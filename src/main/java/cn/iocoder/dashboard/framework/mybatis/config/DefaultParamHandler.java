@@ -1,31 +1,24 @@
-package cn.iocoder.dashboard.framework.mybatis.core.handle;
+package cn.iocoder.dashboard.framework.mybatis.config;
 
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils;
-import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.Date;
 import java.util.Objects;
 
 /**
  * 通用参数填充实现类
- * <p>
+ *
  * 如果没有显式的对通用参数进行赋值，这里会对通用参数进行填充、赋值
  *
  * @author hexiaowu
  */
 @Component
-@Slf4j
-public class DefaultDBFieldHandler implements MetaObjectHandler {
-    @Resource
-    SysUserService userService;
+public class DefaultParamHandler implements MetaObjectHandler {
 
     @Override
     public void insertFill(MetaObject metaObject) {
@@ -55,11 +48,9 @@ public class DefaultDBFieldHandler implements MetaObjectHandler {
 
     @Override
     public void updateFill(MetaObject metaObject) {
-        log.error("进来更新");
         Object modifyTime = getFieldValByName("updateTime", metaObject);
         Object modifier = getFieldValByName("updater", metaObject);
         // 获取登录用户信息
-        // TODO 获取不到 username
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
 
         // 更新时间为空，则以当前时间为更新时间
@@ -68,9 +59,7 @@ public class DefaultDBFieldHandler implements MetaObjectHandler {
         }
         // 当前登录用户不为空，更新人为空，则当前登录用户为更新人
         if (Objects.nonNull(loginUser) && Objects.isNull(modifier)) {
-            Long id = loginUser.getId();
-            SysUserDO user = userService.getUser(id);
-            setFieldValByName("updater", user.getUsername(), metaObject);
+            setFieldValByName("updater", loginUser.getId(), metaObject);
         }
     }
 }
