@@ -22,7 +22,7 @@ public class BaseDO implements Serializable {
     /**
      * 最后更新时间
      */
-    @TableField(fill = FieldFill.UPDATE)
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
     /**
      * 创建者
@@ -32,7 +32,7 @@ public class BaseDO implements Serializable {
     /**
      * 更新者
      */
-    @TableField(fill = FieldFill.UPDATE)
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String updater;
     /**
      * 是否删除
