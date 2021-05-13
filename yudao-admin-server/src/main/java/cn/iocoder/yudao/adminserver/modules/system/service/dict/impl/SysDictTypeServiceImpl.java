@@ -115,6 +115,10 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
 
     @VisibleForTesting
     public void checkDictTypeUnique(Long id, String type) {
+        // 判断type是否为空，减少一次查询数据库的操作
+        if (type == null) {
+            return;
+        }
         SysDictTypeDO dictType = dictTypeMapper.selectByType(type);
         if (dictType == null) {
             return;

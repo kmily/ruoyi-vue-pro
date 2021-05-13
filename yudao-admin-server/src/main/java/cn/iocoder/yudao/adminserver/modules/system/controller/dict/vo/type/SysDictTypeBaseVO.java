@@ -23,6 +23,11 @@ public class SysDictTypeBaseVO {
     @NotNull(message = "状态不能为空")
     private Integer status;
 
+    @ApiModelProperty(value = "字典类型", required = true)
+    @NotNull(message = "字典类型不能为空")
+    @Size(max = 100, message = "字典类型长度不能超过100个字符")
+    private String type;
+
     @ApiModelProperty(value = "备注", example = "快乐的备注")
     private String remark;
 
