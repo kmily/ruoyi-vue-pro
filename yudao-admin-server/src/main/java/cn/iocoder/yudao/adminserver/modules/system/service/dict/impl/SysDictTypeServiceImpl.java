@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.dict.impl;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dict.vo.type.SysDictTypeCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dict.vo.type.SysDictTypeExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dict.vo.type.SysDictTypePageReqVO;
@@ -10,14 +9,15 @@ import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dict.SysDictTy
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.dict.SysDictTypeMapper;
 import cn.iocoder.yudao.adminserver.modules.system.service.dict.SysDictDataService;
 import cn.iocoder.yudao.adminserver.modules.system.service.dict.SysDictTypeService;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.*;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
  * 字典类型 Service 实现类
@@ -66,10 +66,13 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
     @Override
     public void updateDictType(SysDictTypeUpdateReqVO reqVO) {
         // 校验正确性
-        this.checkCreateOrUpdate(reqVO.getId(), reqVO.getName(), null);
+        SysDictTypeDO sysDictTypeDO = this.checkCreateOrUpdate(reqVO.getId(), reqVO.getName(), null);
         // 更新字典类型
         SysDictTypeDO updateObj = SysDictTypeConvert.INSTANCE.convert(reqVO);
         dictTypeMapper.updateById(updateObj);
+        // 更新字典数据,并更新缓存中的字典值
+        dictDataService.updateDictDataType(sysDictTypeDO.getType(), reqVO.getType());
+        dictDataService.refreshDictData();
     }
 
     @Override
@@ -89,13 +92,14 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
         return dictTypeMapper.selectList();
     }
 
-    private void checkCreateOrUpdate(Long id, String name, String type) {
+    private SysDictTypeDO checkCreateOrUpdate(Long id, String name, String type) {
         // 校验自己存在
-        checkDictTypeExists(id);
+        SysDictTypeDO sysDictTypeDO = checkDictTypeExists(id);
         // 校验字典类型的名字的唯一性
         checkDictTypeNameUnique(id, name);
         // 校验字典类型的类型的唯一性
         checkDictTypeUnique(id, type);
+        return sysDictTypeDO;
     }
 
     @VisibleForTesting
@@ -115,6 +119,10 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
 
     @VisibleForTesting
     public void checkDictTypeUnique(Long id, String type) {
+        // 判断type是否为空，减少一次查询数据库的操作
+        if (type == null) {
+            return;
+        }
         SysDictTypeDO dictType = dictTypeMapper.selectByType(type);
         if (dictType == null) {
             return;
