@@ -38,6 +38,19 @@ public interface SysDictDataService extends DictDataFrameworkService {
     void updateDictData(SysDictDataUpdateReqVO reqVO);
 
     /**
+     * 手动更新字典数据
+     */
+
+    void refreshDictData();
+    /**
+     * 更新字典类型
+     *
+     * @param oldType 旧字典类型
+     * @param newType 新字典类型
+     */
+    void updateDictDataType(String oldType, String newType);
+
+    /**
      * 删除字典数据
      *
      * @param id 字典数据编号

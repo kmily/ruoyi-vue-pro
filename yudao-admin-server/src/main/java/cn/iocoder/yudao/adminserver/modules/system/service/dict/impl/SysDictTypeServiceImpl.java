@@ -10,6 +10,7 @@ import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dict.SysDictTy
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.dict.SysDictTypeMapper;
 import cn.iocoder.yudao.adminserver.modules.system.service.dict.SysDictDataService;
 import cn.iocoder.yudao.adminserver.modules.system.service.dict.SysDictTypeService;
+import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
 
@@ -66,10 +67,13 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
     @Override
     public void updateDictType(SysDictTypeUpdateReqVO reqVO) {
         // 校验正确性
-        this.checkCreateOrUpdate(reqVO.getId(), reqVO.getName(), null);
+        SysDictTypeDO sysDictTypeDO = this.checkCreateOrUpdate(reqVO.getId(), reqVO.getName(), null);
         // 更新字典类型
         SysDictTypeDO updateObj = SysDictTypeConvert.INSTANCE.convert(reqVO);
         dictTypeMapper.updateById(updateObj);
+        // 更新字典数据,并更新缓存中的字典值
+        dictDataService.updateDictDataType(sysDictTypeDO.getType(), reqVO.getType());
+        dictDataService.refreshDictData();
     }
 
     @Override
@@ -89,13 +93,14 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
         return dictTypeMapper.selectList();
     }
 
-    private void checkCreateOrUpdate(Long id, String name, String type) {
+    private SysDictTypeDO checkCreateOrUpdate(Long id, String name, String type) {
         // 校验自己存在
-        checkDictTypeExists(id);
+        SysDictTypeDO sysDictTypeDO = checkDictTypeExists(id);
         // 校验字典类型的名字的唯一性
         checkDictTypeNameUnique(id, name);
         // 校验字典类型的类型的唯一性
         checkDictTypeUnique(id, type);
+        return sysDictTypeDO;
     }
 
     @VisibleForTesting

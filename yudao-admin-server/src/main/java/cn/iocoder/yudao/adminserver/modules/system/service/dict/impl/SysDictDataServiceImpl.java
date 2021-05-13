@@ -16,6 +16,7 @@ import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.dict.SysDictDataMap
 import cn.iocoder.yudao.adminserver.modules.system.mq.producer.dict.SysDictDataProducer;
 import cn.iocoder.yudao.adminserver.modules.system.service.dict.SysDictDataService;
 import cn.iocoder.yudao.adminserver.modules.system.service.dict.SysDictTypeService;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableTable;
 import lombok.extern.slf4j.Slf4j;
@@ -175,6 +176,21 @@ public class SysDictDataServiceImpl implements SysDictDataService {
         dictDataMapper.updateById(updateObj);
         // 发送刷新消息
         dictDataProducer.sendDictDataRefreshMessage();
+    }
+
+    @Override
+    public void refreshDictData() {
+        initLocalCache();
+    }
+
+    @Override
+    public void updateDictDataType(String oldType, String newType) {
+        if (oldType == null || newType == null) {
+            return;
+        }
+        dictDataMapper.update(new SysDictDataDO(), new LambdaUpdateWrapper<SysDictDataDO>()
+            .set(SysDictDataDO::getDictType, newType)
+            .eq(SysDictDataDO::getDictType, oldType));
     }
 
     @Override
