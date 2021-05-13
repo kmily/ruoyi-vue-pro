@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.dict.impl;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dict.vo.type.SysDictTypeCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dict.vo.type.SysDictTypeExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dict.vo.type.SysDictTypePageReqVO;
@@ -10,15 +9,15 @@ import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dict.SysDictTy
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.dict.SysDictTypeMapper;
 import cn.iocoder.yudao.adminserver.modules.system.service.dict.SysDictDataService;
 import cn.iocoder.yudao.adminserver.modules.system.service.dict.SysDictTypeService;
-import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.*;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
  * 字典类型 Service 实现类
