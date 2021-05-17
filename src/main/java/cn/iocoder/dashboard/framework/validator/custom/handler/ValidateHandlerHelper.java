@@ -31,6 +31,7 @@ public class ValidateHandlerHelper {
         handlerSet.add(new NotBlankHandler());
         handlerSet.add(new MaxHandler());
         handlerSet.add(new MinHandler());
+        handlerSet.add(new SizeHandler());
     }
 
 
