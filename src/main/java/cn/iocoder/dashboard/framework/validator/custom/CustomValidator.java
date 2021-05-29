@@ -1,7 +1,6 @@
 package cn.iocoder.dashboard.framework.validator.custom;
 
 import cn.hutool.core.util.ArrayUtil;
-import cn.iocoder.dashboard.framework.validator.custom.handler.ValidateHandlerHelper;
 import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.SneakyThrows;

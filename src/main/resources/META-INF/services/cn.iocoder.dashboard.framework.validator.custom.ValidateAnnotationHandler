@@ -1,0 +1,6 @@
+cn.iocoder.dashboard.framework.validator.custom.handler.MaxHandler
+cn.iocoder.dashboard.framework.validator.custom.handler.MinHandler
+cn.iocoder.dashboard.framework.validator.custom.handler.NotBlankHandler
+cn.iocoder.dashboard.framework.validator.custom.handler.NotEmptyHandler
+cn.iocoder.dashboard.framework.validator.custom.handler.NotNullHandler
+cn.iocoder.dashboard.framework.validator.custom.handler.SizeHandler

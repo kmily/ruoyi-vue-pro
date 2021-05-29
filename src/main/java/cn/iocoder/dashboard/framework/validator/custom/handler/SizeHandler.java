@@ -1,8 +1,10 @@
 package cn.iocoder.dashboard.framework.validator.custom.handler;
 
+import cn.iocoder.dashboard.framework.validator.custom.ValidateAnnotationHandler;
 import org.slf4j.helpers.MessageFormatter;
 
 import javax.validation.constraints.Size;
+import java.util.Objects;
 
 /**
  * <p>长度校验处理类
@@ -28,6 +30,10 @@ public class SizeHandler implements ValidateAnnotationHandler<Size> {
 
     @Override
     public String validate(Size validateAnnotation, Object fieldValue) {
+        if (Objects.isNull(fieldValue)) {
+            return null;
+        }
+
         if (fieldValue.toString().length() > validateAnnotation.max()) {
             return MessageFormatter.format(VALUE_GT, fieldValue).getMessage();
         }

@@ -1,10 +1,12 @@
 package cn.iocoder.dashboard.framework.validator.custom.handler;
 
+import cn.iocoder.dashboard.framework.validator.custom.ValidateAnnotationHandler;
 import org.slf4j.helpers.MessageFormatter;
 
 import javax.validation.constraints.Max;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * 最大值校验处理类
@@ -23,6 +25,10 @@ public class MaxHandler implements ValidateAnnotationHandler<Max> {
 
     @Override
     public String validate(Max validateAnnotation, Object fieldValue) {
+        if (Objects.isNull(fieldValue)) {
+            return null;
+        }
+
         long value = validateAnnotation.value();
         boolean valid;
         if (fieldValue instanceof Integer) {

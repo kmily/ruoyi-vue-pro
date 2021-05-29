@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.framework.validator.custom.handler;
+package cn.iocoder.dashboard.framework.validator.custom;
 
 import cn.hutool.core.util.ReflectUtil;
 
@@ -17,6 +17,7 @@ public interface ValidateAnnotationHandler<T extends Annotation> {
 
     /**
      * 获取实现类的具体的注解类对象
+     * @return T
      */
     Class<T> getAnnotation();
 
