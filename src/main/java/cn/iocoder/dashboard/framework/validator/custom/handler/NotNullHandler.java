@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.framework.validator.custom.handler;
 
 import cn.hutool.core.util.ObjectUtil;
-import org.springframework.beans.factory.annotation.Value;
+import cn.iocoder.dashboard.framework.validator.custom.ValidateAnnotationHandler;
 
 import javax.validation.constraints.NotNull;
 

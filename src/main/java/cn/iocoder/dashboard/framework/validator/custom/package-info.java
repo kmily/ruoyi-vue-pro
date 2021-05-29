@@ -6,8 +6,8 @@ package cn.iocoder.dashboard.framework.validator.custom;
  * 功能说明：https://blog.csdn.net/qq_38688267/article/details/115720412
  * <p>
  * 环境搭建：
- * 1、实现{@link cn.iocoder.dashboard.framework.validator.custom.handler.ValidateAnnotationHandler}
- * 2、将实现类注册到{@link cn.iocoder.dashboard.framework.validator.custom.handler.ValidateHandlerHelper}中
+ * 1、实现{@link cn.iocoder.dashboard.framework.validator.custom.ValidateAnnotationHandler}
+ * 2、将实现类注册到{@link cn.iocoder.dashboard.framework.validator.custom.ValidateHandlerHelper}中
  * 3、实现全局异常拦截{@link javax.validation.ConstraintViolationException}异常
  *
  * 使用步骤：
