@@ -52,6 +52,11 @@
         <aliyun-java-sdk-core.version>4.5.18</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.1.0</aliyun-java-sdk-dysmsapi.version>
         <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
+
+        <!-- 导出相关 -->
+        <openhtmltopdf.version>1.0.8</openhtmltopdf.version>
+        <jsoup.version>1.13.1</jsoup.version>
+        <doc4j.import.xhtml.version>8.2.1</doc4j.import.xhtml.version>
     </properties>
 
     <dependencyManagement>
@@ -87,7 +92,11 @@
                 <artifactId>yudao-spring-boot-starter-biz-sms</artifactId>
                 <version>${revision}</version>
             </dependency>
-
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-biz-export</artifactId>
+                <version>${revision}</version>
+            </dependency>
             <!-- Spring 核心 -->
             <dependency>
                 <!-- 用于生成自定义的 Spring @ConfigurationProperties 配置类的说明文件 -->
@@ -396,6 +405,40 @@
                 <version>${aliyun-java-sdk-dysmsapi.version}</version>
             </dependency>
             <!-- SMS SDK end -->
+
+            <!-- export begin -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-freemarker</artifactId>
+                <version>${spring.boot.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.openhtmltopdf</groupId>
+                <artifactId>openhtmltopdf-pdfbox</artifactId>
+                <version>${openhtmltopdf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>${jsoup.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.docx4j</groupId>
+                <artifactId>docx4j-ImportXHTML</artifactId>
+                <version>${doc4j.import.xhtml.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>openhtmltopdf-pdfbox</artifactId>
+                        <groupId>com.openhtmltopdf</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>openhtmltopdf-core</artifactId>
+                        <groupId>com.openhtmltopdf</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!-- export end -->
         </dependencies>
     </dependencyManagement>
 

@@ -1,18 +1,24 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.notice.impl;
 
-import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.system.controller.notice.vo.SysNoticeCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.notice.vo.SysNoticePageReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.notice.vo.SysNoticeUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.convert.notice.SysNoticeConvert;
-import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.notice.SysNoticeMapper;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.notice.SysNoticeDO;
+import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.notice.SysNoticeMapper;
 import cn.iocoder.yudao.adminserver.modules.system.service.notice.SysNoticeService;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.export.service.TemplateExportPdfService;
+import cn.iocoder.yudao.framework.export.service.TemplateExportWordService;
 import com.google.common.annotations.VisibleForTesting;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Entities;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.OutputStream;
 
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.NOTICE_NOT_FOUND;
 
@@ -26,6 +32,12 @@ public class SysNoticeServiceImpl implements SysNoticeService {
 
     @Resource
     private SysNoticeMapper noticeMapper;
+
+    @Resource
+    private TemplateExportPdfService exportPdfService;
+
+    @Resource
+    private TemplateExportWordService exportWordService;
 
     @Override
     public Long createNotice(SysNoticeCreateReqVO reqVO) {
@@ -59,6 +71,33 @@ public class SysNoticeServiceImpl implements SysNoticeService {
     @Override
     public SysNoticeDO getNotice(Long id) {
         return noticeMapper.selectById(id);
+    }
+
+
+    @Override
+    public void exportPdf(Long id, OutputStream outputStream) {
+        // 校验是否存在
+        checkNoticeExists(id);
+        final SysNoticeDO sysNoticeDO = noticeMapper.selectById(id);
+        final String content = sysNoticeDO.getContent();
+        Document doc = Jsoup.parse(content);
+        doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml).escapeMode(Entities.EscapeMode.xhtml);
+        //html 转化 xhtml
+        sysNoticeDO.setContent(doc.getElementsByTag("body").html());
+        exportPdfService.exportPdf(outputStream, sysNoticeDO, "notice.ftl");
+    }
+
+    @Override
+    public void exportWord(Long id, OutputStream outputStream) {
+        // 校验是否存在
+        checkNoticeExists(id);
+        final SysNoticeDO sysNoticeDO = noticeMapper.selectById(id);
+        final String content = sysNoticeDO.getContent();
+        Document doc = Jsoup.parse(content);
+        doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml).escapeMode(Entities.EscapeMode.xhtml);
+        //html 转化 xhtml
+        sysNoticeDO.setContent(doc.getElementsByTag("body").html());
+        exportWordService.exportWord(outputStream, sysNoticeDO,"notice.ftl");
     }
 
     @VisibleForTesting
