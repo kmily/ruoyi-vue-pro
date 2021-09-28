@@ -2,17 +2,21 @@ package cn.iocoder.yudao.framework.apilog.core.filter;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
-import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.apilog.core.service.ApiAccessLogFrameworkService;
 import cn.iocoder.yudao.framework.apilog.core.service.dto.ApiAccessLogCreateDTO;
-import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
-import cn.iocoder.yudao.framework.web.config.WebProperties;
-import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
+import cn.iocoder.yudao.framework.common.config.util.InfConfigUtil;
+import cn.iocoder.yudao.framework.common.enums.ConfigKeyConstants;
+import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.web.config.WebProperties;
+import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -24,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
+
 
 /**
  * API 访问日志 Filter
@@ -57,11 +62,17 @@ public class ApiAccessLogFilter extends OncePerRequestFilter {
         try {
             // 继续过滤器
             filterChain.doFilter(request, response);
-            // 正常执行，记录日志
-            createApiAccessLog(request, beginTim, queryString, requestBody, null);
+            // api log 开关
+            if(InfConfigUtil.apiLogEnable()){
+                // 正常执行，记录日志
+                createApiAccessLog(request, beginTim, queryString, requestBody, null);
+            }
         } catch (Exception ex) {
-            // 异常执行，记录日志
-            createApiAccessLog(request, beginTim, queryString, requestBody, ex);
+            // api log异常日志开关
+            if(InfConfigUtil.apiErrorLogEnable()){
+                // 异常执行，记录日志
+                createApiAccessLog(request, beginTim, queryString, requestBody, ex);
+            }
             throw ex;
         }
     }

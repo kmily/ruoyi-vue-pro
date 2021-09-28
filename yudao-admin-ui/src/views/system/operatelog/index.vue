@@ -36,6 +36,10 @@
         <el-button type="warning" icon="el-icon-download" size="mini" @click="handleExport"
                    v-hasPermi="['system:operate-log:export']">导出</el-button>
       </el-col>
+      <el-col :span="1.5">
+        <log-switch :config-key="InfConfigKeyEnum.OPERATE_LOG_KEY"  open-text="开启操作日志" close-text="关闭操作日志"
+        :permissions="['infra:api-access-log:export']"/>
+      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 

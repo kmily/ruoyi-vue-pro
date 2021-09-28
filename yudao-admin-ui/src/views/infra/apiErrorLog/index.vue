@@ -40,6 +40,10 @@
         <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport"
                    v-hasPermi="['infra:api-error-log:export']">导出</el-button>
       </el-col>
+      <el-col :span="1.5">
+        <log-switch :config-key="InfConfigKeyEnum.API_ERROR_LOG_KEY" 
+        :permissions="['infra:api-access-log:export']" open-text="开启异常日志" close-text="关闭异常日志"/>
+      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 

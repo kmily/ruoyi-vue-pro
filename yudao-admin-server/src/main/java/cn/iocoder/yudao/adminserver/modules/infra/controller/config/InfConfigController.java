@@ -1,13 +1,15 @@
 package cn.iocoder.yudao.adminserver.modules.infra.controller.config;
 
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.config.vo.*;
 import cn.iocoder.yudao.adminserver.modules.infra.convert.config.InfConfigConvert;
 import cn.iocoder.yudao.adminserver.modules.infra.dal.dataobject.config.InfConfigDO;
 import cn.iocoder.yudao.adminserver.modules.infra.service.config.InfConfigService;
+import cn.iocoder.yudao.framework.common.config.enums.InfConfigEnum;
+import cn.iocoder.yudao.framework.common.config.util.InfConfigUtil;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -18,13 +20,15 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
+import static cn.iocoder.yudao.adminserver.modules.infra.enums.InfErrorCodeConstants.CONFIG_GET_VALUE_ERROR_IF_SENSITIVE;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
-import static cn.iocoder.yudao.adminserver.modules.infra.enums.InfErrorCodeConstants.CONFIG_GET_VALUE_ERROR_IF_SENSITIVE;
 
 @Api(tags = "参数配置")
 @RestController
@@ -67,13 +71,28 @@ public class InfConfigController {
         return success(InfConfigConvert.INSTANCE.convert(configService.getConfig(id)));
     }
 
+
+    @PutMapping("/update-value-by-key")
+    @ApiOperation(value = "根据参数键名修改参数值")
+    @PreAuthorize("@ss.hasPermission('infra:config:updateValueByKey')")
+    public CommonResult<Boolean> updateValueByKey(@NotBlank(message = "key 不允许为空") String key, String value) {
+        configService.updateValueByKey(key,value);
+        return success(true);
+    }
+
+
     @GetMapping(value = "/get-value-by-key")
     @ApiOperation(value = "根据参数键名查询参数值", notes = "敏感配置，不允许返回给前端")
     @ApiImplicitParam(name = "key", value = "参数键", required = true, example = "yunai.biz.username", dataTypeClass = String.class)
     public CommonResult<String> getConfigKey(@RequestParam("key") String key) {
         InfConfigDO config = configService.getConfigByKey(key);
         if (config == null) {
-            return null;
+            InfConfigEnum initConfigEnum = InfConfigUtil.getInitConfigEnum(key);
+            if(Objects.nonNull(initConfigEnum)){
+                config = InfConfigConvert.INSTANCE.convert(initConfigEnum);
+            }else{
+                return null;
+            }
         }
         if (config.getSensitive()) {
             throw exception(CONFIG_GET_VALUE_ERROR_IF_SENSITIVE);

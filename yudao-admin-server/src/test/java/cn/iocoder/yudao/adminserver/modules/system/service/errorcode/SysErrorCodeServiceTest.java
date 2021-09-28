@@ -1,9 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.errorcode;
 
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.adminserver.modules.tool.framework.errorcode.core.dto.ErrorCodeAutoGenerateReqDTO;
-import cn.iocoder.yudao.adminserver.modules.infra.enums.config.InfConfigTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.controller.errorcode.vo.SysErrorCodeCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.errorcode.vo.SysErrorCodeExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.errorcode.vo.SysErrorCodePageReqVO;
@@ -12,6 +9,9 @@ import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.errorcode.SysE
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.errorcode.SysErrorCodeMapper;
 import cn.iocoder.yudao.adminserver.modules.system.enums.errorcode.SysErrorCodeTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.errorcode.impl.SysErrorCodeServiceImpl;
+import cn.iocoder.yudao.adminserver.modules.tool.framework.errorcode.core.dto.ErrorCodeAutoGenerateReqDTO;
+import cn.iocoder.yudao.framework.common.config.enums.InfConfigTypeEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import org.assertj.core.util.Lists;
@@ -27,9 +27,9 @@ import java.util.function.Consumer;
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.ERROR_CODE_DUPLICATE;
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.ERROR_CODE_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 

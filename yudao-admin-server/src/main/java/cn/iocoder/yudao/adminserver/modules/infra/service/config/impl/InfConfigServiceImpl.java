@@ -1,25 +1,27 @@
 package cn.iocoder.yudao.adminserver.modules.infra.service.config.impl;
 
-import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.config.vo.InfConfigCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.config.vo.InfConfigExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.config.vo.InfConfigPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.config.vo.InfConfigUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.infra.convert.config.InfConfigConvert;
-import cn.iocoder.yudao.adminserver.modules.infra.dal.mysql.config.InfConfigMapper;
 import cn.iocoder.yudao.adminserver.modules.infra.dal.dataobject.config.InfConfigDO;
-import cn.iocoder.yudao.adminserver.modules.infra.enums.config.InfConfigTypeEnum;
+import cn.iocoder.yudao.adminserver.modules.infra.dal.mysql.config.InfConfigMapper;
 import cn.iocoder.yudao.adminserver.modules.infra.mq.producer.config.InfConfigProducer;
 import cn.iocoder.yudao.adminserver.modules.infra.service.config.InfConfigService;
+import cn.iocoder.yudao.framework.common.config.enums.InfConfigEnum;
+import cn.iocoder.yudao.framework.common.config.enums.InfConfigTypeEnum;
+import cn.iocoder.yudao.framework.common.config.util.InfConfigUtil;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-
 import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.adminserver.modules.infra.enums.InfErrorCodeConstants.*;
 
@@ -57,6 +59,30 @@ public class InfConfigServiceImpl implements InfConfigService {
         // 更新参数配置
         InfConfigDO updateObj = InfConfigConvert.INSTANCE.convert(reqVO);
         configMapper.updateById(updateObj);
+        // 发送刷新消息
+        configProducer.sendConfigRefreshMessage();
+    }
+
+    @Override
+    public void updateValueByKey(String key, String value) {
+        InfConfigDO config = configMapper.selectByKey(key);
+        if (Objects.isNull(config)) {
+            InfConfigEnum initConfigEnum = InfConfigUtil.getInitConfigEnum(key);
+            if(Objects.isNull(initConfigEnum)){
+                throw ServiceExceptionUtil.exception(CONFIG_NOT_EXISTS);
+            }else{
+                //初始化配置
+                InfConfigDO convert = InfConfigConvert.INSTANCE.convert(initConfigEnum);
+                convert.setValue(value);
+                configMapper.insert(convert);
+            }
+        }else {
+            InfConfigDO updateDo = new InfConfigDO();
+            updateDo.setId(config.getId());
+            updateDo.setValue(value);
+            configMapper.updateById(updateDo);
+        }
+
         // 发送刷新消息
         configProducer.sendConfigRefreshMessage();
     }

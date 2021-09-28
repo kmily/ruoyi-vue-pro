@@ -33,6 +33,13 @@ public interface InfConfigService {
     void updateConfig(@Valid InfConfigUpdateReqVO reqVO);
 
     /**
+     * 根据key修改value
+     * @param key
+     * @param value
+     */
+    void updateValueByKey(String key,String value);
+
+    /**
      * 删除参数配置
      *
      * @param id 配置编号
@@ -70,6 +77,8 @@ public interface InfConfigService {
      * @return 列表
      */
     List<InfConfigDO> getConfigList(@Valid InfConfigExportReqVO reqVO);
+
+
 
 
 }

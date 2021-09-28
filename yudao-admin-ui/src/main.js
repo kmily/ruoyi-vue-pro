@@ -33,11 +33,14 @@ import {
 import Pagination from "@/components/Pagination";
 // 自定义表格工具扩展
 import RightToolbar from "@/components/RightToolbar"
+
+import LogSwitch from "@/components/LogSwitch";
+
 // 代码高亮插件
 // import hljs from 'highlight.js'
 // import 'highlight.js/styles/github-gist.css'
 import {DICT_TYPE, getDictDataLabel, getDictDatas} from "@/utils/dict";
-
+import { InfConfigKeyEnum } from '@/utils/constants';
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts
 Vue.prototype.getConfigKey = getConfigKey
@@ -49,6 +52,7 @@ Vue.prototype.selectDictLabel = selectDictLabel
 Vue.prototype.getDictDatas = getDictDatas
 Vue.prototype.getDictDataLabel = getDictDataLabel
 Vue.prototype.DICT_TYPE = DICT_TYPE
+Vue.prototype.InfConfigKeyEnum = InfConfigKeyEnum
 Vue.prototype.download = download
 Vue.prototype.downloadExcel = downloadExcel
 Vue.prototype.downloadWord = downloadWord
@@ -72,6 +76,7 @@ Vue.prototype.msgInfo = function (msg) {
 // 全局组件挂载
 Vue.component('Pagination', Pagination)
 Vue.component('RightToolbar', RightToolbar)
+Vue.component('LogSwitch', LogSwitch)
 
 Vue.use(permission)
 // Vue.use(hljs.vuePlugin);

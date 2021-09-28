@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.apollo.spring.boot;
 
 import cn.iocoder.yudao.framework.apollo.core.ConfigConsts;
+import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.base.Strings;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;

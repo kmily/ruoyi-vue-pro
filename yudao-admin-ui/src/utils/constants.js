@@ -66,3 +66,12 @@ export const InfApiErrorLogProcessStatusEnum = {
   DONE: 1, // 已处理
   IGNORE: 2, // 已忽略
 }
+
+/**
+ * 
+ */
+export const InfConfigKeyEnum = {
+  API_LOG_KEY: 'yudao.web.api.log.enable', 
+  API_ERROR_LOG_KEY: 'yudao.web.api.error.log.enable', 
+  OPERATE_LOG_KEY: 'yudao.operate.log.enable', 
+}

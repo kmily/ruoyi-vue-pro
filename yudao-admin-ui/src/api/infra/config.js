@@ -43,6 +43,15 @@ export function updateConfig(data) {
   })
 }
 
+// 修改参数配置
+export function updateValueByKey(data) {
+  return request({
+    url: '/infra/config/update-value-by-key',
+    method: 'put',
+    data: data
+  })
+}
+
 // 删除参数配置
 export function delConfig(configId) {
   return request({

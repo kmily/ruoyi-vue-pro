@@ -40,6 +40,10 @@
         <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport"
                    v-hasPermi="['infra:api-access-log:export']">导出</el-button>
       </el-col>
+      <el-col :span="1.5">
+        <log-switch :config-key="InfConfigKeyEnum.API_LOG_KEY" 
+        :permissions="['infra:api-access-log:export']" open-text="开启日志" close-text="关闭日志"/>
+      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -114,11 +118,8 @@
 
 <script>
 import { getApiAccessLogPage, exportApiAccessLogExcel } from "@/api/infra/apiAccessLog";
-
 export default {
   name: "ApiAccessLog",
-  components: {
-  },
   data() {
     return {
       // 遮罩层

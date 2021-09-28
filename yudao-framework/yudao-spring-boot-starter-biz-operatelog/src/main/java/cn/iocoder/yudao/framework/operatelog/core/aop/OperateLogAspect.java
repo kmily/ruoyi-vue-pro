@@ -4,6 +4,8 @@ import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
+import cn.iocoder.yudao.framework.common.config.util.InfConfigUtil;
+import cn.iocoder.yudao.framework.common.enums.ConfigKeyConstants;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.operatelog.core.dto.OperateLogCreateReqDTO;
@@ -21,6 +23,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -86,6 +89,10 @@ public class OperateLogAspect {
         try {
             // 执行原有方法
             Object result = joinPoint.proceed();
+            // 是否记录操作日志
+            if(!InfConfigUtil.operateLogEnable()){
+                return result;
+            }
             // 记录正常执行时的操作日志
             this.log(joinPoint, operateLog, apiOperation, startTime, result, null);
             return result;

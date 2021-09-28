@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.infra.convert.config;
 
+import cn.iocoder.yudao.framework.common.config.enums.InfConfigEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.config.vo.InfConfigCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.config.vo.InfConfigExcelVO;
@@ -23,6 +24,8 @@ public interface InfConfigConvert {
     InfConfigDO convert(InfConfigCreateReqVO bean);
 
     InfConfigDO convert(InfConfigUpdateReqVO bean);
+
+    InfConfigDO convert(InfConfigEnum bean);
 
     List<InfConfigExcelVO> convertList(List<InfConfigDO> list);
 
