@@ -99,4 +99,14 @@ public class SysUserProfileController {
         return success(true);
     }
 
+    @PutMapping("/avatar")
+    @ApiOperation("修改用户头像")
+    public CommonResult<Boolean> updateAvatar(@RequestParam("avatarFile") MultipartFile file) throws IOException{
+        if (file.isEmpty()) {
+            throw ServiceExceptionUtil.exception(FILE_IS_EMPTY);
+        }
+        userService.updateAvatar(getLoginUserId(),file.getInputStream());
+        return success(true);
+    }
+
 }

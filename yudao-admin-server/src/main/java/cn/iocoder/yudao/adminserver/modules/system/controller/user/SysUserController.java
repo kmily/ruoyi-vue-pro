@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.system.controller.user;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -32,6 +33,7 @@ import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Api(tags = "用户")
 @RestController
@@ -171,4 +173,18 @@ public class SysUserController {
         return success(userService.importUsers(list, updateSupport));
     }
 
+    @PutMapping("/update-nick-name")
+    @ApiOperation("修改用户昵称")
+    @PreAuthorize("@ss.hasPermission('system:user:update')")
+    public CommonResult<Boolean> updateNickName(@Valid @RequestBody SysUserProfileUpdateReqVO reqVO) {
+        userService.updateNickName(getLoginUserId(), reqVO.getNickname());
+        return success(true);
+    }
+
+    @GetMapping("/get-user-info")
+    @ApiOperation("获取用户信息：头像+昵称")
+    @PreAuthorize("@ss.hasPermission('system:user:query')")
+    public CommonResult<SysUserDO> getUserInfo(){
+        return success(userService.getUserInfo(getLoginUserId()));
+    }
 }

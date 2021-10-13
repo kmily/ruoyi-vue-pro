@@ -1,15 +1,10 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.user;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserExportReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserImportExcelVO;
-import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserImportRespVO;
-import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 
@@ -166,4 +161,24 @@ public interface SysUserService {
      */
     SysUserImportRespVO importUsers(List<SysUserImportExcelVO> importUsers, boolean isUpdateSupport);
 
+    /**
+     * 修改用户昵称
+     * @param loginUserId 用户id
+     * @param newNickname 用户新昵称
+     */
+    void updateNickName(Long loginUserId, String newNickname);
+
+    /**
+     * 修改用户头像
+     * @param loginUserId 用户id
+     * @param inputStream 文件
+     */
+    void updateAvatar(Long loginUserId, InputStream inputStream);
+
+    /**
+     * 获取当前登录用户头像与昵称
+     * @return 用户实体类，仅包含头像于昵称两项
+     * @param loginUserId 用户id
+     */
+    SysUserDO getUserInfo(Long loginUserId);
 }

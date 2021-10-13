@@ -370,4 +370,46 @@ public class SysUserServiceImpl implements SysUserService {
         return respVO;
     }
 
+    @Override
+    public void updateNickName(Long loginUserId, String newNickname) {
+        this.checkUserExists(loginUserId);
+
+        SysUserDO sysUserDO = new SysUserDO();
+        sysUserDO.setId(loginUserId);
+        sysUserDO.setNickname(newNickname);
+        userMapper.updateById(sysUserDO);
+    }
+
+    @Override
+    public void updateAvatar(Long loginUserId, InputStream avatarFile) {
+        SysUserDO sysUserDO = userMapper.selectById(loginUserId);
+        if (sysUserDO == null){
+            throw exception(USER_NOT_EXISTS);
+        }
+        // 判断是否第一次上传头像
+        if (sysUserDO.getAvatar().isEmpty()) {
+            this.updateUserAvatar(loginUserId,avatarFile);
+            return;
+        }
+
+        // 删除旧文件
+        String url = sysUserDO.getAvatar();
+        String AvatarName = url.substring(url.lastIndexOf("/")+1);
+        fileService.deleteFile(AvatarName);
+
+        // 存储文件
+        String avatar = fileService.createFile(IdUtil.fastUUID(), IoUtil.readBytes(avatarFile));
+        sysUserDO.setAvatar(avatar);
+        userMapper.updateById(sysUserDO);
+    }
+
+    @Override
+    public SysUserDO getUserInfo(Long loginUserId) {
+        SysUserDO sysUserDO = userMapper.selectById(loginUserId);
+
+        SysUserDO user = new SysUserDO();
+        user.setNickname(sysUserDO.getNickname());
+        user.setAvatar(sysUserDO.getAvatar());
+        return user;
+    }
 }

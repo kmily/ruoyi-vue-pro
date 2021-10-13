@@ -576,6 +576,28 @@ public class SysUserServiceImplTest extends BaseDbUnitTest {
         verify(passwordEncoder, times(1)).matches(eq(oldPassword), eq(user.getPassword()));
     }
 
+    @Test
+    public void test_update_nick_name() {
+        // 准备数据
+        SysUserDO user = randomSysUserDO();
+        userMapper.insert(user);
+        System.out.println("=====>"+user);
+        // 调用测试
+        userService.updateNickName(user.getId(), randomString());
+
+        System.out.println(userMapper.selectById(user.getId()));
+    }
+
+    @Test
+    public void test_get_user_info() {
+        // 准备数据
+        SysUserDO user = randomSysUserDO();
+        userMapper.insert(user);
+        // 调用测试
+        System.out.println(userService.getUserInfo(user.getId()));
+    }
+
+
     // ========== 随机对象 ==========
 
     @SafeVarargs
