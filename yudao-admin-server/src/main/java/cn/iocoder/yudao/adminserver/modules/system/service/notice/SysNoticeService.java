@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.notice;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.system.controller.notice.vo.SysNoticeCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.notice.vo.SysNoticePageReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.notice.vo.SysNoticeUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.notice.SysNoticeDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+
+import java.io.OutputStream;
 
 /**
  * 通知公告 Service 接口
@@ -49,4 +51,19 @@ public interface SysNoticeService {
      */
     SysNoticeDO getNotice(Long id);
 
+
+    /**
+     * 导出 通知公告 pdf
+     * @param id
+     * @param outputStream
+     */
+    void exportPdf(Long id, OutputStream outputStream);
+
+
+    /**
+     * 导出 通知公告 word
+     * @param id
+     * @param outputStream
+     */
+    void exportWord(Long id, OutputStream outputStream);
 }
