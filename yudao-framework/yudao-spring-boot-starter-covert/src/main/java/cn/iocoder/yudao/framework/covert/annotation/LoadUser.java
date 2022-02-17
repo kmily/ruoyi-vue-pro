@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.framework.covert.annotation;
 
-import cn.iocoder.yudao.framework.covert.handler.params.LongParamsHandler;
-import cn.iocoder.yudao.framework.covert.handler.params.StringParamsHandler;
+import cn.iocoder.yudao.framework.covert.handler.params.UserParamsHandler;
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 
 import java.lang.annotation.*;
@@ -16,7 +15,15 @@ import java.lang.annotation.*;
 @Target({ElementType.FIELD})
 @Inherited
 @JacksonAnnotationsInside
-@Load(bean = "adminUserService", method = "getUser", paramsHandler = LongParamsHandler.class)
+@Load(bean = "adminUserService", method = "loadUsers", paramsHandler = UserParamsHandler.class)
 public @interface LoadUser {
+
+    /**
+     * 是否批量
+     * 如果批量返回集合, 否则返回对象
+     *
+     * @return
+     */
+    boolean batch() default false;
 
 }

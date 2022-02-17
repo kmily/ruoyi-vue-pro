@@ -19,6 +19,8 @@ import cn.iocoder.yudao.module.system.dal.mysql.user.AdminUserMapper;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,7 +66,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     public Long createUser(UserCreateReqVO reqVO) {
         // 校验正确性
         this.checkCreateOrUpdate(null, reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
-            reqVO.getDeptId(), reqVO.getPostIds());
+                reqVO.getDeptId(), reqVO.getPostIds());
         // 插入用户
         AdminUserDO user = UserConvert.INSTANCE.convert(reqVO);
         user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
@@ -77,7 +79,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     public void updateUser(UserUpdateReqVO reqVO) {
         // 校验正确性
         this.checkCreateOrUpdate(reqVO.getId(), reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
-            reqVO.getDeptId(), reqVO.getPostIds());
+                reqVO.getDeptId(), reqVO.getPostIds());
         // 更新用户
         AdminUserDO updateObj = UserConvert.INSTANCE.convert(reqVO);
         userMapper.updateById(updateObj);
@@ -242,7 +244,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             return Collections.emptySet();
         }
         Set<Long> deptIds = CollectionUtils.convertSet(deptService.getDeptsByParentIdFromCache(
-            deptId, true), DeptDO::getId);
+                deptId, true), DeptDO::getId);
         deptIds.add(deptId); // 包括自身
         return deptIds;
     }
@@ -352,12 +354,12 @@ public class AdminUserServiceImpl implements AdminUserService {
             throw exception(USER_IMPORT_LIST_IS_EMPTY);
         }
         UserImportRespVO respVO = UserImportRespVO.builder().createUsernames(new ArrayList<>())
-            .updateUsernames(new ArrayList<>()).failureUsernames(new LinkedHashMap<>()).build();
+                .updateUsernames(new ArrayList<>()).failureUsernames(new LinkedHashMap<>()).build();
         importUsers.forEach(importUser -> {
             // 校验，判断是否有不符合的原因
             try {
                 checkCreateOrUpdate(null, null, importUser.getMobile(), importUser.getEmail(),
-                    importUser.getDeptId(), null);
+                        importUser.getDeptId(), null);
             } catch (ServiceException ex) {
                 respVO.getFailureUsernames().put(importUser.getUsername(), ex.getMessage());
                 return;
@@ -366,7 +368,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             AdminUserDO existUser = userMapper.selectByUsername(importUser.getUsername());
             if (existUser == null) {
                 userMapper.insert(UserConvert.INSTANCE.convert(importUser)
-                    .setPassword(passwordEncoder.encode(userInitPassword))); // 设置默认密码
+                        .setPassword(passwordEncoder.encode(userInitPassword))); // 设置默认密码
                 respVO.getCreateUsernames().add(importUser.getUsername());
                 return;
             }
@@ -388,4 +390,14 @@ public class AdminUserServiceImpl implements AdminUserService {
         return userMapper.selectListByStatus(status);
     }
 
+    @Override
+    public Object loadUsers(Collection<Long> ids, boolean batch) {
+        List<AdminUserDO> users = userMapper.selectBatchIds(ids);
+        LambdaQueryWrapper<AdminUserDO> query = Wrappers
+                .lambdaQuery(AdminUserDO.class)
+                .select(AdminUserDO::getUsername, AdminUserDO::getNickname, AdminUserDO::getId)
+                .in(AdminUserDO::getId, ids);
+        List<AdminUserDO> usersData = userMapper.selectList(query);
+        return batch ? usersData : usersData.get(0);
+    }
 }

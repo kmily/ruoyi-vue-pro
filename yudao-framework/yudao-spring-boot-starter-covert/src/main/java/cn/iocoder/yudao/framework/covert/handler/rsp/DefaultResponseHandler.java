@@ -10,14 +10,6 @@ import org.springframework.http.ResponseEntity;
  */
 public class DefaultResponseHandler implements ResponseHandler {
 
-    private static final ObjectMapper objectMapper;
-
-    static {
-        objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    }
-
-
     /**
      * 不处理
      *
@@ -26,14 +18,6 @@ public class DefaultResponseHandler implements ResponseHandler {
      */
     @Override
     public Object handle(String bean, String method, Object rsp, Object... params) {
-        if (rsp instanceof ResponseEntity) {
-            ResponseEntity responseEntity = (ResponseEntity) rsp;
-            if (responseEntity.getStatusCode() == HttpStatus.OK) {
-                return responseEntity.getBody();
-            } else {
-                return null;
-            }
-        }
         return rsp;
     }
 }

@@ -44,15 +44,6 @@ public @interface Load {
     int cacheSecond() default 600;
 
     /**
-     * 额外参数
-     * <p>
-     * 参数格式，多个参数，按照反射参数占位符传递
-     *
-     * @return
-     */
-    String[] args() default {};
-
-    /**
      * 参数处理器
      *
      * @return

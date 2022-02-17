@@ -6,7 +6,6 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.covert.annotation.Load;
-import cn.iocoder.yudao.framework.covert.handler.LoadArgsHandler;
 import cn.iocoder.yudao.framework.covert.handler.params.ParamsHandler;
 import cn.iocoder.yudao.framework.covert.handler.rsp.ResponseHandler;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -20,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -82,7 +82,7 @@ public class LoadSerializer extends JsonSerializer<Object> implements Contextual
     /**
      * 额外参数
      */
-    private String[] args;
+    private Object[] args;
 
     /**
      * 返回结果处理类
@@ -107,7 +107,7 @@ public class LoadSerializer extends JsonSerializer<Object> implements Contextual
 
     }
 
-    public LoadSerializer(String loadService, String method, int cacheSecond, String[] args, ParamsHandler paramsHandler, ResponseHandler otherResponseHandler) {
+    public LoadSerializer(String loadService, String method, int cacheSecond, Object[] args, ParamsHandler paramsHandler, ResponseHandler otherResponseHandler) {
         this.loadServiceSourceClassName = loadService;
         this.loadService = SpringUtil.getBean(loadService);
         this.method = method;
@@ -120,14 +120,14 @@ public class LoadSerializer extends JsonSerializer<Object> implements Contextual
 
     @Override
     public void serialize(Object bindData, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        Object params = paramsHandler.handle(bindData);
+        Object params = paramsHandler.handleVal(bindData);
         if (params == null || loadService == null) {
             gen.writeObject(bindData);
             return;
         }
 
         // 有效ID，去查询
-        String cacheKey = prefix + method + "-" + paramsHandler.getCacheKey(bindData) + String.join(",", args);
+        String cacheKey = prefix + method + "-" + paramsHandler.getCacheKey(bindData, args);
         if (StrUtil.isBlank(cacheKey)) {
             gen.writeObject(bindData);
             return;
@@ -147,9 +147,7 @@ public class LoadSerializer extends JsonSerializer<Object> implements Contextual
                         List<Object> objectParams = new ArrayList<>();
                         objectParams.add(params);
                         if (this.args != null && this.args.length > 0) {
-                            for (String param : this.args) {
-                                objectParams.add(param);
-                            }
+                            Collections.addAll(objectParams, args);
                         }
                         Object r = ReflectUtil.invoke(loadService, method, objectParams.toArray());
                         if (r != null) {
@@ -198,7 +196,6 @@ public class LoadSerializer extends JsonSerializer<Object> implements Contextual
                 throw new RuntimeException("未注解相关 @Load 注解");
             }
             String bean = load.bean();
-            String[] args = load.args();
             Class<? extends ParamsHandler> paramsHandlerClass = load.paramsHandler();
             Class<? extends ResponseHandler> responseHandlerClass = load.responseHandler();
             String method = load.method();
@@ -206,7 +203,7 @@ public class LoadSerializer extends JsonSerializer<Object> implements Contextual
             ResponseHandler responseHandler = responseHandlerClass.getDeclaredConstructor().newInstance();
             int cacheSecond = load.cacheSecond();
             // 额外参数处理
-            args = LoadArgsHandler.handle(property, args);
+            Object[] args = paramsHandler.handleAnnotation(property);
             return new LoadSerializer(bean, method, cacheSecond, args, paramsHandler, responseHandler);
         }
         return prov.findNullValueSerializer(property);
