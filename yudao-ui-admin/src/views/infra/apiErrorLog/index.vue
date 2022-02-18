@@ -37,7 +37,7 @@
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport"
+        <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
                    v-hasPermi="['infra:api-error-log:export']">导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -49,7 +49,7 @@
       <el-table-column label="用户编号" align="center" prop="userId" />
       <el-table-column label="用户类型" align="center" prop="userType">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.USER_TYPE, scope.row.userType) }}</span>
+          <dict-tag :type="DICT_TYPE.USER_TYPE" :value="scope.row.userType"/>
         </template>
       </el-table-column>>
       <el-table-column label="应用名" align="center" prop="applicationName" />
@@ -63,7 +63,7 @@
       <el-table-column label="异常名" align="center" prop="exceptionName" width="250" />
       <el-table-column label="处理状态" align="center" prop="processStatus">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.INFRA_API_ERROR_LOG_PROCESS_STATUS, scope.row.processStatus) }}</span>
+          <dict-tag :type="DICT_TYPE.INFRA_API_ERROR_LOG_PROCESS_STATUS" :value="scope.row.processStatus" />
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -93,7 +93,7 @@
             <el-form-item label="链路追踪：">{{ form.traceId }}</el-form-item>
             <el-form-item label="应用名：">{{ form.applicationName }}</el-form-item>
             <el-form-item label="用户信息：">
-              {{ form.userId }} | {{ getDictDataLabel(DICT_TYPE.USER_TYPE, form.userType) }} | {{ form.userIp }} | {{ form.userAgent}}
+              {{ form.userId }} <dict-tag :type="DICT_TYPE.USER_TYPE" :value="form.userType" /> | {{ form.userIp }} | {{ form.userAgent}}
             </el-form-item>
             <el-form-item label="请求信息：">{{ form.requestMethod }} | {{ form.requestUrl }} </el-form-item>
             <el-form-item label="请求参数：">{{ form.requestParams }}</el-form-item>
@@ -103,7 +103,7 @@
               <el-input type="textarea" :readonly="true" :autosize="{ maxRows: 20}" v-model="form.exceptionStackTrace"></el-input>
             </el-form-item>
             <el-form-item label="处理状态">
-              {{ getDictDataLabel(DICT_TYPE.INFRA_API_ERROR_LOG_PROCESS_STATUS, form.processStatus) }}
+              <dict-tag :type="DICT_TYPE.INFRA_API_ERROR_LOG_PROCESS_STATUS" :value="form.processStatus" />
             </el-form-item>
             <el-form-item label="处理人">{{ form.processUserId }}</el-form-item>
             <el-form-item label="处理时间">{{ parseTime(form.processTime) }}</el-form-item>
@@ -130,6 +130,8 @@ export default {
     return {
       // 遮罩层
       loading: true,
+      // 导出遮罩层
+      exportLoading: false,
       // 显示搜索条件
       showSearch: true,
       // 总条数
@@ -203,16 +205,12 @@ export default {
     /** 处理已处理 / 已忽略的操作 **/
     handleProcessClick(row, processStatus) {
       const processStatusText = this.getDictDataLabel(this.DICT_TYPE.INFRA_API_ERROR_LOG_PROCESS_STATUS, processStatus)
-      this.$confirm('确认标记为' + processStatusText, '提示', {
-        type: 'warning',
-        confirmButtonText: '确定',
-        cancelButtonText: '取消'
-      }).then(() => {
+      this.$modal.confirm('确认标记为' + processStatusText).then(() => {
         updateApiErrorLogProcess(row.id, processStatus).then(() => {
-          this.msgSuccess("修改成功");
+          this.$modal.msgSuccess("修改成功");
           this.getList();
         });
-      })
+      }).catch(() => {});
     },
     /** 导出按钮操作 */
     handleExport() {
@@ -222,15 +220,13 @@ export default {
       params.pageSize = undefined;
       this.addBeginAndEndTime(params, this.dateRangeExceptionTime, 'exceptionTime');
       // 执行导出
-      this.$confirm('是否确认导出所有API 错误日志数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
+      this.$modal.confirm('是否确认导出所有API 错误日志数据项?').then(() => {
+        this.exportLoading = true;
         return exportApiErrorLogExcel(params);
       }).then(response => {
-        this.downloadExcel(response, 'API 错误日志.xls');
-      })
+        this.$download.excel(response, 'API 错误日志.xls');
+        this.exportLoading = false;
+      }).catch(() => {});
     }
   }
 };

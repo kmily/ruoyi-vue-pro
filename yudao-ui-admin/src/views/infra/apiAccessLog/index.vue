@@ -37,7 +37,7 @@
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport"
+        <el-button type="warning" plain icon="el-icon-download" size="mini" :loading="exportLoading" @click="handleExport"
                    v-hasPermi="['infra:api-access-log:export']">导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -49,7 +49,7 @@
       <el-table-column label="用户编号" align="center" prop="userId" />
       <el-table-column label="用户类型" align="center" prop="userType">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.USER_TYPE, scope.row.userType) }}</span>
+          <dict-tag :type="DICT_TYPE.USER_TYPE" :value="scope.row.userType"/>
         </template>
       </el-table-column>>
       <el-table-column label="应用名" align="center" prop="applicationName" />
@@ -90,7 +90,7 @@
             <el-form-item label="链路追踪：">{{ form.traceId }}</el-form-item>
             <el-form-item label="应用名：">{{ form.applicationName }}</el-form-item>
             <el-form-item label="用户信息：">
-              {{ form.userId }} | {{ getDictDataLabel(DICT_TYPE.USER_TYPE, form.userType) }} | {{ form.userIp }} | {{ form.userAgent}}
+              {{ form.userId }} <dict-tag :type="DICT_TYPE.USER_TYPE" :value="form.userType"/> | {{ form.userIp }} | {{ form.userAgent}}
             </el-form-item>
             <el-form-item label="请求信息：">{{ form.requestMethod }} | {{ form.requestUrl }} </el-form-item>
             <el-form-item label="请求参数：">{{ form.requestParams }}</el-form-item>
@@ -123,6 +123,8 @@ export default {
     return {
       // 遮罩层
       loading: true,
+      // 导出遮罩层
+      exportLoading: false,
       // 显示搜索条件
       showSearch: true,
       // 总条数
@@ -200,15 +202,13 @@ export default {
       params.pageSize = undefined;
       this.addBeginAndEndTime(params, this.dateRangeBeginTime, 'beginTime');
       // 执行导出
-      this.$confirm('是否确认导出所有API 访问日志数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
+      this.$modal.confirm('是否确认导出所有API 访问日志数据项?').then(() => {
+        this.exportLoading = true;
         return exportApiAccessLogExcel(params);
       }).then(response => {
-        this.downloadExcel(response, 'API 访问日志.xls');
-      })
+        this.$download.excel(response, 'API 访问日志.xls');
+        this.exportLoading = false;
+      }).catch(() => {});
     }
   }
 };

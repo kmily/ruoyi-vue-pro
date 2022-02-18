@@ -45,7 +45,7 @@
       </el-table-column>
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.COMMON_STATUS, scope.row.status) }}</span>
+          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
@@ -213,7 +213,7 @@ export default {
         // 修改的提交
         if (this.form.id != null) {
           updateUserGroup(this.form).then(response => {
-            this.msgSuccess("修改成功");
+            this.$modal.msgSuccess("修改成功");
             this.open = false;
             this.getList();
           });
@@ -221,7 +221,7 @@ export default {
         }
         // 添加的提交
         createUserGroup(this.form).then(response => {
-          this.msgSuccess("新增成功");
+          this.$modal.msgSuccess("新增成功");
           this.open = false;
           this.getList();
         });
@@ -230,16 +230,12 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const id = row.id;
-      this.$confirm('是否确认删除用户组编号为"' + id + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
+      this.$modal.confirm('是否确认删除用户组编号为"' + id + '"的数据项?').then(function() {
         return deleteUserGroup(id);
       }).then(() => {
         this.getList();
-        this.msgSuccess("删除成功");
-      })
+        this.$modal.msgSuccess("删除成功");
+      }).catch(() => {});
     },
     getUserNickname(userId) {
       for (const user of this.users) {

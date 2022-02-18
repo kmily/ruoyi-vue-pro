@@ -14,8 +14,19 @@ const permission = {
       state.addRoutes = routes
       state.routes = constantRoutes.concat(routes)
     },
-    SET_SIDEBAR_ROUTERS: (state, routers) => {
-      state.sidebarRouters = constantRoutes.concat(routers)
+    SET_DEFAULT_ROUTES: (state, routes) => {
+      state.defaultRoutes = constantRoutes.concat(routes)
+    },
+    SET_TOPBAR_ROUTES: (state, routes) => {
+      // 顶部导航菜单默认添加统计报表栏指向首页
+      const index = [{
+        path: 'index',
+        meta: { title: '统计报表', icon: 'dashboard'}
+      }]
+      state.topbarRouters = routes.concat(index);
+    },
+    SET_SIDEBAR_ROUTERS: (state, routes) => {
+      state.sidebarRouters = routes
     },
   },
   actions: {
@@ -27,10 +38,12 @@ const permission = {
           const sdata = JSON.parse(JSON.stringify(res.data))
           const rdata = JSON.parse(JSON.stringify(res.data))
           const sidebarRoutes = filterAsyncRouter(sdata)
-          const rewriteRoutes = filterAsyncRouter(rdata, true)
+          const rewriteRoutes = filterAsyncRouter(rdata, false, true)
           rewriteRoutes.push({ path: '*', redirect: '/404', hidden: true })
           commit('SET_ROUTES', rewriteRoutes)
-          commit('SET_SIDEBAR_ROUTERS', sidebarRoutes)
+          commit('SET_SIDEBAR_ROUTERS', constantRoutes.concat(sidebarRoutes))
+          commit('SET_DEFAULT_ROUTES', sidebarRoutes)
+          commit('SET_TOPBAR_ROUTES', sidebarRoutes)
           resolve(rewriteRoutes)
         })
       })
@@ -39,7 +52,7 @@ const permission = {
 }
 
 // 遍历后台传来的路由字符串，转换为组件对象
-function filterAsyncRouter(asyncRouterMap, isRewrite = false) {
+function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
   return asyncRouterMap.filter(route => {
     // 将 ruoyi 后端原有耦合前端的逻辑，迁移到此处
     // 处理 meta 属性
@@ -60,21 +73,23 @@ function filterAsyncRouter(asyncRouterMap, isRewrite = false) {
     }
 
     // filterChildren
-    if (isRewrite && route.children) {
+    if (type && route.children) {
       route.children = filterChildren(route.children)
     }
     if (route.children != null && route.children && route.children.length) {
-      route.children = filterAsyncRouter(route.children, route, isRewrite)
+      route.children = filterAsyncRouter(route.children, route, type)
+    } else {
+      delete route['children']
     }
     return true
   })
 }
 
-function filterChildren(childrenMap) {
+function filterChildren(childrenMap, lastRouter = false) {
   var children = []
   childrenMap.forEach((el, index) => {
     if (el.children && el.children.length) {
-      if (el.component === 'ParentView') {
+      if (el.component === 'ParentView' && !lastRouter) {
         el.children.forEach(c => {
           c.path = el.path + '/' + c.path
           if (c.children && c.children.length) {
@@ -85,6 +100,9 @@ function filterChildren(childrenMap) {
         })
         return
       }
+    }
+    if (lastRouter) {
+      el.path = lastRouter.path + '/' + el.path
     }
     children = children.concat(el)
   })

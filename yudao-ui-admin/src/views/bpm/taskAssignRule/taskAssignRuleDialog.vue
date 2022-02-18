@@ -7,7 +7,7 @@
         <el-table-column label="任务标识" align="center" prop="taskDefinitionKey" width="120" show-tooltip-when-overflow />
         <el-table-column label="规则类型" align="center" prop="type" width="120">
           <template slot-scope="scope">
-            <span>{{ getDictDataLabel(DICT_TYPE.BPM_TASK_ASSIGN_RULE_TYPE, scope.row.type) }}</span>
+            <dict-tag :type="DICT_TYPE.BPM_TASK_ASSIGN_RULE_TYPE" :value="scope.row.type" />
           </template>
         </el-table-column>
         <el-table-column label="规则范围" align="center" prop="options" width="440px">
@@ -257,7 +257,7 @@ export default {
           if (!form.id) {
             form.modelId = this.modelId; // 模型编号
             createTaskAssignRule(form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
@@ -265,7 +265,7 @@ export default {
           } else {
             form.taskDefinitionKey = undefined; // 无法修改
             updateTaskAssignRule(form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });

@@ -49,12 +49,12 @@
       </el-table-column>
       <el-table-column label="任务状态" align="center" prop="status">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.INFRA_JOB_LOG_STATUS, scope.row.status) }}</span>
+          <dict-tag :type="DICT_TYPE.INFRA_JOB_LOG_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button size="mini" type="text" icon="el-icon-view" @click="handleView(scope.row)"
+          <el-button size="mini" type="text" icon="el-icon-view" @click="handleView(scope.row)" :loading="exportLoading"
                      v-hasPermi="['infra:job:query']">详细</el-button>
         </template>
       </el-table-column>
@@ -75,7 +75,9 @@
             <el-form-item label="第几次执行：">{{ form.executeIndex }}</el-form-item>
             <el-form-item label="执行时间：">{{ parseTime(form.beginTime) + ' ~ ' + parseTime(form.endTime) }}</el-form-item>
             <el-form-item label="执行时长：">{{ parseTime(form.duration) + ' 毫秒' }}</el-form-item>
-            <el-form-item label="任务状态：">{{ getDictDataLabel(DICT_TYPE.INFRA_JOB_LOG_STATUS, form.status) }}</el-form-item>
+            <el-form-item label="任务状态：">
+              <dict-tag :type="DICT_TYPE.INFRA_JOB_LOG_STATUS" :value="form.status" />
+            </el-form-item>
             <el-form-item label="执行结果：">{{ form.result }}</el-form-item>
           </el-col>
         </el-row>
@@ -96,6 +98,8 @@ export default {
     return {
       // 遮罩层
       loading: true,
+      // 导出遮罩层
+      exportLoading: false,
       // 显示搜索条件
       showSearch: true,
       // 总条数
@@ -161,15 +165,13 @@ export default {
       params.pageNo = undefined;
       params.pageSize = undefined;
       // 执行导出
-      this.$confirm('是否确认导出所有定时任务日志数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
+      this.$modal.confirm('是否确认导出所有定时任务日志数据项?').then(() => {
+        this.exportLoading = true;
         return exportJobLogExcel(params);
       }).then(response => {
-        this.downloadExcel(response, '定时任务日志.xls');
-      })
+        this.$download.excel(response, '定时任务日志.xls');
+        this.exportLoading = false;
+      }).catch(() => {});
     }
   }
 };

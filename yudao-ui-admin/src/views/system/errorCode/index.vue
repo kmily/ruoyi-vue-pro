@@ -35,7 +35,7 @@
                    v-hasPermi="['system:error-code:create']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport"
+        <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
                    v-hasPermi="['system:error-code:export']">导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -46,11 +46,11 @@
       <el-table-column label="编号" align="center" prop="id" />
       <el-table-column label="类型" align="center" prop="type" width="80">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYSTEM_ERROR_CODE_TYPE, scope.row.type) }}</span>
+          <dict-tag :type="DICT_TYPE.SYSTEM_ERROR_CODE_TYPE" :value="scope.row.type" />
         </template>
       </el-table-column>
       <el-table-column label="应用名" align="center" prop="applicationName" width="200" />
-      <el-table-column label="错误码编码" align="center" prop="code" width="100" />
+      <el-table-column label="错误码编码" align="center" prop="code" width="120" />
       <el-table-column label="错误码提示" align="center" prop="message" width="300" />
       <el-table-column label="备注" align="center" prop="memo" width="200" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
@@ -106,6 +106,8 @@ export default {
     return {
       // 遮罩层
       loading: true,
+      // 导出遮罩层
+      exportLoading: false,
       // 显示搜索条件
       showSearch: true,
       // 总条数
@@ -205,7 +207,7 @@ export default {
         // 修改的提交
         if (this.form.id != null) {
           updateErrorCode(this.form).then(response => {
-            this.msgSuccess("修改成功");
+            this.$modal.msgSuccess("修改成功");
             this.open = false;
             this.getList();
           });
@@ -213,7 +215,7 @@ export default {
         }
         // 添加的提交
         createErrorCode(this.form).then(response => {
-          this.msgSuccess("新增成功");
+          this.$modal.msgSuccess("新增成功");
           this.open = false;
           this.getList();
         });
@@ -222,16 +224,12 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const id = row.id;
-      this.$confirm('是否确认删除错误码编号为"' + id + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
+      this.$modal.confirm('是否确认删除错误码编号为"' + id + '"的数据项?').then(function() {
         return deleteErrorCode(id);
       }).then(() => {
         this.getList();
-        this.msgSuccess("删除成功");
-      })
+        this.$modal.msgSuccess("删除成功");
+      }).catch(() => {});
     },
     /** 导出按钮操作 */
     handleExport() {
@@ -241,15 +239,13 @@ export default {
       params.pageSize = undefined;
       this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行导出
-      this.$confirm('是否确认导出所有错误码数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
+      this.$modal.confirm('是否确认导出所有错误码数据项?').then(() => {
+        this.exportLoading = true;
         return exportErrorCodeExcel(params);
       }).then(response => {
-        this.downloadExcel(response, '错误码.xls');
-      })
+        this.$download.excel(response, '错误码.xls');
+        this.exportLoading = false;
+      }).catch(() => {});
     }
   }
 };

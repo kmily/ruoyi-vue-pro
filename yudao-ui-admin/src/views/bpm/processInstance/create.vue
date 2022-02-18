@@ -12,7 +12,7 @@
         </el-table-column>
         <el-table-column label="流程分类" align="center" prop="category" width="100">
           <template slot-scope="scope">
-            <span>{{ getDictDataLabel(DICT_TYPE.BPM_MODEL_CATEGORY, scope.row.category) }}</span>
+            <dict-tag :type="DICT_TYPE.BPM_MODEL_CATEGORY" :value="scope.row.category" />
           </template>
         </el-table-column>
         <el-table-column label="流程版本" align="center" prop="processDefinition.version" width="80">
@@ -144,9 +144,9 @@ export default {
         processDefinitionId: this.selectProcessInstance.id,
         variables: variables
       }).then(response => {
-        this.msgSuccess("发起流程成功");
+        this.$modal.msgSuccess("发起流程成功");
         // 关闭当前窗口
-        this.$store.dispatch("tagsView/delView", this.$route);
+        this.$tab.closeOpenPage();
         this.$router.go(-1);
       }).catch(() => {
         conf.disabled = false; // 表单开启

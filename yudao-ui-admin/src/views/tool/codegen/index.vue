@@ -59,7 +59,7 @@
     <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize" @pagination="getList"/>
 
     <!-- 预览界面 -->
-    <el-dialog :title="preview.title" :visible.sync="preview.open" width="90%" top="5vh" append-to-body>
+    <el-dialog :title="preview.title" :visible.sync="preview.open" width="90%" top="5vh" append-to-body class="scrollbar">
       <el-row>
         <el-col :span="7">
           <el-tree :data="preview.fileTree" :expand-on-click-node="false" default-expand-all highlight-current
@@ -69,6 +69,7 @@
           <el-tabs v-model="preview.activeName">
             <el-tab-pane v-for="item in preview.data" :label="item.filePath.substring(item.filePath.lastIndexOf('/') + 1)"
                          :name="item.filePath" :key="item.filePath">
+              <el-link :underline="false" icon="el-icon-document-copy" v-clipboard:copy="item.code" v-clipboard:success="clipboardSuccess" style="float:right">复制</el-link>
               <pre><code class="hljs" v-html="highlightedCode(item)"></code></pre>
             </el-tab-pane>
           </el-tabs>
@@ -192,7 +193,7 @@ export default {
     /** 生成代码操作 */
     handleGenTable(row) {
       downloadCodegen(row.id).then(response => {
-        this.downloadZip(response, 'codegen-' + row.tableName + '.zip');
+        this.$download.zip(response, 'codegen-' + row.tableName + '.zip');
       })
     },
     /** 同步数据库操作 */
@@ -205,15 +206,11 @@ export default {
       }
       // 基于 DB 同步
       const tableName = row.tableName;
-      this.$confirm('确认要强制同步"' + tableName + '"表结构吗？', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
+      this.$modal.confirm('确认要强制同步"' + tableName + '"表结构吗？').then(function() {
           return syncCodegenFromDB(row.id);
       }).then(() => {
-          this.msgSuccess("同步成功");
-      })
+          this.$modal.msgSuccess("同步成功");
+      }).catch(() => {});
     },
     /** 打开导入表弹窗 */
     openImportTable() {
@@ -248,6 +245,10 @@ export default {
       var language = item.filePath.substring(item.filePath.lastIndexOf(".") + 1);
       const result = hljs.highlight(language, item.code || "", true);
       return result.value || '&nbsp;';
+    },
+    /** 复制代码成功 */
+    clipboardSuccess(){
+      this.$modal.msgSuccess("复制成功");
     },
     /** 生成 files 目录 **/
     handleFiles(datas) {
@@ -326,16 +327,12 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const tableIds = row.id;
-      this.$confirm('是否确认删除表名称为"' + row.tableName + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
+      this.$modal.confirm('是否确认删除表名称为"' + row.tableName + '"的数据项?').then(function() {
           return deleteCodegen(tableIds);
       }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
-      })
+          this.$modal.msgSuccess("删除成功");
+      }).catch(() => {});
     },
     // 取消按钮
     cancel() {
@@ -360,7 +357,7 @@ export default {
         let form = this.importSQL.form;
         if (form.tableId != null) {
           syncCodegenFromSQL(form.tableId, form.sql).then(response => {
-            this.msgSuccess("同步成功");
+            this.$modal.msgSuccess("同步成功");
             this.importSQL.open = false;
             this.getList();
           });
@@ -368,7 +365,7 @@ export default {
         }
         // 添加的提交
         createCodegenListFromSQL(form).then(response => {
-          this.msgSuccess("导入成功");
+          this.$modal.msgSuccess("导入成功");
           this.importSQL.open = false;
           this.getList();
         });

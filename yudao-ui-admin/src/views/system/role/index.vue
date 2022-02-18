@@ -19,18 +19,18 @@
           range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
       </el-form-item>
       <el-form-item>
-        <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd"
+        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
                    v-hasPermi="['system:role:create']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="warning" icon="el-icon-download" size="mini" @click="handleExport"
+        <el-button type="warning" icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
                    v-hasPermi="['system:role:export']">导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -40,7 +40,11 @@
       <el-table-column label="角色编号" prop="id" width="120" />
       <el-table-column label="角色名称" prop="name" :show-overflow-tooltip="true" width="150" />
       <el-table-column label="角色标识" prop="code" :show-overflow-tooltip="true" width="150" />
-      <el-table-column label="角色类型" prop="type" :formatter="typeFormat" width="80"></el-table-column>
+      <el-table-column label="角色类型" prop="type" width="80">
+        <template slot-scope="scope">
+          <dict-tag :type="DICT_TYPE.SYSTEM_ROLE_TYPE" :value="scope.row.type"/>
+        </template>
+      </el-table-column>
       <el-table-column label="显示顺序" prop="sort" width="100" />
       <el-table-column label="状态" align="center" width="100">
         <template slot-scope="scope">
@@ -180,7 +184,7 @@ import {listSimpleMenus} from "@/api/system/menu";
 import {assignRoleMenu, listRoleMenus, assignRoleDataScope} from "@/api/system/permission";
 import {listSimpleDepts} from "@/api/system/dept";
 import {CommonStatusEnum, SystemDataScopeEnum} from "@/utils/constants";
-import {DICT_TYPE, getDictDataLabel, getDictDatas} from "@/utils/dict";
+import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 
 export default {
   name: "Role",
@@ -188,6 +192,8 @@ export default {
     return {
       // 遮罩层
       loading: true,
+      // 导出遮罩层
+      exportLoading: false,
       // 显示搜索条件
       showSearch: true,
       // 总条数
@@ -271,23 +277,15 @@ export default {
     handleStatusChange(row) {
       // 此时，row 已经变成目标状态了，所以可以直接提交请求和提示
       let text = row.status === CommonStatusEnum.ENABLE ? "启用" : "停用";
-      this.$confirm('确认要"' + text + '""' + row.name + '"角色吗?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('确认要"' + text + '""' + row.name + '"角色吗?').then(function() {
           return changeRoleStatus(row.id, row.status);
         }).then(() => {
-          this.msgSuccess(text + "成功");
+          this.$modal.msgSuccess(text + "成功");
         }).catch(function() {
           // 异常时，需要将 row.status 状态重置回之前的
           row.status = row.status === CommonStatusEnum.ENABLE ? CommonStatusEnum.DISABLE
               : CommonStatusEnum.ENABLE;
         });
-    },
-    // 角色类型字典翻译
-    typeFormat(row, column) {
-      return getDictDataLabel(DICT_TYPE.SYSTEM_ROLE_TYPE, row.type)
     },
     // 取消按钮
     cancel() {
@@ -440,13 +438,13 @@ export default {
         if (valid) {
           if (this.form.id !== undefined) {
             updateRole(this.form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
             addRole(this.form).then(response => {
-              this.msgSuccess("新增成功");
+              this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
             });
@@ -463,7 +461,7 @@ export default {
           dataScopeDeptIds: this.form.dataScope !== SystemDataScopeEnum.DEPT_CUSTOM ? [] :
               this.$refs.dept.getCheckedKeys()
         }).then(response => {
-          this.msgSuccess("修改成功");
+          this.$modal.msgSuccess("修改成功");
           this.openDataScope = false;
           this.getList();
         });
@@ -476,7 +474,7 @@ export default {
           roleId: this.form.id,
           menuIds: [...this.$refs.menu.getCheckedKeys(), ...this.$refs.menu.getHalfCheckedKeys()]
         }).then(response => {
-          this.msgSuccess("修改成功");
+          this.$modal.msgSuccess("修改成功");
           this.openMenu = false;
           this.getList();
         });
@@ -485,29 +483,23 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$confirm('是否确认删除角色编号为"' + ids + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('是否确认删除角色编号为"' + ids + '"的数据项?').then(function() {
           return delRole(ids);
         }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
-        })
+          this.$modal.msgSuccess("删除成功");
+      }).catch(() => {});
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有角色数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('是否确认导出所有角色数据项?').then(function() {
+          this.exportLoading = true;
           return exportRole(queryParams);
         }).then(response => {
-          this.downloadExcel(response, '角色数据.xls');
-        })
+          this.$download.excel(response, '角色数据.xls');
+          this.exportLoading = false;
+      }).catch(() => {});
     }
   }
 };

@@ -52,7 +52,7 @@
       <el-table-column label="流程名" align="center" prop="name" />
       <el-table-column label="流程分类" align="center" prop="category">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.BPM_MODEL_CATEGORY, scope.row.category) }}</span>
+          <dict-tag :type="DICT_TYPE.BPM_MODEL_CATEGORY" :value="scope.row.category" />
         </template>
       </el-table-column>
       <el-table-column label="当前审批任务" align="center" prop="tasks">
@@ -64,32 +64,12 @@
       </el-table-column>
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
-          <span>
-            <el-tag type="primary" v-if="scope.row.status === 1"> <!-- 进行中 -->
-              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_STATUS, scope.row.status) }}
-            </el-tag>
-             <el-tag type="success" v-if="scope.row.status === 2"> <!-- 已结束 -->
-              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_STATUS, scope.row.status) }}
-            </el-tag>
-          </span>
+          <dict-tag :type="DICT_TYPE.BPM_PROCESS_INSTANCE_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
       <el-table-column label="结果" align="center" prop="result">
         <template slot-scope="scope">
-          <span>
-            <el-tag type="primary" v-if="scope.row.result === 1"> <!-- 进行中 -->
-              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, scope.row.result) }}
-            </el-tag>
-             <el-tag type="success" v-if="scope.row.result === 2"> <!-- 通过 -->
-              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, scope.row.result) }}
-            </el-tag>
-             <el-tag type="danger" v-if="scope.row.result === 3"> <!-- 不通过 -->
-              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, scope.row.result) }}
-            </el-tag>
-             <el-tag type="info" v-if="scope.row.result === 4"> <!-- 撤回 -->
-              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, scope.row.result) }}
-            </el-tag>
-          </span>
+          <dict-tag :type="DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT" :value="scope.row.result"/>
         </template>
       </el-table-column>
       <el-table-column label="提交时间" align="center" prop="createTime" width="180">
@@ -119,16 +99,7 @@
 </template>
 
 <script>
-import {
-  getMyProcessInstancePage,
-  createProcessInstanceExt,
-  updateProcessInstanceExt,
-  deleteProcessInstanceExt,
-  getProcessInstanceExt,
-  getProcessInstanceExtPage,
-  exportProcessInstanceExtExcel, cancelProcessInstance
-} from "@/api/bpm/processInstance";
-import {deleteErrorCode} from "@/api/system/errorCode";
+import { getMyProcessInstancePage, cancelProcessInstance } from "@/api/bpm/processInstance";
 
 export default {
   name: "ProcessInstance",
@@ -203,7 +174,7 @@ export default {
         return cancelProcessInstance(id, value);
       }).then(() => {
         this.getList();
-        this.msgSuccess("取消成功");
+        this.$modal.msgSuccess("取消成功");
       })
     },
     /** 处理详情按钮 */

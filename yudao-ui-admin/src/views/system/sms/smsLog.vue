@@ -49,7 +49,7 @@
                    v-hasPermi="['system:sms-log:create']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport"
+        <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
                    v-hasPermi="['system:sms-log:export']">导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -67,33 +67,33 @@
         <template slot-scope="scope">
           <div>{{ scope.row.mobile }}</div>
           <div v-if="scope.row.userType && scope.row.userId">
-            {{ getDictDataLabel(DICT_TYPE.USER_TYPE, scope.row.userType) + '(' + scope.row.userId + ')' }}
+            <dict-tag :type="DICT_TYPE.USER_TYPE" :value="scope.row.userType"/>{{ '(' + scope.row.userId + ')' }}
           </div>
         </template>
       </el-table-column>
       <el-table-column label="短信内容" align="center" prop="templateContent" width="300" />
       <el-table-column label="发送状态" align="center" width="180">
         <template slot-scope="scope">
-          <div>{{ getDictDataLabel(DICT_TYPE.SYSTEM_SMS_SEND_STATUS, scope.row.sendStatus) }}</div>
+          <dict-tag :type="DICT_TYPE.SYSTEM_SMS_SEND_STATUS" :value="scope.row.sendStatus"/>
           <div>{{ parseTime(scope.row.sendTime) }}</div>
         </template>
       </el-table-column>
       <el-table-column label="接收状态" align="center" width="180">
         <template slot-scope="scope">
-          <div>{{ getDictDataLabel(DICT_TYPE.SYSTEM_SMS_RECEIVE_STATUS, scope.row.receiveStatus) }}</div>
+          <dict-tag :type="DICT_TYPE.SYSTEM_SMS_RECEIVE_STATUS" :value="scope.row.receiveStatus"/>
           <div>{{ parseTime(scope.row.receiveTime) }}</div>
         </template>
       </el-table-column>
       <el-table-column label="短信渠道" align="center" width="120">
         <template slot-scope="scope">
           <div>{{ formatChannelSignature(scope.row.channelId) }}</div>
-          <div>【{{ getDictDataLabel(DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE, scope.row.channelCode) }}】</div>
+          <dict-tag :type="DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE" :value="scope.row.channelCode"/>
         </template>
       </el-table-column>
       <el-table-column label="模板编号" align="center" prop="templateId" />
       <el-table-column label="短信类型" align="center" prop="templateType">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYSTEM_SMS_TEMPLATE_TYPE, scope.row.templateType) }}</span>
+          <dict-tag :type="DICT_TYPE.SYSTEM_SMS_TEMPLATE_TYPE" :value="scope.row.templateType"/>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -116,15 +116,14 @@
           </el-col>
           <el-col :span="24">
             <el-form-item label="短信渠道：">
-              {{
-                formatChannelSignature(form.channelId)
-              }}【{{ getDictDataLabel(DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE, form.channelCode) }}】
+              {{formatChannelSignature(form.channelId) }}
+              <dict-tag :type="DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE" :value="form.channelCode"/>
             </el-form-item>
           </el-col>
           <el-col :span="24">
             <el-form-item label="短信模板：">
-              {{ form.templateId }} | {{ form.templateCode }} |
-              {{ getDictDataLabel(DICT_TYPE.SYSTEM_SMS_TEMPLATE_TYPE, form.templateType) }}
+              {{ form.templateId }} | {{ form.templateCode }}
+              <dict-tag :type="DICT_TYPE.SYSTEM_SMS_TEMPLATE_TYPE" :value="form.templateType"/>
             </el-form-item>
           </el-col>
           <el-col :span="24">
@@ -132,7 +131,9 @@
           </el-col>
           <el-col :span="24">
             <el-form-item label="用户信息：">{{ form.mobile }}
-              <span v-if="form.userType && form.userId"> | {{ getDictDataLabel(DICT_TYPE.USER_TYPE, form.userType) }} | {{ form.userId }}</span>
+              <span v-if="form.userType && form.userId">
+                <dict-tag :type="DICT_TYPE.USER_TYPE" :value="form.userType"/>({{ form.userId }})
+              </span>
             </el-form-item>
           </el-col>
           <el-col :span="24">
@@ -145,7 +146,9 @@
             <el-form-item label="创建时间：">{{ parseTime(form.createTime) }}</el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="发送状态：">{{ getDictDataLabel(DICT_TYPE.SYSTEM_SMS_SEND_STATUS, form.sendStatus) }}</el-form-item>
+            <el-form-item label="发送状态：">
+              <dict-tag :type="DICT_TYPE.SYSTEM_SMS_SEND_STATUS" :value="form.sendStatus"/>
+            </el-form-item>
           </el-col>
           <el-col :span="24">
             <el-form-item label="发送时间：">{{ parseTime(form.sendTime) }}</el-form-item>
@@ -164,7 +167,9 @@
             <el-form-item label="API 请求编号：">{{ form.apiRequestId }}</el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="接收状态：">{{ getDictDataLabel(DICT_TYPE.SYSTEM_SMS_RECEIVE_STATUS, form.receiveStatus) }}</el-form-item>
+            <el-form-item label="接收状态：">
+              <dict-tag :type="DICT_TYPE.SYSTEM_SMS_RECEIVE_STATUS" :value="form.receiveStatus"/>
+            </el-form-item>
           </el-col>
           <el-col :span="24">
             <el-form-item label="接收时间：">{{ parseTime(form.receiveTime) }}</el-form-item>
@@ -195,6 +200,8 @@ export default {
     return {
       // 遮罩层
       loading: true,
+      // 导出遮罩层
+      exportLoading: false,
       // 显示搜索条件
       showSearch: true,
       // 总条数
@@ -271,15 +278,13 @@ export default {
       this.addBeginAndEndTime(params, this.dateRangeSendTime, 'sendTime');
       this.addBeginAndEndTime(params, this.dateRangeReceiveTime, 'receiveTime');
       // 执行导出
-      this.$confirm('是否确认导出所有短信日志数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
+      this.$modal.confirm('是否确认导出所有短信日志数据项?').then(() => {
+        this.exportLoading = true;
         return exportSmsLogExcel(params);
       }).then(response => {
-        this.downloadExcel(response, '短信日志.xls');
-      })
+        this.$download.excel(response, '短信日志.xls');
+        this.exportLoading = false;
+      }).catch(() => {});
     },
     /** 详细按钮操作 */
     handleView(row) {

@@ -65,9 +65,8 @@ export default {
 
         // 添加的提交
         createLeave(this.form).then(response => {
-          this.msgSuccess("发起成功");
-          this.$store.dispatch("tagsView/delView", this.$route);
-          this.$router.push({ path: "/bpm/oa/leave"});
+          this.$modal.msgSuccess("发起成功");
+          this.$tab.closeOpenPage({ path: "/bpm/oa/leave" });
         });
       });
     }

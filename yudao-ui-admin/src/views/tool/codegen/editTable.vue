@@ -32,6 +32,7 @@
                 <el-option label="Double" value="Double" />
                 <el-option label="BigDecimal" value="BigDecimal" />
                 <el-option label="Date" value="Date" />
+                <el-option label="Boolean" value="Boolean" />
               </el-select>
             </template>
           </el-table-column>
@@ -194,11 +195,11 @@ export default {
             parentMenuId: genTable.parentMenuId
           };
           updateCodegen(genTable).then(res => {
-            this.msgSuccess("修改成功！");
+            this.$modal.msgSuccess("修改成功！");
             this.close();
           });
         } else {
-          this.msgError("表单校验未通过，请重新检查提交内容");
+          this.$modal.msgError("表单校验未通过，请重新检查提交内容");
         }
       });
     },
@@ -211,8 +212,10 @@ export default {
     },
     /** 关闭按钮 */
     close() {
-      this.$store.dispatch("tagsView/delView", this.$route);
-      this.$router.push({ path: "/tool/codegen", query: { t: Date.now()}})
+      this.$tab.closeOpenPage({
+        path: "/tool/codegen",
+        query: { t: Date.now(), pageNum: this.$route.query.pageNum } }
+      );
     }
   },
   mounted() {

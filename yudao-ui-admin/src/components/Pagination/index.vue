@@ -1,11 +1,13 @@
 <template>
   <div :class="{'hidden':hidden}" class="pagination-container">
     <el-pagination
+      v-if="pageShow"
       :background="background"
       :current-page.sync="currentPage"
       :page-size.sync="pageSize"
       :layout="layout"
       :page-sizes="pageSizes"
+      :pager-count="pagerCount"
       :total="total"
       v-bind="$attrs"
       @size-change="handleSizeChange"
@@ -38,6 +40,11 @@ export default {
         return [10, 20, 30, 50]
       }
     },
+    // 移动端页码按钮的数量端默认值5
+    pagerCount: {
+      type: Number,
+      default: document.body.clientWidth < 992 ? 5 : 7
+    },
     layout: {
       type: String,
       default: 'total, sizes, prev, pager, next, jumper'
@@ -54,6 +61,11 @@ export default {
       type: Boolean,
       default: false
     }
+  },
+  data() {
+    return {
+      pageShow: true
+    };
   },
   computed: {
     currentPage: {
@@ -75,6 +87,12 @@ export default {
   },
   methods: {
     handleSizeChange(val) {
+      if (this.currentPage * val > this.total) {
+        this.pageShow = false;
+        this.$nextTick(() => {
+          this.pageShow = true
+        })
+      }
       this.$emit('pagination', { page: this.currentPage, limit: val })
       if (this.autoScroll) {
         scrollTo(0, 800)

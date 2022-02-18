@@ -37,7 +37,7 @@
                    v-hasPermi="['pay:merchant:create']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport"
+        <el-button type="warning" plain icon="el-icon-download" size="mini" :loading="exportLoading" @click="handleExport"
                    v-hasPermi="['pay:merchant:export']">导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -124,6 +124,8 @@ export default {
     return {
       // 遮罩层
       loading: true,
+      // 导出遮罩层
+      exportLoading: false,
       // 显示搜索条件
       showSearch: true,
       // 总条数
@@ -223,14 +225,10 @@ export default {
     // 用户状态修改
     handleStatusChange(row) {
       let text = row.status === CommonStatusEnum.ENABLE ? "启用" : "停用";
-      this.$confirm('确认要"' + text + '""' + row.name + '"商户吗?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
+      this.$modal.confirm('确认要"' + text + '""' + row.name + '"商户吗?').then(function() {
         return changeMerchantStatus(row.id, row.status);
       }).then(() => {
-        this.msgSuccess(text + "成功");
+        this.$modal.msgSuccess(text + "成功");
       }).catch(function() {
         row.status = row.status === CommonStatusEnum.ENABLE ? CommonStatusEnum.DISABLE
           : CommonStatusEnum.ENABLE;
@@ -245,7 +243,7 @@ export default {
         // 修改的提交
         if (this.form.id != null) {
           updateMerchant(this.form).then(response => {
-            this.msgSuccess("修改成功");
+            this.$modal.msgSuccess("修改成功");
             this.open = false;
             this.getList();
           });
@@ -253,7 +251,7 @@ export default {
         }
         // 添加的提交
         createMerchant(this.form).then(response => {
-          this.msgSuccess("新增成功");
+          this.$modal.msgSuccess("新增成功");
           this.open = false;
           this.getList();
         });
@@ -262,16 +260,12 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const id = row.id;
-      this.$confirm('是否确认删除支付商户信息编号为"' + id + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('是否确认删除支付商户信息编号为"' + id + '"的数据项?').then(function() {
           return deleteMerchant(id);
         }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
-        })
+          this.$modal.msgSuccess("删除成功");
+      }).catch(() => {});
     },
     /** 导出按钮操作 */
     handleExport() {
@@ -281,15 +275,13 @@ export default {
       params.pageSize = undefined;
       this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行导出
-      this.$confirm('是否确认导出所有支付商户信息数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('是否确认导出所有支付商户信息数据项?').then(() => {
+          this.exportLoading = true;
           return exportMerchantExcel(params);
         }).then(response => {
-          this.downloadExcel(response, '支付商户信息.xls');
-        })
+          this.$download.excel(response, '支付商户信息.xls');
+          this.exportLoading = false;
+      }).catch(() => {});
     }
   }
 };

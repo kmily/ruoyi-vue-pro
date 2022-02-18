@@ -10,15 +10,17 @@
 
     <!-- 展示文档 -->
     <div v-loading="loading" :style="'height:'+ height">
-      <iframe :src="src" frameborder="no" style="width: 100%;height: 100%" scrolling="auto" />
+      <i-frame :src="src" />
     </div>
   </div>
 </template>
 <script>
 import { exportHtml, exportWord, exportMarkdown} from "@/api/tool/dbDoc";
+import iFrame from "@/components/iFrame/index";
 
 export default {
   name: "DBDoc",
+  components: { iFrame },
   data() {
     return {
       height: document.documentElement.clientHeight - 94.5 + "px;",
@@ -46,19 +48,19 @@ export default {
     /** 处理导出 HTML */
     handleExportHtml() {
       exportHtml().then(response => {
-        this.downloadHtml(response, '数据库文档.html');
+        this.$download.html(response, '数据库文档.html');
       })
     },
     /** 处理导出 Word */
     handleExportWord() {
       exportWord().then(response => {
-        this.downloadWord(response, '数据库文档.doc');
+        this.$download.word(response, '数据库文档.doc');
       })
     },
     /** 处理导出 Markdown */
     handleExportMarkdown() {
       exportMarkdown().then(response => {
-        this.downloadMarkdown(response, '数据库文档.md');
+        this.$download.markdown(response, '数据库文档.md');
       })
     }
   }

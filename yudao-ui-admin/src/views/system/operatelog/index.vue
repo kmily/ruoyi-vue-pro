@@ -26,14 +26,14 @@
           type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
       </el-form-item>
       <el-form-item>
-        <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="warning" icon="el-icon-download" size="mini" @click="handleExport"
+        <el-button type="warning" icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
                    v-hasPermi="['system:operate-log:export']">导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -45,7 +45,7 @@
       <el-table-column label="操作名" align="center" prop="name" width="180" />
       <el-table-column label="操作类型" align="center" prop="type">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYSTEM_OPERATE_TYPE, scope.row.type) }}</span>
+          <dict-tag :type="DICT_TYPE.SYSTEM_OPERATE_TYPE" :value="scope.row.type"/>
         </template>
       </el-table-column>
       <el-table-column label="操作人" align="center" prop="userNickname" />
@@ -72,13 +72,8 @@
       </el-table-column>
     </el-table>
 
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNo"
-      :limit.sync="queryParams.pageSize"
-      @pagination="getList"
-    />
+    <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
+                @pagination="getList" />
 
     <!-- 操作日志详细 -->
     <el-dialog title="访问日志详细" :visible.sync="open" width="700px" append-to-body>
@@ -95,7 +90,8 @@
           </el-col>
           <el-col :span="24">
             <el-form-item label="操作信息：">
-              {{ form.module }} | {{ form.name }} | {{ getDictDataLabel(DICT_TYPE.SYSTEM_OPERATE_TYPE, form.type) }}
+              {{ form.module }} | {{ form.name }}
+              <dict-tag :type="DICT_TYPE.SYSTEM_OPERATE_TYPE" :value="form.type"/>
               <br /> {{ form.content }}
               <br /> {{ form.exts }}
             </el-form-item>
@@ -138,6 +134,8 @@ export default {
     return {
       // 遮罩层
       loading: true,
+      // 导出遮罩层
+      exportLoading: false,
       // 显示搜索条件
       showSearch: true,
       // 总条数
@@ -182,14 +180,6 @@ export default {
         }
       );
     },
-    // 操作日志状态字典翻译
-    statusFormat(row, column) {
-      return this.selectDictLabel(this.statusOptions, row.status);
-    },
-    // 操作日志类型字典翻译
-    typeFormat(row, column) {
-      return this.selectDictLabel(this.typeOptions, row.businessType);
-    },
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNo = 1;
@@ -212,15 +202,13 @@ export default {
         this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
         this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
       ])
-      this.$confirm('是否确认导出所有操作日志数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('是否确认导出所有操作日志数据项?').then(() => {
+          this.exportLoading = true;
           return exportOperateLog(queryParams);
         }).then(response => {
-          this.downloadExcel(response, '操作日志.xls');
-        })
+          this.$download.excel(response, '操作日志.xls');
+          this.exportLoading = false;
+      }).catch(() => {});
     }
   }
 };

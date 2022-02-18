@@ -72,9 +72,9 @@
       <el-table-column prop="keyTemplate" label="Key 模板" width="200" />
       <el-table-column prop="keyType" label="Key 类型" width="100" />
       <el-table-column prop="valueType" label="Value 类型" />
-      <el-table-column prop="timeoutType" label="超时时间" width="150">
+      <el-table-column prop="timeoutType" label="超时时间" width="200">
         <template slot-scope="scope">
-          {{ getDictDataLabel(DICT_TYPE.INFRA_REDIS_TIMEOUT_TYPE, scope.row.timeoutType) }}
+          <dict-tag :type="DICT_TYPE.INFRA_REDIS_TIMEOUT_TYPE" :value="scope.row.timeoutType" />
           <span v-if="scope.row.timeout > 0">({{ scope.row.timeout / 1000 }} 秒)</span>
         </template>
       </el-table-column>
@@ -92,8 +92,6 @@ export default {
   name: "Server",
   data() {
     return {
-      // 加载层信息
-      loading: [],
       // 统计命令信息
       commandstats: null,
       // 使用内存
@@ -115,7 +113,7 @@ export default {
       // 查询 Redis 监控信息
       getCache().then((response) => {
         this.cache = response.data;
-        this.loading.close();
+        this.$modal.closeLoading();
 
         this.commandstats = echarts.init(this.$refs.commandstats, "macarons");
         const commandStats = [];
@@ -176,12 +174,7 @@ export default {
     },
     // 打开加载层
     openLoading() {
-      this.loading = this.$loading({
-        lock: true,
-        text: "拼命读取中",
-        spinner: "el-icon-loading",
-        background: "rgba(0, 0, 0, 0.7)",
-      });
+      this.$modal.loading("正在加载缓存监控数据，请稍后！");
     },
   },
 };

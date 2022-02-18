@@ -96,7 +96,7 @@ export default {
       // 修改的提交
       if (data.id) {
         updateModel(data).then(response => {
-          this.msgSuccess("修改成功")
+          this.$modal.msgSuccess("修改成功")
           // 跳转回去
           this.close()
         })
@@ -104,15 +104,14 @@ export default {
       }
       // 添加的提交
       createModel(data).then(response => {
-        this.msgSuccess("保存成功")
+        this.$modal.msgSuccess("保存成功")
         // 跳转回去
         this.close()
       })
     },
     /** 关闭按钮 */
     close() {
-      this.$store.dispatch("tagsView/delView", this.$route);
-      this.$router.push({ path: "/bpm/manager/model", query: { t: Date.now()}})
+      this.$tab.closeOpenPage({ path: "/bpm/manager/model" });
     },
   }
 };

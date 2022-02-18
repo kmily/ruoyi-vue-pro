@@ -30,7 +30,8 @@
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="primary" icon="el-icon-plus" size="mini" v-hasPermi="['bpm:oa-leave:create']" @click="handleAdd">发起请假</el-button>
+        <el-button type="primary" plain icon="el-icon-plus" size="mini"
+                   v-hasPermi="['bpm:oa-leave:create']" @click="handleAdd">发起请假</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -38,7 +39,11 @@
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
       <el-table-column label="申请编号" align="center" prop="id" />
-      <el-table-column label="状态" align="center" prop="result" :formatter="resultFormat" />
+      <el-table-column label="状态" align="center" prop="result">
+        <template slot-scope="scope">
+          <dict-tag :type="DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT" :value="scope.row.result"/>
+        </template>
+      </el-table-column>
       <el-table-column label="开始时间" align="center" prop="startTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.startTime) }}</span>
@@ -49,7 +54,11 @@
           <span>{{ parseTime(scope.row.endTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="请假类型" align="center" prop="type" :formatter="typeFormat" />
+      <el-table-column label="请假类型" align="center" prop="type">
+        <template slot-scope="scope">
+          <dict-tag :type="DICT_TYPE.BPM_OA_LEAVE_TYPE" :value="scope.row.type"/>
+        </template>
+      </el-table-column>
       <el-table-column label="原因" align="center" prop="reason" />
       <el-table-column label="申请时间" align="center" prop="applyTime" width="180">
         <template slot-scope="scope">
@@ -75,7 +84,7 @@
 
 <script>
 import { getLeavePage } from "@/api/bpm/leave"
-import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
+import { getDictDatas, DICT_TYPE } from '@/utils/dict'
 import {cancelProcessInstance} from "@/api/bpm/processInstance";
 
 export default {
@@ -160,15 +169,9 @@ export default {
         return cancelProcessInstance(id, value);
       }).then(() => {
         this.getList();
-        this.msgSuccess("取消成功");
+        this.$modal.msgSuccess("取消成功");
       })
-    },
-    resultFormat(row, column) {
-      return getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, row.result)
-    },
-    typeFormat(row, column) {
-      return getDictDataLabel(DICT_TYPE.BPM_OA_LEAVE_TYPE, row.type)
-    },
+    }
   }
 };
 </script>
