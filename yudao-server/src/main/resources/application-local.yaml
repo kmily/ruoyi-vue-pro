@@ -44,23 +44,23 @@ spring:
       datasource:
         master:
           name: ruoyi-vue-pro
-          url: jdbc:mysql://www.tangkc.com:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
+          url: jdbc:mysql://www.xs.com:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
           driver-class-name: com.mysql.jdbc.Driver
           username: root
-          password: TangMySQL2020
+          password: xs&123
         slave: # 模拟从库，可根据自己需要修改
           name: ruoyi-vue-pro
-          url: jdbc:mysql://www.tangkc.com:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
+          url: jdbc:mysql://www.xs.com:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
           driver-class-name: com.mysql.jdbc.Driver
           username: root
-          password: TangMySQL2020
+          password: xs&123
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   redis:
-    host: www.tangkc.com # 地址
+    host: www.xs.com # 地址
     port: 6379 # 端口
     database: 0 # 数据库索引
-    password: TangRedis2020
+    password: Xs+123
 
 --- #################### 定时任务相关配置 ####################
 
