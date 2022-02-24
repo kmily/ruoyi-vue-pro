@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.file.vo.FilePageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileDO;
 import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * 文件操作 Mapper
@@ -16,29 +17,28 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface FileMapper extends BaseMapperX<FileDO> {
 
-    default PageResult<FileDO> selectPage(FilePageReqVO reqVO) {
-        return selectPage(reqVO, new QueryWrapperX<FileDO>()
-                .likeIfPresent("id", reqVO.getId())
-                .likeIfPresent("type", reqVO.getType())
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
-                .orderByDesc("create_time"));
-    }
+	default PageResult<FileDO> selectPage(FilePageReqVO reqVO) {
+		return selectPage(reqVO, new QueryWrapperX<FileDO>()
+				.likeIfPresent("id", reqVO.getId())
+				.likeIfPresent("type", reqVO.getType())
+				.betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+				.orderByDesc("create_time"));
+	}
 
-    default Integer selectCountById(String id) {
-        return selectCount(FileDO::getId, id);
-    }
+	default Integer selectCountById(String id) {
+		return selectCount(FileDO::getId, id);
+	}
 
-    /**
-     * 基于 Path 获取文件
-     * 实际上，是基于 ID 查询
-     * 由于前端使用 <img /> 的方式获取图片，所以需要忽略租户的查询
-     *
-     * @param path 路径
-     * @return 文件
-     */
-    @InterceptorIgnore(tenantLine = "true")
-    default FileDO selectByPath(String path) {
-        return selectById(path);
-    }
+	/**
+	 * 基于 Path 获取文件
+	 * 实际上，是基于 ID 查询
+	 * 由于前端使用 <img /> 的方式获取图片，所以需要忽略租户的查询
+	 *
+	 * @param path 路径
+	 * @return 文件
+	 */
+	@Select("SELECT * FROM infra_file WHERE id = #{path} AND deleted = 0 ")
+	@InterceptorIgnore(tenantLine = "true")
+	FileDO selectByPath(String path);
 
 }
