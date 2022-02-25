@@ -35,7 +35,7 @@
         <module>yudao-spring-boot-starter-biz-social</module>
         <module>yudao-spring-boot-starter-biz-tenant</module>
         <module>yudao-spring-boot-starter-biz-data-permission</module>
-        <module>yudao-spring-boot-starter-covert</module>
+        <module>yudao-spring-boot-starter-loader</module>
     </modules>
 
     <artifactId>yudao-framework</artifactId>

@@ -426,7 +426,7 @@
 
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
-                <artifactId>yudao-spring-boot-starter-covert</artifactId>
+                <artifactId>yudao-spring-boot-starter-loader</artifactId>
                 <version>${revision}</version>
             </dependency>
 

@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class YudaoCovertAutoConfiguration {
+public class YudaoLoaderAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(SpringUtil.class)

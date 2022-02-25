@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>yudao-spring-boot-starter-covert</artifactId>
+    <artifactId>yudao-spring-boot-starter-loader</artifactId>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
