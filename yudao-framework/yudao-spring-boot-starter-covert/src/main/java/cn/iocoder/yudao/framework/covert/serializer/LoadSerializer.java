@@ -121,17 +121,15 @@ public class LoadSerializer extends JsonSerializer<Object> implements Contextual
     @Override
     public void serialize(Object bindData, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         Object params = paramsHandler.handleVal(bindData);
+        gen.writeObject(bindData);
+        gen.writeFieldName('$' + gen.getOutputContext().getCurrentName());
         if (params == null || loadService == null) {
-            gen.writeObject(bindData);
+            gen.writeObject(null);
             return;
         }
 
         // 有效ID，去查询
         String cacheKey = prefix + method + "-" + paramsHandler.getCacheKey(bindData, args);
-        if (StrUtil.isBlank(cacheKey)) {
-            gen.writeObject(bindData);
-            return;
-        }
         Object result = getCacheInfo(cacheKey);
         if (result == null) {
             StampedLock lock = lockMap.get(cacheKey, true, LockUtil::createStampLock);
