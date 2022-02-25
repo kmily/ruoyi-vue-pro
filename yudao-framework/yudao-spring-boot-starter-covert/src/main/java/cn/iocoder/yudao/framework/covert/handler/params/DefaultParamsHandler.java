@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.covert.handler.params;
 
+import cn.iocoder.yudao.framework.covert.bo.AnnotationsResult;
 import com.fasterxml.jackson.databind.BeanProperty;
 
 /**
@@ -15,7 +16,7 @@ public class DefaultParamsHandler implements ParamsHandler {
     }
 
     @Override
-    public Object[] handleAnnotation(BeanProperty property) {
-        return null;
+    public AnnotationsResult handleAnnotation(BeanProperty property) {
+        return new AnnotationsResult();
     }
 }

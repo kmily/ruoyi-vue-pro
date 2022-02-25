@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.covert.handler.params;
 
 import cn.hutool.crypto.SecureUtil;
+import cn.iocoder.yudao.framework.covert.bo.AnnotationsResult;
 import com.fasterxml.jackson.databind.BeanProperty;
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,7 +24,7 @@ public interface ParamsHandler {
      * @param property
      * @return
      */
-    Object[] handleAnnotation(BeanProperty property);
+    AnnotationsResult handleAnnotation(BeanProperty property);
 
     /**
      * 获取缓存的key

@@ -19,6 +19,13 @@ import java.lang.annotation.*;
 public @interface LoadUser {
 
     /**
+     * 回显到字段, 填写了已填写的为准, 否则自动填充$+被翻译字段
+     *
+     * @return
+     */
+    String field() default "";
+
+    /**
      * 是否批量
      * 如果批量返回集合, 否则返回对象
      *

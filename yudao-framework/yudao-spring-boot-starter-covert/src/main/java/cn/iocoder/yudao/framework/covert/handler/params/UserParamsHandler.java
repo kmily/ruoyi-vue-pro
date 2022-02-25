@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.covert.handler.params;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.covert.annotation.LoadUser;
+import cn.iocoder.yudao.framework.covert.bo.AnnotationsResult;
 import com.fasterxml.jackson.databind.BeanProperty;
 
 import java.util.Collections;
@@ -27,12 +28,16 @@ public class UserParamsHandler implements ParamsHandler {
     }
 
     @Override
-    public Object[] handleAnnotation(BeanProperty property) {
+    public AnnotationsResult handleAnnotation(BeanProperty property) {
+        AnnotationsResult annotationsResult = new AnnotationsResult();
         // 用户注解值处理
-        LoadUser loadDict = property.getAnnotation(LoadUser.class);
-        if (loadDict != null) {
-            return new Object[]{loadDict.batch()};
+        LoadUser loadUser = property.getAnnotation(LoadUser.class);
+        if (loadUser != null) {
+            annotationsResult.setRemoteParams(new Object[]{loadUser.batch()});
+            if (loadUser.field() != "") {
+                annotationsResult.setWriteField(loadUser.field());
+            }
         }
-        return null;
+        return annotationsResult;
     }
 }
