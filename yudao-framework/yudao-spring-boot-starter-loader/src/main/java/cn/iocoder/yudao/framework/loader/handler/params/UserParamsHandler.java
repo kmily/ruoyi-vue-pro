@@ -1,12 +1,11 @@
-package cn.iocoder.yudao.framework.covert.handler.params;
+package cn.iocoder.yudao.framework.loader.handler.params;
 
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.framework.covert.annotation.LoadUser;
-import cn.iocoder.yudao.framework.covert.bo.AnnotationsResult;
+import cn.iocoder.yudao.framework.loader.annotation.LoadUser;
+import cn.iocoder.yudao.framework.loader.bo.AnnotationsResult;
 import com.fasterxml.jackson.databind.BeanProperty;
 
-import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 

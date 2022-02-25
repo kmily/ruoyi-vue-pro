@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.controller.admin.dict.vo.type;
 
-import cn.iocoder.yudao.framework.covert.annotation.LoadUser;
+import cn.iocoder.yudao.framework.loader.annotation.LoadUser;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

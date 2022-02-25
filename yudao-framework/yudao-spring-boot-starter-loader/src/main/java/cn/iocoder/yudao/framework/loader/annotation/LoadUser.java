@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.framework.covert.annotation;
+package cn.iocoder.yudao.framework.loader.annotation;
 
-import cn.iocoder.yudao.framework.covert.handler.params.UserParamsHandler;
+import cn.iocoder.yudao.framework.loader.handler.params.UserParamsHandler;
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 
 import java.lang.annotation.*;

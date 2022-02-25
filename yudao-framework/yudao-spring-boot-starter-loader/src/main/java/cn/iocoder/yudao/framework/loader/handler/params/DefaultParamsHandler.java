@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.framework.covert.handler.params;
+package cn.iocoder.yudao.framework.loader.handler.params;
 
-import cn.iocoder.yudao.framework.covert.bo.AnnotationsResult;
+import cn.iocoder.yudao.framework.loader.bo.AnnotationsResult;
 import com.fasterxml.jackson.databind.BeanProperty;
 
 /**

@@ -1,8 +1,6 @@
-package cn.iocoder.yudao.framework.covert.bo;
+package cn.iocoder.yudao.framework.loader.bo;
 
 import lombok.Data;
-
-import java.util.List;
 
 /**
  * 注解处理结果

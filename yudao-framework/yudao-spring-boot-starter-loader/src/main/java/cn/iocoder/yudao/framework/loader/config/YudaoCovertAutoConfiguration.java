@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.covert.config;
+package cn.iocoder.yudao.framework.loader.config;
 
 
 import cn.hutool.extra.spring.SpringUtil;
