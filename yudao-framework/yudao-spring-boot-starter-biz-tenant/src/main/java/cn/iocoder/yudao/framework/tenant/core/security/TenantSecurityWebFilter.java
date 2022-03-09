@@ -64,7 +64,7 @@ public class TenantSecurityWebFilter extends ApiRequestFilter {
             if (tenantId == null) {
                 tenantId = user.getTenantId();
                 TenantContextHolder.setTenantId(tenantId);
-            // 如果传递了租户编号，则进行比对租户编号，避免越权问题
+                // 如果传递了租户编号，则进行比对租户编号，避免越权问题
             } else if (!Objects.equals(user.getTenantId(), TenantContextHolder.getTenantId())) {
                 log.error("[doFilterInternal][租户({}) User({}/{}) 越权访问租户({}) URL({}/{})]",
                         user.getTenantId(), user.getId(), user.getUserType(),
@@ -84,14 +84,14 @@ public class TenantSecurityWebFilter extends ApiRequestFilter {
                         "租户的请求未传递，请进行排查"));
                 return;
             }
-			// 3. 校验租户是合法，例如说被禁用、到期
-			try {
-				tenantFrameworkService.validTenant(tenantId);
-			} catch (Throwable ex) {
-				CommonResult<?> result = globalExceptionHandler.allExceptionHandler(request, ex);
-				ServletUtils.writeJSON(response, result);
-				return;
-			}
+            // 3. 校验租户是合法，例如说被禁用、到期
+            try {
+                tenantFrameworkService.validTenant(tenantId);
+            } catch (Throwable ex) {
+                CommonResult<?> result = globalExceptionHandler.allExceptionHandler(request, ex);
+                ServletUtils.writeJSON(response, result);
+                return;
+            }
         }
 
         // 继续过滤
