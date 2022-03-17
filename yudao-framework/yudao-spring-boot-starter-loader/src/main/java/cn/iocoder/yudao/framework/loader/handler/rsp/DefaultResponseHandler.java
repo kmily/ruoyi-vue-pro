@@ -13,7 +13,7 @@ public class DefaultResponseHandler implements ResponseHandler {
      */
     @Override
     public Object handle(String bean, String method, Object rsp, Class<?> cls, Object... params) {
-        if (cls != Object.class) {
+        if (cls == Object.class) {
             return rsp;
         } else if (rsp.getClass() == cls) {
             return rsp;
