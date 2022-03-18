@@ -34,6 +34,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 权限 Service 实现类
@@ -62,7 +63,7 @@ public class PermissionServiceImpl implements PermissionService {
      *
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
-    private volatile Multimap<Long, Long> roleMenuCache;
+    private volatile Multimap<Long, RoleMenuDO> roleMenuCache;
     /**
      * 菜单编号与角色编号的缓存映射
      * key：菜单编号
@@ -109,10 +110,10 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         // 初始化 roleMenuCache 和 menuRoleCache 缓存
-        ImmutableMultimap.Builder<Long, Long> roleMenuCacheBuilder = ImmutableMultimap.builder();
+        ImmutableMultimap.Builder<Long, RoleMenuDO> roleMenuCacheBuilder = ImmutableMultimap.builder();
         ImmutableMultimap.Builder<Long, Long> menuRoleCacheBuilder = ImmutableMultimap.builder();
         roleMenuList.forEach(roleMenuDO -> {
-            roleMenuCacheBuilder.put(roleMenuDO.getRoleId(), roleMenuDO.getMenuId());
+            roleMenuCacheBuilder.put(roleMenuDO.getRoleId(), roleMenuDO);
             menuRoleCacheBuilder.put(roleMenuDO.getMenuId(), roleMenuDO.getRoleId());
         });
         roleMenuCache = roleMenuCacheBuilder.build();
@@ -162,7 +163,7 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         // 获得角色拥有的菜单关联
-        List<Long> menuIds = MapUtils.getList(roleMenuCache, roleIds);
+        List<Long> menuIds = MapUtils.getList(roleMenuCache, roleIds).stream().filter(roleMenuDO -> !roleMenuDO.getDeleted()).map(RoleMenuDO::getMenuId).collect(Collectors.toList());;
         return menuService.getMenuListFromCache(menuIds, menuTypes, menusStatuses);
     }
 
@@ -206,6 +207,15 @@ public class PermissionServiceImpl implements PermissionService {
         }
         if (!CollectionUtil.isEmpty(deleteMenuIds)) {
             roleMenuMapper.deleteListByRoleIdAndMenuIds(roleId, deleteMenuIds);
+            roleMenuCache.asMap().forEach((key, ruleMenuDOList) -> {
+                if (key.equals(roleId)) {
+                    ruleMenuDOList.forEach(ruleMenuDO -> {
+                        if (deleteMenuIds.contains(ruleMenuDO.getMenuId())) {
+                            ruleMenuDO.setDeleted(true);
+                        }
+                    });
+                }
+            });
         }
         // 发送刷新消息. 注意，需要事务提交后，在进行发送刷新消息。不然 db 还未提交，结果缓存先刷新了
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
