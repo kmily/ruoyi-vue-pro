@@ -83,6 +83,8 @@ public class CodegenServiceImpl implements CodegenService {
         codegenTableMapper.insert(table);
         // 构建 CodegenColumnDO 数组，插入到 DB 中
         List<CodegenColumnDO> columns = codegenBuilder.buildColumns(schemaColumns);
+        //给字段TableId的添加值
+        columns.forEach(i-> i.setTableId(table.getId()));
         codegenColumnMapper.insertBatch(columns);
         return table.getId();
     }
