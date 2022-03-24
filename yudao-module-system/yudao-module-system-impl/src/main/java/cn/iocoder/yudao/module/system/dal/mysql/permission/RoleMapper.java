@@ -44,7 +44,7 @@ public interface RoleMapper extends BaseMapperX<RoleDO> {
         return selectList(new LambdaQueryWrapperX<RoleDO>().inIfPresent(RoleDO::getStatus, statuses));
     }
 
-    @Select("SELECT id FROM system_role WHERE update_time > #{maxUpdateTime} LIMIT 1")
+    @Select("SELECT id FROM system_role WHERE update_time > #{maxUpdateTime} AND ROWNUM = 1")
     RoleDO selectExistsByUpdateTimeAfter(Date maxUpdateTime);
 
 }

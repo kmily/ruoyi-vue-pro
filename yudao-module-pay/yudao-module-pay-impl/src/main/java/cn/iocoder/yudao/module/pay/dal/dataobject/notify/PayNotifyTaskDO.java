@@ -20,7 +20,7 @@ import java.util.Date;
  *
  * @author 芋道源码
  */
-@TableName("pay_notify_task")
+@TableName(value = "pay_notify_task", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)

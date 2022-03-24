@@ -52,7 +52,7 @@ public interface TenantMapper extends BaseMapperX<TenantDO> {
         return selectList(TenantDO::getPackageId, packageId);
     }
 
-    @Select("SELECT id FROM system_tenant WHERE update_time > #{maxUpdateTime} LIMIT 1")
+    @Select("SELECT id FROM system_tenant WHERE update_time > #{maxUpdateTime} AND ROWNUM = 1")
     Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
 
 }

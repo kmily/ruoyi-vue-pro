@@ -11,11 +11,10 @@ import lombok.*;
 /**
  * 支付商户信息 DO
  * 目前暂时没有特别的用途，主要为未来多商户提供基础。
- *
  * @author 芋道源码
  */
 @Data
-@TableName("pay_merchant")
+@TableName(value = "pay_merchant", autoResultMap = true)
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
@@ -44,7 +43,7 @@ public class PayMerchantDO extends BaseDO {
     private String shortName;
     /**
      * 状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;

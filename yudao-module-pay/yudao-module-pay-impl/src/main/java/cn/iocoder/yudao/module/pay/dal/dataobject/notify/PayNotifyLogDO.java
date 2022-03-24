@@ -11,7 +11,7 @@ import lombok.*;
  *
  * @author 芋道源码
  */
-@TableName("pay_notify_log")
+@TableName(value = "pay_notify_log", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder

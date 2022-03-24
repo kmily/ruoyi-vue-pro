@@ -10,10 +10,9 @@ import lombok.ToString;
 
 /**
  * 错误码表
- *
  * @author 芋道源码
  */
-@TableName(value = "system_error_code")
+@TableName(value = "system_error_code", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -26,7 +25,7 @@ public class ErrorCodeDO extends BaseDO {
     private Long id;
     /**
      * 错误码类型
-     *
+     * <p>
      * 枚举 {@link ErrorCodeTypeEnum}
      */
     private Integer type;

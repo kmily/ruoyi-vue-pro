@@ -21,7 +21,7 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
         return selectOne(PayChannelDO::getAppId, appId, PayChannelDO::getCode, code);
     }
 
-    @Select("SELECT id FROM pay_channel WHERE update_time > #{maxUpdateTime} LIMIT 1")
+    @Select("SELECT id FROM pay_channel WHERE update_time > #{maxUpdateTime} AND ROWNUM = 1")
     Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
 
     default PageResult<PayChannelDO> selectPage(PayChannelPageReqVO reqVO) {

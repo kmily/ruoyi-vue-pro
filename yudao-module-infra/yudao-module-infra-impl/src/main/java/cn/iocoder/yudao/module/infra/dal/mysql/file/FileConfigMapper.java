@@ -26,7 +26,7 @@ public interface FileConfigMapper extends BaseMapperX<FileConfigDO> {
                 .orderByDesc(FileConfigDO::getId));
     }
 
-    @Select("SELECT id FROM infra_file_config WHERE update_time > #{maxUpdateTime} LIMIT 1")
+    @Select("SELECT id FROM infra_file_config WHERE update_time > #{maxUpdateTime} AND ROWNUM = 1")
     Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
 
 }

@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
  *
  * @author ruoyi
  */
-@TableName("system_user_role")
+@TableName(value = "system_user_role", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class UserRoleDO extends BaseDO {

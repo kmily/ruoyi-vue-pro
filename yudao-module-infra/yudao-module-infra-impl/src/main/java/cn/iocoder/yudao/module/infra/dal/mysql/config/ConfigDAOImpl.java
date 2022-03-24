@@ -27,7 +27,7 @@ public class ConfigDAOImpl implements ConfigFrameworkDAO {
 
     @Override
     public boolean selectExistsByUpdateTimeAfter(Date maxUpdateTime) {
-        return jdbcTemplate.query("SELECT id FROM infra_config WHERE update_time > ? LIMIT 1",
+        return jdbcTemplate.query("SELECT id FROM infra_config WHERE update_time > ? AND ROWNUM = 1",
                 ResultSet::next, maxUpdateTime);
     }
 

@@ -10,10 +10,9 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 通知公告表
- *
  * @author ruoyi
  */
-@TableName("system_notice")
+@TableName(value = "system_notice", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class NoticeDO extends BaseDO {
@@ -28,7 +27,7 @@ public class NoticeDO extends BaseDO {
     private String title;
     /**
      * 公告类型
-     *
+     * <p>
      * 枚举 {@link NoticeTypeEnum}
      */
     @TableField("notice_type")
@@ -39,7 +38,7 @@ public class NoticeDO extends BaseDO {
     private String content;
     /**
      * 公告状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;

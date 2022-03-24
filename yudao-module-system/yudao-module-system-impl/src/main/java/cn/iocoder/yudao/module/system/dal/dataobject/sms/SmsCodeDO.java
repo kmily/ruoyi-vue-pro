@@ -8,12 +8,11 @@ import java.util.Date;
 
 /**
  * 手机验证码 DO
- *
+ * <p>
  * idx_mobile 索引：基于 {@link #mobile} 字段
- *
  * @author 芋道源码
  */
-@TableName("system_sms_code")
+@TableName(value = "system_sms_code", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder
@@ -35,7 +34,7 @@ public class SmsCodeDO extends BaseDO {
     private String code;
     /**
      * 发送场景
-     *
+     * <p>
      * 枚举 {@link SmsCodeDO}
      */
     private Integer scene;

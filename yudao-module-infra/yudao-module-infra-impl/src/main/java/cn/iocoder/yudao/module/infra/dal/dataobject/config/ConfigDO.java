@@ -11,10 +11,9 @@ import lombok.ToString;
 
 /**
  * 参数配置表
- *
  * @author 芋道源码
  */
-@TableName("infra_config")
+@TableName(value = "infra_config", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -45,14 +44,14 @@ public class ConfigDO extends BaseDO {
     private String value;
     /**
      * 参数类型
-     *
+     * <p>
      * 枚举 {@link ConfigTypeEnum}
      */
     @TableField("`type`")
     private Integer type;
     /**
      * 是否敏感
-     *
+     * <p>
      * 对于敏感配置，需要管理权限才能查看
      */
     @TableField("`sensitive`")

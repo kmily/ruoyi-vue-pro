@@ -15,10 +15,9 @@ import java.util.Date;
 
 /**
  * 支付订单 DO
- *
  * @author 芋道源码
  */
-@TableName("pay_order")
+@TableName(value = "pay_order", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -33,25 +32,25 @@ public class PayOrderDO extends BaseDO {
     private Long id;
     /**
      * 商户编号
-     *
+     * <p>
      * 关联 {@link PayMerchantDO#getId()}
      */
     private Long merchantId;
     /**
      * 应用编号
-     *
+     * <p>
      * 关联 {@link PayAppDO#getId()}
      */
     private Long appId;
     /**
      * 渠道编号
-     *
+     * <p>
      * 关联 {@link PayChannelDO#getId()}
      */
     private Long channelId;
     /**
      * 渠道编码
-     *
+     * <p>
      * 枚举 {@link PayChannelEnum}
      */
     private String channelCode;
@@ -77,7 +76,7 @@ public class PayOrderDO extends BaseDO {
     private String notifyUrl;
     /**
      * 通知商户支付结果的回调状态
-     *
+     * <p>
      * 枚举 {@link PayOrderNotifyStatusEnum}
      */
     private Integer notifyStatus;
@@ -94,7 +93,7 @@ public class PayOrderDO extends BaseDO {
     private Long amount;
     /**
      * 渠道手续费，单位：百分比
-     *
+     * <p>
      * 冗余 {@link PayChannelDO#getFeeRate()}
      */
     private Double channelFeeRate;
@@ -104,7 +103,7 @@ public class PayOrderDO extends BaseDO {
     private Long channelFeeAmount;
     /**
      * 支付状态
-     *
+     * <p>
      * 枚举 {@link PayOrderStatusEnum}
      */
     private Integer status;
@@ -126,7 +125,7 @@ public class PayOrderDO extends BaseDO {
     private Date notifyTime;
     /**
      * 支付成功的订单拓展单编号
-     *
+     * <p>
      * 关联 {@link PayOrderDO#getId()}
      */
     private Long successExtensionId;
@@ -134,7 +133,7 @@ public class PayOrderDO extends BaseDO {
     // ========== 退款相关字段 ==========
     /**
      * 退款状态
-     *
+     * <p>
      * 枚举 {@link PayRefundTypeEnum}
      */
     private Integer refundStatus;
@@ -150,7 +149,7 @@ public class PayOrderDO extends BaseDO {
     // ========== 渠道相关字段 ==========
     /**
      * 渠道用户编号
-     *
+     * <p>
      * 例如说，微信 openid、支付宝账号
      */
     private String channelUserId;

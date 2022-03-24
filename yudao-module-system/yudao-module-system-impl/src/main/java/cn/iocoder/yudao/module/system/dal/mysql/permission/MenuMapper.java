@@ -28,7 +28,7 @@ public interface MenuMapper extends BaseMapperX<MenuDO> {
                 .eqIfPresent(MenuDO::getStatus, reqVO.getStatus()));
     }
 
-    @Select("SELECT id FROM system_menu WHERE update_time > #{maxUpdateTime} LIMIT 1")
+    @Select("SELECT id FROM system_menu WHERE update_time > #{maxUpdateTime} AND ROWNUM = 1")
     MenuDO selectExistsByUpdateTimeAfter(Date maxUpdateTime);
 
 }

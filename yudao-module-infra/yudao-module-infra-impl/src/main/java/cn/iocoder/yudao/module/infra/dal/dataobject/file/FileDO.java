@@ -14,7 +14,7 @@ import java.io.InputStream;
  * @author 芋道源码
  */
 @Data
-@TableName("infra_file")
+@TableName(value = "infra_file", autoResultMap = true)
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder

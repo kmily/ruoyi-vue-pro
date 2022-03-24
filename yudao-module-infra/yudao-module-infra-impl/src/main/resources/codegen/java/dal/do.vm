@@ -10,7 +10,7 @@ import ${BaseDOClassName};
  *
  * @author ${table.author}
  */
-@TableName("${table.tableName}")
+@TableName(value = "${table.tableName}", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

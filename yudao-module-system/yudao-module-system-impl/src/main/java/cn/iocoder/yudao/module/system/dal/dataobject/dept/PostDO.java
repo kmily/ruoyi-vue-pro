@@ -9,10 +9,9 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 岗位表
- *
  * @author ruoyi
  */
-@TableName("system_post")
+@TableName(value = "system_post", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class PostDO extends BaseDO {
@@ -36,7 +35,7 @@ public class PostDO extends BaseDO {
     private Integer sort;
     /**
      * 状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;

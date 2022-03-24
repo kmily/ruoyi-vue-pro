@@ -9,10 +9,9 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 角色和菜单关联
- *
  * @author ruoyi
  */
-@TableName("system_role_menu")
+@TableName(value = "system_role_menu", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class RoleMenuDO extends TenantBaseDO {

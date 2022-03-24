@@ -10,7 +10,7 @@ import lombok.*;
  *
  * @author 芋道源码
  */
-@TableName("infra_test_demo")
+@TableName(value = "infra_test_demo", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

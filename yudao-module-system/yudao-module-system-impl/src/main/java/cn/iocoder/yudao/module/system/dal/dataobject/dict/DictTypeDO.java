@@ -9,10 +9,9 @@ import lombok.*;
 
 /**
  * 字典类型表
- *
  * @author ruoyi
  */
-@TableName("system_dict_type")
+@TableName(value = "system_dict_type", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -37,7 +36,7 @@ public class DictTypeDO extends BaseDO {
     private String type;
     /**
      * 状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;

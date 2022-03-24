@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.system.dal.mysql.sms;
 
-import cn.iocoder.yudao.framework.mybatis.core.enums.SqlConstants;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsCodeDO;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 @Mapper
 public interface SmsCodeMapper extends BaseMapperX<SmsCodeDO> {
@@ -18,9 +19,15 @@ public interface SmsCodeMapper extends BaseMapperX<SmsCodeDO> {
      * @return 手机验证码
      */
     default SmsCodeDO selectLastByMobile(String mobile, String code, Integer scene) {
-        return selectOne(new QueryWrapperX<SmsCodeDO>()
-                .eq("mobile", mobile).eqIfPresent("scene", scene).eqIfPresent("code", code)
-                .orderByDesc("id").last(SqlConstants.LIMIT1));
+        List<SmsCodeDO> smsCodeDOS = selectList(new QueryWrapperX<SmsCodeDO>()
+                .eq("mobile", mobile)
+                .eqIfPresent("scene", scene)
+                .eqIfPresent("code", code)
+                .orderByDesc("id"));
+        if (smsCodeDOS.isEmpty()) {
+            return null;
+        }
+        return smsCodeDOS.get(0);
     }
 
 }

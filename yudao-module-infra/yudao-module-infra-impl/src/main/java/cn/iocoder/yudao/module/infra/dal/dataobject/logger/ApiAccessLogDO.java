@@ -14,7 +14,7 @@ import java.util.Date;
  *
  * @author 芋道源码
  */
-@TableName("infra_api_access_log")
+@TableName(value = "infra_api_access_log", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
