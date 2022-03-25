@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.system.dal.dataobject.dict;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -11,7 +13,8 @@ import lombok.EqualsAndHashCode;
  * 字典数据表
  * @author ruoyi
  */
-@TableName(value = "system_dict_data", autoResultMap = true)
+@TableName(value = "SYSTEM_DICT_DATA", autoResultMap = true)
+@KeySequence(value = "SEQ_SYSTEM_DICT_DATA",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class DictDataDO extends BaseDO {

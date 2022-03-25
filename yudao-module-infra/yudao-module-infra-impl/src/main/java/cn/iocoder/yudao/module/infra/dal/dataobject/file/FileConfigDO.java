@@ -3,7 +3,10 @@ package cn.iocoder.yudao.module.infra.dal.dataobject.file;
 import cn.iocoder.yudao.framework.file.core.client.FileClientConfig;
 import cn.iocoder.yudao.framework.file.core.enums.FileStorageEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
@@ -14,7 +17,8 @@ import lombok.*;
  * @author 芋道源码
  */
 @Data
-@TableName(value = "infra_file_config", autoResultMap = true)
+@TableName(value = "INFRA_FILE_CONFIG", autoResultMap = true)
+@KeySequence(value = "SEQ_INFRA_FILE_CONFIG",dbType = DbType.ORACLE)
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
@@ -25,6 +29,7 @@ public class FileConfigDO extends BaseDO {
     /**
      * 配置编号，数据库自增
      */
+    @TableId
     private Long id;
     /**
      * 配置名

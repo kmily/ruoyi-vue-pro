@@ -13,7 +13,8 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
  * @author jason
  * @author 芋道源码
  */
-@TableName(value = "bpm_oa_leave", autoResultMap = true)
+@TableName(value = "BPM_OA_LEAVE", autoResultMap = true)
+@KeySequence(value = "SEQ_BPM_OA_LEAVE",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -36,7 +37,6 @@ public class BpmOALeaveDO extends BaseDO {
     /**
      * 请假类型
      */
-    @TableField("`type`")
     private String type;
     /**
      * 原因

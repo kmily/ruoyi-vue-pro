@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.pay.dal.dataobject.merchant;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -14,7 +16,8 @@ import lombok.*;
  * 即 PayMerchantDO : PayAppDO = 1 : n
  * @author 芋道源码
  */
-@TableName(value = "pay_app", autoResultMap = true)
+@TableName(value = "PAY_APP", autoResultMap = true)
+@KeySequence(value = "SEQ_PAY_APP",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

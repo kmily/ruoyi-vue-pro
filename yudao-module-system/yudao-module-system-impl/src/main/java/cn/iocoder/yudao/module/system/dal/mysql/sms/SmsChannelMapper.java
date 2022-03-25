@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.system.dal.mysql.sms;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
@@ -14,14 +16,22 @@ import java.util.Date;
 public interface SmsChannelMapper extends BaseMapperX<SmsChannelDO> {
 
     default PageResult<SmsChannelDO> selectPage(SmsChannelPageReqVO reqVO) {
-        return selectPage(reqVO, new QueryWrapperX<SmsChannelDO>()
-                .likeIfPresent("signature", reqVO.getSignature())
-                .eqIfPresent("status", reqVO.getStatus())
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
-                .orderByDesc("id"));
+        return selectPage(reqVO, new LambdaQueryWrapperX<SmsChannelDO>()
+                .likeIfPresent(SmsChannelDO::getSignature, reqVO.getSignature())
+                .eqIfPresent(SmsChannelDO::getStatus, reqVO.getStatus())
+                .betweenIfPresent(BaseDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .orderByDesc(SmsChannelDO::getId));
     }
 
-    @Select("SELECT id FROM system_sms_channel WHERE update_time > #{maxUpdateTime} AND ROWNUM = 1")
-    Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
+    default Long selectExistsByUpdateTimeAfter(Date maxUpdateTime){
+        SmsChannelDO smsChannelDO = selectOne(new LambdaQueryWrapperX<SmsChannelDO>()
+                .gt(SmsChannelDO::getUpdateTime, maxUpdateTime)
+                .last(" AND ROWNUM = 1")
+                .select(SmsChannelDO::getId));
+        if (smsChannelDO == null) {
+            return null;
+        }
+        return smsChannelDO.getId();
+    }
 
 }

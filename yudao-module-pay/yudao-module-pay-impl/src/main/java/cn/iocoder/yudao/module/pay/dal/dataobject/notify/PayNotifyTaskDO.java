@@ -7,6 +7,9 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,7 +23,8 @@ import java.util.Date;
  *
  * @author 芋道源码
  */
-@TableName(value = "pay_notify_task", autoResultMap = true)
+@TableName(value = "PAY_NOTIFY_TASK", autoResultMap = true)
+@KeySequence(value = "SEQ_PAY_NOTIFY_TASK",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
@@ -39,6 +43,7 @@ public class PayNotifyTaskDO extends BaseDO {
     /**
      * 编号，自增
      */
+    @TableId
     private Long id;
     /**
      * 商户编号

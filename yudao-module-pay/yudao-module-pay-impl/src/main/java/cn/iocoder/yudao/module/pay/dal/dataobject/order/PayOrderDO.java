@@ -8,6 +8,9 @@ import cn.iocoder.yudao.module.pay.enums.refund.PayRefundTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
@@ -17,7 +20,8 @@ import java.util.Date;
  * 支付订单 DO
  * @author 芋道源码
  */
-@TableName(value = "pay_order", autoResultMap = true)
+@TableName(value = "PAY_ORDER", autoResultMap = true)
+@KeySequence(value = "SEQ_PAY_ORDER",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -29,6 +33,7 @@ public class PayOrderDO extends BaseDO {
     /**
      * 订单编号，数据库自增
      */
+    @TableId
     private Long id;
     /**
      * 商户编号

@@ -65,7 +65,28 @@
         </root>
     </springProfile>
     <!-- 其它环境 -->
-    <springProfile name="dev,default">
+    <springProfile name="dev">
+        <root level="INFO">
+            <appender-ref ref="STDOUT"/>
+            <appender-ref ref="ASYNC"/>
+            <appender-ref ref="GRPC"/>
+        </root>
+    </springProfile>
+    <springProfile name="prod">
+        <root level="INFO">
+            <appender-ref ref="STDOUT"/>
+            <appender-ref ref="ASYNC"/>
+            <appender-ref ref="GRPC"/>
+        </root>
+    </springProfile>
+    <springProfile name="localo">
+        <root level="INFO">
+            <appender-ref ref="STDOUT"/>
+            <appender-ref ref="ASYNC"/>
+            <appender-ref ref="GRPC"/>
+        </root>
+    </springProfile>
+    <springProfile name="localm">
         <root level="INFO">
             <appender-ref ref="STDOUT"/>
             <appender-ref ref="ASYNC"/>

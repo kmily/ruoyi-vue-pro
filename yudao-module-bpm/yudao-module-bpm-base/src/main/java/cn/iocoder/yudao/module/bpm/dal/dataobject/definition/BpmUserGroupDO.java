@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.bpm.dal.dataobject.definition;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.JsonLongSetTypeHandler;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -15,7 +17,8 @@ import java.util.Set;
  *
  * @author 芋道源码
  */
-@TableName(value = "bpm_user_group", autoResultMap = true)
+@TableName(value = "BPM_USER_GROUP", autoResultMap = true)
+@KeySequence(value = "SEQ_BPM_USER_GROUP",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

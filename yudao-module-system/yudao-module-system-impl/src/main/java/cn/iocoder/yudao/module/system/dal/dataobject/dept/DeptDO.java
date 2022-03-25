@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.system.dal.dataobject.dept;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -13,7 +15,8 @@ import lombok.EqualsAndHashCode;
  * @author ruoyi
  * @author 芋道源码
  */
-@TableName(value = "system_dept", autoResultMap = true)
+@TableName(value = "SYSTEM_DEPT", autoResultMap = true)
+@KeySequence(value = "SEQ_SYSTEM_DEPT",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class DeptDO extends BaseDO {

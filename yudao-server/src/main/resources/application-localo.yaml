@@ -44,16 +44,16 @@ spring:
       datasource:
         master:
           name: ruoyi_template
-          url: jdbc:mysql://47.95.196.48:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
-          driver-class-name: com.mysql.jdbc.Driver
+          url: jdbc:oracle:thin:@39.98.182.24:1531:orcl?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
+          driver-class-name: oracle.jdbc.OracleDriver
           username: ruoyi_template
-          password: 123qwe!@#QWE
+          password: ruoyi_template
         slave: # 模拟从库，可根据自己需要修改
           name: ruoyi_template
-          url: jdbc:mysql://47.95.196.48:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
-          driver-class-name: com.mysql.jdbc.Driver
+          url: jdbc:oracle:thin:@39.98.182.24:1531:orcl?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
+          driver-class-name: oracle.jdbc.OracleDriver
           username: ruoyi_template
-          password: 123qwe!@#QWE
+          password: ruoyi_template
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   redis:

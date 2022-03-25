@@ -3,7 +3,10 @@ package cn.iocoder.yudao.module.system.dal.dataobject.sms;
 import cn.iocoder.yudao.module.system.enums.sms.SmsTemplateTypeEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
@@ -18,7 +21,8 @@ import java.util.List;
  * @author zzf
  * @since 2021-01-25
  */
-@TableName(value = "system_sms_template", autoResultMap = true)
+@TableName(value = "SYSTEM_SMS_TEMPLATE", autoResultMap = true)
+@KeySequence(value = "SEQ_SYSTEM_SMS_TEMPLATE",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -27,6 +31,7 @@ public class SmsTemplateDO extends BaseDO {
     /**
      * 自增编号
      */
+    @TableId
     private Long id;
 
     // ========= 模板相关字段 =========

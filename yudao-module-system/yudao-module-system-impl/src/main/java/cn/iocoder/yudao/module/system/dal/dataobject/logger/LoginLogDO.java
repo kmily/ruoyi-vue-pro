@@ -4,6 +4,9 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,7 +18,8 @@ import lombok.ToString;
  * 注意，包括登录和登出两种行为
  * @author 芋道源码
  */
-@TableName(value = "system_login_log", autoResultMap = true)
+@TableName(value = "SYSTEM_LOGIN_LOG", autoResultMap = true)
+@KeySequence(value = "SEQ_SYSTEM_LOGIN_LOG",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -24,6 +28,7 @@ public class LoginLogDO extends BaseDO {
     /**
      * 日志主键
      */
+    @TableId
     private Long id;
     /**
      * 日志类型

@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.system.dal.mysql.permission;
 
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleMenuDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -29,19 +32,29 @@ public interface RoleMenuMapper extends BaseMapperX<RoleMenuDO> {
     }
 
     default void deleteListByRoleIdAndMenuIds(Long roleId, Collection<Long> menuIds) {
-        delete(new QueryWrapper<RoleMenuDO>().eq("role_id", roleId)
-                .in("menu_id", menuIds));
+        delete(new LambdaQueryWrapperX<RoleMenuDO>()
+                .eq(RoleMenuDO::getRoleId, roleId)
+                .in(RoleMenuDO::getMenuId, menuIds));
     }
 
     default void deleteListByMenuId(Long menuId) {
-        delete(new QueryWrapper<RoleMenuDO>().eq("menu_id", menuId));
+        delete(new LambdaQueryWrapperX<RoleMenuDO>().eq(RoleMenuDO::getMenuId, menuId));
     }
 
     default void deleteListByRoleId(Long roleId) {
-        delete(new QueryWrapper<RoleMenuDO>().eq("role_id", roleId));
+        delete(new LambdaQueryWrapperX<RoleMenuDO>().eq(RoleMenuDO::getRoleId, roleId));
     }
 
-    @Select("SELECT id FROM system_role_menu WHERE update_time > #{maxUpdateTime} AND ROWNUM = 1")
-    Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
+
+    default Long selectExistsByUpdateTimeAfter(Date maxUpdateTime){
+        RoleMenuDO roleMenuDO = selectOne(new LambdaQueryWrapperX<RoleMenuDO>()
+                .gt(RoleMenuDO::getUpdateTime, maxUpdateTime)
+                .last(" AND ROWNUM = 1")
+                .select(RoleMenuDO::getId));
+        if (roleMenuDO == null) {
+            return null;
+        }
+        return roleMenuDO.getId();
+    }
 
 }

@@ -3,6 +3,9 @@ package cn.iocoder.yudao.module.system.dal.dataobject.tenant;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
@@ -13,7 +16,8 @@ import java.util.Date;
  *
  * @author 芋道源码
  */
-@TableName(value = "system_tenant", autoResultMap = true)
+@TableName(value = "SYSTEM_TENANT", autoResultMap = true)
+@KeySequence(value = "SEQ_SYSTEM_TENANT",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -30,6 +34,7 @@ public class TenantDO extends BaseDO {
     /**
      * 租户编号，自增
      */
+    @TableId
     private Long id;
     /**
      * 租户名，唯一

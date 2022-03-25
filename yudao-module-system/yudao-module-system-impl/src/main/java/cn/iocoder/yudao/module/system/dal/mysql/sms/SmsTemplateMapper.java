@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.system.dal.mysql.sms;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplatePageReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -15,8 +17,17 @@ import java.util.List;
 @Mapper
 public interface SmsTemplateMapper extends BaseMapperX<SmsTemplateDO> {
 
-    @Select("SELECT id FROM system_sms_template WHERE update_time > #{maxUpdateTime} AND ROWNUM = 1")
-    Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
+
+    default Long selectExistsByUpdateTimeAfter(Date maxUpdateTime){
+        SmsTemplateDO smsChannelDO = selectOne(new LambdaQueryWrapperX<SmsTemplateDO>()
+                .gt(SmsTemplateDO::getUpdateTime, maxUpdateTime)
+                .last(" AND ROWNUM = 1")
+                .select(SmsTemplateDO::getId));
+        if (smsChannelDO == null) {
+            return null;
+        }
+        return smsChannelDO.getId();
+    }
 
     default SmsTemplateDO selectByCode(String code) {
         return selectOne(SmsTemplateDO::getCode, code);

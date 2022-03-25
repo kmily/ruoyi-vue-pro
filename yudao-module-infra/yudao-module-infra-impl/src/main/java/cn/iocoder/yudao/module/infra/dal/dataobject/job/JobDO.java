@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.infra.dal.dataobject.job;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.infra.enums.job.JobStatusEnum;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -10,7 +12,8 @@ import lombok.*;
  * 定时任务 DO
  * @author 芋道源码
  */
-@TableName(value = "infra_job", autoResultMap = true)
+@TableName(value = "INFRA_JOB", autoResultMap = true)
+@KeySequence(value = "SEQ_INFRA_JOB",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

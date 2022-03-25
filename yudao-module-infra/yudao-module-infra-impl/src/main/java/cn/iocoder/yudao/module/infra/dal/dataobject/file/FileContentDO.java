@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.infra.dal.dataobject.file;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -13,7 +15,8 @@ import lombok.*;
  * @author 芋道源码
  */
 @Data
-@TableName(value = "infra_file_content", autoResultMap = true)
+@TableName(value = "INFRA_FILE_CONTENT", autoResultMap = true)
+@KeySequence(value = "SEQ_INFRA_FILE_CONTENT",dbType = DbType.ORACLE)
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder

@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.system.dal.mysql.dept;
 
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -28,7 +30,16 @@ public interface DeptMapper extends BaseMapperX<DeptDO> {
         return selectCount(DeptDO::getParentId, parentId);
     }
 
-    @Select("SELECT id FROM system_dept WHERE update_time > #{maxUpdateTime} AND ROWNUM = 1")
-    Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
+
+    default Long selectExistsByUpdateTimeAfter(Date maxUpdateTime){
+        DeptDO deptDO = selectOne(new LambdaQueryWrapperX<DeptDO>()
+                .gt(DeptDO::getUpdateTime, maxUpdateTime)
+                .last(" AND ROWNUM = 1")
+                .select(DeptDO::getId));
+        if (deptDO == null) {
+            return null;
+        }
+        return deptDO.getId();
+    }
 
 }

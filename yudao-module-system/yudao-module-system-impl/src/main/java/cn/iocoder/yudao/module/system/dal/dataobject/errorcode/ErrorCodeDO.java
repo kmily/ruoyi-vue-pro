@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.system.dal.dataobject.errorcode;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.system.enums.errorcode.ErrorCodeTypeEnum;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -12,7 +14,8 @@ import lombok.ToString;
  * 错误码表
  * @author 芋道源码
  */
-@TableName(value = "system_error_code", autoResultMap = true)
+@TableName(value = "SYSTEM_ERROR_CODE", autoResultMap = true)
+@KeySequence(value = "SEQ_SYSTEM_ERROR_CODE",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

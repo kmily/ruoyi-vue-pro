@@ -21,7 +21,7 @@ import java.util.Date;
  *
  * @author 芋道源码
  */
-@TableName(value = "system_user_session", autoResultMap = true)
+@TableName(value = "SYSTEM_USER_SESSION", autoResultMap = true)
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = true)

@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.system.dal.mysql.permission;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RolePageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.lang.Nullable;
@@ -44,7 +46,12 @@ public interface RoleMapper extends BaseMapperX<RoleDO> {
         return selectList(new LambdaQueryWrapperX<RoleDO>().inIfPresent(RoleDO::getStatus, statuses));
     }
 
-    @Select("SELECT id FROM system_role WHERE update_time > #{maxUpdateTime} AND ROWNUM = 1")
-    RoleDO selectExistsByUpdateTimeAfter(Date maxUpdateTime);
+
+    default RoleDO selectExistsByUpdateTimeAfter(Date maxUpdateTime){
+        return selectOne(new LambdaQueryWrapperX<RoleDO>()
+                .gt(RoleDO::getUpdateTime, maxUpdateTime)
+                .last(" AND ROWNUM = 1")
+                .select(RoleDO::getId));
+    }
 
 }

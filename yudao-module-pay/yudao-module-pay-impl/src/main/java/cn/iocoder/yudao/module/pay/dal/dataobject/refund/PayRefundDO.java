@@ -8,6 +8,8 @@ import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundTypeEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -21,7 +23,8 @@ import java.util.Date;
  * 即 PayOrderDO : PayRefundDO = 1 : n
  * @author 芋道源码
  */
-@TableName(value = "pay_refund", autoResultMap = true)
+@TableName(value = "PAY_REFUND", autoResultMap = true)
+@KeySequence(value = "SEQ_PAY_REFUND",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

@@ -3,7 +3,10 @@ package cn.iocoder.yudao.module.system.dal.dataobject.notice;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.system.enums.notice.NoticeTypeEnum;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,7 +15,8 @@ import lombok.EqualsAndHashCode;
  * 通知公告表
  * @author ruoyi
  */
-@TableName(value = "system_notice", autoResultMap = true)
+@TableName(value = "SYSTEM_NOTICE", autoResultMap = true)
+@KeySequence(value = "SEQ_SYSTEM_NOTICE",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class NoticeDO extends BaseDO {
@@ -20,6 +24,7 @@ public class NoticeDO extends BaseDO {
     /**
      * 公告ID
      */
+    @TableId
     private Long id;
     /**
      * 公告标题

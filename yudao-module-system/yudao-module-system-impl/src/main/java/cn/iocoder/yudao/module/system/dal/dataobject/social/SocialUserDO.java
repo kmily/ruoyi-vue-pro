@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.system.dal.dataobject.social;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -13,7 +15,8 @@ import lombok.*;
  *
  * @author weir
  */
-@TableName(value = "system_social_user", autoResultMap = true)
+@TableName(value = "SYSTEM_SOCIAL_USER", autoResultMap = true)
+@KeySequence(value = "SEQ_SYSTEM_SOCIAL_USER",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder

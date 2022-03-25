@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.infra.dal.dataobject.logger;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -14,7 +16,8 @@ import java.util.Date;
  *
  * @author 芋道源码
  */
-@TableName(value = "infra_api_access_log", autoResultMap = true)
+@TableName(value = "INFRA_API_ACCESS_LOG", autoResultMap = true)
+@KeySequence(value = "SEQ_INFRA_API_ACCESS_LOG",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

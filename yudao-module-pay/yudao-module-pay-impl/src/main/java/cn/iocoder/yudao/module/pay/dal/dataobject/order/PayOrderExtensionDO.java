@@ -3,7 +3,10 @@ package cn.iocoder.yudao.module.pay.dal.dataobject.order;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
@@ -14,7 +17,8 @@ import java.util.Map;
  * 支付订单拓展 DO
  * @author 芋道源码
  */
-@TableName(value = "pay_order_extension", autoResultMap = true)
+@TableName(value = "PAY_ORDER_EXTENSION", autoResultMap = true)
+@KeySequence(value = "SEQ_PAY_ORDER_EXTENSION",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -26,6 +30,7 @@ public class PayOrderExtensionDO extends BaseDO {
     /**
      * 订单拓展编号，数据库自增
      */
+    @TableId
     private Long id;
     /**
      * 支付订单号，根据规则生成

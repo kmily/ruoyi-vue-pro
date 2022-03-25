@@ -4,6 +4,8 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
@@ -18,7 +20,8 @@ import lombok.*;
  * @author 芋道源码
  */
 @Data
-@TableName(value = "pay_channel", autoResultMap = true)
+@TableName(value = "PAY_CHANNEL", autoResultMap = true)
+@KeySequence(value = "SEQ_PAY_CHANNEL",dbType = DbType.ORACLE)
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder

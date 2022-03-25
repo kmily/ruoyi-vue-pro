@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.system.dal.mysql.tenant;
 
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
@@ -52,7 +54,16 @@ public interface TenantMapper extends BaseMapperX<TenantDO> {
         return selectList(TenantDO::getPackageId, packageId);
     }
 
-    @Select("SELECT id FROM system_tenant WHERE update_time > #{maxUpdateTime} AND ROWNUM = 1")
-    Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
+
+    default Long selectExistsByUpdateTimeAfter(Date maxUpdateTime){
+        TenantDO tenantDO = selectOne(new LambdaQueryWrapperX<TenantDO>()
+                .gt(TenantDO::getUpdateTime, maxUpdateTime)
+                .last(" AND ROWNUM = 1")
+                .select(TenantDO::getId));
+        if (tenantDO == null) {
+            return null;
+        }
+        return tenantDO.getId();
+    }
 
 }
