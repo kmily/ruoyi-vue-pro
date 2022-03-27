@@ -2,7 +2,7 @@
   <div class="app-container">
 
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="短信签名" prop="signature">
         <el-input v-model="queryParams.signature" placeholder="请输入短信签名" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
@@ -17,15 +17,15 @@
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
+        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
+        <el-button type="primary" plain icon="Plus" @click="handleAdd"
                    v-hasPermi="['system:sms-channel:create']">新增</el-button>
       </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" />
@@ -56,9 +56,9 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
-          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
+          <el-button size="mini" type="text" icon="Edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['system:sms-channel:update']">修改</el-button>
-          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
+          <el-button size="mini" type="text" icon="Delete" @click="handleDelete(scope.row)"
                      v-hasPermi="['system:sms-channel:delete']">删除</el-button>
         </template>
       </el-table-column>
@@ -69,7 +69,7 @@
 
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
-      <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="130px">
         <el-form-item label="短信签名" prop="signature">
           <el-input v-model="form.signature" placeholder="请输入短信签名" />
         </el-form-item>
@@ -148,17 +148,20 @@ function getList(){
     loading.value = false;
   });
 }
+
 /** 搜索按钮操作 */
 function handleQuery() {
   queryParams.value.pageNo = 1;
   getList();
 }
+
 /** 重置按钮操作 */
 function resetQuery() {
   dateRangeCreateTime.value = [];
   proxy.resetForm("queryForm");
   handleQuery();
 }
+
 /** 取消按钮 */
 function cancel() {
   open.value = false;
@@ -179,12 +182,14 @@ function reset() {
   };
   proxy.resetForm("queryForm");
 }
+
 /** 新增按钮操作 */
 function handleAdd() {
   reset();
   open.value = true;
   title.value = "添加短信渠道";
 }
+
 /** 修改按钮操作 */
 function handleUpdate(row) {
     reset();
@@ -195,6 +200,7 @@ function handleUpdate(row) {
       title.value = "修改短信渠道";
     });
 }
+
 /** 提交表单 */
 function submitForm() {
   proxy.$refs["formRef"].validate(valid => {
@@ -218,6 +224,7 @@ function submitForm() {
       });
   });
 }
+
 /** 删除按钮操作 */
 function handleDelete(row) {
   const id = row.id;
@@ -228,5 +235,6 @@ function handleDelete(row) {
     proxy.$modal.msgSuccess("删除成功");
   }).catch(() => {});
 }
+
 getList();
 </script>
