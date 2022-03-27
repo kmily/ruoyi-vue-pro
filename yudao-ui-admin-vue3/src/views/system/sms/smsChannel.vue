@@ -95,10 +95,12 @@
           <el-input v-model="form.callbackUrl" placeholder="请输入短信发送回调 URL" />
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
-      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="submitForm">确 定</el-button>
+          <el-button @click="cancel">取 消</el-button>
+        </div>
+      </template>
     </el-dialog>
   </div>
 </template>
@@ -140,7 +142,6 @@ function getList(){
   // 处理查询参数
   let params = {...queryParams.value};
   proxy.addBeginAndEndTime(params, dateRangeCreateTime.value, 'createTime');
-  console.log(params);
   // 执行查询
   getSmsChannelPage(params).then(response => {
     list.value = response.data.list;

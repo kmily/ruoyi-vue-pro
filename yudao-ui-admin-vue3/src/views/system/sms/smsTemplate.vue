@@ -214,7 +214,6 @@ const data = reactive({
     channelId: [{required: true, message: "短信渠道编号不能为空", trigger: "change"}],
   },
   sendSmsForm: {
-    mobile: undefined,
     params: [], // 模板的参数列表
   },
   sendSmsRules: {
@@ -359,6 +358,7 @@ function handleSendSms(row) {
     obj[item] = undefined;
     return obj;
   }, {});
+  console.log(sendSmsForm.value);
   // 根据 row 重置 rules
   sendSmsRules.value.templateParams = row.params.reduce(function (obj, item) {
     obj[item] = {required: true, message: '参数 ' + item + " 不能为空", trigger: "change"};

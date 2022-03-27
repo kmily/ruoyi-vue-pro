@@ -1,7 +1,7 @@
 
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
       <el-form-item label="登录地址" prop="userIp">
         <el-input v-model="queryParams.userIp" placeholder="请输入登录地址" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
@@ -27,7 +27,7 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
-          <el-button size="small" type="text" icon="el-icon-delete" @click="handleForceLogout(scope.row)"
+          <el-button size="small" type="text" icon="Delete" @click="handleForceLogout(scope.row)"
                      v-hasPermi="['system:user-session:delete']">强退
           </el-button>
         </template>
