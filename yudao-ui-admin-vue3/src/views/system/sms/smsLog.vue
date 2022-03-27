@@ -2,7 +2,7 @@
   <div class="app-container">
 
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="100px">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="100px">
       <el-form-item label="手机号" prop="mobile">
         <el-input v-model="queryParams.mobile" placeholder="请输入手机号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
@@ -23,7 +23,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="发送时间">
-        <el-date-picker v-model="dateRangeSendTime" style="width: 240px" value-format="yyyy-MM-dd"
+        <el-date-picker v-model="dateRangeSendTime" style="width: 240px" value-format="YYYY-MM-DD"
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"/>
       </el-form-item>
       <el-form-item label="接收状态" prop="receiveStatus">
@@ -33,7 +33,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="接收时间">
-        <el-date-picker v-model="dateRangeReceiveTime" style="width: 240px" value-format="yyyy-MM-dd"
+        <el-date-picker v-model="dateRangeReceiveTime" style="width: 240px" value-format="YYYY-MM-DD"
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"/>
       </el-form-item>
       <el-form-item>
@@ -44,19 +44,11 @@
 
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
-      <!--      <el-col :span="1.5">-->
-      <!--        <el-button type="primary" plain icon="el-icon-plus" size="small" @click="handleAdd"-->
-      <!--                   v-hasPermi="['system:sms-log:create']">新增-->
-      <!--        </el-button>-->
-      <!--      </el-col>-->
       <el-col :span="1.5">
-        <el-button type="warning"  icon="Download" size="small" @click="handleExport"
-                   :loading="exportLoading"
-                   v-hasPermi="['system:sms-log:export']">导出
-        </el-button>
-
+        <el-button type="warning" icon="Download" @click="handleExport" :loading="exportLoading"
+                   v-hasPermi="['system:sms-log:export']">导出</el-button>
       </el-col>
-      <right-toolbar :showSearch="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar :showSearch="showSearch" @queryTable="getList" />
     </el-row>
 
     <!-- 列表 -->
@@ -103,7 +95,7 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
-          <el-button size="small" type="text" icon="el-icon-view" @click="handleView(scope.row,scope.index)"
+          <el-button size="small" type="text" icon="View" @click="handleView(scope.row,scope.index)"
                      v-hasPermi="['system:sms-log:query']">详细
           </el-button>
         </template>
@@ -226,8 +218,6 @@ const data = reactive({
     storage: undefined,
     config: {}
   },
-
-
 });
 const {queryParams, formData} = toRefs(data);
 
@@ -236,8 +226,8 @@ function getList() {
   loading.value = true;
   // 处理查询参数
   let params = {...queryParams.value};
-  proxy.addBeginAndEndTime(params, dateRangeSendTime, 'sendTime');
-  proxy.addBeginAndEndTime(params, dateRangeReceiveTime, 'receiveTime');
+  proxy.addBeginAndEndTime(params, dateRangeSendTime.value, 'sendTime');
+  proxy.addBeginAndEndTime(params, dateRangeReceiveTime.value, 'receiveTime');
   // 执行查询
   getSmsLogPage(params).then(response => {
     list.value = response.data.list;
@@ -301,14 +291,9 @@ function formatChannelSignature(channelId) {
   return '找不到签名：' + channelId;
 }
 
-function initData() {
-  // 获得短信渠道
-  getSimpleSmsChannels().then(response => {
-    channelOptions.value = response.data;
-
-  })
-  getList();
-
-}
-initData();
+// 获得短信渠道
+getSimpleSmsChannels().then(response => {
+  channelOptions.value = response.data;
+})
+getList();
 </script>
