@@ -37,8 +37,8 @@
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
+        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -50,7 +50,7 @@
       <!--        </el-button>-->
       <!--      </el-col>-->
       <el-col :span="1.5">
-        <el-button type="warning"  icon="el-icon-download" size="small" @click="handleExport"
+        <el-button type="warning"  icon="Download" size="small" @click="handleExport"
                    :loading="exportLoading"
                    v-hasPermi="['system:sms-log:export']">导出
         </el-button>
