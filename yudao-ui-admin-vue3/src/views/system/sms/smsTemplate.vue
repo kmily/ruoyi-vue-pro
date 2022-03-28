@@ -2,7 +2,7 @@
   <div class="app-container">
 
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="150px">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="150px">
       <el-form-item label="短信类型" prop="type">
         <el-select v-model="queryParams.type" placeholder="请选择短信类型" clearable>
           <el-option v-for="dict in getDictDatas(DICT_TYPE.SYSTEM_SMS_TEMPLATE_TYPE)"
@@ -19,7 +19,7 @@
         <el-input v-model="queryParams.code" placeholder="请输入模板编码" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="短信 API 的模板编号" prop="apiTemplateId">
-        <el-input v-model="queryParams.apiTemplateId" placeholder="请输入短信 API 的模板编号" clearable size="small"
+        <el-input v-model="queryParams.apiTemplateId" placeholder="请输入短信 API 的模板编号" clearable
                   @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="短信渠道" prop="channelId">
@@ -30,7 +30,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd"
+        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="YYYY-MM-DD"
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"/>
       </el-form-item>
       <el-form-item>
@@ -42,15 +42,12 @@
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="primary" plain icon="el-icon-plus" size="small" @click="handleAdd"
-                   v-hasPermi="['system:sms-template:create']">新增
-        </el-button>
+        <el-button type="primary" plain icon="Plus" @click="handleAdd"
+                   v-hasPermi="['system:sms-template:create']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="warning" plain icon="Download" size="small" @click="handleExport"
-                   :loading="exportLoading"
-                   v-hasPermi="['system:sms-template:export']">导出
-        </el-button>
+        <el-button type="warning" plain icon="Download" @click="handleExport" :loading="exportLoading"
+                   v-hasPermi="['system:sms-template:export']">导出</el-button>
       </el-col>
       <right-toolbar :showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -85,13 +82,13 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="150">
         <template #default="scope">
-          <el-button size="small" type="text" icon="el-icon-share" @click="handleSendSms(scope.row)"
+          <el-button size="small" type="text" icon="Share" @click="handleSendSms(scope.row)"
                      v-hasPermi="['system:sms-template:send-sms']">测试
           </el-button>
-          <el-button size="small" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
+          <el-button size="small" type="text" icon="Edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['system:sms-template:update']">修改
           </el-button>
-          <el-button size="small" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
+          <el-button size="small" type="text" icon="Delete" @click="handleDelete(scope.row)"
                      v-hasPermi="['system:sms-template:delete']">删除
           </el-button>
         </template>
@@ -140,30 +137,34 @@
           <el-input v-model="formData.remark" placeholder="请输入备注"/>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
-      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="submitForm">确 定</el-button>
+          <el-button @click="cancel">取 消</el-button>
+        </div>
+      </template>
     </el-dialog>
 
     <!-- 对话框(发送短信) -->
     <el-dialog title="测试发送短信" v-model="sendSmsOpen" width="500px" append-to-body>
-      <el-form ref="sendSmsForm" :model="sendSmsForm" :rules="sendSmsRules" label-width="140px">
+      <el-form ref="sendSmsForm" :model="sendSmsFormData" :rules="sendSmsRules" label-width="140px">
         <el-form-item label="模板内容" prop="content">
-          <el-input v-model="sendSmsForm.content" type="textarea" placeholder="请输入模板内容" readonly/>
+          <el-input v-model="sendSmsFormData.content" type="textarea" placeholder="请输入模板内容" readonly/>
         </el-form-item>
         <el-form-item label="手机号" prop="mobile">
-          <el-input v-model="sendSmsForm.mobile" placeholder="请输入手机号"/>
+          <el-input v-model="sendSmsFormData.mobile" placeholder="请输入手机号"/>
         </el-form-item>
-        <el-form-item v-for="param in sendSmsForm.params" :label="'参数 {' + param + '}'"
+        <el-form-item v-for="param in sendSmsFormData.params" :label="'参数 {' + param + '}'"
                       :prop="'templateParams.' + param">
-          <el-input v-model="sendSmsForm.templateParams[param]" :placeholder="'请输入 ' + param + ' 参数'"/>
+          <el-input v-model="sendSmsFormData.templateParams[param]" :placeholder="'请输入 ' + param + ' 参数'"/>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitSendSmsForm">确 定</el-button>
-        <el-button @click="cancelSendSms">取 消</el-button>
-      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="submitSendSmsForm">确 定</el-button>
+          <el-button @click="cancelSendSms">取 消</el-button>
+        </div>
+      </template>
     </el-dialog>
 
   </div>
@@ -181,6 +182,7 @@ const {proxy} = getCurrentInstance();
 const loading = ref(true);// 遮罩层
 const exportLoading = ref(false);// 导出遮罩层
 const showSearch = ref(true);// 显示搜索条件
+const title = ref(""); // 弹窗标题
 const total = ref(0);// 总条数
 const list = ref([]);// 表格数据
 const open = ref(false);// 是否显示弹出层
@@ -190,7 +192,6 @@ const channelOptions = ref([]);
 const sendSmsOpen = ref(false);  // 发送短信
 
 const data = reactive({
-
   // 查询参数
   queryParams: {
     pageNo: 1,
@@ -212,7 +213,7 @@ const data = reactive({
     apiTemplateId: [{required: true, message: "短信 API 的模板编号不能为空", trigger: "blur"}],
     channelId: [{required: true, message: "短信渠道编号不能为空", trigger: "change"}],
   },
-  sendSmsForm: {
+  sendSmsFormData: {
     params: [], // 模板的参数列表
   },
   sendSmsRules: {
@@ -223,8 +224,7 @@ const data = reactive({
   formData: {},
 });
 
-const {queryParams, rules, sendSmsForm, sendSmsRules, formData} = toRefs(data);
-
+const {queryParams, rules, sendSmsFormData, sendSmsRules, formData} = toRefs(data);
 
 /** 查询列表 */
 function getList() {
@@ -351,10 +351,10 @@ function handleExport() {
 function handleSendSms(row) {
   resetSendSms(row);
   // 设置参数
-  sendSmsForm.value.content = row.content;
-  sendSmsForm.value.params = row.params;
-  sendSmsForm.value.templateCode = row.code;
-  sendSmsForm.value.templateParams = row.params.reduce(function (obj, item) {
+  sendSmsFormData.value.content = row.content;
+  sendSmsFormData.value.params = row.params;
+  sendSmsFormData.value.templateCode = row.code;
+  sendSmsFormData.value.templateParams = row.params.reduce(function (obj, item) {
     obj[item] = undefined;
     return obj;
   }, {});
@@ -370,9 +370,9 @@ function handleSendSms(row) {
 /** 重置发送短信的表单 */
 function resetSendSms() {
   // 根据 row 重置表单
-  sendSmsForm.value = {
+  sendSmsFormData.value = {
     content: undefined,
-    params: undefined,
+    params: [],
     mobile: undefined,
     templateCode: undefined,
     templateParams: {}
@@ -393,7 +393,7 @@ function submitSendSmsForm() {
       return;
     }
     // 添加的提交
-    sendSms(sendSmsForm).then(response => {
+    sendSms(sendSmsFormData.value).then(response => {
       proxy.$modal.msgSuccess("提交发送成功！发送结果，见发送日志编号：" + response.data);
       sendSmsOpen.value = false;
     });

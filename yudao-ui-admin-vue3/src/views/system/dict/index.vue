@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryDictRef" size="small" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryDictRef" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="字典名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入字典名称" clearable style="width: 240px" @keyup.enter="handleQuery" />
       </el-form-item>
@@ -13,7 +13,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
+        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="YYYY-MM-DD" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
@@ -23,12 +23,13 @@
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="primary" plain icon="Plus" size="mini" @click="handleAdd" v-hasPermi="['system:dict:create']">新增</el-button>
+        <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['system:dict:create']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="warning" icon="Download" size="mini" @click="handleExport" :loading="exportLoading" v-hasPermi="['system:dict:export']">导出</el-button>
+        <el-button type="warning" icon="Download" size="mini" @click="handleExport" :loading="exportLoading"
+                   v-hasPermi="['system:dict:export']">导出</el-button>
       </el-col>
-      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" />
     </el-row>
 
     <el-table v-loading="loading" :data="typeList">
@@ -154,7 +155,7 @@ function handleQuery() {
   getList();
 }
 
-/** 表单重置 */ 
+/** 表单重置 */
 function reset() {
   proxy.resetForm("dictDgRef");
   form.value = {
@@ -168,6 +169,7 @@ function reset() {
 
 /** 重置按钮操作 */
 function resetQuery() {
+  dateRangeCreateTime.value = [];
   proxy.resetForm("queryDictRef");
   handleQuery();
 }
