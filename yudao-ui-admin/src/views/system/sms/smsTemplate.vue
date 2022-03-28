@@ -19,7 +19,7 @@
         <el-input v-model="queryParams.code" placeholder="请输入模板编码" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="短信 API 的模板编号" prop="apiTemplateId">
-        <el-input v-model="queryParams.apiTemplateId" placeholder="请输入短信 API 的模板编号" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.apiTemplateId" placeholder="请输入短信 API 的模板编号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="短信渠道" prop="channelId">
         <el-select v-model="queryParams.channelId" placeholder="请选择短信渠道" clearable>

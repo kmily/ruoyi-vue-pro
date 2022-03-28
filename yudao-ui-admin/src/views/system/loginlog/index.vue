@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <doc-alert title="系统日志" url="https://doc.iocoder.cn/system-log" />
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="登录地址" prop="userIp">
         <el-input v-model="queryParams.userIp" placeholder="请输入登录地址" clearable style="width: 240px;"
