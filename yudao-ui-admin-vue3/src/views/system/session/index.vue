@@ -1,4 +1,3 @@
-
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
@@ -39,60 +38,71 @@
   </div>
 </template>
 
-<script setup name="Online">
+<script>
 import {list, forceLogout} from "@/api/system/session";
+export default {
+  name: "Online",
+  setup() {
+    const {proxy} = getCurrentInstance();
+    const state = reactive({
+      // 遮罩层
+      loading: true,
+      // 总条数
+      total: 0,
+      // 表格数据
+      listData: [],
+      // 查询参数
+      queryParams: {
+        pageNo: 1,
+        pageSize: 10,
+        userIp: undefined,
+        username: undefined
+      }
+    });
+    onMounted(() => {
+      getList();
+    })
 
-const {proxy} = getCurrentInstance();
-const loading = ref(true);// 遮罩层
-const total = ref(0);// 总条数
-const listData = ref([]);// 表格数据
+    const getList = () => {
+      state.loading = true;
 
+      list(state.queryParams).then(response => {
+        state.listData = response.data.list;
+        state.total = response.data.total;
+        state.loading = false;
+      });
+    }
 
+    /** 搜索按钮操作 */
+    const handleQuery = () => {
+      state.queryParams.pageNo = 1;
+      getList();
+    }
 
-const data = reactive({
-  // 查询参数
-  queryParams: {
-    pageNo: 1,
-    pageSize: 10,
-    userIp: undefined,
-    username: undefined
+    /** 重置按钮操作 */
+    const resetQuery = () => {
+      proxy.resetForm("queryForm");
+      handleQuery();
+    }
+
+    /** 强退按钮操作 */
+    const handleForceLogout = (row) => {
+      proxy.$modal.confirm('是否确认强退名称为"' + row.username + '"的数据项?').then(function () {
+        return forceLogout(row.id);
+      }).then(() => {
+        getList();
+        proxy.$modal.msgSuccess("强退成功");
+      }).catch(() => {
+      });
+    }
+    return {
+      ...toRefs(state),
+      getList,
+      handleQuery,
+      resetQuery,
+      handleForceLogout
+    }
   }
-});
-const {queryParams} = toRefs(data);
-/** 查询登录日志列表 */
-function getList() {
-  loading.value = true;
-  console.log(queryParams.value);
-  list(queryParams.value).then(response => {
-    listData.value = response.data.list;
-    total.value = response.data.total;
-    loading.value = false;
-  });
 }
-
-/** 搜索按钮操作 */
-function handleQuery() {
-  queryParams.value.pageNo = 1;
-  getList();
-}
-
-/** 重置按钮操作 */
-function resetQuery() {
- proxy.resetForm("queryForm");
-  handleQuery();
-}
-
-/** 强退按钮操作 */
-function handleForceLogout(row) {
-  proxy.$modal.confirm('是否确认强退名称为"' + row.username + '"的数据项?').then(function () {
-    return forceLogout(row.id);
-  }).then(() => {
-    getList();
-    proxy.$modal.msgSuccess("强退成功");
-  }).catch(() => {
-  });
-}
-
-getList();
 </script>
 
