@@ -147,16 +147,16 @@
 
     <!-- 对话框(发送短信) -->
     <el-dialog title="测试发送短信" v-model="sendSmsOpen" width="500px" append-to-body>
-      <el-form ref="sendSmsForm" :model="sendSmsForm" :rules="sendSmsRules" label-width="140px">
+      <el-form ref="sendSmsForm" :model="sendSmsFormData" :rules="sendSmsRules" label-width="140px">
         <el-form-item label="模板内容" prop="content">
-          <el-input v-model="sendSmsForm.content" type="textarea" placeholder="请输入模板内容" readonly/>
+          <el-input v-model="sendSmsFormData.content" type="textarea" placeholder="请输入模板内容" readonly/>
         </el-form-item>
         <el-form-item label="手机号" prop="mobile">
-          <el-input v-model="sendSmsForm.mobile" placeholder="请输入手机号"/>
+          <el-input v-model="sendSmsFormData.mobile" placeholder="请输入手机号"/>
         </el-form-item>
-        <el-form-item v-for="param in sendSmsForm.params" :label="'参数 {' + param + '}'"
+        <el-form-item v-for="param in sendSmsFormData.params" :label="'参数 {' + param + '}'"
                       :prop="'templateParams.' + param">
-          <el-input v-model="sendSmsForm.templateParams[param]" :placeholder="'请输入 ' + param + ' 参数'"/>
+          <el-input v-model="sendSmsFormData.templateParams[param]" :placeholder="'请输入 ' + param + ' 参数'"/>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -213,7 +213,7 @@ const data = reactive({
     apiTemplateId: [{required: true, message: "短信 API 的模板编号不能为空", trigger: "blur"}],
     channelId: [{required: true, message: "短信渠道编号不能为空", trigger: "change"}],
   },
-  sendSmsForm: {
+  sendSmsFormData: {
     params: [], // 模板的参数列表
   },
   sendSmsRules: {
@@ -224,7 +224,7 @@ const data = reactive({
   formData: {},
 });
 
-const {queryParams, rules, sendSmsForm, sendSmsRules, formData} = toRefs(data);
+const {queryParams, rules, sendSmsFormData, sendSmsRules, formData} = toRefs(data);
 
 /** 查询列表 */
 function getList() {
@@ -351,14 +351,13 @@ function handleExport() {
 function handleSendSms(row) {
   resetSendSms(row);
   // 设置参数
-  sendSmsForm.value.content = row.content;
-  sendSmsForm.value.params = row.params;
-  sendSmsForm.value.templateCode = row.code;
-  sendSmsForm.value.templateParams = row.params.reduce(function (obj, item) {
+  sendSmsFormData.value.content = row.content;
+  sendSmsFormData.value.params = row.params;
+  sendSmsFormData.value.templateCode = row.code;
+  sendSmsFormData.value.templateParams = row.params.reduce(function (obj, item) {
     obj[item] = undefined;
     return obj;
   }, {});
-  console.log(sendSmsForm.value);
   // 根据 row 重置 rules
   sendSmsRules.value.templateParams = row.params.reduce(function (obj, item) {
     obj[item] = {required: true, message: '参数 ' + item + " 不能为空", trigger: "change"};
@@ -371,9 +370,9 @@ function handleSendSms(row) {
 /** 重置发送短信的表单 */
 function resetSendSms() {
   // 根据 row 重置表单
-  sendSmsForm.value = {
+  sendSmsFormData.value = {
     content: undefined,
-    params: undefined,
+    params: [],
     mobile: undefined,
     templateCode: undefined,
     templateParams: {}
@@ -394,7 +393,7 @@ function submitSendSmsForm() {
       return;
     }
     // 添加的提交
-    sendSms(sendSmsForm).then(response => {
+    sendSms(sendSmsFormData.value).then(response => {
       proxy.$modal.msgSuccess("提交发送成功！发送结果，见发送日志编号：" + response.data);
       sendSmsOpen.value = false;
     });
