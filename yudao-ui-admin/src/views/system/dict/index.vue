@@ -37,13 +37,7 @@
     <el-table v-loading="loading" :data="typeList">
       <el-table-column label="字典编号" align="center" prop="id" />
       <el-table-column label="字典名称" align="center" prop="name" :show-overflow-tooltip="true" />
-      <el-table-column label="字典类型" align="center" :show-overflow-tooltip="true">
-        <template slot-scope="scope">
-          <router-link :to="'/dict/type/data/' + scope.row.id" class="link-type">
-            <span>{{ scope.row.type }}</span>
-          </router-link>
-        </template>
-      </el-table-column>
+      <el-table-column label="字典类型" align="center" prop="type" :show-overflow-tooltip="true" />
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
@@ -59,6 +53,8 @@
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['system:dict:update']">修改</el-button>
+          <el-button size="mini" type="text" icon="el-icon-circle-check" @click="handleDictData(scope.row)"
+                     v-hasPermi="['system:dict:create']">配置</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
                      v-hasPermi="['system:dict:delete']">删除</el-button>
         </template>
@@ -206,6 +202,12 @@ export default {
         this.form = response.data;
         this.open = true;
         this.title = "修改字典类型";
+      });
+    },
+    /** 修改字典数据操作 */
+    handleDictData(row) {
+      this.$router.push({
+        path:"/dict/type/data/" + row.id
       });
     },
     /** 提交按钮 */

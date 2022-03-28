@@ -119,9 +119,9 @@
 
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="110px">
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="流程标识" prop="key">
-          <el-input v-model="form.key" placeholder="请输入流标标识" style="width: 330px;" :disabled="form.id" />
+          <el-input v-model="form.key" placeholder="请输入流标标识" style="width: 360px;" :disabled="form.id" />
           <el-tooltip v-if="!form.id" class="item" effect="light" content="新建后，流程标识不可修改！" placement="top">
             <i style="padding-left: 5px;" class="el-icon-question" />
           </el-tooltip>

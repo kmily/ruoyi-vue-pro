@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
-      <h3 class="title">芋道后台管理系统</h3>
+      <h1 class="title">芋道后台管理系统</h1>
       <el-form-item prop="tenantName" v-if="tenantEnable">
         <el-input v-model="loginForm.tenantName" type="text" auto-complete="off" placeholder='租户'>
           <svg-icon slot="prefix" icon-class="tree" class="el-input__icon input-icon" />
