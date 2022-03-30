@@ -129,7 +129,7 @@
                   <el-form-item label="部门状态">
                      <el-radio-group v-model="form.status">
                         <el-radio
-                           v-for="dict in sys_normal_disable"
+                           v-for="dict in getDictDatas(DICT_TYPE.COMMON_STATUS)"
                            :key="dict.value"
                            :label="dict.value"
                         >{{ dict.label }}</el-radio>
@@ -165,6 +165,8 @@ const title = ref("");
 const deptOptions = ref([]);
 const isExpandAll = ref(true);
 const refreshTable = ref(true);
+
+/* 注：未打开对话框时，DOM尚未渲染因此无法获取 */
 const deptRef = ref()
 const queryRef = ref()
 
@@ -196,6 +198,7 @@ function getList() {
 }
 /** 取消按钮 */
 function cancel() {
+  console.log(deptRef.value)
   open.value = false;
   reset();
 }
@@ -256,7 +259,7 @@ async function handleUpdate(row) {
 }
 /** 提交按钮 */
 function submitForm() {
-  deptRef.value.validate(valid => {
+  deptRef.value?.validate(valid => {
     if (valid) {
       if (form.value.deptId !== undefined) {
         updateDept(form.value).then(response => {

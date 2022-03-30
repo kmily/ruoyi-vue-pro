@@ -103,7 +103,7 @@ export function getDictDatas2(dictType, values) {
   }
   // 如果是单个元素，则转换成数组
   if (!Array.isArray(values)) {
-    values = [this.value];
+    values = [values];
   }
   // 获得字典数据
   const results = [];
