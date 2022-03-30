@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryFormRef" size="small" :inline="true" v-show="showSearch" label-width="100px">
+    <el-form :model="queryParams" ref="queryFormRef" :inline="true" v-show="showSearch" label-width="100px">
       <el-form-item label="任务名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入任务名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
@@ -21,18 +21,18 @@
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="primary" plain :icon="Plus" size="small" @click="handleAdd"
+        <el-button type="primary" plain :icon="Plus" @click="handleAdd"
                    v-hasPermi="['infra:job:create']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="warning" :icon="Download" size="small" @click="handleExport" :loading="exportLoading"
+        <el-button type="warning" :icon="Download" @click="handleExport" :loading="exportLoading"
                    v-hasPermi="['infra:job:export']">导出</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="info" :icon="Operation" size="small" @click="handleJobLog"
+        <el-button type="info" :icon="Operation" @click="handleJobLog"
                    v-hasPermi="['infra:job:query']">执行日志</el-button>
       </el-col>
-      <right-toolbar v-model:showSearch="showSearch" @queryTable="loadList"></right-toolbar>
+      <right-toolbar v-model:showSearch="showSearch" @queryTable="loadList" />
     </el-row>
 
     <el-table :height="tableScrollHeight" v-loading="loading" :data="jobList">
@@ -105,18 +105,21 @@
           <el-input v-model="form.monitorTimeout" placeholder="请输入监控超时时间，单位：毫秒" />
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
-      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="submitForm">确 定</el-button>
+          <el-button @click="cancel">取 消</el-button>
+        </div>
+      </template>
     </el-dialog>
 
     <el-dialog title="Cron表达式生成器" v-model="openCron" append-to-body custom-class="scrollbar" destroy-on-close>
-      <crontab @hide="openCron=false" @fill="crontabFill" :expression="expression"></crontab>
+      <crontab @hide="openCron=false" @fill="crontabFill" :expression="expression" />
     </el-dialog>
 
     <!-- 任务详细 -->
     <el-dialog title="任务详细" v-model="openView" width="700px" append-to-body>
+      <!-- TODO @蒜蓉辣椒酱：使用 el-form-item 而不是 div 哈 -->
       <div style="display: flex; flex-direction: column">
         <div style="display: flex; flex-direction: row">
           <div style="width: 90px; text-align: right; font-weight: bold">任务编号:</div>
@@ -152,19 +155,15 @@
           <div style="width: 90px; text-align: right; font-weight: bold">重试间隔:</div>
           <div style="margin-left: 10px; line-height: 1; display: flex; align-items: center" v-text="form.retryInterval + ' 毫秒'"></div>
         </div>
-
         <div style="display: flex; flex-direction: row; margin-top: 10px">
           <div style="width: 90px; text-align: right; font-weight: bold">监控超时时间:</div>
           <div style="margin-left: 10px; line-height: 1; display: flex; align-items: center" v-text="form.monitorTimeout > 0 ? form.monitorTimeout + ' 毫秒' : '未开启'"></div>
         </div>
-
         <div style="display: flex; flex-direction: row; margin-top: 10px; height: 100px; align-items: flex-start; align-content: flex-start; justify-content: flex-start">
           <div style="width: 90px; text-align: right; font-weight: bold">后续执行时间:</div>
           <div style="width: calc(700px - 40px - 90px - 10px); box-sizing: border-box; margin-left: 10px; line-height: 1; display: flex; align-items: center; word-break: break-word;" v-html="Array.from(nextTimes, x => proxy.parseTime(x)).join('<br/>')"></div>
         </div>
-
       </div>
-
       <template #footer>
         <el-button @click="openView = false">关 闭</el-button>
       </template>

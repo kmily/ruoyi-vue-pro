@@ -1,15 +1,15 @@
 <template>
   <div class="app-container">
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="120px">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="120px">
       <el-form-item label="处理器的名字" prop="handlerName">
         <el-input v-model="queryParams.handlerName" placeholder="请输入处理器的名字" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="开始执行时间" prop="beginTime">
-        <el-date-picker clearable v-model="queryParams.beginTime" type="date" value-format="yyyy-MM-dd" placeholder="选择开始执行时间" />
+        <el-date-picker clearable v-model="queryParams.beginTime" type="date" value-format="YYYY-MM-DD" placeholder="选择开始执行时间" />
       </el-form-item>
       <el-form-item label="结束执行时间" prop="endTime">
-        <el-date-picker clearable v-model="queryParams.endTime" type="date" value-format="yyyy-MM-dd" placeholder="选择结束执行时间" />
+        <el-date-picker clearable v-model="queryParams.endTime" type="date" value-format="YYYY-MM-DD" placeholder="选择结束执行时间" />
       </el-form-item>
       <el-form-item label="任务状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择任务状态" clearable>
@@ -25,10 +25,10 @@
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="warning" :icon="Download" size="small" @click="handleExport"
+        <el-button type="warning" :icon="Download" @click="handleExport"
                    v-hasPermi="['infra:job:export']">导出</el-button>
       </el-col>
-      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" />
     </el-row>
 
     <el-table v-loading="loading" :data="list">
@@ -102,7 +102,6 @@
           <div style="margin-left: 10px; line-height: 1; display: flex; align-items: center" v-text="form.result"></div>
         </div>
       </div>
-
       <template #footer>
         <el-button @click="open = false">关 闭</el-button>
       </template>
