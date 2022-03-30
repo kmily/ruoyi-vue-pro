@@ -121,15 +121,15 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/monitor/job-log',
+    path: '/infra/job/log',
     component: Layout,
     hidden: true,
     children: [
       {
-        path: 'index',
-        component: () => import('@/views/monitor/job/log'),
+        path: "",
+        component: () => import('@/views/infra/job/log'),
         name: 'JobLog',
-        meta: { title: '调度日志', activeMenu: '/monitor/job' }
+        meta: { title: '调度日志', activeMenu: '/infra/job' }
       }
     ]
   },

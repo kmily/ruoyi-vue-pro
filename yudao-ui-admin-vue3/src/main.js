@@ -76,7 +76,7 @@ app.use(router)
 app.use(store)
 app.use(plugins)
 app.use(elementIcons)
-app.component('svg-icon', SvgIcon)
+// app.component('svg-icon', SvgIcon) // FIXME: svg icon会与VForm3 冲突，暂时隐藏掉，发现问题再说
 
 // 引入 VForm 组件，参考 https://www.vform666.com/document3.html 文档
 import axios from 'axios'
