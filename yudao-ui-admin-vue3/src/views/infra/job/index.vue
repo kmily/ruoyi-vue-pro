@@ -186,8 +186,8 @@ import {useRouter} from "vue-router";
 import {DICT_TYPE, } from "@/utils/dict";
 
 const tableScrollHeight = computed(() => {
-  const formHeight = 42;
-  const opHeight = 32;
+  const formHeight = showSearch.value ? 50 : 0;
+  const opHeight = 40;
   const paginationHeight = 65;
   const padding = 40;
   const header = 84;

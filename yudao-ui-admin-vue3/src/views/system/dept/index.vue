@@ -10,18 +10,14 @@
             />
          </el-form-item>
          <el-form-item label="状态" prop="status">
-            <el-select v-model="queryParams.status" placeholder="部门状态" clearable>
-               <el-option
-                  v-for="dict in sys_normal_disable"
-                  :key="dict.value"
-                  :label="dict.label"
-                  :value="dict.value"
-               />
-            </el-select>
+           <el-select v-model="queryParams.status" placeholder="请选择部门状态" clearable>
+             <el-option v-for="dict in getDictDatas(DICT_TYPE.COMMON_STATUS)"
+                        :key="dict.value" :label="dict.label" :value="dict.value"/>
+           </el-select>
          </el-form-item>
          <el-form-item>
-            <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-            <el-button icon="Refresh" @click="resetQuery">重置</el-button>
+            <el-button type="primary" :icon="Search" @click="handleQuery">搜索</el-button>
+            <el-button :icon="Refresh" @click="resetQuery">重置</el-button>
          </el-form-item>
       </el-form>
 
@@ -30,16 +26,16 @@
             <el-button
                type="primary"
                plain
-               icon="Plus"
+               :icon="Plus"
                @click="handleAdd"
-               v-hasPermi="['system:dept:add']"
+               v-hasPermi="['system:dept:create']"
             >新增</el-button>
          </el-col>
          <el-col :span="1.5">
             <el-button
                type="info"
                plain
-               icon="Sort"
+               :icon="Sort"
                @click="toggleExpandAll"
             >展开/折叠</el-button>
          </el-col>
@@ -50,15 +46,14 @@
          v-if="refreshTable"
          v-loading="loading"
          :data="deptList"
-         row-key="deptId"
+         row-key="id"
          :default-expand-all="isExpandAll"
-         :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
       >
-         <el-table-column prop="deptName" label="部门名称" width="260"></el-table-column>
-         <el-table-column prop="orderNum" label="排序" width="200"></el-table-column>
+         <el-table-column prop="name" label="部门名称" width="260"></el-table-column>
+         <el-table-column prop="sort" label="排序" width="200"></el-table-column>
          <el-table-column prop="status" label="状态" width="100">
             <template #default="scope">
-               <dict-tag :options="sys_normal_disable" :value="scope.row.status" />
+              <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
             </template>
          </el-table-column>
          <el-table-column label="创建时间" align="center" prop="createTime" width="200">
@@ -70,22 +65,22 @@
             <template #default="scope">
                <el-button
                   type="text"
-                  icon="Edit"
+                  :icon="Edit"
                   @click="handleUpdate(scope.row)"
-                  v-hasPermi="['system:dept:edit']"
+                  v-hasPermi="['system:dept:update']"
                >修改</el-button>
                <el-button
                   type="text"
-                  icon="Plus"
+                  :icon="Plus"
                   @click="handleAdd(scope.row)"
-                  v-hasPermi="['system:dept:add']"
+                  v-hasPermi="['system:dept:create']"
                >新增</el-button>
                <el-button
                   v-if="scope.row.parentId != 0"
                   type="text"
-                  icon="Delete"
+                  :icon="Delete"
                   @click="handleDelete(scope.row)"
-                  v-hasPermi="['system:dept:remove']"
+                  v-hasPermi="['system:dept:delete']"
                >删除</el-button>
             </template>
          </el-table-column>
@@ -153,11 +148,14 @@
    </div>
 </template>
 
-<script setup name="Dept">
+<script setup>
+import {ref, getCurrentInstance, reactive, nextTick} from "vue"
 import { listDept, getDept, delDept, addDept, updateDept, listDeptExcludeChild } from "@/api/system/dept";
+import DictTag from "@/components/DictTag"
+import {DICT_TYPE, getDictDatas} from "@/utils/dict"
+import {Delete, Edit, Plus, Refresh, Sort, Search} from "@element-plus/icons-vue";
 
 const { proxy } = getCurrentInstance();
-const { sys_normal_disable } = proxy.useDict("sys_normal_disable");
 
 const deptList = ref([]);
 const open = ref(false);
@@ -167,6 +165,8 @@ const title = ref("");
 const deptOptions = ref([]);
 const isExpandAll = ref(true);
 const refreshTable = ref(true);
+const deptRef = ref()
+const queryRef = ref()
 
 const data = reactive({
   form: {},
@@ -189,7 +189,8 @@ const { queryParams, form, rules } = toRefs(data);
 function getList() {
   loading.value = true;
   listDept(queryParams.value).then(response => {
-    deptList.value = proxy.handleTree(response.data, "deptId");
+    deptList.value = proxy.handleTree(response.data);
+    console.log(deptList.value)
     loading.value = false;
   });
 }
@@ -210,7 +211,7 @@ function reset() {
     email: undefined,
     status: "0"
   };
-  proxy.resetForm("deptRef");
+  deptRef.value?.resetFields()
 }
 /** 搜索按钮操作 */
 function handleQuery() {
@@ -218,7 +219,7 @@ function handleQuery() {
 }
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm("queryRef");
+  queryRef.value?.resetFields()
   handleQuery();
 }
 /** 新增按钮操作 */
@@ -227,7 +228,7 @@ async function handleAdd(row) {
   await listDept().then(response => {
     deptOptions.value = proxy.handleTree(response.data, "deptId");
   });
-  if (row != undefined) {
+  if (row !== undefined) {
     form.value.parentId = row.deptId;
   }
   open.value = true;
@@ -255,9 +256,9 @@ async function handleUpdate(row) {
 }
 /** 提交按钮 */
 function submitForm() {
-  proxy.$refs["deptRef"].validate(valid => {
+  deptRef.value.validate(valid => {
     if (valid) {
-      if (form.value.deptId != undefined) {
+      if (form.value.deptId !== undefined) {
         updateDept(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;

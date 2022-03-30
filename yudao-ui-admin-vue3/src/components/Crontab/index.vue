@@ -369,7 +369,7 @@ function clearCron() {
     week: "?",
     year: "",
   };
-  for (let j in this.crontabValueObj.value) {
+  for (let j in crontabValueObj.value) {
     changeRadio(j, crontabValueObj.value[j]);
   }
 }
