@@ -120,6 +120,11 @@ public class LoadSerializer extends JsonSerializer<Object> implements Contextual
 
     @Override
     public void serialize(Object bindData, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        if (bindData == null || loadService == null) {
+            gen.writeObject(null);
+            return;
+        }
+
         Object params = paramsHandler.handleVal(bindData);
         gen.writeObject(bindData);
         String writeField = annotationsResult.getWriteField();
@@ -136,10 +141,6 @@ public class LoadSerializer extends JsonSerializer<Object> implements Contextual
             writeField = '$' + gen.getOutputContext().getCurrentName();
         }
         gen.writeFieldName(writeField);
-        if (params == null || loadService == null) {
-            gen.writeObject(null);
-            return;
-        }
 
         // 有效ID，去查询
         Object[] args = annotationsResult.getRemoteParams();
@@ -154,30 +155,28 @@ public class LoadSerializer extends JsonSerializer<Object> implements Contextual
                 // 再次尝试拿缓存
                 result = getCacheInfo(cacheKey);
                 if (result == null) {
-                    try {
-                        // 多参数组装
-                        List<Object> objectParams = new ArrayList<>();
-                        objectParams.add(params);
-                        if (args != null && args.length > 0) {
-                            Collections.addAll(objectParams, args);
+                    // 多参数组装
+                    List<Object> objectParams = new ArrayList<>();
+                    objectParams.add(params);
+                    if (args != null && args.length > 0) {
+                        Collections.addAll(objectParams, args);
+                    }
+                    Object r = ReflectUtil.invoke(loadService, method, objectParams.toArray());
+                    if (r != null) {
+                        result = this.responseHandler.handle(this.loadServiceSourceClassName, method, r, writeClass, objectParams.toArray());
+                        if (cacheSecond > 0) {
+                            success.put(cacheKey, result, TimeUnit.SECONDS.toMillis(cacheSecond));
                         }
-                        Object r = ReflectUtil.invoke(loadService, method, objectParams.toArray());
-                        if (r != null) {
-                            result = this.responseHandler.handle(this.loadServiceSourceClassName, method, r, writeClass, objectParams.toArray());
-                            if (cacheSecond > 0) {
-                                success.put(cacheKey, result, TimeUnit.SECONDS.toMillis(cacheSecond));
-                            }
-                        } else {
-                            log.error("【{}】 翻译失败，未找到：{}", prefix, params);
-                            error.put(cacheKey, bindData);
-                            result = null;
-                        }
-                    } catch (Exception e) {
-                        log.error("【{}】翻译服务异常：{}", prefix, e);
+                    } else {
+                        log.error("【{}】 翻译失败，未找到：{}", prefix, params);
                         error.put(cacheKey, bindData);
-                        result = bindData;
+                        result = null;
                     }
                 }
+            } catch (Exception e) {
+                log.error("【{}】翻译服务异常：{}", prefix, e);
+                error.put(cacheKey, bindData);
+                result = bindData;
             } finally {
                 writeLock.unlock();
             }
