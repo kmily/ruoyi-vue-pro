@@ -6,6 +6,7 @@
       :page-size.sync="pageSize"
       :layout="layout"
       :page-sizes="pageSizes"
+      :pager-count="pagerCount"
       :total="total"
       v-bind="$attrs"
       @size-change="handleSizeChange"
@@ -60,6 +61,10 @@ export default {
       default: false
     }
   },
+  data() {
+    return {
+    };
+  },
   computed: {
     currentPage: {
       get() {
@@ -80,6 +85,9 @@ export default {
   },
   methods: {
     handleSizeChange(val) {
+      if (this.currentPage * val > this.total) {
+        this.currentPage = 1
+      }
       this.$emit('pagination', { page: this.currentPage, limit: val })
       if (this.autoScroll) {
         scrollTo(0, 800)

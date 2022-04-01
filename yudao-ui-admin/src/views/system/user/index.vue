@@ -13,27 +13,27 @@
       </el-col>
       <!--用户数据-->
       <el-col :span="20" :xs="24">
-        <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+        <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
           <el-form-item label="用户名称" prop="username">
-            <el-input v-model="queryParams.username" placeholder="请输入用户名称" clearable size="small" style="width: 240px"
+            <el-input v-model="queryParams.username" placeholder="请输入用户名称" clearable style="width: 240px"
                       @keyup.enter.native="handleQuery"/>
           </el-form-item>
           <el-form-item label="手机号码" prop="mobile">
-            <el-input v-model="queryParams.mobile" placeholder="请输入手机号码" clearable size="small" style="width: 240px"
+            <el-input v-model="queryParams.mobile" placeholder="请输入手机号码" clearable style="width: 240px"
                       @keyup.enter.native="handleQuery"/>
           </el-form-item>
           <el-form-item label="状态" prop="status">
-            <el-select v-model="queryParams.status" placeholder="用户状态" clearable size="small" style="width: 240px">
+            <el-select v-model="queryParams.status" placeholder="用户状态" clearable style="width: 240px">
               <el-option v-for="dict in statusDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
             </el-select>
           </el-form-item>
           <el-form-item label="创建时间">
-            <el-date-picker v-model="dateRange" size="small" style="width: 240px" value-format="yyyy-MM-dd" type="daterange"
+            <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd" type="daterange"
               range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-            <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+            <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+            <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
           </el-form-item>
         </el-form>
 
@@ -429,14 +429,10 @@ export default {
     // 用户状态修改
     handleStatusChange(row) {
       let text = row.status === CommonStatusEnum.ENABLE ? "启用" : "停用";
-      this.$confirm('确认要"' + text + '""' + row.username + '"用户吗?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('确认要"' + text + '""' + row.username + '"用户吗?').then(function() {
           return changeUserStatus(row.id, row.status);
         }).then(() => {
-          this.msgSuccess(text + "成功");
+          this.$modal.msgSuccess(text + "成功");
         }).catch(function() {
           row.status = row.status === CommonStatusEnum.ENABLE ? CommonStatusEnum.DISABLE
               : CommonStatusEnum.ENABLE;
@@ -510,7 +506,7 @@ export default {
         cancelButtonText: "取消"
       }).then(({ value }) => {
           resetUserPwd(row.id, value).then(response => {
-            this.msgSuccess("修改成功，新密码是：" + value);
+            this.$modal.msgSuccess("修改成功，新密码是：" + value);
           });
         }).catch(() => {});
     },
@@ -542,13 +538,13 @@ export default {
         if (valid) {
           if (this.form.id !== undefined) {
             updateUser(this.form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
             addUser(this.form).then(response => {
-              this.msgSuccess("新增成功");
+              this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
             });
@@ -563,7 +559,7 @@ export default {
           userId: this.form.id,
           roleIds: this.form.roleIds,
         }).then(response => {
-          this.msgSuccess("分配角色成功");
+          this.$modal.msgSuccess("分配角色成功");
           this.openRole = false;
           this.getList();
         });
@@ -572,15 +568,11 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$confirm('是否确认删除用户编号为"' + ids + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('是否确认删除用户编号为"' + ids + '"的数据项?').then(function() {
           return delUser(ids);
         }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
+          this.$modal.msgSuccess("删除成功");
       }).catch(() => {});
     },
     /** 导出按钮操作 */
@@ -589,15 +581,11 @@ export default {
         this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
         this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
       ]);
-      this.$confirm('是否确认导出所有用户数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(() => {
+      this.$modal.confirm('是否确认导出所有用户数据项?').then(() => {
           this.exportLoading = true;
           return exportUser(queryParams);
         }).then(response => {
-          this.downloadExcel(response, '用户数据.xls');
+          this.$download.excel(response, '用户数据.xls');
           this.exportLoading = false;
       }).catch(() => {});
     },
@@ -609,7 +597,7 @@ export default {
     /** 下载模板操作 */
     importTemplate() {
       importTemplate().then(response => {
-        this.downloadExcel(response, '用户导入模板.xls');
+        this.$download.excel(response, '用户导入模板.xls');
       });
     },
     // 文件上传中处理
@@ -619,7 +607,7 @@ export default {
     // 文件上传成功处理
     handleFileSuccess(response, file, fileList) {
       if (response.code !== 0) {
-        this.msgError(response.msg)
+        this.$modal.msgError(response.msg)
         return;
       }
       this.upload.open = false;

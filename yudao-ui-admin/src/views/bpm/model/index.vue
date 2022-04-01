@@ -1,24 +1,25 @@
 <template>
   <div class="app-container">
+    <doc-alert title="工作流" url="https://doc.iocoder.cn/bpm" />
 
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="流程标识" prop="key">
-        <el-input v-model="queryParams.key" placeholder="请输入流程标识" clearable style="width: 240px;" size="small"
+        <el-input v-model="queryParams.key" placeholder="请输入流程标识" clearable style="width: 240px;"
                   @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="流程名称" prop="name">
-        <el-input v-model="queryParams.name" placeholder="请输入流程名称" clearable style="width: 240px;" size="small"
+        <el-input v-model="queryParams.name" placeholder="请输入流程名称" clearable style="width: 240px;"
                   @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="流程分类" prop="category">
-        <el-select v-model="queryParams.category" placeholder="流程分类" clearable size="small" style="width: 240px">
+        <el-select v-model="queryParams.category" placeholder="流程分类" clearable style="width: 240px">
           <el-option v-for="dict in categoryDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -291,7 +292,7 @@ export default {
         // 设置上传的请求头部
         headers: getBaseHeader(),
         // 上传的地址
-        url: process.env.VUE_APP_BASE_API + '/admin-api/' + "/bpm/model/import",
+        url: process.env.VUE_APP_BASE_API + '/admin-api' + "/bpm/model/import",
         // 表单
         form: {},
         // 校验规则
@@ -399,7 +400,7 @@ export default {
             formCustomCreatePath: this.form.formType === 20 ? this.form.formCustomCreatePath : undefined,
             formCustomViewPath: this.form.formType === 20 ? this.form.formCustomViewPath : undefined,
           }).then(response => {
-            this.msgSuccess("修改模型成功");
+            this.$modal.msgSuccess("修改模型成功");
             this.open = false;
             this.getList();
           });
@@ -425,11 +426,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const that = this;
-      this.$confirm('是否删除该流程！！', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
+      this.$modal.confirm('是否删除该流程！！').then(function() {
         deleteModel(row.id).then(response => {
           that.getList();
           that.msgSuccess("删除成功");
@@ -439,11 +436,7 @@ export default {
     /** 部署按钮操作 */
     handleDeploy(row) {
       const that = this;
-      this.$confirm('是否部署该流程！！', "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "success"
-      }).then(function() {
+      this.$modal.confirm('是否部署该流程！！').then(function() {
         deployModel(row.id).then(response => {
           that.getList();
           that.msgSuccess("部署成功");
@@ -491,15 +484,11 @@ export default {
       const id = row.id;
       let state = row.processDefinition.suspensionState;
       let statusState = state === 1 ? '激活' : '挂起';
-      this.$confirm('是否确认' + statusState + '流程名字为"' + row.name + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
+      this.$modal.confirm('是否确认' + statusState + '流程名字为"' + row.name + '"的数据项?').then(function() {
         return updateModelState(id, state);
       }).then(() => {
         this.getList();
-        this.msgSuccess(statusState + "成功");
+        this.$modal.msgSuccess(statusState + "成功");
       }).catch(() => {});
     },
     /** 导入按钮操作 */
@@ -513,13 +502,13 @@ export default {
     // 文件上传成功处理
     handleFileSuccess(response, file, fileList) {
       if (response.code !== 0) {
-        this.msgError(response.msg)
+        this.$modal.msgError(response.msg)
         return;
       }
       // 重置表单
       this.uploadClose();
       // 提示，并刷新
-      this.msgSuccess("导入流程成功！请点击【设计流程】按钮，进行编辑保存后，才可以进行【发布流程】");
+      this.$modal.msgSuccess("导入流程成功！请点击【设计流程】按钮，进行编辑保存后，才可以进行【发布流程】");
       this.getList();
     },
     uploadClose() {

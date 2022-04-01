@@ -4,6 +4,10 @@ import store from '@/store'
 import { getToken } from '@/utils/auth'
 import errorCode from '@/utils/errorCode'
 import Cookies from "js-cookie";
+import {getTenantEnable} from "@/utils/ruoyi";
+
+// 是否显示重新登录
+export let isRelogin = { show: false };
 
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
 // 创建axios实例
@@ -21,9 +25,11 @@ service.interceptors.request.use(config => {
     config.headers['Authorization'] = 'Bearer ' + getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
   }
   // 设置租户
-  const tenantId = Cookies.get('tenantId');
-  if (tenantId) {
-    config.headers['tenant-id'] = tenantId;
+  if (getTenantEnable()) {
+    const tenantId = Cookies.get('tenantId');
+    if (tenantId) {
+      config.headers['tenant-id'] = tenantId;
+    }
   }
   // get请求映射params参数
   if (config.method === 'get' && config.params) {
@@ -60,20 +66,23 @@ service.interceptors.response.use(res => {
     // 获取错误信息
     const msg = errorCode[code] || res.data.msg || errorCode['default']
     if (code === 401) {
-      MessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', {
-          confirmButtonText: '重新登录',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
-      ).then(() => {
-        store.dispatch('LogOut').then(() => {
-          // if (location.pathname !== '/login') { // 避免重复跳转
-          //
-          // }
-          location.href = '/index';
-        })
-      }).catch(() => {});
-      return Promise.reject('令牌验证失败')
+      if (!isRelogin.show) {
+        isRelogin.show = true;
+        MessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', {
+            confirmButtonText: '重新登录',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }
+        ).then(() => {
+          isRelogin.show = false;
+          store.dispatch('LogOut').then(() => {
+            location.href = '/index';
+          })
+        }).catch(() => {
+          isRelogin.show = false;
+        });
+      }
+      return Promise.reject('无效的会话，或者会话已过期，请重新登录。')
     } else if (code === 500) {
       Message({
         message: msg,
@@ -85,9 +94,9 @@ service.interceptors.response.use(res => {
         type: 'error',
         duration: 0,
         dangerouslyUseHTMLString: true,
-        message: '<div>演示模式，不发进行写操作</div>'
+        message: '<div>演示模式，无法进行写操作</div>'
           + '<div> &nbsp; </div>'
-          + '<div>参考 https://www.iocoder.cn/Yudao/build-debugger-environment 教程</div>'
+          + '<div>参考 https://doc.iocoder.cn/ 教程</div>'
           + '<div> &nbsp; </div>'
           + '<div>5 分钟搭建本地环境</div>',
       })

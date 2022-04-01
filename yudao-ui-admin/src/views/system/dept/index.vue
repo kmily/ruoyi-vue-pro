@@ -1,28 +1,32 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch">
       <el-form-item label="部门名称" prop="name">
-        <el-input v-model="queryParams.name" placeholder="请输入部门名称" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.name" placeholder="请输入部门名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="菜单状态" clearable size="small">
+        <el-select v-model="queryParams.status" placeholder="菜单状态" clearable>
           <el-option v-for="dict in statusDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd" v-hasPermi="['system:dept:create']">新增</el-button>
+        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
+                   v-hasPermi="['system:dept:create']">新增</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button type="info" plain icon="el-icon-sort" size="mini" @click="toggleExpandAll">展开/折叠</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="deptList" row-key="id" default-expand-all
+    <el-table v-if="refreshTable" v-loading="loading" :data="deptList" row-key="id" :default-expand-all="isExpandAll"
               :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
       <el-table-column prop="name" label="部门名称" width="260"></el-table-column>
       <el-table-column prop="leader" label="负责人" :formatter="userNicknameFormat" width="120"/>
@@ -53,7 +57,7 @@
     <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row>
-          <el-col :span="24" v-if="form.parentId !== 0">
+          <el-col :span="24">
             <el-form-item label="上级部门" prop="parentId">
               <treeselect v-model="form.parentId" :options="deptOptions" :normalizer="normalizer" placeholder="选择上级部门" />
             </el-form-item>
@@ -131,6 +135,12 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      // 是否展开，默认全部展开
+      isExpandAll: true,
+      // 重新渲染表格状态
+      refreshTable: true,
+      // 是否展开
+      expand: false,
       // 状态数据字典
       statusOptions: [],
       // 查询参数
@@ -142,9 +152,6 @@ export default {
       form: {},
       // 表单校验
       rules: {
-        parentId: [
-          { required: true, message: "上级部门不能为空", trigger: "blur" }
-        ],
         name: [
           { required: true, message: "部门名称不能为空", trigger: "blur" }
         ],
@@ -255,11 +262,22 @@ export default {
 	        this.deptOptions = this.handleTree(response.data, "id");
       });
     },
+    /** 展开/折叠操作 */
+    toggleExpandAll() {
+      this.refreshTable = false;
+      this.isExpandAll = !this.isExpandAll;
+      this.$nextTick(() => {
+        this.refreshTable = true;
+      });
+    },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
       getDept(row.id).then(response => {
         this.form = response.data;
+        if (this.form.parentId === 0) { // 无父部门时，标记为 undefined，避免展示为 Unknown
+          this.form.parentId = undefined;
+        }
         this.open = true;
         this.title = "修改部门";
       });
@@ -273,13 +291,13 @@ export default {
         if (valid) {
           if (this.form.id !== undefined) {
             updateDept(this.form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
             addDept(this.form).then(response => {
-              this.msgSuccess("新增成功");
+              this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
             });
@@ -289,15 +307,11 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      this.$confirm('是否确认删除名称为"' + row.name + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('是否确认删除名称为"' + row.name + '"的数据项?').then(function() {
           return delDept(row.id);
         }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
+          this.$modal.msgSuccess("删除成功");
       }).catch(() => {});
     }
   }

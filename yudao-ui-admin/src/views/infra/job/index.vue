@@ -1,21 +1,21 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="100px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="100px">
       <el-form-item label="任务名称" prop="name">
-        <el-input v-model="queryParams.name" placeholder="请输入任务名称" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.name" placeholder="请输入任务名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="任务状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择任务状态" clearable size="small">
+        <el-select v-model="queryParams.status" placeholder="请选择任务状态" clearable>
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_JOB_STATUS)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="处理器的名字" prop="handlerName">
-        <el-input v-model="queryParams.handlerName" placeholder="请输入处理器的名字" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.handlerName" placeholder="请输入处理器的名字" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -115,7 +115,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="Cron表达式生成器" :visible.sync="openCron" >
+    <el-dialog title="Cron表达式生成器" :visible.sync="openCron" append-to-body class="scrollbar" destroy-on-close>
       <crontab @hide="openCron=false" @fill="crontabFill" :expression="expression"></crontab>
     </el-dialog>
 
@@ -247,14 +247,10 @@ export default {
     },
     /** 立即执行一次 **/
     handleRun(row) {
-      this.$confirm('确认要立即执行一次"' + row.name + '"任务吗?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('确认要立即执行一次"' + row.name + '"任务吗?').then(function() {
           return runJob(row.id);
         }).then(() => {
-          this.msgSuccess("执行成功");
+          this.$modal.msgSuccess("执行成功");
       }).catch(() => {});
     },
     /** 任务详细信息 */
@@ -312,13 +308,13 @@ export default {
         if (valid) {
           if (this.form.id !== undefined) {
             updateJob(this.form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
             addJob(this.form).then(response => {
-              this.msgSuccess("新增成功");
+              this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
             });
@@ -329,15 +325,11 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id;
-      this.$confirm('是否确认删除定时任务编号为"' + ids + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('是否确认删除定时任务编号为"' + ids + '"的数据项?').then(function() {
           return delJob(ids);
         }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
+          this.$modal.msgSuccess("删除成功");
       }).catch(() => {});
     },
     /** 更新状态操作 */
@@ -345,15 +337,11 @@ export default {
       const id = row.id;
       let status = open ? InfraJobStatusEnum.NORMAL : InfraJobStatusEnum.STOP;
       let statusStr = open ? '开启' : '关闭';
-      this.$confirm('是否确认' + statusStr + '定时任务编号为"' + id + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
+      this.$modal.confirm('是否确认' + statusStr + '定时任务编号为"' + id + '"的数据项?').then(function() {
         return updateJobStatus(id, status);
       }).then(() => {
         this.getList();
-        this.msgSuccess(statusStr + "成功");
+        this.$modal.msgSuccess(statusStr + "成功");
       }).catch(() => {});
     },
     // 更多操作触发
@@ -375,15 +363,11 @@ export default {
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
-      this.$confirm("是否确认导出所有定时任务数据项?", "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(() => {
+      this.$modal.confirm("是否确认导出所有定时任务数据项?").then(() => {
           this.exportLoading = true;
           return exportJob(queryParams);
         }).then(response => {
-          this.downloadExcel(response, '定时任务.xls');
+          this.$download.excel(response, '定时任务.xls');
           this.exportLoading = false;
       }).catch(() => {});
     }

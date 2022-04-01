@@ -144,9 +144,9 @@ export default {
         processDefinitionId: this.selectProcessInstance.id,
         variables: variables
       }).then(response => {
-        this.msgSuccess("发起流程成功");
+        this.$modal.msgSuccess("发起流程成功");
         // 关闭当前窗口
-        this.$store.dispatch("tagsView/delView", this.$route);
+        this.$tab.closeOpenPage();
         this.$router.go(-1);
       }).catch(() => {
         conf.disabled = false; // 表单开启

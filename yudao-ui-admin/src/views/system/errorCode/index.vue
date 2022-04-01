@@ -2,29 +2,29 @@
   <div class="app-container">
 
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="100px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="100px">
       <el-form-item label="错误码类型" prop="type">
-        <el-select v-model="queryParams.type" placeholder="请选择错误码类型" clearable size="small">
+        <el-select v-model="queryParams.type" placeholder="请选择错误码类型" clearable>
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_ERROR_CODE_TYPE)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="应用名" prop="applicationName">
-        <el-input v-model="queryParams.applicationName" placeholder="请输入应用名" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.applicationName" placeholder="请输入应用名" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="错误码编码" prop="code">
-        <el-input v-model="queryParams.code" placeholder="请输入错误码编码" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.code" placeholder="请输入错误码编码" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="错误码提示" prop="message">
-        <el-input v-model="queryParams.message" placeholder="请输入错误码提示" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.message" placeholder="请输入错误码提示" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRangeCreateTime" size="small" style="width: 240px" value-format="yyyy-MM-dd"
+        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd"
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -207,7 +207,7 @@ export default {
         // 修改的提交
         if (this.form.id != null) {
           updateErrorCode(this.form).then(response => {
-            this.msgSuccess("修改成功");
+            this.$modal.msgSuccess("修改成功");
             this.open = false;
             this.getList();
           });
@@ -215,7 +215,7 @@ export default {
         }
         // 添加的提交
         createErrorCode(this.form).then(response => {
-          this.msgSuccess("新增成功");
+          this.$modal.msgSuccess("新增成功");
           this.open = false;
           this.getList();
         });
@@ -224,15 +224,11 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const id = row.id;
-      this.$confirm('是否确认删除错误码编号为"' + id + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
+      this.$modal.confirm('是否确认删除错误码编号为"' + id + '"的数据项?').then(function() {
         return deleteErrorCode(id);
       }).then(() => {
         this.getList();
-        this.msgSuccess("删除成功");
+        this.$modal.msgSuccess("删除成功");
       }).catch(() => {});
     },
     /** 导出按钮操作 */
@@ -243,15 +239,11 @@ export default {
       params.pageSize = undefined;
       this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行导出
-      this.$confirm('是否确认导出所有错误码数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
+      this.$modal.confirm('是否确认导出所有错误码数据项?').then(() => {
         this.exportLoading = true;
         return exportErrorCodeExcel(params);
       }).then(response => {
-        this.downloadExcel(response, '错误码.xls');
+        this.$download.excel(response, '错误码.xls');
         this.exportLoading = false;
       }).catch(() => {});
     }

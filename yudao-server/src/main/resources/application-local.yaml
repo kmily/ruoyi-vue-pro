@@ -44,12 +44,14 @@ spring:
       datasource:
         master:
           name: ruoyi-vue-pro
+#          name: ruoyi-vue-pro-flowable
           url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
           driver-class-name: com.mysql.jdbc.Driver
           username: root
           password: 123456
         slave: # 模拟从库，可根据自己需要修改
           name: ruoyi-vue-pro
+#          name: ruoyi-vue-pro-flowable
           url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
           driver-class-name: com.mysql.jdbc.Driver
           username: root
@@ -178,14 +180,10 @@ yudao:
     enable: false # 本地环境，暂时关闭图片验证码，方便登录等接口的测试
   security:
     token-header: Authorization
-    token-secret: abcdefghijklmnopqrstuvwxyz
     token-timeout: 1d
-#    session-timeout: 30m
     session-timeout: 1d
     mock-enable: true
     mock-secret: test
-  file:
-    base-path: http://127.0.0.1:${server.port}${yudao.web.admin-api.prefix}/infra/file/get/
   xss:
     enable: false
     exclude-urls: # 如下两个 url，仅仅是为了演示，去掉配置也没关系

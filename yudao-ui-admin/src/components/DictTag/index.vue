@@ -5,7 +5,7 @@
       <span v-if="dict.colorType === 'default' || dict.colorType === '' || dict.colorType === undefined" :key="dict.value" :index="index"
             :class="dict.cssClass">{{ dict.label }}</span>
       <!-- Tag 样式 -->
-      <el-tag v-else :key="dict.value" :index="index" :type="dict.colorType" :class="dict.cssClass">
+      <el-tag v-else :disable-transitions="true" :key="dict.value" :index="index" :type="dict.colorType" :class="dict.cssClass">
         {{ dict.label }}
       </el-tag>
     </template>
@@ -17,7 +17,7 @@ export default {
   name: "DictTag",
   props: {
     type: String,
-    value: [Number, String, Array],
+    value: [Number, String, Boolean, Array],
   },
 };
 </script>

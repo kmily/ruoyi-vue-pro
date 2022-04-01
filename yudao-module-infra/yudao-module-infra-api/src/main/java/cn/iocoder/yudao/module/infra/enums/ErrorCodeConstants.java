@@ -30,5 +30,23 @@ public interface ErrorCodeConstants {
     // ========= 文件相关 1001003000=================
     ErrorCode FILE_PATH_EXISTS = new ErrorCode(1001003000, "文件路径已存在");
     ErrorCode FILE_NOT_EXISTS = new ErrorCode(1001003001, "文件不存在");
+    ErrorCode FILE_IS_EMPTY = new ErrorCode(1001003002, "文件为空");
+
+    // ========== 代码生成器 1001004000 ==========
+    ErrorCode CODEGEN_TABLE_EXISTS = new ErrorCode(1003001000, "表定义已经存在");
+    ErrorCode CODEGEN_IMPORT_TABLE_NULL = new ErrorCode(1003001001, "导入的表不存在");
+    ErrorCode CODEGEN_IMPORT_COLUMNS_NULL = new ErrorCode(1003001002, "导入的字段不存在");
+    ErrorCode CODEGEN_PARSE_SQL_ERROR = new ErrorCode(1003001003, "解析 SQL 失败，请检查");
+    ErrorCode CODEGEN_TABLE_NOT_EXISTS = new ErrorCode(1003001004, "表定义不存在");
+    ErrorCode CODEGEN_COLUMN_NOT_EXISTS = new ErrorCode(1003001005, "字段义不存在");
+    ErrorCode CODEGEN_SYNC_COLUMNS_NULL = new ErrorCode(1003001006, "同步的字段不存在");
+    ErrorCode CODEGEN_SYNC_NONE_CHANGE = new ErrorCode(1003001007, "同步失败，不存在改变");
+
+    // ========== 字典类型（测试）1001005000 ==========
+    ErrorCode TEST_DEMO_NOT_EXISTS = new ErrorCode(1001005000, "测试示例不存在");
+
+    // ========== 文件配置 1001006000 ==========
+    ErrorCode FILE_CONFIG_NOT_EXISTS = new ErrorCode(1001006000, "文件配置不存在");
+    ErrorCode FILE_CONFIG_DELETE_FAIL_MASTER = new ErrorCode(1001006001, "该文件配置不允许删除，原因：它是主配置，删除会导致无法上传文件");
 
 }

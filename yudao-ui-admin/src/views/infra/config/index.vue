@@ -1,39 +1,27 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="参数名称" prop="name">
-        <el-input v-model="queryParams.name" placeholder="请输入参数名称" clearable size="small" style="width: 240px"
+        <el-input v-model="queryParams.name" placeholder="请输入参数名称" clearable style="width: 240px"
                   @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="参数键名" prop="key">
-        <el-input v-model="queryParams.key" placeholder="请输入参数键名" clearable size="small" style="width: 240px"
+        <el-input v-model="queryParams.key" placeholder="请输入参数键名" clearable style="width: 240px"
                   @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="系统内置" prop="type">
-        <el-select v-model="queryParams.type" placeholder="系统内置" clearable size="small">
-          <el-option
-              v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_CONFIG_TYPE)"
-              :key="parseInt(dict.value)"
-              :label="dict.label"
-              :value="parseInt(dict.value)"
-          />
+        <el-select v-model="queryParams.type" placeholder="系统内置" clearable>
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_CONFIG_TYPE)" :key="parseInt(dict.value)"
+                     :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
       <el-form-item label="创建时间">
-        <el-date-picker
-          v-model="dateRange"
-          size="small"
-          style="width: 240px"
-          value-format="yyyy-MM-dd"
-          type="daterange"
-          range-separator="-"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-        ></el-date-picker>
+        <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd" type="daterange"
+          range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -185,10 +173,6 @@ export default {
         }
       );
     },
-    // 参数系统内置字典翻译
-    typeFormat(row, column) {
-      return this.selectDictLabel(this.typeOptions, row.type);
-    },
     // 取消按钮
     cancel() {
       this.open = false;
@@ -238,13 +222,13 @@ export default {
         if (valid) {
           if (this.form.id !== undefined) {
             updateConfig(this.form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
             addConfig(this.form).then(response => {
-              this.msgSuccess("新增成功");
+              this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
             });
@@ -255,15 +239,11 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$confirm('是否确认删除参数编号为"' + ids + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('是否确认删除参数编号为"' + ids + '"的数据项?').then(function() {
           return delConfig(ids);
         }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
+          this.$modal.msgSuccess("删除成功");
       }).catch(() => {});
     },
     /** 导出按钮操作 */
@@ -272,15 +252,11 @@ export default {
         this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
         this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
       ]);
-      this.$confirm('是否确认导出所有参数数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(() => {
+      this.$modal.confirm('是否确认导出所有参数数据项?').then(() => {
           this.exportLoading = true;
           return exportConfig(queryParams);
         }).then(response => {
-          this.downloadExcel(response, '参数配置.xls');
+          this.$download.excel(response, '参数配置.xls');
           this.exportLoading = false;
       }).catch(() => {});
     },

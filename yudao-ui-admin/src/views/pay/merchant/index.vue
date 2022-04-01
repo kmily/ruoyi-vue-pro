@@ -2,31 +2,31 @@
   <div class="app-container">
 
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="商户号" prop="no">
-        <el-input v-model="queryParams.no" placeholder="请输入商户号" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.no" placeholder="请输入商户号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="商户全称" prop="name">
-        <el-input v-model="queryParams.name" placeholder="请输入商户全称" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.name" placeholder="请输入商户全称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="商户简称" prop="shortName">
-        <el-input v-model="queryParams.shortName" placeholder="请输入商户简称" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.shortName" placeholder="请输入商户简称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="开启状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择开启状态" clearable size="small">
+        <el-select v-model="queryParams.status" placeholder="请选择开启状态" clearable>
           <el-option v-for="dict in statusDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
       <el-form-item label="备注" prop="remark">
-        <el-input v-model="queryParams.remark" placeholder="请输入备注" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.remark" placeholder="请输入备注" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRangeCreateTime" size="small" style="width: 240px" value-format="yyyy-MM-dd"
+        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd"
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -225,14 +225,10 @@ export default {
     // 用户状态修改
     handleStatusChange(row) {
       let text = row.status === CommonStatusEnum.ENABLE ? "启用" : "停用";
-      this.$confirm('确认要"' + text + '""' + row.name + '"商户吗?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
+      this.$modal.confirm('确认要"' + text + '""' + row.name + '"商户吗?').then(function() {
         return changeMerchantStatus(row.id, row.status);
       }).then(() => {
-        this.msgSuccess(text + "成功");
+        this.$modal.msgSuccess(text + "成功");
       }).catch(function() {
         row.status = row.status === CommonStatusEnum.ENABLE ? CommonStatusEnum.DISABLE
           : CommonStatusEnum.ENABLE;
@@ -247,7 +243,7 @@ export default {
         // 修改的提交
         if (this.form.id != null) {
           updateMerchant(this.form).then(response => {
-            this.msgSuccess("修改成功");
+            this.$modal.msgSuccess("修改成功");
             this.open = false;
             this.getList();
           });
@@ -255,7 +251,7 @@ export default {
         }
         // 添加的提交
         createMerchant(this.form).then(response => {
-          this.msgSuccess("新增成功");
+          this.$modal.msgSuccess("新增成功");
           this.open = false;
           this.getList();
         });
@@ -264,15 +260,11 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const id = row.id;
-      this.$confirm('是否确认删除支付商户信息编号为"' + id + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('是否确认删除支付商户信息编号为"' + id + '"的数据项?').then(function() {
           return deleteMerchant(id);
         }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
+          this.$modal.msgSuccess("删除成功");
       }).catch(() => {});
     },
     /** 导出按钮操作 */
@@ -283,15 +275,11 @@ export default {
       params.pageSize = undefined;
       this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行导出
-      this.$confirm('是否确认导出所有支付商户信息数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(() => {
+      this.$modal.confirm('是否确认导出所有支付商户信息数据项?').then(() => {
           this.exportLoading = true;
           return exportMerchantExcel(params);
         }).then(response => {
-          this.downloadExcel(response, '支付商户信息.xls');
+          this.$download.excel(response, '支付商户信息.xls');
           this.exportLoading = false;
       }).catch(() => {});
     }

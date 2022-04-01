@@ -100,62 +100,6 @@ export function addBeginAndEndTime(params, dateRange, propName) {
   return params;
 }
 
-// 回显数据字典 原若依所保留，请使用 dict.js 中的新方法
-export function selectDictLabel(datas, value) {
-  var actions = [];
-  Object.keys(datas).some((key) => {
-    if (datas[key].dictValue == ('' + value)) {
-      actions.push(datas[key].dictLabel);
-      return true;
-    }
-  })
-  return actions.join('');
-}
-
-// 通用下载方法
-export function download(fileName) {
-  window.location.href = baseURL + "/common/download?fileName=" + encodeURI(fileName) + "&delete=" + true;
-}
-
-// 下载 Excel 方法
-export function downloadExcel(data, fileName) {
-  download0(data, fileName, 'application/vnd.ms-excel');
-}
-
-// 下载 Word 方法
-export function downloadWord(data, fileName) {
-  download0(data, fileName, 'application/msword');
-}
-
-// 下载 Zip 方法
-export function downloadZip(data, fileName) {
-  download0(data, fileName, 'application/zip');
-}
-
-// 下载 Html 方法
-export function downloadHtml(data, fileName) {
-  download0(data, fileName, 'text/html');
-}
-
-// 下载 Markdown 方法
-export function downloadMarkdown(data, fileName) {
-  download0(data, fileName, 'text/markdown');
-}
-
-function download0(data, fileName, mineType) {
-  // 创建 blob
-  let blob = new Blob([data], {type: mineType});
-  // 创建 href 超链接，点击进行下载
-  window.URL = window.URL || window.webkitURL;
-  let href = URL.createObjectURL(blob);
-  let downA = document.createElement("a");
-  downA.href = href;
-  downA.download = fileName;
-  downA.click();
-  // 销毁超连接
-  window.URL.revokeObjectURL(href);
-}
-
 // 字符串格式化(%s )
 export function sprintf(str) {
   var args = arguments, flag = true, i = 1;
@@ -225,4 +169,31 @@ export function getNowDateTime(timeStr) {
   let minutes = now.getMinutes().toString().padStart(2, "0") // 得到分钟;
   let seconds = now.getSeconds().toString().padStart(2, "0") // 得到秒;
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+/**
+ * 获得租户功能是否开启
+ */
+export function getTenantEnable() {
+  // console.log("enable: " + process.env.VUE_APP_TENANT_ENABLE)
+  if (process.env.VUE_APP_TENANT_ENABLE === "true") {
+    return true;
+  }
+  if (process.env.VUE_APP_TENANT_ENABLE === "false") {
+    return false;
+  }
+  return process.env.VUE_APP_TENANT_ENABLE || true;
+}
+
+/**
+ * 获得文档是否开启
+ */
+export function getDocEnable() {
+  if (process.env.VUE_APP_DOC_ENABLE === "true") {
+    return true;
+  }
+  if (process.env.VUE_APP_DOC_ENABLE === "false") {
+    return false;
+  }
+  return process.env.VUE_APP_DOC_ENABLE || false;
 }

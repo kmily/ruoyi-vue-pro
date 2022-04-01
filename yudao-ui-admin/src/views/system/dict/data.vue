@@ -1,22 +1,22 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="字典名称" prop="dictType">
-        <el-select v-model="queryParams.dictType" size="small">
+        <el-select v-model="queryParams.dictType">
           <el-option v-for="item in typeOptions" :key="item.id" :label="item.name" :value="item.type"/>
         </el-select>
       </el-form-item>
       <el-form-item label="字典标签" prop="label">
-        <el-input v-model="queryParams.label" placeholder="请输入字典标签" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.label" placeholder="请输入字典标签" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="数据状态" clearable size="small">
+        <el-select v-model="queryParams.status" placeholder="数据状态" clearable>
           <el-option v-for="dict in statusOptions" :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -266,13 +266,13 @@ export default {
         if (valid) {
           if (this.form.id !== undefined) {
             updateData(this.form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
             addData(this.form).then(response => {
-              this.msgSuccess("新增成功");
+              this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
             });
@@ -283,29 +283,21 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id;
-      this.$confirm('是否确认删除字典编码为"' + ids + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('是否确认删除字典编码为"' + ids + '"的数据项?').then(function() {
           return delData(ids);
         }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
+          this.$modal.msgSuccess("删除成功");
       }).catch(() => {});
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(() => {
+      this.$modal.confirm('是否确认导出所有数据项?').then(() => {
           this.exportLoading = true;
           return exportData(queryParams);
         }).then(response => {
-          this.downloadExcel(response, '字典数据.xls');
+          this.$download.excel(response, '字典数据.xls');
           this.exportLoading = false;
       }).catch(() => {});
     }

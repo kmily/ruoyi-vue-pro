@@ -18,12 +18,7 @@ const permission = {
       state.defaultRoutes = constantRoutes.concat(routes)
     },
     SET_TOPBAR_ROUTES: (state, routes) => {
-      // 顶部导航菜单默认添加统计报表栏指向首页
-      const index = [{
-        path: 'index',
-        meta: { title: '统计报表', icon: 'dashboard'}
-      }]
-      state.topbarRouters = routes.concat(index);
+      state.topbarRouters = routes
     },
     SET_SIDEBAR_ROUTERS: (state, routes) => {
       state.sidebarRouters = routes
@@ -89,7 +84,7 @@ function filterChildren(childrenMap, lastRouter = false) {
   var children = []
   childrenMap.forEach((el, index) => {
     if (el.children && el.children.length) {
-      if (el.component === 'ParentView') {
+      if (el.component === 'ParentView' && !lastRouter) {
         el.children.forEach(c => {
           c.path = el.path + '/' + c.path
           if (c.children && c.children.length) {

@@ -68,7 +68,7 @@ export default {
       return;
     }
     socialBind(type, code, state).then(resp => {
-      this.msgSuccess("绑定成功");
+      this.$modal.msgSuccess("绑定成功");
       this.$router.replace('/user/profile');
       // 调用父组件, 刷新
       this.getUser();
@@ -87,13 +87,12 @@ export default {
     },
     unbind(socialUser) {
       socialUnbind(socialUser.type, socialUser.unionId).then(resp => {
-        this.msgSuccess("解绑成功");
+        this.$modal.msgSuccess("解绑成功");
         socialUser.unionId = undefined;
       });
     },
     close() {
-      this.$store.dispatch("tagsView/delView", this.$route);
-      this.$router.push({ path: "/index" });
+      this.$tab.closePage();
     }
   }
 };

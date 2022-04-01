@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.module.system.controller.admin.user.vo.user;
 
+import cn.iocoder.yudao.framework.common.validation.Mobile;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Set;
 
@@ -18,6 +19,7 @@ public class UserBaseVO {
 
     @ApiModelProperty(value = "用户账号", required = true, example = "yudao")
     @NotBlank(message = "用户账号不能为空")
+    @Pattern(regexp = "^[a-zA-Z0-9]{4,30}$", message = "用户账号由 数字、字母 组成")
     @Size(min = 4, max = 30, message = "用户账号长度为 4-30 个字符")
     private String username;
 
@@ -40,7 +42,7 @@ public class UserBaseVO {
     private String email;
 
     @ApiModelProperty(value = "手机号码", example = "15601691300")
-    @Length(min = 11, max = 11, message = "手机号长度必须 11 位")
+    @Mobile
     private String mobile;
 
     @ApiModelProperty(value = "用户性别", example = "1", notes = "参见 SexEnum 枚举类")

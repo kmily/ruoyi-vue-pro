@@ -1,15 +1,15 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" label-width="68px">
       <el-form-item label="登录地址" prop="userIp">
-        <el-input v-model="queryParams.userIp" placeholder="请输入登录地址" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.userIp" placeholder="请输入登录地址" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="用户名称" prop="username">
-        <el-input v-model="queryParams.username" placeholder="请输入用户名称" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.username" placeholder="请输入用户名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
 
     </el-form>
@@ -32,7 +32,8 @@
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="pageNo" :limit.sync="pageSize" />
+    <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
+                @pagination="getList"/>
   </div>
 </template>
 
@@ -83,15 +84,11 @@ export default {
     },
     /** 强退按钮操作 */
     handleForceLogout(row) {
-      this.$confirm('是否确认强退名称为"' + row.username + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('是否确认强退名称为"' + row.username + '"的数据项?').then(function() {
           return forceLogout(row.id);
         }).then(() => {
           this.getList();
-          this.msgSuccess("强退成功");
+          this.$modal.msgSuccess("强退成功");
       }).catch(() => {});
     }
   }

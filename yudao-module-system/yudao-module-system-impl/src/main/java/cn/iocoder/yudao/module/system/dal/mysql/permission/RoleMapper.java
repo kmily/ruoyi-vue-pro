@@ -2,13 +2,13 @@ package cn.iocoder.yudao.module.system.dal.mysql.permission;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RolePageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
-import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.lang.Nullable;
 
 import java.util.Collection;
@@ -41,13 +41,10 @@ public interface RoleMapper extends BaseMapperX<RoleDO> {
     }
 
     default List<RoleDO> selectListByStatus(@Nullable Collection<Integer> statuses) {
-        return selectList(new QueryWrapperX<RoleDO>().in("status", statuses));
+        return selectList(new LambdaQueryWrapperX<RoleDO>().inIfPresent(RoleDO::getStatus, statuses));
     }
 
-    @InterceptorIgnore(tenantLine = "true") // 该方法忽略多租户。原因：该方法被异步 task 调用，此时获取不到租户编号
-    default boolean selectExistsByUpdateTimeAfter(Date maxUpdateTime) {
-        return selectOne(new QueryWrapper<RoleDO>().select("id")
-                .gt("update_time", maxUpdateTime).last("LIMIT 1")) != null;
-    }
+    @Select("SELECT id FROM system_role WHERE update_time > #{maxUpdateTime} LIMIT 1")
+    RoleDO selectExistsByUpdateTimeAfter(Date maxUpdateTime);
 
 }

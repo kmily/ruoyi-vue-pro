@@ -1,5 +1,7 @@
 <template>
   <div class="app-container">
+    <doc-alert title="功能权限" url="https://doc.iocoder.cn/resource-permission" />
+    <doc-alert title="数据权限" url="https://doc.iocoder.cn/data-permission" />
     <el-form :model="queryParams" ref="queryForm" v-show="showSearch" :inline="true">
       <el-form-item label="角色名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入角色名称" clearable size="small" style="width: 240px"
@@ -149,16 +151,8 @@
         <el-form-item label="菜单权限">
           <el-checkbox v-model="menuExpand" @change="handleCheckedTreeExpand($event, 'menu')">展开/折叠</el-checkbox>
           <el-checkbox v-model="menuNodeAll" @change="handleCheckedTreeNodeAll($event, 'menu')">全选/全不选</el-checkbox>
-          <el-tree
-              class="tree-border"
-              :data="menuOptions"
-              show-checkbox
-              ref="menu"
-              node-key="id"
-              :check-strictly="form.menuCheckStrictly"
-              empty-text="加载中，请稍后"
-              :props="defaultProps"
-          ></el-tree>
+          <el-tree class="tree-border" :data="menuOptions" show-checkbox ref="menu" node-key="id"
+              :check-strictly="form.menuCheckStrictly" empty-text="加载中，请稍后" :props="defaultProps"></el-tree>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -277,14 +271,10 @@ export default {
     handleStatusChange(row) {
       // 此时，row 已经变成目标状态了，所以可以直接提交请求和提示
       let text = row.status === CommonStatusEnum.ENABLE ? "启用" : "停用";
-      this.$confirm('确认要"' + text + '""' + row.name + '"角色吗?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('确认要"' + text + '""' + row.name + '"角色吗?').then(function() {
           return changeRoleStatus(row.id, row.status);
         }).then(() => {
-          this.msgSuccess(text + "成功");
+          this.$modal.msgSuccess(text + "成功");
         }).catch(function() {
           // 异常时，需要将 row.status 状态重置回之前的
           row.status = row.status === CommonStatusEnum.ENABLE ? CommonStatusEnum.DISABLE
@@ -402,16 +392,17 @@ export default {
         // 处理 menuOptions 参数
         this.menuOptions = [];
         this.menuOptions.push(...this.handleTree(response.data, "id"));
+        // 获取角色拥有的菜单权限
+        listRoleMenus(id).then(response => {
+          // 设置为严格，避免设置父节点自动选中子节点，解决半选中问题
+          this.form.menuCheckStrictly = true
+          // 设置选中
+          this.$refs.menu.setCheckedKeys(response.data);
+          // 设置为非严格，继续使用半选中
+          this.form.menuCheckStrictly = false
+        })
       });
-      // 获得角色拥有的菜单集合
-      listRoleMenus(id).then(response => {
-        // 设置为严格，避免设置父节点自动选中子节点，解决半选中问题
-        this.form.menuCheckStrictly = true
-        // 设置选中
-        this.$refs.menu.setCheckedKeys(response.data);
-        // 设置为非严格，继续使用半选中
-        this.form.menuCheckStrictly = false
-      })
+
     },
     /** 分配数据权限操作 */
     handleDataScope(row) {
@@ -442,13 +433,13 @@ export default {
         if (valid) {
           if (this.form.id !== undefined) {
             updateRole(this.form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
             addRole(this.form).then(response => {
-              this.msgSuccess("新增成功");
+              this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
             });
@@ -465,7 +456,7 @@ export default {
           dataScopeDeptIds: this.form.dataScope !== SystemDataScopeEnum.DEPT_CUSTOM ? [] :
               this.$refs.dept.getCheckedKeys()
         }).then(response => {
-          this.msgSuccess("修改成功");
+          this.$modal.msgSuccess("修改成功");
           this.openDataScope = false;
           this.getList();
         });
@@ -478,7 +469,7 @@ export default {
           roleId: this.form.id,
           menuIds: [...this.$refs.menu.getCheckedKeys(), ...this.$refs.menu.getHalfCheckedKeys()]
         }).then(response => {
-          this.msgSuccess("修改成功");
+          this.$modal.msgSuccess("修改成功");
           this.openMenu = false;
           this.getList();
         });
@@ -487,29 +478,21 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$confirm('是否确认删除角色编号为"' + ids + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('是否确认删除角色编号为"' + ids + '"的数据项?').then(function() {
           return delRole(ids);
         }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
+          this.$modal.msgSuccess("删除成功");
       }).catch(() => {});
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有角色数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('是否确认导出所有角色数据项?').then(function() {
           this.exportLoading = true;
           return exportRole(queryParams);
         }).then(response => {
-          this.downloadExcel(response, '角色数据.xls');
+          this.$download.excel(response, '角色数据.xls');
           this.exportLoading = false;
       }).catch(() => {});
     }
