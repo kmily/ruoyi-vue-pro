@@ -40,12 +40,12 @@ public class LoadSerializer extends JsonSerializer<Object> implements Contextual
     /**
      * 成功翻译
      */
-    private static final TimedCache<String, Object> success = new TimedCache<>(TimeUnit.SECONDS.toMillis(dataCacheMinutes));
+    private static final TimedCache<String, Object> success = new TimedCache<>(TimeUnit.MINUTES.toMillis(dataCacheMinutes));
 
     /**
      * 失败翻译
      */
-    private static final TimedCache<String, Object> error = new TimedCache<>(TimeUnit.SECONDS.toMillis(dataCacheMinutes));
+    private static final TimedCache<String, Object> error = new TimedCache<>(TimeUnit.MINUTES.toMillis(dataCacheMinutes));
 
     /**
      * 锁避免同时请求同一ID
