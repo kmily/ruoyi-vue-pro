@@ -170,7 +170,7 @@ public class LoadSerializer extends JsonSerializer<Object> implements Contextual
                     } else {
                         log.error("【{}】 翻译失败，未找到：{}", prefix, params);
                         error.put(cacheKey, bindData);
-                        result = null;
+                        result = bindData;
                     }
                 }
             } catch (Exception e) {
