@@ -34,6 +34,6 @@ public interface ParamsHandler {
      * @return
      */
     default String getCacheKey(Object val, Object[] annotationVal) {
-        return SecureUtil.md5(StringUtils.join(val, annotationVal));
+        return StringUtils.join(val, annotationVal);
     }
 }

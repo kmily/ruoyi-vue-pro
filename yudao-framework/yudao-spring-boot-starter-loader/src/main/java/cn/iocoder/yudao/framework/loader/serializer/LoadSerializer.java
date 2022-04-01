@@ -16,15 +16,12 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.StampedLock;
 
 @Slf4j
@@ -41,24 +38,19 @@ public class LoadSerializer extends JsonSerializer<Object> implements Contextual
     private static final int lockCacheMinutes = 10;
 
     /**
-     * 缓存检测周期，单位秒
-     */
-    private static final int cacheCheckScheduleTime = 10;
-
-    /**
      * 成功翻译
      */
-    private static final TimedCache<String, Object> success = new TimedCache(TimeUnit.MINUTES.toMillis(dataCacheMinutes), new ConcurrentHashMap<>());
+    private static final TimedCache<String, Object> success = new TimedCache<>(TimeUnit.SECONDS.toMillis(dataCacheMinutes));
 
     /**
      * 失败翻译
      */
-    private static final TimedCache<String, Object> error = new TimedCache(TimeUnit.MINUTES.toMillis(dataCacheMinutes), new ConcurrentHashMap<>());
+    private static final TimedCache<String, Object> error = new TimedCache<>(TimeUnit.SECONDS.toMillis(dataCacheMinutes));
 
     /**
      * 锁避免同时请求同一ID
      */
-    private static final TimedCache<String, StampedLock> lockMap = new TimedCache<>(TimeUnit.MINUTES.toMillis(lockCacheMinutes), new ConcurrentHashMap<>());
+    private static final TimedCache<String, StampedLock> lockMap = new TimedCache<>(TimeUnit.MINUTES.toMillis(lockCacheMinutes));
 
     /**
      * 远程调用服务原始calss
@@ -102,12 +94,10 @@ public class LoadSerializer extends JsonSerializer<Object> implements Contextual
 
     public LoadSerializer() {
         super();
-        success.schedulePrune(TimeUnit.SECONDS.toMillis(cacheCheckScheduleTime));
-        error.schedulePrune(TimeUnit.SECONDS.toMillis(cacheCheckScheduleTime));
-        lockMap.schedulePrune(TimeUnit.SECONDS.toMillis(cacheCheckScheduleTime));
     }
 
     public LoadSerializer(String loadService, String method, int cacheSecond, AnnotationsResult annotationsResult, ParamsHandler paramsHandler, ResponseHandler otherResponseHandler) {
+        this();
         this.loadServiceSourceClassName = loadService;
         this.loadService = SpringUtil.getBean(loadService);
         this.method = method;
@@ -115,71 +105,70 @@ public class LoadSerializer extends JsonSerializer<Object> implements Contextual
         this.annotationsResult = annotationsResult;
         this.responseHandler = otherResponseHandler;
         this.paramsHandler = paramsHandler;
-        prefix = loadServiceSourceClassName + "-";
+        prefix = loadServiceSourceClassName;
     }
 
     @Override
     public void serialize(Object bindData, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        // 写入原始数据
+        gen.writeObject(bindData);
         if (bindData == null || loadService == null) {
-            gen.writeObject(null);
             return;
         }
 
-        Object params = paramsHandler.handleVal(bindData);
-        gen.writeObject(bindData);
-        String writeField = annotationsResult.getWriteField();
-        boolean custom = false;
+        // 获取要翻译写入的字段
+        String writeField = '$' + gen.getOutputContext().getCurrentName();
         Class<?> writeClass = Object.class;
-        if (writeField != null) {
+        if (StringUtils.isNotBlank(annotationsResult.getWriteField())) {
             Field field = ReflectUtil.getField(gen.getCurrentValue().getClass(), annotationsResult.getWriteField());
             if (field != null) {
+                writeField = annotationsResult.getWriteField();
                 writeClass = field.getType();
-                custom = true;
             }
-        }
-        if (!custom) {
-            writeField = '$' + gen.getOutputContext().getCurrentName();
         }
         gen.writeFieldName(writeField);
 
-        // 有效ID，去查询
+        // 获取缓存KEY
         Object[] args = annotationsResult.getRemoteParams();
-        String cacheKey = prefix + method + "-" + paramsHandler.getCacheKey(bindData, args);
+        String cacheKey = "" + Objects.hash(prefix, method, paramsHandler.getCacheKey(bindData, args));
         Object result = getCacheInfo(cacheKey);
-        if (result == null) {
-            StampedLock lock = lockMap.get(cacheKey, true, LockUtil::createStampLock);
-            Lock writeLock = lock.asWriteLock();
-            try {
-                // 获取锁成功后请求这个ID
-                writeLock.lock();
-                // 再次尝试拿缓存
-                result = getCacheInfo(cacheKey);
-                if (result == null) {
-                    // 多参数组装
-                    List<Object> objectParams = new ArrayList<>();
-                    objectParams.add(params);
-                    if (args != null && args.length > 0) {
-                        Collections.addAll(objectParams, args);
-                    }
-                    Object r = ReflectUtil.invoke(loadService, method, objectParams.toArray());
-                    if (r != null) {
-                        result = this.responseHandler.handle(this.loadServiceSourceClassName, method, r, writeClass, objectParams.toArray());
-                        if (cacheSecond > 0) {
-                            success.put(cacheKey, result, TimeUnit.SECONDS.toMillis(cacheSecond));
-                        }
-                    } else {
-                        log.error("【{}】 翻译失败，未找到：{}", prefix, params);
-                        error.put(cacheKey, bindData);
-                        result = bindData;
-                    }
+        if (result != null) {
+            log.info("{} cache 命中: {}", prefix, result);
+            gen.writeObject(result);
+            return;
+        }
+
+        StampedLock lock = lockMap.get(cacheKey, true, LockUtil::createStampLock);
+        // 写锁避免同一业务ID重复查询
+        long stamp = lock.writeLock();
+        try {
+            // 多参数组装
+            Object[] objectParams = new Object[args.length + 1];
+            objectParams[0] = paramsHandler.handleVal(bindData);
+            for (int i = 0; i < args.length; i++) {
+                objectParams[i + 1] = args[0];
+            }
+
+            // 请求翻译结果
+            Object loadResult = ReflectUtil.invoke(loadService, method, objectParams);
+
+            if (loadResult != null) {
+                result = this.responseHandler.handle(this.loadServiceSourceClassName, method, loadResult, writeClass, objectParams);
+                if (cacheSecond > 0) {
+                    success.put(cacheKey, result);
                 }
-            } catch (Exception e) {
-                log.error("【{}】翻译服务异常：{}", prefix, e);
+            } else {
+                log.error("【{}】 翻译失败，未找到：{}", prefix, bindData);
                 error.put(cacheKey, bindData);
                 result = bindData;
-            } finally {
-                writeLock.unlock();
             }
+
+        } catch (Exception e) {
+            log.error("【{}】翻译服务异常：{}", prefix, e);
+            error.put(cacheKey, bindData);
+            result = bindData;
+        } finally {
+            lock.unlockWrite(stamp);
         }
         gen.writeObject(result);
     }
@@ -187,7 +176,7 @@ public class LoadSerializer extends JsonSerializer<Object> implements Contextual
     /**
      * 获取厍信息
      *
-     * @param cacheKey
+     * @param cacheKey 缓存的KEY
      * @return
      */
     private Object getCacheInfo(String cacheKey) {
@@ -217,7 +206,7 @@ public class LoadSerializer extends JsonSerializer<Object> implements Contextual
             AnnotationsResult annotationsResult = paramsHandler.handleAnnotation(property);
             return new LoadSerializer(bean, method, cacheSecond, annotationsResult, paramsHandler, responseHandler);
         }
-        return prov.findNullValueSerializer(property);
+        return prov.findNullValueSerializer(null);
     }
 }
 

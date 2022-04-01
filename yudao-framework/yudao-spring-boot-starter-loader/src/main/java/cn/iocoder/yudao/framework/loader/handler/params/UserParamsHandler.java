@@ -33,7 +33,7 @@ public class UserParamsHandler implements ParamsHandler {
         LoadUser loadUser = property.getAnnotation(LoadUser.class);
         if (loadUser != null) {
             annotationsResult.setRemoteParams(new Object[]{loadUser.batch()});
-            if (loadUser.field() != "") {
+            if (!"".equals(loadUser.field())) {
                 annotationsResult.setWriteField(loadUser.field());
             }
         }
