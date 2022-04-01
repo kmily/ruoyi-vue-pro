@@ -130,6 +130,7 @@ public class LoadSerializer extends JsonSerializer<Object> implements Contextual
 
         // 获取缓存KEY
         Object[] args = annotationsResult.getRemoteParams();
+        int argsLength = args == null ? 0 : args.length;
         String cacheKey = "" + Objects.hash(prefix, method, paramsHandler.getCacheKey(bindData, args));
         Object result = getCacheInfo(cacheKey);
         if (result != null) {
@@ -143,10 +144,10 @@ public class LoadSerializer extends JsonSerializer<Object> implements Contextual
         long stamp = lock.writeLock();
         try {
             // 多参数组装
-            Object[] objectParams = new Object[args.length + 1];
+            Object[] objectParams = new Object[argsLength + 1];
             objectParams[0] = paramsHandler.handleVal(bindData);
-            for (int i = 0; i < args.length; i++) {
-                objectParams[i + 1] = args[0];
+            for (int i = 0; i < argsLength; i++) {
+                objectParams[i + 1] = args[i];
             }
 
             // 请求翻译结果
