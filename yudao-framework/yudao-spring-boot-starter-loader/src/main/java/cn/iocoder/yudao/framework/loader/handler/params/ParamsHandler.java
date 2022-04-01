@@ -35,6 +35,6 @@ public interface ParamsHandler {
      * @return
      */
     default String getCacheKey(Object val, Object[] annotationVal) {
-        return StringUtils.join(val, Convert.toStr(annotationVal));
+        return Convert.toStr(val) + Convert.toStr(annotationVal);
     }
 }
