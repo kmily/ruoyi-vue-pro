@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.loader.handler.params;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.crypto.SecureUtil;
 import cn.iocoder.yudao.framework.loader.bo.AnnotationsResult;
 import com.fasterxml.jackson.databind.BeanProperty;
@@ -34,6 +35,6 @@ public interface ParamsHandler {
      * @return
      */
     default String getCacheKey(Object val, Object[] annotationVal) {
-        return StringUtils.join(val, annotationVal);
+        return StringUtils.join(val, Convert.toStr(annotationVal));
     }
 }
