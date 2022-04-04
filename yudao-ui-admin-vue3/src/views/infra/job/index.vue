@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryFormRef" :inline="true" v-show="showSearch" label-width="100px">
+    <el-form :model="queryParams" id="queryForm" ref="queryFormRef" :inline="true" v-show="showSearch" label-width="100px">
       <el-form-item label="任务名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入任务名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
@@ -185,10 +185,30 @@ import {
 import {useRouter} from "vue-router";
 import {DICT_TYPE, } from "@/utils/dict";
 
+let lastFormHeight = 50;
+
 const tableScrollHeight = computed(() => {
-  const formHeight = showSearch.value ? 50 : 0;
+  let formHeight = 0;
+  if (showSearch.value) {
+    const queryForm = document.getElementById("queryForm")
+    if (queryForm) {
+      formHeight = parseInt(window.getComputedStyle(queryForm).height)
+    } else {
+      formHeight = lastFormHeight
+    }
+
+    if (!formHeight) { // form 从隐藏到展示 此时取不到style 就取上一次的高度
+      formHeight = lastFormHeight
+    }
+
+  }
+  if (formHeight > 0) {
+    lastFormHeight = formHeight;
+  }
+
+
   const opHeight = 40;
-  const paginationHeight = 65;
+  const paginationHeight = 96;
   const padding = 40;
   const header = 84;
   return `calc(100vh - ${header + padding + paginationHeight + opHeight + formHeight}px)`;
@@ -345,6 +365,7 @@ function handleAdd() {
  */
 function handleUpdate(row) {
   reset()
+  console.log(queryFormRef.value)
   const id = row.id
   JobApi.getJob(id).then(response => {
     form.value = response.data

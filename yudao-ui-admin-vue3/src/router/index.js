@@ -134,15 +134,15 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/tool/gen-edit',
+    path: '/codegen',
     component: Layout,
     hidden: true,
     children: [
       {
-        path: 'index/:tableId(\\d+)',
-        component: () => import('@/views/tool/gen/editTable'),
+        path: 'edit/:tableId(\\d+)',
+        component: () => import('@/views/infra/codegen/editTable'),
         name: 'GenEdit',
-        meta: { title: '修改生成配置', activeMenu: '/tool/gen' }
+        meta: { title: '修改生成配置', activeMenu: '/codegen' }
       }
     ]
   }

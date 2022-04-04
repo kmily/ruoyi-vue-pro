@@ -49,7 +49,8 @@
 </template>
 
 <script setup>
-import { listDbTable, importTable } from "@/api/infra/codegen";
+import * as CodegenApi from "@/api/infra/codegen";
+import {ref, reactive, getCurrentInstance} from "vue"
 
 const total = ref(0);
 const visible = ref(false);
@@ -66,6 +67,8 @@ const queryParams = reactive({
 
 const emit = defineEmits(["ok"]);
 
+const queryRef = ref()
+
 /** 查询参数列表 */
 function show() {
   getList();
@@ -81,7 +84,7 @@ function handleSelectionChange(selection) {
 }
 /** 查询表数据 */
 function getList() {
-  listDbTable(queryParams).then(res => {
+  CodegenApi.getSchemaTableList(queryParams).then(res => {
     dbTableList.value = res.rows;
     total.value = res.total;
   });
@@ -93,13 +96,14 @@ function handleQuery() {
 }
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm("queryRef");
+  // proxy.resetForm("queryRef");
+  queryRef.value?.resetFields()
   handleQuery();
 }
 /** 导入按钮操作 */
 function handleImportTable() {
   const tableNames = tables.value.join(",");
-  if (tableNames == "") {
+  if (tableNames === "") {
     proxy.$modal.msgError("请选择要导入的表");
     return;
   }

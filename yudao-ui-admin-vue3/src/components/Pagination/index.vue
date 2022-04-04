@@ -98,6 +98,8 @@ function handleCurrentChange(val) {
 .pagination-container {
   background: #fff;
   padding: 32px 16px;
+  display: flex;
+  justify-content: flex-end;
 }
 .pagination-container.hidden {
   display: none;

@@ -127,7 +127,7 @@
 </template>
 
 <script setup name="GenEdit">
-import { getGenTable, updateGenTable } from "@/api/infra/codegen";
+import {getCodegenDetail, updateCodegen} from "@/api/infra/codegen";
 import {  } from "@/api/system/dict/type";
 import basicInfoForm from "./basicInfoForm";
 import genInfoForm from "./genInfoForm";
@@ -157,7 +157,7 @@ function submitForm() {
         treeParentCode: genTable.treeParentCode,
         parentMenuId: genTable.parentMenuId
       };
-      updateGenTable(genTable).then(res => {
+      updateCodegen(genTable).then(res => {
         proxy.$modal.msgSuccess(res.msg);
         if (res.code === 200) {
           close();
@@ -184,7 +184,7 @@ function close() {
   const tableId = route.params && route.params.tableId;
   if (tableId) {
     // 获取表详细信息
-    getGenTable(tableId).then(res => {
+    getCodegenDetail(tableId).then(res => {
       columns.value = res.data.rows;
       info.value = res.data.info;
       tables.value = res.data.tables;
