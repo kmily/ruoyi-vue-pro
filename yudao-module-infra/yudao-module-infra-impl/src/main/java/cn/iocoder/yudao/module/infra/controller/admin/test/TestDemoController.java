@@ -43,7 +43,8 @@ public class TestDemoController {
 
     @PutMapping("/update")
     @ApiOperation("更新字典类型")
-    @PreAuthorize("@ss.hasPermission('infra:test-demo:update')")    public CommonResult<Boolean> updateTestDemo(@Valid @RequestBody TestDemoUpdateReqVO updateReqVO) {
+    @PreAuthorize("@ss.hasPermission('infra:test-demo:update')")
+    public CommonResult<Boolean> updateTestDemo(@Valid @RequestBody TestDemoUpdateReqVO updateReqVO) {
         testDemoService.updateTestDemo(updateReqVO);
         return success(true);
     }
