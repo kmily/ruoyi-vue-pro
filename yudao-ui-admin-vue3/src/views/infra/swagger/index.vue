@@ -1,9 +1,7 @@
+<script setup lang="ts"></script>
+
 <template>
-   <i-frame v-model:src="url" />
+  <div>index</div>
 </template>
 
-<script setup>
-import iFrame from '@/components/iFrame'
-
-const url = ref(import.meta.env.VITE_APP_BASE_API + "/doc.html")
-</script>
+<style scoped></style>
