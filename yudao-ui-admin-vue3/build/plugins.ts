@@ -5,6 +5,7 @@ import svgLoader from "vite-svg-loader";
 import legacy from "@vitejs/plugin-legacy";
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import WindiCSS from "vite-plugin-windicss";
+import styleImport from "vite-plugin-style-import";
 import VueI18n from "@intlify/vite-plugin-vue-i18n";
 import ElementPlus from "unplugin-element-plus/vite";
 import { visualizer } from "rollup-plugin-visualizer";
@@ -50,6 +51,18 @@ export function getPluginsList(command, VITE_LEGACY) {
     }),
     // svg组件化支持
     svgLoader(),
+    // 按需加载vxe-table
+    styleImport({
+      libs: [
+        {
+          libraryName: "vxe-table",
+          esModule: true,
+          ensureStyleFile: true,
+          resolveComponent: name => `vxe-table/es/${name}`,
+          resolveStyle: name => `vxe-table/es/${name}/style.css`
+        }
+      ]
+    }),
     ElementPlus({}),
     // 是否为打包后的文件提供传统浏览器兼容性支持
     VITE_LEGACY

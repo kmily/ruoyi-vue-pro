@@ -39,6 +39,7 @@ specifiers:
   eslint: ^8.8.0
   eslint-plugin-prettier: ^4.0.0
   eslint-plugin-vue: ^8.4.1
+  font-awesome: ^4.7.0
   husky: 7.0.2
   lint-staged: 11.1.2
   lodash: ^4.17.21
@@ -81,7 +82,9 @@ specifiers:
   vue-i18n: ^9.2.0-beta.33
   vue-router: ^4.0.14
   vue-types: ^4.1.1
+  vxe-table: ^4.2.2
   windicss: ^3.5.1
+  xe-utils: ^3.5.4
 
 dependencies:
   '@ctrl/tinycolor': 3.4.0
@@ -95,6 +98,7 @@ dependencies:
   dayjs: 1.11.0
   element-plus: 2.1.8_1a412d14def5ff5ca1122000e4bee666
   element-resize-detector: 1.2.4
+  font-awesome: 4.7.0
   lodash: 4.17.21
   lodash-es: 4.17.21
   lodash-unified: 1.0.2_da03a4540fbd16bbaafbb96724306afd
@@ -110,6 +114,8 @@ dependencies:
   vue-i18n: 9.2.0-beta.33_vue@3.2.31
   vue-router: 4.0.14_vue@3.2.31
   vue-types: 4.1.1_vue@3.2.31
+  vxe-table: 4.2.2_vue@3.2.31+xe-utils@3.5.4
+  xe-utils: 3.5.4
 
 devDependencies:
   '@commitlint/cli': 13.1.0
@@ -2811,6 +2817,11 @@ packages:
         optional: true
     dev: false
 
+  /font-awesome/4.7.0:
+    resolution: {integrity: sha512-U6kGnykA/6bFmg1M/oT9EkFeIYv7JlX3bozwQJWiiLz6L0w3F5vBVPxHlwyX/vtNq1ckcpRKOB9f2Qal/VtFpg==}
+    engines: {node: '>=0.10.3'}
+    dev: false
+
   /fraction.js/4.2.0:
     resolution: {integrity: sha512-MhLuK+2gUcnZe8ZHlaaINnQLl0xRIGRfcGk2yl8xoQAfHrSsL3rYu6FCmBdkdbhc9EPlwyGHewaRsvwRMJtAlA==}
     dev: true
@@ -5227,6 +5238,16 @@ packages:
       '@vue/shared': 3.2.31
     dev: false
 
+  /vxe-table/4.2.2_vue@3.2.31+xe-utils@3.5.4:
+    resolution: {integrity: sha512-snt+HAKdDy4nmdhmRVf8j70dg7uTtITLbd+QlD1SV423dIjDZ3ERI5UNY3JwRyK+UDR0BJjF3uiTSEMkW/rFlQ==}
+    peerDependencies:
+      vue: ^3.2.2
+      xe-utils: ^3.5.0
+    dependencies:
+      vue: 3.2.31
+      xe-utils: 3.5.4
+    dev: false
+
   /webpack-virtual-modules/0.4.3:
     resolution: {integrity: sha512-5NUqC2JquIL2pBAAo/VfBP6KuGkHIZQXW/lNKupLPfhViwh8wNsu0BObtl09yuKZszeEUfbXz8xhrHvSG16Nqw==}
     dev: true
@@ -5286,6 +5307,10 @@ packages:
       imurmurhash: 0.1.4
       signal-exit: 3.0.7
     dev: true
+
+  /xe-utils/3.5.4:
+    resolution: {integrity: sha512-oH7VOgvHv34pn198dhKPVKnuEHV22Q06YpCTVnAS3JuutylmZj/rtJGvn0BxxWQ37w2LgCknoebLA4uIGXwFtw==}
+    dev: false
 
   /y18n/5.0.8:
     resolution: {integrity: sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==}
