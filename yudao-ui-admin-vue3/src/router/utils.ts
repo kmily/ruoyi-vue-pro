@@ -1,24 +1,24 @@
 import {
-  RouterHistory,
-  RouteRecordRaw,
-  RouteComponent,
-  createWebHistory,
-  createWebHashHistory,
-  RouteRecordNormalized
+    createWebHashHistory,
+    createWebHistory,
+    RouteComponent,
+    RouteRecordNormalized,
+    RouteRecordRaw,
+    RouterHistory
 } from "vue-router";
-import { router } from "./index";
-import { loadEnv } from "../../build";
-import { useTimeoutFn } from "@vueuse/core";
-import { RouteConfigs } from "/@/layout/types";
-import { buildHierarchyTree } from "/@/utils/tree";
-import { usePermissionStoreHook } from "/@/store/modules/permission";
+import {router} from "./index";
+import {loadEnv} from "../../build";
+import {useTimeoutFn} from "@vueuse/core";
+import {RouteConfigs} from "/@/layout/types";
+import {buildHierarchyTree} from "/@/utils/tree";
+import {usePermissionStoreHook} from "/@/store/modules/permission";
+// 动态路由
+import {getAsyncRoutes} from "/@/api/routes";
+
 const Layout = () => import("/@/layout/index.vue");
 const IFrame = () => import("/@/layout/frameView.vue");
 // https://cn.vitejs.dev/guide/features.html#glob-import
 const modulesRoutes = import.meta.glob("/src/views/**/*.{vue,tsx}");
-
-// 动态路由
-import { getAsyncRoutes } from "/@/api/routes";
 
 // 按照路由中meta下的rank等级升序来排序路由
 function ascending(arr: any[]) {
@@ -237,7 +237,11 @@ function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>) {
     } else if (v.meta?.frameSrc) {
       v.component = IFrame;
     } else {
-      const index = modulesRoutesKeys.findIndex(ev => ev.includes(v.path));
+      // 对后端传component组件路径和不传做兼容（如果后端传component组件路径，那么path可以随便写，如果不传，component组件路径会根path保持一致）
+      const index = v?.component
+        ? // @ts-expect-error
+          modulesRoutesKeys.findIndex(ev => ev.includes(v.component))
+        : modulesRoutesKeys.findIndex(ev => ev.includes(v.path));
       v.component = modulesRoutes[modulesRoutesKeys[index]];
     }
     v.meta = {

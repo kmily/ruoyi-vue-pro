@@ -18,9 +18,9 @@ const { locale, t } = useI18n();
 const routers = useRouter().options.routes;
 const menuRef = templateRef<ElRef | null>("menu", null);
 const instance =
-  getCurrentInstance().appContext.config.globalProperties.$storage;
+    getCurrentInstance().appContext.config.globalProperties.$storage;
 const title =
-  getCurrentInstance().appContext.config.globalProperties.$config?.Title;
+    getCurrentInstance().appContext.config.globalProperties.$config?.Title;
 
 const {
   logout,
@@ -40,17 +40,10 @@ onMounted(() => {
 });
 
 watch(
-  () => locale.value,
-  () => {
-    changeTitle(route.meta);
-  }
-);
-
-watch(
-  () => route.path,
-  () => {
-    menuSelect(route.path, routers);
-  }
+    () => locale.value,
+    () => {
+      changeTitle(route.meta);
+    }
 );
 
 function translationCh() {
@@ -73,18 +66,18 @@ function translationEn() {
       <h4>{{ title }}</h4>
     </div>
     <el-menu
-      ref="menu"
-      class="horizontal-header-menu"
-      mode="horizontal"
-      :default-active="route.path"
-      router
-      @select="indexPath => menuSelect(indexPath, routers)"
+        ref="menu"
+        class="horizontal-header-menu"
+        mode="horizontal"
+        :default-active="route.path"
+        router
+        @select="indexPath => menuSelect(indexPath, routers)"
     >
       <sidebar-item
-        v-for="route in usePermissionStoreHook().wholeMenus"
-        :key="route.path"
-        :item="route"
-        :base-path="route.path"
+          v-for="route in usePermissionStoreHook().wholeMenus"
+          :key="route.path"
+          :item="route"
+          :base-path="route.path"
       />
     </el-menu>
     <div class="horizontal-header-right">
@@ -100,16 +93,16 @@ function translationEn() {
         <template #dropdown>
           <el-dropdown-menu class="translation">
             <el-dropdown-item
-              :style="getDropdownItemStyle(locale, 'zh')"
-              @click="translationCh"
+                :style="getDropdownItemStyle(locale, 'zh')"
+                @click="translationCh"
             >
               <span class="check-zh" v-show="locale === 'zh'">
                 <IconifyIconOffline icon="check" /> </span
               >简体中文
             </el-dropdown-item>
             <el-dropdown-item
-              :style="getDropdownItemStyle(locale, 'en')"
-              @click="translationEn"
+                :style="getDropdownItemStyle(locale, 'en')"
+                @click="translationEn"
             >
               <span class="check-en" v-show="locale === 'en'">
                 <IconifyIconOffline icon="check" /> </span
@@ -128,8 +121,8 @@ function translationEn() {
           <el-dropdown-menu class="logout">
             <el-dropdown-item @click="logout">
               <IconifyIconOffline
-                icon="logout-circle-r-line"
-                style="margin: 5px"
+                  icon="logout-circle-r-line"
+                  style="margin: 5px"
               />
               {{ t("buttons.hsLoginOut") }}</el-dropdown-item
             >
@@ -137,9 +130,9 @@ function translationEn() {
         </template>
       </el-dropdown>
       <span
-        class="el-icon-setting"
-        :title="t('buttons.hssystemSet')"
-        @click="onPanel"
+          class="el-icon-setting"
+          :title="t('buttons.hssystemSet')"
+          @click="onPanel"
       >
         <IconifyIconOffline icon="setting" />
       </span>
