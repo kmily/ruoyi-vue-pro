@@ -17,6 +17,11 @@ import java.util.List;
  */
 public class ExcelUtils {
 
+    static {
+        // 解决 JDK 版本大于 16 时，Excel 导出异常处理
+        StaticComponentContainer.Modules.exportAllToAll();
+    }
+
     /**
      * 将列表以 Excel 响应给前端
      *
@@ -30,8 +35,6 @@ public class ExcelUtils {
      */
     public static <T> void write(HttpServletResponse response, String filename, String sheetName,
                                  Class<T> head, List<T> data) throws IOException {
-        //jdk 版本大于16 excel导出异常处理
-        StaticComponentContainer.Modules.exportAllToAll();
         // 输出 Excel
         EasyExcel.write(response.getOutputStream(), head)
                 .autoCloseStream(false) // 不要自动关闭，交给 Servlet 自己处理
