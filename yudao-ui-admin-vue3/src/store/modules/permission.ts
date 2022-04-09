@@ -26,11 +26,11 @@ export const usePermissionStore = defineStore({
             this.wholeMenus = filterTree(
                 ascending(this.constantMenus.concat(routes))
             );
-
+            
             this.menusTree = cloneDeep(
                 filterTree(ascending(this.constantMenus.concat(routes)))
             );
-
+            
             const getButtonAuth = (arrRoutes: Array<RouteConfigs>) => {
                 if (!arrRoutes || !arrRoutes.length) return;
                 arrRoutes.forEach((v: RouteConfigs) => {
@@ -42,7 +42,7 @@ export const usePermissionStore = defineStore({
                     }
                 });
             };
-
+            
             getButtonAuth(this.wholeMenus);
         },
         async changeSetting(routes) {

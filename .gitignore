@@ -45,3 +45,4 @@ nbdist/
 
 ### JRebel ###
 rebel.xml
+/yudao-admin-ui/node_modules/

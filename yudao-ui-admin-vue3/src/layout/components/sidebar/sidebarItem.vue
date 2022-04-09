@@ -139,6 +139,7 @@ function resolvePath(routePath) {
 <template>
   <template
     v-if="
+      props.item.children &&
       hasOneShowingChild(props.item.children, props.item) &&
       (!onlyOneChild.children || onlyOneChild.noShowingChildren)
     "
