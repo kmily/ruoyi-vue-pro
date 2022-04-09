@@ -62,8 +62,13 @@
 
         <!-- Test 测试相关 -->
         <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-test</artifactId>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId> <!-- framework 中的 test 不使用 yudao-spring-boot-starter-test，避免循环依赖 -->
             <scope>test</scope>
         </dependency>
     </dependencies>

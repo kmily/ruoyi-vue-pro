@@ -25,11 +25,13 @@
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-mybatis</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-redis</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Test 测试相关 -->

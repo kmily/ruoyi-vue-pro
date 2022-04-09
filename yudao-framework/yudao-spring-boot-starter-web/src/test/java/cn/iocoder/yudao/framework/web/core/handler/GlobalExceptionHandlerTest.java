@@ -3,11 +3,12 @@ package cn.iocoder.yudao.framework.web.core.handler;
 import cn.iocoder.yudao.framework.apilog.core.service.ApiErrorLogFrameworkService;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -27,7 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class GlobalExceptionHandlerTest extends BaseMockitoUnitTest {
+@ExtendWith(MockitoExtension.class)
+class GlobalExceptionHandlerTest {
 
     @InjectMocks
     private GlobalExceptionHandler globalExceptionHandler;
