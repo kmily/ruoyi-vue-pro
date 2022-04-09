@@ -2,8 +2,8 @@ import { defineStore } from "pinia";
 import { store } from "/@/store";
 import { userType } from "./types";
 import { router } from "/@/router";
+import { storageSession } from "/@/utils/storage";
 import { login } from "/@/api/login";
-import { storageLocal, storageSession } from "/@/utils/storage";
 import { getToken, setToken, removeToken } from "/@/utils/auth";
 import { useMultiTagsStoreHook } from "/@/store/modules/multiTags";
 
@@ -43,7 +43,6 @@ export const useUserStore = defineStore({
       this.token = "";
       this.name = "";
       removeToken();
-      storageLocal.clear();
       storageSession.clear();
       useMultiTagsStoreHook().handleTags("equal", [
         {
