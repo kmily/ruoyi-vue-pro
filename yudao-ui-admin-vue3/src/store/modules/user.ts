@@ -27,7 +27,7 @@ export const useUserStore = defineStore({
           .then(res => {
             if (res && res.code === 0) {
               setToken(res.data.token);
-              this.token = res.data.token;
+              // this.token = res.data.token;
               resolve();
             } else {
               reject(res.msg);

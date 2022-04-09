@@ -227,7 +227,8 @@ function handleAliveRoute(matched: RouteRecordNormalized[], mode?: string) {
 }
 
 // 过滤后端传来的动态路由 重新生成规范路由
-function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>) {
+// TODO @code：是否有办法，不修改到源码 parentPath
+function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>, parentPath: string = '/') {
   if (!arrRoutes || !arrRoutes.length) return;
   const modulesRoutesKeys = Object.keys(modulesRoutes);
   arrRoutes.forEach((v: RouteRecordRaw) => {
@@ -249,8 +250,9 @@ function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>) {
       icon: v.icon,
       rank: v.id
     };
+    v.path = generateRoutePath(parentPath, v.path);
     if (v.children) {
-      addAsyncRoutes(v.children);
+      addAsyncRoutes(v.children, v.path);
     }
   });
   return arrRoutes;
@@ -261,6 +263,15 @@ export function getRedirect(item: any) {
   } else {
     return item.path;
   }
+}
+function generateRoutePath(parentPath: string, path: string) {
+    if (parentPath.endsWith('/')) {
+        parentPath = parentPath.slice(0, -1); // 移除默认的 /
+    }
+    if (!path.startsWith('/')) {
+        path = '/' + path;
+    }
+    return parentPath + path;
 }
 // 获取路由历史模式 https://next.router.vuejs.org/zh/guide/essentials/history-mode.html
 function getHistoryMode(): RouterHistory {
