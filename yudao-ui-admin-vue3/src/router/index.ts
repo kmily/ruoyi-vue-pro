@@ -38,6 +38,7 @@ import errorRouter from "./modules/error";
 // import nestedRouter from "./modules/nested";
 // import flowChartRouter from "./modules/flowchart";
 import remainingRouter from "./modules/remaining";
+import {getToken} from "/@/utils/auth";
 // import componentsRouter from "./modules/components";
 
 // 原始静态路由（未做任何处理）
@@ -101,7 +102,9 @@ router.beforeEach((to: toRouteType, _from, next) => {
             handleAliveRoute(newMatched);
         }
     }
-    const name = storageSession.getItem("info");
+    // TODO @code：是否登录，最好以 token 为标准
+    // const name = storageSession.getItem("info");
+    const name = getToken();
     NProgress.start();
     const externalLink = isUrl(to?.name);
     if (!externalLink)
@@ -127,7 +130,8 @@ router.beforeEach((to: toRouteType, _from, next) => {
         } else {
             // 刷新
             if (usePermissionStoreHook().wholeMenus.length === 0)
-                initRouter(name.username).then((router: Router) => {
+                // TODO @code：这里 initRouter 无参数，不应该传入 name.username，已去除。
+                initRouter().then((router: Router) => {
                     if (!useMultiTagsStoreHook().getMultiTagsCache) {
                         const handTag = (
                             path: string,
