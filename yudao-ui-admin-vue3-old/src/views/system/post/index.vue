@@ -106,7 +106,6 @@ import {CommonStatusEnum} from "@/utils/constants";
 
 const { proxy } = getCurrentInstance();
 
-
 const postList = ref([]);
 const open = ref(false);
 const loading = ref(true);
