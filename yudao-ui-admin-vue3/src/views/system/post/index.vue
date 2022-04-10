@@ -5,22 +5,33 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { getJobList } from "/@/api/system/post";
+import dayjs from "dayjs";
+import { getPostList } from "/@/api/system/post";
 import { FormInstance } from "element-plus";
+import { Switch } from "@pureadmin/components";
+import { successMessage } from "/@/utils/message";
 import { reactive, ref, onMounted, computed } from "vue";
 import { useEpThemeStoreHook } from "/@/store/modules/epTheme";
 import { useRenderIcon } from "/@/components/ReIcon/src/hooks";
 
-const queryParams = reactive({
-  code: "",
-  user: "",
-  status: ""
+const tableOptions = reactive({
+  size: "default",
+  loading: true,
+  buttonRef: undefined,
+  visible: false,
+  totalPage: 0,
+  switchLoadMap: {},
+  checkList: [],
+  tableData: [],
+  queryParams: {
+    pageNo: 1,
+    pageSize: 10,
+    name: undefined,
+    user: undefined,
+    code: undefined,
+    status: undefined
+  }
 });
-let jobList = ref([]);
-let loading = ref(false);
-const totalPage = ref(0);
-let pageSize = ref(10);
-let size = ref("default");
 
 const formRef = ref<FormInstance>();
 
@@ -32,11 +43,20 @@ const resetForm = (formEl: FormInstance | undefined) => {
 const getDropdownItemStyle = computed(() => {
   return s => {
     return {
-      background: s === size.value ? useEpThemeStoreHook().epThemeColor : "",
-      color: s === size.value ? "#f4f4f5" : "#000"
+      background:
+        s === tableOptions.size ? useEpThemeStoreHook().epThemeColor : "",
+      color: s === tableOptions.size ? "#f4f4f5" : "#000"
     };
   };
 });
+
+async function getTableData() {
+  tableOptions.loading = true;
+  getPostList().then((response: any) => {
+    tableOptions.tableData = response?.data?.list;
+    tableOptions.totalPage = response?.data?.total;
+  });
+}
 
 function handleUpdate(row) {
   console.log(row);
@@ -54,10 +74,31 @@ function handleSizeChange(val: number) {
   console.log(`${val} items per page`);
 }
 
-onMounted(async () => {
-  let { data } = await getJobList();
-  jobList.value = data.list;
-  totalPage.value = data.total;
+function onCheckChange(val) {
+  console.log("onCheckChange", val);
+}
+
+function handleSelectionChange(val) {
+  console.log("handleSelectionChange", val);
+}
+
+// function onChange(checked, { $index, row }) {
+//   tableOptions.switchLoadMap.[$index] = Object.assign({}, tableOptions.switchLoadMap.[$index], {
+//     loading: true
+//   });
+//   setTimeout(() => {
+//     tableOptions.switchLoadMap.[$index] = Object.assign(
+//       {},
+//       tableOptions.switchLoadMap.[$index],
+//       {
+//         loading: false
+//       }
+//     );
+//     successMessage("已成功修改岗位状态");
+//   }, 300);
+// }
+onMounted(() => {
+  getTableData();
 });
 </script>
 
@@ -66,31 +107,55 @@ onMounted(async () => {
     <!-- TODO size="small" -->
     <!-- TODO label-width="68px" -->
     <!-- TODO v-show="showSearch" -->
-    <el-form :model="queryParams" ref="formRef" :inline="true" class="bg-white w-99/100 pl-8 pt-4">
-      <el-form-item label="岗位编码：">
-        <!-- TODO @keyup.enter.native="handleQuery" -->
-        <el-input v-model="queryParams.code" placeholder="请输入岗位编码" clearable />
+    <el-form
+      ref="formRef"
+      :inline="true"
+      :model="tableOptions.queryParams"
+      class="bg-white w-99/100 pl-8 pt-4"
+    >
+      <el-form-item label="岗位编码：" prop="code">
+        <el-input
+          v-model="tableOptions.queryParams.code"
+          placeholder="请输入"
+          clearable
+        />
       </el-form-item>
-      <el-form-item label="岗位名称：">
-        <!-- TODO @keyup.enter.native="handleQuery" -->
-        <el-input v-model="queryParams.user" placeholder="请输入岗位名称" clearable />
+      <el-form-item label="岗位名称：" prop="user">
+        <el-input
+          v-model="tableOptions.queryParams.user"
+          placeholder="请输入"
+          clearable
+        />
       </el-form-item>
-      <el-form-item label="状态：">
-        <!-- TODO @keyup.enter.native="handleQuery" -->
-        <el-select v-model="queryParams.status" placeholder="请选择岗位状态" clearable>
+      <el-form-item label="状态：" prop="status">
+        <el-select
+          v-model="tableOptions.queryParams.status"
+          placeholder="请选择"
+          clearable
+        >
           <el-option label="开启" value="1" />
           <el-option label="关闭" value="0" />
         </el-select>
       </el-form-item>
       <el-form-item>
-        <!-- TODO @keyup.enter.native="handleQuery" -->
-        <el-button type="primary" :icon="useRenderIcon('search')">搜索</el-button>
-        <!-- TODO resetQuery -->
-        <el-button :icon="useRenderIcon('refresh')" @click="resetForm(formRef)">重置</el-button>
+        <el-button
+          type="primary"
+          :icon="useRenderIcon('search')"
+          :loading="tableOptions.loading"
+          @click="getTableData"
+          >搜索</el-button
+        >
+        <el-button :icon="useRenderIcon('refresh')" @click="resetForm(formRef)"
+          >重置</el-button
+        >
       </el-form-item>
     </el-form>
 
-    <div class="w-99/100 mt-6 pb-4 bg-white">
+    <div
+      class="w-99/100 mt-6 pb-4 bg-white"
+      v-loading="tableOptions.loading"
+      loading
+    >
       <div class="flex justify-between w-full h-60px p-4">
         <p class="font-bold">岗位列表</p>
         <div class="w-200px flex items-center justify-around">
@@ -104,28 +169,107 @@ onMounted(async () => {
           <!-- TODO @click="handleExport" -->
           <!-- TODO :loading="exportLoading" -->
           <!-- TODO -hasPermi="['system:post:export']" -->
-          <el-button type="warning" :icon="useRenderIcon('export')">导出</el-button>
-          <IconifyIconOffline class="cursor-pointer" icon="refresh-right" width="20" color="#606266"/>
+          <el-button type="success" :icon="useRenderIcon('import')"
+            >导入</el-button
+          >
+          <el-button type="warning" :icon="useRenderIcon('export')"
+            >导出</el-button
+          >
+          <el-tooltip effect="dark" content="刷新" placement="top">
+            <IconifyIconOffline
+              class="cursor-pointer outline-none"
+              icon="refresh-right"
+              width="20"
+              color="#606266"
+              @click="getTableData"
+            />
+          </el-tooltip>
 
           <!-- TODO 右边按钮的组件封装 -->
-          <el-dropdown id="header-translation" trigger="click">
-            <IconifyIconOffline class="cursor-pointer" icon="density" width="20" color="#606266"/>
-            <template #dropdown>
-              <el-dropdown-menu class="translation">
-                <el-dropdown-item :style="getDropdownItemStyle('large')" @click="size = 'large'">松散</el-dropdown-item>
-                <el-dropdown-item :style="getDropdownItemStyle('default')" @click="size = 'default'">默认</el-dropdown-item>
-                <el-dropdown-item :style="getDropdownItemStyle('small')" @click="size = 'small'">紧凑</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+          <el-tooltip effect="dark" content="密度" placement="top">
+            <el-dropdown id="header-translation" trigger="click">
+              <IconifyIconOffline
+                class="cursor-pointer outline-none"
+                icon="density"
+                width="20"
+                color="#606266"
+              />
+              <template #dropdown>
+                <el-dropdown-menu class="translation">
+                  <el-dropdown-item
+                    :style="getDropdownItemStyle('large')"
+                    @click="tableOptions.size = 'large'"
+                  >
+                    松散
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    :style="getDropdownItemStyle('default')"
+                    @click="tableOptions.size = 'default'"
+                  >
+                    默认
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    :style="getDropdownItemStyle('small')"
+                    @click="tableOptions.size = 'small'"
+                  >
+                    紧凑
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </el-tooltip>
 
-          <IconifyIconOffline class="cursor-pointer" icon="setting" width="20" color="#606266"/>
+          <el-popover :width="200" trigger="click">
+            <template #reference>
+              <IconifyIconOffline
+                class="cursor-pointer outline-none"
+                icon="setting"
+                width="20"
+                color="#606266"
+                @mouseover="e => (tableOptions.buttonRef = e.currentTarget)"
+                @mouseenter="tableOptions.visible = true"
+                @mouseleave="tableOptions.visible = false"
+              />
+            </template>
+            <el-checkbox-group
+              v-model="tableOptions.checkList"
+              @change="onCheckChange"
+            >
+              <el-checkbox label="序号列" />
+              <el-checkbox label="勾选列" />
+            </el-checkbox-group>
+          </el-popover>
         </div>
+        <el-tooltip
+          ref="tooltipRef"
+          v-model:visible="tableOptions.visible"
+          :popper-options="{
+            modifiers: [
+              {
+                name: 'computeStyles',
+                options: {
+                  adaptive: false,
+                  enabled: false
+                }
+              }
+            ]
+          }"
+          placement="top"
+          :virtual-ref="tableOptions.buttonRef"
+          virtual-triggering
+          trigger="click"
+          content="列设置"
+        />
       </div>
       <!-- TODO 边框不对 -->
       <!-- TODO :header-cell-style="{ background: '#fafafa', color: '#606266' }" -->
-      <el-table border :size="size" v-loading="loading" :data="jobList"
-                :header-cell-style="{ background: '#fafafa', color: '#606266' }">
+      <el-table
+        border
+        :size="tableOptions.size"
+        v-loading="tableOptions.loading"
+        :data="tableOptions.tableData"
+        :header-cell-style="{ background: '#fafafa', color: '#606266' }"
+      >
         <el-table-column label="岗位编号" align="center" prop="id" />
         <el-table-column label="岗位编码" align="center" prop="code" />
         <el-table-column label="岗位名称" align="center" prop="name" />
@@ -133,28 +277,45 @@ onMounted(async () => {
         <el-table-column label="状态" align="center" prop="status">
           <!-- TODO dict-tag -->
           <template #default="scope">
-            <el-tag>{{ scope.row.status }}</el-tag>
+            <Switch
+              :size="tableOptions.size"
+              v-model:checked="scope.row.status"
+              :checkedValue="1"
+              :unCheckedValue="0"
+              checked-children="已开启"
+              un-checked-children="已关闭"
+            />
           </template>
         </el-table-column>
-        <el-table-column label="创建时间" align="center" prop="createTime">
-          <!-- TODO parseTime(scope.row.createTime) -->
+        <el-table-column
+          label="创建时间"
+          align="center"
+          width="180"
+          prop="createTime"
+        >
           <template #default="scope">
-            <span>{{ scope.row.createTime }}</span>
+            <span>{{
+              dayjs(scope.row.createTime).format("YYYY-MM-DD HH:mm:ss")
+            }}</span>
           </template>
         </el-table-column>
         <!-- TODO class-name="small-padding fixed-width" -->
-        <el-table-column label="操作" align="center">
+        <el-table-column label="操作" width="130" align="center">
           <template #default="scope">
             <!-- TODO size="mini" -->
             <!-- TODO icon="el-icon-edit" -->
             <!-- TODO v-hasPermi="['system:post:update']" -->
-            <el-button type="text" @click="handleUpdate(scope.row)">修改</el-button>
-            <el-popconfirm title="确定删除吗？">
+            <el-button type="text" @click="handleUpdate(scope.row)"
+              >修改</el-button
+            >
+            <el-popconfirm title="是否确认删除？">
               <template #reference>
                 <!-- TODO size="mini" -->
                 <!-- TODO icon="el-icon-delete" -->
                 <!-- TODO v-hasPermi="['system:post:delete']" -->
-                <el-button type="text" @click="handleDelete(scope.row)">删除</el-button>
+                <el-button type="text" @click="handleDelete(scope.row)"
+                  >删除</el-button
+                >
               </template>
             </el-popconfirm>
           </template>
@@ -162,9 +323,17 @@ onMounted(async () => {
       </el-table>
 
       <!-- TODO 分页组件 -->
-      <el-pagination class="flex justify-end mt-4 mr-2" :small="size === 'small'" v-model:page-size="pageSize"
-          :page-sizes="[10, 20, 30, 50]" :background="true" layout="total, sizes, prev, pager, next, jumper"
-          :total="totalPage" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
+      <el-pagination
+        class="flex justify-end mt-4 mr-2"
+        :size="tableOptions.size"
+        v-model:page-size="tableOptions.queryParams.pageSize"
+        :page-sizes="[10, 20, 30, 50]"
+        :background="true"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="tableOptions.totalPage"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
     </div>
 
     <!-- TODO 添加或修改岗位对话框 -->

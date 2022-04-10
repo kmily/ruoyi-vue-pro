@@ -24,13 +24,13 @@ export const useUserStore = defineStore({
     async loginByUsername(data) {
       return new Promise<void>((resolve, reject) => {
         login(data)
-          .then(res => {
-            if (res && res.code === 0) {
-              setToken(res.data.token);
+          .then((res: any) => {
+            if (res && res?.code === 0) {
+              setToken(res?.data?.token);
               // this.token = res.data.token;
-              resolve();
+              resolve(res);
             } else {
-              reject(res.msg);
+              reject(res?.msg);
             }
           })
           .catch(error => {

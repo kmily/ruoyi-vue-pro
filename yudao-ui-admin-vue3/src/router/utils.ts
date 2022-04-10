@@ -231,23 +231,9 @@ function handleAliveRoute(matched: RouteRecordNormalized[], mode?: string) {
 function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>, parentPath: string = '/') {
   if (!arrRoutes || !arrRoutes.length) return;
   const modulesRoutesKeys = Object.keys(modulesRoutes);
-  let rank = 0; // 后端已经排序过，所以顺序递增即可
   arrRoutes.forEach((v: RouteRecordRaw) => {
-    // 处理基础属性
-    v.meta = {
-      title: v.name,
-      icon: v.icon,
-      rank: rank++
-    };
-    v.path = generateRoutePath(parentPath, v.path);
-    // 删除无用的属性
-    Object.keys(v).forEach((key) => (v[key] == null) && delete v[key]); // 清理无效的属性
-    delete v.id
-    delete v.parentId
-    delete v.name
-    // 处理不同类型的菜单的属性
     if (v.children) {
-      v.redirect = getRedirect(v.path, v.children);
+      v.redirect = getRedirect(v.children[0]);
       v.component = Layout;
     } else if (v.meta?.frameSrc) {
       v.component = IFrame;
@@ -259,28 +245,33 @@ function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>, parentPath: string = '
         : modulesRoutesKeys.findIndex(ev => ev.includes(v.path));
       v.component = modulesRoutes[modulesRoutesKeys[index]];
     }
+    v.meta = {
+      title: v.name,
+      icon: v.icon,
+      rank: v.id
+    };
+    v.path = generateRoutePath(parentPath, v.path);
     if (v.children) {
       addAsyncRoutes(v.children, v.path);
     }
   });
   return arrRoutes;
 }
-export function getRedirect(parentPath: string, children: Array<Object>) {
-  if (!children || children.length == 0) {
-    return parentPath;
+export function getRedirect(item: any) {
+  if (item.children) {
+    getRedirect(item.children[0]);
+  } else {
+    return item.path;
   }
-  let path = generateRoutePath(parentPath, children[0].path);
-  // 递归子节点
-  return getRedirect(path, children[0].children);
 }
 function generateRoutePath(parentPath: string, path: string) {
-  if (parentPath.endsWith('/')) {
-    parentPath = parentPath.slice(0, -1); // 移除默认的 /
-  }
-  if (!path.startsWith('/')) {
-    path = '/' + path;
-  }
-  return parentPath + path;
+    if (parentPath.endsWith('/')) {
+        parentPath = parentPath.slice(0, -1); // 移除默认的 /
+    }
+    if (!path.startsWith('/')) {
+        path = '/' + path;
+    }
+    return parentPath + path;
 }
 // 获取路由历史模式 https://next.router.vuejs.org/zh/guide/essentials/history-mode.html
 function getHistoryMode(): RouterHistory {
