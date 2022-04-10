@@ -182,79 +182,80 @@ function resolvePath(routePath) {
         :svg="props.item.meta.extraIcon.svg ? true : false"
       />
     </template>
-    <view v-if="props.item.children">
-      <sidebar-item
-        v-for="child in props.item.children"
-        :key="child.path"
-        :is-nest="true"
-        :item="child"
-        :base-path="resolvePath(child.path)"
-        class="nest-menu"
-      />
-    </view>
-    <view v-else>
-      <el-menu-item
-        :index="resolvePath(props.item.path)"
-        :class="{ 'submenu-title-noDropdown': !isNest }"
-        :style="getNoDropdownStyle"
-      >
-        <div class="el-icon" v-show="props.item.meta.icon">
-          <component
-            :is="
+    <view v-for="child in props.item.children">
+      <view v-if="child.children">
+        <sidebar-item
+          :key="child.path"
+          :is-nest="true"
+          :item="child"
+          :base-path="resolvePath(child.path)"
+          class="nest-menu"
+        />
+      </view>
+      <view v-else>
+        <el-menu-item
+          :index="resolvePath(child.path)"
+          :class="{ 'submenu-title-noDropdown': !isNest }"
+          :style="getNoDropdownStyle"
+        >
+          <div class="el-icon" v-show="child.meta.icon">
+            <component
+              :is="
             useRenderIcon(
-              props.item.meta.icon ||
-                (props.item.meta && props.item.meta.icon)
+              child.meta.icon ||
+                (child.meta && child.meta.icon)
             )
           "
-          />
-        </div>
-        <div
-          v-if="
-          !pureApp.sidebar.opened &&
-          pureApp.layout === 'mix' &&
-          props.item?.pathList?.length === 2
-        "
-          :style="getDivStyle"
-        >
-        <span :style="getMenuTextStyle">
-          {{ transformI18n(props.item.meta.title, props.item.meta.i18n) }}
-        </span>
-        </div>
-        <template #title>
-          <div :style="getDivStyle">
-          <span v-if="!menuMode">
-            {{ transformI18n(props.item.meta.title, props.item.meta.i18n) }}
-          </span>
-            <el-tooltip
-              v-else
-              placement="top"
-              :offset="-10"
-              :disabled="!props.item.showTooltip"
-            >
-              <template #content>
-                {{
-                  transformI18n(props.item.meta.title, props.item.meta.i18n)
-                }}
-              </template>
-              <span
-                ref="menuTextRef"
-                :style="getMenuTextStyle"
-                @mouseover="hoverMenu(props.item)"
-              >
-              {{ transformI18n(props.item.meta.title, props.item.meta.i18n) }}
-            </span>
-            </el-tooltip>
-            <FontIcon
-              v-if="props.item.meta.extraIcon"
-              width="30px"
-              height="30px"
-              :style="getExtraIconStyle"
-              :icon="props.item.meta.extraIcon.name"
-              :svg="props.item.meta.extraIcon.svg ? true : false"
             />
           </div>
-        </template>
-      </el-menu-item>
+          <div
+            v-if="
+          !pureApp.sidebar.opened &&
+          pureApp.layout === 'mix' &&
+          child?.pathList?.length === 2
+        "
+            :style="getDivStyle"
+          >
+        <span :style="getMenuTextStyle">
+          {{ transformI18n(child.meta.title, child.meta.i18n) }}
+        </span>
+          </div>
+          <template #title>
+            <div :style="getDivStyle">
+          <span v-if="!menuMode">
+            {{ transformI18n(child.meta.title, child.meta.i18n) }}
+          </span>
+              <el-tooltip
+                v-else
+                placement="top"
+                :offset="-10"
+                :disabled="!child.showTooltip"
+              >
+                <template #content>
+                  {{
+                    transformI18n(child.meta.title, child.meta.i18n)
+                  }}
+                </template>
+                <span
+                  ref="menuTextRef"
+                  :style="getMenuTextStyle"
+                  @mouseover="hoverMenu(child)"
+                >
+              {{ transformI18n(child.meta.title, child.meta.i18n) }}
+            </span>
+              </el-tooltip>
+              <FontIcon
+                v-if="child.meta.extraIcon"
+                width="30px"
+                height="30px"
+                :style="getExtraIconStyle"
+                :icon="child.meta.extraIcon.name"
+                :svg="child.meta.extraIcon.svg ? true : false"
+              />
+            </div>
+          </template>
+        </el-menu-item>
+      </view>
     </view>
   </el-sub-menu>
 </template>
