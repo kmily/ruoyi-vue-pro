@@ -32,8 +32,11 @@ import {
   ElEmpty,
   ElCollapse,
   ElCollapseItem,
+  ElTable,
+  ElTableColumn,
   ElDialog,
   ElCard,
+  ElPopconfirm,
   // 指令
   ElLoading,
   ElInfiniteScroll
@@ -75,6 +78,9 @@ const components = [
   ElEmpty,
   ElCollapse,
   ElCollapseItem,
+  ElPopconfirm,
+  ElTable,
+  ElTableColumn,
   ElDialog,
   ElCard
 ];
