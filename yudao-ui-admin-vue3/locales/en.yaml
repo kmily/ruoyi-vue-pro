@@ -21,6 +21,7 @@ buttons:
 menus:
   hshome: Home
   hslogin: Login
+  hsJob: Job Manage
   hserror: Error Page
   hsfourZeroFour: "404"
   hsfourZeroOne: "403"

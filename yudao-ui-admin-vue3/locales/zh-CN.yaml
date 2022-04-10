@@ -21,6 +21,8 @@ buttons:
 menus:
   hshome: 首页
   hslogin: 登陆
+  hseditor: 编辑器
+  hsJob: 岗位管理
   hserror: 错误页面
   hsfourZeroFour: "404"
   hsfourZeroOne: "403"
