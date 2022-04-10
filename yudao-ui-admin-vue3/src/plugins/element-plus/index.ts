@@ -37,6 +37,8 @@ import {
   ElDialog,
   ElCard,
   ElPopconfirm,
+  ElCheckbox,
+  ElCheckboxGroup,
   // 指令
   ElLoading,
   ElInfiniteScroll
@@ -79,6 +81,8 @@ const components = [
   ElCollapse,
   ElCollapseItem,
   ElPopconfirm,
+  ElCheckbox,
+  ElCheckboxGroup,
   ElTable,
   ElTableColumn,
   ElDialog,
