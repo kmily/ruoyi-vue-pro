@@ -88,8 +88,6 @@ export default ({ command, mode }: ConfigEnv): UserConfigExport => {
         "@iconify/vue",
         "element-plus/lib/locale/lang/en",
         "element-plus/lib/locale/lang/zh-cn",
-        "vxe-table/lib/locale/lang/zh-CN",
-        "vxe-table/lib/locale/lang/en-US"
       ],
       exclude: ["@pureadmin/theme/dist/browser-utils"]
     },
