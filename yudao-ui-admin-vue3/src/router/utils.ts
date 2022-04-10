@@ -1,19 +1,19 @@
 import {
-  createWebHashHistory,
-  createWebHistory,
-  RouteComponent,
-  RouteRecordNormalized,
-  RouteRecordRaw,
-  RouterHistory
+    createWebHashHistory,
+    createWebHistory,
+    RouteComponent,
+    RouteRecordNormalized,
+    RouteRecordRaw,
+    RouterHistory
 } from "vue-router";
-import { router } from "./index";
-import { loadEnv } from "../../build";
-import { useTimeoutFn } from "@vueuse/core";
-import { RouteConfigs } from "/@/layout/types";
-import { buildHierarchyTree } from "/@/utils/tree";
-import { usePermissionStoreHook } from "/@/store/modules/permission";
+import {router} from "./index";
+import {loadEnv} from "../../build";
+import {useTimeoutFn} from "@vueuse/core";
+import {RouteConfigs} from "/@/layout/types";
+import {buildHierarchyTree} from "/@/utils/tree";
+import {usePermissionStoreHook} from "/@/store/modules/permission";
 // 动态路由
-import { getAsyncRoutes } from "/@/api/routes";
+import {getAsyncRoutes} from "/@/api/routes";
 
 const Layout = () => import("/@/layout/index.vue");
 const IFrame = () => import("/@/layout/frameView.vue");
@@ -139,6 +139,7 @@ function initRouter() {
               const flattenRouters = router
                 .getRoutes()
                 .find(n => n.path === "/");
+              console.info(router.options.routes[0]);
               router.addRoute(flattenRouters);
             }
             resolve(router);
@@ -227,7 +228,7 @@ function handleAliveRoute(matched: RouteRecordNormalized[], mode?: string) {
 
 // 过滤后端传来的动态路由 重新生成规范路由
 // TODO @code：是否有办法，不修改到源码 parentPath
-function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>, parentPath = "/") {
+function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>, parentPath: string = '/') {
   if (!arrRoutes || !arrRoutes.length) return;
   const modulesRoutesKeys = Object.keys(modulesRoutes);
   arrRoutes.forEach((v: RouteRecordRaw) => {
@@ -264,13 +265,13 @@ export function getRedirect(item: any) {
   }
 }
 function generateRoutePath(parentPath: string, path: string) {
-  if (parentPath.endsWith("/")) {
-    parentPath = parentPath.slice(0, -1); // 移除默认的 /
-  }
-  if (!path.startsWith("/")) {
-    path = "/" + path;
-  }
-  return parentPath + path;
+    if (parentPath.endsWith('/')) {
+        parentPath = parentPath.slice(0, -1); // 移除默认的 /
+    }
+    if (!path.startsWith('/')) {
+        path = '/' + path;
+    }
+    return parentPath + path;
 }
 // 获取路由历史模式 https://next.router.vuejs.org/zh/guide/essentials/history-mode.html
 function getHistoryMode(): RouterHistory {
