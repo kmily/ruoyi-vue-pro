@@ -6,8 +6,10 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleMenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.Date;
@@ -17,18 +19,12 @@ import java.util.stream.Collectors;
 @Mapper
 public interface RoleMenuMapper extends BaseMapperX<RoleMenuDO> {
 
-    default List<RoleMenuDO> selectListByRoleId(Long roleId) {
-        return selectList(new QueryWrapper<RoleMenuDO>().eq("role_id", roleId));
+    @Repository
+    class BatchInsertMapper extends ServiceImpl<RoleMenuMapper, RoleMenuDO> {
     }
 
-    default void insertList(Long roleId, Collection<Long> menuIds) {
-        List<RoleMenuDO> list = menuIds.stream().map(menuId -> {
-            RoleMenuDO entity = new RoleMenuDO();
-            entity.setRoleId(roleId);
-            entity.setMenuId(menuId);
-            return entity;
-        }).collect(Collectors.toList());
-        insertBatch(list);
+    default List<RoleMenuDO> selectListByRoleId(Long roleId) {
+        return selectList(new QueryWrapper<RoleMenuDO>().eq("role_id", roleId));
     }
 
     default void deleteListByRoleIdAndMenuIds(Long roleId, Collection<Long> menuIds) {
