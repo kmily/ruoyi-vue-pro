@@ -37,7 +37,7 @@ public interface AdminUserService {
     /**
      * 更新用户的最后登陆信息
      *
-     * @param id 用户编号
+     * @param id      用户编号
      * @param loginIp 登陆 IP
      */
     void updateUserLogin(Long id, String loginIp);
@@ -45,7 +45,7 @@ public interface AdminUserService {
     /**
      * 修改用户个人信息
      *
-     * @param id 用户编号
+     * @param id    用户编号
      * @param reqVO 用户个人信息
      */
     void updateUserProfile(Long id, @Valid UserProfileUpdateReqVO reqVO);
@@ -53,7 +53,7 @@ public interface AdminUserService {
     /**
      * 修改用户个人密码
      *
-     * @param id 用户编号
+     * @param id    用户编号
      * @param reqVO 更新用户个人密码
      */
     void updateUserPassword(Long id, @Valid UserProfileUpdatePasswordReqVO reqVO);
@@ -199,5 +199,14 @@ public interface AdminUserService {
      * @return 用户们
      */
     List<AdminUserDO> getUsersByStatus(Integer status);
+
+    /**
+     * 翻译用户
+     *
+     * @param ids   用户编号数组
+     * @param batch 是否批量用户
+     * @return 用户列表
+     */
+    Object loadUsers(Collection<Long> ids, boolean batch);
 
 }

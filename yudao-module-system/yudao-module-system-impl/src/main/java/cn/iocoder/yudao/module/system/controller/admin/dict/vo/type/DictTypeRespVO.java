@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.controller.admin.dict.vo.type;
 
+import cn.iocoder.yudao.framework.loader.annotation.LoadUser;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,10 @@ public class DictTypeRespVO extends DictTypeBaseVO {
 
     @ApiModelProperty(value = "字典类型", required = true, example = "sys_common_sex")
     private String type;
+
+    @ApiModelProperty(value = "修改人")
+    @LoadUser(batch = true)
+    private String updater;
 
     @ApiModelProperty(value = "创建时间", required = true, example = "时间戳格式")
     private Date createTime;
