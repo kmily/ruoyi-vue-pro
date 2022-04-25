@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.system.dal.dataobject.sensitiveword;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.StringLiSTTypeHandler;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -15,7 +17,8 @@ import java.util.List;
  *
  * @author 永不言败
  */
-@TableName(value = "system_sensitive_word", autoResultMap = true)
+@TableName(value = "SYSTEM_SENSITIVE_WORD", autoResultMap = true)
+@KeySequence(value = "SEQ_SYSTEM_SENSITIVE_WORD",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
