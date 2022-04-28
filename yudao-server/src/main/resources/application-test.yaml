@@ -62,10 +62,6 @@ spring:
     database: 0 # 数据库索引
     password: 123456
 
-jasypt:
-  encryptor:
-    password: yuanma # 加解密的秘钥
-
 --- #################### 定时任务相关配置 ####################
 
 # Quartz 配置项，对应 QuartzProperties 配置类

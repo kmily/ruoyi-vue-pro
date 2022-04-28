@@ -1,0 +1,16 @@
+${AnsiColor.BRIGHT_YELLOW}
+███╗   ██╗ ██████╗     ██████╗ ██╗   ██╗ ██████╗
+████╗  ██║██╔═══██╗    ██╔══██╗██║   ██║██╔════╝
+██╔██╗ ██║██║   ██║    ██████╔╝██║   ██║██║  ███╗
+██║╚██╗██║██║   ██║    ██╔══██╗██║   ██║██║   ██║
+██║ ╚████║╚██████╔╝    ██████╔╝╚██████╔╝╚██████╔╝
+╚═╝  ╚═══╝ ╚═════╝     ╚═════╝  ╚═════╝  ╚═════╝
+${AnsiColor.CYAN}
+******************************************************************
+                     欢迎使用芋道API服务
+******************************************************************
+${AnsiColor.BRIGHT_RED}
+MANIFEST.MF Version: ${shansima.info.version}
+Spring Boot Version: ${spring-boot.version}${spring-boot.formatted-version}
+Application Version: ${shansima.info.version}
+${AnsiColor.BRIGHT_GREEN}
