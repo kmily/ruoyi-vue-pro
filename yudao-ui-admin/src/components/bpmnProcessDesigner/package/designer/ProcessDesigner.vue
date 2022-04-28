@@ -253,9 +253,9 @@ export default {
     });
   },
   watch: {
-    value: function (newValue) { // 在 xmlString 发生变化时，重新创建，从而绘制流程图
-      this.createNewDiagram(newValue);
-    }
+    //value: function (newValue) { // 在 xmlString 发生变化时，重新创建，从而绘制流程图
+    //  this.createNewDiagram(newValue);
+    //}
   },
   methods: {
     initBpmnModeler() {
