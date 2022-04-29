@@ -131,7 +131,7 @@ export default {
       if (type === "SequentialMultiInstance") {
         this.multiLoopInstance = window.bpmnInstances.moddle.create("bpmn:MultiInstanceLoopCharacteristics", { isSequential: true });
       } else {
-        this.multiLoopInstance = window.bpmnInstances.moddle.create("bpmn:MultiInstanceLoopCharacteristics");
+        this.multiLoopInstance = window.bpmnInstances.moddle.create("bpmn:MultiInstanceLoopCharacteristics", { collection: "${coll_userList}" });
       }
       window.bpmnInstances.modeling.updateProperties(this.bpmnElement, {
         loopCharacteristics: this.multiLoopInstance

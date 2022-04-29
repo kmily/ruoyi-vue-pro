@@ -30,6 +30,7 @@ import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
@@ -65,6 +66,8 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
      */
     private Map<Long, BpmTaskAssignScript> scriptMap = Collections.emptyMap();
 
+    private static ConcurrentHashMap<String, Set<Long>> userTaskMap;
+
     public BpmUserTaskActivityBehavior(UserTask userTask) {
         super(userTask);
     }
@@ -73,33 +76,42 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
         this.scriptMap = convertMap(scripts, script -> script.getEnum().getId());
     }
 
+    public void setUserTaskMap(ConcurrentHashMap<String, Set<Long>> userTaskMapTmp) {
+        userTaskMap = userTaskMapTmp;
+    }
+
     @Override
     @DataPermission(enable = false) // 不需要处理数据权限， 不然会有问题，查询不到数据
-    protected void handleAssignments(TaskService taskService, String assignee, String owner, List<String> candidateUsers, List<String> candidateGroups, TaskEntity task, ExpressionManager expressionManager, DelegateExecution execution, ProcessEngineConfigurationImpl processEngineConfiguration) {
+    protected void handleAssignments(TaskService taskService, String assignee, String owner,
+        List<String> candidateUsers, List<String> candidateGroups, TaskEntity task, ExpressionManager expressionManager,
+        DelegateExecution execution, ProcessEngineConfigurationImpl processEngineConfiguration) {
         // 第一步，获得任务的规则
         BpmTaskAssignRuleDO rule = getTaskRule(task);
         // 第二步，获得任务的候选用户们
-        Set<Long> candidateUserIds = calculateTaskCandidateUsers(task, rule);
+        calculateTaskCandidateUsers(task, rule);
         // 第三步，设置一个作为负责人
-        Long assigneeUserId = chooseTaskAssignee(candidateUserIds);
+        Long assigneeUserId = chooseTaskAssignee(task);
         TaskHelper.changeTaskAssignee(task, String.valueOf(assigneeUserId));
     }
 
     private BpmTaskAssignRuleDO getTaskRule(TaskEntity task) {
-        List<BpmTaskAssignRuleDO> taskRules = bpmTaskRuleService.getTaskAssignRuleListByProcessDefinitionId(task.getProcessDefinitionId(),
+        List<BpmTaskAssignRuleDO> taskRules =
+            bpmTaskRuleService.getTaskAssignRuleListByProcessDefinitionId(task.getProcessDefinitionId(),
                 task.getTaskDefinitionKey());
         if (CollUtil.isEmpty(taskRules)) {
-            throw new FlowableException(StrUtil.format("流程任务({}/{}/{}) 找不到符合的任务规则",
-                    task.getId(), task.getProcessDefinitionId(), task.getTaskDefinitionKey()));
+            throw new FlowableException(
+                StrUtil.format("流程任务({}/{}/{}) 找不到符合的任务规则", task.getId(), task.getProcessDefinitionId(),
+                    task.getTaskDefinitionKey()));
         }
         if (taskRules.size() > 1) {
-            throw new FlowableException(StrUtil.format("流程任务({}/{}/{}) 找到过多任务规则({})",
-                    task.getId(), task.getProcessDefinitionId(), task.getTaskDefinitionKey(), taskRules.size()));
+            throw new FlowableException(
+                StrUtil.format("流程任务({}/{}/{}) 找到过多任务规则({})", task.getId(), task.getProcessDefinitionId(),
+                    task.getTaskDefinitionKey(), taskRules.size()));
         }
         return taskRules.get(0);
     }
 
-    Set<Long> calculateTaskCandidateUsers(TaskEntity task, BpmTaskAssignRuleDO rule) {
+    void calculateTaskCandidateUsers(TaskEntity task, BpmTaskAssignRuleDO rule) {
         Set<Long> assigneeUserIds = null;
         if (Objects.equals(BpmTaskAssignRuleTypeEnum.ROLE.getType(), rule.getType())) {
             assigneeUserIds = calculateTaskCandidateUsersByRole(task, rule);
@@ -115,17 +127,25 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
             assigneeUserIds = calculateTaskCandidateUsersByUserGroup(task, rule);
         } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.SCRIPT.getType(), rule.getType())) {
             assigneeUserIds = calculateTaskCandidateUsersByScript(task, rule);
+        } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.USER_SIGN.getType(), rule.getType())) {
+            assigneeUserIds = calculateTaskCandidateUsersByUser(task, rule);
+        } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.USER_OR_SIGN.getType(), rule.getType())) {
+            assigneeUserIds = calculateTaskCandidateUsersByUser(task, rule);
         }
 
         // 移除被禁用的用户
         removeDisableUsers(assigneeUserIds);
         // 如果候选人为空，抛出异常 TODO 芋艿：没候选人的策略选择。1 - 挂起；2 - 直接结束；3 - 强制一个兜底人
         if (CollUtil.isEmpty(assigneeUserIds)) {
-            log.error("[calculateTaskCandidateUsers][流程任务({}/{}/{}) 任务规则({}) 找不到候选人]",
-                    task.getId(), task.getProcessDefinitionId(), task.getTaskDefinitionKey(), toJsonString(rule));
+            log.error("[calculateTaskCandidateUsers][流程任务({}/{}/{}) 任务规则({}) 找不到候选人]", task.getId(),
+                task.getProcessDefinitionId(), task.getTaskDefinitionKey(), toJsonString(rule));
             throw exception(TASK_CREATE_FAIL_NO_CANDIDATE_USER);
         }
-        return assigneeUserIds;
+        String userTaskMapKey = String.format("%s-%s", task.getName(), task.getProcessInstanceId());
+        // 判断map中是否已经存在流程用户信息，存在就不再添加
+        if (!userTaskMap.containsKey(userTaskMapKey)) {
+            userTaskMap.put(userTaskMapKey, assigneeUserIds);
+        }
     }
 
     private Set<Long> calculateTaskCandidateUsersByRole(TaskEntity task, BpmTaskAssignRuleDO rule) {
@@ -174,10 +194,22 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
         return userIds;
     }
 
-    private Long chooseTaskAssignee(Set<Long> candidateUserIds) {
+    private Long chooseTaskAssignee(TaskEntity task) {
         // TODO 芋艿：未来可以优化下，改成轮询的策略
-        int index = RandomUtil.randomInt(candidateUserIds.size());
-        return CollUtil.get(candidateUserIds, index);
+        //                int index = RandomUtil.randomInt(candidateUserIds.size());
+        String userTaskMapKey = String.format("%s-%s", task.getName(), task.getProcessInstanceId());
+        Set<Long> candidateUserIdSet = userTaskMap.get(userTaskMapKey);
+        Long candidateUserId = CollUtil.get(candidateUserIdSet, 0);
+        // 移除已经获取的用户
+        candidateUserIdSet.remove(candidateUserId);
+        if (candidateUserIdSet.size() < 1) {
+            // 所有用于都已经设置完成，删除map中的流程用户信息
+            userTaskMap.remove(userTaskMapKey);
+        } else {
+            // 更新map中的流程用户信息
+            userTaskMap.put(userTaskMapKey, candidateUserIdSet);
+        }
+        return candidateUserId;
     }
 
     @VisibleForTesting

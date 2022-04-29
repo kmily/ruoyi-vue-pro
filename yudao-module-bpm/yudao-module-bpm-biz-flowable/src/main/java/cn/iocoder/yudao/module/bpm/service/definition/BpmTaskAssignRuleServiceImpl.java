@@ -197,6 +197,10 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService{
             adminUserApi.validUsers(options);
         } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.USER_GROUP.getType())) {
             userGroupService.validUserGroups(options);
+        } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.USER_SIGN.getType())) {
+            adminUserApi.validUsers(options);
+        } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.USER_OR_SIGN.getType())) {
+            adminUserApi.validUsers(options);
         } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.SCRIPT.getType())) {
             dictDataApi.validDictDatas(DictTypeConstants.TASK_ASSIGN_SCRIPT,
                     CollectionUtils.convertSet(options, String::valueOf));
