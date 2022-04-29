@@ -203,6 +203,10 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
         } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.SCRIPT.getType())) {
             dictDataApi.validDictDatas(DictTypeConstants.TASK_ASSIGN_SCRIPT,
                     CollectionUtils.convertSet(options, String::valueOf));
+        }else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.USER_SIGN.getType())) {
+            adminUserApi.validUsers(options);
+        } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.USER_OR_SIGN.getType())) {
+            adminUserApi.validUsers(options);
         } else {
             throw new IllegalArgumentException(StrUtil.format("未知的规则类型({})", type));
         }
