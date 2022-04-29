@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSON;
+import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
@@ -30,7 +32,6 @@ import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
@@ -66,18 +67,12 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
      */
     private Map<Long, BpmTaskAssignScript> scriptMap = Collections.emptyMap();
 
-    private static ConcurrentHashMap<String, Set<Long>> userTaskMap;
-
     public BpmUserTaskActivityBehavior(UserTask userTask) {
         super(userTask);
     }
 
     public void setScripts(List<BpmTaskAssignScript> scripts) {
         this.scriptMap = convertMap(scripts, script -> script.getEnum().getId());
-    }
-
-    public void setUserTaskMap(ConcurrentHashMap<String, Set<Long>> userTaskMapTmp) {
-        userTaskMap = userTaskMapTmp;
     }
 
     @Override
@@ -88,9 +83,10 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
         // 第一步，获得任务的规则
         BpmTaskAssignRuleDO rule = getTaskRule(task);
         // 第二步，获得任务的候选用户们
-        calculateTaskCandidateUsers(task, rule);
+        Set<Long> candidateUserIds = calculateTaskCandidateUsers(task, rule);
         // 第三步，设置一个作为负责人
-        Long assigneeUserId = chooseTaskAssignee(task);
+        Long assigneeUserId = chooseTaskAssignee(execution, candidateUserIds);
+        log.info("assigneeUserId = " + assigneeUserId);
         TaskHelper.changeTaskAssignee(task, String.valueOf(assigneeUserId));
     }
 
@@ -111,7 +107,7 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
         return taskRules.get(0);
     }
 
-    void calculateTaskCandidateUsers(TaskEntity task, BpmTaskAssignRuleDO rule) {
+    Set<Long> calculateTaskCandidateUsers(TaskEntity task, BpmTaskAssignRuleDO rule) {
         Set<Long> assigneeUserIds = null;
         if (Objects.equals(BpmTaskAssignRuleTypeEnum.ROLE.getType(), rule.getType())) {
             assigneeUserIds = calculateTaskCandidateUsersByRole(task, rule);
@@ -141,11 +137,7 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
                 task.getProcessDefinitionId(), task.getTaskDefinitionKey(), toJsonString(rule));
             throw exception(TASK_CREATE_FAIL_NO_CANDIDATE_USER);
         }
-        String userTaskMapKey = String.format("%s-%s", task.getName(), task.getProcessInstanceId());
-        // 判断map中是否已经存在流程用户信息，存在就不再添加
-        if (!userTaskMap.containsKey(userTaskMapKey)) {
-            userTaskMap.put(userTaskMapKey, assigneeUserIds);
-        }
+        return assigneeUserIds;
     }
 
     private Set<Long> calculateTaskCandidateUsersByRole(TaskEntity task, BpmTaskAssignRuleDO rule) {
@@ -194,22 +186,20 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
         return userIds;
     }
 
-    private Long chooseTaskAssignee(TaskEntity task) {
-        // TODO 芋艿：未来可以优化下，改成轮询的策略
-        //                int index = RandomUtil.randomInt(candidateUserIds.size());
-        String userTaskMapKey = String.format("%s-%s", task.getName(), task.getProcessInstanceId());
-        Set<Long> candidateUserIdSet = userTaskMap.get(userTaskMapKey);
-        Long candidateUserId = CollUtil.get(candidateUserIdSet, 0);
-        // 移除已经获取的用户
-        candidateUserIdSet.remove(candidateUserId);
-        if (candidateUserIdSet.size() < 1) {
-            // 所有用于都已经设置完成，删除map中的流程用户信息
-            userTaskMap.remove(userTaskMapKey);
-        } else {
-            // 更新map中的流程用户信息
-            userTaskMap.put(userTaskMapKey, candidateUserIdSet);
+    private Long chooseTaskAssignee(DelegateExecution execution, Set<Long> candidateUserIds) {
+        // 获取任务变量
+        Map<String, Object> variables = execution.getVariables();
+        // 设置任务集合变量key
+        String expressionText = String.format("%s_userList", execution.getCurrentActivityId());
+        // 判断当前任务是否为并行任务, 是的话获取任务变量
+        if (variables.containsKey(expressionText)) {
+            String user = variables.get("user").toString();
+            return Long.valueOf(user);
         }
-        return candidateUserId;
+
+        // TODO 芋艿：未来可以优化下，改成轮询的策略
+        int index = RandomUtil.randomInt(candidateUserIds.size());
+        return CollUtil.get(candidateUserIds, index);
     }
 
     @VisibleForTesting
@@ -225,3 +215,4 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
         });
     }
 }
+

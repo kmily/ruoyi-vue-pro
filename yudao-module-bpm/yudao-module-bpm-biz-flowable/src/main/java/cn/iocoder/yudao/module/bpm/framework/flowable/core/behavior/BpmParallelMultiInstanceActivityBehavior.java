@@ -89,11 +89,9 @@ public class BpmParallelMultiInstanceActivityBehavior extends ParallelMultiInsta
         String expressionText = String.format("%s_userList", taskRule.getTaskDefinitionKey());
         // 设置任务集合变量与任务关系
         multiInstanceRootExecution.setVariable(expressionText, assigneeUserIds);
-        /*
         // 设置任务集合EL表达式
         this.collectionExpression = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager()
             .createExpression(String.format("${%s}", expressionText));
-
         // 根据会签，或签类型，设置会签,或签条件
         if (BpmTaskAssignRuleTypeEnum.USER_SIGN.getType().equals(taskRule.getType())) {
             // 会签
@@ -104,59 +102,9 @@ public class BpmParallelMultiInstanceActivityBehavior extends ParallelMultiInsta
         }
         // 设置取出集合变量
         this.collectionElementVariable = "user";
-        */
-       /* int nrOfInstances = this.resolveNrOfInstances(multiInstanceRootExecution);
-        if (nrOfInstances < 0) {
-            throw new FlowableIllegalArgumentException(
-                "Invalid number of instances: must be non-negative integer value, but was " + nrOfInstances);
-        } else {
-            this.setLoopVariable(multiInstanceRootExecution, "nrOfInstances", nrOfInstances);
-            this.setLoopVariable(multiInstanceRootExecution, "nrOfCompletedInstances",
-                ParallelMultiInstanceLoopVariable.completed(multiInstanceRootExecution.getId()));
-            this.setLoopVariable(multiInstanceRootExecution, "nrOfActiveInstances",
-                ParallelMultiInstanceLoopVariable.active(multiInstanceRootExecution.getId()));
-            List<ExecutionEntity> concurrentExecutions = new ArrayList();
-
-            int loopCounter;
-            ExecutionEntity concurrentExecution;
-            for (loopCounter = 0; loopCounter < nrOfInstances; ++loopCounter) {
-                concurrentExecution = CommandContextUtil.getExecutionEntityManager()
-                    .createChildExecution((ExecutionEntity)multiInstanceRootExecution);
-                concurrentExecution.setCurrentFlowElement(this.activity);
-                concurrentExecution.setActive(true);
-                concurrentExecution.setScope(false);
-                concurrentExecutions.add(concurrentExecution);
-                this.logLoopDetails(concurrentExecution, "initialized", loopCounter, 0, nrOfInstances, nrOfInstances);
-            }
-
-            for (loopCounter = 0; loopCounter < nrOfInstances; ++loopCounter) {
-                concurrentExecution = (ExecutionEntity)concurrentExecutions.get(loopCounter);
-                if (concurrentExecution.isActive() && !concurrentExecution.isEnded() && !concurrentExecution.getParent()
-                    .isEnded()) {
-                    this.executeOriginalBehavior(concurrentExecution, (ExecutionEntity)multiInstanceRootExecution,
-                        loopCounter);
-                }
-            }
-
-            if (!concurrentExecutions.isEmpty()) {
-                multiInstanceRootExecution.setActive(false);
-            }
-
-            ProcessEngineConfigurationImpl processEngineConfiguration =
-                CommandContextUtil.getProcessEngineConfiguration();
-            if (this.isAsyncWithoutWaitStates(processEngineConfiguration)) {
-                JobEntity job = JobUtil.createJob((ExecutionEntity)concurrentExecutions.get(0),
-                    "parallel-multi-instance-no-waits-async-leave", processEngineConfiguration);
-                JobService jobService = processEngineConfiguration.getJobServiceConfiguration().getJobService();
-                jobService.createAsyncJobNoTriggerAsyncExecutor(job, true);
-                jobService.insertJob(job);
-            }
-
-            return nrOfInstances;
-    }*/
         return super.createInstances(multiInstanceRootExecution);
     }
-/*
+
     @Override
     protected Object resolveCollection(DelegateExecution execution) {
         Object collection = null;
@@ -183,12 +131,6 @@ public class BpmParallelMultiInstanceActivityBehavior extends ParallelMultiInsta
 
         return collection;
     }
-
-
-
-
-
-    */
 
     private BpmTaskAssignRuleDO getTaskRule(DelegateExecution task) {
         List<BpmTaskAssignRuleDO> taskRules =
