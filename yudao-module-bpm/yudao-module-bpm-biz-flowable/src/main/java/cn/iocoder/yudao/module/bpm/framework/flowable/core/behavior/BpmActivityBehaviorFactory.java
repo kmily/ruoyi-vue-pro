@@ -54,7 +54,7 @@ public class BpmActivityBehaviorFactory extends DefaultActivityBehaviorFactory {
         userTaskActivityBehavior.setUserGroupService(userGroupService);
         userTaskActivityBehavior.setAdminUserApi(adminUserApi);
         userTaskActivityBehavior.setScripts(scripts);
-        userTaskActivityBehavior.setUserTaskMap(new ConcurrentHashMap<>());
+//        userTaskActivityBehavior.setUserTaskMap(new ConcurrentHashMap<>());
         return userTaskActivityBehavior;
     }
 
