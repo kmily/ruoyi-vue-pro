@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.pay.dal.mysql.merchant;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.PayChannelExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.PayChannelPageReqVO;
@@ -21,33 +23,42 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
         return selectOne(PayChannelDO::getAppId, appId, PayChannelDO::getCode, code);
     }
 
-    @Select("SELECT id FROM pay_channel WHERE update_time > #{maxUpdateTime} LIMIT 1")
-    Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
+
+    default Long selectExistsByUpdateTimeAfter(Date maxUpdateTime){
+        PayChannelDO payChannelDO = selectOne(new LambdaQueryWrapperX<PayChannelDO>()
+                .gt(PayChannelDO::getUpdateTime, maxUpdateTime)
+                .last(" AND ROWNUM = 1")
+                .select(PayChannelDO::getId));
+        if (payChannelDO == null) {
+            return null;
+        }
+        return payChannelDO.getId();
+    }
 
     default PageResult<PayChannelDO> selectPage(PayChannelPageReqVO reqVO) {
-        return selectPage(reqVO, new QueryWrapperX<PayChannelDO>()
-                .eqIfPresent("code", reqVO.getCode())
-                .eqIfPresent("status", reqVO.getStatus())
-                .eqIfPresent("remark", reqVO.getRemark())
-                .eqIfPresent("fee_rate", reqVO.getFeeRate())
-                .eqIfPresent("merchant_id", reqVO.getMerchantId())
-                .eqIfPresent("app_id", reqVO.getAppId())
-                // .eqIfPresent("config", reqVO.getConfig())
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
-                .orderByDesc("id")        );
+        return selectPage(reqVO, new LambdaQueryWrapperX<PayChannelDO>()
+                .eqIfPresent(PayChannelDO::getCode, reqVO.getCode())
+                .eqIfPresent(PayChannelDO::getStatus, reqVO.getStatus())
+                .eqIfPresent(PayChannelDO::getRemark, reqVO.getRemark())
+                .eqIfPresent(PayChannelDO::getFeeRate, reqVO.getFeeRate())
+                .eqIfPresent(PayChannelDO::getMerchantId, reqVO.getMerchantId())
+                .eqIfPresent(PayChannelDO::getAppId, reqVO.getAppId())
+                .betweenIfPresent(PayChannelDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .orderByDesc(PayChannelDO::getId)
+        );
     }
 
     default List<PayChannelDO> selectList(PayChannelExportReqVO reqVO) {
-        return selectList(new QueryWrapperX<PayChannelDO>()
-                .eqIfPresent("code", reqVO.getCode())
-                .eqIfPresent("status", reqVO.getStatus())
-                .eqIfPresent("remark", reqVO.getRemark())
-                .eqIfPresent("fee_rate", reqVO.getFeeRate())
-                .eqIfPresent("merchant_id", reqVO.getMerchantId())
-                .eqIfPresent("app_id", reqVO.getAppId())
-                // .eqIfPresent("config", reqVO.getConfig())
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
-                .orderByDesc("id")        );
+        return selectList(new LambdaQueryWrapperX<PayChannelDO>()
+                .eqIfPresent(PayChannelDO::getCode, reqVO.getCode())
+                .eqIfPresent(PayChannelDO::getStatus, reqVO.getStatus())
+                .eqIfPresent(PayChannelDO::getRemark, reqVO.getRemark())
+                .eqIfPresent(PayChannelDO::getFeeRate, reqVO.getFeeRate())
+                .eqIfPresent(PayChannelDO::getMerchantId, reqVO.getMerchantId())
+                .eqIfPresent(PayChannelDO::getAppId, reqVO.getAppId())
+                .betweenIfPresent(BaseDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .orderByDesc(PayChannelDO::getId)
+        );
     }
 
     /**

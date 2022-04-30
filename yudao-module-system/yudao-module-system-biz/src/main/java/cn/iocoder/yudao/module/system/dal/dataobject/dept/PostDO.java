@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.system.dal.dataobject.dept;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -9,10 +11,10 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 岗位表
- *
  * @author ruoyi
  */
-@TableName("system_post")
+@TableName(value = "SYSTEM_POST", autoResultMap = true)
+@KeySequence(value = "SEQ_SYSTEM_POST",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class PostDO extends BaseDO {
@@ -36,7 +38,7 @@ public class PostDO extends BaseDO {
     private Integer sort;
     /**
      * 状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;

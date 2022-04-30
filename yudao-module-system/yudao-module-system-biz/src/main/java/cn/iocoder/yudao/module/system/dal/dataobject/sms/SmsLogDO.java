@@ -5,7 +5,10 @@ import cn.iocoder.yudao.module.system.enums.sms.SmsSendStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.sms.core.enums.SmsFrameworkErrorCodeConstants;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
@@ -19,7 +22,8 @@ import java.util.Map;
  * @author zzf
  * @since 2021-01-25
  */
-@TableName(value = "system_sms_log", autoResultMap = true)
+@TableName(value = "SYSTEM_SMS_LOG", autoResultMap = true)
+@KeySequence(value = "SEQ_SYSTEM_SMS_LOG",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -31,6 +35,7 @@ public class SmsLogDO extends BaseDO {
     /**
      * 自增编号
      */
+    @TableId
     private Long id;
 
     // ========= 渠道相关字段 =========

@@ -2,6 +2,9 @@ package cn.iocoder.yudao.module.pay.dal.dataobject.notify;
 
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
@@ -11,7 +14,8 @@ import lombok.*;
  *
  * @author 芋道源码
  */
-@TableName("pay_notify_log")
+@TableName(value = "PAY_NOTIFY_LOG", autoResultMap = true)
+@KeySequence(value = "SEQ_PAY_NOTIFY_LOG",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder
@@ -22,6 +26,7 @@ public class PayNotifyLogDO extends BaseDO {
     /**
      * 日志编号，自增
      */
+    @TableId
     private Long id;
     /**
      * 通知任务编号

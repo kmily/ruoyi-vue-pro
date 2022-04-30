@@ -4,6 +4,9 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.db.DataSourceConfigDO;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,7 +17,8 @@ import lombok.experimental.Accessors;
  *
  * @author 芋道源码
  */
-@TableName(value = "infra_codegen_table", autoResultMap = true)
+@TableName(value = "INFRA_CODEGEN_TABLE", autoResultMap = true)
+@KeySequence(value = "SEQ_INFRA_CODEGEN_TABLE",dbType = DbType.ORACLE)
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
@@ -23,6 +27,7 @@ public class CodegenTableDO extends BaseDO {
     /**
      * ID 编号
      */
+    @TableId
     private Long id;
 
     /**

@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.system.dal.dataobject.dict;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -9,10 +11,10 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 字典数据表
- *
  * @author ruoyi
  */
-@TableName("system_dict_data")
+@TableName(value = "SYSTEM_DICT_DATA", autoResultMap = true)
+@KeySequence(value = "SEQ_SYSTEM_DICT_DATA",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class DictDataDO extends BaseDO {
@@ -36,19 +38,19 @@ public class DictDataDO extends BaseDO {
     private String value;
     /**
      * 字典类型
-     *
+     * <p>
      * 冗余 {@link DictDataDO#getDictType()}
      */
     private String dictType;
     /**
      * 状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
     /**
      * 颜色类型
-     *
+     * <p>
      * 对应到 element-ui 为 default、primary、success、info、warning、danger
      */
     private String colorType;

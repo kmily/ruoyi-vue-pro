@@ -2,7 +2,9 @@ package cn.iocoder.yudao.module.pay.dal.dataobject.merchant;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -11,11 +13,11 @@ import lombok.*;
 /**
  * 支付商户信息 DO
  * 目前暂时没有特别的用途，主要为未来多商户提供基础。
- *
  * @author 芋道源码
  */
 @Data
-@TableName("pay_merchant")
+@TableName(value = "PAY_MERCHANT", autoResultMap = true)
+@KeySequence(value = "SEQ_PAY_MERCHANT",dbType = DbType.ORACLE)
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
@@ -44,7 +46,7 @@ public class PayMerchantDO extends BaseDO {
     private String shortName;
     /**
      * 状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;

@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.config.vo.ConfigRespVO;
 import cn.iocoder.yudao.module.infra.controller.admin.config.vo.ConfigUpdateReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;

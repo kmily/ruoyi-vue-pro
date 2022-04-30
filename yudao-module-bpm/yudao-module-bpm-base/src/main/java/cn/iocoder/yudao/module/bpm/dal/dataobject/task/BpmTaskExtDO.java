@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.bpm.dal.dataobject.task;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -16,7 +18,8 @@ import java.util.Date;
  *
  * @author 芋道源码
  */
-@TableName(value = "bpm_task_ext", autoResultMap = true)
+@TableName(value = "BPM_TASK_EXT", autoResultMap = true)
+@KeySequence(value = "SEQ_BPM_TASK_EXT",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

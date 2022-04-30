@@ -95,7 +95,7 @@ public class MenuServiceImpl implements MenuService {
         ImmutableMultimap.Builder<String, MenuDO> permMenuCacheBuilder = ImmutableMultimap.builder();
         menuList.forEach(menuDO -> {
             menuCacheBuilder.put(menuDO.getId(), menuDO);
-            permMenuCacheBuilder.put(menuDO.getPermission(), menuDO);
+            permMenuCacheBuilder.put(menuDO.getPermission() == null ? "" : menuDO.getPermission(), menuDO);
         });
         menuCache = menuCacheBuilder.build();
         permissionMenuCache = permMenuCacheBuilder.build();

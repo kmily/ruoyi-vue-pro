@@ -1,7 +1,6 @@
-package cn.iocoder.yudao.module.system.dal.dataobject.permission;
+package cn.iocoder.yudao.module.system.dal.dataobject.dept;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -10,14 +9,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 角色和菜单关联
+ * 用户和岗位关联
+ *
  * @author ruoyi
  */
-@TableName(value = "SYSTEM_ROLE_MENU", autoResultMap = true)
-@KeySequence(value = "SEQ_SYSTEM_ROLE_MENU",dbType = DbType.ORACLE)
+@TableName("system_user_post")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class RoleMenuDO extends TenantBaseDO {
+public class UserPostDO extends BaseDO {
 
     /**
      * 自增主键
@@ -25,12 +24,12 @@ public class RoleMenuDO extends TenantBaseDO {
     @TableId
     private Long id;
     /**
-     * 角色ID
+     * 用户 ID
      */
-    private Long roleId;
+    private Long userId;
     /**
-     * 菜单ID
+     * 角色 ID
      */
-    private Long menuId;
+    private Long postId;
 
 }

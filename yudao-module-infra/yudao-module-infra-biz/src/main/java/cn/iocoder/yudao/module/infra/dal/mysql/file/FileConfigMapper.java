@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.infra.dal.mysql.file;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigPageReqVO;
@@ -26,7 +27,15 @@ public interface FileConfigMapper extends BaseMapperX<FileConfigDO> {
                 .orderByDesc(FileConfigDO::getId));
     }
 
-    @Select("SELECT id FROM infra_file_config WHERE update_time > #{maxUpdateTime} LIMIT 1")
-    Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
+    default Long selectExistsByUpdateTimeAfter(Date maxUpdateTime){
+        FileConfigDO fileConfigDO = selectOne(new LambdaQueryWrapperX<FileConfigDO>()
+                .gt(FileConfigDO::getUpdateTime, maxUpdateTime)
+                .last(" AND ROWNUM = 1")
+                .select(FileConfigDO::getId));
+        if (fileConfigDO == null) {
+            return null;
+        }
+        return fileConfigDO.getId();
+    }
 
 }

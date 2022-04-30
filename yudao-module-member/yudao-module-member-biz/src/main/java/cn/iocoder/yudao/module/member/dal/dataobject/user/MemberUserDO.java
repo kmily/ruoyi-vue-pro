@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.member.dal.dataobject.user;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -16,7 +18,8 @@ import java.util.Date;
  *
  * @author 芋道源码
  */
-@TableName(value = "member_user", autoResultMap = true)
+@TableName(value = "MEMBER_USER", autoResultMap = true)
+@KeySequence(value = "SEQ_MEMBER_USER",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder

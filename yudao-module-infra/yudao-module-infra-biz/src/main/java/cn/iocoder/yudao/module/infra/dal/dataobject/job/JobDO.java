@@ -2,16 +2,18 @@ package cn.iocoder.yudao.module.infra.dal.dataobject.job;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.infra.enums.job.JobStatusEnum;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
  * 定时任务 DO
- *
  * @author 芋道源码
  */
-@TableName("infra_job")
+@TableName(value = "INFRA_JOB", autoResultMap = true)
+@KeySequence(value = "SEQ_INFRA_JOB",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -31,7 +33,7 @@ public class JobDO extends BaseDO {
     private String name;
     /**
      * 任务状态
-     *
+     * <p>
      * 枚举 {@link JobStatusEnum}
      */
     private Integer status;
@@ -64,7 +66,7 @@ public class JobDO extends BaseDO {
     /**
      * 监控超时时间，单位：毫秒
      * 为空时，表示不监控
-     *
+     * <p>
      * 注意，这里的超时的目的，不是进行任务的取消，而是告警任务的执行时间过长
      */
     private Integer monitorTimeout;

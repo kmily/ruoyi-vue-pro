@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.sms;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
@@ -8,12 +11,12 @@ import java.util.Date;
 
 /**
  * 手机验证码 DO
- *
+ * <p>
  * idx_mobile 索引：基于 {@link #mobile} 字段
- *
  * @author 芋道源码
  */
-@TableName("system_sms_code")
+@TableName(value = "SYSTEM_SMS_CODE", autoResultMap = true)
+@KeySequence(value = "SEQ_SYSTEM_SMS_CODE",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder
@@ -24,6 +27,7 @@ public class SmsCodeDO extends BaseDO {
     /**
      * 编号
      */
+    @TableId
     private Integer id;
     /**
      * 手机号
@@ -35,7 +39,7 @@ public class SmsCodeDO extends BaseDO {
     private String code;
     /**
      * 发送场景
-     *
+     * <p>
      * 枚举 {@link SmsCodeDO}
      */
     private Integer scene;

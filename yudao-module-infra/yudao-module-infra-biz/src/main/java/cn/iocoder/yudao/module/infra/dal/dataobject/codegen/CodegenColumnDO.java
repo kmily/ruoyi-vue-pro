@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.infra.dal.dataobject.codegen;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenColumnHtmlTypeEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenColumnListConditionEnum;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -14,7 +16,8 @@ import lombok.experimental.Accessors;
  *
  * @author 芋道源码
  */
-@TableName(value = "infra_codegen_column", autoResultMap = true)
+@TableName(value = "INFRA_CODEGEN_COLUMN", autoResultMap = true)
+@KeySequence(value = "SEQ_INFRA_CODEGEN_COLUMN",dbType = DbType.ORACLE)
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)

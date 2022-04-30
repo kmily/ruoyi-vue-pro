@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.infra.dal.dataobject.file;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
@@ -14,7 +17,8 @@ import java.io.InputStream;
  * @author 芋道源码
  */
 @Data
-@TableName("infra_file")
+@TableName(value = "INFRA_FILE", autoResultMap = true)
+@KeySequence(value = "SEQ_INFRA_FILE",dbType = DbType.ORACLE)
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
@@ -25,6 +29,7 @@ public class FileDO extends BaseDO {
     /**
      * 编号，数据库自增
      */
+    @TableId
     private Long id;
     /**
      * 配置编号
@@ -45,7 +50,6 @@ public class FileDO extends BaseDO {
      *
      * 通过 {@link cn.hutool.core.io.FileTypeUtil#getType(InputStream)} 获取
      */
-    @TableField(value = "`type`")
     private String type;
     /**
      * 文件大小

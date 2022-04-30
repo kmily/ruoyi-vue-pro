@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.system.dal.dataobject.dept;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -10,11 +12,11 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 部门表
- *
  * @author ruoyi
  * @author 芋道源码
  */
-@TableName("system_dept")
+@TableName(value = "SYSTEM_DEPT", autoResultMap = true)
+@KeySequence(value = "SEQ_SYSTEM_DEPT",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class DeptDO extends BaseDO {
@@ -30,7 +32,7 @@ public class DeptDO extends BaseDO {
     private String name;
     /**
      * 父部门ID
-     *
+     * <p>
      * 关联 {@link #id}
      */
     private Long parentId;
@@ -40,7 +42,7 @@ public class DeptDO extends BaseDO {
     private Integer sort;
     /**
      * 负责人
-     *
+     * <p>
      * 关联 {@link AdminUserDO#getId()}
      */
     private Long leaderUserId;
@@ -54,7 +56,7 @@ public class DeptDO extends BaseDO {
     private String email;
     /**
      * 部门状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;

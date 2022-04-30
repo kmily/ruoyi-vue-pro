@@ -3,6 +3,9 @@ package cn.iocoder.yudao.module.system.dal.dataobject.sms;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.sms.core.enums.SmsChannelEnum;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,7 +17,8 @@ import lombok.ToString;
  * @author zzf
  * @since 2021-01-25
  */
-@TableName(value = "system_sms_channel", autoResultMap = true)
+@TableName(value = "SYSTEM_SMS_CHANNEL", autoResultMap = true)
+@KeySequence(value = "SEQ_SYSTEM_SMS_CHANNEL",dbType = DbType.ORACLE)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -23,6 +27,7 @@ public class SmsChannelDO extends BaseDO {
     /**
      * 渠道编号
      */
+    @TableId
     private Long id;
     /**
      * 短信签名
