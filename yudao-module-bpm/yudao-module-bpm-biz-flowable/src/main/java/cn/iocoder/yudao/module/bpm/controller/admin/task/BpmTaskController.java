@@ -49,7 +49,7 @@ public class BpmTaskController {
     @ApiImplicitParam(name = "processInstanceId", value = "流程实例的编号", required = true, dataTypeClass = String.class)
     @PreAuthorize("@ss.hasPermission('bpm:task:query')")
     public CommonResult<List<BpmTaskRespVO>> getTaskListByProcessInstanceId(
-            @RequestParam("processInstanceId") String processInstanceId) {
+        @RequestParam("processInstanceId") String processInstanceId) {
         return success(taskService.getTaskListByProcessInstanceId(processInstanceId));
     }
 
@@ -74,6 +74,12 @@ public class BpmTaskController {
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
     public CommonResult<Boolean> updateTaskAssignee(@Valid @RequestBody BpmTaskUpdateAssigneeReqVO reqVO) {
         taskService.updateTaskAssignee(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
+    @PutMapping("/rollback/task")
+    @ApiOperation(value = "退回任务", notes = "用于【流程详情】的【退回】按钮")
+    public CommonResult<Boolean> rollbackTask() {
         return success(true);
     }
 }
