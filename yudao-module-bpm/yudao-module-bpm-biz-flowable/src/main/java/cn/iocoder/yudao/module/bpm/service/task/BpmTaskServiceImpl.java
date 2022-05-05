@@ -192,7 +192,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 更新任务拓展表为通过
         taskExtMapper.updateByTaskId(
             new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.APPROVE.getResult())
-                .setComment(reqVO.getComment()));
+                .setReason(reqVO.getReason()));
         // 判断任务是否为或签，或签时删除其余不用审批的任务
         List<BpmTaskAssignRuleDO> bpmTaskAssignRuleList =
             taskAssignRuleMapper.selectListByProcessDefinitionId(task.getProcessDefinitionId(),
@@ -220,8 +220,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         processInstanceService.updateProcessInstanceExtReject(instance.getProcessInstanceId(), reqVO.getReason());
 
         // 更新任务拓展表为不通过
-        taskExtMapper.updateByTaskId(new BpmTaskExtDO().setTaskId(task.getId())
-                .setResult(BpmProcessInstanceResultEnum.REJECT.getResult()).setReason(reqVO.getReason()));
+        taskExtMapper.updateByTaskId(
+            new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.REJECT.getResult())
+                .setReason(reqVO.getReason()));
     }
 
     @Override
