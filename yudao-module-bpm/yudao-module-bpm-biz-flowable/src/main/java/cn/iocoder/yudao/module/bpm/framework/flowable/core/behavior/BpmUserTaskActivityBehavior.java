@@ -86,7 +86,6 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
         Set<Long> candidateUserIds = calculateTaskCandidateUsers(task, rule);
         // 第三步，设置一个作为负责人
         Long assigneeUserId = chooseTaskAssignee(execution, candidateUserIds);
-        log.info("assigneeUserId = " + assigneeUserId);
         TaskHelper.changeTaskAssignee(task, String.valueOf(assigneeUserId));
     }
 
