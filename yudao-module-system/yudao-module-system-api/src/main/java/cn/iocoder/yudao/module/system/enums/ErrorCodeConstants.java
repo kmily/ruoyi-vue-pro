@@ -124,4 +124,8 @@ public interface ErrorCodeConstants {
     ErrorCode SENSITIVE_WORD_NOT_EXISTS = new ErrorCode(1002019000, "系统敏感词在所有标签中都不存在");
     ErrorCode SENSITIVE_WORD_EXISTS = new ErrorCode(1002019001, "系统敏感词已在标签中存在");
 
+
+    // ========== 行政区域 1002020000 ==========
+    ErrorCode AREA_NOT_EXISTS = new ErrorCode(1002020001, "行政区域不存在");
+
 }
