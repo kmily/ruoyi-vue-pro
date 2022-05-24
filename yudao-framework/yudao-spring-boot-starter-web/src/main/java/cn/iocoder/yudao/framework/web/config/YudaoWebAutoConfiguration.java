@@ -123,7 +123,7 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
      * 创建 jaskson 反序列化过滤 Bean，解决 Xss 安全问题
      */
     @Bean
-    @ConditionalOnProperty(value = "cargoservice.xss.enable", havingValue = "true")
+    @ConditionalOnProperty(value = "yudao.xss.enable", havingValue = "true")
     public Jackson2ObjectMapperBuilderCustomizer xssJacksonCustomizer() {
         return builder -> builder.deserializerByType(String.class, new JacksonXssClean());
     }
