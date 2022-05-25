@@ -1,6 +1,7 @@
 'use strict'
 const path = require('path')
 const defaultSettings = require('./src/settings.js')
+const timeStamp = new Date().getTime();
 
 function resolve(dir) {
   return path.join(__dirname, dir)
@@ -59,6 +60,10 @@ module.exports = {
       alias: {
         '@': resolve('src')
       }
+    },
+    output: {
+      filename: `static/js/[name].${timeStamp}.js`,
+      chunkFilename: `static/js/[name].${timeStamp}.js`
     },
     plugins: [
       // http://doc.ruoyi.vip/ruoyi-vue/other/faq.html#使用gzip解压缩静态文件
