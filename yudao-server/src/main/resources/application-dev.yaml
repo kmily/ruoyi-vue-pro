@@ -202,3 +202,25 @@ justauth:
     type: REDIS
     prefix: 'social_auth_state:' # 缓存前缀，目前只对 Redis 缓存生效，默认 JUSTAUTH::STATE::
     timeout: 24h # 超时时长，目前只对 Redis 缓存生效，默认 3 分钟
+
+  ##################
+  #  MQTT 配置
+  ##################
+spring:
+  mqtt:
+    # 用户名
+    username: admin
+    # 密码
+    password: public
+    # 设置会话心跳时间，默认60秒。服务器会每隔（1.5 * KeepAlive）秒的时间向客户端发送心跳判断客户端是否在线，但这个方法并没有重连的机制
+    keepAliveInterval: 20
+    # 推送信息的连接地址，如果有多个，用逗号隔开，如：tcp://121.40.60.243:1883,tcp://116.62.68.46:1883
+    url: tcp://127.0.0.1:1883
+    # 连接服务器默认客户端ID: mqtt_client_${random.value}
+    clientId: mqtt_client_${random.value}
+    # 默认主题数组，实际可在调用接口时指定
+    defaultTopic: device_info, status, setting, offline, cmd
+    # 服务质量参数数组，必须与Topic数量一致，逗号分隔
+    defaultQos: 1,1,1,1,1
+    # 设置操作完成的超时时长，默认3000毫秒
+    completionTimeout: 0
