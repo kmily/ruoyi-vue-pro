@@ -1,6 +1,6 @@
 const state = {
   visitedViews: [],
-  cachedViews: []
+  cachedViews: ['AppMain']
 }
 
 const mutations = {
@@ -44,6 +44,7 @@ const mutations = {
     } else {
       state.cachedViews = []
     }
+    state.cachedViews.push('AppMain');
   },
 
   DEL_ALL_VISITED_VIEWS: state => {
@@ -52,7 +53,7 @@ const mutations = {
     state.visitedViews = affixTags
   },
   DEL_ALL_CACHED_VIEWS: state => {
-    state.cachedViews = []
+    state.cachedViews = ['AppMain']
   },
 
   UPDATE_VISITED_VIEW: (state, view) => {
@@ -63,7 +64,7 @@ const mutations = {
       }
     }
   },
-  
+
   DEL_RIGHT_VIEWS: (state, view) => {
     const index = state.visitedViews.findIndex(v => v.path === view.path)
     if (index === -1) {

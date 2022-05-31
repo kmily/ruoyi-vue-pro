@@ -3,6 +3,7 @@ import { getRouters } from '@/api/menu'
 import Layout from '@/layout/index'
 import ParentView from '@/components/ParentView';
 import { toCamelCase } from "@/utils";
+import {AppMain} from "@/layout/components";
 
 const permission = {
   state: {
@@ -65,7 +66,7 @@ function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
       if (route.parentId === 0) {
         route.component = Layout
       } else {
-        route.component = ParentView
+        route.component = AppMain
       }
     } else { // 根节点
       route.component = loadView(route.component)
