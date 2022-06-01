@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.ExampleBuilder;
@@ -32,8 +33,6 @@ import static springfox.documentation.builders.RequestHandlerSelectors.basePacka
 @EnableSwagger2
 @EnableKnife4j
 @ConditionalOnClass({Docket.class, ApiInfoBuilder.class})
-// 允许使用 swagger.enable=false 禁用 Swagger
-@ConditionalOnProperty(prefix = "yudao.swagger", value = "enable", matchIfMissing = true)
 @EnableConfigurationProperties(SwaggerProperties.class)
 public class YudaoSwaggerAutoConfiguration {
 
@@ -46,8 +45,13 @@ public class YudaoSwaggerAutoConfiguration {
     @Bean
     public Docket createRestApi() {
         SwaggerProperties properties = swaggerProperties();
+        if (properties.getEnable() == null) {
+            properties.setEnable(true);
+        }
         // 创建 Docket 对象
         return new Docket(DocumentationType.SWAGGER_2)
+                // 允许使用 swagger.enable=false 禁用 Swagger
+                .enable(properties.getEnable())
                 // 用来创建该 API 的基本信息，展示在文档的页面中（自定义展示的信息）
                 .apiInfo(apiInfo(properties))
                 // 设置扫描指定 package 包下的
