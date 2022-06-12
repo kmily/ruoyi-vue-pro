@@ -21,12 +21,14 @@ public class ValidationUtils {
 
     private static final Pattern PATTERN_XML_NCNAME = Pattern.compile("[a-zA-Z_][\\-_.0-9_a-zA-Z$]*");
 
+    //参考 http://www.cppcns.com/wangluo/re/462474.html
+    private static final Pattern PATTERN_MOBILE = Pattern.compile("^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d{8}");
+
     public static boolean isMobile(String mobile) {
         if (StrUtil.length(mobile) != 11) {
             return false;
         }
-        // TODO 芋艿，后面完善手机校验
-        return true;
+        return PATTERN_MOBILE.matcher(mobile).matches();
     }
 
     public static boolean isURL(String url) {
