@@ -7,7 +7,6 @@
 
     import UserSelect from "@/components/UserSelect/UserSelect";
     export default {
-      name: "Notice",
       components: {
         UserSelect
       },
@@ -195,9 +194,21 @@ export default {
       this.$refs.tree.filter(val);
     },
   },
-  computed : {
-    idVal(){
-      return this.value.toString()
+  computed: {
+    idVal() {
+      if (this.userListSelected.length < 1 ){
+        this.updateSelected();
+      }
+
+      let str = '';
+      let end_index = this.userListSelected.length -1;
+      for (let i = 0; i < this.userListSelected.length; i++) {
+        str = str + this.userListSelected[i].nickname;
+        if (i < end_index ){
+          str = str + ','
+        }
+      }
+      return str
     }
   },
   created() {
@@ -251,11 +262,13 @@ export default {
       this.open = true;
       this.getList();
       this.getTreeSelect();
-
-
-      if (this.value != null && this.value !== []){
-        listSimpleUserToUserSelectByIds(this.value).then(response =>{
-          if (response.data != null){
+      this.updateSelected();
+    },
+    // 更新已选中数据
+    updateSelected(){
+      if (this.value != null && this.value !== []) {
+        listSimpleUserToUserSelectByIds(this.value).then(response => {
+          if (response.data != null) {
             this.userListSelected = response.data;
           }
         })
