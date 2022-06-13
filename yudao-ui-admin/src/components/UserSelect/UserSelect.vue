@@ -2,9 +2,24 @@
 <!--
   用户选择框：
   使用方式：
+
+    加载:
+
+    import UserSelect from "@/components/UserSelect/UserSelect";
+    export default {
+      name: "Notice",
+      components: {
+        UserSelect
+      },
+    }
+
+    使用:
     <el-form-item label="用户" prop="user" >
+      // 插入在这个地方即可, 注意类型是数组类型 `[1,2,3]`
       <user-select v-model="form.users"/>
     </el-form-item>
+
+
    操作方式：点击进入用户选择窗口，选择完成后X掉窗口就可以
    数据类型：数组类型，值为用户的id
 
