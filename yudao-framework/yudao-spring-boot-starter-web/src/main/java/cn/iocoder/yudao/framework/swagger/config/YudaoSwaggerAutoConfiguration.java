@@ -100,7 +100,7 @@ public class YudaoSwaggerAutoConfiguration {
     private static List<SecurityContext> securityContexts() {
         return Collections.singletonList(SecurityContext.builder()
                 .securityReferences(securityReferences())
-                .forPaths(PathSelectors.regex("^(?!auth).*$"))
+                .operationSelector(o -> o.requestMappingPattern().matches("^(?!auth).*$"))
                 .build());
     }
 
