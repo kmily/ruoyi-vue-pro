@@ -38,6 +38,7 @@ import java.util.stream.IntStream;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.SUCCESS;
+import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 /**
  * 拦截使用 @OperateLog 注解，如果满足条件，则生成操作日志。
@@ -244,6 +245,9 @@ public class OperateLogAspect {
             } else {
                 operateLogObj.setResultCode(SUCCESS.getCode());
             }
+        } else if (operateLogObj.getType().equals(EXPORT.getType())) {
+            // 添加导出成功
+            operateLogObj.setResultCode(SUCCESS.getCode());
         }
         // （异常）处理 resultCode 和 resultMsg 字段
         if (exception != null) {
