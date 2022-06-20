@@ -38,13 +38,14 @@ import java.util.stream.IntStream;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.SUCCESS;
+import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 /**
  * 拦截使用 @OperateLog 注解，如果满足条件，则生成操作日志。
  * 满足如下任一条件，则会进行记录：
  * 1. 使用 @ApiOperation + 非 @GetMapping
  * 2. 使用 @OperateLog 注解
- *
+ * <p>
  * 但是，如果声明 @OperateLog 注解时，将 enable 属性设置为 false 时，强制不记录。
  *
  * @author 芋道源码
@@ -77,7 +78,8 @@ public class OperateLogAspect {
         return around0(joinPoint, operateLog, apiOperation);
     }
 
-    @Around("!@annotation(io.swagger.annotations.ApiOperation) && @annotation(operateLog)") // 兼容处理，只添加 @OperateLog 注解的情况
+    @Around("!@annotation(io.swagger.annotations.ApiOperation) && @annotation(operateLog)")
+    // 兼容处理，只添加 @OperateLog 注解的情况
     public Object around(ProceedingJoinPoint joinPoint,
                          cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog operateLog) throws Throwable {
         return around0(joinPoint, operateLog, null);
@@ -244,6 +246,9 @@ public class OperateLogAspect {
             } else {
                 operateLogObj.setResultCode(SUCCESS.getCode());
             }
+        } else if (operateLogObj.getType().equals(EXPORT.getType())) {
+            // 添加导出成功
+            operateLogObj.setResultCode(SUCCESS.getCode());
         }
         // （异常）处理 resultCode 和 resultMsg 字段
         if (exception != null) {
