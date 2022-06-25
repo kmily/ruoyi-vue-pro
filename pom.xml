@@ -93,4 +93,27 @@
         </repository>
     </repositories>
 
+    <profiles>
+        <profile>
+            <id>local</id>
+            <properties>
+                <profilesActive>local</profilesActive>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <profilesActive>dev</profilesActive>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <profilesActive>prod</profilesActive>
+            </properties>
+        </profile>
+    </profiles>
 </project>

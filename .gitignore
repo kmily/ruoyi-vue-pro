@@ -45,3 +45,4 @@ nbdist/
 
 ### JRebel ###
 rebel.xml
+/LOG_FILE_IS_UNDEFINED
