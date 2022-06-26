@@ -38,4 +38,14 @@ export default {
     window.URL.revokeObjectURL(href);
   },
 
+  //移动端浏览器下载方法
+  mobileDownload (url, fileName) {
+    const a = document.createElement('a')
+    a.href = url
+    a.download = fileName // 下载后文件名
+    a.style.display = 'none'
+    document.body.appendChild(a)
+    a.click() // 点击下载
+    document.body.removeChild(a) // 下载完成移除元素
+  }
 }
