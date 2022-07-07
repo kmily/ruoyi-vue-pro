@@ -3,10 +3,9 @@ package cn.iocoder.yudao.framework.web.core.filter;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.http.HTMLFilter;
-import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.web.core.util.XssUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
@@ -23,27 +22,37 @@ import java.util.Map;
  *
  * @author 芋道源码
  */
+@Slf4j
 public class XssRequestWrapper extends HttpServletRequestWrapper {
 
     /**
      * 基于线程级别的 HTMLFilter 对象，因为它线程非安全
      */
-    private static final ThreadLocal<HTMLFilter> HTML_FILTER = ThreadLocal.withInitial(() -> {
-        HTMLFilter htmlFilter = new HTMLFilter();
-        // 反射修改 encodeQuotes 属性为 false，避免 " 被转移成 &quot; 字符
-        ReflectUtil.setFieldValue(htmlFilter, "encodeQuotes", false);
-        return htmlFilter;
-    });
-
+//    private static final ThreadLocal<HTMLFilter> HTML_FILTER = ThreadLocal.withInitial(() -> {
+//        HTMLFilter htmlFilter = new HTMLFilter();
+//        // 反射修改 encodeQuotes 属性为 false，避免 " 被转移成 &quot; 字符
+//        ReflectUtil.setFieldValue(htmlFilter, "encodeQuotes", false);
+//        return htmlFilter;
+//    });
+//
     public XssRequestWrapper(HttpServletRequest request) {
         super(request);
     }
+//
+//    private static String filterXss(String content) {
+//        if (StrUtil.isEmpty(content)) {
+//            return content;
+//        }
+//        return HTML_FILTER.get().filter(content);
+//    }
 
-    private static String filterXss(String content) {
-        if (StrUtil.isEmpty(content)) {
-            return content;
+    private static String filterXss(String input) {
+        if (StrUtil.isNotBlank(input)){
+            log.info("input: {}", input);
+            log.info("filter: {}",  XssUtils.filter(input));
+            return XssUtils.filter(input);
         }
-        return HTML_FILTER.get().filter(content);
+        return input;
     }
 
     // ========== IO 流相关 ==========
@@ -55,14 +64,14 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
 
     @Override
     public ServletInputStream getInputStream() throws IOException {
-        // 如果非 json 请求，不进行 Xss 处理
-        if (!ServletUtils.isJsonRequest(this)) {
-            return super.getInputStream();
-        }
+//        // 如果非 json 请求，不进行 Xss 处理
+//        if (!ServletUtils.isJsonRequest(this)) {
+//            return super.getInputStream();
+//        }
 
         // 读取内容，并过滤
         String content = IoUtil.readUtf8(super.getInputStream());
-        content = filterXss(content);
+//        content = filterXss(content);
         final ByteArrayInputStream newInputStream = new ByteArrayInputStream(content.getBytes());
         // 返回 ServletInputStream
         return new ServletInputStream() {

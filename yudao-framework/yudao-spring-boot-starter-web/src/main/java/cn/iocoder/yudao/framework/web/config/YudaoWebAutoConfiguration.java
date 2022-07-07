@@ -7,9 +7,11 @@ import cn.iocoder.yudao.framework.web.core.filter.DemoFilter;
 import cn.iocoder.yudao.framework.web.core.filter.XssFilter;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalResponseBodyHandler;
+import cn.iocoder.yudao.framework.web.core.json.JacksonXssClean;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -115,6 +117,15 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
     @ConditionalOnProperty(value = "yudao.demo", havingValue = "true")
     public FilterRegistrationBean<DemoFilter> demoFilter() {
         return createFilterBean(new DemoFilter(), WebFilterOrderEnum.DEMO_FILTER);
+    }
+
+    /**
+     * 创建 jaskson 反序列化过滤 Bean，解决 Xss 安全问题
+     */
+    @Bean
+    @ConditionalOnProperty(value = "yudao.xss.enable", havingValue = "true")
+    public Jackson2ObjectMapperBuilderCustomizer xssJacksonCustomizer() {
+        return builder -> builder.deserializerByType(String.class, new JacksonXssClean());
     }
 
     private static <T extends Filter> FilterRegistrationBean<T> createFilterBean(T filter, Integer order) {
