@@ -27,6 +27,7 @@
         <mybatis-plus-generator.version>3.5.2</mybatis-plus-generator.version>
         <dynamic-datasource.version>3.5.0</dynamic-datasource.version>
         <redisson.version>3.17.3</redisson.version>
+        <liquibase.version>4.12.0</liquibase.version>
         <!-- Config 配置中心相关 -->
         <apollo.version>1.9.2</apollo.version>
         <!-- Job 定时任务相关 -->

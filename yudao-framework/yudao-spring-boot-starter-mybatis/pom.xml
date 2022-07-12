@@ -58,6 +58,11 @@
             <groupId>com.baomidou</groupId>
             <artifactId>dynamic-datasource-spring-boot-starter</artifactId> <!-- 多数据源 -->
         </dependency>
+        <!-- 数据库脚本自动更新模块 -->
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+        </dependency>
 
         <!-- 工具类相关 -->
         <dependency>

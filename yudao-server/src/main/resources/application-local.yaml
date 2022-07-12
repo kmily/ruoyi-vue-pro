@@ -65,6 +65,12 @@ spring:
 #          username: sa
 #          password: JSm:g(*%lU4ZAkz06cd52KqT3)i1?H7W
 
+  # 数据库版本自动更新管理
+  liquibase:
+    change-log: classpath:db/changelog/master-mysql.xml #指定SQL文件位置
+    enabled: true #liquibase的开启关闭
+    contexts: local #指定执行的sql环境，对应sql文件里面的contexts
+
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   redis:
     host: 127.0.0.1 # 地址
