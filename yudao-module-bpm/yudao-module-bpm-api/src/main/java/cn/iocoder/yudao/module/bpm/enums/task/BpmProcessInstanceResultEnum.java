@@ -45,4 +45,13 @@ public enum BpmProcessInstanceResultEnum {
         return ObjectUtils.equalsAny(result, APPROVE.getResult(), REJECT.getResult(), CANCEL.getResult(), BACK.getResult());
     }
 
+    public static String getValue(Integer code) {
+        for (BpmProcessInstanceResultEnum resultEnum : BpmProcessInstanceResultEnum.values()) {
+            if (resultEnum.getResult().equals(code)) {
+                return resultEnum.getDesc();
+            }
+        }
+        return "未知状态！";
+    }
+
 }

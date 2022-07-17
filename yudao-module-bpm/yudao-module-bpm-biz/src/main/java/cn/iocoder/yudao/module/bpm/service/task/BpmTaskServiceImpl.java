@@ -285,7 +285,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 }
                 // 如果已经是最终的结果，则跳过
                 if (BpmProcessInstanceResultEnum.isEndResult(taskExt.getResult())) {
-                    log.error("[updateTaskExtCancel][taskId({}) 处于结果({})，无需进行更新]", taskId, taskExt.getResult());
+                    log.error("[updateTaskExtCancel][taskId({}) 处于结果({})，无需进行更新]", taskId, BpmProcessInstanceResultEnum.getValue(taskExt.getResult()));
                     return;
                 }
 
