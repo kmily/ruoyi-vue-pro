@@ -24,8 +24,9 @@ public interface BpmActivityService {
      * 获得执行编号对应的活动实例
      *
      * @param executionId 执行编号
+     * @param activityId  节点Id
      * @return 活动实例
      */
-    HistoricActivityInstance getHistoricActivityByExecutionId(String executionId);
+    HistoricActivityInstance getHistoricActivityByExecutionId(String executionId, String activityId);
 
 }
