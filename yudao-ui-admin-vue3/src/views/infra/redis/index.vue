@@ -16,7 +16,6 @@ import {
   ElDescriptionsItem,
   ElMessage
 } from 'element-plus'
-import Dialog from '@/components/Dialog/src/Dialog.vue'
 const cache = ref<RedisMonitorInfoVO>()
 const keyListLoad = ref(true)
 const keyList = ref<RedisKeyInfo[]>([])
