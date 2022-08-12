@@ -8,6 +8,6 @@
 #end
 #end
 #if (${column.javaType} == "Date")## 时间类型
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = "GMT+8")
 #end
     private ${column.javaType} ${column.javaField};
