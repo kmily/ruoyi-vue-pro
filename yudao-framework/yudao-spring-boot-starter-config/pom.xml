@@ -32,6 +32,12 @@
             <groupId>com.ctrip.framework.apollo</groupId>
             <artifactId>apollo-client</artifactId> <!-- 引入 Apollo Client 库，实现内嵌的配置中心 -->
         </dependency>
+
+        <!--热加载配置用到 EnvironmentChangeEvent-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-context</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
