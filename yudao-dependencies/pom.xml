@@ -17,6 +17,7 @@
         <revision>1.6.3-snapshot</revision>
         <!-- 统一依赖管理 -->
         <spring.boot.version>2.6.10</spring.boot.version>
+        <spring-cloud-context.version>3.1.3</spring-cloud-context.version>
         <!-- Web 相关 -->
         <knife4j.version>3.0.3</knife4j.version>
         <swagger-annotations.version>1.6.6</swagger-annotations.version>
@@ -564,6 +565,13 @@
                 <groupId>org.jeecgframework.jimureport</groupId>
                 <artifactId>jimureport-spring-boot-starter</artifactId>
                 <version>${jimureport.version}</version>
+            </dependency>
+
+            <!--热加载配置用到 EnvironmentChangeEvent-->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-context</artifactId>
+                <version>${spring-cloud-context.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

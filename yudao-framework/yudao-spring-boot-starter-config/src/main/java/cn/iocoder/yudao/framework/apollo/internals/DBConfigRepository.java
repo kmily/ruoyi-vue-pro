@@ -5,6 +5,7 @@ import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.yudao.framework.apollo.core.ConfigConsts;
 import cn.iocoder.yudao.framework.apollo.internals.dto.ConfigRespDTO;
+import cn.iocoder.yudao.framework.common.util.string.SpringContextUtils;
 import com.ctrip.framework.apollo.Apollo;
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.utils.ApolloThreadFactory;
@@ -16,12 +17,10 @@ import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.ctrip.framework.apollo.util.factory.PropertiesFactory;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.context.environment.EnvironmentChangeEvent;
 
 import java.lang.reflect.Constructor;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -111,6 +110,19 @@ public class DBConfigRepository extends AbstractConfigRepository {
         // 第四部，触发配置刷新！重要！！！！
         super.fireRepositoryChange(m_namespace, newProperties);
         log.info("[sync][缓存配置，数量为:{}]", configs.size());
+
+        try {
+            // 以上， 不能热加载 @ConfigurationProperties 获取的配置， 需要 publishEvent
+            // 参考 https://www.jianshu.com/p/b8d459f8ed2b
+            Set<String> keys = new HashSet<>();
+            newProperties.keySet().forEach(key -> keys.add(key.toString()));
+
+            // 解决热加载 ConfigurationProperties 配置
+            SpringContextUtils.getApplicationContext().publishEvent(new EnvironmentChangeEvent(keys));
+            log.info("已发送事件: EnvironmentChangeEvent, 热加载@ConfigurationProperties的配置");
+        } catch (Exception e) {
+            log.error("Publish EnvironmentChangeEvent 处理热加载出现错误", e);
+        }
     }
 
     @Override
