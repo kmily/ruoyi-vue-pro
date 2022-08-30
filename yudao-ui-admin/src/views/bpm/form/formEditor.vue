@@ -449,7 +449,7 @@ export default {
     },
     /** 关闭按钮 */
     close() {
-      this.$tab.closeOpenPage({ path: "/bpm/manager/form" });
+      this.$tab.closeOpenPage({ path: "/manager/form" });
     },
     encodeFields() {
       const fields = []
