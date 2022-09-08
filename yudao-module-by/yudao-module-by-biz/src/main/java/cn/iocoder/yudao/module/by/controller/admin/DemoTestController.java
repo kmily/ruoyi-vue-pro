@@ -1,4 +1,4 @@
-package com.risestartech.bybf.module.by.controller.admin;
+package cn.iocoder.yudao.module.by.controller.admin;
 
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
