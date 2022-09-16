@@ -38,6 +38,6 @@ public class SwaggerProperties {
      * 扫描的包
      */
     @NotEmpty(message = "扫描的 package 不能为空")
-    private String basePackage;
+    private String[] basePackages;
 
 }
