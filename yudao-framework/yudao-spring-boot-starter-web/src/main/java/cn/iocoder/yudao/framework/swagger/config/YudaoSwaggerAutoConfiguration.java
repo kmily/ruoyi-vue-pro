@@ -48,12 +48,8 @@ public class YudaoSwaggerAutoConfiguration {
                 .apiInfo(apiInfo(properties))
                 // ② 设置扫描指定 package 包下的
                 .select()
-                .apis(
-                        // 支持扫描多包
-                        t -> Arrays.stream(properties.getBasePackages())
-                                    .map(RequestHandlerSelectors::basePackage)
-                                    .anyMatch(predicate -> predicate.test(t))
-                )
+                // 支持扫描多包
+                .apis(t -> Arrays.stream(properties.getBasePackages()).map(RequestHandlerSelectors::basePackage).anyMatch(predicate -> predicate.test(t)))
 //                .apis(basePackage("cn.iocoder.yudao.module.system")) // 可用于 swagger 无法展示时使用
                 .paths(PathSelectors.any())
                 .build()
