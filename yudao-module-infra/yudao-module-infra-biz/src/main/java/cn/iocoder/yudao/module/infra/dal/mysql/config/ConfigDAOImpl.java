@@ -34,7 +34,7 @@ public class ConfigDAOImpl implements ConfigFrameworkDAO {
         return jdbcTemplate.query("SELECT config_key, value, update_time, deleted FROM infra_config",
                 (rs, rowNum) -> new ConfigRespDTO().setKey(rs.getString("config_key"))
                         .setValue(rs.getString("value"))
-                        .setUpdateTime(rs.getDate("update_time"))
+                        .setUpdateTime(rs.getTimestamp("update_time"))
                         .setDeleted(rs.getBoolean("deleted")));
     }
 
