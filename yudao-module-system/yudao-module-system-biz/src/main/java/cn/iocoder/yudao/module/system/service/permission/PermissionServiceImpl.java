@@ -479,7 +479,7 @@ public class PermissionServiceImpl implements PermissionService {
             // 情况一，ALL
             if (Objects.equals(role.getDataScope(), DataScopeEnum.ALL.getScope())) {
                 result.setAll(true);
-                continue;
+                break;
             }
             // 情况二，DEPT_CUSTOM
             if (Objects.equals(role.getDataScope(), DataScopeEnum.DEPT_CUSTOM.getScope())) {
