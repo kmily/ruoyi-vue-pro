@@ -40,7 +40,6 @@ public class DesensitizationInterceptor implements Interceptor {
         }
     }
 
-
     /**
      * 针对列表查询进行脱敏处理
      *
