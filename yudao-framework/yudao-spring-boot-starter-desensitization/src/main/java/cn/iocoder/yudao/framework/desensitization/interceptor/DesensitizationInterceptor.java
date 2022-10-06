@@ -12,12 +12,19 @@ import java.sql.Statement;
 import java.util.Collection;
 
 /**
+ * 脱敏处理拦截器，在查询结果时，对脱敏字段进行脱敏处理
+ *
  * @author VampireAchao
  * @since 2022/10/6 11:24
  */
 @Intercepts(@Signature(type = ResultSetHandler.class, method = "handleResultSets", args = {Statement.class}))
 public class DesensitizationInterceptor implements Interceptor {
 
+    /**
+     * 主要逻辑
+     *
+     * @param entity 实体类
+     */
     private void processDesensitization(Object entity) {
         for (Field field : ReflectUtil.getFields(entity.getClass())) {
             if (!field.isAnnotationPresent(Desensitization.class)) {
@@ -34,6 +41,13 @@ public class DesensitizationInterceptor implements Interceptor {
     }
 
 
+    /**
+     * 针对列表查询进行脱敏处理
+     *
+     * @param invocation invocation
+     * @return 脱敏后的结果
+     * @throws Throwable 异常
+     */
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         Object proceed = invocation.proceed();
