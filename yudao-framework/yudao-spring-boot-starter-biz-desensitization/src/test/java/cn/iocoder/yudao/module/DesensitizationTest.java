@@ -24,20 +24,4 @@ class DesensitizationTest extends BaseDbUnitTest {
         Assertions.assertEquals("a**************@gmail.com", userInfo.getEmail());
     }
 
-    @Test
-    void testUpdate() {
-        UserInfo userInfo = UserInfo.builder().id(1L).mobile("12345678910").email("achao1441470436@gmail.com").build();
-        SqlHelper.execute(UserInfo.class, m -> m.updateById(userInfo));
-        Assertions.assertEquals("123****8910", userInfo.getMobile());
-        Assertions.assertEquals("a**************@gmail.com", userInfo.getEmail());
-    }
-
-    @Test
-    void testSave() {
-        UserInfo userInfo = UserInfo.builder().name("张三").mobile("12345678910").email("achao1441470436@gmail.com").build();
-        SqlHelper.execute(UserInfo.class, m -> m.insert(userInfo));
-        Assertions.assertEquals("123****8910", userInfo.getMobile());
-        Assertions.assertEquals("a**************@gmail.com", userInfo.getEmail());
-    }
-
 }
