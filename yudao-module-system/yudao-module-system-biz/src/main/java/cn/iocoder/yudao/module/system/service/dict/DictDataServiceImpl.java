@@ -49,7 +49,7 @@ public class DictDataServiceImpl implements DictDataService {
 
     @Override
     public List<DictDataDO> getDictDatas() {
-        List<DictDataDO> list = dictDataMapper.selectList();
+        List<DictDataDO> list = dictDataMapper.selectList(new LambdaQueryWrapperX<DictDataDO>().eq(DictDataDO::getStatus,0));
         list.sort(COMPARATOR_TYPE_AND_SORT);
         return list;
     }
