@@ -12,6 +12,7 @@ import org.apache.tika.Tika;
 public class FileTypeUtils {
 
     private static final ThreadLocal<Tika> TIKA = TransmittableThreadLocal.withInitial(Tika::new);
+    public static final String[] IMAGE_MEDIA_TYPES = { "image/bmp", "image/gif", "image/jpg", "image/jpeg", "image/png" };
 
     /**
      * 获得文件的 mineType，对于doc，jar等文件会有误差
@@ -43,6 +44,23 @@ public class FileTypeUtils {
      */
     public static String getMineType(byte[] data, String name) {
         return TIKA.get().detect(data, name);
+    }
+
+    /**
+     * 判断是否图片
+     *
+     * @param mediaType
+     * @return
+     */
+    public static boolean isImage(String mediaType) {
+        boolean result = false;
+        for (String typeItem : IMAGE_MEDIA_TYPES) {
+            if (typeItem.equals(mediaType)) {
+                result = true;
+                break;
+            }
+        }
+        return result;
     }
 
 }

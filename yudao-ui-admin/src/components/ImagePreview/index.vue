@@ -1,6 +1,6 @@
 <template>
   <el-image
-    :src="`${realSrc}`"
+    :src="`${realThumbnailSrc}`"
     fit="cover"
     :style="`width:${realWidth};height:${realHeight};`"
     :preview-src-list="realSrcList"
@@ -21,6 +21,10 @@ export default {
       type: String,
       required: true
     },
+    thumbnail: {
+      type: String,
+      required: false
+    },
     width: {
       type: [Number, String],
       default: ""
@@ -37,6 +41,13 @@ export default {
         return real_src;
       }
       return process.env.VUE_APP_BASE_API + real_src;
+    },
+    realThumbnailSrc() {
+      let real_thumbnail_src = this.thumbnail != null ? this.thumbnail.split(",")[0] : this.src.split(",")[0];
+      if (isExternal(real_thumbnail_src)) {
+        return real_thumbnail_src;
+      }
+      return process.env.VUE_APP_BASE_API + real_thumbnail_src;
     },
     realSrcList() {
       let real_src_list = this.src.split(",");

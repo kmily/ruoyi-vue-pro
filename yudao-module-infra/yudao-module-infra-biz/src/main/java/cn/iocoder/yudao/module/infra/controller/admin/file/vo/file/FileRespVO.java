@@ -25,6 +25,12 @@ public class FileRespVO {
     @ApiModelProperty(value = "文件 URL", required = true, example = "https://www.iocoder.cn/yudao.jpg")
     private String url;
 
+    @ApiModelProperty(value = "缩略图路径", required = true, example = "yudao.min.jpg")
+    private String thumbnailPath;
+
+    @ApiModelProperty(value = "缩略图 URL", required = true, example = "https://www.iocoder.cn/yudao.min.jpg")
+    private String thumbnailUrl;
+
     @ApiModelProperty(value = "文件MIME类型", example = "application/octet-stream")
     private String type;
 

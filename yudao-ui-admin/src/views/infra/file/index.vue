@@ -34,6 +34,7 @@
       <el-table-column label="文件内容" align="center" prop="content" min-width="150px">
         <template slot-scope="scope">
           <image-preview v-if="scope.row.type&&scope.row.type.indexOf('image/') === 0" :src="scope.row.url"
+                         :thumbnail="scope.row.thumbnailUrl"
                          :width="'100px'"></image-preview>
           <i v-else>无法预览，点击
             <el-link type="primary" :underline="false" style="font-size:12px;vertical-align: baseline;" target="_blank"

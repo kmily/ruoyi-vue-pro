@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.infra.service.file;
 
+import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -10,9 +11,13 @@ import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePageReqVO
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.file.FileMapper;
 import lombok.SneakyThrows;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_NOT_EXISTS;
@@ -54,12 +59,26 @@ public class FileServiceImpl implements FileService {
         Assert.notNull(client, "客户端(master) 不能为空");
         String url = client.upload(content, path);
 
+        // 生成图片文件缩略图
+        String thumbnailPath = null;
+        String thumbnailUrl = null;
+        if (client.genThumbnailImage() && FileTypeUtils.isImage(type)) {
+            String extName = FileNameUtil.extName(path);
+            thumbnailPath = path.substring(0, path.lastIndexOf(".")) + ".min." + extName;
+            // 生成 200x200 缩略图
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            Thumbnails.of(new ByteArrayInputStream(content)).size(200, 200).toOutputStream(outputStream);
+            thumbnailUrl = client.upload(outputStream.toByteArray(), thumbnailPath);
+        }
+            
         // 保存到数据库
         FileDO file = new FileDO();
         file.setConfigId(client.getId());
         file.setName(name);
         file.setPath(path);
         file.setUrl(url);
+        file.setThumbnailPath(thumbnailPath);
+        file.setThumbnailUrl(thumbnailUrl);
         file.setType(type);
         file.setSize(content.length);
         fileMapper.insert(file);

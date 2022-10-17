@@ -80,6 +80,16 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
         return null;
     }
 
+    /**
+     * 是否支持图片生成缩略图
+     *
+     * @return
+     */
+    @Override
+    public boolean genThumbnailImage() {
+        return false;
+    }
+
     @Override
     public String upload(byte[] content, String path) throws Exception {
         // 执行上传
