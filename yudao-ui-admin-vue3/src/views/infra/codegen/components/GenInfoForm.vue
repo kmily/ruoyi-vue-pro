@@ -8,13 +8,15 @@ import { useForm } from '@/hooks/web/useForm'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { listSimpleMenusApi } from '@/api/system/menu'
 import { CodegenTableVO } from '@/api/infra/codegen/types'
+import { FormSchema } from '@/types/form'
 const props = defineProps({
   genInfo: {
     type: Object as PropType<Nullable<CodegenTableVO>>,
     default: () => null
   }
 })
-const defaultProps = {
+const menuProps = {
+  checkStrictly: true,
   children: 'children',
   label: 'name',
   value: 'id'
@@ -30,7 +32,6 @@ const rules = reactive({
 })
 const templateTypeOptions = getIntDictOptions(DICT_TYPE.INFRA_CODEGEN_TEMPLATE_TYPE)
 const sceneOptions = getIntDictOptions(DICT_TYPE.INFRA_CODEGEN_SCENE)
-const parentMenuId = ref()
 const treeRef = ref<InstanceType<typeof ElTreeSelect>>()
 const menuOptions = ref<any>([]) // 树形结构
 const getTree = async () => {
@@ -111,9 +112,13 @@ const schema = reactive<FormSchema[]>([
 const { register, methods, elFormRef } = useForm({
   schema
 })
+const parentMenuId = ref<number>()
+//子组件像父组件传值
+const emit = defineEmits(['menu'])
 const handleNodeClick = () => {
-  console.log(parentMenuId.value)
+  emit('menu', parentMenuId.value)
 }
+
 // ========== 初始化 ==========
 onMounted(async () => {
   await getTree()
@@ -142,11 +147,10 @@ defineExpose({
         v-model="parentMenuId"
         ref="treeRef"
         node-key="id"
-        check-on-click-node
-        expand-on-click-node="false"
-        :props="defaultProps"
+        :props="menuProps"
         :data="menuOptions"
-        @node-click="handleNodeClick"
+        check-strictly
+        @change="handleNodeClick"
       />
     </template>
   </Form>

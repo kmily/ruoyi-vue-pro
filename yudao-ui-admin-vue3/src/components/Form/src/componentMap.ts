@@ -10,6 +10,7 @@ import {
   ElRate,
   ElSelect,
   ElSelectV2,
+  ElTreeSelect,
   ElSlider,
   ElSwitch,
   ElTimePicker,
@@ -20,6 +21,7 @@ import {
 } from 'element-plus'
 import { InputPassword } from '@/components/InputPassword'
 import { Editor } from '@/components/Editor'
+import { ComponentName } from '@/types/components'
 
 const componentMap: Recordable<Component, ComponentName> = {
   Radio: ElRadioGroup,
@@ -40,6 +42,7 @@ const componentMap: Recordable<Component, ComponentName> = {
   Divider: ElDivider,
   TimeSelect: ElTimeSelect,
   SelectV2: ElSelectV2,
+  TreeSelect: ElTreeSelect,
   RadioButton: ElRadioGroup,
   InputPassword: InputPassword,
   Editor: Editor
