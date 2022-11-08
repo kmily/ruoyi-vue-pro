@@ -11,7 +11,6 @@ import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientCon
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayQrPayClient;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayWapPayClient;
 import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig;
-import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPubPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import com.alipay.api.response.AlipayTradePrecreateResponse;
 import org.junit.jupiter.api.Test;
