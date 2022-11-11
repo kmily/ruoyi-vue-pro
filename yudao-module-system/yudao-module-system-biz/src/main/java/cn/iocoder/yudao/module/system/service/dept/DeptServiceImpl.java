@@ -207,6 +207,20 @@ public class DeptServiceImpl implements DeptService {
         if (CollUtil.isEmpty(depts)) {
             return;
         }
+
+        //如果是顶级部门，则需要考虑租户隔离问题
+        if(parentId == 0){
+            // TODO 此处需优化，因程序中的模型并不存在租户id属性，故此处需要发起数据库查询
+            List<Long> ids = depts.stream().map(dept -> dept.getId()).collect(Collectors.toList());
+            List<DeptDO> deptDOS = getDepts(ids);
+
+            // 数据库查询结果和缓存结果查询不一致，则以数据库查询结果为准
+            if(depts.size() != deptDOS.size()){
+                depts.clear();
+                depts.addAll(deptDOS);
+            }
+        }
+
         result.addAll(depts);
         // 继续递归
         depts.forEach(dept -> getDeptsByParentIdFromCache(result, dept.getId(),
