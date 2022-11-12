@@ -27,7 +27,7 @@ public class FileDO extends BaseDO {
     private Long id;
     /**
      * 配置编号
-     *
+     * <p>
      * 关联 {@link FileConfigDO#getId()}
      */
     private Long configId;
@@ -40,9 +40,18 @@ public class FileDO extends BaseDO {
      */
     private String path;
     /**
+     * 缩略图路径（如果是图片文件）
+     */
+    private String thumbnailPath;
+    /**
      * 访问地址
      */
     private String url;
+    /**
+     * 缩略图访问地址（如果是图片文件）
+     */
+    private String thumbnailUrl;
+
     /**
      * 文件的 MIME 类型，例如 "application/octet-stream"
      */

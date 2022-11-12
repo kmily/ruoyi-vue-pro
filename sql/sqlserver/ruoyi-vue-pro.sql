@@ -2634,6 +2634,8 @@ CREATE TABLE [dbo].[infra_file] (
   [config_id] bigint  NULL,
   [path] nvarchar(512) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
   [url] nvarchar(1024) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
+  [thumbnail_path] nvarchar(512) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [thumbnail_url] nvarchar(1024) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [type] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [size] int  NOT NULL,
   [creator] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,

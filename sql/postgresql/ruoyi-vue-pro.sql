@@ -1198,6 +1198,8 @@ CREATE TABLE "infra_file" (
   "config_id" int8,
   "path" varchar(512) COLLATE "pg_catalog"."default" NOT NULL,
   "url" varchar(1024) COLLATE "pg_catalog"."default" NOT NULL,
+  "thumbnail_path" varchar(512) COLLATE "pg_catalog"."default",
+  "thumbnail_url" varchar(1024) COLLATE "pg_catalog"."default",
   "type" varchar(127) COLLATE "pg_catalog"."default",
   "size" int4 NOT NULL,
   "creator" varchar(64) COLLATE "pg_catalog"."default",

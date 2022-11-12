@@ -15,6 +15,12 @@ public interface FileClient {
     Long getId();
 
     /**
+     * 是否支持图片生成缩略图
+     * @return
+    */
+   boolean genThumbnailImage();
+
+    /**
      * 上传文件
      *
      * @param content 文件流

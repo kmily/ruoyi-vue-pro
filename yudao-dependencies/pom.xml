@@ -57,6 +57,7 @@
         <tika-core.version>2.5.0</tika-core.version>
         <aj-captcha.version>1.3.0</aj-captcha.version>
         <netty-all.version>4.1.82.Final</netty-all.version>
+        <thumbnailator.version>[0.4, 0.5)</thumbnailator.version>
         <!-- 三方云服务相关 -->
         <minio.version>8.2.2</minio.version>
         <aliyun-java-sdk-core.version>4.6.2</aliyun-java-sdk-core.version>
@@ -507,6 +508,12 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
                 <version>${netty-all.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.coobird</groupId>
+                <artifactId>thumbnailator</artifactId>
+                <version>${thumbnailator.version}</version>
             </dependency>
 
             <!-- 三方云服务相关 -->

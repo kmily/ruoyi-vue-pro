@@ -27,4 +27,8 @@ public class LocalFileClientConfig implements FileClientConfig {
     @URL(message = "domain 必须是 URL 格式")
     private String domain;
 
+    /**
+     * 是否生成缩略图
+     */
+    private boolean genThumbnailImage;
 }

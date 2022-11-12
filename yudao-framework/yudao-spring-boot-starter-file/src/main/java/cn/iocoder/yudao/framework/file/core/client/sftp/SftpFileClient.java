@@ -30,6 +30,16 @@ public class SftpFileClient extends AbstractFileClient<SftpFileClientConfig> {
         this.sftp = new Sftp(config.getHost(), config.getPort(), config.getUsername(), config.getPassword());
     }
 
+    /**
+     * 是否支持图片生成缩略图
+     *
+     * @return
+     */
+    @Override
+    public boolean genThumbnailImage() {
+        return false;
+    }
+
     @Override
     public String upload(byte[] content, String path) {
         // 执行写入

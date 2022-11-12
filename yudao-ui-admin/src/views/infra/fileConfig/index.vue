@@ -87,6 +87,12 @@
         <el-form-item v-if="form.storage >= 10 && form.storage <= 12" label="基础路径" prop="config.basePath">
           <el-input v-model="form.config.basePath" placeholder="请输入基础路径" />
         </el-form-item>
+        <el-form-item v-if="form.storage == 10" label="生成缩略图" prop="config.genThumbnailImage">
+          <el-radio-group v-model="form.config.genThumbnailImage">
+            <el-radio key="true" :label="true">是</el-radio>
+            <el-radio key="false" :label="false">否</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item v-if="form.storage >= 11 && form.storage <= 12" label="主机地址" prop="config.host">
           <el-input v-model="form.config.host" placeholder="请输入主机地址" />
         </el-form-item>

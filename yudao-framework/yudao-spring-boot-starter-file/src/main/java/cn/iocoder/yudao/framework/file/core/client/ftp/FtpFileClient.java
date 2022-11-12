@@ -37,6 +37,16 @@ public class FtpFileClient extends AbstractFileClient<FtpFileClientConfig> {
                 CharsetUtil.CHARSET_UTF_8, null, null, FtpMode.valueOf(config.getMode()));
     }
 
+    /**
+     * 是否支持图片生成缩略图
+     *
+     * @return
+     */
+    @Override
+    public boolean genThumbnailImage() {
+        return false;
+    }
+
     @Override
     public String upload(byte[] content, String path) {
         // 执行写入

@@ -24,6 +24,16 @@ public class LocalFileClient extends AbstractFileClient<LocalFileClientConfig> {
         }
     }
 
+    /**
+      * 是否支持图片生成缩略图
+      *
+      * @return
+      */
+     @Override
+     public boolean genThumbnailImage() {
+         return config.isGenThumbnailImage();
+     }
+
     @Override
     public String upload(byte[] content, String path) {
         // 执行写入

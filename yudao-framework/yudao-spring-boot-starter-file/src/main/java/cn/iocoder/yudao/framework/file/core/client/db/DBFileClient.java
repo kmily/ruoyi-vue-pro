@@ -20,6 +20,16 @@ public class DBFileClient extends AbstractFileClient<DBFileClientConfig> {
     protected void doInit() {
     }
 
+    /**
+     * 是否支持图片生成缩略图
+     *
+     * @return
+     */
+    @Override
+    public boolean genThumbnailImage() {
+        return false;
+    }
+
     @Override
     public String upload(byte[] content, String path) {
         getDao().insert(getId(), path, content);
