@@ -1,0 +1,1 @@
+DELETE FROM "qg_sys_shop";

@@ -8,6 +8,7 @@
     <version>${revision}</version>
     <packaging>pom</packaging>
     <modules>
+
         <module>yudao-dependencies</module>
         <module>yudao-framework</module>
         <!-- Server 主项目 -->
@@ -22,6 +23,8 @@
         <module>yudao-module-visualization</module>
         <!-- 示例项目 -->
         <module>yudao-example</module>
+        <!-- 自定义项目 -->
+        <module>yudao-module-yr</module>
     </modules>
 
     <name>${project.artifactId}</name>
