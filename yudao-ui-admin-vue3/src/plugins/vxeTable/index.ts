@@ -1,9 +1,10 @@
-import { App, unref } from 'vue'
-import 'xe-utils'
+import { App, unref, watch } from 'vue'
 import XEUtils from 'xe-utils'
+import './index.scss'
 import './renderer'
 import { i18n } from '@/plugins/vueI18n'
-import zhCN from 'vxe-table/es/locale/lang/zh-CN'
+import { useAppStore } from '@/store/modules/app'
+import zhCN from 'vxe-table/lib/locale/lang/zh-CN'
 import enUS from 'vxe-table/lib/locale/lang/en-US'
 import {
   // 全局对象
@@ -45,6 +46,18 @@ import {
   Table
 } from 'vxe-table'
 
+const appStore = useAppStore()
+watch(
+  () => appStore.getIsDark,
+  () => {
+    if (appStore.getIsDark) {
+      import('./theme/dark.scss')
+    } else {
+      import('./theme/light.scss')
+    }
+  },
+  { immediate: true }
+)
 // 全局默认参数
 VXETable.setup({
   size: 'medium', // 全局尺寸
@@ -139,10 +152,6 @@ VXETable.formats.mixin({
   formatDate({ cellValue }, format) {
     return XEUtils.toDateString(cellValue, format || 'yyyy-MM-dd HH:mm:ss')
   },
-  // 格式字典
-  formatDict() {
-    return 'cellValue 123'
-  },
   // 四舍五入金额，每隔3位逗号分隔，默认2位数
   formatAmount({ cellValue }, digits = 2) {
     return XEUtils.commafy(Number(cellValue), { digits })
@@ -158,6 +167,10 @@ VXETable.formats.mixin({
   // 向下舍入,默认两位数
   formatCutNumber({ cellValue }, digits = 2) {
     return XEUtils.toFixed(XEUtils.floor(cellValue, digits), digits)
+  },
+  // 格式化图片，将图片链接转换为html标签
+  formatImg({ cellValue }) {
+    return '<img height="40" src="' + cellValue + '"> '
   }
 })
 export const setupVxeTable = (app: App<Element>) => {
