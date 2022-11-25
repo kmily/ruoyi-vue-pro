@@ -1,5 +1,5 @@
 import { computed, reactive } from 'vue'
-import { VxeGridProps } from 'vxe-table'
+import { SizeType, VxeGridProps } from 'vxe-table'
 import { useAppStore } from '@/store/modules/app'
 import { VxeAllSchemas } from './useVxeCrudSchemas'
 import { useI18n } from '@/hooks/web/useI18n'
@@ -18,27 +18,30 @@ interface UseVxeGridConfig<T = any> {
 const appStore = useAppStore()
 
 const currentSize = computed(() => {
-  if (appStore.getCurrentSize === 'small') {
-    return 'small'
-  } else if (appStore.getCurrentSize === 'large') {
-    return 'mini'
-  } else {
-    return 'medium'
+  let resSize: SizeType = 'small'
+  const appsize = appStore.getCurrentSize
+  switch (appsize) {
+    case 'large':
+      resSize = 'medium'
+      break
+    case 'default':
+      resSize = 'small'
+      break
+    case 'small':
+      resSize = 'mini'
+      break
   }
+  return resSize
 })
 
 export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
   const gridOptions = reactive<VxeGridProps>({
     loading: true,
-    size: currentSize.value,
-    height: 800,
+    size: currentSize as any,
+    height: 700,
     rowConfig: {
       isCurrent: true, // 当鼠标点击行时，是否要高亮当前行
       isHover: true // 当鼠标移到行时，是否要高亮当前行
-    },
-    showOverflow: 'tooltip', // 当内容溢出时显示为省略号
-    tooltipConfig: {
-      showAll: true // 开启全表工具提示
     },
     toolbarConfig: {
       custom: true,
@@ -78,7 +81,7 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
       props: { result: 'list', total: 'total' },
       ajax: {
         query: ({ page, form }) => {
-          const queryParams = Object.assign({}, form)
+          const queryParams = Object.assign({}, JSON.parse(JSON.stringify(form)))
           queryParams.pageSize = page.pageSize
           queryParams.pageNo = page.currentPage
           gridOptions.loading = false
@@ -90,9 +93,11 @@ export const useVxeGrid = <T = any>(config?: UseVxeGridConfig<T>) => {
     }
   })
   const delList = (ids: string | number | string[] | number[]) => {
-    message.delConfirm().then(() => {
-      config?.delListApi && config?.delListApi(ids)
-      message.success(t('common.delSuccess'))
+    return new Promise(async () => {
+      message.delConfirm().then(() => {
+        config?.delListApi && config?.delListApi(ids)
+        message.success(t('common.delSuccess'))
+      })
     })
   }
   return {
