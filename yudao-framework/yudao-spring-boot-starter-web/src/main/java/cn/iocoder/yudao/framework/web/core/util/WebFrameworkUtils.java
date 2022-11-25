@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.framework.web.core.util;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
+import org.springframework.core.env.Environment;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -85,10 +87,21 @@ public class WebFrameworkUtils {
             return userType;
         }
         // 2. 其次，基于 URL 前缀的约定
-        if (request.getRequestURI().startsWith(properties.getAdminApi().getPrefix())) {
+        userType = getLoginUserType(request, "");
+        if(null==userType){
+            // 如果改变了 context-path 这里需要加下配置，否则会获取不到正确的用户类型
+            Environment env = SpringUtil.getApplicationContext().getEnvironment();
+            String context = StrUtil.blankToDefault(env.getProperty("server.servlet.context-path"), "");
+            return getLoginUserType(request, context);
+        }
+        return userType;
+    }
+
+    private static Integer getLoginUserType(HttpServletRequest request, String context) {
+        if (request.getRequestURI().startsWith(context+properties.getAdminApi().getPrefix())) {
             return UserTypeEnum.ADMIN.getValue();
         }
-        if (request.getRequestURI().startsWith(properties.getAppApi().getPrefix())) {
+        if (request.getRequestURI().startsWith(context+properties.getAppApi().getPrefix())) {
             return UserTypeEnum.MEMBER.getValue();
         }
         return null;
