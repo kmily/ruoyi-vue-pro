@@ -187,6 +187,14 @@ export default {
   created() {
     // 租户开关
     this.tenantEnable = getTenantEnable();
+    if (this.tenantEnable) {
+      getTenantIdByName(this.loginForm.tenantName).then(res => { // 设置租户
+        const tenantId = res.data;
+        if (tenantId && tenantId >= 0) {
+          setTenantId(tenantId)
+        }
+      });
+    }
     // 验证码开关
     this.captchaEnable = getCaptchaEnable();
     // 重定向地址
@@ -250,7 +258,8 @@ export default {
       // 设置登录中
       this.loading = true;
       // 计算 redirectUri
-      const redirectUri = location.origin + '/social-login?type=' + socialTypeEnum.type + '&redirect=' + (this.redirect || "/"); // 重定向不能丢
+      const redirectUri = location.origin + '/social-login?'
+        + encodeURIComponent('type=' + socialTypeEnum.type + '&redirect=' + (this.redirect || "/")); // 重定向不能丢
       // const redirectUri = 'http://127.0.0.1:48080/api/gitee/callback';
       // const redirectUri = 'http://127.0.0.1:48080/api/dingtalk/callback';
       // 进行跳转

@@ -29,6 +29,8 @@ export const isRelogin = { show: false }
 let requestList: any[] = []
 // 是否正在刷新中
 let isRefreshToken = false
+// 请求白名单，无须token的接口
+const whiteList: string[] = ['/login', '/refresh-token']
 
 // 创建axios实例
 const service: AxiosInstance = axios.create({
@@ -41,14 +43,20 @@ const service: AxiosInstance = axios.create({
 service.interceptors.request.use(
   (config: AxiosRequestConfig) => {
     // 是否需要设置 token
-    const isToken = (config!.headers || {}).isToken === false
+    let isToken = (config!.headers || {}).isToken === false
+    whiteList.some((v) => {
+      if (config.url) {
+        config.url.indexOf(v) > -1
+        return (isToken = false)
+      }
+    })
     if (getAccessToken() && !isToken) {
       ;(config as Recordable).headers.Authorization = 'Bearer ' + getAccessToken() // 让每个请求携带自定义token
     }
     // 设置租户
-    if (tenantEnable) {
+    if (tenantEnable && tenantEnable === 'true') {
       const tenantId = getTenantId()
-      if (tenantId) service.defaults.headers.common['tenant-id'] = tenantId
+      if (tenantId) (config as Recordable).headers['tenant-id'] = tenantId
     }
     const params = config.params || {}
     const data = config.data || false
@@ -129,7 +137,6 @@ service.interceptors.response.use(
           // 2.1 刷新成功，则回放队列的请求 + 当前请求
           setToken((await refreshTokenRes).data.data)
           config.headers!.Authorization = 'Bearer ' + getAccessToken()
-          service.defaults.headers.Authorization = 'Bearer ' + getAccessToken()
           requestList.forEach((cb: any) => {
             cb()
           })
@@ -175,9 +182,7 @@ service.interceptors.response.use(
         // hard coding：忽略这个提示，直接登出
         console.log(msg)
       } else {
-        ElNotification.error({
-          title: msg
-        })
+        ElNotification.error({ title: msg })
       }
       return Promise.reject('error')
     } else {

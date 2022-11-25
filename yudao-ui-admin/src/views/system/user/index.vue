@@ -79,9 +79,7 @@
                          v-hasPermi="['system:user:update']">修改</el-button>
               <el-dropdown  @command="(command) => handleCommand(command, scope.$index, scope.row)"
                             v-hasPermi="['system:user:delete', 'system:user:update-password', 'system:permission:assign-user-role']">
-                <span class="el-dropdown-link">
-                  <i class="el-icon-d-arrow-right el-icon--right"></i>更多
-                </span>
+                <el-button size="mini" type="text" icon="el-icon-d-arrow-right">更多</el-button>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item command="handleDelete" v-if="scope.row.id !== 1" size="mini" type="text" icon="el-icon-delete"
                                     v-hasPermi="['system:user:delete']">删除</el-dropdown-item>
@@ -274,8 +272,6 @@ export default {
       deptName: undefined,
       // 默认密码
       initPassword: undefined,
-      // 状态数据字典
-      statusOptions: [],
       // 性别状态字典
       sexOptions: [],
       // 岗位选项
