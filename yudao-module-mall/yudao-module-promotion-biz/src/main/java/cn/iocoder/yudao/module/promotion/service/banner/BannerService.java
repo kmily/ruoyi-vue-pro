@@ -48,6 +48,7 @@ public interface BannerService {
 
     /**
      * 获得所有 Banner列表
+     *
      * @return Banner列表
      */
     List<BannerDO> getBannerList();

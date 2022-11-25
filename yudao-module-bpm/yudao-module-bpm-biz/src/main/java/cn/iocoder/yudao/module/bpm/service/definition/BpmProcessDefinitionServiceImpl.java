@@ -33,7 +33,6 @@ import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.PROCESS_DEFINITION_KEY_NOT_MATCH;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.PROCESS_DEFINITION_NAME_NOT_MATCH;
 import static java.util.Collections.emptyList;
@@ -213,7 +212,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
      * @param bpmnBytes 原始的 BPMN XML 字节数组
      * @return BPMN Model
      */
-    private  BpmnModel buildBpmnModel(byte[] bpmnBytes) {
+    private BpmnModel buildBpmnModel(byte[] bpmnBytes) {
         // 转换成 BpmnModel 对象
         BpmnXMLConverter converter = new BpmnXMLConverter();
         return converter.convertToBpmnModel(new BytesStreamSource(bpmnBytes), true, true);

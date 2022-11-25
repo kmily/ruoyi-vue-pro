@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.bpm.service.task;
 
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
@@ -23,7 +22,6 @@ public interface BpmTaskService {
      *
      * @param userId    用户编号
      * @param pageReqVO 分页请求
-     *
      * @return 流程任务分页
      */
     PageResult<BpmTaskTodoPageItemRespVO> getTodoTaskPage(Long userId, BpmTaskTodoPageReqVO pageReqVO);
@@ -33,7 +31,6 @@ public interface BpmTaskService {
      *
      * @param userId    用户编号
      * @param pageReqVO 分页请求
-     *
      * @return 流程任务分页
      */
     PageResult<BpmTaskDonePageItemRespVO> getDoneTaskPage(Long userId, BpmTaskDonePageReqVO pageReqVO);
@@ -42,19 +39,17 @@ public interface BpmTaskService {
      * 获得流程任务 Map
      *
      * @param processInstanceIds 流程实例的编号数组
-     *
      * @return 流程任务 Map
      */
     default Map<String, List<Task>> getTaskMapByProcessInstanceIds(List<String> processInstanceIds) {
         return CollectionUtils.convertMultiMap(getTasksByProcessInstanceIds(processInstanceIds),
-            Task::getProcessInstanceId);
+                Task::getProcessInstanceId);
     }
 
     /**
      * 获得流程任务列表
      *
      * @param processInstanceIds 流程实例的编号数组
-     *
      * @return 流程任务列表
      */
     List<Task> getTasksByProcessInstanceIds(List<String> processInstanceIds);
@@ -63,7 +58,6 @@ public interface BpmTaskService {
      * 获得指令流程实例的流程任务列表，包括所有状态的
      *
      * @param processInstanceId 流程实例的编号
-     *
      * @return 流程任务列表
      */
     List<BpmTaskRespVO> getTaskListByProcessInstanceId(String processInstanceId);

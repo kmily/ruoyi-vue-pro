@@ -22,13 +22,13 @@ import java.util.List;
 public abstract class AbstractSmsClient implements SmsClient {
 
     /**
-     * 短信渠道配置
-     */
-    protected volatile SmsChannelProperties properties;
-    /**
      * 错误码枚举类
      */
     protected final SmsCodeMapping codeMapping;
+    /**
+     * 短信渠道配置
+     */
+    protected volatile SmsChannelProperties properties;
 
     public AbstractSmsClient(SmsChannelProperties properties, SmsCodeMapping codeMapping) {
         this.properties = prepareProperties(properties);

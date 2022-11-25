@@ -28,6 +28,14 @@ import static cn.hutool.core.text.CharSequenceUtil.*;
 public class CodegenBuilder {
 
     /**
+     * 多租户编号的字段名
+     */
+    public static final String TENANT_ID_FIELD = "tenantId";
+    /**
+     * {@link cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO} 的字段
+     */
+    public static final Set<String> BASE_DO_FIELDS = new HashSet<>();
+    /**
      * 字段名与 {@link CodegenColumnListConditionEnum} 的默认映射
      * 注意，字段的匹配以后缀的方式
      */
@@ -37,7 +45,6 @@ public class CodegenBuilder {
                     .put("time", CodegenColumnListConditionEnum.BETWEEN)
                     .put("date", CodegenColumnListConditionEnum.BETWEEN)
                     .build();
-
     /**
      * 字段名与 {@link CodegenColumnHtmlTypeEnum} 的默认映射
      * 注意，字段的匹配以后缀的方式
@@ -55,15 +62,6 @@ public class CodegenBuilder {
                     .put("time", CodegenColumnHtmlTypeEnum.DATETIME)
                     .put("date", CodegenColumnHtmlTypeEnum.DATETIME)
                     .build();
-
-    /**
-     * 多租户编号的字段名
-     */
-    public static final String TENANT_ID_FIELD = "tenantId";
-    /**
-     * {@link cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO} 的字段
-     */
-    public static final Set<String> BASE_DO_FIELDS = new HashSet<>();
     /**
      * 新增操作，不需要传递的字段
      */

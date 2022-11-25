@@ -35,32 +35,32 @@ public class ProductCommentDO extends BaseDO {
     private Long id;
     /**
      * 商品 SPU 编号
-     *
+     * <p>
      * 关联 {@link ProductSpuDO#getId()}
      */
     private Long spuId;
     /**
      * 交易订单编号
-     *
+     * <p>
      * 关联 TradeOrderDO 的 id 编号
      */
     private Long orderId;
     /**
      * 交易订单项编号
-     *
+     * <p>
      * 关联 TradeOrderItemDO 的 id 编号
      */
     private Long orderItemId;
     /**
      * 审核状态
-     *
+     * <p>
      * 枚举 {@link ProductCommentAuditStatusEnum}
      */
     private Integer auditStatus;
 
     /**
      * 用户编号
-     *
+     * <p>
      * 关联 MemberUserDO 的 id 编号
      */
     private Long userId;
@@ -83,25 +83,25 @@ public class ProductCommentDO extends BaseDO {
     private List<String> picUrls;
     /**
      * 描述相符星级
-     *
+     * <p>
      * 1-5 星
      */
     private Integer descriptionScore;
     /**
      * 商品评论星级
-     *
+     * <p>
      * 1-5 星
      */
     private Integer productScore;
     /**
      * 服务评论星级
-     *
+     * <p>
      * 1-5 星
      */
     private Integer serviceScore;
     /**
      * 物流评论星级
-     *
+     * <p>
      * 1-5 星
      */
     private Integer expressComment;
@@ -121,7 +121,7 @@ public class ProductCommentDO extends BaseDO {
 
     /**
      * 有用的计数
-     *
+     * <p>
      * 其他用户看到评论时，可点击「有用」按钮
      */
     private Integer usefulCount;

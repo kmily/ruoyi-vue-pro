@@ -60,13 +60,13 @@ public enum SocialTypeEnum implements IntArrayValuable {
      */
     private final String source;
 
+    public static SocialTypeEnum valueOfType(Integer type) {
+        return ArrayUtil.firstMatch(o -> o.getType().equals(type), values());
+    }
+
     @Override
     public int[] array() {
         return ARRAYS;
-    }
-
-    public static SocialTypeEnum valueOfType(Integer type) {
-        return ArrayUtil.firstMatch(o -> o.getType().equals(type), values());
     }
 
 }

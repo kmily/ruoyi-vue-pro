@@ -29,13 +29,13 @@ public class ProductGroupBindDO extends BaseDO {
     private Long id;
     /**
      * 商品分组编号
-     *
+     * <p>
      * 关联 {@link ProductGroupDO#getId()}
      */
     private Long groupId;
     /**
      * 商品 SPU 编号
-     *
+     * <p>
      * 关联 {@link ProductSpuDO#getId()}
      */
     private Long spuId;

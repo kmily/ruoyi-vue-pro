@@ -22,23 +22,22 @@ import java.util.Set;
 @Component
 public class BpmProcessInstanceEventListener extends AbstractFlowableEngineEventListener {
 
+    public static final Set<FlowableEngineEventType> PROCESS_INSTANCE_EVENTS = ImmutableSet.<FlowableEngineEventType>builder()
+            .add(FlowableEngineEventType.PROCESS_CREATED)
+            .add(FlowableEngineEventType.PROCESS_CANCELLED)
+            .add(FlowableEngineEventType.PROCESS_COMPLETED)
+            .build();
     @Resource
     @Lazy
     private BpmProcessInstanceService processInstanceService;
 
-    public static final Set<FlowableEngineEventType> PROCESS_INSTANCE_EVENTS = ImmutableSet.<FlowableEngineEventType>builder()
-                     .add(FlowableEngineEventType.PROCESS_CREATED)
-                     .add(FlowableEngineEventType.PROCESS_CANCELLED)
-                     .add(FlowableEngineEventType.PROCESS_COMPLETED)
-                     .build();
-
-    public BpmProcessInstanceEventListener(){
+    public BpmProcessInstanceEventListener() {
         super(PROCESS_INSTANCE_EVENTS);
     }
 
     @Override
     protected void processCreated(FlowableEngineEntityEvent event) {
-        processInstanceService.createProcessInstanceExt((ProcessInstance)event.getEntity());
+        processInstanceService.createProcessInstanceExt((ProcessInstance) event.getEntity());
     }
 
     @Override
@@ -48,6 +47,6 @@ public class BpmProcessInstanceEventListener extends AbstractFlowableEngineEvent
 
     @Override
     protected void processCompleted(FlowableEngineEntityEvent event) {
-        processInstanceService.updateProcessInstanceExtComplete((ProcessInstance)event.getEntity());
+        processInstanceService.updateProcessInstanceExtComplete((ProcessInstance) event.getEntity());
     }
 }

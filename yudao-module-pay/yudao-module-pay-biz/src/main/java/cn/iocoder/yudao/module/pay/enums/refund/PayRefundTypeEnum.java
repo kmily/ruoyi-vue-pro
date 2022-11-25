@@ -15,8 +15,7 @@ public enum PayRefundTypeEnum implements IntArrayValuable {
 
     NO(0, "未退款"),
     SOME(10, "部分退款"),
-    ALL(20, "全部退款")
-    ;
+    ALL(20, "全部退款");
 
     private final Integer status;
     private final String name;

@@ -36,7 +36,7 @@ public class WXCodeMapping extends AbstractPayCodeMapping {
                 return PAY_CONFIG_APP_ID_ERROR;
             }
             if (Objects.equals(apiMsg, "签名错误，请检查后再试")
-                || Objects.equals(apiMsg, "签名错误")) {
+                    || Objects.equals(apiMsg, "签名错误")) {
                 return PAY_CONFIG_SIGN_ERROR;
             }
         }

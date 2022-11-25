@@ -37,7 +37,7 @@ public interface JobService {
     /**
      * 更新定时任务的状态
      *
-     * @param id 任务编号
+     * @param id     任务编号
      * @param status 状态
      */
     void updateJobStatus(Long id, Integer status) throws SchedulerException;

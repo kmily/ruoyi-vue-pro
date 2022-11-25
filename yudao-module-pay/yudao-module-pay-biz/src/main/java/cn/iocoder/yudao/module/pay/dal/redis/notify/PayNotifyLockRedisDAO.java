@@ -20,6 +20,10 @@ public class PayNotifyLockRedisDAO {
     @Resource
     private RedissonClient redissonClient;
 
+    private static String formatKey(Long id) {
+        return String.format(PAY_NOTIFY_LOCK.getKeyTemplate(), id);
+    }
+
     public void lock(Long id, Long timeoutMillis, Runnable runnable) {
         String lockKey = formatKey(id);
         RLock lock = redissonClient.getLock(lockKey);
@@ -30,10 +34,6 @@ public class PayNotifyLockRedisDAO {
         } finally {
             lock.unlock();
         }
-    }
-
-    private static String formatKey(Long id) {
-        return String.format(PAY_NOTIFY_LOCK.getKeyTemplate(), id);
     }
 
 }

@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.pay.dal.mysql.refund;
 
-import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundExportReqVO;
-import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundPageReqVO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
+import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundExportReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundPageReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -51,7 +51,7 @@ public interface PayRefundMapper extends BaseMapperX<PayRefundDO> {
         return selectOne("req_no", reqNo);
     }
 
-    default  PayRefundDO selectByTradeNoAndMerchantRefundNo(String tradeNo, String merchantRefundNo){
+    default PayRefundDO selectByTradeNoAndMerchantRefundNo(String tradeNo, String merchantRefundNo) {
         return selectOne("trade_no", tradeNo, "merchant_refund_no", merchantRefundNo);
     }
 }

@@ -56,19 +56,19 @@ public class ProductSpuDO extends BaseDO {
     private String description;
     /**
      * 商品分类编号
-     *
+     * <p>
      * 关联 {@link ProductCategoryDO#getId()}
      */
     private Long categoryId;
     /**
      * 商品品牌编号
-     *
+     * <p>
      * 关联 {@link ProductBrandDO#getId()}
      */
     private Long brandId;
     /**
      * 商品图片的数组
-     *
+     * <p>
      * 1. 第一张图片将作为商品主图，支持同时上传多张图；
      * 2. 建议使用尺寸 800x800 像素以上、大小不超过 1M 的正方形图片；
      * 3. 至少 1 张，最多上传 10 张
@@ -86,7 +86,7 @@ public class ProductSpuDO extends BaseDO {
     private Integer sort;
     /**
      * 商品状态
-     *
+     * <p>
      * 枚举 {@link ProductSpuStatusEnum}
      */
     private Integer status;
@@ -95,31 +95,31 @@ public class ProductSpuDO extends BaseDO {
 
     /**
      * 规格类型
-     *
+     * <p>
      * 枚举 {@link ProductSpuSpecTypeEnum}
      */
     private Integer specType;
     /**
      * 最小价格，单位使用：分
-     *
+     * <p>
      * 基于其对应的 {@link ProductSkuDO#getPrice()} 最小值
      */
     private Integer minPrice;
     /**
      * 最大价格，单位使用：分
-     *
+     * <p>
      * 基于其对应的 {@link ProductSkuDO#getPrice()} 最大值
      */
     private Integer maxPrice;
     /**
      * 市场价，单位使用：分
-     *
+     * <p>
      * 基于其对应的 {@link ProductSkuDO#getMarketPrice()} 最大值
      */
     private Integer marketPrice;
     /**
      * 总库存
-     *
+     * <p>
      * 基于其对应的 {@link ProductSkuDO#getStock()} 求和
      */
     private Integer totalStock;

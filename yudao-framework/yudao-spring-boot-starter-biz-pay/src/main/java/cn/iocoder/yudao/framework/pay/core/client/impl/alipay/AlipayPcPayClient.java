@@ -55,6 +55,6 @@ public class AlipayPcPayClient extends AbstractAlipayClient {
             return PayCommonResult.build(e.getErrCode(), e.getErrMsg(), null, codeMapping);
         }
         // 响应为表单格式，前端可嵌入响应的页面或关闭当前支付窗口
-        return PayCommonResult.build(StrUtil.blankToDefault(response.getCode(),"10000") ,response.getMsg(), response, codeMapping);
+        return PayCommonResult.build(StrUtil.blankToDefault(response.getCode(), "10000"), response.getMsg(), response, codeMapping);
     }
 }

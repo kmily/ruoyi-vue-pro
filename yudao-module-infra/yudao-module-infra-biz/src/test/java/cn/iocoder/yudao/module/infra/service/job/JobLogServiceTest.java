@@ -55,13 +55,13 @@ public class JobLogServiceTest extends BaseDbUnitTest {
                 .beginTime(reqVO.getBeginTime()).status(JobLogStatusEnum.RUNNING.getStatus()).build();
         jobLogMapper.insert(log);
         // 调用
-        jobLogService.updateJobLogResultAsync(log.getId(), reqVO.getBeginTime(), reqVO.getDuration(), true,reqVO.getResult());
+        jobLogService.updateJobLogResultAsync(log.getId(), reqVO.getBeginTime(), reqVO.getDuration(), true, reqVO.getResult());
         // 校验记录的属性是否正确
         JobLogDO job = jobLogMapper.selectById(log.getId());
         assertEquals(JobLogStatusEnum.SUCCESS.getStatus(), job.getStatus());
 
         // 调用
-        jobLogService.updateJobLogResultAsync(log.getId(), reqVO.getBeginTime(), reqVO.getDuration(), false,reqVO.getResult());
+        jobLogService.updateJobLogResultAsync(log.getId(), reqVO.getBeginTime(), reqVO.getDuration(), false, reqVO.getResult());
         // 校验记录的属性是否正确
         JobLogDO job2 = jobLogMapper.selectById(log.getId());
         assertEquals(JobLogStatusEnum.FAILURE.getStatus(), job2.getStatus());

@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * Bpm 任务分配的规则表，用于自定义配置每个任务的负责人、候选人的分配规则。
  * 也就是说，废弃 BPMN 原本的 UserTask 设置的 assignee、candidateUsers 等配置，而是通过使用该规则进行计算对应的负责人。
- *
+ * <p>
  * 1. 默认情况下，{@link #processDefinitionId} 为 {@link #PROCESS_DEFINITION_ID_NULL} 值，表示贵改则与流程模型关联
  * 2. 在流程模型部署后，会将他的所有规则记录，复制出一份新部署出来的流程定义，通过设置 {@link #processDefinitionId} 为新的流程定义的编号进行关联
  *
@@ -42,26 +42,26 @@ public class BpmTaskAssignRuleDO extends BaseDO {
 
     /**
      * 流程模型编号
-     *
+     * <p>
      * 关联 Model 的 id 属性
      */
     private String modelId;
     /**
      * 流程定义编号
-     *
+     * <p>
      * 关联 ProcessDefinition 的 id 属性
      */
     private String processDefinitionId;
     /**
      * 流程任务的定义 Key
-     *
+     * <p>
      * 关联 Task 的 taskDefinitionKey 属性
      */
     private String taskDefinitionKey;
 
     /**
      * 规则类型
-     *
+     * <p>
      * 枚举 {@link BpmTaskAssignRuleTypeEnum}
      */
     @TableField("`type`")
@@ -69,7 +69,7 @@ public class BpmTaskAssignRuleDO extends BaseDO {
     /**
      * 规则值数组，一般关联指定表的编号
      * 根据 type 不同，对应的值是不同的：
-     *
+     * <p>
      * 1. {@link BpmTaskAssignRuleTypeEnum#ROLE} 时：角色编号
      * 2. {@link BpmTaskAssignRuleTypeEnum#DEPT_MEMBER} 时：部门编号
      * 3. {@link BpmTaskAssignRuleTypeEnum#DEPT_LEADER} 时：部门编号

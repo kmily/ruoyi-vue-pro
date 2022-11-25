@@ -39,6 +39,27 @@ public class DictDataServiceTest extends BaseDbUnitTest {
     @MockBean
     private DictTypeService dictTypeService;
 
+    @SafeVarargs
+    private static DictDataDO randomDictDataDO(Consumer<DictDataDO>... consumers) {
+        Consumer<DictDataDO> consumer = (o) -> {
+            o.setStatus(randomCommonStatus()); // 保证 status 的范围
+        };
+        return randomPojo(DictDataDO.class, ArrayUtils.append(consumer, consumers));
+    }
+
+    /**
+     * 生成一个有效的字典类型
+     *
+     * @param type 字典类型
+     * @return DictTypeDO 对象
+     */
+    private static DictTypeDO randomDictTypeDO(String type) {
+        return randomPojo(DictTypeDO.class, o -> {
+            o.setType(type);
+            o.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 保证 status 是开启
+        });
+    }
+
     @Test
     public void testGetDictDataPage() {
         // mock 数据
@@ -194,6 +215,8 @@ public class DictDataServiceTest extends BaseDbUnitTest {
         dictDataService.checkDictDataValueUnique(randomLongId(), randomString(), randomString());
     }
 
+    // ========== 随机对象 ==========
+
     @Test
     public void testCheckDictDataValueUnique_valueDuplicateForCreate() {
         // 准备参数
@@ -225,29 +248,6 @@ public class DictDataServiceTest extends BaseDbUnitTest {
         // 调用，校验异常
         assertServiceException(() -> dictDataService.checkDictDataValueUnique(id, dictType, value),
                 DICT_DATA_VALUE_DUPLICATE);
-    }
-
-    // ========== 随机对象 ==========
-
-    @SafeVarargs
-    private static DictDataDO randomDictDataDO(Consumer<DictDataDO>... consumers) {
-        Consumer<DictDataDO> consumer = (o) -> {
-            o.setStatus(randomCommonStatus()); // 保证 status 的范围
-        };
-        return randomPojo(DictDataDO.class, ArrayUtils.append(consumer, consumers));
-    }
-
-    /**
-     * 生成一个有效的字典类型
-     *
-     * @param type 字典类型
-     * @return DictTypeDO 对象
-     */
-    private static DictTypeDO randomDictTypeDO(String type) {
-        return randomPojo(DictTypeDO.class, o -> {
-            o.setType(type);
-            o.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 保证 status 是开启
-        });
     }
 
 }

@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormPageReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormUpdateReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * 动态表单 Service 接口
  *
- * @author  @风里雾里
+ * @author @风里雾里
  */
 public interface BpmFormService {
 
@@ -91,9 +91,9 @@ public interface BpmFormService {
     /**
      * 校验流程表单已配置
      *
-     * @param configStr  configStr 字段
+     * @param configStr configStr 字段
      * @return 流程表单
      */
-    BpmFormDO checkFormConfig(String  configStr);
+    BpmFormDO checkFormConfig(String configStr);
 
 }

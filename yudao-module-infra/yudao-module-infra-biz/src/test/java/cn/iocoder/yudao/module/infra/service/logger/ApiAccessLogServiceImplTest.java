@@ -77,7 +77,7 @@ public class ApiAccessLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setUserType(userType);
         reqVO.setApplicationName(applicationName);
         reqVO.setRequestUrl(requestUrl);
-        reqVO.setBeginTime((new LocalDateTime[]{buildTime(2021, 3, 12),buildTime(2021, 3, 14)}));
+        reqVO.setBeginTime((new LocalDateTime[]{buildTime(2021, 3, 12), buildTime(2021, 3, 14)}));
         reqVO.setDuration(duration);
         reqVO.setResultCode(resultCode);
 
@@ -134,7 +134,7 @@ public class ApiAccessLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setUserType(userType);
         reqVO.setApplicationName(applicationName);
         reqVO.setRequestUrl(requestUrl);
-        reqVO.setBeginTime((new LocalDateTime[]{buildTime(2021, 3, 12),buildTime(2021, 3, 14)}));
+        reqVO.setBeginTime((new LocalDateTime[]{buildTime(2021, 3, 12), buildTime(2021, 3, 14)}));
         reqVO.setDuration(duration);
         reqVO.setResultCode(resultCode);
 

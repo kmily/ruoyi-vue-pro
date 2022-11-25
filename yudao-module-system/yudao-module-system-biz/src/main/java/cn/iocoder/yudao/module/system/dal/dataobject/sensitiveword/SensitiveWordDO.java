@@ -41,7 +41,7 @@ public class SensitiveWordDO extends BaseDO {
     private String description;
     /**
      * 标签数组
-     *
+     * <p>
      * 用于实现不同的业务场景下，需要使用不同标签的敏感词。
      * 例如说，tag 有短信、论坛两种，敏感词 "推广" 在短信下是敏感词，在论坛下不是敏感词。
      * 此时，我们会存储一条敏感词记录，它的 name 为"推广"，tag 为短信。
@@ -50,7 +50,7 @@ public class SensitiveWordDO extends BaseDO {
     private List<String> tags;
     /**
      * 状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;

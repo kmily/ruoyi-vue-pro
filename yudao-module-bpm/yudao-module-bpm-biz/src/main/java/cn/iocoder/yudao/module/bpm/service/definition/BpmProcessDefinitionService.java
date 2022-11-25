@@ -16,6 +16,7 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 /**
  * Flowable流程定义接口
  *
@@ -52,7 +53,7 @@ public interface BpmProcessDefinitionService {
     /**
      * 更新流程定义状态
      *
-     * @param id 流程定义的编号
+     * @param id    流程定义的编号
      * @param state 状态
      */
     void updateProcessDefinitionState(String id, Integer state);
@@ -91,7 +92,7 @@ public interface BpmProcessDefinitionService {
 
     /**
      * 获得编号对应的 ProcessDefinition
-     *
+     * <p>
      * 相比 {@link #getProcessDefinition(String)} 方法，category 的取值是正确
      *
      * @param id 编号

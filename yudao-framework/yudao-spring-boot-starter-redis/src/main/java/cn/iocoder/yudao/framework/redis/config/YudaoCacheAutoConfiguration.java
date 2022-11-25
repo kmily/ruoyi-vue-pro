@@ -20,7 +20,7 @@ public class YudaoCacheAutoConfiguration {
 
     /**
      * RedisCacheConfiguration Bean
-     *
+     * <p>
      * 参考 org.springframework.boot.autoconfigure.cache.RedisCacheConfiguration 的 createConfiguration 方法
      */
     @Bean

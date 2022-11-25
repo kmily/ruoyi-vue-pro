@@ -156,7 +156,7 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setUserNickname("wangkai");
         reqVO.setModule("order");
         reqVO.setType(OperateTypeEnum.CREATE.getType());
-        reqVO.setStartTime((new LocalDateTime[]{buildTime(2021, 3, 5),buildTime(2021, 3, 7)}));
+        reqVO.setStartTime((new LocalDateTime[]{buildTime(2021, 3, 5), buildTime(2021, 3, 7)}));
         reqVO.setSuccess(true);
 
         // 调用 service 方法

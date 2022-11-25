@@ -62,7 +62,7 @@ public class JmReportTokenServiceImpl implements JmReportTokenServiceI {
 
     /**
      * 获得用户编号
-     *
+     * <p>
      * 虽然方法名获得的是 username，实际对应到项目中是用户编号
      *
      * @param token JmReport 前端传递的 token

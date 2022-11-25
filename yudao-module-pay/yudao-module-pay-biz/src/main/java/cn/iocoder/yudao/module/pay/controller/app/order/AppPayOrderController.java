@@ -24,7 +24,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
-import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.PAY_CHANNEL_CLIENT_NOT_FOUND;
 
 @Api(tags = "用户 APP - 支付订单")
 @RestController
@@ -66,19 +66,20 @@ public class AppPayOrderController {
     @ApiOperation("通知微信公众号支付的结果")
     public String notifyWxPayOrder(@PathVariable("channelId") Long channelId,
                                    @RequestBody String xmlData) throws Exception {
-        orderService.notifyPayOrder(channelId,  PayNotifyDataDTO.builder().body(xmlData).build());
+        orderService.notifyPayOrder(channelId, PayNotifyDataDTO.builder().body(xmlData).build());
         return "success";
     }
 
     /**
      * 统一的跳转页面， 支付宝跳转参数说明
      * https://opendocs.alipay.com/open/203/105285#%E5%89%8D%E5%8F%B0%E5%9B%9E%E8%B7%B3%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E
+     *
      * @param channelId 渠道id
      * @return 返回跳转页面
      */
     @GetMapping(value = "/return/{channelId}")
     @ApiOperation("渠道统一的支付成功返回地址")
-    public String returnAliPayOrder(@PathVariable("channelId") Long channelId, @RequestParam Map<String, String> params){
+    public String returnAliPayOrder(@PathVariable("channelId") Long channelId, @RequestParam Map<String, String> params) {
         //TODO 可以根据渠道和 app_id 返回不同的页面
         log.info("app_id  is {}", params.get("app_id"));
         return String.format("渠道[%s]支付成功", channelId);
@@ -87,8 +88,8 @@ public class AppPayOrderController {
     /**
      * 统一的渠道支付回调，支付宝的退款回调
      *
-     * @param channelId 渠道编号
-     * @param params form 参数
+     * @param channelId  渠道编号
+     * @param params     form 参数
      * @param originData http request body
      * @return 成功返回 "success"
      */

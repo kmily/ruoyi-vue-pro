@@ -49,7 +49,8 @@ public class ConfigServiceImpl implements ConfigService {
         checkCreateOrUpdate(reqVO.getId(), null); // 不允许更新 key
         // 更新参数配置
         ConfigDO updateObj = ConfigConvert.INSTANCE.convert(reqVO);
-        configMapper.updateById(updateObj);;
+        configMapper.updateById(updateObj);
+        ;
     }
 
     @Override

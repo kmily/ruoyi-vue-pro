@@ -32,7 +32,7 @@ public class ApiAccessLogDO extends BaseDO {
     private Long id;
     /**
      * 链路追踪编号
-     *
+     * <p>
      * 一般来说，通过链路追踪编号，可以将访问日志，错误日志，链路追踪日志，logger 打印日志等，结合在一起，从而进行排错。
      */
     private String traceId;
@@ -42,13 +42,13 @@ public class ApiAccessLogDO extends BaseDO {
     private Long userId;
     /**
      * 用户类型
-     *
+     * <p>
      * 枚举 {@link UserTypeEnum}
      */
     private Integer userType;
     /**
      * 应用名
-     *
+     * <p>
      * 目前读取 `spring.application.name` 配置项
      */
     private String applicationName;
@@ -65,7 +65,7 @@ public class ApiAccessLogDO extends BaseDO {
     private String requestUrl;
     /**
      * 请求参数
-     *
+     * <p>
      * query: Query String
      * body: Quest Body
      */
@@ -95,13 +95,13 @@ public class ApiAccessLogDO extends BaseDO {
     private Integer duration;
     /**
      * 结果码
-     *
+     * <p>
      * 目前使用的 {@link CommonResult#getCode()} 属性
      */
     private Integer resultCode;
     /**
      * 结果提示
-     *
+     * <p>
      * 目前使用的 {@link CommonResult#getMsg()} 属性
      */
     private String resultMsg;

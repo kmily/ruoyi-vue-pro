@@ -27,7 +27,7 @@ public class PayMerchantExcelVO {
     @ExcelProperty("商户简称")
     private String shortName;
 
-    @ExcelProperty(value = "开启状态",converter = DictConvert.class)
+    @ExcelProperty(value = "开启状态", converter = DictConvert.class)
     @DictFormat("sys_common_status")
     private Integer status;
 

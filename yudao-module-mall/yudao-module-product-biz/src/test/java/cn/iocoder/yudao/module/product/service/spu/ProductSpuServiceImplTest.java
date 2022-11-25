@@ -71,6 +71,37 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
     @MockBean
     private ProductPropertyValueService productPropertyValueService;
 
+    /**
+     * 生成笛卡尔积
+     *
+     * @param data 数据
+     * @return 笛卡尔积
+     */
+    public static <T> List<List<T>> cartesianProduct(List<List<T>> data) {
+        List<List<T>> res = null; // 结果集(当前为第N个List，则该处存放的就为前N-1个List的笛卡尔积集合)
+        for (List<T> list : data) { // 遍历数据
+            List<List<T>> temp = new ArrayList<>(); // 临时结果集，存放本次循环后生成的笛卡尔积集合
+            if (res == null) { // 结果集为null表示第一次循环既list为第一个List
+                for (T t : list) { // 便利第一个List
+                    // 利用stream生成List，第一个List的笛卡尔积集合约等于自己本身（需要创建一个List并把对象添加到当中），存放到临时结果集
+                    temp.add(Stream.of(t).collect(Collectors.toList()));
+                }
+                res = temp; // 将临时结果集赋值给结果集
+                continue; // 跳过本次循环
+            }
+            // 不为第一个List，计算前面的集合（笛卡尔积）和当前List的笛卡尔积集合
+            for (T t : list) { // 便利
+                for (List<T> rl : res) { // 便利前面的笛卡尔积集合
+                    // 利用stream生成List
+                    temp.add(Stream.concat(rl.stream(), Stream.of(t)).collect(Collectors.toList()));
+                }
+            }
+            res = temp; // 将临时结果集赋值给结果集
+        }
+        // 返回结果
+        return res;
+    }
+
     public String generateNo() {
         return DateUtil.format(new Date(), "yyyyMMddHHmmss") + RandomUtil.randomInt(100000, 999999);
     }
@@ -238,7 +269,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         String code = generateNo();
 
         // 准备参数
-        ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class, o->{
+        ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class, o -> {
             o.setStatus(ProductSpuStatusEnum.ENABLE.getStatus());
             o.setTotalStock(500);
             o.setMinPrice(1);
@@ -286,7 +317,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         Long categoryId = generateId();
 
         // 准备参数
-        ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class, o->{
+        ProductSpuDO createReqVO = randomPojo(ProductSpuDO.class, o -> {
             o.setStatus(ProductSpuStatusEnum.ENABLE.getStatus());
             o.setTotalStock(1);
             o.setMinPrice(1);
@@ -354,38 +385,6 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
 
         Assertions.assertIterableEquals(collect, spuPage.getList());
         assertEquals(spuPage.getTotal(), result.getTotal());
-    }
-
-
-    /**
-     * 生成笛卡尔积
-     *
-     * @param data 数据
-     * @return 笛卡尔积
-     */
-    public static <T> List<List<T>> cartesianProduct(List<List<T>> data) {
-        List<List<T>> res = null; // 结果集(当前为第N个List，则该处存放的就为前N-1个List的笛卡尔积集合)
-        for (List<T> list : data) { // 遍历数据
-            List<List<T>> temp = new ArrayList<>(); // 临时结果集，存放本次循环后生成的笛卡尔积集合
-            if (res == null) { // 结果集为null表示第一次循环既list为第一个List
-                for (T t : list) { // 便利第一个List
-                    // 利用stream生成List，第一个List的笛卡尔积集合约等于自己本身（需要创建一个List并把对象添加到当中），存放到临时结果集
-                    temp.add(Stream.of(t).collect(Collectors.toList()));
-                }
-                res = temp; // 将临时结果集赋值给结果集
-                continue; // 跳过本次循环
-            }
-            // 不为第一个List，计算前面的集合（笛卡尔积）和当前List的笛卡尔积集合
-            for (T t : list) { // 便利
-                for (List<T> rl : res) { // 便利前面的笛卡尔积集合
-                    // 利用stream生成List
-                    temp.add(Stream.concat(rl.stream(), Stream.of(t)).collect(Collectors.toList()));
-                }
-            }
-            res = temp; // 将临时结果集赋值给结果集
-        }
-        // 返回结果
-        return res;
     }
 
     @Test

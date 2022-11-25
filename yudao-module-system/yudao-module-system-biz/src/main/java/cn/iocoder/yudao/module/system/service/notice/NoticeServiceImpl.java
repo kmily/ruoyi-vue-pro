@@ -6,8 +6,8 @@ import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeCreateReq
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.notice.NoticeConvert;
-import cn.iocoder.yudao.module.system.dal.mysql.notice.NoticeMapper;
 import cn.iocoder.yudao.module.system.dal.dataobject.notice.NoticeDO;
+import cn.iocoder.yudao.module.system.dal.mysql.notice.NoticeMapper;
 import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
 

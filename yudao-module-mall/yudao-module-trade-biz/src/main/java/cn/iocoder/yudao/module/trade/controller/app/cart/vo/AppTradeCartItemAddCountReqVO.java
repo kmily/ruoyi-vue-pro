@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class AppTradeCartItemAddCountReqVO {
 
-    @ApiModelProperty(value = "商品 SKU 编号", required = true,example = "1024")
+    @ApiModelProperty(value = "商品 SKU 编号", required = true, example = "1024")
     @NotNull(message = "商品 SKU 编号不能为空")
     private Long skuId;
 

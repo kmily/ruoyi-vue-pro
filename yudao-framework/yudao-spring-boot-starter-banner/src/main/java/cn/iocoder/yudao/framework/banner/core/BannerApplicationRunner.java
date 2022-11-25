@@ -16,6 +16,10 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class BannerApplicationRunner implements ApplicationRunner {
 
+    private static boolean isNotPresent(String className) {
+        return !ClassUtils.isPresent(className, ClassUtils.getDefaultClassLoader());
+    }
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         ThreadUtil.execute(() -> {
@@ -41,10 +45,6 @@ public class BannerApplicationRunner implements ApplicationRunner {
                 System.out.println("[工作流模块 yudao-module-bpm - 已禁用][参考 https://doc.iocoder.cn/bpm/ 开启]");
             }
         });
-    }
-
-    private static boolean isNotPresent(String className) {
-        return !ClassUtils.isPresent(className, ClassUtils.getDefaultClassLoader());
     }
 
 }

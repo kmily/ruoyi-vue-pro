@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.product.controller.admin.brand.vo;
 
-import lombok.*;
-import io.swagger.annotations.*;
+import io.swagger.annotations.ApiModel;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @ApiModel("管理后台 - 商品品牌创建 Request VO")
 @Data

@@ -34,7 +34,7 @@ public class FileConfigDO extends BaseDO {
     private String name;
     /**
      * 存储器
-     *
+     * <p>
      * 枚举 {@link FileStorageEnum}
      */
     private Integer storage;
@@ -44,7 +44,7 @@ public class FileConfigDO extends BaseDO {
     private String remark;
     /**
      * 是否为主配置
-     *
+     * <p>
      * 由于我们可以配置多个文件配置，默认情况下，使用主配置进行文件的上传
      */
     private Boolean master;

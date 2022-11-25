@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.system.mq.producer.dept;
 
-import cn.iocoder.yudao.module.system.mq.message.dept.DeptRefreshMessage;
 import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;
+import cn.iocoder.yudao.module.system.mq.message.dept.DeptRefreshMessage;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

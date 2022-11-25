@@ -52,7 +52,7 @@ public class MenuServiceImpl implements MenuService {
     /**
      * 菜单缓存
      * key：菜单编号
-     *
+     * <p>
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
     private volatile Map<Long, MenuDO> menuCache;
@@ -60,7 +60,7 @@ public class MenuServiceImpl implements MenuService {
      * 权限与菜单缓存
      * key：权限 {@link MenuDO#getPermission()}
      * value：MenuDO 数组，因为一个权限可能对应多个 MenuDO 对象
-     *
+     * <p>
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
     private volatile Multimap<String, MenuDO> permissionMenuCache;
@@ -224,7 +224,7 @@ public class MenuServiceImpl implements MenuService {
         }
         // 创建新数组，避免缓存被修改
         return menuCache.values().stream().filter(menu -> menuTypes.contains(menu.getType())
-                && menusStatuses.contains(menu.getStatus()))
+                        && menusStatuses.contains(menu.getStatus()))
                 .collect(Collectors.toList());
     }
 
@@ -236,8 +236,8 @@ public class MenuServiceImpl implements MenuService {
             return Collections.emptyList();
         }
         return menuCache.values().stream().filter(menu -> menuIds.contains(menu.getId())
-                && menuTypes.contains(menu.getType())
-                && menusStatuses.contains(menu.getStatus()))
+                        && menuTypes.contains(menu.getType())
+                        && menusStatuses.contains(menu.getStatus()))
                 .collect(Collectors.toList());
     }
 
@@ -253,13 +253,13 @@ public class MenuServiceImpl implements MenuService {
 
     /**
      * 校验父菜单是否合法
-     *
+     * <p>
      * 1. 不能设置自己为父菜单
      * 2. 父菜单不存在
      * 3. 父菜单必须是 {@link MenuTypeEnum#MENU} 菜单类型
      *
      * @param parentId 父菜单编号
-     * @param childId 当前菜单编号
+     * @param childId  当前菜单编号
      */
     @VisibleForTesting
     public void checkParentResource(Long parentId, Long childId) {
@@ -277,19 +277,19 @@ public class MenuServiceImpl implements MenuService {
         }
         // 父菜单必须是目录或者菜单类型
         if (!MenuTypeEnum.DIR.getType().equals(menu.getType())
-            && !MenuTypeEnum.MENU.getType().equals(menu.getType())) {
+                && !MenuTypeEnum.MENU.getType().equals(menu.getType())) {
             throw ServiceExceptionUtil.exception(MENU_PARENT_NOT_DIR_OR_MENU);
         }
     }
 
     /**
      * 校验菜单是否合法
-     *
+     * <p>
      * 1. 校验相同父菜单编号下，是否存在相同的菜单名
      *
-     * @param name 菜单名字
+     * @param name     菜单名字
      * @param parentId 父菜单编号
-     * @param id 菜单编号
+     * @param id       菜单编号
      */
     @VisibleForTesting
     public void checkResource(Long parentId, String name, Long id) {
@@ -308,7 +308,7 @@ public class MenuServiceImpl implements MenuService {
 
     /**
      * 初始化菜单的通用属性。
-     *
+     * <p>
      * 例如说，只有目录或者菜单类型的菜单，才设置 icon
      *
      * @param menu 菜单

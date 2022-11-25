@@ -22,14 +22,13 @@ import java.lang.reflect.Method;
  */
 public class YudaoAuthRequestFactory extends AuthRequestFactory {
 
-    protected JustAuthProperties properties;
-    protected AuthStateCache authStateCache;
-
     /**
      * 由于父类 configureHttpConfig 方法是 private 修饰，所以获取后，进行反射调用
      */
     private final Method configureHttpConfigMethod = ReflectUtil.getMethod(AuthRequestFactory.class,
             "configureHttpConfig", String.class, AuthConfig.class, JustAuthProperties.JustAuthHttpConfig.class);
+    protected JustAuthProperties properties;
+    protected AuthStateCache authStateCache;
 
     public YudaoAuthRequestFactory(JustAuthProperties properties, AuthStateCache authStateCache) {
         super(properties, authStateCache);

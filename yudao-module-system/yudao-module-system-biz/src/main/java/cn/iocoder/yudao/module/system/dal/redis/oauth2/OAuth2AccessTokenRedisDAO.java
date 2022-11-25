@@ -27,6 +27,10 @@ public class OAuth2AccessTokenRedisDAO {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
+    private static String formatKey(String accessToken) {
+        return String.format(OAUTH2_ACCESS_TOKEN.getKeyTemplate(), accessToken);
+    }
+
     public OAuth2AccessTokenDO get(String accessToken) {
         String redisKey = formatKey(accessToken);
         return JsonUtils.parseObject(stringRedisTemplate.opsForValue().get(redisKey), OAuth2AccessTokenDO.class);
@@ -48,10 +52,6 @@ public class OAuth2AccessTokenRedisDAO {
     public void deleteList(Collection<String> accessTokens) {
         List<String> redisKeys = CollectionUtils.convertList(accessTokens, OAuth2AccessTokenRedisDAO::formatKey);
         stringRedisTemplate.delete(redisKeys);
-    }
-
-    private static String formatKey(String accessToken) {
-        return String.format(OAUTH2_ACCESS_TOKEN.getKeyTemplate(), accessToken);
     }
 
 }

@@ -8,6 +8,8 @@ import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.crypto.digest.HmacAlgorithm;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsSendRespDTO;
@@ -15,8 +17,6 @@ import cn.iocoder.yudao.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.yudao.framework.sms.core.client.impl.AbstractSmsClient;
 import cn.iocoder.yudao.framework.sms.core.enums.SmsTemplateAuditStatusEnum;
 import cn.iocoder.yudao.framework.sms.core.property.SmsChannelProperties;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +24,7 @@ import java.util.Map;
 
 /**
  * 基于钉钉 WebHook 实现的调试的短信客户端实现类
- *
+ * <p>
  * 考虑到省钱，我们使用钉钉 WebHook 模拟发送短信，方便调试。
  *
  * @author 芋道源码
@@ -61,7 +61,7 @@ public class DebugDingTalkSmsClient extends AbstractSmsClient {
 
     /**
      * 构建请求地址
-     *
+     * <p>
      * 参见 https://developers.dingtalk.com/document/app/custom-robot-access/title-nfv-794-g71 文档
      *
      * @param path 请求路径

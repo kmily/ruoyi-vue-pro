@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.pay.dal.mysql.order;
 
-import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderExportReqVO;
-import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderPageReqVO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
+import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderExportReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderPageReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -55,7 +55,7 @@ public interface PayOrderMapper extends BaseMapperX<PayOrderDO> {
     /**
      * 查询符合的订单数量
      *
-     * @param appId 应用编号
+     * @param appId  应用编号
      * @param status 订单状态
      * @return 条数
      */

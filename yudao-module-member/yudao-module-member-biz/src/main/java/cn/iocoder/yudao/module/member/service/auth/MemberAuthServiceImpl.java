@@ -259,7 +259,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             throw exception(USER_NOT_EXISTS);
         }
         // 参数：未加密密码，编码后的密码
-        if (!passwordEncoder.matches(oldPassword,user.getPassword())) {
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw exception(USER_PASSWORD_FAILED);
         }
         return user;

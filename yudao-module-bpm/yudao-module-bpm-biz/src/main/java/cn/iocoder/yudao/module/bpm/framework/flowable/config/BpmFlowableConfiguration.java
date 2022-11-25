@@ -20,7 +20,7 @@ public class BpmFlowableConfiguration {
 
     /**
      * BPM 模块的 ProcessEngineConfigurationConfigurer 实现类：
-     *
+     * <p>
      * 1. 设置各种监听器
      * 2. 设置自定义的 ActivityBehaviorFactory 实现
      */

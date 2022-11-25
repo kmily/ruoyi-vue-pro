@@ -28,7 +28,7 @@ public class PayRefundNotifyDTO {
      * 调用支付渠道时，使用该字段作为对接的订单号。
      * 1. 调用微信支付 https://api.mch.weixin.qq.com/pay/unifiedorder 时，使用该字段作为 out_trade_no
      * 2. 调用支付宝 https://opendocs.alipay.com/apis 时，使用该字段作为 out_trade_no
-     *  这里对应 pay_extension 里面的 no
+     * 这里对应 pay_extension 里面的 no
      * 例如说，P202110132239124200055
      */
     private String tradeNo;
@@ -41,7 +41,7 @@ public class PayRefundNotifyDTO {
      * 注：针对同一次退款请求，如果调用接口失败或异常了，重试时需要保证退款请求号不能变更，
      * 防止该笔交易重复退款。支付宝会保证同样的退款请求号多次请求只会退一次。
      * 退款单请求号，根据规则生成
-     *
+     * <p>
      * 例如说，RR202109181134287570000
      */
     private String reqNo;
@@ -51,7 +51,6 @@ public class PayRefundNotifyDTO {
      * 退款是否成功
      */
     private PayNotifyRefundStatusEnum status;
-
 
 
     /**

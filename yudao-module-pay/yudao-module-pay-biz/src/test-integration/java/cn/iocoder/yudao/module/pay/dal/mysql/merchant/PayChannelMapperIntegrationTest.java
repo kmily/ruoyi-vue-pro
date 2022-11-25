@@ -46,6 +46,7 @@ public class PayChannelMapperIntegrationTest extends BaseDbIntegrationTest {
     }
 
     // TODO @ouyang：Zfb 改成 AlipayQr
+
     /**
      * 插入 {@link PayChannelEnum#ALIPAY_QR} 初始配置
      */

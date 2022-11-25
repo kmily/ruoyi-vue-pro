@@ -28,6 +28,17 @@ public class PayClientFactoryImplTest {
 
     private final PayClientFactoryImpl payClientFactory = new PayClientFactoryImpl();
 
+    private static PayOrderUnifiedReqDTO buildPayOrderUnifiedReqDTO() {
+        PayOrderUnifiedReqDTO reqDTO = new PayOrderUnifiedReqDTO();
+        reqDTO.setAmount(123L);
+        reqDTO.setSubject("IPhone 13");
+        reqDTO.setBody("biubiubiu");
+        reqDTO.setMerchantOrderId(String.valueOf(System.currentTimeMillis()));
+        reqDTO.setUserIp("127.0.0.1");
+        reqDTO.setNotifyUrl("http://127.0.0.1:8080");
+        return reqDTO;
+    }
+
     /**
      * {@link WXPubPayClient} 的 V2 版本
      */
@@ -117,17 +128,6 @@ public class PayClientFactoryImplTest {
         PayOrderUnifiedReqDTO reqDTO = buildPayOrderUnifiedReqDTO();
         CommonResult<?> result = client.unifiedOrder(reqDTO);
         System.out.println(JsonUtils.toJsonString(result));
-    }
-
-    private static PayOrderUnifiedReqDTO buildPayOrderUnifiedReqDTO() {
-        PayOrderUnifiedReqDTO reqDTO = new PayOrderUnifiedReqDTO();
-        reqDTO.setAmount(123L);
-        reqDTO.setSubject("IPhone 13");
-        reqDTO.setBody("biubiubiu");
-        reqDTO.setMerchantOrderId(String.valueOf(System.currentTimeMillis()));
-        reqDTO.setUserIp("127.0.0.1");
-        reqDTO.setNotifyUrl("http://127.0.0.1:8080");
-        return reqDTO;
     }
 
 }

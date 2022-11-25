@@ -62,7 +62,7 @@ public interface TradeOrderConvert {
         });
     }
 
-    @Mapping(source = "userId" , target = "userId")
+    @Mapping(source = "userId", target = "userId")
     PriceCalculateReqDTO convert(AppTradeOrderCreateReqVO createReqVO, Long userId);
 
     @Mappings({
@@ -70,6 +70,7 @@ public interface TradeOrderConvert {
             @Mapping(source = "count", target = "incrCount"),
     })
     ProductSkuUpdateStockReqDTO.Item convert(TradeOrderItemDO bean);
+
     List<ProductSkuUpdateStockReqDTO.Item> convertList(List<TradeOrderItemDO> list);
 
     default PayOrderInfoCreateReqDTO convert(TradeOrderDO tradeOrderDO, List<TradeOrderItemDO> tradeOrderItemDOs,

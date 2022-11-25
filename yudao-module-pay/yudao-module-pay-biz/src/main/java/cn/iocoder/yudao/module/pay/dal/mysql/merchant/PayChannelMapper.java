@@ -80,13 +80,14 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
     }
 
     // TODO @aquan：select 命名
+
     /**
      * 根据支付应用ID集合获得支付渠道列表
      *
      * @param appIds 应用编号集合
      * @return 支付渠道列表
      */
-    default List<PayChannelDO> getChannelListByAppIds(Collection<Long> appIds){
+    default List<PayChannelDO> getChannelListByAppIds(Collection<Long> appIds) {
         return this.selectList(new QueryWrapper<PayChannelDO>().lambda()
                 .in(PayChannelDO::getAppId, appIds));
     }

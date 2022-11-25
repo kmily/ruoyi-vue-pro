@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.product.api.sku;
 
-import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
+import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 
 import java.util.Collection;
 import java.util.List;

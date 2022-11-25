@@ -15,10 +15,6 @@ import java.util.List;
 @Mapper
 public interface RoleMenuMapper extends BaseMapperX<RoleMenuDO> {
 
-    @Repository
-    class BatchInsertMapper extends ServiceImpl<RoleMenuMapper, RoleMenuDO> {
-    }
-
     default List<RoleMenuDO> selectListByRoleId(Long roleId) {
         return selectList(new QueryWrapper<RoleMenuDO>().eq("role_id", roleId));
     }
@@ -38,5 +34,9 @@ public interface RoleMenuMapper extends BaseMapperX<RoleMenuDO> {
 
     @Select("SELECT COUNT(*) FROM system_role_menu WHERE update_time > #{maxUpdateTime}")
     Long selectCountByUpdateTimeGt(LocalDateTime maxUpdateTime);
+
+    @Repository
+    class BatchInsertMapper extends ServiceImpl<RoleMenuMapper, RoleMenuDO> {
+    }
 
 }

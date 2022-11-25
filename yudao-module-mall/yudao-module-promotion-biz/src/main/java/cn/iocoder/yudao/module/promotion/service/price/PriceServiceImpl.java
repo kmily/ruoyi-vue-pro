@@ -37,11 +37,11 @@ import static java.util.Collections.singletonList;
 
 /**
  * 价格计算 Service 实现类
- *
+ * <p>
  * 优惠计算顺序：min(限时折扣, 会员折扣) > 满减送 > 优惠券。
  * 参考文档：
  * 1. <a href="https://help.youzan.com/displaylist/detail_4_4-1-60384">有赞文档：限时折扣、满减送、优惠券哪个优先计算？</a>
- *
+ * <p>
  * TODO 芋艿：进一步完善
  * 1. 限时折扣：指定金额、减免金额、折扣
  * 2. 满减送：循环、折扣
@@ -157,10 +157,10 @@ public class PriceServiceImpl implements PriceService {
      * 计算商品级别的价格，例如说：
      * 1. 会员折扣
      * 2. 限时折扣 {@link cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountActivityDO}
-     *
+     * <p>
      * 其中，会员折扣、限时折扣取最低价
      *
-     * @param userId 用户编号
+     * @param userId         用户编号
      * @param priceCalculate 价格计算的结果
      */
     private void calculatePriceForSkuLevel(Long userId, PriceCalculateRespDTO priceCalculate) {
@@ -244,7 +244,7 @@ public class PriceServiceImpl implements PriceService {
      * 计算订单级别的价格，例如说：
      * 1. 满减送 {@link cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO}
      *
-     * @param userId 用户编号
+     * @param userId         用户编号
      * @param priceCalculate 价格计算的结果
      */
     @SuppressWarnings("unused")
@@ -291,7 +291,7 @@ public class PriceServiceImpl implements PriceService {
      * 获得最大匹配的满减送活动的规格
      *
      * @param rewardActivity 满减送活动
-     * @param orderItems 商品项
+     * @param orderItems     商品项
      * @return 匹配的活动规格
      */
     private RewardActivityDO.Rule getLastMatchRewardActivityRule(RewardActivityDO rewardActivity,
@@ -387,14 +387,14 @@ public class PriceServiceImpl implements PriceService {
      * 添加单个 OrderItem 的营销明细
      *
      * @param priceCalculate 价格计算结果
-     * @param orderItem 单个订单商品 SKU
-     * @param id 营销编号
-     * @param name 营销名字
-     * @param type 营销类型
-     * @param level 营销级别
-     * @param newPayPrice 新的单实付金额（总）
-     * @param meet 是否满足优惠条件
-     * @param meetTip 满足条件的提示
+     * @param orderItem      单个订单商品 SKU
+     * @param id             营销编号
+     * @param name           营销名字
+     * @param type           营销类型
+     * @param level          营销级别
+     * @param newPayPrice    新的单实付金额（总）
+     * @param meet           是否满足优惠条件
+     * @param meetTip        满足条件的提示
      */
     private void addPromotion(PriceCalculateRespDTO priceCalculate, PriceCalculateRespDTO.OrderItem orderItem,
                               Long id, String name, Integer type, Integer level,
@@ -415,14 +415,14 @@ public class PriceServiceImpl implements PriceService {
      * 添加多个 OrderItem 的营销明细
      *
      * @param priceCalculate 价格计算结果
-     * @param orderItems 多个订单商品 SKU
-     * @param id 营销编号
-     * @param name 营销名字
-     * @param type 营销类型
-     * @param level 营销级别
+     * @param orderItems     多个订单商品 SKU
+     * @param id             营销编号
+     * @param name           营销名字
+     * @param type           营销类型
+     * @param level          营销级别
      * @param discountPrices 多个订单商品 SKU 的优惠价格（总），和 orderItems 一一对应
-     * @param meet 是否满足优惠条件
-     * @param meetTip 满足条件的提示
+     * @param meet           是否满足优惠条件
+     * @param meetTip        满足条件的提示
      */
     private void addPromotion(PriceCalculateRespDTO priceCalculate, List<PriceCalculateRespDTO.OrderItem> orderItems,
                               Long id, String name, Integer type, Integer level,
@@ -461,8 +461,8 @@ public class PriceServiceImpl implements PriceService {
     /**
      * 修改 OrderItem 的 payPrice 价格，同时会修改 Order 的 payPrice 价格
      *
-     * @param orderItem 订单商品 SKU
-     * @param newPayPrice 新的 payPrice 价格
+     * @param orderItem      订单商品 SKU
+     * @param newPayPrice    新的 payPrice 价格
      * @param priceCalculate 价格计算结果
      */
     private void modifyOrderItemPayPrice(PriceCalculateRespDTO.OrderItem orderItem, Integer newPayPrice,
@@ -481,12 +481,12 @@ public class PriceServiceImpl implements PriceService {
 
     /**
      * 修改 OrderItem 的 orderPartPrice 价格，同时会修改 Order 的 discountPrice 价格
-     *
+     * <p>
      * 本质：分摊 Order 的 discountPrice 价格，到对应的 OrderItem 的 orderPartPrice 价格中
      *
-     * @param orderItem 订单商品 SKU
+     * @param orderItem         订单商品 SKU
      * @param addOrderPartPrice 新增的 discountPrice 价格
-     * @param priceCalculate 价格计算结果
+     * @param priceCalculate    价格计算结果
      */
     private void modifyOrderItemOrderPartPriceFromDiscountPrice(PriceCalculateRespDTO.OrderItem orderItem, Integer addOrderPartPrice,
                                                                 PriceCalculateRespDTO priceCalculate) {
@@ -501,12 +501,12 @@ public class PriceServiceImpl implements PriceService {
 
     /**
      * 修改 OrderItem 的 orderPartPrice 价格，同时会修改 Order 的 couponPrice 价格
-     *
+     * <p>
      * 本质：分摊 Order 的 couponPrice 价格，到对应的 OrderItem 的 orderPartPrice 价格中
      *
-     * @param orderItem 订单商品 SKU
+     * @param orderItem         订单商品 SKU
      * @param addOrderPartPrice 新增的 couponPrice 价格
-     * @param priceCalculate 价格计算结果
+     * @param priceCalculate    价格计算结果
      */
     private void modifyOrderItemOrderPartPriceFromCouponPrice(PriceCalculateRespDTO.OrderItem orderItem, Integer addOrderPartPrice,
                                                               PriceCalculateRespDTO priceCalculate) {

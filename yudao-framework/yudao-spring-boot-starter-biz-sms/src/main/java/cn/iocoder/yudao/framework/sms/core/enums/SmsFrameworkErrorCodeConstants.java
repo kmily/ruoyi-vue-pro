@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 
 /**
  * 短信框架的错误码枚举
- *
+ * <p>
  * 短信框架，使用 2-001-000-000 段
  *
  * @author 芋道源码

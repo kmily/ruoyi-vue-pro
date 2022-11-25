@@ -36,7 +36,7 @@ public interface MemberUserService {
      * 基于手机号创建用户。
      * 如果用户已经存在，则直接进行返回
      *
-     * @param mobile 手机号
+     * @param mobile     手机号
      * @param registerIp 注册 IP
      * @return 用户对象
      */
@@ -45,7 +45,7 @@ public interface MemberUserService {
     /**
      * 更新用户的最后登陆信息
      *
-     * @param id 用户编号
+     * @param id      用户编号
      * @param loginIp 登陆 IP
      */
     void updateUserLogin(Long id, String loginIp);
@@ -68,14 +68,16 @@ public interface MemberUserService {
 
     /**
      * 修改用户昵称
-     * @param userId 用户id
+     *
+     * @param userId   用户id
      * @param nickname 用户新昵称
      */
     void updateUserNickname(Long userId, String nickname);
 
     /**
      * 修改用户头像
-     * @param userId 用户id
+     *
+     * @param userId      用户id
      * @param inputStream 头像文件
      * @return 头像url
      */
@@ -83,15 +85,16 @@ public interface MemberUserService {
 
     /**
      * 修改手机
+     *
      * @param userId 用户id
-     * @param reqVO 请求实体
+     * @param reqVO  请求实体
      */
     void updateUserMobile(Long userId, AppUserUpdateMobileReqVO reqVO);
 
     /**
      * 判断密码是否匹配
      *
-     * @param rawPassword 未加密的密码
+     * @param rawPassword     未加密的密码
      * @param encodedPassword 加密后的密码
      * @return 是否匹配
      */

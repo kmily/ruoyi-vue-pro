@@ -43,19 +43,19 @@ public class OperateLogDO extends BaseDO {
     private Long id;
     /**
      * 链路追踪编号
-     *
+     * <p>
      * 一般来说，通过链路追踪编号，可以将访问日志，错误日志，链路追踪日志，logger 打印日志等，结合在一起，从而进行排错。
      */
     private String traceId;
     /**
      * 用户编号
-     *
+     * <p>
      * 关联 MemberUserDO 的 id 属性，或者 AdminUserDO 的 id 属性
      */
     private Long userId;
     /**
      * 用户类型
-     *
+     * <p>
      * 关联 {@link  UserTypeEnum}
      */
     private Integer userType;
@@ -69,7 +69,7 @@ public class OperateLogDO extends BaseDO {
     private String name;
     /**
      * 操作分类
-     *
+     * <p>
      * 枚举 {@link OperateTypeEnum}
      */
     private Integer type;
@@ -108,10 +108,10 @@ public class OperateLogDO extends BaseDO {
     private String javaMethod;
     /**
      * Java 方法的参数
-     *
+     * <p>
      * 实际格式为 Map<String, Object>
-     *     不使用 @TableField(typeHandler = FastjsonTypeHandler.class) 注解的原因是，数据库存储有长度限制，会进行裁剪，会导致 JSON 反序列化失败
-     *     其中，key 为参数名，value 为参数值
+     * 不使用 @TableField(typeHandler = FastjsonTypeHandler.class) 注解的原因是，数据库存储有长度限制，会进行裁剪，会导致 JSON 反序列化失败
+     * 其中，key 为参数名，value 为参数值
      */
     private String javaMethodArgs;
     /**
@@ -124,19 +124,19 @@ public class OperateLogDO extends BaseDO {
     private Integer duration;
     /**
      * 结果码
-     *
+     * <p>
      * 目前使用的 {@link CommonResult#getCode()} 属性
      */
     private Integer resultCode;
     /**
      * 结果提示
-     *
+     * <p>
      * 目前使用的 {@link CommonResult#getMsg()} 属性
      */
     private String resultMsg;
     /**
      * 结果数据
-     *
+     * <p>
      * 如果是对象，则使用 JSON 格式化
      */
     private String resultData;

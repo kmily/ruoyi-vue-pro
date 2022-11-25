@@ -34,7 +34,7 @@ public class TradeCartItemDO extends BaseDO {
 
     /**
      * 用户编号
-     *
+     * <p>
      * 关联 MemberUserDO 的 id 编号
      */
     private Long userId;
@@ -45,13 +45,13 @@ public class TradeCartItemDO extends BaseDO {
 
     /**
      * 商品 SPU 编号
-     *
+     * <p>
      * 关联 ProductSpuDO 的 id 编号
      */
     private Long spuId;
     /**
      * 商品 SKU 编号
-     *
+     * <p>
      * 关联 ProductSkuDO 的 id 编号
      */
     private Long skuId;

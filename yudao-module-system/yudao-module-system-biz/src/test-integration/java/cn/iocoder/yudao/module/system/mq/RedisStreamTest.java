@@ -15,7 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
-public class RedisStreamTest  {
+public class RedisStreamTest {
 
     @Import({SmsSendConsumer.class, MailSendConsumer.class})
     @Disabled

@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.pay.dal.mysql.notify;
 
+import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.pay.dal.dataobject.notify.PayNotifyTaskDO;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyStatusEnum;
-import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -14,7 +14,7 @@ public interface PayNotifyTaskCoreMapper extends BaseMapperX<PayNotifyTaskDO> {
 
     /**
      * 获得需要通知的 PayNotifyTaskDO 记录。需要满足如下条件：
-     *
+     * <p>
      * 1. status 非成功
      * 2. nextNotifyTime 小于当前时间
      *

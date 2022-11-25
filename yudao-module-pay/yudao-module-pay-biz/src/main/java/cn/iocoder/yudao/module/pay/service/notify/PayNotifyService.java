@@ -20,8 +20,9 @@ public interface PayNotifyService {
 
     /**
      * 执行支付通知
-     *
+     * <p>
      * 注意，该方法提供给定时任务调用。目前是 yudao-server 进行调用
+     *
      * @return 通知数量
      */
     int executeNotify() throws InterruptedException;

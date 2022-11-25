@@ -12,9 +12,9 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
-* OAuth2 客户端 Base VO，提供给添加、修改、详细的子 VO 使用
-* 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
-*/
+ * OAuth2 客户端 Base VO，提供给添加、修改、详细的子 VO 使用
+ * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
+ */
 @Data
 public class OAuth2ClientBaseVO {
 
@@ -53,7 +53,7 @@ public class OAuth2ClientBaseVO {
     @ApiModelProperty(value = "可重定向的 URI 地址", required = true, example = "https://www.iocoder.cn")
     @NotNull(message = "可重定向的 URI 地址不能为空")
     private List<@NotEmpty(message = "重定向的 URI 不能为空")
-        @URL(message = "重定向的 URI 格式不正确") String> redirectUris;
+    @URL(message = "重定向的 URI 格式不正确") String> redirectUris;
 
     @ApiModelProperty(value = "授权类型", required = true, example = "password", notes = "参见 OAuth2GrantTypeEnum 枚举")
     @NotNull(message = "授权类型不能为空")

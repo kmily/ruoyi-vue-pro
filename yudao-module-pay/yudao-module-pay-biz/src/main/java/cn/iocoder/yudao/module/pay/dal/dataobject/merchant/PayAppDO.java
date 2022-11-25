@@ -11,7 +11,7 @@ import lombok.*;
  * 支付应用 DO
  * 一个商户下，可能会有多个支付应用。例如说，京东有京东商城、京东到家等等
  * 不过一般来说，一个商户，只有一个应用哈~
- *
+ * <p>
  * 即 PayMerchantDO : PayAppDO = 1 : n
  *
  * @author 芋道源码
@@ -37,7 +37,7 @@ public class PayAppDO extends BaseDO {
     private String name;
     /**
      * 状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
@@ -56,7 +56,7 @@ public class PayAppDO extends BaseDO {
 
     /**
      * 商户编号
-     *
+     * <p>
      * 关联 {@link PayMerchantDO#getId()}
      */
     private Long merchantId;

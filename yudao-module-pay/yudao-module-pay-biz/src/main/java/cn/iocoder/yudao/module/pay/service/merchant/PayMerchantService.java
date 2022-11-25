@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.pay.service.merchant;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.merchant.PayMerchantCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.merchant.PayMerchantExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.merchant.PayMerchantPageReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.merchant.PayMerchantUpdateReqVO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayMerchantDO;
 
 import javax.validation.Valid;
@@ -97,7 +97,7 @@ public interface PayMerchantService {
      * @return 商户 Map
      */
     default Map<Long, PayMerchantDO> getMerchantMap(Collection<Long> merchantIds) {
-        List<PayMerchantDO> list =  this.getMerchantList(merchantIds);
+        List<PayMerchantDO> list = this.getMerchantList(merchantIds);
         return CollectionUtils.convertMap(list, PayMerchantDO::getId);
     }
 

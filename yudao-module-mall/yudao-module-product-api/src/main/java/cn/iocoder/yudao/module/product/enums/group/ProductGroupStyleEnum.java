@@ -17,7 +17,8 @@ public enum ProductGroupStyleEnum implements IntArrayValuable {
 
     ONE(1, "每列一个"),
     TWO(2, "每列两个"),
-    THREE(2, "每列三个"),;
+    THREE(2, "每列三个"),
+    ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ProductGroupStyleEnum::getStyle).toArray();
 

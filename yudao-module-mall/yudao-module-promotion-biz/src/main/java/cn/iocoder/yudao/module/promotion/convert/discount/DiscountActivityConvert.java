@@ -52,6 +52,7 @@ public interface DiscountActivityConvert {
     DiscountActivityDetailRespVO convert(DiscountActivityDO activity, List<DiscountProductDO> products);
 
     // =========== 比较是否相等 ==========
+
     /**
      * 比较两个限时折扣商品是否相等
      *

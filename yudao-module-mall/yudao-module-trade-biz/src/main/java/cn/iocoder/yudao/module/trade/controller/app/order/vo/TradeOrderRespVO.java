@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.trade.controller.app.order.vo;
 
-import lombok.*;
-import io.swagger.annotations.*;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
 
 @ApiModel("订单交易 Response VO")
 @Data
@@ -63,7 +64,7 @@ public class TradeOrderRespVO {
 
     /**
      * 订单项数组
-     *
+     * <p>
      * // TODO 芋艿，后续考虑怎么优化下，目前是内嵌了别的 dto
      */
     private List<TradeOrderItemRespVO> orderItems;

@@ -42,6 +42,12 @@ public class JobServiceTest extends BaseDbUnitTest {
     @MockBean
     private SchedulerManager schedulerManager;
 
+    private static void fillJobMonitorTimeoutEmpty(JobDO job) {
+        if (job.getMonitorTimeout() == null) {
+            job.setMonitorTimeout(0);
+        }
+    }
+
     @Test
     public void testCreateJob_cronExpressionValid() {
         // 准备参数。Cron 表达式为 String 类型，默认随机字符串。
@@ -78,7 +84,7 @@ public class JobServiceTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testUpdateJob_jobNotExists(){
+    public void testUpdateJob_jobNotExists() {
         // 准备参数
         JobUpdateReqVO reqVO = randomPojo(JobUpdateReqVO.class, o -> o.setCronExpression("0 0/1 * * * ? *"));
         // 调用，并断言异常
@@ -86,7 +92,7 @@ public class JobServiceTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testUpdateJob_onlyNormalStatus(){
+    public void testUpdateJob_onlyNormalStatus() {
         // mock 数据
         JobCreateReqVO createReqVO = randomPojo(JobCreateReqVO.class, o -> o.setCronExpression("0 0/1 * * * ? *"));
         JobDO job = JobConvert.INSTANCE.convert(createReqVO);
@@ -283,12 +289,6 @@ public class JobServiceTest extends BaseDbUnitTest {
         // 断言
         assertEquals(1, list.size());
         assertPojoEquals(dbJob, list.get(0));
-    }
-
-    private static void fillJobMonitorTimeoutEmpty(JobDO job) {
-        if (job.getMonitorTimeout() == null) {
-            job.setMonitorTimeout(0);
-        }
     }
 
 }

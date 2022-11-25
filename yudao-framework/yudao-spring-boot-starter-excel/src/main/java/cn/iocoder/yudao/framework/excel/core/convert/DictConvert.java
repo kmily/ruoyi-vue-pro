@@ -19,6 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DictConvert implements Converter<Object> {
 
+    private static String getType(ExcelContentProperty contentProperty) {
+        return contentProperty.getField().getAnnotation(DictFormat.class).value();
+    }
+
     @Override
     public Class<?> supportJavaTypeKey() {
         throw new UnsupportedOperationException("暂不支持，也不需要");
@@ -63,10 +67,6 @@ public class DictConvert implements Converter<Object> {
         }
         // 生成 Excel 小表格
         return new WriteCellData<>(label);
-    }
-
-    private static String getType(ExcelContentProperty contentProperty) {
-        return contentProperty.getField().getAnnotation(DictFormat.class).value();
     }
 
 }

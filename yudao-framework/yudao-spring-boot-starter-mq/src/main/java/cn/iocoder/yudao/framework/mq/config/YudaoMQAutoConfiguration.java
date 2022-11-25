@@ -40,6 +40,33 @@ import java.util.Properties;
 @Slf4j
 public class YudaoMQAutoConfiguration {
 
+    /**
+     * 构建消费者名字，使用本地 IP + 进程编号的方式。
+     * 参考自 RocketMQ clientId 的实现
+     *
+     * @return 消费者名字
+     */
+    private static String buildConsumerName() {
+        return String.format("%s@%d", SystemUtil.getHostInfo().getAddress(), SystemUtil.getCurrentPID());
+    }
+
+    // ========== 消费者相关 ==========
+
+    /**
+     * 校验 Redis 版本号，是否满足最低的版本号要求！
+     */
+    private static void checkRedisVersion(RedisTemplate<String, ?> redisTemplate) {
+        // 获得 Redis 版本
+        Properties info = redisTemplate.execute((RedisCallback<Properties>) RedisServerCommands::info);
+        String version = MapUtil.getStr(info, "redis_version");
+        // 校验最低版本必须大于等于 5.0.0
+        int majorVersion = Integer.parseInt(StrUtil.subBefore(version, '.', false));
+        if (majorVersion < 5) {
+            throw new IllegalStateException(StrUtil.format("您当前的 Redis 版本为 {}，小于最低要求的 5.0.0 版本！" +
+                    "请参考 {} 文档进行安装。", version, DocumentEnum.REDIS_INSTALL.getUrl()));
+        }
+    }
+
     @Bean
     public RedisMQTemplate redisMQTemplate(StringRedisTemplate redisTemplate,
                                            List<RedisMessageInterceptor> interceptors) {
@@ -48,8 +75,6 @@ public class YudaoMQAutoConfiguration {
         interceptors.forEach(redisMQTemplate::addInterceptor);
         return redisMQTemplate;
     }
-
-    // ========== 消费者相关 ==========
 
     /**
      * 创建 Redis Pub/Sub 广播消费的容器
@@ -74,7 +99,7 @@ public class YudaoMQAutoConfiguration {
 
     /**
      * 创建 Redis Stream 集群消费的容器
-     *
+     * <p>
      * Redis Stream 的 xreadgroup 命令：https://www.geek-book.com/src/docs/redis/redis/redis.io/commands/xreadgroup.html
      */
     @Bean(initMethod = "start", destroyMethod = "stop")
@@ -102,7 +127,8 @@ public class YudaoMQAutoConfiguration {
             // 创建 listener 对应的消费者分组
             try {
                 redisTemplate.opsForStream().createGroup(listener.getStreamKey(), listener.getGroup());
-            } catch (Exception ignore) {}
+            } catch (Exception ignore) {
+            }
             // 设置 listener 对应的 redisTemplate
             listener.setRedisMQTemplate(redisMQTemplate);
             // 创建 Consumer 对象
@@ -119,31 +145,6 @@ public class YudaoMQAutoConfiguration {
                     listener.getStreamKey(), listener.getClass().getName());
         });
         return container;
-    }
-
-    /**
-     * 构建消费者名字，使用本地 IP + 进程编号的方式。
-     * 参考自 RocketMQ clientId 的实现
-     *
-     * @return 消费者名字
-     */
-    private static String buildConsumerName() {
-        return String.format("%s@%d", SystemUtil.getHostInfo().getAddress(), SystemUtil.getCurrentPID());
-    }
-
-    /**
-     * 校验 Redis 版本号，是否满足最低的版本号要求！
-     */
-    private static void checkRedisVersion(RedisTemplate<String, ?> redisTemplate) {
-        // 获得 Redis 版本
-        Properties info = redisTemplate.execute((RedisCallback<Properties>) RedisServerCommands::info);
-        String version = MapUtil.getStr(info, "redis_version");
-        // 校验最低版本必须大于等于 5.0.0
-        int majorVersion = Integer.parseInt(StrUtil.subBefore(version, '.', false));
-        if (majorVersion < 5) {
-            throw new IllegalStateException(StrUtil.format("您当前的 Redis 版本为 {}，小于最低要求的 5.0.0 版本！" +
-                    "请参考 {} 文档进行安装。", version, DocumentEnum.REDIS_INSTALL.getUrl()));
-        }
     }
 
 }

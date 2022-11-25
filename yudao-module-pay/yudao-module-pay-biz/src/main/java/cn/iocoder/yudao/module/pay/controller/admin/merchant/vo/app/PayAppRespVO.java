@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.app;
 
-import lombok.*;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
-import io.swagger.annotations.*;
 
 @ApiModel("管理后台 - 支付应用信息 Response VO")
 @Data

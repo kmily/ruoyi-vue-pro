@@ -77,7 +77,7 @@ public class ApiErrorLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setUserType(userType);
         reqVO.setApplicationName(applicationName);
         reqVO.setRequestUrl(requestUrl);
-        reqVO.setExceptionTime((new LocalDateTime[]{buildTime(2021, 3, 12),buildTime(2021, 3, 14)}));
+        reqVO.setExceptionTime((new LocalDateTime[]{buildTime(2021, 3, 12), buildTime(2021, 3, 14)}));
         reqVO.setProcessStatus(progressStatus);
 
         // 调用service方法
@@ -129,7 +129,7 @@ public class ApiErrorLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setUserType(userType);
         reqVO.setApplicationName(applicationName);
         reqVO.setRequestUrl(requestUrl);
-        reqVO.setExceptionTime((new LocalDateTime[]{buildTime(2021, 3, 12),buildTime(2021, 3, 14)}));
+        reqVO.setExceptionTime((new LocalDateTime[]{buildTime(2021, 3, 12), buildTime(2021, 3, 14)}));
         reqVO.setProcessStatus(progressStatus);
 
         // 调用service方法

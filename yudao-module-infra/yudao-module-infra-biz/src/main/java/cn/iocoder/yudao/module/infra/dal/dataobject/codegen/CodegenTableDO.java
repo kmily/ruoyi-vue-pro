@@ -29,13 +29,13 @@ public class CodegenTableDO extends BaseDO {
 
     /**
      * 数据源编号
-     *
+     * <p>
      * 关联 {@link DataSourceConfigDO#getId()}
      */
     private Long dataSourceConfigId;
     /**
      * 生成场景
-     *
+     * <p>
      * 枚举 {@link CodegenSceneEnum}
      */
     private Integer scene;
@@ -59,19 +59,19 @@ public class CodegenTableDO extends BaseDO {
 
     /**
      * 模块名，即一级目录
-     *
+     * <p>
      * 例如说，system、infra、tool 等等
      */
     private String moduleName;
     /**
      * 业务名，即二级目录
-     *
+     * <p>
      * 例如说，user、permission、dict 等等
      */
     private String businessName;
     /**
      * 类名称（首字母大写）
-     *
+     * <p>
      * 例如说，SysUser、SysMenu、SysDictData 等等
      */
     private String className;
@@ -88,7 +88,7 @@ public class CodegenTableDO extends BaseDO {
 
     /**
      * 模板类型
-     *
+     * <p>
      * 枚举 {@link CodegenTemplateTypeEnum}
      */
     private Integer templateType;
@@ -97,7 +97,7 @@ public class CodegenTableDO extends BaseDO {
 
     /**
      * 父菜单编号
-     *
+     * <p>
      * 关联 MenuDO 的 id 属性
      */
     private Long parentMenuId;

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 /**
  * 限时折扣活动 DO
- *
+ * <p>
  * 一个活动下，可以有 {@link DiscountProductDO} 商品；
  * 一个商品，在指定时间段内，只能属于一个活动；
  *
@@ -35,7 +35,7 @@ public class DiscountActivityDO extends BaseDO {
     private String name;
     /**
      * 状态
-     *
+     * <p>
      * 枚举 {@link PromotionActivityStatusEnum}
      */
     private Integer status;

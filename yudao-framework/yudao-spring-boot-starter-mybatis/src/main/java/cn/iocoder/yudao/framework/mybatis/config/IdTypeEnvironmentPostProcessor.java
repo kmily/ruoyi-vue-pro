@@ -30,6 +30,18 @@ public class IdTypeEnvironmentPostProcessor implements EnvironmentPostProcessor 
     private static final Set<DbType> INPUT_ID_TYPES = SetUtils.asSet(DbType.ORACLE, DbType.ORACLE_12C,
             DbType.POSTGRE_SQL, DbType.KINGBASE_ES, DbType.DB2, DbType.H2);
 
+    public static DbType getDbType(ConfigurableEnvironment environment) {
+        String primary = environment.getProperty(DATASOURCE_DYNAMIC_KEY + "." + "primary");
+        if (StrUtil.isEmpty(primary)) {
+            return null;
+        }
+        String url = environment.getProperty(DATASOURCE_DYNAMIC_KEY + ".datasource." + primary + ".url");
+        if (StrUtil.isEmpty(url)) {
+            return null;
+        }
+        return JdbcUtils.getDbType(url);
+    }
+
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         // 如果获取不到 DbType，则不进行处理
@@ -91,18 +103,6 @@ public class IdTypeEnvironmentPostProcessor implements EnvironmentPostProcessor 
         if (StrUtil.isNotEmpty(driverClass)) {
             environment.getSystemProperties().put(QUARTZ_JOB_STORE_DRIVER_KEY, driverClass);
         }
-    }
-
-    public static DbType getDbType(ConfigurableEnvironment environment) {
-        String primary = environment.getProperty(DATASOURCE_DYNAMIC_KEY + "." + "primary");
-        if (StrUtil.isEmpty(primary)) {
-            return null;
-        }
-        String url = environment.getProperty(DATASOURCE_DYNAMIC_KEY + ".datasource." + primary + ".url");
-        if (StrUtil.isEmpty(url)) {
-            return null;
-        }
-        return JdbcUtils.getDbType(url);
     }
 
 }

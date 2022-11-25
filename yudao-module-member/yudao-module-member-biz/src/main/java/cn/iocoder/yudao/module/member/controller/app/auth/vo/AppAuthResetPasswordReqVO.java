@@ -32,7 +32,7 @@ public class AppAuthResetPasswordReqVO {
     @Pattern(regexp = "^[0-9]+$", message = "手机验证码必须都是数字")
     private String code;
 
-    @ApiModelProperty(value = "手机号",required = true,example = "15878962356")
+    @ApiModelProperty(value = "手机号", required = true, example = "15878962356")
     @NotBlank(message = "手机号不能为空")
     @Mobile
     private String mobile;

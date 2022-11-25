@@ -38,10 +38,64 @@ import static springfox.documentation.builders.RequestHandlerSelectors.basePacka
 @EnableConfigurationProperties(SwaggerProperties.class)
 public class YudaoSwaggerAutoConfiguration {
 
+    /**
+     * API 摘要信息
+     */
+    private static ApiInfo apiInfo(SwaggerProperties properties) {
+        return new ApiInfoBuilder()
+                .title(properties.getTitle())
+                .description(properties.getDescription())
+                .contact(new Contact(properties.getAuthor(), null, null))
+                .version(properties.getVersion())
+                .build();
+    }
+
+    /**
+     * 安全模式，这里配置通过请求头 Authorization 传递 token 参数
+     */
+    private static List<SecurityScheme> securitySchemes() {
+        return Collections.singletonList(new ApiKey(HttpHeaders.AUTHORIZATION, "Authorization", "header"));
+    }
+
+    // ========== apiInfo ==========
+
+    /**
+     * 安全上下文
+     *
+     * @see #securitySchemes()
+     * @see #authorizationScopes()
+     */
+    private static List<SecurityContext> securityContexts() {
+        return Collections.singletonList(SecurityContext.builder()
+                .securityReferences(securityReferences())
+                // 通过 PathSelectors.regex("^(?!auth).*$")，排除包含 "auth" 的接口不需要使用securitySchemes
+                .operationSelector(o -> o.requestMappingPattern().matches("^(?!auth).*$"))
+                .build());
+    }
+
+    // ========== securitySchemes ==========
+
+    private static List<SecurityReference> securityReferences() {
+        return Collections.singletonList(new SecurityReference(HttpHeaders.AUTHORIZATION, authorizationScopes()));
+    }
+
+    private static AuthorizationScope[] authorizationScopes() {
+        return new AuthorizationScope[]{new AuthorizationScope("global", "accessEverything")};
+    }
+
+    private static List<RequestParameter> globalRequestParameters() {
+        RequestParameterBuilder tenantParameter = new RequestParameterBuilder()
+                .name(HEADER_TENANT_ID).description("租户编号")
+                .in(ParameterType.HEADER).example(new ExampleBuilder().value(1L).build());
+        return Collections.singletonList(tenantParameter.build());
+    }
+
     @Bean
     public SpringFoxHandlerProviderBeanPostProcessor springFoxHandlerProviderBeanPostProcessor() {
         return new SpringFoxHandlerProviderBeanPostProcessor();
     }
+
+    // ========== globalRequestParameters ==========
 
     @Bean
     public Docket createRestApi(SwaggerProperties properties) {
@@ -60,60 +114,6 @@ public class YudaoSwaggerAutoConfiguration {
                 .securityContexts(securityContexts())
                 // ④ 全局参数（多租户 header）
                 .globalRequestParameters(globalRequestParameters());
-    }
-
-    // ========== apiInfo ==========
-
-    /**
-     * API 摘要信息
-     */
-    private static ApiInfo apiInfo(SwaggerProperties properties) {
-        return new ApiInfoBuilder()
-                .title(properties.getTitle())
-                .description(properties.getDescription())
-                .contact(new Contact(properties.getAuthor(), null, null))
-                .version(properties.getVersion())
-                .build();
-    }
-
-    // ========== securitySchemes ==========
-
-    /**
-     * 安全模式，这里配置通过请求头 Authorization 传递 token 参数
-     */
-    private static List<SecurityScheme> securitySchemes() {
-        return Collections.singletonList(new ApiKey(HttpHeaders.AUTHORIZATION, "Authorization", "header"));
-    }
-
-    /**
-     * 安全上下文
-     *
-     * @see #securitySchemes()
-     * @see #authorizationScopes()
-     */
-    private static List<SecurityContext> securityContexts() {
-        return Collections.singletonList(SecurityContext.builder()
-                .securityReferences(securityReferences())
-                // 通过 PathSelectors.regex("^(?!auth).*$")，排除包含 "auth" 的接口不需要使用securitySchemes
-                .operationSelector(o -> o.requestMappingPattern().matches("^(?!auth).*$"))
-                .build());
-    }
-
-    private static List<SecurityReference> securityReferences() {
-        return Collections.singletonList(new SecurityReference(HttpHeaders.AUTHORIZATION, authorizationScopes()));
-    }
-
-    private static AuthorizationScope[] authorizationScopes() {
-        return new AuthorizationScope[]{new AuthorizationScope("global", "accessEverything")};
-    }
-
-    // ========== globalRequestParameters ==========
-
-    private static List<RequestParameter> globalRequestParameters() {
-        RequestParameterBuilder tenantParameter = new RequestParameterBuilder()
-                .name(HEADER_TENANT_ID).description("租户编号")
-                .in(ParameterType.HEADER).example(new ExampleBuilder().value(1L).build());
-        return Collections.singletonList(tenantParameter.build());
     }
 
 }

@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.pay.controller.admin.merchant;
 
-import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.merchant.*;
-import cn.iocoder.yudao.module.pay.convert.merchant.PayMerchantConvert;
-import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayMerchantDO;
-import cn.iocoder.yudao.module.pay.service.merchant.PayMerchantService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.merchant.*;
+import cn.iocoder.yudao.module.pay.convert.merchant.PayMerchantConvert;
+import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayMerchantDO;
+import cn.iocoder.yudao.module.pay.service.merchant.PayMerchantService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -106,7 +106,7 @@ public class PayMerchantController {
     @PreAuthorize("@ss.hasPermission('pay:merchant:export')")
     @OperateLog(type = EXPORT)
     public void exportMerchantExcel(@Valid PayMerchantExportReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
+                                    HttpServletResponse response) throws IOException {
         List<PayMerchantDO> list = merchantService.getMerchantList(exportReqVO);
         // 导出 Excel
         List<PayMerchantExcelVO> datas = PayMerchantConvert.INSTANCE.convertList02(list);

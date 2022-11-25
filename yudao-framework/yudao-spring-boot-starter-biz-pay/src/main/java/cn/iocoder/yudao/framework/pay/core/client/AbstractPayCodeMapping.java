@@ -7,10 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 将 API 的错误码，转换为通用的错误码
  *
+ * @author 芋道源码
  * @see PayCommonResult
  * @see PayFrameworkErrorCodeConstants
- *
- * @author 芋道源码
  */
 @Slf4j
 public abstract class AbstractPayCodeMapping {

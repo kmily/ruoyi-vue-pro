@@ -30,7 +30,7 @@ public class ProductPropertyValueDO extends BaseDO {
     private Long id;
     /**
      * 规格键编号
-     *
+     * <p>
      * 关联 {@link ProductPropertyDO#getId()}
      */
     private Long propertyId;
@@ -40,13 +40,12 @@ public class ProductPropertyValueDO extends BaseDO {
     private String name;
     /**
      * 状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
     /**
      * 备注
-     *
      */
     private String remark;
 

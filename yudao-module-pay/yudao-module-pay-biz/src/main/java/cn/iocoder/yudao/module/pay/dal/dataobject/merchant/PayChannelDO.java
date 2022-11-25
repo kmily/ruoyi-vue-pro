@@ -13,7 +13,7 @@ import lombok.*;
 /**
  * 支付渠道 DO
  * 一个应用下，会有多种支付渠道，例如说微信支付、支付宝支付等等
- *
+ * <p>
  * 即 PayAppDO : PayChannelDO = 1 : n
  *
  * @author 芋道源码
@@ -34,13 +34,13 @@ public class PayChannelDO extends BaseDO {
     private Long id;
     /**
      * 渠道编码
-     *
+     * <p>
      * 枚举 {@link PayChannelEnum}
      */
     private String code;
     /**
      * 状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
@@ -55,13 +55,13 @@ public class PayChannelDO extends BaseDO {
 
     /**
      * 商户编号
-     *
+     * <p>
      * 关联 {@link PayMerchantDO#getId()}
      */
     private Long merchantId;
     /**
      * 应用编号
-     *
+     * <p>
      * 关联 {@link PayAppDO#getId()}
      */
     private Long appId;

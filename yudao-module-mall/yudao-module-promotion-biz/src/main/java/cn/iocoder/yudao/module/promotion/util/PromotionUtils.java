@@ -16,7 +16,7 @@ public class PromotionUtils {
      * 根据时间，计算活动状态
      *
      * @param startTime 开始时间
-     * @param endTime 结束时间
+     * @param endTime   结束时间
      * @return 活动状态
      */
     public static Integer calculateActivityStatus(LocalDateTime startTime, LocalDateTime endTime) {

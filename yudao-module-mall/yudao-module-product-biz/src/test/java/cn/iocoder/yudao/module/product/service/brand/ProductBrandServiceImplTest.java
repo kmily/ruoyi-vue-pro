@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
@@ -25,10 +24,10 @@ import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.BRAND_NOT
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
-* {@link ProductBrandServiceImpl} 的单元测试类
-*
-* @author 芋道源码
-*/
+ * {@link ProductBrandServiceImpl} 的单元测试类
+ *
+ * @author 芋道源码
+ */
 @Import(ProductBrandServiceImpl.class)
 public class ProductBrandServiceImplTest extends BaseDbUnitTest {
 
@@ -88,8 +87,8 @@ public class ProductBrandServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         brandService.deleteBrand(id);
-       // 校验数据不存在了
-       assertNull(brandMapper.selectById(id));
+        // 校验数据不存在了
+        assertNull(brandMapper.selectById(id));
     }
 
     @Test
@@ -103,31 +102,31 @@ public class ProductBrandServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testGetBrandPage() {
-       // mock 数据
-       ProductBrandDO dbBrand = randomPojo(ProductBrandDO.class, o -> { // 等会查询到
-           o.setName("芋道源码");
-           o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-           o.setCreateTime(buildTime(2022, 2, 1));
-       });
-       brandMapper.insert(dbBrand);
-       // 测试 name 不匹配
-       brandMapper.insert(cloneIgnoreId(dbBrand, o -> o.setName("源码")));
-       // 测试 status 不匹配
-       brandMapper.insert(cloneIgnoreId(dbBrand, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
-       // 测试 createTime 不匹配
-       brandMapper.insert(cloneIgnoreId(dbBrand, o -> o.setCreateTime(buildTime(2022, 3, 1))));
-       // 准备参数
-       ProductBrandPageReqVO reqVO = new ProductBrandPageReqVO();
-       reqVO.setName("芋道");
-       reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-       reqVO.setCreateTime((new LocalDateTime[]{buildTime(2022, 1, 1), buildTime(2022, 2, 25)}));
+        // mock 数据
+        ProductBrandDO dbBrand = randomPojo(ProductBrandDO.class, o -> { // 等会查询到
+            o.setName("芋道源码");
+            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
+            o.setCreateTime(buildTime(2022, 2, 1));
+        });
+        brandMapper.insert(dbBrand);
+        // 测试 name 不匹配
+        brandMapper.insert(cloneIgnoreId(dbBrand, o -> o.setName("源码")));
+        // 测试 status 不匹配
+        brandMapper.insert(cloneIgnoreId(dbBrand, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        // 测试 createTime 不匹配
+        brandMapper.insert(cloneIgnoreId(dbBrand, o -> o.setCreateTime(buildTime(2022, 3, 1))));
+        // 准备参数
+        ProductBrandPageReqVO reqVO = new ProductBrandPageReqVO();
+        reqVO.setName("芋道");
+        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2022, 1, 1), buildTime(2022, 2, 25)}));
 
-       // 调用
-       PageResult<ProductBrandDO> pageResult = brandService.getBrandPage(reqVO);
-       // 断言
-       assertEquals(1, pageResult.getTotal());
-       assertEquals(1, pageResult.getList().size());
-       assertPojoEquals(dbBrand, pageResult.getList().get(0));
+        // 调用
+        PageResult<ProductBrandDO> pageResult = brandService.getBrandPage(reqVO);
+        // 断言
+        assertEquals(1, pageResult.getTotal());
+        assertEquals(1, pageResult.getList().size());
+        assertPojoEquals(dbBrand, pageResult.getList().get(0));
     }
 
 }

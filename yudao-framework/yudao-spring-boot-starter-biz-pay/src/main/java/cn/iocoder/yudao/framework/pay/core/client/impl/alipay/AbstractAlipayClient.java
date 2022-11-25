@@ -26,7 +26,7 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
 /**
  * 支付宝抽象类， 实现支付宝统一的接口。如退款
  *
- * @author  jason
+ * @author jason
  */
 @Slf4j
 public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayClientConfig> {
@@ -36,6 +36,27 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
     public AbstractAlipayClient(Long channelId, String channelCode,
                                 AlipayPayClientConfig config, AbstractPayCodeMapping codeMapping) {
         super(channelId, channelCode, config, codeMapping);
+    }
+
+    /**
+     * 支付宝统一回调参数  str 转 map
+     *
+     * @param s 支付宝支付通知回调参数
+     * @return map 支付宝集合
+     */
+    public static Map<String, String> strToMap(String s) {
+        // TODO @zxy：这个可以使用 hutool 的 HttpUtil decodeParams 方法么？
+        Map<String, String> stringStringMap = new HashMap<>();
+        // 调整时间格式
+        String s3 = s.replaceAll("%3A", ":");
+        // 获取 map
+        String s4 = s3.replace("+", " ");
+        String[] split = s4.split("&");
+        for (String s1 : split) {
+            String[] split1 = s1.split("=");
+            stringStringMap.put(split1[0], split1[1]);
+        }
+        return stringStringMap;
     }
 
     @Override
@@ -48,16 +69,17 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
 
     /**
      * 从支付宝通知返回参数中解析 PayOrderNotifyRespDTO, 通知具体参数参考
-     *  //https://opendocs.alipay.com/open/203/105286
+     * //https://opendocs.alipay.com/open/203/105286
+     *
      * @param data 通知结果
      * @return 解析结果 PayOrderNotifyRespDTO
-     * @throws Exception  解析失败，抛出异常
+     * @throws Exception 解析失败，抛出异常
      */
     @Override
-    public  PayOrderNotifyRespDTO parseOrderNotify(PayNotifyDataDTO data) throws Exception {
+    public PayOrderNotifyRespDTO parseOrderNotify(PayNotifyDataDTO data) throws Exception {
         Map<String, String> params = strToMap(data.getBody());
 
-        return  PayOrderNotifyRespDTO.builder().orderExtensionNo(params.get("out_trade_no"))
+        return PayOrderNotifyRespDTO.builder().orderExtensionNo(params.get("out_trade_no"))
                 .channelOrderNo(params.get("trade_no")).channelUserId(params.get("seller_id"))
                 .tradeStatus(params.get("trade_status"))
                 .successTime(LocalDateTimeUtil.parse(params.get("notify_time"), "yyyy-MM-dd HH:mm:ss"))
@@ -89,7 +111,7 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
     public boolean verifyNotifyData(PayNotifyDataDTO notifyData) {
         boolean verifyResult = false;
         try {
-            verifyResult =  AlipaySignature.rsaCheckV1(notifyData.getParams(), config.getAlipayPublicKey(), StandardCharsets.UTF_8.name(), "RSA2");
+            verifyResult = AlipaySignature.rsaCheckV1(notifyData.getParams(), config.getAlipayPublicKey(), StandardCharsets.UTF_8.name(), "RSA2");
         } catch (AlipayApiException e) {
             log.error("[AlipayClient verifyNotifyData][(notify param is :{}) 验证失败]", toJsonString(notifyData.getParams()), e);
         }
@@ -98,12 +120,13 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
 
     /**
      * 支付宝统一的退款接口 alipay.trade.refund
+     *
      * @param reqDTO 退款请求 request DTO
      * @return 退款请求 Response
      */
     @Override
-    protected PayCommonResult<PayRefundUnifiedRespDTO> doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO)  {
-        AlipayTradeRefundModel model=new AlipayTradeRefundModel();
+    protected PayCommonResult<PayRefundUnifiedRespDTO> doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) {
+        AlipayTradeRefundModel model = new AlipayTradeRefundModel();
         model.setTradeNo(reqDTO.getChannelOrderNo());
         model.setOutTradeNo(reqDTO.getPayTradeNo());
         model.setOutRequestNo(reqDTO.getMerchantRefundId());
@@ -112,7 +135,7 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
         AlipayTradeRefundRequest refundRequest = new AlipayTradeRefundRequest();
         refundRequest.setBizModel(model);
         try {
-            AlipayTradeRefundResponse response =  client.execute(refundRequest);
+            AlipayTradeRefundResponse response = client.execute(refundRequest);
             log.info("[doUnifiedRefund][response({}) 发起退款 渠道返回", toJsonString(response));
             if (response.isSuccess()) {
                 //退款导致触发的异步通知是发送到支付接口中设置的notify_url
@@ -128,29 +151,6 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
             log.error("[doUnifiedRefund][request({}) 发起退款失败,网络读超时，退款状态未知]", toJsonString(reqDTO), e);
             return PayCommonResult.build(e.getErrCode(), e.getErrMsg(), null, codeMapping);
         }
-    }
-
-
-
-    /**
-     * 支付宝统一回调参数  str 转 map
-     *
-     * @param s 支付宝支付通知回调参数
-     * @return map 支付宝集合
-     */
-    public static Map<String, String> strToMap(String s) {
-        // TODO @zxy：这个可以使用 hutool 的 HttpUtil decodeParams 方法么？
-        Map<String, String> stringStringMap = new HashMap<>();
-        // 调整时间格式
-        String s3 = s.replaceAll("%3A", ":");
-        // 获取 map
-        String s4 = s3.replace("+", " ");
-        String[] split = s4.split("&");
-        for (String s1 : split) {
-            String[] split1 = s1.split("=");
-            stringStringMap.put(split1[0], split1[1]);
-        }
-        return stringStringMap;
     }
 
 }

@@ -155,7 +155,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         // TODO @luowenfeng: 可以下 existsSkuMap2; 会简洁一点; 另外, 可以考虑抽一个小方法, 用于 Properties 生成一个串; 这样 177 也可以复用了
         Map<String, Long> existsSkuMap = existsSkus.stream()
                 .map(v -> {
-                    String collect = v.getProperties() == null? "null": v.getProperties()
+                    String collect = v.getProperties() == null ? "null" : v.getProperties()
                             .stream()
                             .map(m -> String.valueOf(m.getValueId()))
                             .collect(Collectors.joining());
@@ -170,7 +170,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 
         List<ProductSkuDO> allUpdateSkus = ProductSkuConvert.INSTANCE.convertSkuDOList(skus);
         allUpdateSkus.forEach(p -> {
-            String propertiesKey = p.getProperties() == null? "null": p.getProperties().stream().map(m -> String.valueOf(m.getValueId())).collect(Collectors.joining());
+            String propertiesKey = p.getProperties() == null ? "null" : p.getProperties().stream().map(m -> String.valueOf(m.getValueId())).collect(Collectors.joining());
             // 1、找得到的，进行更新
             if (existsSkuMap.containsKey(propertiesKey)) {
                 updateSkus.add(p);
@@ -182,7 +182,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
             insertSkus.add(p);
         });
         // 3、多余的，删除
-        if(!existsSkuMap.isEmpty()){
+        if (!existsSkuMap.isEmpty()) {
             deleteSkus = new ArrayList<>(existsSkuMap.values());
         }
 

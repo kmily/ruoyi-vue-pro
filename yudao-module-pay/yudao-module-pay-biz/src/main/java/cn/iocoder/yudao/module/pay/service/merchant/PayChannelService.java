@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.pay.service.merchant;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.PayChannelCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.PayChannelExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.PayChannelPageReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.PayChannelUpdateReqVO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayChannelDO;
 
 import javax.validation.Valid;
@@ -111,7 +111,7 @@ public interface PayChannelService {
 
     /**
      * 支付渠道的合法性
-     *
+     * <p>
      * 如果不合法，抛出 {@link ServiceException} 业务异常
      *
      * @param id 渠道编号
@@ -121,11 +121,11 @@ public interface PayChannelService {
 
     /**
      * 支付渠道的合法性
-     *
+     * <p>
      * 如果不合法，抛出 {@link ServiceException} 业务异常
      *
      * @param appId 应用编号
-     * @param code 支付渠道
+     * @param code  支付渠道
      * @return 渠道信息
      */
     PayChannelDO validPayChannel(Long appId, String code);

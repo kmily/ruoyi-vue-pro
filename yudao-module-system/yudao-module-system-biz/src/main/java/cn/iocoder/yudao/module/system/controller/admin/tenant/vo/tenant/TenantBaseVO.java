@@ -1,16 +1,16 @@
 package cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant;
 
-import lombok.*;
-import io.swagger.annotations.*;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**
-* 租户 Base VO，提供给添加、修改、详细的子 VO 使用
-* 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
-*/
+ * 租户 Base VO，提供给添加、修改、详细的子 VO 使用
+ * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
+ */
 @Data
 public class TenantBaseVO {
 

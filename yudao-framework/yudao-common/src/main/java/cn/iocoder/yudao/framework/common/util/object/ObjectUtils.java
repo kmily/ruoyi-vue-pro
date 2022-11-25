@@ -1,12 +1,10 @@
 package cn.iocoder.yudao.framework.common.util.object;
 
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -19,7 +17,7 @@ public class ObjectUtils {
     /**
      * 复制对象，并忽略 Id 编号
      *
-     * @param object 被复制对象
+     * @param object   被复制对象
      * @param consumer 消费者，可以二次编辑被复制对象
      * @return 复制后的对象
      */

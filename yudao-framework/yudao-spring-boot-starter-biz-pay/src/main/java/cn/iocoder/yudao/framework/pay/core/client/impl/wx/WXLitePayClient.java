@@ -47,10 +47,18 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
         super(channelId, PayChannelEnum.WX_LITE.getCode(), config, new WXCodeMapping());
     }
 
+    private static String getOpenid(PayOrderUnifiedReqDTO reqDTO) {
+        String openid = MapUtil.getStr(reqDTO.getChannelExtras(), "openid");
+        if (StrUtil.isEmpty(openid)) {
+            throw new IllegalArgumentException("支付请求的 openid 不能为空！");
+        }
+        return openid;
+    }
+
     @Override
     protected void doInit() {
         WxPayConfig payConfig = new WxPayConfig();
-        BeanUtil.copyProperties(config, payConfig, "privateKeyContent","privateCertContent");
+        BeanUtil.copyProperties(config, payConfig, "privateKeyContent", "privateCertContent");
         payConfig.setTradeType(WxPayConstants.TradeType.JSAPI); // 设置使用 JS API 支付方式
 //        if (StrUtil.isNotEmpty(config.getKeyContent())) {
 //            payConfig.setKeyContent(config.getKeyContent().getBytes(StandardCharsets.UTF_8));
@@ -127,16 +135,7 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
         return client.createOrderV3(TradeTypeEnum.JSAPI, request);
     }
 
-    private static String getOpenid(PayOrderUnifiedReqDTO reqDTO) {
-        String openid = MapUtil.getStr(reqDTO.getChannelExtras(), "openid");
-        if (StrUtil.isEmpty(openid)) {
-            throw new IllegalArgumentException("支付请求的 openid 不能为空！");
-        }
-        return openid;
-    }
-
     /**
-     *
      * 微信支付回调 分 v2 和v3 的处理方式
      *
      * @param data 通知结果

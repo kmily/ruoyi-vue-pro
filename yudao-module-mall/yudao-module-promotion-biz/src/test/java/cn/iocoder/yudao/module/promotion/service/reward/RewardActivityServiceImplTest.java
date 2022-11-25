@@ -32,10 +32,10 @@ import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
-* {@link RewardActivityServiceImpl} 的单元测试类
-*
-* @author 芋道源码
-*/
+ * {@link RewardActivityServiceImpl} 的单元测试类
+ *
+ * @author 芋道源码
+ */
 @Import(RewardActivityServiceImpl.class)
 public class RewardActivityServiceImplTest extends BaseDbUnitTest {
 
@@ -127,8 +127,8 @@ public class RewardActivityServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         rewardActivityService.deleteRewardActivity(id);
-       // 校验数据不存在了
-       assertNull(rewardActivityMapper.selectById(id));
+        // 校验数据不存在了
+        assertNull(rewardActivityMapper.selectById(id));
     }
 
     @Test
@@ -142,27 +142,27 @@ public class RewardActivityServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testGetRewardActivityPage() {
-       // mock 数据
-       RewardActivityDO dbRewardActivity = randomPojo(RewardActivityDO.class, o -> { // 等会查询到
-           o.setName("芋艿");
-           o.setStatus(PromotionActivityStatusEnum.CLOSE.getStatus());
-       });
-       rewardActivityMapper.insert(dbRewardActivity);
-       // 测试 name 不匹配
-       rewardActivityMapper.insert(cloneIgnoreId(dbRewardActivity, o -> o.setName("土豆")));
-       // 测试 status 不匹配
-       rewardActivityMapper.insert(cloneIgnoreId(dbRewardActivity, o -> o.setStatus(PromotionActivityStatusEnum.RUN.getStatus())));
-       // 准备参数
-       RewardActivityPageReqVO reqVO = new RewardActivityPageReqVO();
-       reqVO.setName("芋艿");
-       reqVO.setStatus(PromotionActivityStatusEnum.CLOSE.getStatus());
+        // mock 数据
+        RewardActivityDO dbRewardActivity = randomPojo(RewardActivityDO.class, o -> { // 等会查询到
+            o.setName("芋艿");
+            o.setStatus(PromotionActivityStatusEnum.CLOSE.getStatus());
+        });
+        rewardActivityMapper.insert(dbRewardActivity);
+        // 测试 name 不匹配
+        rewardActivityMapper.insert(cloneIgnoreId(dbRewardActivity, o -> o.setName("土豆")));
+        // 测试 status 不匹配
+        rewardActivityMapper.insert(cloneIgnoreId(dbRewardActivity, o -> o.setStatus(PromotionActivityStatusEnum.RUN.getStatus())));
+        // 准备参数
+        RewardActivityPageReqVO reqVO = new RewardActivityPageReqVO();
+        reqVO.setName("芋艿");
+        reqVO.setStatus(PromotionActivityStatusEnum.CLOSE.getStatus());
 
-       // 调用
-       PageResult<RewardActivityDO> pageResult = rewardActivityService.getRewardActivityPage(reqVO);
-       // 断言
-       assertEquals(1, pageResult.getTotal());
-       assertEquals(1, pageResult.getList().size());
-       assertPojoEquals(dbRewardActivity, pageResult.getList().get(0), "rules");
+        // 调用
+        PageResult<RewardActivityDO> pageResult = rewardActivityService.getRewardActivityPage(reqVO);
+        // 断言
+        assertEquals(1, pageResult.getTotal());
+        assertEquals(1, pageResult.getList().size());
+        assertPojoEquals(dbRewardActivity, pageResult.getList().get(0), "rules");
     }
 
     @Test

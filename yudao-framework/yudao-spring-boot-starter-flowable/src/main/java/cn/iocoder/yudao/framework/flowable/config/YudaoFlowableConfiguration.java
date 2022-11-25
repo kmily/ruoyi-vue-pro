@@ -13,7 +13,7 @@ public class YudaoFlowableConfiguration {
 
     /**
      * 参考 {@link org.flowable.spring.boot.FlowableJobConfiguration} 类，创建对应的 AsyncListenableTaskExecutor Bean
-     *
+     * <p>
      * 如果不创建，会导致项目启动时，Flowable 报错的问题
      */
     @Bean

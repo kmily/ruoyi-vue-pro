@@ -45,11 +45,11 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 
 /**
  * 提供给外部应用调用为主
- *
+ * <p>
  * 一般来说，管理后台的 /system-api/* 是不直接提供给外部应用使用，主要是外部应用能够访问的数据与接口是有限的，而管理后台的 RBAC 无法很好的控制。
  * 参考大量的开放平台，都是独立的一套 OpenAPI，对应到【本系统】就是在 Controller 下新建 open 包，实现 /open-api/* 接口，然后通过 scope 进行控制。
  * 另外，一个公司如果有多个管理后台，它们 client_id 产生的 access token 相互之间是无法互通的，即无法访问它们系统的 API 接口，直到两个 client_id 产生信任授权。
- *
+ * <p>
  * 考虑到【本系统】暂时不想做的过于复杂，默认只有获取到 access token 之后，可以访问【本系统】管理后台的 /system-api/* 所有接口，除非手动添加 scope 控制。
  * scope 的使用示例，可见 {@link OAuth2UserController} 类
  *
@@ -71,15 +71,25 @@ public class OAuth2OpenController {
     @Resource
     private OAuth2TokenService oauth2TokenService;
 
+    private static OAuth2GrantTypeEnum getGrantTypeEnum(String responseType) {
+        if (StrUtil.equals(responseType, "code")) {
+            return OAuth2GrantTypeEnum.AUTHORIZATION_CODE;
+        }
+        if (StrUtil.equalsAny(responseType, "token")) {
+            return OAuth2GrantTypeEnum.IMPLICIT;
+        }
+        throw exception0(BAD_REQUEST.getCode(), "response_type 参数值只允许 code 和 token");
+    }
+
     /**
      * 对应 Spring Security OAuth 的 TokenEndpoint 类的 postAccessToken 方法
-     *
+     * <p>
      * 授权码 authorization_code 模式时：code + redirectUri + state 参数
      * 密码 password 模式时：username + password + scope 参数
      * 刷新 refresh_token 模式时：refreshToken 参数
      * 客户端 client_credentials 模式：scope 参数
      * 简化 implicit 模式时：不支持
-     *
+     * <p>
      * 注意，默认需要传递 client_id + client_secret 参数
      */
     @PostMapping("/token")
@@ -198,12 +208,12 @@ public class OAuth2OpenController {
 
     /**
      * 对应 Spring Security OAuth 的 AuthorizationEndpoint 类的 approveOrDeny 方法
-     *
+     * <p>
      * 场景一：【自动授权 autoApprove = true】
-     *      刚进入 sso.vue 界面，调用该接口，用户历史已经给该应用做过对应的授权，或者 OAuth2Client 支持该 scope 的自动授权
+     * 刚进入 sso.vue 界面，调用该接口，用户历史已经给该应用做过对应的授权，或者 OAuth2Client 支持该 scope 的自动授权
      * 场景二：【手动授权 autoApprove = false】
-     *      在 sso.vue 界面，用户选择好 scope 授权范围，调用该接口，进行授权。此时，approved 为 true 或者 false
-     *
+     * 在 sso.vue 界面，用户选择好 scope 授权范围，调用该接口，进行授权。此时，approved 为 true 或者 false
+     * <p>
      * 因为前后端分离，Axios 无法很好的处理 302 重定向，所以和 Spring Security OAuth 略有不同，返回结果是重定向的 URL，剩余交给前端处理
      */
     @PostMapping("/authorize")
@@ -255,16 +265,6 @@ public class OAuth2OpenController {
         }
         // 3.2 如果是 token 则是 implicit 简化模式，则发送 accessToken 访问令牌，并重定向
         return success(getImplicitGrantRedirect(getLoginUserId(), client, approveScopes, redirectUri, state));
-    }
-
-    private static OAuth2GrantTypeEnum getGrantTypeEnum(String responseType) {
-        if (StrUtil.equals(responseType, "code")) {
-            return OAuth2GrantTypeEnum.AUTHORIZATION_CODE;
-        }
-        if (StrUtil.equalsAny(responseType, "token")) {
-            return OAuth2GrantTypeEnum.IMPLICIT;
-        }
-        throw exception0(BAD_REQUEST.getCode(), "response_type 参数值只允许 code 和 token");
     }
 
     private String getImplicitGrantRedirect(Long userId, OAuth2ClientDO client,

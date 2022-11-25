@@ -40,7 +40,7 @@ public class RewardActivityDO extends BaseDO {
     private String name;
     /**
      * 状态
-     *
+     * <p>
      * 枚举 {@link PromotionActivityStatusEnum}
      */
     private Integer status;
@@ -58,13 +58,13 @@ public class RewardActivityDO extends BaseDO {
     private String remark;
     /**
      * 条件类型
-     *
+     * <p>
      * 枚举 {@link PromotionConditionTypeEnum}
      */
     private Integer conditionType;
     /**
      * 商品范围
-     *
+     * <p>
      * 枚举 {@link PromotionProductScopeEnum}
      */
     private Integer productScope;
@@ -87,7 +87,7 @@ public class RewardActivityDO extends BaseDO {
 
         /**
          * 优惠门槛
-         *
+         * <p>
          * 1. 满 N 元，单位：分
          * 2. 满 N 件
          */

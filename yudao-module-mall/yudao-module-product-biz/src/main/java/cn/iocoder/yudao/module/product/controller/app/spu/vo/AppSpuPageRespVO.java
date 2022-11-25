@@ -9,7 +9,7 @@ import java.util.List;
 
 @ApiModel("App - 商品spu分页 Request VO")
 @Data
-public class AppSpuPageRespVO  {
+public class AppSpuPageRespVO {
 
     @ApiModelProperty(value = "主键", required = true, example = "1")
     private Long id;

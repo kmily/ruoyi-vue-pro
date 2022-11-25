@@ -20,6 +20,10 @@ import java.util.function.Function;
  */
 public class DefaultStreamMessageListenerContainerX<K, V extends Record<K, ?>> extends DefaultStreamMessageListenerContainer<K, V> {
 
+    public DefaultStreamMessageListenerContainerX(RedisConnectionFactory connectionFactory, StreamMessageListenerContainerOptions<K, V> containerOptions) {
+        super(connectionFactory, containerOptions);
+    }
+
     /**
      * 参考 {@link StreamMessageListenerContainer#create(RedisConnectionFactory, StreamMessageListenerContainerOptions)} 的实现
      */
@@ -27,10 +31,6 @@ public class DefaultStreamMessageListenerContainerX<K, V extends Record<K, ?>> e
         Assert.notNull(connectionFactory, "RedisConnectionFactory must not be null!");
         Assert.notNull(options, "StreamMessageListenerContainerOptions must not be null!");
         return new DefaultStreamMessageListenerContainerX<>(connectionFactory, options);
-    }
-
-    public DefaultStreamMessageListenerContainerX(RedisConnectionFactory connectionFactory, StreamMessageListenerContainerOptions<K, V> containerOptions) {
-        super(connectionFactory, containerOptions);
     }
 
     /**

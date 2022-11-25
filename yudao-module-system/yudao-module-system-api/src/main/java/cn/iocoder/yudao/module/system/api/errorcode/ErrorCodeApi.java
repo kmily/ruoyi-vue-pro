@@ -23,11 +23,11 @@ public interface ErrorCodeApi {
 
     /**
      * 增量获得错误码数组
-     *
+     * <p>
      * 如果 minUpdateTime 为空时，则获取所有错误码
      *
      * @param applicationName 应用名
-     * @param minUpdateTime 最小更新时间
+     * @param minUpdateTime   最小更新时间
      * @return 错误码数组
      */
     List<ErrorCodeRespDTO> getErrorCodeList(String applicationName, LocalDateTime minUpdateTime);

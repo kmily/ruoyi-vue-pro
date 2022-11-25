@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 
 /**
  * Pay 错误码 Core 枚举类
- *
+ * <p>
  * pay 系统，使用 1-007-000-000 段
  */
 public interface ErrorCodeConstants {
@@ -14,7 +14,7 @@ public interface ErrorCodeConstants {
      */
     ErrorCode PAY_APP_NOT_FOUND = new ErrorCode(1007000000, "App 不存在");
     ErrorCode PAY_APP_IS_DISABLE = new ErrorCode(1007000002, "App 已经被禁用");
-    ErrorCode PAY_APP_EXIST_TRANSACTION_ORDER_CANT_DELETE =  new ErrorCode(1007000003, "支付应用存在交易中的订单,无法删除");
+    ErrorCode PAY_APP_EXIST_TRANSACTION_ORDER_CANT_DELETE = new ErrorCode(1007000003, "支付应用存在交易中的订单,无法删除");
 
     /**
      * ========== CHANNEL 模块 1-007-001-000 ==========
@@ -24,9 +24,9 @@ public interface ErrorCodeConstants {
     ErrorCode PAY_CHANNEL_CLIENT_NOT_FOUND = new ErrorCode(1007001002, "支付渠道的客户端不存在");
     ErrorCode CHANNEL_NOT_EXISTS = new ErrorCode(1007001003, "支付渠道不存在");
     ErrorCode CHANNEL_EXIST_SAME_CHANNEL_ERROR = new ErrorCode(1007001005, "已存在相同的渠道");
-    ErrorCode CHANNEL_WECHAT_VERSION_2_MCH_KEY_IS_NULL = new ErrorCode(1007001006,"微信渠道v2版本中商户密钥不可为空");
-    ErrorCode CHANNEL_WECHAT_VERSION_3_PRIVATE_KEY_IS_NULL = new ErrorCode(1007001007,"微信渠道v3版本apiclient_key.pem不可为空");
-    ErrorCode CHANNEL_WECHAT_VERSION_3_CERT_KEY_IS_NULL = new ErrorCode(1007001008,"微信渠道v3版本中apiclient_cert.pem不可为空");
+    ErrorCode CHANNEL_WECHAT_VERSION_2_MCH_KEY_IS_NULL = new ErrorCode(1007001006, "微信渠道v2版本中商户密钥不可为空");
+    ErrorCode CHANNEL_WECHAT_VERSION_3_PRIVATE_KEY_IS_NULL = new ErrorCode(1007001007, "微信渠道v3版本apiclient_key.pem不可为空");
+    ErrorCode CHANNEL_WECHAT_VERSION_3_CERT_KEY_IS_NULL = new ErrorCode(1007001008, "微信渠道v3版本中apiclient_cert.pem不可为空");
     ErrorCode PAY_CHANNEL_NOTIFY_VERIFY_FAILED = new ErrorCode(1007001009, "渠道通知校验失败");
     /**
      * ========== ORDER 模块 1-007-002-000 ==========
@@ -56,9 +56,6 @@ public interface ErrorCodeConstants {
      */
     ErrorCode PAY_MERCHANT_NOT_EXISTS = new ErrorCode(1007004000, "支付商户信息不存在");
     ErrorCode PAY_MERCHANT_EXIST_APP_CANT_DELETE = new ErrorCode(1007004001, "支付商户存在支付应用,无法删除");
-
-
-
 
 
 }

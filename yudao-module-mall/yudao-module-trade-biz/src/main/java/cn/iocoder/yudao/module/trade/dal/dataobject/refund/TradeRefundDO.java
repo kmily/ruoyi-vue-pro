@@ -32,19 +32,19 @@ public class TradeRefundDO extends BaseDO {
     private Long id;
     /**
      * 退款流水号
-     *
+     * <p>
      * 例如说，1146347329394184195
      */
     private String sn;
     /**
      * 退款状态
-     *
+     * <p>
      * 枚举 {@link TradeOrderRefundStatusEnum}
      */
     private Integer status;
     /**
      * 用户编号
-     *
+     * <p>
      * 关联 MemberUserDO 的 id 编号
      */
     private Long userId;
@@ -54,7 +54,7 @@ public class TradeRefundDO extends BaseDO {
     private String userMobile;
     /**
      * 申请类型
-     *
+     * <p>
      * 枚举 {@link TradeRefundTypeEnum}
      */
     private Integer type;
@@ -64,7 +64,7 @@ public class TradeRefundDO extends BaseDO {
     private String reasonMemo; // buyer_msg
     /**
      * 用户售后凭证图片的地址数组
-     *
+     * <p>
      * 数组，以逗号分隔
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
@@ -84,13 +84,13 @@ public class TradeRefundDO extends BaseDO {
     // ========== 交易订单相关 ==========
     /**
      * 交易订单编号
-     *
+     * <p>
      * 外键 {@link TradeOrderDO#getId()}
      */
     private Long tradeOrderId;
     /**
      * 交易订单项编号
-     *
+     * <p>
      * 关联 {@link TradeOrderItemDO#getId()}
      * 如果全部退款，则该值设置为 0 即可
      */
@@ -112,7 +112,7 @@ public class TradeRefundDO extends BaseDO {
     private Integer refundPrice; // refund_amount
     /**
      * 支付退款编号
-     *
+     * <p>
      * 对接 pay-module-biz 支付服务的退款订单编号，即 PayRefundDO 的 id 编号
      */
     private Long payRefundId;
@@ -121,7 +121,7 @@ public class TradeRefundDO extends BaseDO {
     // ========== 退货相关 ==========
     /**
      * 退货物流公司编号
-     *
+     * <p>
      * 关联 ExpressDO 的 id 编号
      */
     private Long returnExpressId; // express_name

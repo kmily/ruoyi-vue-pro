@@ -37,14 +37,14 @@ public enum SmsSceneEnum implements IntArrayValuable {
      */
     private final String description;
 
-    @Override
-    public int[] array() {
-        return ARRAYS;
-    }
-
     public static SmsSceneEnum getCodeByScene(Integer scene) {
         return ArrayUtil.firstMatch(sceneEnum -> sceneEnum.getScene().equals(scene),
                 values());
+    }
+
+    @Override
+    public int[] array() {
+        return ARRAYS;
     }
 
 }

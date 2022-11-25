@@ -310,7 +310,7 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
         reqVO.setContactName("艿");
         reqVO.setContactMobile("1560");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCreateTime(new LocalDateTime[]{buildTime(2020, 12, 1),buildTime(2020, 12, 24)});
+        reqVO.setCreateTime(new LocalDateTime[]{buildTime(2020, 12, 1), buildTime(2020, 12, 24)});
 
         // 调用
         PageResult<TenantDO> pageResult = tenantService.getTenantPage(reqVO);
@@ -347,7 +347,7 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
         reqVO.setContactName("艿");
         reqVO.setContactMobile("1560");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCreateTime(new LocalDateTime[]{buildTime(2020, 12, 1),buildTime(2020, 12, 24)});
+        reqVO.setCreateTime(new LocalDateTime[]{buildTime(2020, 12, 1), buildTime(2020, 12, 24)});
 
         // 调用
         List<TenantDO> list = tenantService.getTenantList(reqVO);
@@ -454,7 +454,7 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
         TenantContextHolder.setTenantId(dbTenant.getId());
         // mock 菜单
         when(menuService.getMenus()).thenReturn(Arrays.asList(randomPojo(MenuDO.class, o -> o.setId(100L)),
-                        randomPojo(MenuDO.class, o -> o.setId(101L))));
+                randomPojo(MenuDO.class, o -> o.setId(101L))));
 
         // 调用
         tenantService.handleTenantMenu(handler);

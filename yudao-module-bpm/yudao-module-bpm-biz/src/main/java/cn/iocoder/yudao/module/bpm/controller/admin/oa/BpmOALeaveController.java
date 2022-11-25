@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.oa;
 
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.controller.admin.oa.vo.BpmOALeaveCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.oa.vo.BpmOALeavePageReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.oa.vo.BpmOALeaveRespVO;
 import cn.iocoder.yudao.module.bpm.convert.oa.BpmOALeaveConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.oa.BpmOALeaveDO;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.service.oa.BpmOALeaveService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;

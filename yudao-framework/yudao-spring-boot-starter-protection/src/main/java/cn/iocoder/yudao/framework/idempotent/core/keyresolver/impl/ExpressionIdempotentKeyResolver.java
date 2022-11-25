@@ -24,6 +24,23 @@ public class ExpressionIdempotentKeyResolver implements IdempotentKeyResolver {
     private final ParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
     private final ExpressionParser expressionParser = new SpelExpressionParser();
 
+    private static Method getMethod(JoinPoint point) {
+        // 处理，声明在类上的情况
+        MethodSignature signature = (MethodSignature) point.getSignature();
+        Method method = signature.getMethod();
+        if (!method.getDeclaringClass().isInterface()) {
+            return method;
+        }
+
+        // 处理，声明在接口上的情况
+        try {
+            return point.getTarget().getClass().getDeclaredMethod(
+                    point.getSignature().getName(), method.getParameterTypes());
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public String resolver(JoinPoint joinPoint, Idempotent idempotent) {
         // 获得被拦截方法参数名列表
@@ -41,23 +58,6 @@ public class ExpressionIdempotentKeyResolver implements IdempotentKeyResolver {
         // 解析参数
         Expression expression = expressionParser.parseExpression(idempotent.keyArg());
         return expression.getValue(evaluationContext, String.class);
-    }
-
-    private static Method getMethod(JoinPoint point) {
-        // 处理，声明在类上的情况
-        MethodSignature signature = (MethodSignature) point.getSignature();
-        Method method = signature.getMethod();
-        if (!method.getDeclaringClass().isInterface()) {
-            return method;
-        }
-
-        // 处理，声明在接口上的情况
-        try {
-            return point.getTarget().getClass().getDeclaredMethod(
-                    point.getSignature().getName(), method.getParameterTypes());
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

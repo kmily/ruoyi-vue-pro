@@ -76,6 +76,15 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
     @MockBean
     private FileApi fileApi;
 
+    @SafeVarargs
+    private static AdminUserDO randomAdminUserDO(Consumer<AdminUserDO>... consumers) {
+        Consumer<AdminUserDO> consumer = (o) -> {
+            o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
+            o.setSex(randomEle(SexEnum.values()).getSex()); // 保证 sex 的范围
+        };
+        return randomPojo(AdminUserDO.class, ArrayUtils.append(consumer, consumers));
+    }
+
     @Test
     public void testCreatUser_success() {
         // 准备参数
@@ -226,7 +235,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         ByteArrayInputStream avatarFile = new ByteArrayInputStream(avatarFileBytes);
         // mock 方法
         String avatar = randomString();
-        when(fileApi.createFile(eq( avatarFileBytes))).thenReturn(avatar);
+        when(fileApi.createFile(eq(avatarFileBytes))).thenReturn(avatar);
 
         // 调用
         userService.updateUserAvatar(userId, avatarFile);
@@ -271,7 +280,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testDeleteUser_success(){
+    public void testDeleteUser_success() {
         // mock 数据
         AdminUserDO dbUser = randomAdminUserDO();
         userMapper.insert(dbUser);
@@ -295,7 +304,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         reqVO.setUsername("tu");
         reqVO.setMobile("1560");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2020, 12, 1),buildTime(2020, 12, 24)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2020, 12, 1), buildTime(2020, 12, 24)}));
         reqVO.setDeptId(1L); // 其中，1L 是 2L 的父部门
         // mock 方法
         List<DeptDO> deptList = newArrayList(randomPojo(DeptDO.class, o -> o.setId(2L)));
@@ -318,7 +327,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         reqVO.setUsername("tu");
         reqVO.setMobile("1560");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2020, 12, 1),buildTime(2020, 12, 24)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2020, 12, 1), buildTime(2020, 12, 24)}));
         reqVO.setDeptId(1L); // 其中，1L 是 2L 的父部门
         // mock 方法
         List<DeptDO> deptList = newArrayList(randomPojo(DeptDO.class, o -> o.setId(2L)));
@@ -570,6 +579,8 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         verify(passwordEncoder, times(1)).matches(eq(oldPassword), eq(user.getPassword()));
     }
 
+    // ========== 随机对象 ==========
+
     @Test
     public void testUsersByPostIds() {
         // 准备参数
@@ -589,17 +600,6 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         // 断言
         assertEquals(1, result.size());
         assertEquals(user1, result.get(0));
-    }
-
-    // ========== 随机对象 ==========
-
-    @SafeVarargs
-    private static AdminUserDO randomAdminUserDO(Consumer<AdminUserDO>... consumers) {
-        Consumer<AdminUserDO> consumer = (o) -> {
-            o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
-            o.setSex(randomEle(SexEnum.values()).getSex()); // 保证 sex 的范围
-        };
-        return randomPojo(AdminUserDO.class, ArrayUtils.append(consumer, consumers));
     }
 
 }

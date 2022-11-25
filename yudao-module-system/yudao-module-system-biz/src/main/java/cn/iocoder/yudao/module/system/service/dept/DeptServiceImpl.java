@@ -49,7 +49,7 @@ public class DeptServiceImpl implements DeptService {
     /**
      * 部门缓存
      * key：部门编号 {@link DeptDO#getId()}
-     *
+     * <p>
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
     @SuppressWarnings("FieldCanBeLocal")
@@ -58,7 +58,7 @@ public class DeptServiceImpl implements DeptService {
      * 父部门缓存
      * key：部门编号 {@link DeptDO#getParentId()}
      * value: 直接子部门列表
-     *
+     * <p>
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
     private volatile Multimap<Long, DeptDO> parentDeptCache;
@@ -191,10 +191,10 @@ public class DeptServiceImpl implements DeptService {
     /**
      * 递归获取所有的子部门，添加到 result 结果
      *
-     * @param result 结果
-     * @param parentId 父编号
+     * @param result         结果
+     * @param parentId       父编号
      * @param recursiveCount 递归次数
-     * @param parentDeptMap 父部门 Map，使用缓存，避免变化
+     * @param parentDeptMap  父部门 Map，使用缓存，避免变化
      */
     private void getDeptsByParentIdFromCache(List<DeptDO> result, Long parentId, int recursiveCount,
                                              Multimap<Long, DeptDO> parentDeptMap) {

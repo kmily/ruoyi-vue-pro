@@ -4,7 +4,7 @@ import me.zhyd.oauth.config.AuthSource;
 
 /**
  * 拓展 JustAuth 各 api 需要的 url， 用枚举类分平台类型管理
- *
+ * <p>
  * 默认配置 {@link me.zhyd.oauth.config.AuthDefaultSource}
  *
  * @author timfruit
@@ -15,7 +15,6 @@ public enum AuthExtendSource implements AuthSource {
      * 微信小程序授权登录
      */
     WECHAT_MINI_APP {
-
         @Override
         public String authorize() {
             // 参见 https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/login.html 文档

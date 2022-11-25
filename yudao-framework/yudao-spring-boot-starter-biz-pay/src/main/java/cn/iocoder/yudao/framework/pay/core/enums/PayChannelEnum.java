@@ -28,6 +28,14 @@ public enum PayChannelEnum {
     ALIPAY_QR("alipay_qr", "支付宝扫码支付", AlipayPayClientConfig.class);
 
     /**
+     * 微信支付
+     */
+    public static final String WECHAT = "WECHAT";
+    /**
+     * 支付宝支付
+     */
+    public static final String ALIPAY = "ALIPAY";
+    /**
      * 编码
      * <p>
      * 参考 https://www.pingxx.com/api/支付渠道属性值.html
@@ -37,21 +45,10 @@ public enum PayChannelEnum {
      * 名字
      */
     private final String name;
-
     /**
      * 配置类
      */
     private final Class<? extends PayClientConfig> configClass;
-
-    /**
-     * 微信支付
-     */
-    public static final String WECHAT = "WECHAT";
-
-    /**
-     * 支付宝支付
-     */
-    public static final String ALIPAY = "ALIPAY";
 
     public static PayChannelEnum getByCode(String code) {
         return ArrayUtil.firstMatch(o -> o.getCode().equals(code), values());

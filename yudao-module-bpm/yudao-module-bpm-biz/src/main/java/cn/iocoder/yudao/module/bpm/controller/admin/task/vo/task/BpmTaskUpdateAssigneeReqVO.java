@@ -3,9 +3,6 @@ package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import net.bytebuddy.implementation.bind.annotation.Empty;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;

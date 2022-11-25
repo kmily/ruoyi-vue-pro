@@ -96,8 +96,8 @@ public interface BpmProcessInstanceConvert {
         return event;
     }
 
-    default BpmMessageSendWhenProcessInstanceApproveReqDTO convert2ApprovedReq(ProcessInstance instance){
-        return  new BpmMessageSendWhenProcessInstanceApproveReqDTO()
+    default BpmMessageSendWhenProcessInstanceApproveReqDTO convert2ApprovedReq(ProcessInstance instance) {
+        return new BpmMessageSendWhenProcessInstanceApproveReqDTO()
                 .setStartUserId(NumberUtils.parseLong(instance.getStartUserId()))
                 .setProcessInstanceId(instance.getId())
                 .setProcessInstanceName(instance.getName());
@@ -105,10 +105,10 @@ public interface BpmProcessInstanceConvert {
 
     default BpmMessageSendWhenProcessInstanceRejectReqDTO convert2RejectReq(ProcessInstance instance, String reason) {
         return new BpmMessageSendWhenProcessInstanceRejectReqDTO()
-            .setProcessInstanceName(instance.getName())
-            .setProcessInstanceId(instance.getId())
-            .setReason(reason)
-            .setStartUserId(NumberUtils.parseLong(instance.getStartUserId()));
+                .setProcessInstanceName(instance.getName())
+                .setProcessInstanceId(instance.getId())
+                .setReason(reason)
+                .setStartUserId(NumberUtils.parseLong(instance.getStartUserId()));
     }
 
 }

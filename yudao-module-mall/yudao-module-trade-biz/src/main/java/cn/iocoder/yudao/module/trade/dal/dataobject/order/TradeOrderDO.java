@@ -35,25 +35,25 @@ public class TradeOrderDO extends BaseDO {
     private Long id;
     /**
      * 订单流水号
-     *
+     * <p>
      * 例如说，1146347329394184195
      */
     private String no;
     /**
      * 订单类型
-     *
+     * <p>
      * 枚举 {@link TradeOrderTypeEnum}
      */
     private Integer type; // TODO order_promotion_type
     /**
      * 订单来源终端
-     *
+     * <p>
      * 枚举 {@link TerminalEnum}
      */
     private Integer terminal;
     /**
      * 用户编号
-     *
+     * <p>
      * 关联 MemberUserDO 的 id 编号
      */
     private Long userId;
@@ -67,7 +67,7 @@ public class TradeOrderDO extends BaseDO {
     private String userRemark;
     /**
      * 订单状态
-     *
+     * <p>
      * 枚举 {@link TradeOrderStatusEnum}
      */
     private Integer status;
@@ -86,7 +86,7 @@ public class TradeOrderDO extends BaseDO {
     private LocalDateTime cancelTime;
     /**
      * 取消类型
-     *
+     * <p>
      * 枚举 {@link TradeOrderCancelTypeEnum}
      */
     private Integer cancelType;
@@ -98,7 +98,7 @@ public class TradeOrderDO extends BaseDO {
     // ========== 价格 + 支付基本信息 ==========
     /**
      * 是否已支付
-     *
+     * <p>
      * true - 已经支付过
      * false - 没有支付过
      */
@@ -115,24 +115,24 @@ public class TradeOrderDO extends BaseDO {
 
     /**
      * 商品原价（总），单位：分
-     *
+     * <p>
      * 基于 {@link TradeOrderItemDO#getOriginalPrice()} 求和
-     *
+     * <p>
      * 对应 taobao 的 trade.total_fee 字段
      */
     private Integer originalPrice;
     /**
      * 订单原价（总），单位：分
-     *
+     * <p>
      * 基于 {@link OrderItem#getPayPrice()} 求和
      * 和 {@link #originalPrice} 的差异：去除商品级优惠
      */
     private Integer orderPrice;
     /**
      * 订单优惠（总），单位：分
-     *
+     * <p>
      * 订单级优惠：对主订单的优惠，常见如：订单满 200 元减 10 元；订单满 80 包邮。
-     *
+     * <p>
      * 对应 taobao 的 order.discount_fee 字段
      */
     private Integer discountPrice;
@@ -142,13 +142,13 @@ public class TradeOrderDO extends BaseDO {
     private Integer deliveryPrice;
     /**
      * 订单调价（总），单位：分
-     *
+     * <p>
      * 正数，加价；负数，减价
      */
     private Integer adjustPrice;
     /**
      * 应付金额（总），单位：分
-     *
+     * <p>
      * = {@link OrderItem#getPayPrice()} 求和
      * - {@link #couponPrice}
      * - {@link #pointPrice}
@@ -159,13 +159,13 @@ public class TradeOrderDO extends BaseDO {
     private Integer payPrice;
     /**
      * 支付订单编号
-     *
+     * <p>
      * 对接 pay-module-biz 支付服务的支付订单编号，即 PayOrderDO 的 id 编号
      */
     private Long payOrderId;
     /**
      * 支付成功的支付渠道
-     *
+     * <p>
      * 对应 PayChannelEnum 枚举
      */
     private Integer payChannel;
@@ -173,7 +173,7 @@ public class TradeOrderDO extends BaseDO {
     // ========== 收件 + 物流基本信息 ==========
     /**
      * 配置模板的编号
-     *
+     * <p>
      * 关联 DeliveryTemplateDO 的 id 编号
      */
     private Long deliveryTemplateId;
@@ -183,7 +183,7 @@ public class TradeOrderDO extends BaseDO {
     private String expressNo;
     /**
      * 发货状态
-     *
+     * <p>
      * true - 已发货
      * false - 未发货
      */
@@ -220,13 +220,13 @@ public class TradeOrderDO extends BaseDO {
     // ========== 退款基本信息 ==========
     /**
      * 退款状态
-     *
+     * <p>
      * 枚举 {@link TradeOrderRefundStatusEnum}
      */
     private Integer refundStatus;
     /**
      * 退款金额，单位：分
-     *
+     * <p>
      * 注意，退款并不会影响 {@link #payPrice} 实际支付金额
      * 也就说，一个订单最终产生多少金额的收入 = payPrice - refundPrice
      */
@@ -239,13 +239,13 @@ public class TradeOrderDO extends BaseDO {
     private Long couponId;
     /**
      * 优惠劵减免金额，单位：分
-     *
+     * <p>
      * 对应 taobao 的 trade.coupon_fee 字段
      */
     private Integer couponPrice;
     /**
      * 积分抵扣的金额，单位：分
-     *
+     * <p>
      * 对应 taobao 的 trade.point_fee 字段
      */
     private Integer pointPrice;

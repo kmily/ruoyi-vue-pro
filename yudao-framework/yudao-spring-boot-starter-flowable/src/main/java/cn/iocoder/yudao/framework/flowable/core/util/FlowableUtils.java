@@ -49,7 +49,8 @@ public class FlowableUtils {
 
     /**
      * 比较 两个bpmnModel 是否相同
-     * @param oldModel  老的bpmn model
+     *
+     * @param oldModel 老的bpmn model
      * @param newModel 新的bpmn model
      */
     public static boolean equals(BpmnModel oldModel, BpmnModel newModel) {
@@ -59,9 +60,10 @@ public class FlowableUtils {
 
     /**
      * 把 bpmnModel 转换成 byte[]
-     * @param model  bpmnModel
+     *
+     * @param model bpmnModel
      */
-    public  static byte[] getBpmnBytes(BpmnModel model) {
+    public static byte[] getBpmnBytes(BpmnModel model) {
         if (model == null) {
             return new byte[0];
         }

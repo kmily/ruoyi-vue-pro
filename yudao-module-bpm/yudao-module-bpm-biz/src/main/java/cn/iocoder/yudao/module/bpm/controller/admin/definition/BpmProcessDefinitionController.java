@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -40,7 +39,7 @@ public class BpmProcessDefinitionController {
         return success(bpmDefinitionService.getProcessDefinitionPage(pageReqVO));
     }
 
-    @GetMapping ("/list")
+    @GetMapping("/list")
     @ApiOperation(value = "获得流程定义列表")
     @PreAuthorize("@ss.hasPermission('bpm:process-definition:query')")
     public CommonResult<List<BpmProcessDefinitionRespVO>> getProcessDefinitionList(
@@ -48,7 +47,7 @@ public class BpmProcessDefinitionController {
         return success(bpmDefinitionService.getProcessDefinitionList(listReqVO));
     }
 
-    @GetMapping ("/get-bpmn-xml")
+    @GetMapping("/get-bpmn-xml")
     @ApiOperation(value = "获得流程定义的 BPMN XML")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = String.class)
     @PreAuthorize("@ss.hasPermission('bpm:process-definition:query')")

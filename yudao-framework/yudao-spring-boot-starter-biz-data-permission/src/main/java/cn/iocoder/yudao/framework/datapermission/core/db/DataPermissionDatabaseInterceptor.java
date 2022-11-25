@@ -37,7 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 数据权限拦截器，通过 {@link DataPermissionRule} 数据权限规则，重写 SQL 的方式来实现
  * 主要的 SQL 重写方法，可见 {@link #builderExpression(Expression, List)} 方法
- *
+ * <p>
  * 整体的代码实现上，参考 {@link com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor} 实现。
  * 所以每次 MyBatis Plus 升级时，需要 Review 下其具体的实现是否有变更！
  *
@@ -450,7 +450,7 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
      * 处理条件
      *
      * @param currentExpression 当前 where 条件
-     * @param tables 多个表
+     * @param tables            多个表
      */
     protected Expression builderExpression(Expression currentExpression, List<Table> tables) {
         // 没有表需要处理直接返回
@@ -580,7 +580,7 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
 
         /**
          * 指定数据权限规则，对指定 MappedStatement 无需重写（不生效)的缓存
-         *
+         * <p>
          * value：{@link MappedStatement#getId()} 编号
          */
         @Getter
@@ -590,7 +590,7 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
          * 判断是否无需重写
          * ps：虽然有点中文式英语，但是容易读懂即可
          *
-         * @param ms MappedStatement
+         * @param ms    MappedStatement
          * @param rules 数据权限规则数组
          * @return 是否无需重写
          */
@@ -612,7 +612,7 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
         /**
          * 添加无需重写的 MappedStatement
          *
-         * @param ms MappedStatement
+         * @param ms    MappedStatement
          * @param rules 数据权限规则数组
          */
         public void addNoRewritable(MappedStatement ms, List<DataPermissionRule> rules) {

@@ -74,6 +74,10 @@ public class TenantServiceImpl implements TenantService {
     @Resource
     private PermissionService permissionService;
 
+    private static boolean isSystemTenant(TenantDO tenant) {
+        return Objects.equals(tenant.getPackageId(), TenantDO.PACKAGE_ID_SYSTEM);
+    }
+
     @Override
     public List<Long> getTenantIds() {
         List<TenantDO> tenants = tenantMapper.selectList();
@@ -254,10 +258,6 @@ public class TenantServiceImpl implements TenantService {
         }
         // 执行处理器
         handler.handle(menuIds);
-    }
-
-    private static boolean isSystemTenant(TenantDO tenant) {
-        return Objects.equals(tenant.getPackageId(), TenantDO.PACKAGE_ID_SYSTEM);
     }
 
     private boolean isTenantDisable() {

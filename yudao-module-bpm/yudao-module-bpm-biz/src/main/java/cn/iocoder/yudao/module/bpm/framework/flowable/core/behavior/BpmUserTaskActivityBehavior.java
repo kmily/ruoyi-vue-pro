@@ -37,8 +37,8 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
 
     @Override
     protected void handleAssignments(TaskService taskService, String assignee, String owner,
-        List<String> candidateUsers, List<String> candidateGroups, TaskEntity task, ExpressionManager expressionManager,
-        DelegateExecution execution, ProcessEngineConfigurationImpl processEngineConfiguration) {
+                                     List<String> candidateUsers, List<String> candidateGroups, TaskEntity task, ExpressionManager expressionManager,
+                                     DelegateExecution execution, ProcessEngineConfigurationImpl processEngineConfiguration) {
         // 第一步，获得任务的候选用户
         Long assigneeUserId = calculateTaskCandidateUsers(execution);
         Assert.notNull(assigneeUserId, "任务处理人不能为空");

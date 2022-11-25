@@ -133,7 +133,7 @@ public class TestDemoServiceImplTest extends BaseDbUnitTest {
         reqVO.setType(1);
         reqVO.setCategory(2);
         reqVO.setRemark("哈哈哈");
-        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 11, 10),buildTime(2021, 11, 12)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 11, 10), buildTime(2021, 11, 12)}));
 
         // 调用
         PageResult<TestDemoDO> pageResult = testDemoService.getTestDemoPage(reqVO);
@@ -174,7 +174,7 @@ public class TestDemoServiceImplTest extends BaseDbUnitTest {
         reqVO.setType(1);
         reqVO.setCategory(2);
         reqVO.setRemark("哈哈哈");
-        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 11, 10),buildTime(2021, 11, 12)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 11, 10), buildTime(2021, 11, 12)}));
 
         // 调用
         List<TestDemoDO> list = testDemoService.getTestDemoList(reqVO);

@@ -3,7 +3,10 @@ package cn.iocoder.yudao.module.pay.service.notify;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.http.HttpUtil;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.pay.dal.dataobject.notify.PayNotifyLogDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.notify.PayNotifyTaskDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
@@ -16,9 +19,6 @@ import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.module.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
 import cn.iocoder.yudao.module.pay.service.notify.vo.PayNotifyOrderReqVO;
 import cn.iocoder.yudao.module.pay.service.notify.vo.PayRefundOrderReqVO;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.util.date.DateUtils;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
 import lombok.extern.slf4j.Slf4j;
@@ -206,7 +206,7 @@ public class PayNotifyServiceImpl implements PayNotifyService {
         Object request;
         if (Objects.equals(task.getType(), PayNotifyTypeEnum.ORDER.getType())) {
             request = PayNotifyOrderReqVO.builder().merchantOrderId(task.getMerchantOrderId())
-                            .payOrderId(task.getDataId()).build();
+                    .payOrderId(task.getDataId()).build();
         } else if (Objects.equals(task.getType(), PayNotifyTypeEnum.REFUND.getType())) {
             request = PayRefundOrderReqVO.builder().merchantOrderId(task.getMerchantOrderId())
                     .payRefundId(task.getDataId()).build();
@@ -223,8 +223,8 @@ public class PayNotifyServiceImpl implements PayNotifyService {
     /**
      * 处理并更新通知结果
      *
-     * @param task 通知任务
-     * @param invokeResult 通知结果
+     * @param task            通知任务
+     * @param invokeResult    通知结果
      * @param invokeException 通知异常
      * @return 最终任务的状态
      */

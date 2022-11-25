@@ -17,7 +17,9 @@ public interface OAuth2UserConvert {
     OAuth2UserConvert INSTANCE = Mappers.getMapper(OAuth2UserConvert.class);
 
     OAuth2UserInfoRespVO convert(AdminUserDO bean);
+
     OAuth2UserInfoRespVO.Dept convert(DeptDO dept);
+
     List<OAuth2UserInfoRespVO.Post> convertList(List<PostDO> list);
 
     UserProfileUpdateReqVO convert(OAuth2UserUpdateReqVO bean);

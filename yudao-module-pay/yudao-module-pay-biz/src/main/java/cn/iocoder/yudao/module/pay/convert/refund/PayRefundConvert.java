@@ -98,7 +98,7 @@ public interface PayRefundConvert {
     @Mappings(value = {
             @Mapping(source = "amount", target = "payAmount"),
             @Mapping(source = "id", target = "orderId"),
-            @Mapping(target = "status",ignore = true)
+            @Mapping(target = "status", ignore = true)
     })
     PayRefundDO convert(PayOrderDO orderDO);
 

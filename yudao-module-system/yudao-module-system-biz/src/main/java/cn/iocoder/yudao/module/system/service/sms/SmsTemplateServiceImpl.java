@@ -28,7 +28,10 @@ import org.springframework.util.Assert;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -70,7 +73,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     /**
      * 短信模板缓存
      * key：短信模板编码 {@link SmsTemplateDO#getCode()}
-     *
+     * <p>
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
     private volatile Map<String, SmsTemplateDO> smsTemplateCache;
@@ -251,7 +254,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     /**
      * 校验 API 短信平台的模板是否有效
      *
-     * @param channelId 渠道编号
+     * @param channelId     渠道编号
      * @param apiTemplateId API 模板编号
      */
     @VisibleForTesting

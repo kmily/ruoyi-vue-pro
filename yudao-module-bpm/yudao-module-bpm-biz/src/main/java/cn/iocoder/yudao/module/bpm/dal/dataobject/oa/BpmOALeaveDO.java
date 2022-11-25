@@ -1,14 +1,17 @@
 package cn.iocoder.yudao.module.bpm.dal.dataobject.oa;
 
-import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
-import lombok.*;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
+
+import java.time.LocalDateTime;
 
 /**
  * OA 请假申请 DO
- *
+ * <p>
  * {@link #day} 请假天数，目前先简单做。一般是分成请假上午和下午，可以是 1 整天，可以是 0.5 半天
  *
  * @author jason
@@ -30,7 +33,7 @@ public class BpmOALeaveDO extends BaseDO {
     private Long id;
     /**
      * 申请人的用户编号
-     *
+     * <p>
      * 关联 AdminUserDO 的 id 属性
      */
     private Long userId;
@@ -57,7 +60,7 @@ public class BpmOALeaveDO extends BaseDO {
     private Long day;
     /**
      * 请假的结果
-     *
+     * <p>
      * 枚举 {@link BpmProcessInstanceResultEnum}
      * 考虑到简单，所以直接复用了 BpmProcessInstanceResultEnum 枚举，也可以自己定义一个枚举哈
      */
@@ -65,7 +68,7 @@ public class BpmOALeaveDO extends BaseDO {
 
     /**
      * 对应的流程编号
-     *
+     * <p>
      * 关联 ProcessInstance 的 id 属性
      */
     private String processInstanceId;

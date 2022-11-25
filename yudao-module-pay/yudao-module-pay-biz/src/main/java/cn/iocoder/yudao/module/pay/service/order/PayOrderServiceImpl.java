@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
@@ -28,7 +29,6 @@ import cn.iocoder.yudao.module.pay.service.merchant.PayAppService;
 import cn.iocoder.yudao.module.pay.service.merchant.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
 import cn.iocoder.yudao.module.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderSubmitReqDTO;
 import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderSubmitRespDTO;
@@ -173,6 +173,7 @@ public class PayOrderServiceImpl implements PayOrderService {
 
     /**
      * 根据支付渠道的编码，生成支付渠道的返回地址
+     *
      * @param channel 支付渠道
      * @return 支付成功返回的地址。 配置地址 + "/" + channel id
      */
@@ -211,7 +212,7 @@ public class PayOrderServiceImpl implements PayOrderService {
 
     @Override
     @Transactional
-    public void notifyPayOrder(Long channelId,  PayNotifyDataDTO notifyData) throws Exception {
+    public void notifyPayOrder(Long channelId, PayNotifyDataDTO notifyData) throws Exception {
         // TODO 芋艿，记录回调日志
         log.info("[notifyPayOrder][channelId({}) 回调数据({})]", channelId, notifyData.getBody());
 

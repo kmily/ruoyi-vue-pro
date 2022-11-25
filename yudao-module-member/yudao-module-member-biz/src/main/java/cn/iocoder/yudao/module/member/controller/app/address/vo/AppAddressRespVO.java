@@ -1,8 +1,12 @@
 package cn.iocoder.yudao.module.member.controller.app.address.vo;
 
-import lombok.*;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import java.time.LocalDateTime;
-import io.swagger.annotations.*;
 
 @ApiModel("用户 APP - 用户收件地址 Response VO")
 @Data

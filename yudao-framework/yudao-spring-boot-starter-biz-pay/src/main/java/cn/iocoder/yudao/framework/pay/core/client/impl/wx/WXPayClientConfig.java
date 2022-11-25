@@ -84,6 +84,18 @@ public class WXPayClientConfig implements PayClientConfig {
     @NotBlank(message = "apiV3 密钥值 不能为空", groups = V3.class)
     private String apiV3Key;
 
+    public static void main(String[] args) throws FileNotFoundException {
+        String path = "/Users/yunai/Downloads/wx_pay/apiclient_cert.p12";
+        /// String path = "/Users/yunai/Downloads/wx_pay/apiclient_key.pem";
+        /// String path = "/Users/yunai/Downloads/wx_pay/apiclient_cert.pem";
+        System.out.println(IoUtil.readUtf8(new FileInputStream(path)));
+    }
+
+    @Override
+    public Set<ConstraintViolation<PayClientConfig>> verifyParam(Validator validator) {
+        return validator.validate(this, this.getApiVersion().equals(API_VERSION_V2) ? V2.class : V3.class);
+    }
+
     /**
      * 分组校验 v2版本
      */
@@ -94,18 +106,6 @@ public class WXPayClientConfig implements PayClientConfig {
      * 分组校验 v3版本
      */
     public interface V3 {
-    }
-
-    @Override
-    public Set<ConstraintViolation<PayClientConfig>> verifyParam(Validator validator) {
-        return validator.validate(this, this.getApiVersion().equals(API_VERSION_V2) ? V2.class : V3.class);
-    }
-
-    public static void main(String[] args) throws FileNotFoundException {
-        String path = "/Users/yunai/Downloads/wx_pay/apiclient_cert.p12";
-        /// String path = "/Users/yunai/Downloads/wx_pay/apiclient_key.pem";
-        /// String path = "/Users/yunai/Downloads/wx_pay/apiclient_cert.pem";
-        System.out.println(IoUtil.readUtf8(new FileInputStream(path)));
     }
 
 }

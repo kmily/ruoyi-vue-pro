@@ -25,6 +25,8 @@ public class PayAppPageItemRespVO extends PayAppBaseVO {
      * 所属商户
      */
     private PayMerchant payMerchant;
+    @ApiModelProperty(value = "渠道编码集合", required = true, example = "alipay_pc,alipay_wap...")
+    private Set<String> channelCodes;
 
     @ApiModel("商户")
     @Data
@@ -37,9 +39,6 @@ public class PayAppPageItemRespVO extends PayAppBaseVO {
         private String name;
 
     }
-
-    @ApiModelProperty(value = "渠道编码集合", required = true, example = "alipay_pc,alipay_wap...")
-    private Set<String> channelCodes;
 
 
 }

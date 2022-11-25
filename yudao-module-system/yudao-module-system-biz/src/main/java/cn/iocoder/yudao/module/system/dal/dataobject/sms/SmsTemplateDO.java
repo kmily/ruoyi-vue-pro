@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.sms;
 
-import cn.iocoder.yudao.module.system.enums.sms.SmsTemplateTypeEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.system.enums.sms.SmsTemplateTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -35,13 +35,13 @@ public class SmsTemplateDO extends BaseDO {
 
     /**
      * 短信类型
-     *
+     * <p>
      * 枚举 {@link SmsTemplateTypeEnum}
      */
     private Integer type;
     /**
      * 启用状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
@@ -55,7 +55,7 @@ public class SmsTemplateDO extends BaseDO {
     private String name;
     /**
      * 模板内容
-     *
+     * <p>
      * 内容的参数，使用 {} 包括，例如说 {name}
      */
     private String content;
@@ -77,13 +77,13 @@ public class SmsTemplateDO extends BaseDO {
 
     /**
      * 短信渠道编号
-     *
+     * <p>
      * 关联 {@link SmsChannelDO#getId()}
      */
     private Long channelId;
     /**
      * 短信渠道编码
-     *
+     * <p>
      * 冗余 {@link SmsChannelDO#getCode()}
      */
     private String channelCode;

@@ -36,7 +36,7 @@ public class YudaoMybatisAutoConfiguration {
     }
 
     @Bean
-    public MetaObjectHandler defaultMetaObjectHandler(){
+    public MetaObjectHandler defaultMetaObjectHandler() {
         return new DefaultDBFieldHandler(); // 自动填充参数类
     }
 

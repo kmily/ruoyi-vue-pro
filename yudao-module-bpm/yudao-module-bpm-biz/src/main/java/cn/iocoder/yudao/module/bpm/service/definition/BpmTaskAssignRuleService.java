@@ -22,7 +22,7 @@ public interface BpmTaskAssignRuleService {
      * 获得流程定义的任务分配规则数组
      *
      * @param processDefinitionId 流程定义的编号
-     * @param taskDefinitionKey 流程任务定义的 Key。允许空
+     * @param taskDefinitionKey   流程任务定义的 Key。允许空
      * @return 任务规则数组
      */
     List<BpmTaskAssignRuleDO> getTaskAssignRuleListByProcessDefinitionId(String processDefinitionId,
@@ -39,7 +39,7 @@ public interface BpmTaskAssignRuleService {
     /**
      * 获得流程定义的任务分配规则数组
      *
-     * @param modelId 流程模型的编号
+     * @param modelId             流程模型的编号
      * @param processDefinitionId 流程定义的编号
      * @return 任务规则数组
      */
@@ -63,7 +63,7 @@ public interface BpmTaskAssignRuleService {
     /**
      * 判断指定流程模型和流程定义的分配规则是否相等
      *
-     * @param modelId 流程模型编号
+     * @param modelId             流程模型编号
      * @param processDefinitionId 流程定义编号
      * @return 是否相等
      */
@@ -73,7 +73,7 @@ public interface BpmTaskAssignRuleService {
      * 将流程流程模型的任务分配规则，复制一份给流程定义
      * 目的：每次流程模型部署时，都会生成一个新的流程定义，此时考虑到每次部署的流程不可变性，所以需要复制一份给该流程定义
      *
-     * @param fromModelId 流程模型编号
+     * @param fromModelId           流程模型编号
      * @param toProcessDefinitionId 流程定义编号
      */
     void copyTaskAssignRules(String fromModelId, String toProcessDefinitionId);

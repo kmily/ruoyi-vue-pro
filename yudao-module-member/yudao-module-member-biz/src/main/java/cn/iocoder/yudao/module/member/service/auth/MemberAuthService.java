@@ -6,7 +6,7 @@ import javax.validation.Valid;
 
 /**
  * 会员的认证 Service 接口
- *
+ * <p>
  * 提供用户的账号密码登录、token 的校验等认证相关的功能
  *
  * @author 芋道源码
@@ -55,7 +55,7 @@ public interface MemberAuthService {
     /**
      * 获得社交认证 URL
      *
-     * @param type 社交平台类型
+     * @param type        社交平台类型
      * @param redirectUri 跳转地址
      * @return 认证 URL
      */
@@ -63,13 +63,15 @@ public interface MemberAuthService {
 
     /**
      * 修改用户密码
-     * @param userId 用户id
+     *
+     * @param userId    用户id
      * @param userReqVO 用户请求实体类
      */
     void updatePassword(Long userId, AppAuthUpdatePasswordReqVO userReqVO);
 
     /**
      * 忘记密码
+     *
      * @param userReqVO 用户请求实体类
      */
     void resetPassword(AppAuthResetPasswordReqVO userReqVO);
@@ -78,7 +80,7 @@ public interface MemberAuthService {
      * 给用户发送短信验证码
      *
      * @param userId 用户编号
-     * @param reqVO 发送信息
+     * @param reqVO  发送信息
      */
     void sendSmsCode(Long userId, AppAuthSmsSendReqVO reqVO);
 

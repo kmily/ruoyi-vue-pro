@@ -151,7 +151,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     /**
      * 校验收件地址是否存在
      *
-     * @param userId 用户编号
+     * @param userId    用户编号
      * @param addressId 收件地址编号
      * @return 收件地址
      */
@@ -170,7 +170,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         tradeOrderDO.setStatus(TradeOrderStatusEnum.WAITING_PAYMENT.getStatus());
         tradeOrderDO.setType(TradeOrderTypeEnum.NORMAL.getType());
         tradeOrderDO.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
-        tradeOrderDO.setProductCount(getSumValue(order.getItems(),  PriceCalculateRespDTO.OrderItem::getCount, Integer::sum));
+        tradeOrderDO.setProductCount(getSumValue(order.getItems(), PriceCalculateRespDTO.OrderItem::getCount, Integer::sum));
         tradeOrderDO.setTerminal(TerminalEnum.H5.getTerminal()); // todo 数据来源?
         tradeOrderDO.setAdjustPrice(0).setPayed(false); // 支付信息
         tradeOrderDO.setDeliveryStatus(false); // 物流信息
@@ -188,11 +188,11 @@ public class TradeOrderServiceImpl implements TradeOrderService {
 
     /**
      * 执行创建完创建完订单后的逻辑
-     *
+     * <p>
      * 例如说：优惠劵的扣减、积分的扣减、支付单的创建等等
      *
-     * @param userId 用户编号
-     * @param createReqVO 创建订单请求
+     * @param userId       用户编号
+     * @param createReqVO  创建订单请求
      * @param tradeOrderDO 交易订单
      */
     private void afterCreateTradeOrder(Long userId, AppTradeOrderCreateReqVO createReqVO,

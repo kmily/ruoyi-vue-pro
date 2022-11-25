@@ -61,7 +61,7 @@ public class FileController {
     @GetMapping("/{configId}/get/**")
     @PermitAll
     @ApiOperation("下载文件")
-    @ApiImplicitParam(name = "configId", value = "配置编号",  required = true, dataTypeClass = Long.class)
+    @ApiImplicitParam(name = "configId", value = "配置编号", required = true, dataTypeClass = Long.class)
     public void getFileContent(HttpServletRequest request,
                                HttpServletResponse response,
                                @PathVariable("configId") Long configId) throws Exception {

@@ -53,11 +53,6 @@ public class AuthLoginReqVO {
     @ApiModelProperty(value = "state", required = true, example = "9b2ffbc1-7425-4155-9894-9d5c08541d62")
     private String socialState;
 
-    /**
-     * 开启验证码的 Group
-     */
-    public interface CodeEnableGroup {}
-
     @AssertTrue(message = "授权码不能为空")
     public boolean isSocialCodeValid() {
         return socialType == null || StrUtil.isNotEmpty(socialCode);
@@ -66,6 +61,12 @@ public class AuthLoginReqVO {
     @AssertTrue(message = "授权 state 不能为空")
     public boolean isSocialState() {
         return socialType == null || StrUtil.isNotEmpty(socialState);
+    }
+
+    /**
+     * 开启验证码的 Group
+     */
+    public interface CodeEnableGroup {
     }
 
 }

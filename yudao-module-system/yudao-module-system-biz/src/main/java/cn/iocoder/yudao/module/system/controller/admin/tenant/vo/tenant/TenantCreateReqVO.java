@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant;
 
-import lombok.*;
-import io.swagger.annotations.*;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;

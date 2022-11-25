@@ -80,7 +80,7 @@ public class SensitiveWordController {
     @PreAuthorize("@ss.hasPermission('system:sensitive-word:export')")
     @OperateLog(type = EXPORT)
     public void exportSensitiveWordExcel(@Valid SensitiveWordExportReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
+                                         HttpServletResponse response) throws IOException {
         List<SensitiveWordDO> list = sensitiveWordService.getSensitiveWordList(exportReqVO);
         // 导出 Excel
         List<SensitiveWordExcelVO> datas = SensitiveWordConvert.INSTANCE.convertList02(list);

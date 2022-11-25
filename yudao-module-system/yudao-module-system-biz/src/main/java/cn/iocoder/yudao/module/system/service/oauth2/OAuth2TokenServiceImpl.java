@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.Calendar;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
@@ -43,6 +42,14 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
 
     @Resource
     private OAuth2ClientService oauth2ClientService;
+
+    private static String generateAccessToken() {
+        return IdUtil.fastSimpleUUID();
+    }
+
+    private static String generateRefreshToken() {
+        return IdUtil.fastSimpleUUID();
+    }
 
     @Override
     @Transactional
@@ -153,14 +160,6 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
                 .setExpiresTime(LocalDateTime.now().plusSeconds(clientDO.getRefreshTokenValiditySeconds()));
         oauth2RefreshTokenMapper.insert(refreshToken);
         return refreshToken;
-    }
-
-    private static String generateAccessToken() {
-        return IdUtil.fastSimpleUUID();
-    }
-
-    private static String generateRefreshToken() {
-        return IdUtil.fastSimpleUUID();
     }
 
 }

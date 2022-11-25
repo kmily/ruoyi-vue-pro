@@ -245,7 +245,7 @@ public class BpmModelServiceImpl implements BpmModelService {
      * @param metaInfoStr 流程模型 metaInfo 字段
      * @return 流程表单
      */
-    private BpmFormDO checkFormConfig(String  metaInfoStr) {
+    private BpmFormDO checkFormConfig(String metaInfoStr) {
         BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(metaInfoStr, BpmModelMetaInfoRespDTO.class);
         if (metaInfo == null || metaInfo.getFormType() == null) {
             throw exception(MODEL_DEPLOY_FAIL_FORM_NOT_CONFIG);
@@ -270,6 +270,7 @@ public class BpmModelServiceImpl implements BpmModelService {
 
     /**
      * 挂起 deploymentId 对应的流程定义。 这里一个deploymentId 只关联一个流程定义
+     *
      * @param deploymentId 流程发布Id.
      */
     private void updateProcessDefinitionSuspended(String deploymentId) {

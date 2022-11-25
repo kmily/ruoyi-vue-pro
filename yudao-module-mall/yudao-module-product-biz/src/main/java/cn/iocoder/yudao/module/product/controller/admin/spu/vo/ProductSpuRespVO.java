@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @ApiModel("管理后台 - 商品 SPU Response VO")
 @Data

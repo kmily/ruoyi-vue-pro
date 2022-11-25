@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.infra.controller.admin.db.vo;
 
-import lombok.*;
-import java.util.*;
-import io.swagger.annotations.*;
-import javax.validation.constraints.*;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import javax.validation.constraints.NotNull;
 
 @ApiModel("管理后台 - 数据源配置更新 Request VO")
 @Data

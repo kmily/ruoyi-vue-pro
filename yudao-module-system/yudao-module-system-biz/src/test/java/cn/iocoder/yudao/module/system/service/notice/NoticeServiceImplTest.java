@@ -2,27 +2,26 @@ package cn.iocoder.yudao.module.system.service.notice;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notice.NoticeDO;
 import cn.iocoder.yudao.module.system.dal.mysql.notice.NoticeMapper;
 import cn.iocoder.yudao.module.system.enums.notice.NoticeTypeEnum;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.NOTICE_NOT_FOUND;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.NOTICE_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Import(NoticeServiceImpl.class)
@@ -33,6 +32,29 @@ class NoticeServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private NoticeMapper sysNoticeMapper;
+
+    @SafeVarargs
+    private static NoticeDO randomNoticeDO(Consumer<NoticeDO>... consumers) {
+        NoticeDO notice = randomPojo(NoticeDO.class, consumers);
+        notice.setType(randomEle(NoticeTypeEnum.values()).getType());
+        notice.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        return notice;
+    }
+
+    @SafeVarargs
+    private static NoticeUpdateReqVO randomNoticeUpdateReqVO(Consumer<NoticeUpdateReqVO>... consumers) {
+        NoticeUpdateReqVO reqVO = randomPojo(NoticeUpdateReqVO.class, consumers);
+        reqVO.setType(randomEle(NoticeTypeEnum.values()).getType());
+        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        return reqVO;
+    }
+
+    private static NoticeCreateReqVO randomNoticeCreateReqVO() {
+        NoticeCreateReqVO reqVO = randomPojo(NoticeCreateReqVO.class);
+        reqVO.setType(randomEle(NoticeTypeEnum.values()).getType());
+        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        return reqVO;
+    }
 
     @Test
     public void testPageNotices_success() {
@@ -134,29 +156,6 @@ class NoticeServiceImplTest extends BaseDbUnitTest {
     @Test
     public void checkNoticeExists_noExists() {
         assertServiceException(() -> sysNoticeService.checkNoticeExists(randomLongId()), NOTICE_NOT_FOUND);
-    }
-
-    @SafeVarargs
-    private static NoticeDO randomNoticeDO(Consumer<NoticeDO>... consumers) {
-        NoticeDO notice = randomPojo(NoticeDO.class, consumers);
-        notice.setType(randomEle(NoticeTypeEnum.values()).getType());
-        notice.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        return notice;
-    }
-
-    @SafeVarargs
-    private static NoticeUpdateReqVO randomNoticeUpdateReqVO(Consumer<NoticeUpdateReqVO>... consumers) {
-        NoticeUpdateReqVO reqVO = randomPojo(NoticeUpdateReqVO.class, consumers);
-        reqVO.setType(randomEle(NoticeTypeEnum.values()).getType());
-        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        return reqVO;
-    }
-
-    private static NoticeCreateReqVO randomNoticeCreateReqVO() {
-        NoticeCreateReqVO reqVO = randomPojo(NoticeCreateReqVO.class);
-        reqVO.setType(randomEle(NoticeTypeEnum.values()).getType());
-        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        return reqVO;
     }
 
 

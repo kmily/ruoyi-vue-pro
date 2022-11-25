@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel;
 
-import lombok.*;
+import com.alibaba.excel.annotation.ExcelProperty;
+import lombok.Data;
 
 import java.time.LocalDateTime;
-
-import com.alibaba.excel.annotation.ExcelProperty;
 
 /**
  * 支付渠道 Excel VO

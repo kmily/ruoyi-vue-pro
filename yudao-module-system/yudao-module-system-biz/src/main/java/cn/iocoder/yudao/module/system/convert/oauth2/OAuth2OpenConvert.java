@@ -31,6 +31,7 @@ public interface OAuth2OpenConvert {
         respVO.setScope(OAuth2Utils.buildScopeStr(bean.getScopes()));
         return respVO;
     }
+
     OAuth2OpenAccessTokenRespVO convert0(OAuth2AccessTokenDO bean);
 
     default OAuth2OpenCheckTokenRespVO convert2(OAuth2AccessTokenDO bean) {
@@ -39,6 +40,7 @@ public interface OAuth2OpenConvert {
         respVO.setUserType(UserTypeEnum.ADMIN.getValue());
         return respVO;
     }
+
     OAuth2OpenCheckTokenRespVO convert3(OAuth2AccessTokenDO bean);
 
     default OAuth2OpenAuthorizeInfoRespVO convert(OAuth2ClientDO client, List<OAuth2ApproveDO> approves) {

@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.sms;
 
-import cn.iocoder.yudao.module.system.enums.sms.SmsReceiveStatusEnum;
-import cn.iocoder.yudao.module.system.enums.sms.SmsSendStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.sms.core.enums.SmsFrameworkErrorCodeConstants;
+import cn.iocoder.yudao.module.system.enums.sms.SmsReceiveStatusEnum;
+import cn.iocoder.yudao.module.system.enums.sms.SmsSendStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -39,13 +39,13 @@ public class SmsLogDO extends BaseDO {
 
     /**
      * 短信渠道编号
-     *
+     * <p>
      * 关联 {@link SmsChannelDO#getId()}
      */
     private Long channelId;
     /**
      * 短信渠道编码
-     *
+     * <p>
      * 冗余 {@link SmsChannelDO#getCode()}
      */
     private String channelCode;
@@ -54,19 +54,19 @@ public class SmsLogDO extends BaseDO {
 
     /**
      * 模板编号
-     *
+     * <p>
      * 关联 {@link SmsTemplateDO#getId()}
      */
     private Long templateId;
     /**
      * 模板编码
-     *
+     * <p>
      * 冗余 {@link SmsTemplateDO#getCode()}
      */
     private String templateCode;
     /**
      * 短信类型
-     *
+     * <p>
      * 冗余 {@link SmsTemplateDO#getType()}
      */
     private Integer templateType;
@@ -81,7 +81,7 @@ public class SmsLogDO extends BaseDO {
     private Map<String, Object> templateParams;
     /**
      * 短信 API 的模板编号
-     *
+     * <p>
      * 冗余 {@link SmsTemplateDO#getApiTemplateId()}
      */
     private String apiTemplateId;
@@ -98,7 +98,7 @@ public class SmsLogDO extends BaseDO {
     private Long userId;
     /**
      * 用户类型
-     *
+     * <p>
      * 枚举 {@link UserTypeEnum}
      */
     private Integer userType;
@@ -107,7 +107,7 @@ public class SmsLogDO extends BaseDO {
 
     /**
      * 发送状态
-     *
+     * <p>
      * 枚举 {@link SmsSendStatusEnum}
      */
     private Integer sendStatus;
@@ -117,20 +117,20 @@ public class SmsLogDO extends BaseDO {
     private LocalDateTime sendTime;
     /**
      * 发送结果的编码
-     *
+     * <p>
      * 枚举 {@link SmsFrameworkErrorCodeConstants}
      */
     private Integer sendCode;
     /**
      * 发送结果的提示
-     *
+     * <p>
      * 一般情况下，使用 {@link SmsFrameworkErrorCodeConstants}
      * 异常情况下，通过格式化 Exception 的提示存储
      */
     private String sendMsg;
     /**
      * 短信 API 发送结果的编码
-     *
+     * <p>
      * 由于第三方的错误码可能是字符串，所以使用 String 类型
      */
     private String apiSendCode;
@@ -140,13 +140,13 @@ public class SmsLogDO extends BaseDO {
     private String apiSendMsg;
     /**
      * 短信 API 发送返回的唯一请求 ID
-     *
+     * <p>
      * 用于和短信 API 进行定位于排错
      */
     private String apiRequestId;
     /**
      * 短信 API 发送返回的序号
-     *
+     * <p>
      * 用于和短信 API 平台的发送记录关联
      */
     private String apiSerialNo;
@@ -155,7 +155,7 @@ public class SmsLogDO extends BaseDO {
 
     /**
      * 接收状态
-     *
+     * <p>
      * 枚举 {@link SmsReceiveStatusEnum}
      */
     private Integer receiveStatus;

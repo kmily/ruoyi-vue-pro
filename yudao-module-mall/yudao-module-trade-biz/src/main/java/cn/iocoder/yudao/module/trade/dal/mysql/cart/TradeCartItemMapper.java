@@ -26,9 +26,9 @@ public interface TradeCartItemMapper extends BaseMapperX<TradeCartItemDO> {
                 .in(TradeCartItemDO::getSkuId, skuIds));
     }
 
-   default void updateByIds(Collection<Long> ids, TradeCartItemDO updateObject) {
-       update(updateObject, new LambdaQueryWrapper<TradeCartItemDO>().in(TradeCartItemDO::getId, ids));
-   }
+    default void updateByIds(Collection<Long> ids, TradeCartItemDO updateObject) {
+        update(updateObject, new LambdaQueryWrapper<TradeCartItemDO>().in(TradeCartItemDO::getId, ids));
+    }
 
     default Integer selectSumByUserId(Long userId) {
         // SQL sum 查询

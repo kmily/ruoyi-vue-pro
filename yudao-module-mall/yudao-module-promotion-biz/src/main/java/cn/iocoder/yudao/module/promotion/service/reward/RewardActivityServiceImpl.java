@@ -108,7 +108,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
     /**
      * 校验商品参加的活动是否冲突
      *
-     * @param id 活动编号
+     * @param id     活动编号
      * @param spuIds 商品 SPU 编号数组
      */
     private void validateRewardActivitySpuConflicts(Long id, Collection<Long> spuIds) {
@@ -130,7 +130,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
     /**
      * 获得商品参加的满减送活动的数组
      *
-     * @param spuIds 商品 SPU 编号数组
+     * @param spuIds   商品 SPU 编号数组
      * @param statuses 活动状态数组
      * @return 商品参加的满减送活动的数组
      */

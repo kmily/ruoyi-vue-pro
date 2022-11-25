@@ -76,7 +76,7 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
                     responseV3 = unifiedOrderV2(reqDTO).getCodeUrl();
                     break;
                 case WXPayClientConfig.API_VERSION_V3:
-                  responseV3 = this.unifiedOrderV3(reqDTO);
+                    responseV3 = this.unifiedOrderV3(reqDTO);
                     break;
                 default:
                     throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
@@ -120,7 +120,6 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
     }
 
     /**
-     *
      * 微信支付回调 分v2 和v3 的处理方式
      *
      * @param data 通知结果

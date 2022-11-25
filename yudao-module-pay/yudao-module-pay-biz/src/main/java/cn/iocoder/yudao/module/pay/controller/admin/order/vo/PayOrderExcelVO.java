@@ -83,7 +83,7 @@ public class PayOrderExcelVO {
     private Integer refundTimes;
 
     @ExcelProperty("退款总金额，单位：元")
-    private String  refundAmount;
+    private String refundAmount;
 
     @ExcelProperty("商品描述")
     private String body;

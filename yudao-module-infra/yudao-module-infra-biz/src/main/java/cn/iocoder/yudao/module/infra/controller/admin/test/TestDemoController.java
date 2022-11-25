@@ -78,16 +78,18 @@ public class TestDemoController {
 
     @GetMapping("/page")
     @ApiOperation("获得字典类型分页")
-    @PreAuthorize("@ss.hasPermission('infra:test-demo:query')")    public CommonResult<PageResult<TestDemoRespVO>> getTestDemoPage(@Valid TestDemoPageReqVO pageVO) {
+    @PreAuthorize("@ss.hasPermission('infra:test-demo:query')")
+    public CommonResult<PageResult<TestDemoRespVO>> getTestDemoPage(@Valid TestDemoPageReqVO pageVO) {
         PageResult<TestDemoDO> pageResult = testDemoService.getTestDemoPage(pageVO);
         return success(TestDemoConvert.INSTANCE.convertPage(pageResult));
     }
 
     @GetMapping("/export-excel")
     @ApiOperation("导出字典类型 Excel")
-    @PreAuthorize("@ss.hasPermission('infra:test-demo:export')")    @OperateLog(type = EXPORT)
+    @PreAuthorize("@ss.hasPermission('infra:test-demo:export')")
+    @OperateLog(type = EXPORT)
     public void exportTestDemoExcel(@Valid TestDemoExportReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
+                                    HttpServletResponse response) throws IOException {
         List<TestDemoDO> list = testDemoService.getTestDemoList(exportReqVO);
         // 导出 Excel
         List<TestDemoExcelVO> datas = TestDemoConvert.INSTANCE.convertList02(list);

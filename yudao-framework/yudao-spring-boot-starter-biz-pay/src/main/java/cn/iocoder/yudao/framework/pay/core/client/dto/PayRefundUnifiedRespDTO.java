@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.framework.pay.core.client.dto;
 
-import cn.iocoder.yudao.framework.pay.core.enums.PayChannelRefundRespEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+
 /**
  * 统一退款 Response DTO
  *

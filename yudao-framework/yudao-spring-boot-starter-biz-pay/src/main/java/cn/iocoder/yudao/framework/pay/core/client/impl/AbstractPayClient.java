@@ -102,7 +102,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
         PayCommonResult<PayRefundUnifiedRespDTO> resp;
         try {
             resp = doUnifiedRefund(reqDTO);
-        }  catch (Throwable ex) {
+        } catch (Throwable ex) {
             // 记录异常日志
             log.error("[unifiedRefund][request({}) 发起退款失败]", toJsonString(reqDTO), ex);
             resp = PayCommonResult.error(ex);

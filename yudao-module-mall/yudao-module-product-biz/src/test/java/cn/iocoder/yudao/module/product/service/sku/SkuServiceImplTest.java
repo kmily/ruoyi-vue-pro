@@ -15,11 +15,12 @@ import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_E
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 // TODO 芋艿：整合到 {@link ProductSkuServiceTest} 中
+
 /**
-* {@link ProductSkuServiceImpl} 的单元测试类
-*
-* @author 芋道源码
-*/
+ * {@link ProductSkuServiceImpl} 的单元测试类
+ *
+ * @author 芋道源码
+ */
 @Import(ProductSkuServiceImpl.class)
 @Disabled // TODO 芋艿：临时去掉
 public class SkuServiceImplTest extends BaseDbUnitTest {
@@ -40,8 +41,8 @@ public class SkuServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         ProductSkuService.deleteSku(id);
-       // 校验数据不存在了
-       assertNull(ProductSkuMapper.selectById(id));
+        // 校验数据不存在了
+        assertNull(ProductSkuMapper.selectById(id));
     }
 
     @Test

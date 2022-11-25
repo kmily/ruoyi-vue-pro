@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.pay.service.merchant;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.app.PayAppCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.app.PayAppExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.app.PayAppPageReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.app.PayAppUpdateReqVO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayAppDO;
 
 import javax.validation.Valid;
@@ -98,14 +98,14 @@ public interface PayAppService {
      * @return 商户 Map
      */
     default Map<Long, PayAppDO> getAppMap(Collection<Long> appIdList) {
-        List<PayAppDO> list =  this.getAppList(appIdList);
+        List<PayAppDO> list = this.getAppList(appIdList);
         return CollectionUtils.convertMap(list, PayAppDO::getId);
     }
 
 
     /**
      * 支付应用的合法性
-     *
+     * <p>
      * 如果不合法，抛出 {@link ServiceException} 业务异常
      *
      * @param id 应用编号

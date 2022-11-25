@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @ApiModel("管理后台 - Banner Response VO")
 @Data
 @ToString(callSuper = true)
-public class BannerRespVO  extends BannerBaseVO {
+public class BannerRespVO extends BannerBaseVO {
 
     @ApiModelProperty(value = "banner编号", required = true)
     @NotNull(message = "banner编号不能为空")

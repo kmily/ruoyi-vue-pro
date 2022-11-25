@@ -8,7 +8,7 @@ import lombok.*;
 
 /**
  * 商品分类 DO
- *
+ * <p>
  * 商品分类一共两类：
  * 1）一级分类：{@link #parentId} 等于 0
  * 2）二级 + 三级分类：{@link #parentId} 不等于 0
@@ -44,7 +44,7 @@ public class ProductCategoryDO extends BaseDO {
     private String name;
     /**
      * 分类图片
-     *
+     * <p>
      * 一级分类：推荐 200 x 100 分辨率
      * 二级 + 三级分类：推荐 100 x 100 分辨率
      */
@@ -59,7 +59,7 @@ public class ProductCategoryDO extends BaseDO {
     private String description;
     /**
      * 开启状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;

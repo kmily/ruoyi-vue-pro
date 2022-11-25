@@ -23,7 +23,7 @@ public class AuthController {
     /**
      * 使用 code 访问令牌，获得访问令牌
      *
-     * @param code 授权码
+     * @param code        授权码
      * @param redirectUri 重定向 URI
      * @return 访问令牌；注意，实际项目中，最好创建对应的 ResponseVO 类，只返回必要的字段
      */

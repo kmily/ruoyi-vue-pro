@@ -1,9 +1,6 @@
 package cn.iocoder.yudao.module.pay.convert.merchant;
 
-import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.merchant.PayMerchantCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.merchant.PayMerchantExcelVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.merchant.PayMerchantRespVO;
@@ -11,6 +8,8 @@ import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.merchant.PayMerc
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayMerchantDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper
 public interface PayMerchantConvert {

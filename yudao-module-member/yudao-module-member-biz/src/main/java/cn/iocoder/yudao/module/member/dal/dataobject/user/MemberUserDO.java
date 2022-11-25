@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 /**
  * 会员用户 DO
- *
+ * <p>
  * uk_mobile 索引：基于 {@link #mobile} 字段
  *
  * @author 芋道源码
@@ -41,7 +41,7 @@ public class MemberUserDO extends TenantBaseDO {
     private String avatar;
     /**
      * 帐号状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
@@ -52,7 +52,7 @@ public class MemberUserDO extends TenantBaseDO {
     private String mobile;
     /**
      * 加密后的密码
-     *
+     * <p>
      * 因为目前使用 {@link BCryptPasswordEncoder} 加密器，所以无需自己处理 salt 盐
      */
     private String password;

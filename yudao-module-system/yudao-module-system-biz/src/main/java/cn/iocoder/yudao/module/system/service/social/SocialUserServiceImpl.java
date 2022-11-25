@@ -147,8 +147,8 @@ public class SocialUserServiceImpl implements SocialUserService {
     /**
      * 请求社交平台，获得授权的用户
      *
-     * @param type 社交平台的类型
-     * @param code 授权码
+     * @param type  社交平台的类型
+     * @param code  授权码
      * @param state 授权 state
      * @return 授权的用户
      */

@@ -347,12 +347,12 @@ public class MenuServiceTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testCheckResource_sonMenuNameDuplicate(){
-        MenuDO sonMenu=initParentAndSonMenuDO();
-        Long parentId=sonMenu.getParentId();
+    public void testCheckResource_sonMenuNameDuplicate() {
+        MenuDO sonMenu = initParentAndSonMenuDO();
+        Long parentId = sonMenu.getParentId();
 
-        Long otherSonMenuId=randomLongId();
-        String otherSonMenuName=sonMenu.getName(); //相同名称
+        Long otherSonMenuId = randomLongId();
+        String otherSonMenuName = sonMenu.getName(); //相同名称
 
         assertServiceException(() -> menuService.checkResource(parentId, otherSonMenuName, otherSonMenuId), MENU_NAME_DUPLICATE);
     }

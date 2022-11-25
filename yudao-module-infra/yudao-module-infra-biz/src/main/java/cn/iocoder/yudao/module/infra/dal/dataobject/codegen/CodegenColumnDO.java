@@ -29,7 +29,7 @@ public class CodegenColumnDO extends BaseDO {
     private Long id;
     /**
      * 表编号
-     *
+     * <p>
      * 关联 {@link CodegenTableDO#getId()}
      */
     private Long tableId;
@@ -69,7 +69,7 @@ public class CodegenColumnDO extends BaseDO {
 
     /**
      * Java 属性类型
-     *
+     * <p>
      * 例如说 String、Boolean 等等
      */
     private String javaType;
@@ -79,7 +79,7 @@ public class CodegenColumnDO extends BaseDO {
     private String javaField;
     /**
      * 字典类型
-     *
+     * <p>
      * 关联 DictTypeDO 的 type 属性
      */
     private String dictType;
@@ -104,7 +104,7 @@ public class CodegenColumnDO extends BaseDO {
     private Boolean listOperation;
     /**
      * List 查询操作的条件类型
-     *
+     * <p>
      * 枚举 {@link CodegenColumnListConditionEnum}
      */
     private String listOperationCondition;
@@ -117,7 +117,7 @@ public class CodegenColumnDO extends BaseDO {
 
     /**
      * 显示类型
-     *
+     * <p>
      * 枚举 {@link CodegenColumnHtmlTypeEnum}
      */
     private String htmlType;

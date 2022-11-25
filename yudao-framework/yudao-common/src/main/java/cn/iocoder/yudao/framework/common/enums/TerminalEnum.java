@@ -19,7 +19,8 @@ public enum TerminalEnum implements IntArrayValuable {
     MINI_PROGRAM(1, "小程序"),
     H5(2, "H5"),
     IOS(3, "iOS"),
-    ANDROID(3, "安卓"),;
+    ANDROID(3, "安卓"),
+    ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(TerminalEnum::getTerminal).toArray();
 

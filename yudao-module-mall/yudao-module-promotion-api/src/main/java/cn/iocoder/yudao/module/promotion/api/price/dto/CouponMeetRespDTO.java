@@ -4,7 +4,7 @@ import lombok.Data;
 
 /**
  * 优惠劵的匹配信息 Response DTO
- *
+ * <p>
  * why 放在 price 包下？主要获取的时候，需要涉及到较多的价格计算逻辑，放在 price 可以更好的复用逻辑
  *
  * @author 芋道源码
@@ -24,7 +24,7 @@ public class CouponMeetRespDTO {
     private Boolean meet;
     /**
      * 不匹配的提示，即 {@link #meet} = true 才有值
-     *
+     * <p>
      * 例如说：
      * 1. 所结算商品没有符合条件的商品
      * 2. 差 XXX 元可用优惠劵

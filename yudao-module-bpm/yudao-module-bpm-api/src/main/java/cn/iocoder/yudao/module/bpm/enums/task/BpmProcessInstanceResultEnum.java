@@ -24,7 +24,7 @@ public enum BpmProcessInstanceResultEnum {
 
     /**
      * 结果
-     *
+     * <p>
      * 如果新增时，注意 {@link #isEndResult(Integer)} 是否需要变更
      */
     private final Integer result;
@@ -35,7 +35,7 @@ public enum BpmProcessInstanceResultEnum {
 
     /**
      * 判断该结果是否已经处于 End 最终结果
-     *
+     * <p>
      * 主要用于一些结果更新的逻辑，如果已经是最终结果，就不再进行更新
      *
      * @param result 结果

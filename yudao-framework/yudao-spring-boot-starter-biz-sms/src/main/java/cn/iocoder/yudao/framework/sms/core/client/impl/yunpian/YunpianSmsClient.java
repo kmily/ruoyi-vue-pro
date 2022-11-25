@@ -52,6 +52,24 @@ public class YunpianSmsClient extends AbstractSmsClient {
         Assert.notEmpty(properties.getApiKey(), "apiKey 不能为空");
     }
 
+    private static String formatTplValue(List<KeyValue<String, Object>> templateParams) {
+        if (CollUtil.isEmpty(templateParams)) {
+            return "";
+        }
+        // 参考 https://www.yunpian.com/official/document/sms/zh_cn/introduction_demos_encode_sample 格式化
+        StringJoiner joiner = new StringJoiner("&");
+        templateParams.forEach(param -> joiner.add(String.format("#%s#=%s", param.getKey(),
+                URLUtil.encode(String.valueOf(param.getValue())))));
+        return joiner.toString();
+    }
+
+    private static String formatResultMsg(Result<?> sendResult) {
+        if (StrUtil.isEmpty(sendResult.getDetail())) {
+            return sendResult.getMsg();
+        }
+        return sendResult.getMsg() + " => " + sendResult.getDetail();
+    }
+
     @Override
     public void doInit() {
         YunpianClient oldClient = client;
@@ -77,17 +95,6 @@ public class YunpianSmsClient extends AbstractSmsClient {
             request.put(YunpianConstant.CALLBACK_URL, properties.getCallbackUrl());
             return client.sms().tpl_single_send(request);
         }, response -> new SmsSendRespDTO().setSerialNo(String.valueOf(response.getSid())));
-    }
-
-    private static String formatTplValue(List<KeyValue<String, Object>> templateParams) {
-        if (CollUtil.isEmpty(templateParams)) {
-            return "";
-        }
-        // 参考 https://www.yunpian.com/official/document/sms/zh_cn/introduction_demos_encode_sample 格式化
-        StringJoiner joiner = new StringJoiner("&");
-        templateParams.forEach(param -> joiner.add(String.format("#%s#=%s", param.getKey(),
-                URLUtil.encode(String.valueOf(param.getValue())))));
-        return joiner.toString();
     }
 
     @Override
@@ -116,17 +123,21 @@ public class YunpianSmsClient extends AbstractSmsClient {
         }, response -> {
             Template template = response.get(0);
             return new SmsTemplateRespDTO().setId(String.valueOf(template.getTpl_id())).setContent(template.getTpl_content())
-                   .setAuditStatus(convertSmsTemplateAuditStatus(template.getCheck_status())).setAuditReason(template.getReason());
+                    .setAuditStatus(convertSmsTemplateAuditStatus(template.getCheck_status())).setAuditReason(template.getReason());
         });
     }
 
     @VisibleForTesting
     Integer convertSmsTemplateAuditStatus(String checkStatus) {
         switch (checkStatus) {
-            case "CHECKING": return SmsTemplateAuditStatusEnum.CHECKING.getStatus();
-            case "SUCCESS": return SmsTemplateAuditStatusEnum.SUCCESS.getStatus();
-            case "FAIL": return SmsTemplateAuditStatusEnum.FAIL.getStatus();
-            default: throw new IllegalArgumentException(String.format("未知审核状态(%s)", checkStatus));
+            case "CHECKING":
+                return SmsTemplateAuditStatusEnum.CHECKING.getStatus();
+            case "SUCCESS":
+                return SmsTemplateAuditStatusEnum.SUCCESS.getStatus();
+            case "FAIL":
+                return SmsTemplateAuditStatusEnum.FAIL.getStatus();
+            default:
+                throw new IllegalArgumentException(String.format("未知审核状态(%s)", checkStatus));
         }
     }
 
@@ -146,16 +157,9 @@ public class YunpianSmsClient extends AbstractSmsClient {
         return SmsCommonResult.build(String.valueOf(result.getCode()), formatResultMsg(result), null, data, codeMapping);
     }
 
-    private static String formatResultMsg(Result<?> sendResult) {
-        if (StrUtil.isEmpty(sendResult.getDetail())) {
-            return sendResult.getMsg();
-        }
-        return sendResult.getMsg() + " => " + sendResult.getDetail();
-    }
-
     /**
      * 短信接收状态
-     *
+     * <p>
      * 参见 https://www.yunpian.com/official/document/sms/zh_cn/domestic_push_report 文档
      *
      * @author 芋道源码
@@ -165,7 +169,7 @@ public class YunpianSmsClient extends AbstractSmsClient {
 
         /**
          * 接收状态
-         *
+         * <p>
          * 目前仅有 SUCCESS / FAIL，所以使用 Boolean 接收
          */
         @JsonProperty("report_status")
@@ -176,14 +180,14 @@ public class YunpianSmsClient extends AbstractSmsClient {
         private String mobile;
         /**
          * 运营商返回的代码，如："DB:0103"
-         *
+         * <p>
          * 由于不同运营商信息不同，此字段仅供参考；
          */
         @JsonProperty("error_msg")
         private String errorMsg;
         /**
          * 运营商反馈代码的中文解释
-         *
+         * <p>
          * 默认不推送此字段，如需推送，请联系客服
          */
         @JsonProperty("error_detail")
@@ -194,7 +198,7 @@ public class YunpianSmsClient extends AbstractSmsClient {
         private Long sid;
         /**
          * 用户自定义 id
-         *
+         * <p>
          * 这里我们传递的是 SysSmsLogDO 的日志编号
          */
         private Long uid;

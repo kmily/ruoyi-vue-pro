@@ -57,7 +57,7 @@ public interface DeptService {
     /**
      * 获得所有子部门，从缓存中
      *
-     * @param parentId 部门编号
+     * @param parentId  部门编号
      * @param recursive 是否递归获取所有
      * @return 子部门列表
      */

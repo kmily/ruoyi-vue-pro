@@ -53,6 +53,34 @@ public class SimpleTrie {
     }
 
     /**
+     * 返回文本从 index 开始的敏感词，并使用 StringBuilder 参数进行返回
+     * <p>
+     * 逻辑和 {@link #recursion(String, int, Map)} 是一致，只是多了 result 返回结果
+     *
+     * @param text   文本
+     * @param index  开始未知
+     * @param child  节点（当前遍历到的）
+     * @param result 返回敏感词
+     * @return 是否有敏感词
+     */
+    @SuppressWarnings("unchecked")
+    private static boolean recursionWithResult(String text, int index, Map<Character, Object> child, StringBuilder result) {
+        if (index == text.length()) {
+            return true;
+        }
+        Character c = text.charAt(index);
+        child = (Map<Character, Object>) child.get(c);
+        if (child == null) {
+            return true;
+        }
+        if (child.containsKey(CHARACTER_END)) {
+            result.append(c);
+            return false;
+        }
+        return recursionWithResult(text, ++index, child, result.append(c));
+    }
+
+    /**
      * 验证文本是否合法，即不包含敏感词
      *
      * @param text 文本
@@ -91,7 +119,7 @@ public class SimpleTrie {
 
     /**
      * 获得文本所包含的不合法的敏感词
-     *
+     * <p>
      * 注意，才当即最短匹配原则。例如说：当敏感词存在 “煞笔”，“煞笔二货 ”时，只会返回 “煞笔”。
      *
      * @param text 文本
@@ -112,34 +140,6 @@ public class SimpleTrie {
             }
         }
         return new ArrayList<>(results);
-    }
-
-    /**
-     * 返回文本从 index 开始的敏感词，并使用 StringBuilder 参数进行返回
-     *
-     * 逻辑和 {@link #recursion(String, int, Map)} 是一致，只是多了 result 返回结果
-     *
-     * @param text   文本
-     * @param index  开始未知
-     * @param child  节点（当前遍历到的）
-     * @param result 返回敏感词
-     * @return 是否有敏感词
-     */
-    @SuppressWarnings("unchecked")
-    private static boolean recursionWithResult(String text, int index, Map<Character, Object> child, StringBuilder result) {
-        if (index == text.length()) {
-            return true;
-        }
-        Character c = text.charAt(index);
-        child = (Map<Character, Object>) child.get(c);
-        if (child == null) {
-            return true;
-        }
-        if (child.containsKey(CHARACTER_END)) {
-            result.append(c);
-            return false;
-        }
-        return recursionWithResult(text, ++index, child, result.append(c));
     }
 
 }

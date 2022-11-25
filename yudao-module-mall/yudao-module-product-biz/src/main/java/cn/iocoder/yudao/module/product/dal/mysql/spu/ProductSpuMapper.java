@@ -47,7 +47,7 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
     /**
      * 更新商品 SPU 库存
      *
-     * @param id 商品 SPU 编号
+     * @param id        商品 SPU 编号
      * @param incrCount 增加的库存数量
      */
     default void updateStock(Long id, Integer incrCount) {

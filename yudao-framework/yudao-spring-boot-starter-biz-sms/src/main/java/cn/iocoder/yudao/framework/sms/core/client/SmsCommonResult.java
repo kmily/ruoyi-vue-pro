@@ -11,9 +11,9 @@ import lombok.ToString;
 
 /**
  * 短信的 CommonResult 拓展类
- *
+ * <p>
  * 考虑到不同的平台，返回的 code 和 msg 是不同的，所以统一额外返回 {@link #apiCode} 和 {@link #apiMsg} 字段
- *
+ * <p>
  * 另外，一些短信平台（例如说阿里云、腾讯云）会返回一个请求编号，用于排查请求失败的问题，我们设置到 {@link #apiRequestId} 字段
  *
  * @author 芋道源码
@@ -25,7 +25,7 @@ public class SmsCommonResult<T> extends CommonResult<T> {
 
     /**
      * API 返回错误码
-     *
+     * <p>
      * 由于第三方的错误码可能是字符串，所以使用 String 类型
      */
     private String apiCode;

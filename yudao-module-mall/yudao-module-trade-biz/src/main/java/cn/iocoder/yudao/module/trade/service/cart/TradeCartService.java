@@ -18,7 +18,7 @@ public interface TradeCartService {
     /**
      * 添加商品到购物车
      *
-     * @param userId 用户编号
+     * @param userId        用户编号
      * @param addCountReqVO 添加信息
      */
     void addCartItemCount(Long userId, @Valid AppTradeCartItemAddCountReqVO addCountReqVO);
@@ -26,7 +26,7 @@ public interface TradeCartService {
     /**
      * 更新购物车商品数量
      *
-     * @param userId 用户编号
+     * @param userId           用户编号
      * @param updateCountReqVO 更新信息
      */
     void updateCartItemCount(Long userId, AppTradeCartItemUpdateCountReqVO updateCountReqVO);
@@ -34,7 +34,7 @@ public interface TradeCartService {
     /**
      * 更新购物车商品是否选中
      *
-     * @param userId 用户编号
+     * @param userId              用户编号
      * @param updateSelectedReqVO 更新信息
      */
     void updateCartItemSelected(Long userId, AppTradeCartItemUpdateSelectedReqVO updateSelectedReqVO);

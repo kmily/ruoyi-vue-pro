@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.system.mq.producer.permission;
 
-import cn.iocoder.yudao.module.system.mq.message.permission.MenuRefreshMessage;
 import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;
+import cn.iocoder.yudao.module.system.mq.message.permission.MenuRefreshMessage;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

@@ -33,10 +33,10 @@ import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
-* {@link DiscountActivityServiceImpl} 的单元测试类
-*
-* @author 芋道源码
-*/
+ * {@link DiscountActivityServiceImpl} 的单元测试类
+ *
+ * @author 芋道源码
+ */
 @Import(DiscountActivityServiceImpl.class)
 public class DiscountActivityServiceImplTest extends BaseDbUnitTest {
 
@@ -165,8 +165,8 @@ public class DiscountActivityServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         discountActivityService.deleteDiscountActivity(id);
-       // 校验数据不存在了
-       assertNull(discountActivityMapper.selectById(id));
+        // 校验数据不存在了
+        assertNull(discountActivityMapper.selectById(id));
     }
 
     @Test
@@ -180,31 +180,31 @@ public class DiscountActivityServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testGetDiscountActivityPage() {
-       // mock 数据
-       DiscountActivityDO dbDiscountActivity = randomPojo(DiscountActivityDO.class, o -> { // 等会查询到
-           o.setName("芋艿");
-           o.setStatus(PromotionActivityStatusEnum.WAIT.getStatus());
-           o.setCreateTime(buildTime(2021, 1, 15));
-       });
-       discountActivityMapper.insert(dbDiscountActivity);
-       // 测试 name 不匹配
-       discountActivityMapper.insert(cloneIgnoreId(dbDiscountActivity, o -> o.setName("土豆")));
-       // 测试 status 不匹配
-       discountActivityMapper.insert(cloneIgnoreId(dbDiscountActivity, o -> o.setStatus(PromotionActivityStatusEnum.END.getStatus())));
-       // 测试 createTime 不匹配
-       discountActivityMapper.insert(cloneIgnoreId(dbDiscountActivity, o -> o.setCreateTime(buildTime(2021, 2, 10))));
-       // 准备参数
-       DiscountActivityPageReqVO reqVO = new DiscountActivityPageReqVO();
-       reqVO.setName("芋艿");
-       reqVO.setStatus(PromotionActivityStatusEnum.WAIT.getStatus());
-       reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 1, 1), buildTime(2021, 1, 31)}));
+        // mock 数据
+        DiscountActivityDO dbDiscountActivity = randomPojo(DiscountActivityDO.class, o -> { // 等会查询到
+            o.setName("芋艿");
+            o.setStatus(PromotionActivityStatusEnum.WAIT.getStatus());
+            o.setCreateTime(buildTime(2021, 1, 15));
+        });
+        discountActivityMapper.insert(dbDiscountActivity);
+        // 测试 name 不匹配
+        discountActivityMapper.insert(cloneIgnoreId(dbDiscountActivity, o -> o.setName("土豆")));
+        // 测试 status 不匹配
+        discountActivityMapper.insert(cloneIgnoreId(dbDiscountActivity, o -> o.setStatus(PromotionActivityStatusEnum.END.getStatus())));
+        // 测试 createTime 不匹配
+        discountActivityMapper.insert(cloneIgnoreId(dbDiscountActivity, o -> o.setCreateTime(buildTime(2021, 2, 10))));
+        // 准备参数
+        DiscountActivityPageReqVO reqVO = new DiscountActivityPageReqVO();
+        reqVO.setName("芋艿");
+        reqVO.setStatus(PromotionActivityStatusEnum.WAIT.getStatus());
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 1, 1), buildTime(2021, 1, 31)}));
 
-       // 调用
-       PageResult<DiscountActivityDO> pageResult = discountActivityService.getDiscountActivityPage(reqVO);
-       // 断言
-       assertEquals(1, pageResult.getTotal());
-       assertEquals(1, pageResult.getList().size());
-       assertPojoEquals(dbDiscountActivity, pageResult.getList().get(0));
+        // 调用
+        PageResult<DiscountActivityDO> pageResult = discountActivityService.getDiscountActivityPage(reqVO);
+        // 断言
+        assertEquals(1, pageResult.getTotal());
+        assertEquals(1, pageResult.getList().size());
+        assertPojoEquals(dbDiscountActivity, pageResult.getList().get(0));
     }
 
 }

@@ -178,7 +178,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
         reqVO.setName("土豆");
         reqVO.setCode("tu");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2022, 2, 1),buildTime(2022, 2, 12)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2022, 2, 1), buildTime(2022, 2, 12)}));
 
         // 调用
         List<RoleDO> list = roleService.getRoleList(reqVO);
@@ -208,7 +208,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
         reqVO.setName("土豆");
         reqVO.setCode("tu");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2022, 2, 1),buildTime(2022, 2, 12)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2022, 2, 1), buildTime(2022, 2, 12)}));
 
         // 调用
         PageResult<RoleDO> pageResult = roleService.getRolePage(reqVO);
@@ -274,7 +274,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
     }
 
     private RoleDO createRoleDO(String name, RoleTypeEnum typeEnum, DataScopeEnum scopeEnum, Integer status) {
-        return createRoleDO( name, typeEnum, scopeEnum, status, randomString());
+        return createRoleDO(name, typeEnum, scopeEnum, status, randomString());
     }
 
     private RoleDO createRoleDO(String name, RoleTypeEnum typeEnum, DataScopeEnum scopeEnum, Integer status, String code) {

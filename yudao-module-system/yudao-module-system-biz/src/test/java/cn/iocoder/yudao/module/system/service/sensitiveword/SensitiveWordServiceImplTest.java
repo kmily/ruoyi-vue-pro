@@ -158,7 +158,7 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         reqVO.setName("笨");
         reqVO.setTag("论坛");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2022, 2, 1),buildTime(2022, 2, 12)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2022, 2, 1), buildTime(2022, 2, 12)}));
 
         // 调用
         PageResult<SensitiveWordDO> pageResult = sensitiveWordService.getSensitiveWordPage(reqVO);
@@ -189,7 +189,7 @@ public class SensitiveWordServiceImplTest extends BaseDbUnitTest {
         reqVO.setName("笨");
         reqVO.setTag("论坛");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2022, 2, 1),buildTime(2022, 2, 12)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2022, 2, 1), buildTime(2022, 2, 12)}));
 
         // 调用
         List<SensitiveWordDO> list = sensitiveWordService.getSensitiveWordList(reqVO);

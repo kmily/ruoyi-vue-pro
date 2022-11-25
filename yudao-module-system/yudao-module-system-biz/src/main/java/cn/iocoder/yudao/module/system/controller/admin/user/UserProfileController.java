@@ -95,7 +95,8 @@ public class UserProfileController {
         return success(true);
     }
 
-    @RequestMapping(value = "/update-avatar", method = {RequestMethod.POST, RequestMethod.PUT}) // 解决 uni-app 不支持 Put 上传文件的问题
+    @RequestMapping(value = "/update-avatar", method = {RequestMethod.POST, RequestMethod.PUT})
+    // 解决 uni-app 不支持 Put 上传文件的问题
     @ApiOperation("上传用户个人头像")
     public CommonResult<String> updateUserAvatar(@RequestParam("avatarFile") MultipartFile file) throws Exception {
         if (file.isEmpty()) {

@@ -86,7 +86,7 @@ public class AppAuthController {
     }
 
     @PostMapping("/update-password")
-    @ApiOperation(value = "修改用户密码",notes = "用户修改密码时使用")
+    @ApiOperation(value = "修改用户密码", notes = "用户修改密码时使用")
     @PreAuthenticated
     public CommonResult<Boolean> updatePassword(@RequestBody @Valid AppAuthUpdatePasswordReqVO reqVO) {
         authService.updatePassword(getLoginUserId(), reqVO);

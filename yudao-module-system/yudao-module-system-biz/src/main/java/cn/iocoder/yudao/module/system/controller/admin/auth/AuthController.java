@@ -148,7 +148,7 @@ public class AuthController {
             @ApiImplicitParam(name = "redirectUri", value = "回调路径", dataTypeClass = String.class)
     })
     public CommonResult<String> socialLogin(@RequestParam("type") Integer type,
-                                                    @RequestParam("redirectUri") String redirectUri) {
+                                            @RequestParam("redirectUri") String redirectUri) {
         return CommonResult.success(socialUserService.getAuthorizeUrl(type, redirectUri));
     }
 

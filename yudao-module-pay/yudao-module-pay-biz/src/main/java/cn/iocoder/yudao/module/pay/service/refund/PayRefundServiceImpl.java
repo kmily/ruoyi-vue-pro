@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.pay.service.refund;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
@@ -19,7 +20,6 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderMapper;
 import cn.iocoder.yudao.module.pay.dal.mysql.refund.PayRefundMapper;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderNotifyStatusEnum;
@@ -94,7 +94,7 @@ public class PayRefundServiceImpl implements PayRefundService {
         // 获得 PayOrderDO
         PayOrderDO order = orderService.getOrder(req.getPayOrderId());
         // 校验订单是否存在
-        if (Objects.isNull(order) ) {
+        if (Objects.isNull(order)) {
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.PAY_ORDER_NOT_FOUND);
         }
         // 校验 App
@@ -117,7 +117,7 @@ public class PayRefundServiceImpl implements PayRefundService {
         }
         PayOrderExtensionDO orderExtensionDO = orderExtensionService.getOrderExtension(order.getSuccessExtensionId());
         PayRefundDO payRefundDO = refundMapper.selectByTradeNoAndMerchantRefundNo(orderExtensionDO.getNo(), req.getMerchantRefundId());
-        if(Objects.nonNull(payRefundDO)){
+        if (Objects.nonNull(payRefundDO)) {
             // 退款订单已经提交过。
             //TODO 校验相同退款单的金额
             // TODO @jason：咱要不封装一个 ObjectUtils.equalsAny
@@ -183,7 +183,7 @@ public class PayRefundServiceImpl implements PayRefundService {
         }
         // 解析渠道退款通知数据， 统一处理
         PayRefundNotifyDTO refundNotify = client.parseRefundNotify(notifyData);
-        if (Objects.equals(PayNotifyRefundStatusEnum.SUCCESS,refundNotify.getStatus())){
+        if (Objects.equals(PayNotifyRefundStatusEnum.SUCCESS, refundNotify.getStatus())) {
             payRefundSuccess(refundNotify);
         } else {
             //TODO 支付异常， 支付宝似乎没有支付异常的通知。
@@ -204,7 +204,7 @@ public class PayRefundServiceImpl implements PayRefundService {
         Long refundedAmount = payOrderDO.getRefundAmount();
 
         PayOrderStatusEnum orderStatus = PayOrderStatusEnum.SUCCESS;
-        if(Objects.equals(payOrderDO.getAmount(), refundedAmount+ refundDO.getRefundAmount())){
+        if (Objects.equals(payOrderDO.getAmount(), refundedAmount + refundDO.getRefundAmount())) {
             //支付金额  = 已退金额 + 本次退款金额。
             orderStatus = PayOrderStatusEnum.CLOSED;
         }
@@ -235,7 +235,8 @@ public class PayRefundServiceImpl implements PayRefundService {
 
     /**
      * 校验是否进行退款
-     * @param req 退款申请信息
+     *
+     * @param req   退款申请信息
      * @param order 原始支付订单信息
      */
     private void validatePayRefund(PayRefundReqDTO req, PayOrderDO order) {
@@ -248,7 +249,7 @@ public class PayRefundServiceImpl implements PayRefundService {
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.PAY_REFUND_ALL_REFUNDED);
         }
         // 校验金额 退款金额不能大于 原定的金额
-        if (req.getAmount() + order.getRefundAmount() > order.getAmount()){
+        if (req.getAmount() + order.getRefundAmount() > order.getAmount()) {
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.PAY_REFUND_AMOUNT_EXCEED);
         }
         // 校验渠道订单号

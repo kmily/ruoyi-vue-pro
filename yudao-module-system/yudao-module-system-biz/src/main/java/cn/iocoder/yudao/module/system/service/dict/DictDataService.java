@@ -84,7 +84,7 @@ public interface DictDataService {
      * 2. 字典数据被禁用
      *
      * @param dictType 字典类型
-     * @param values 字典数据值的数组
+     * @param values   字典数据值的数组
      */
     void validDictDatas(String dictType, Collection<String> values);
 
@@ -92,7 +92,7 @@ public interface DictDataService {
      * 获得指定的字典数据
      *
      * @param dictType 字典类型
-     * @param value 字典数据值
+     * @param value    字典数据值
      * @return 字典数据
      */
     DictDataDO getDictData(String dictType, String value);
@@ -101,7 +101,7 @@ public interface DictDataService {
      * 解析获得指定的字典数据，从缓存中
      *
      * @param dictType 字典类型
-     * @param label 字典数据标签
+     * @param label    字典数据标签
      * @return 字典数据
      */
     DictDataDO parseDictData(String dictType, String label);

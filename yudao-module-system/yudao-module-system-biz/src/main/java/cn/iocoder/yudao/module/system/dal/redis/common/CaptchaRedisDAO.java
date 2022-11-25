@@ -19,6 +19,10 @@ public class CaptchaRedisDAO {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
+    private static String formatKey(String uuid) {
+        return String.format(CAPTCHA_CODE.getKeyTemplate(), uuid);
+    }
+
     public String get(String uuid) {
         String redisKey = formatKey(uuid);
         return stringRedisTemplate.opsForValue().get(redisKey);
@@ -32,10 +36,6 @@ public class CaptchaRedisDAO {
     public void delete(String uuid) {
         String redisKey = formatKey(uuid);
         stringRedisTemplate.delete(redisKey);
-    }
-
-    private static String formatKey(String uuid) {
-        return String.format(CAPTCHA_CODE.getKeyTemplate(), uuid);
     }
 
 }

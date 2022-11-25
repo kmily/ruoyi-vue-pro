@@ -33,7 +33,7 @@ public class SpringExpressionUtils {
     /**
      * 从切面中，单个解析 EL 表达式的结果
      *
-     * @param joinPoint  切面点
+     * @param joinPoint        切面点
      * @param expressionString EL 表达式数组
      * @return 执行界面
      */
@@ -45,7 +45,7 @@ public class SpringExpressionUtils {
     /**
      * 从切面中，批量解析 EL 表达式的结果
      *
-     * @param joinPoint   切面点
+     * @param joinPoint         切面点
      * @param expressionStrings EL 表达式数组
      * @return 结果，key 为表达式，value 为对应值
      */

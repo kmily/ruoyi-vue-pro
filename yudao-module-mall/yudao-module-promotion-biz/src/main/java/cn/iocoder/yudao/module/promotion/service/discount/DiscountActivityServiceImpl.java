@@ -104,7 +104,7 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
     /**
      * 校验商品是否冲突
      *
-     * @param id 编号
+     * @param id       编号
      * @param products 商品列表
      */
     private void validateDiscountActivityProductConflicts(Long id, List<DiscountActivityBaseVO.Product> products) {

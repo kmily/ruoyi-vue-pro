@@ -34,7 +34,7 @@ public class ProductGroupDO extends BaseDO {
     private String name;
     /**
      * 状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
@@ -48,13 +48,13 @@ public class ProductGroupDO extends BaseDO {
     private Integer sort;
     /**
      * 风格，用于 APP 首页展示商品的样式
-     *
+     * <p>
      * 枚举 {@link ProductGroupStyleEnum}
      */
     private Integer style;
     /**
      * 是否默认
-     *
+     * <p>
      * true - 系统默认，不允许删除
      * false - 自定义，允许删除
      */

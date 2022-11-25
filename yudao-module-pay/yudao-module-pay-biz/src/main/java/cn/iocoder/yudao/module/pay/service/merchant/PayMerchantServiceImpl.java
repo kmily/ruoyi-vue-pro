@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.pay.service.merchant;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.merchant.PayMerchantCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.merchant.PayMerchantExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.merchant.PayMerchantPageReqVO;
@@ -10,7 +11,6 @@ import cn.iocoder.yudao.module.pay.convert.merchant.PayMerchantConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayMerchantDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.merchant.PayAppMapper;
 import cn.iocoder.yudao.module.pay.dal.mysql.merchant.PayMerchantMapper;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -21,7 +21,8 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.PAY_MERCHANT_EXIST_APP_CANT_DELETE;
+import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.PAY_MERCHANT_NOT_EXISTS;
 
 /**
  * 支付商户信息 Service 实现类
@@ -136,6 +137,7 @@ public class PayMerchantServiceImpl implements PayMerchantService {
     }
 
     // TODO @芋艿：后续增加下合适的算法
+
     /**
      * 根据年月日时分秒毫秒生成商户号
      *

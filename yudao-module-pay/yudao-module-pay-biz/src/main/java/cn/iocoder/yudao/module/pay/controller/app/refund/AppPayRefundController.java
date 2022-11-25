@@ -34,11 +34,11 @@ public class AppPayRefundController {
 
     @PostMapping("/refund")
     @ApiOperation("提交退款订单")
-    public CommonResult<AppPayRefundRespVO> submitRefundOrder(@RequestBody AppPayRefundReqVO reqVO){
+    public CommonResult<AppPayRefundRespVO> submitRefundOrder(@RequestBody AppPayRefundReqVO reqVO) {
         PayRefundReqDTO req = PayRefundConvert.INSTANCE.convert(reqVO);
         req.setUserIp(getClientIP());
         // TODO 测试暂时模拟生成商户退款订单
-        if(StrUtil.isEmpty(reqVO.getMerchantRefundId())) {
+        if (StrUtil.isEmpty(reqVO.getMerchantRefundId())) {
             req.setMerchantRefundId(PaySeqUtils.genMerchantRefundNo());
         }
         return success(PayRefundConvert.INSTANCE.convert(refundService.submitRefundOrder(req)));

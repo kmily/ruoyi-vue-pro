@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.pay.service.refund;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayNotifyDataDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundPageReqVO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.service.order.dto.PayRefundReqDTO;
 import cn.iocoder.yudao.module.pay.service.order.dto.PayRefundRespDTO;
@@ -53,7 +53,7 @@ public interface PayRefundService {
      * 渠道的退款通知
      *
      * @param channelId  渠道编号
-     * @param notifyData  通知数据
+     * @param notifyData 通知数据
      * @throws Exception 退款通知异常
      */
     void notifyPayRefund(Long channelId, PayNotifyDataDTO notifyData) throws Exception;

@@ -24,7 +24,7 @@ public class PayOrderPageItemRespVO extends PayOrderBaseVO {
     private String merchantName;
 
     @ApiModelProperty(value = "应用名称")
-    private String  appName;
+    private String appName;
 
     @ApiModelProperty(value = "渠道名称")
     private String channelCodeName;

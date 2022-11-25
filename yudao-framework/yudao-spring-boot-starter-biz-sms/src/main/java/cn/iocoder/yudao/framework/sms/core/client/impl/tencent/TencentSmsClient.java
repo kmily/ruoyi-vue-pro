@@ -189,6 +189,7 @@ public class TencentSmsClient extends AbstractSmsClient {
 
     /**
      * 封装查询模版审核状态请求
+     *
      * @param apiTemplateId api 的模版 id
      * @return 查询模版审核状态请求
      */
@@ -225,6 +226,10 @@ public class TencentSmsClient extends AbstractSmsClient {
             return SmsCommonResult.build(e.getErrorCode(), e.getMessage(), e.getRequestId(), null, codeMapping);
         }
         return resultGen.apply(response);
+    }
+
+    private interface SdkFunction<T, R> {
+        R apply(T t) throws TencentCloudSDKException;
     }
 
     @Data
@@ -293,10 +298,6 @@ public class TencentSmsClient extends AbstractSmsClient {
          * 发送短信记录id
          */
         private Long logId;
-    }
-
-    private interface SdkFunction<T, R> {
-        R apply(T t) throws TencentCloudSDKException;
     }
 
 }

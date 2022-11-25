@@ -21,8 +21,8 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.containsAny;
+import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.*;
 
 /**
  * 定时任务 Service 实现类
@@ -38,6 +38,12 @@ public class JobServiceImpl implements JobService {
 
     @Resource
     private SchedulerManager schedulerManager;
+
+    private static void fillJobMonitorTimeoutEmpty(JobDO job) {
+        if (job.getMonitorTimeout() == null) {
+            job.setMonitorTimeout(0);
+        }
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -156,18 +162,12 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public PageResult<JobDO> getJobPage(JobPageReqVO pageReqVO) {
-		return jobMapper.selectPage(pageReqVO);
+        return jobMapper.selectPage(pageReqVO);
     }
 
     @Override
     public List<JobDO> getJobList(JobExportReqVO exportReqVO) {
-		return jobMapper.selectList(exportReqVO);
-    }
-
-    private static void fillJobMonitorTimeoutEmpty(JobDO job) {
-        if (job.getMonitorTimeout() == null) {
-            job.setMonitorTimeout(0);
-        }
+        return jobMapper.selectList(exportReqVO);
     }
 
 }

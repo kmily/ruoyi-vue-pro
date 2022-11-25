@@ -20,10 +20,8 @@ import java.time.Duration;
 @Slf4j
 public class DictFrameworkUtils {
 
-    private static DictDataApi dictDataApi;
-
     private static final DictDataRespDTO DICT_DATA_NULL = new DictDataRespDTO();
-
+    private static DictDataApi dictDataApi;
     /**
      * 针对 {@link #getDictDataLabel(String, String)} 的缓存
      */

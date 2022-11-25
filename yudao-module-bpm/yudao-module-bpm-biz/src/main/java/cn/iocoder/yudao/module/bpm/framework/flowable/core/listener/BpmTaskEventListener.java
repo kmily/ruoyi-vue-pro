@@ -29,22 +29,20 @@ import java.util.Set;
 @Slf4j
 public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
 
-    @Resource
-    @Lazy // 解决循环依赖
-    private BpmTaskService taskService;
-
-    @Resource
-    @Lazy // 解决循环依赖
-    private BpmActivityService activityService;
-
     public static final Set<FlowableEngineEventType> TASK_EVENTS = ImmutableSet.<FlowableEngineEventType>builder()
             .add(FlowableEngineEventType.TASK_CREATED)
             .add(FlowableEngineEventType.TASK_ASSIGNED)
             .add(FlowableEngineEventType.TASK_COMPLETED)
             .add(FlowableEngineEventType.ACTIVITY_CANCELLED)
             .build();
+    @Resource
+    @Lazy // 解决循环依赖
+    private BpmTaskService taskService;
+    @Resource
+    @Lazy // 解决循环依赖
+    private BpmActivityService activityService;
 
-    public BpmTaskEventListener(){
+    public BpmTaskEventListener() {
         super(TASK_EVENTS);
     }
 
@@ -55,12 +53,12 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
 
     @Override
     protected void taskCompleted(FlowableEngineEntityEvent event) {
-        taskService.updateTaskExtComplete((Task)event.getEntity());
+        taskService.updateTaskExtComplete((Task) event.getEntity());
     }
 
     @Override
     protected void taskAssigned(FlowableEngineEntityEvent event) {
-        taskService.updateTaskExtAssign((Task)event.getEntity());
+        taskService.updateTaskExtAssign((Task) event.getEntity());
     }
 
     @Override

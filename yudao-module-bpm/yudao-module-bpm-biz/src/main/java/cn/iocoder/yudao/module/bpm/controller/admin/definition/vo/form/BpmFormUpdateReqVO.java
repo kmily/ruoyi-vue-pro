@@ -1,8 +1,12 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form;
 
-import lombok.*;
-import io.swagger.annotations.*;
-import javax.validation.constraints.*;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @ApiModel("管理后台 - 动态表单更新 Request VO")

@@ -38,6 +38,14 @@ public class ConfigServiceTest extends BaseDbUnitTest {
     @Resource
     private ConfigMapper configMapper;
 
+    @SafeVarargs
+    private static ConfigDO randomConfigDO(Consumer<ConfigDO>... consumers) {
+        Consumer<ConfigDO> consumer = (o) -> {
+            o.setType(randomEle(ConfigTypeEnum.values()).getType()); // 保证 key 的范围
+        };
+        return RandomUtils.randomPojo(ConfigDO.class, ArrayUtils.append(consumer, consumers));
+    }
+
     @Test
     public void testCreateConfig_success() {
         // 准备参数
@@ -169,7 +177,7 @@ public class ConfigServiceTest extends BaseDbUnitTest {
         reqVO.setName("艿");
         reqVO.setKey("nai");
         reqVO.setType(ConfigTypeEnum.SYSTEM.getType());
-        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 1, 15),buildTime(2021, 2, 15)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 1, 15), buildTime(2021, 2, 15)}));
 
         // 调用
         PageResult<ConfigDO> pageResult = configService.getConfigPage(reqVO);
@@ -202,7 +210,7 @@ public class ConfigServiceTest extends BaseDbUnitTest {
         reqVO.setName("艿");
         reqVO.setKey("nai");
         reqVO.setType(ConfigTypeEnum.SYSTEM.getType());
-        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 1, 15),buildTime(2021, 2, 15)}));
+        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 1, 15), buildTime(2021, 2, 15)}));
 
         // 调用
         List<ConfigDO> list = configService.getConfigList(reqVO);
@@ -210,6 +218,8 @@ public class ConfigServiceTest extends BaseDbUnitTest {
         assertEquals(1, list.size());
         assertPojoEquals(dbConfig, list.get(0));
     }
+
+    // ========== 随机对象 ==========
 
     @Test
     public void testGetConfigByKey() {
@@ -224,16 +234,6 @@ public class ConfigServiceTest extends BaseDbUnitTest {
         // 断言
         assertNotNull(config);
         assertPojoEquals(dbConfig, config);
-    }
-
-    // ========== 随机对象 ==========
-
-    @SafeVarargs
-    private static ConfigDO randomConfigDO(Consumer<ConfigDO>... consumers) {
-        Consumer<ConfigDO> consumer = (o) -> {
-            o.setType(randomEle(ConfigTypeEnum.values()).getType()); // 保证 key 的范围
-        };
-        return RandomUtils.randomPojo(ConfigDO.class, ArrayUtils.append(consumer, consumers));
     }
 
 }

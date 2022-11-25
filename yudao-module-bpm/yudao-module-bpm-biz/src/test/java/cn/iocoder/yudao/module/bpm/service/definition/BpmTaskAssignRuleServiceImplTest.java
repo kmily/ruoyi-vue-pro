@@ -41,7 +41,8 @@ import static org.mockito.Mockito.when;
  *
  * @author 芋道源码
  */
-@Import({BpmTaskAssignRuleServiceImpl.class, BpmTaskAssignStartUserScript.class}) // Import 引入 BpmTaskAssignStartUserScript 目的是保证不报错
+@Import({BpmTaskAssignRuleServiceImpl.class, BpmTaskAssignStartUserScript.class})
+// Import 引入 BpmTaskAssignStartUserScript 目的是保证不报错
 public class BpmTaskAssignRuleServiceImplTest extends BaseDbUnitTest {
 
     @Resource

@@ -46,6 +46,14 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
         super(channelId, PayChannelEnum.WX_PUB.getCode(), config, new WXCodeMapping());
     }
 
+    private static String getOpenid(PayOrderUnifiedReqDTO reqDTO) {
+        String openid = MapUtil.getStr(reqDTO.getChannelExtras(), "openid");
+        if (StrUtil.isEmpty(openid)) {
+            throw new IllegalArgumentException("支付请求的 openid 不能为空！");
+        }
+        return openid;
+    }
+
     @Override
     protected void doInit() {
         WxPayConfig payConfig = new WxPayConfig();
@@ -87,11 +95,10 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
         } catch (WxPayException e) {
             log.error("[unifiedOrder][request({}) 发起支付失败，原因({})]", toJsonString(reqDTO), e);
             return PayCommonResult.build(ObjectUtils.defaultIfNull(e.getErrCode(), e.getReturnCode(), "CustomErrorCode"),
-                    ObjectUtils.defaultIfNull(e.getErrCodeDes(), e.getCustomErrorMsg()),null, codeMapping);
+                    ObjectUtils.defaultIfNull(e.getErrCodeDes(), e.getCustomErrorMsg()), null, codeMapping);
         }
         return PayCommonResult.build(CODE_SUCCESS, MESSAGE_SUCCESS, response, codeMapping);
     }
-
 
     private WxPayMpOrderResult unifiedOrderV2(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
         // 构建 WxPayUnifiedOrderRequest 对象
@@ -122,16 +129,7 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
         return client.createOrderV3(TradeTypeEnum.JSAPI, request);
     }
 
-    private static String getOpenid(PayOrderUnifiedReqDTO reqDTO) {
-        String openid = MapUtil.getStr(reqDTO.getChannelExtras(), "openid");
-        if (StrUtil.isEmpty(openid)) {
-            throw new IllegalArgumentException("支付请求的 openid 不能为空！");
-        }
-        return openid;
-    }
-
     /**
-     *
      * 微信支付回调 分v2 和v3 的处理方式
      *
      * @param data 通知结果

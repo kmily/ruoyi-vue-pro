@@ -103,15 +103,15 @@ public class AlipayPayClientConfig implements PayClientConfig {
     @NotBlank(message = "指定根证书内容字符串不能为空", groups = {ModeCertificate.class})
     private String rootCertContent;
 
-    public interface ModePublicKey {
-    }
-
-    public interface ModeCertificate {
-    }
-
     @Override
     public Set<ConstraintViolation<PayClientConfig>> verifyParam(Validator validator) {
         return validator.validate(this,
                 MODE_PUBLIC_KEY.equals(this.getMode()) ? ModePublicKey.class : ModeCertificate.class);
+    }
+
+    public interface ModePublicKey {
+    }
+
+    public interface ModeCertificate {
     }
 }

@@ -1,8 +1,12 @@
 package cn.iocoder.yudao.module.product.controller.admin.property.vo.value;
 
-import lombok.*;
-import io.swagger.annotations.*;
-import javax.validation.constraints.*;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import javax.validation.constraints.NotNull;
 
 @ApiModel("管理后台 - 规格值更新 Request VO")
 @Data

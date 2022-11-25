@@ -17,7 +17,8 @@ public enum DeliveryTypeEnum implements IntArrayValuable {
 
     // TODO 芋艿：英文单词，需要再想下；
     EXPRESS(1, "快递发货"),
-    USER(2, "用户自提"),;
+    USER(2, "用户自提"),
+    ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(DeliveryTypeEnum::getMode).toArray();
 

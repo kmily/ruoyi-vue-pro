@@ -14,7 +14,7 @@ public interface TradeOrderService {
      * 创建交易订单
      *
      * @param loginUserId 登录用户
-     * @param userIp 用户 IP 地址
+     * @param userIp      用户 IP 地址
      * @param createReqVO 创建交易订单请求模型
      * @return 交易订单的编号
      */

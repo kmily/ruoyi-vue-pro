@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.pay.core.enums;
 /**
  * 退款通知, 统一的渠道退款状态
  *
- * @author  jason
+ * @author jason
  */
 public enum PayNotifyRefundStatusEnum {
     /**

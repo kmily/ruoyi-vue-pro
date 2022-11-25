@@ -39,7 +39,7 @@ public class TenantDO extends BaseDO {
     private String name;
     /**
      * 联系人的用户编号
-     *
+     * <p>
      * 关联 {@link AdminUserDO#getId()}
      */
     private Long contactUserId;
@@ -53,19 +53,19 @@ public class TenantDO extends BaseDO {
     private String contactMobile;
     /**
      * 租户状态
-     *
+     * <p>
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
     /**
      * 绑定域名
-     *
+     * <p>
      * TODO 芋艿：目前是预留字段，未来会支持根据域名，自动查询到对应的租户。等等
      */
     private String domain;
     /**
      * 租户套餐编号
-     *
+     * <p>
      * 关联 {@link TenantPackageDO#getId()}
      * 特殊逻辑：系统内置租户，不使用套餐，暂时使用 {@link #PACKAGE_ID_SYSTEM} 标识
      */

@@ -37,7 +37,7 @@ public class PayOrderNotifyRespDTO {
 
     /**
      * 通知的原始数据
-     *
+     * <p>
      * 主要用于持久化，方便后续修复数据，或者排错
      */
     private String data;

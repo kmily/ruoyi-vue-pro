@@ -69,10 +69,10 @@ public class JobController {
         return success(true);
     }
 
-	@DeleteMapping("/delete")
+    @DeleteMapping("/delete")
     @ApiOperation("删除定时任务")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
-	@PreAuthorize("@ss.hasPermission('infra:job:delete')")
+    @PreAuthorize("@ss.hasPermission('infra:job:delete')")
     public CommonResult<Boolean> deleteJob(@RequestParam("id") Long id)
             throws SchedulerException {
         jobService.deleteJob(id);
@@ -134,7 +134,7 @@ public class JobController {
     })
     @PreAuthorize("@ss.hasPermission('infra:job:query')")
     public CommonResult<List<LocalDateTime>> getJobNextTimes(@RequestParam("id") Long id,
-                                                   @RequestParam(value = "count", required = false, defaultValue = "5") Integer count) {
+                                                             @RequestParam(value = "count", required = false, defaultValue = "5") Integer count) {
         JobDO job = jobService.getJob(id);
         if (job == null) {
             return success(Collections.emptyList());

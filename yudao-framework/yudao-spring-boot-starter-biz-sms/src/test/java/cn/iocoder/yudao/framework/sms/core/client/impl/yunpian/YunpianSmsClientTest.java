@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.framework.sms.core.client.impl.yunpian;
 
 import cn.hutool.core.util.ReflectUtil;
-import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
@@ -10,6 +9,7 @@ import cn.iocoder.yudao.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.yudao.framework.sms.core.enums.SmsTemplateAuditStatusEnum;
 import cn.iocoder.yudao.framework.sms.core.property.SmsChannelProperties;
+import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import com.google.common.collect.Lists;
 import com.yunpian.sdk.YunpianClient;
 import com.yunpian.sdk.api.SmsApi;

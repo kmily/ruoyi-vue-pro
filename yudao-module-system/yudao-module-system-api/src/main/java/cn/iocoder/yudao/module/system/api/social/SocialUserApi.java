@@ -17,7 +17,7 @@ public interface SocialUserApi {
     /**
      * 获得社交平台的授权 URL
      *
-     * @param type 社交平台的类型 {@link SocialTypeEnum}
+     * @param type        社交平台的类型 {@link SocialTypeEnum}
      * @param redirectUri 重定向 URL
      * @return 社交平台的授权 URL
      */
@@ -43,9 +43,9 @@ public interface SocialUserApi {
      * 在认证信息不正确的情况下，也会抛出 {@link ServiceException} 业务异常
      *
      * @param userType 用户类型
-     * @param type 社交平台的类型
-     * @param code 授权码
-     * @param state state
+     * @param type     社交平台的类型
+     * @param code     授权码
+     * @param state    state
      * @return 绑定用户编号
      */
     Long getBindUserId(Integer userType, Integer type, String code, String state);

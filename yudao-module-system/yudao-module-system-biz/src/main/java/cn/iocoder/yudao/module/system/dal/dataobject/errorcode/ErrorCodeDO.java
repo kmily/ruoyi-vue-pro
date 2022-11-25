@@ -28,7 +28,7 @@ public class ErrorCodeDO extends BaseDO {
     private Long id;
     /**
      * 错误码类型
-     *
+     * <p>
      * 枚举 {@link ErrorCodeTypeEnum}
      */
     private Integer type;

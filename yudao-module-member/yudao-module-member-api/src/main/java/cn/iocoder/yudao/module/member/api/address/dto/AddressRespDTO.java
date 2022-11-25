@@ -40,7 +40,7 @@ public class AddressRespDTO {
     private String detailAddress;
     /**
      * 是否默认
-     *
+     * <p>
      * true - 默认收件地址
      */
     private Boolean defaulted;

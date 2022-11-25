@@ -17,7 +17,7 @@ public class PayNotifyDataDTO {
 
 
     /**
-     *  HTTP 回调接口的 request body
+     * HTTP 回调接口的 request body
      */
     private String body;
 
@@ -25,5 +25,5 @@ public class PayNotifyDataDTO {
     /**
      * HTTP 回调接口 content type 为 application/x-www-form-urlencoded 的所有参数
      */
-    private Map<String,String> params;
+    private Map<String, String> params;
 }

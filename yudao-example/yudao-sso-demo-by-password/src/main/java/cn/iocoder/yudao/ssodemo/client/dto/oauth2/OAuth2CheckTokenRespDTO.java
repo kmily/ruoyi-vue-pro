@@ -51,7 +51,7 @@ public class OAuth2CheckTokenRespDTO {
 
     /**
      * 过期时间
-     *
+     * <p>
      * 时间戳 / 1000，即单位：秒
      */
     private Long exp;

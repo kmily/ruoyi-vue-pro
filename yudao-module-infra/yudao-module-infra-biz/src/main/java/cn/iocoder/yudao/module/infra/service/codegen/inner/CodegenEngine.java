@@ -40,7 +40,7 @@ import static cn.hutool.core.text.CharSequenceUtil.*;
 /**
  * 代码生成的引擎，用于具体生成代码
  * 目前基于 {@link org.apache.velocity.app.Velocity} 模板引擎实现
- *
+ * <p>
  * 考虑到 Java 模板引擎的框架非常多，Freemarker、Velocity、Thymeleaf 等等，所以我们采用 hutool 封装的 {@link cn.hutool.extra.template.Template} 抽象
  *
  * @author 芋道源码
@@ -95,10 +95,6 @@ public class CodegenEngine {
             .put("codegen/sql/sql.vm", "sql/sql.sql")
             .put("codegen/sql/h2.vm", "sql/h2.sql")
             .build();
-
-    @Resource
-    private CodegenProperties codegenProperties;
-
     /**
      * 模板引擎，由 hutool 实现
      */
@@ -107,12 +103,70 @@ public class CodegenEngine {
      * 全局通用变量映射
      */
     private final Map<String, Object> globalBindingMap = new HashMap<>();
+    @Resource
+    private CodegenProperties codegenProperties;
 
     public CodegenEngine() {
         // 初始化 TemplateEngine 属性
         TemplateConfig config = new TemplateConfig();
         config.setResourceMode(TemplateConfig.ResourceMode.CLASSPATH);
         this.templateEngine = new VelocityEngine(config);
+    }
+
+    private static String javaTemplatePath(String path) {
+        return "codegen/java/" + path + ".vm";
+    }
+
+    private static String javaModuleImplVOFilePath(String path) {
+        return javaModuleFilePath("controller/${sceneEnum.basePackage}/${table.businessName}/" +
+                "vo/${sceneEnum.prefixClass}${table.className}" + path, "biz", "main");
+    }
+
+    private static String javaModuleImplControllerFilePath() {
+        return javaModuleFilePath("controller/${sceneEnum.basePackage}/${table.businessName}/" +
+                "${sceneEnum.prefixClass}${table.className}Controller", "biz", "main");
+    }
+
+    private static String javaModuleImplMainFilePath(String path) {
+        return javaModuleFilePath(path, "biz", "main");
+    }
+
+    private static String javaModuleApiMainFilePath(String path) {
+        return javaModuleFilePath(path, "api", "main");
+    }
+
+    private static String javaModuleImplTestFilePath(String path) {
+        return javaModuleFilePath(path, "biz", "test");
+    }
+
+    private static String javaModuleFilePath(String path, String module, String src) {
+        return "yudao-module-${table.moduleName}/" + // 顶级模块
+                "yudao-module-${table.moduleName}-" + module + "/" + // 子模块
+                "src/" + src + "/java/${basePackage}/module/${table.moduleName}/" + path + ".java";
+    }
+
+    private static String mapperXmlFilePath() {
+        return "yudao-module-${table.moduleName}/" + // 顶级模块
+                "yudao-module-${table.moduleName}-biz/" + // 子模块
+                "src/main/resources/mapper/${table.businessName}/${table.className}Mapper.xml";
+    }
+
+    private static String vueTemplatePath(String path) {
+        return "codegen/vue/" + path + ".vm";
+    }
+
+    private static String vueFilePath(String path) {
+        return "yudao-ui-${sceneEnum.basePackage}/" + // 顶级目录
+                "src/" + path;
+    }
+
+    private static String vue3TemplatePath(String path) {
+        return "codegen/vue3/" + path + ".vm";
+    }
+
+    private static String vue3FilePath(String path) {
+        return "yudao-ui-${sceneEnum.basePackage}-vue3/" + // 顶级目录
+                "src/" + path;
     }
 
     @PostConstruct
@@ -187,60 +241,5 @@ public class CodegenEngine {
         filePath = StrUtil.replace(filePath, "${table.businessName}", table.getBusinessName());
         filePath = StrUtil.replace(filePath, "${table.className}", table.getClassName());
         return filePath;
-    }
-
-    private static String javaTemplatePath(String path) {
-        return "codegen/java/" + path + ".vm";
-    }
-
-    private static String javaModuleImplVOFilePath(String path) {
-        return javaModuleFilePath("controller/${sceneEnum.basePackage}/${table.businessName}/" +
-                "vo/${sceneEnum.prefixClass}${table.className}" + path, "biz", "main");
-    }
-
-    private static String javaModuleImplControllerFilePath() {
-        return javaModuleFilePath("controller/${sceneEnum.basePackage}/${table.businessName}/" +
-                "${sceneEnum.prefixClass}${table.className}Controller", "biz", "main");
-    }
-
-    private static String javaModuleImplMainFilePath(String path) {
-        return javaModuleFilePath(path, "biz", "main");
-    }
-
-    private static String javaModuleApiMainFilePath(String path) {
-        return javaModuleFilePath(path, "api", "main");
-    }
-
-    private static String javaModuleImplTestFilePath(String path) {
-        return javaModuleFilePath(path, "biz", "test");
-    }
-
-    private static String javaModuleFilePath(String path, String module, String src) {
-        return "yudao-module-${table.moduleName}/" + // 顶级模块
-                "yudao-module-${table.moduleName}-" + module + "/" + // 子模块
-                "src/" + src + "/java/${basePackage}/module/${table.moduleName}/" + path + ".java";
-    }
-
-    private static String mapperXmlFilePath() {
-        return "yudao-module-${table.moduleName}/" + // 顶级模块
-                "yudao-module-${table.moduleName}-biz/" + // 子模块
-                "src/main/resources/mapper/${table.businessName}/${table.className}Mapper.xml";
-    }
-
-    private static String vueTemplatePath(String path) {
-        return "codegen/vue/" + path + ".vm";
-    }
-
-    private static String vueFilePath(String path) {
-        return "yudao-ui-${sceneEnum.basePackage}/" + // 顶级目录
-                "src/" + path;
-    }
-    private static String vue3TemplatePath(String path) {
-        return "codegen/vue3/" + path + ".vm";
-    }
-
-    private static String vue3FilePath(String path) {
-        return "yudao-ui-${sceneEnum.basePackage}-vue3/" + // 顶级目录
-                "src/" + path;
     }
 }

@@ -18,7 +18,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @author 芋道源码
  */
 @Configuration(proxyBeanMethods = false)
-@ConditionalOnProperty(prefix = "yudao.error-code", value = "enable", matchIfMissing = true) // 允许使用 yudao.error-code.enable=false 禁用访问日志
+@ConditionalOnProperty(prefix = "yudao.error-code", value = "enable", matchIfMissing = true)
+// 允许使用 yudao.error-code.enable=false 禁用访问日志
 @EnableConfigurationProperties(ErrorCodeProperties.class)
 @EnableScheduling // 开启调度任务的功能，因为 ErrorCodeRemoteLoader 通过定时刷新错误码
 public class YudaoErrorCodeConfiguration {

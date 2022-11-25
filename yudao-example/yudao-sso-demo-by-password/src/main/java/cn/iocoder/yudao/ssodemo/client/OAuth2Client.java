@@ -16,27 +16,32 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * OAuth 2.0 客户端
- *
+ * <p>
  * 对应调用 OAuth2OpenController 接口
  */
 @Component
 public class OAuth2Client {
 
-    private static final String BASE_URL = "http://127.0.0.1:48080/admin-api/system/oauth2";
-
     /**
      * 租户编号
-     *
+     * <p>
      * 默认使用 1；如果使用别的租户，可以调整
      */
     public static final Long TENANT_ID = 1L;
-
+    private static final String BASE_URL = "http://127.0.0.1:48080/admin-api/system/oauth2";
     private static final String CLIENT_ID = "yudao-sso-demo-by-password";
     private static final String CLIENT_SECRET = "test";
 
 
-//    @Resource // 可优化，注册一个 RestTemplate Bean，然后注入
+    //    @Resource // 可优化，注册一个 RestTemplate Bean，然后注入
     private final RestTemplate restTemplate = new RestTemplate();
+
+    private static void addClientHeader(HttpHeaders headers) {
+        // client 拼接，需要 BASE64 编码
+        String client = CLIENT_ID + ":" + CLIENT_SECRET;
+        client = Base64Utils.encodeToString(client.getBytes(StandardCharsets.UTF_8));
+        headers.add("Authorization", "Basic " + client);
+    }
 
     /**
      * 校验访问令牌，并返回它的基本信息
@@ -59,7 +64,8 @@ public class OAuth2Client {
                 BASE_URL + "/check-token",
                 HttpMethod.POST,
                 new HttpEntity<>(body, headers),
-                new ParameterizedTypeReference<CommonResult<OAuth2CheckTokenRespDTO>>() {}); // 解决 CommonResult 的泛型丢失
+                new ParameterizedTypeReference<CommonResult<OAuth2CheckTokenRespDTO>>() {
+                }); // 解决 CommonResult 的泛型丢失
         Assert.isTrue(exchange.getStatusCode().is2xxSuccessful(), "响应必须是 200 成功");
         return exchange.getBody();
     }
@@ -86,7 +92,8 @@ public class OAuth2Client {
                 BASE_URL + "/token",
                 HttpMethod.POST,
                 new HttpEntity<>(body, headers),
-                new ParameterizedTypeReference<CommonResult<OAuth2AccessTokenRespDTO>>() {}); // 解决 CommonResult 的泛型丢失
+                new ParameterizedTypeReference<CommonResult<OAuth2AccessTokenRespDTO>>() {
+                }); // 解决 CommonResult 的泛型丢失
         Assert.isTrue(exchange.getStatusCode().is2xxSuccessful(), "响应必须是 200 成功");
         return exchange.getBody();
     }
@@ -112,16 +119,10 @@ public class OAuth2Client {
                 BASE_URL + "/token",
                 HttpMethod.DELETE,
                 new HttpEntity<>(body, headers),
-                new ParameterizedTypeReference<CommonResult<Boolean>>() {}); // 解决 CommonResult 的泛型丢失
+                new ParameterizedTypeReference<CommonResult<Boolean>>() {
+                }); // 解决 CommonResult 的泛型丢失
         Assert.isTrue(exchange.getStatusCode().is2xxSuccessful(), "响应必须是 200 成功");
         return exchange.getBody();
-    }
-
-    private static void addClientHeader(HttpHeaders headers) {
-        // client 拼接，需要 BASE64 编码
-        String client = CLIENT_ID + ":" + CLIENT_SECRET;
-        client = Base64Utils.encodeToString(client.getBytes(StandardCharsets.UTF_8));
-        headers.add("Authorization", "Basic " + client);
     }
 
 }

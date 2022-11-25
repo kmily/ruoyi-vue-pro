@@ -22,13 +22,13 @@ public class IdempotentRedisDAO {
 
     private final StringRedisTemplate redisTemplate;
 
+    private static String formatKey(String key) {
+        return String.format(IDEMPOTENT.getKeyTemplate(), key);
+    }
+
     public Boolean setIfAbsent(String key, long timeout, TimeUnit timeUnit) {
         String redisKey = formatKey(key);
         return redisTemplate.opsForValue().setIfAbsent(redisKey, "", timeout, timeUnit);
-    }
-
-    private static String formatKey(String key) {
-        return String.format(IDEMPOTENT.getKeyTemplate(), key);
     }
 
 }

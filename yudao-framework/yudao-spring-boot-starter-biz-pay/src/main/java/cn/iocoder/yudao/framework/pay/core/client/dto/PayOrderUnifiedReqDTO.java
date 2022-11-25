@@ -73,7 +73,7 @@ public class PayOrderUnifiedReqDTO {
     // ========== 拓展参数 ==========
     /**
      * 支付渠道的额外参数
-     *
+     * <p>
      * 例如说，微信公众号需要传递 openid 参数
      */
     private Map<String, String> channelExtras;

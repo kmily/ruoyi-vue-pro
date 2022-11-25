@@ -28,10 +28,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 
 /**
-* {@link OAuth2ClientServiceImpl} 的单元测试类
-*
-* @author 芋道源码
-*/
+ * {@link OAuth2ClientServiceImpl} 的单元测试类
+ *
+ * @author 芋道源码
+ */
 @Import(OAuth2ClientServiceImpl.class)
 public class OAuth2ClientServiceImplTest extends BaseDbUnitTest {
 
@@ -158,27 +158,27 @@ public class OAuth2ClientServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testGetOAuth2ClientPage() {
-       // mock 数据
-       OAuth2ClientDO dbOAuth2Client = randomPojo(OAuth2ClientDO.class, o -> { // 等会查询到
-           o.setName("潜龙");
-           o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-       });
-       oauth2ClientMapper.insert(dbOAuth2Client);
-       // 测试 name 不匹配
-       oauth2ClientMapper.insert(cloneIgnoreId(dbOAuth2Client, o -> o.setName("凤凰")));
-       // 测试 status 不匹配
-       oauth2ClientMapper.insert(cloneIgnoreId(dbOAuth2Client, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
-       // 准备参数
-       OAuth2ClientPageReqVO reqVO = new OAuth2ClientPageReqVO();
-       reqVO.setName("龙");
-       reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        // mock 数据
+        OAuth2ClientDO dbOAuth2Client = randomPojo(OAuth2ClientDO.class, o -> { // 等会查询到
+            o.setName("潜龙");
+            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        });
+        oauth2ClientMapper.insert(dbOAuth2Client);
+        // 测试 name 不匹配
+        oauth2ClientMapper.insert(cloneIgnoreId(dbOAuth2Client, o -> o.setName("凤凰")));
+        // 测试 status 不匹配
+        oauth2ClientMapper.insert(cloneIgnoreId(dbOAuth2Client, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        // 准备参数
+        OAuth2ClientPageReqVO reqVO = new OAuth2ClientPageReqVO();
+        reqVO.setName("龙");
+        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
 
-       // 调用
-       PageResult<OAuth2ClientDO> pageResult = oauth2ClientService.getOAuth2ClientPage(reqVO);
-       // 断言
-       assertEquals(1, pageResult.getTotal());
-       assertEquals(1, pageResult.getList().size());
-       assertPojoEquals(dbOAuth2Client, pageResult.getList().get(0));
+        // 调用
+        PageResult<OAuth2ClientDO> pageResult = oauth2ClientService.getOAuth2ClientPage(reqVO);
+        // 断言
+        assertEquals(1, pageResult.getTotal());
+        assertEquals(1, pageResult.getList().size());
+        assertPojoEquals(dbOAuth2Client, pageResult.getList().get(0));
     }
 
     @Test

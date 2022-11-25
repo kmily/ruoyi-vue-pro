@@ -35,7 +35,7 @@ public class ProductSkuUpdateStockReqDTO {
 
         /**
          * 库存变化数量
-         *
+         * <p>
          * 正数：增加库存
          * 负数：扣减库存
          */

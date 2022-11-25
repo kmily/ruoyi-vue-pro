@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.framework.sms.core.client.impl.aliyun;
 
-import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.sms.core.enums.SmsFrameworkErrorCodeConstants;
+import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 

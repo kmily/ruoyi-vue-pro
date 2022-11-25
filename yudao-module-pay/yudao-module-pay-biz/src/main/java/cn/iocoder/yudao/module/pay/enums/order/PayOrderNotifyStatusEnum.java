@@ -15,8 +15,7 @@ public enum PayOrderNotifyStatusEnum implements IntArrayValuable {
 
     NO(0, "未通知"),
     SUCCESS(10, "通知成功"),
-    FAILURE(20, "通知失败")
-    ;
+    FAILURE(20, "通知失败");
 
     private final Integer status;
     private final String name;

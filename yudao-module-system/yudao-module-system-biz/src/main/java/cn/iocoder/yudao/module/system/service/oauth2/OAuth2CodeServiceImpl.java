@@ -32,6 +32,10 @@ public class OAuth2CodeServiceImpl implements OAuth2CodeService {
     @Resource
     private OAuth2CodeMapper oauth2CodeMapper;
 
+    private static String generateCode() {
+        return IdUtil.fastSimpleUUID();
+    }
+
     @Override
     public OAuth2CodeDO createAuthorizationCode(Long userId, Integer userType, String clientId,
                                                 List<String> scopes, String redirectUri, String state) {
@@ -55,10 +59,6 @@ public class OAuth2CodeServiceImpl implements OAuth2CodeService {
         }
         oauth2CodeMapper.deleteById(codeDO.getId());
         return codeDO;
-    }
-
-    private static String generateCode() {
-        return IdUtil.fastSimpleUUID();
     }
 
 }

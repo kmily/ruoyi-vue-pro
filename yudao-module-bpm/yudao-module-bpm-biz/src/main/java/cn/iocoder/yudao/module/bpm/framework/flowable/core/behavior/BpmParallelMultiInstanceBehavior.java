@@ -34,7 +34,7 @@ public class BpmParallelMultiInstanceBehavior extends ParallelMultiInstanceBehav
      * 重写该方法，主要实现两个功能：
      * 1. 忽略原有的 collectionVariable、collectionElementVariable 表达式，而是采用自己定义的
      * 2. 获得任务的处理人，并设置到 collectionVariable 中，用于 BpmUserTaskActivityBehavior 从中可以获取任务的处理人
-     *
+     * <p>
      * 注意，多个任务实例，每个任务实例对应一个处理人，所以返回的数量就是任务处理人的数量
      *
      * @param execution 执行任务

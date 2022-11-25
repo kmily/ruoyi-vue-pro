@@ -28,7 +28,7 @@ public class SocialUserDO extends BaseDO {
     private Long id;
     /**
      * 社交平台的类型
-     *
+     * <p>
      * 枚举 {@link SocialTypeEnum}
      */
     private Integer type;

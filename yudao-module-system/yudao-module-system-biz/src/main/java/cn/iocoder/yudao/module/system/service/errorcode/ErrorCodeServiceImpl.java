@@ -78,11 +78,11 @@ public class ErrorCodeServiceImpl implements ErrorCodeService {
 
     /**
      * 校验错误码的唯一字段是否重复
-     *
+     * <p>
      * 是否存在相同编码的错误码
      *
      * @param code 错误码编码
-     * @param id 错误码编号
+     * @param id   错误码编号
      */
     @VisibleForTesting
     public void validateCodeDuplicate(Integer code, Long id) {

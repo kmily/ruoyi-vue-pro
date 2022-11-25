@@ -26,38 +26,38 @@ public class DiscountProductDO extends BaseDO {
     private Long id;
     /**
      * 限时折扣活动的编号
-     *
+     * <p>
      * 关联 {@link DiscountActivityDO#getId()}
      */
     private Long activityId;
     /**
      * 商品 SPU 编号
-     *
+     * <p>
      * 关联 ProductSpuDO 的 id 编号
      */
     private Long spuId;
     /**
      * 商品 SKU 编号
-     *
+     * <p>
      * 关联 ProductSkuDO 的 id 编号
      */
     private Long skuId;
 
     /**
      * 折扣类型
-     *
+     * <p>
      * 枚举 {@link PromotionDiscountTypeEnum}
      */
     private Integer discountType;
     /**
      * 折扣百分比
-     *
+     * <p>
      * 例如，80% 为 80
      */
     private Integer discountPercent;
     /**
      * 优惠金额，单位：分
-     *
+     * <p>
      * 当 {@link #discountType} 为 {@link PromotionDiscountTypeEnum#PRICE} 生效
      */
     private Integer discountPrice;

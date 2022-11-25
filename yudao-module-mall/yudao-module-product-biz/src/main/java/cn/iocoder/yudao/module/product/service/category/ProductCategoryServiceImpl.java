@@ -98,7 +98,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         for (; i >= 0; --i) {
             ProductCategoryDO category = productCategoryMapper.selectById(parentId);
             parentId = category.getParentId();
-            if(Objects.equals(parentId, ProductCategoryDO.PARENT_ID_NULL)){
+            if (Objects.equals(parentId, ProductCategoryDO.PARENT_ID_NULL)) {
                 break;
             }
         }
