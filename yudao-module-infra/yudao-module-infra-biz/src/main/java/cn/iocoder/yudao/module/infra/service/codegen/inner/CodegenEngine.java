@@ -121,6 +121,7 @@ public class CodegenEngine {
     private void initGlobalBindingMap() {
         // 全局配置
         globalBindingMap.put("basePackage", codegenProperties.getBasePackage());
+        globalBindingMap.put("moduleNamePrefix", codegenProperties.getModuleNamePrefix());
         globalBindingMap.put("baseFrameworkPackage", codegenProperties.getBasePackage()
                 + '.' + "framework"); // 用于后续获取测试类的 package 地址
         // 全局 Java Bean
@@ -177,6 +178,8 @@ public class CodegenEngine {
     private String formatFilePath(String filePath, Map<String, Object> bindingMap) {
         filePath = StrUtil.replace(filePath, "${basePackage}",
                 getStr(bindingMap, "basePackage").replaceAll("\\.", "/"));
+        filePath = StrUtil.replace(filePath, "${moduleNamePrefix}",
+                getStr(bindingMap, "moduleNamePrefix").replaceAll("\\.", "/"));
         filePath = StrUtil.replace(filePath, "${classNameVar}",
                 getStr(bindingMap, "classNameVar"));
         // sceneEnum 包含的字段
@@ -218,14 +221,14 @@ public class CodegenEngine {
     }
 
     private static String javaModuleFilePath(String path, String module, String src) {
-        return "yudao-module-${table.moduleName}/" + // 顶级模块
-                "yudao-module-${table.moduleName}-" + module + "/" + // 子模块
+        return "${moduleNamePrefix}-${table.moduleName}/" + // 顶级模块
+                "${moduleNamePrefix}-${table.moduleName}-" + module + "/" + // 子模块
                 "src/" + src + "/java/${basePackage}/module/${table.moduleName}/" + path + ".java";
     }
 
     private static String mapperXmlFilePath() {
-        return "yudao-module-${table.moduleName}/" + // 顶级模块
-                "yudao-module-${table.moduleName}-biz/" + // 子模块
+        return "${moduleNamePrefix}-${table.moduleName}/" + // 顶级模块
+                "${moduleNamePrefix}-${table.moduleName}-biz/" + // 子模块
                 "src/main/resources/mapper/${table.businessName}/${table.className}Mapper.xml";
     }
 
