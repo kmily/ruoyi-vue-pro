@@ -139,8 +139,3 @@ yudao:
       expire-time: 2h # 支付的过期时间
 
 debug: false
-
-#积木报表配置
-minidao :
-  base-package: org.jeecg.modules.jmreport.desreport.dao*
-  db-type: mysql
