@@ -23,22 +23,22 @@ public class SecurityConfiguration {
             @Override
             public void customize(ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry) {
                 // Swagger 接口文档
-                registry.antMatchers("/swagger-ui.html").anonymous()
-                        .antMatchers("/swagger-resources/**").anonymous()
-                        .antMatchers("/webjars/**").anonymous()
-                        .antMatchers("/*/api-docs").anonymous();
+                registry.requestMatchers("/swagger-ui.html").anonymous()
+                        .requestMatchers("/swagger-resources/**").anonymous()
+                        .requestMatchers("/webjars/**").anonymous()
+                        .requestMatchers("/*/api-docs").anonymous();
                 // 积木报表
-                registry.antMatchers("/jmreport/**").permitAll();
+                registry.requestMatchers("/jmreport/**").permitAll();
                 // Spring Boot Actuator 的安全配置
-                registry.antMatchers("/actuator").anonymous()
-                        .antMatchers("/actuator/**").anonymous();
+                registry.requestMatchers("/actuator").anonymous()
+                        .requestMatchers("/actuator/**").anonymous();
                 // Druid 监控
-                registry.antMatchers("/druid/**").anonymous();
+                registry.requestMatchers("/druid/**").anonymous();
                 // Spring Boot Admin Server 的安全配置
-                registry.antMatchers(adminSeverContextPath).anonymous()
-                        .antMatchers(adminSeverContextPath + "/**").anonymous();
+                registry.requestMatchers(adminSeverContextPath).anonymous()
+                        .requestMatchers(adminSeverContextPath + "/**").anonymous();
                 // 文件读取
-                registry.antMatchers(buildAdminApi("/infra/file/*/get/**")).permitAll();
+                registry.requestMatchers(buildAdminApi("/infra/file/*/get/**")).permitAll();
             }
 
         };
