@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group;
 import lombok.*;
 import java.util.*;
 import io.swagger.annotations.*;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 /**
 * 用户组 Base VO，提供给添加、修改、详细的子 VO 使用

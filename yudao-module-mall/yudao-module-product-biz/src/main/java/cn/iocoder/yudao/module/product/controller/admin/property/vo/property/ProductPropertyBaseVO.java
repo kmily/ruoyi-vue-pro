@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.product.controller.admin.property.vo.property;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * 规格名称 Base VO，提供给添加、修改、详细的子 VO 使用

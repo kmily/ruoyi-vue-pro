@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 
 /**

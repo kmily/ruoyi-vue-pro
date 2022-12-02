@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.dal.redis.common;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.Duration;
 
 import static cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants.CAPTCHA_CODE;

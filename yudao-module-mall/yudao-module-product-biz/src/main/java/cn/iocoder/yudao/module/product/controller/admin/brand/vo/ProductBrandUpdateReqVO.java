@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.product.controller.admin.brand.vo;
 
 import lombok.*;
 import io.swagger.annotations.*;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @ApiModel("管理后台 - 商品品牌更新 Request VO")
 @Data

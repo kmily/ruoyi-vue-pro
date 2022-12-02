@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.infra.controller.admin.db.vo;
 import lombok.*;
 import java.util.*;
 import io.swagger.annotations.*;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @ApiModel("管理后台 - 数据源配置更新 Request VO")
 @Data

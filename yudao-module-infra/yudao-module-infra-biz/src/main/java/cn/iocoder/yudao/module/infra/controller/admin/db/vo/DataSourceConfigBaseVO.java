@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.infra.controller.admin.db.vo;
 import lombok.*;
 import java.util.*;
 import io.swagger.annotations.*;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 /**
 * 数据源配置 Base VO，提供给添加、修改、详细的子 VO 使用

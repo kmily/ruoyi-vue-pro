@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.system.mq.message.dept.DeptRefreshMessage;
 import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * Dept 部门相关消息的 Producer

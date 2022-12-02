@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.bpm.controller.admin.oa.vo;
 import lombok.*;
 import java.time.LocalDateTime;
 import io.swagger.annotations.*;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;

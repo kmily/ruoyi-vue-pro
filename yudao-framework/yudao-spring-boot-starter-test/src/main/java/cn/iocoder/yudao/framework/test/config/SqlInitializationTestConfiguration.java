@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 
-import javax.sql.DataSource;
+import jakarta.sql.DataSource;
 
 /**
  * SQL 初始化的测试 Configuration

@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigP
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigUpdateReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileConfigDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 

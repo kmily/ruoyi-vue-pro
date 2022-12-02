@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.pay.api.order;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * 支付单 API 接口

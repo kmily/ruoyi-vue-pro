@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form;
 import lombok.*;
 import io.swagger.annotations.*;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 @ApiModel("管理后台 - 动态表单创建 Request VO")

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.trade.controller.app.order;
 
-import cn.hutool.extra.servlet.ServletUtil;
+import cn.hutool.extra.servlet.JakartaServletUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Api(tags = "用户 App - 交易订单")
 @RestController
@@ -45,7 +45,7 @@ public class AppTradeOrderController {
                                                HttpServletRequest servletRequest) {
         // 获取登录用户、用户 IP 地址
         Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
-        String clientIp = ServletUtil.getClientIP(servletRequest);
+        String clientIp = JakartaServletUtil.getClientIP(servletRequest);
         // 创建交易订单，预支付记录
         Long orderId = tradeOrderService.createTradeOrder(loginUserId, clientIp, createReqVO);
         return CommonResult.success(orderId);

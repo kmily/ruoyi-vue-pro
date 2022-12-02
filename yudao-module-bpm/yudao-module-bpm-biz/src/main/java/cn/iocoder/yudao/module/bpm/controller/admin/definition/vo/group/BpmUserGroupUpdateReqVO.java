@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group;
 
 import lombok.*;
 import io.swagger.annotations.*;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @ApiModel("管理后台 - 用户组更新 Request VO")
 @Data

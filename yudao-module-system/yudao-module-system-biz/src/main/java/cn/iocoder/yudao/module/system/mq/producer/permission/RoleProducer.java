@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.system.mq.message.permission.RoleRefreshMessage;
 import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * Role 角色相关消息的 Producer

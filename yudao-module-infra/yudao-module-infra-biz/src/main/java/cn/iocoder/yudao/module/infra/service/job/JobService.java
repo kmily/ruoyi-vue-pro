@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobUpdateReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.job.JobDO;
 import org.quartz.SchedulerException;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 

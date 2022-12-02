@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel;
 
 import lombok.*;
 import io.swagger.annotations.*;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @ApiModel("管理后台 - 支付渠道 更新 Request VO")
 @Data

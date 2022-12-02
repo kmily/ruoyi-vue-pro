@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages;
 import lombok.*;
 import java.util.*;
 import io.swagger.annotations.*;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @ApiModel("管理后台 - 租户套餐更新 Request VO")
 @Data

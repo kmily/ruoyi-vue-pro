@@ -21,8 +21,8 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import javax.annotation.Resource;
-import javax.annotation.security.PermitAll;
+import jakarta.annotation.Resource;
+import jakarta.annotation.security.PermitAll;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

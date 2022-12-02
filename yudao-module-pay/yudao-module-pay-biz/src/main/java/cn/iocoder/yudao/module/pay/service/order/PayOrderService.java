@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderSubmitReqDTO;
 import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderSubmitRespDTO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

@@ -4,7 +4,7 @@ import lombok.*;
 import io.swagger.annotations.*;
 import org.hibernate.validator.constraints.URL;
 
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 
 /**

@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.app;
 
 import lombok.*;
 import io.swagger.annotations.*;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 /**
 * 支付应用信息 Base VO，提供给添加、修改、详细的子 VO 使用

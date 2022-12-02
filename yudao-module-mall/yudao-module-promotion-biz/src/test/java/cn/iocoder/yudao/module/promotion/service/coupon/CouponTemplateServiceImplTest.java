@@ -14,7 +14,7 @@ import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTemplateValidityType
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
