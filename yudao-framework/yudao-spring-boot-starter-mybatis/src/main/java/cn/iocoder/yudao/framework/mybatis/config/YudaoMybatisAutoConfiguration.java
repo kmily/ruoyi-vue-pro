@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.mybatis.config;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.mybatis.core.handler.DefaultDBFieldHandler;
+import cn.iocoder.yudao.framework.mybatis.core.inner.LogicDeleteInnerInterceptor;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.incrementer.IKeyGenerator;
@@ -29,9 +30,10 @@ import org.springframework.core.env.ConfigurableEnvironment;
 public class YudaoMybatisAutoConfiguration {
 
     @Bean
-    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+    public MybatisPlusInterceptor mybatisPlusInterceptor(ConfigurableEnvironment environment) {
         MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
         mybatisPlusInterceptor.addInnerInterceptor(new PaginationInnerInterceptor()); // 分页插件
+        mybatisPlusInterceptor.addInnerInterceptor(new LogicDeleteInnerInterceptor(environment)); // 逻辑删除插件
         return mybatisPlusInterceptor;
     }
 
