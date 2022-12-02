@@ -17,6 +17,8 @@ import java.time.LocalDateTime;
 @Data
 public abstract class BaseDO implements Serializable {
 
+    public static final String FIELD_DELETED_TIME = "deleted_time";
+
     /**
      * 创建时间
      */
@@ -47,4 +49,8 @@ public abstract class BaseDO implements Serializable {
     @TableLogic
     private Boolean deleted;
 
+    /**
+     * 删除时间
+     */
+    private LocalDateTime deletedTime;
 }
