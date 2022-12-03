@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -47,6 +48,13 @@ public interface DictDataMapper extends BaseMapperX<DictDataDO> {
         return selectList(new LambdaQueryWrapperX<DictDataDO>().likeIfPresent(DictDataDO::getLabel, reqVO.getLabel())
                 .likeIfPresent(DictDataDO::getDictType, reqVO.getDictType())
                 .eqIfPresent(DictDataDO::getStatus, reqVO.getStatus()));
+    }
+
+    default int deleteByEntity(DictDataDO dictDataDO) {
+        // 这里更新删除时间，是为了保证字典表的唯一索引
+        dictDataDO.setDeletedTime(LocalDateTime.now());
+        dictDataDO.setDeleted(true);
+        return updateById(dictDataDO);
     }
 
 }
