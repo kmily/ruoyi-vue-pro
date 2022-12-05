@@ -9,18 +9,20 @@ import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.service.auth.AdminAuthService;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2TokenService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Api(tags = "管理后台 - OAuth2.0 令牌")
+@Tag(name = "管理后台 - OAuth2.0 令牌")
 @RestController
 @RequestMapping("/system/oauth2-token")
 public class OAuth2TokenController {
@@ -31,7 +33,7 @@ public class OAuth2TokenController {
     private AdminAuthService authService;
 
     @GetMapping("/page")
-    @ApiOperation(value = "获得访问令牌分页", notes = "只返回有效期内的")
+    @Operation(summary = "获得访问令牌分页", description = "只返回有效期内的")
     @PreAuthorize("@ss.hasPermission('system:oauth2-token:page')")
     public CommonResult<PageResult<OAuth2AccessTokenRespVO>> getAccessTokenPage(@Valid OAuth2AccessTokenPageReqVO reqVO) {
         PageResult<OAuth2AccessTokenDO> pageResult = oauth2TokenService.getAccessTokenPage(reqVO);
@@ -39,8 +41,7 @@ public class OAuth2TokenController {
     }
 
     @DeleteMapping("/delete")
-    @ApiOperation("删除访问令牌")
-    @ApiImplicitParam(name = "accessToken", value = "访问令牌", required = true, dataTypeClass = String.class, example = "tudou")
+    @Operation(summary = "删除访问令牌")
     @PreAuthorize("@ss.hasPermission('system:oauth2-token:delete')")
     public CommonResult<Boolean> deleteAccessToken(@RequestParam("accessToken") String accessToken) {
         authService.logout(accessToken, LoginLogTypeEnum.LOGOUT_DELETE.getType());

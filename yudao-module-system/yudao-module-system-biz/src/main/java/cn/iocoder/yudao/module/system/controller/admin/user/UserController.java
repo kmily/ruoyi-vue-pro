@@ -1,40 +1,49 @@
 package cn.iocoder.yudao.module.system.controller.admin.user;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
-import cn.iocoder.yudao.module.system.convert.user.UserConvert;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
-import cn.iocoder.yudao.module.system.service.dept.DeptService;
-import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
+import cn.iocoder.yudao.module.system.convert.user.UserConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.module.system.enums.common.SexEnum;
+import cn.iocoder.yudao.module.system.service.dept.DeptService;
+import cn.iocoder.yudao.module.system.service.user.AdminUserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-@Api(tags = "管理后台 - 用户")
+@Tag(name = "管理后台 - 用户")
 @RestController
 @RequestMapping("/system/user")
 @Validated
@@ -46,7 +55,7 @@ public class UserController {
     private DeptService deptService;
 
     @PostMapping("/create")
-    @ApiOperation("新增用户")
+    @Operation(summary = "新增用户")
     @PreAuthorize("@ss.hasPermission('system:user:create')")
     public CommonResult<Long> createUser(@Valid @RequestBody UserCreateReqVO reqVO) {
         Long id = userService.createUser(reqVO);
@@ -54,7 +63,7 @@ public class UserController {
     }
 
     @PutMapping("update")
-    @ApiOperation("修改用户")
+    @Operation(summary = "修改用户")
     @PreAuthorize("@ss.hasPermission('system:user:update')")
     public CommonResult<Boolean> updateUser(@Valid @RequestBody UserUpdateReqVO reqVO) {
         userService.updateUser(reqVO);
@@ -62,8 +71,8 @@ public class UserController {
     }
 
     @DeleteMapping("/delete")
-    @ApiOperation("删除用户")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @Operation(summary = "删除用户")
+    
     @PreAuthorize("@ss.hasPermission('system:user:delete')")
     public CommonResult<Boolean> deleteUser(@RequestParam("id") Long id) {
         userService.deleteUser(id);
@@ -71,7 +80,7 @@ public class UserController {
     }
 
     @PutMapping("/update-password")
-    @ApiOperation("重置用户密码")
+    @Operation(summary = "重置用户密码")
     @PreAuthorize("@ss.hasPermission('system:user:update-password')")
     public CommonResult<Boolean> updateUserPassword(@Valid @RequestBody UserUpdatePasswordReqVO reqVO) {
         userService.updateUserPassword(reqVO.getId(), reqVO.getPassword());
@@ -79,7 +88,7 @@ public class UserController {
     }
 
     @PutMapping("/update-status")
-    @ApiOperation("修改用户状态")
+    @Operation(summary = "修改用户状态")
     @PreAuthorize("@ss.hasPermission('system:user:update')")
     public CommonResult<Boolean> updateUserStatus(@Valid @RequestBody UserUpdateStatusReqVO reqVO) {
         userService.updateUserStatus(reqVO.getId(), reqVO.getStatus());
@@ -87,7 +96,7 @@ public class UserController {
     }
 
     @GetMapping("/page")
-    @ApiOperation("获得用户分页列表")
+    @Operation(summary = "获得用户分页列表")
     @PreAuthorize("@ss.hasPermission('system:user:list')")
     public CommonResult<PageResult<UserPageItemRespVO>> getUserPage(@Valid UserPageReqVO reqVO) {
         // 获得用户分页列表
@@ -110,7 +119,7 @@ public class UserController {
     }
 
     @GetMapping("/list-all-simple")
-    @ApiOperation(value = "获取用户精简信息列表", notes = "只包含被开启的用户，主要用于前端的下拉选项")
+    @Operation(summary = "获取用户精简信息列表", description = "只包含被开启的用户，主要用于前端的下拉选项")
     public CommonResult<List<UserSimpleRespVO>> getSimpleUsers() {
         // 获用户门列表，只要开启状态的
         List<AdminUserDO> list = userService.getUsersByStatus(CommonStatusEnum.ENABLE.getStatus());
@@ -119,15 +128,15 @@ public class UserController {
     }
 
     @GetMapping("/get")
-    @ApiOperation("获得用户详情")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @Operation(summary = "获得用户详情")
+    
     @PreAuthorize("@ss.hasPermission('system:user:query')")
     public CommonResult<UserRespVO> getInfo(@RequestParam("id") Long id) {
         return success(UserConvert.INSTANCE.convert(userService.getUser(id)));
     }
 
     @GetMapping("/export")
-    @ApiOperation("导出用户")
+    @Operation(summary = "导出用户")
     @PreAuthorize("@ss.hasPermission('system:user:export')")
     @OperateLog(type = EXPORT)
     public void exportUsers(@Validated UserExportReqVO reqVO,
@@ -159,7 +168,7 @@ public class UserController {
     }
 
     @GetMapping("/get-import-template")
-    @ApiOperation("获得导入用户模板")
+    @Operation(summary = "获得导入用户模板")
     public void importTemplate(HttpServletResponse response) throws IOException {
         // 手动创建导出 demo
         List<UserImportExcelVO> list = Arrays.asList(
@@ -174,11 +183,7 @@ public class UserController {
     }
 
     @PostMapping("/import")
-    @ApiOperation("导入用户")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "file", value = "Excel 文件", required = true, dataTypeClass = MultipartFile.class),
-            @ApiImplicitParam(name = "updateSupport", value = "是否支持更新，默认为 false", example = "true", dataTypeClass = Boolean.class)
-    })
+    @Operation(summary = "导入用户")
     @PreAuthorize("@ss.hasPermission('system:user:import')")
     public CommonResult<UserImportRespVO> importExcel(@RequestParam("file") MultipartFile file,
                                                       @RequestParam(value = "updateSupport", required = false, defaultValue = "false") Boolean updateSupport) throws Exception {

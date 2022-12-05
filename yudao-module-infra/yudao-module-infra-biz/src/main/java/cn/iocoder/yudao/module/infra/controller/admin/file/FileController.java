@@ -12,25 +12,29 @@ import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FileUploadReq
 import cn.iocoder.yudao.module.infra.convert.file.FileConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileDO;
 import cn.iocoder.yudao.module.infra.service.file.FileService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Api(tags = "管理后台 - 文件存储")
+@Tag(name = "管理后台 - 文件存储")
 @RestController
 @RequestMapping("/infra/file")
 @Validated
@@ -41,7 +45,7 @@ public class FileController {
     private FileService fileService;
 
     @PostMapping("/upload")
-    @ApiOperation("上传文件")
+    @Operation(summary = "上传文件")
     @OperateLog(logArgs = false) // 上传文件，没有记录操作日志的必要
     public CommonResult<String> uploadFile(FileUploadReqVO uploadReqVO) throws Exception {
         MultipartFile file = uploadReqVO.getFile();
@@ -50,8 +54,7 @@ public class FileController {
     }
 
     @DeleteMapping("/delete")
-    @ApiOperation("删除文件")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
+    @Operation(summary = "删除文件")
     @PreAuthorize("@ss.hasPermission('infra:file:delete')")
     public CommonResult<Boolean> deleteFile(@RequestParam("id") Long id) throws Exception {
         fileService.deleteFile(id);
@@ -60,8 +63,7 @@ public class FileController {
 
     @GetMapping("/{configId}/get/**")
     @PermitAll
-    @ApiOperation("下载文件")
-    @ApiImplicitParam(name = "configId", value = "配置编号",  required = true, dataTypeClass = Long.class)
+    @Operation(summary = "下载文件")
     public void getFileContent(HttpServletRequest request,
                                HttpServletResponse response,
                                @PathVariable("configId") Long configId) throws Exception {
@@ -82,7 +84,7 @@ public class FileController {
     }
 
     @GetMapping("/page")
-    @ApiOperation("获得文件分页")
+    @Operation(summary = "获得文件分页")
     @PreAuthorize("@ss.hasPermission('infra:file:query')")
     public CommonResult<PageResult<FileRespVO>> getFilePage(@Valid FilePageReqVO pageVO) {
         PageResult<FileDO> pageResult = fileService.getFilePage(pageVO);

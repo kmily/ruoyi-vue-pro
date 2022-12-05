@@ -1,16 +1,18 @@
 package cn.iocoder.yudao.module.pay.controller.admin.refund.vo;
 
-import lombok.*;
-import io.swagger.annotations.*;
-import jakarta.validation.constraints.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-@ApiModel("管理后台 - 退款订单更新 Request VO")
+@Schema(title = "管理后台 - 退款订单更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class PayRefundUpdateReqVO extends PayRefundBaseVO {
 
-    @ApiModelProperty(value = "支付退款编号", required = true)
+    @Schema(title  = "支付退款编号", required = true)
     @NotNull(message = "支付退款编号不能为空")
     private Long id;
 

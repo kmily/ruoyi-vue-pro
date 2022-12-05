@@ -11,15 +11,19 @@ import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -33,7 +37,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
  *
  * @author 芋道源码
  */
-@Api(tags = "管理后台 - OAuth2.0 用户")
+@Tag(name = "管理后台 - OAuth2.0 用户")
 @RestController
 @RequestMapping("/system/oauth2/user")
 @Validated
@@ -48,7 +52,7 @@ public class OAuth2UserController {
     private PostService postService;
 
     @GetMapping("/get")
-    @ApiOperation("获得用户基本信息")
+    @Operation(summary = "获得用户基本信息")
     @PreAuthorize("@ss.hasScope('user.read')") //
     public CommonResult<OAuth2UserInfoRespVO> getUserInfo() {
         // 获得用户基本信息
@@ -68,7 +72,7 @@ public class OAuth2UserController {
     }
 
     @PutMapping("/update")
-    @ApiOperation("更新用户基本信息")
+    @Operation(summary = "更新用户基本信息")
     @PreAuthorize("@ss.hasScope('user.write')")
     public CommonResult<Boolean> updateUserInfo(@Valid @RequestBody OAuth2UserUpdateReqVO reqVO) {
         // 这里将 UserProfileUpdateReqVO =》UserProfileUpdateReqVO 对象，实现接口的复用。

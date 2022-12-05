@@ -5,22 +5,32 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.quartz.core.util.CronUtils;
-import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.*;
+import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobCreateReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobExcelVO;
+import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobExportReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobPageReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobRespVO;
+import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobUpdateReqVO;
 import cn.iocoder.yudao.module.infra.convert.job.JobConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.job.JobDO;
 import cn.iocoder.yudao.module.infra.service.job.JobService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import org.quartz.SchedulerException;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.quartz.SchedulerException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -30,7 +40,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-@Api(tags = "管理后台 - 定时任务")
+@Tag(name = "管理后台 - 定时任务")
 @RestController
 @RequestMapping("/infra/job")
 @Validated
@@ -40,7 +50,7 @@ public class JobController {
     private JobService jobService;
 
     @PostMapping("/create")
-    @ApiOperation("创建定时任务")
+    @Operation(summary = "创建定时任务")
     @PreAuthorize("@ss.hasPermission('infra:job:create')")
     public CommonResult<Long> createJob(@Valid @RequestBody JobCreateReqVO createReqVO)
             throws SchedulerException {
@@ -48,7 +58,7 @@ public class JobController {
     }
 
     @PutMapping("/update")
-    @ApiOperation("更新定时任务")
+    @Operation(summary = "更新定时任务")
     @PreAuthorize("@ss.hasPermission('infra:job:update')")
     public CommonResult<Boolean> updateJob(@Valid @RequestBody JobUpdateReqVO updateReqVO)
             throws SchedulerException {
@@ -57,11 +67,7 @@ public class JobController {
     }
 
     @PutMapping("/update-status")
-    @ApiOperation("更新定时任务的状态")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class),
-            @ApiImplicitParam(name = "status", value = "状态", required = true, example = "1", dataTypeClass = Integer.class),
-    })
+    @Operation(summary = "更新定时任务的状态")
     @PreAuthorize("@ss.hasPermission('infra:job:update')")
     public CommonResult<Boolean> updateJobStatus(@RequestParam(value = "id") Long id, @RequestParam("status") Integer status)
             throws SchedulerException {
@@ -70,8 +76,7 @@ public class JobController {
     }
 
 	@DeleteMapping("/delete")
-    @ApiOperation("删除定时任务")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @Operation(summary = "删除定时任务")
 	@PreAuthorize("@ss.hasPermission('infra:job:delete')")
     public CommonResult<Boolean> deleteJob(@RequestParam("id") Long id)
             throws SchedulerException {
@@ -80,8 +85,8 @@ public class JobController {
     }
 
     @PutMapping("/trigger")
-    @ApiOperation("触发定时任务")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @Operation(summary = "触发定时任务")
+    
     @PreAuthorize("@ss.hasPermission('infra:job:trigger')")
     public CommonResult<Boolean> triggerJob(@RequestParam("id") Long id) throws SchedulerException {
         jobService.triggerJob(id);
@@ -89,8 +94,8 @@ public class JobController {
     }
 
     @GetMapping("/get")
-    @ApiOperation("获得定时任务")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @Operation(summary = "获得定时任务")
+    
     @PreAuthorize("@ss.hasPermission('infra:job:query')")
     public CommonResult<JobRespVO> getJob(@RequestParam("id") Long id) {
         JobDO job = jobService.getJob(id);
@@ -98,8 +103,7 @@ public class JobController {
     }
 
     @GetMapping("/list")
-    @ApiOperation("获得定时任务列表")
-    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, dataTypeClass = List.class)
+    @Operation(summary = "获得定时任务列表")
     @PreAuthorize("@ss.hasPermission('infra:job:query')")
     public CommonResult<List<JobRespVO>> getJobList(@RequestParam("ids") Collection<Long> ids) {
         List<JobDO> list = jobService.getJobList(ids);
@@ -107,7 +111,7 @@ public class JobController {
     }
 
     @GetMapping("/page")
-    @ApiOperation("获得定时任务分页")
+    @Operation(summary = "获得定时任务分页")
     @PreAuthorize("@ss.hasPermission('infra:job:query')")
     public CommonResult<PageResult<JobRespVO>> getJobPage(@Valid JobPageReqVO pageVO) {
         PageResult<JobDO> pageResult = jobService.getJobPage(pageVO);
@@ -115,7 +119,7 @@ public class JobController {
     }
 
     @GetMapping("/export-excel")
-    @ApiOperation("导出定时任务 Excel")
+    @Operation(summary = "导出定时任务 Excel")
     @PreAuthorize("@ss.hasPermission('infra:job:export')")
     @OperateLog(type = EXPORT)
     public void exportJobExcel(@Valid JobExportReqVO exportReqVO,
@@ -127,11 +131,7 @@ public class JobController {
     }
 
     @GetMapping("/get_next_times")
-    @ApiOperation("获得定时任务的下 n 次执行时间")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class),
-            @ApiImplicitParam(name = "count", value = "数量", example = "5", dataTypeClass = Long.class)
-    })
+    @Operation(summary = "获得定时任务的下 n 次执行时间")
     @PreAuthorize("@ss.hasPermission('infra:job:query')")
     public CommonResult<List<LocalDateTime>> getJobNextTimes(@RequestParam("id") Long id,
                                                    @RequestParam(value = "count", required = false, defaultValue = "5") Integer count) {

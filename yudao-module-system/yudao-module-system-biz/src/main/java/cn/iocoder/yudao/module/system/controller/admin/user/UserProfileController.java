@@ -20,22 +20,28 @@ import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.permission.RoleService;
 import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_IS_EMPTY;
 
-@Api(tags = "管理后台 - 用户个人中心")
+@Tag(name = "管理后台 - 用户个人中心")
 @RestController
 @RequestMapping("/system/user/profile")
 @Validated
@@ -56,7 +62,7 @@ public class UserProfileController {
     private SocialUserService socialService;
 
     @GetMapping("/get")
-    @ApiOperation("获得登录用户信息")
+    @Operation(summary = "获得登录用户信息")
     @DataPermission(enable = false) // 关闭数据权限，避免只查看自己时，查询不到部门。
     public CommonResult<UserProfileRespVO> profile() {
         // 获得用户基本信息
@@ -82,21 +88,21 @@ public class UserProfileController {
     }
 
     @PutMapping("/update")
-    @ApiOperation("修改用户个人信息")
+    @Operation(summary = "修改用户个人信息")
     public CommonResult<Boolean> updateUserProfile(@Valid @RequestBody UserProfileUpdateReqVO reqVO) {
         userService.updateUserProfile(getLoginUserId(), reqVO);
         return success(true);
     }
 
     @PutMapping("/update-password")
-    @ApiOperation("修改用户个人密码")
+    @Operation(summary = "修改用户个人密码")
     public CommonResult<Boolean> updateUserProfilePassword(@Valid @RequestBody UserProfileUpdatePasswordReqVO reqVO) {
         userService.updateUserPassword(getLoginUserId(), reqVO);
         return success(true);
     }
 
     @RequestMapping(value = "/update-avatar", method = {RequestMethod.POST, RequestMethod.PUT}) // 解决 uni-app 不支持 Put 上传文件的问题
-    @ApiOperation("上传用户个人头像")
+    @Operation(summary = "上传用户个人头像")
     public CommonResult<String> updateUserAvatar(@RequestParam("avatarFile") MultipartFile file) throws Exception {
         if (file.isEmpty()) {
             throw ServiceExceptionUtil.exception(FILE_IS_EMPTY);

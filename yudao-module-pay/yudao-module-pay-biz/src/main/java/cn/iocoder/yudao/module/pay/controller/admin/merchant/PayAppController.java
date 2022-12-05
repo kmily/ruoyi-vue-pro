@@ -7,7 +7,14 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
-import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.app.*;
+import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.app.PayAppCreateReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.app.PayAppExcelVO;
+import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.app.PayAppExportReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.app.PayAppPageItemRespVO;
+import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.app.PayAppPageReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.app.PayAppRespVO;
+import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.app.PayAppUpdateReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.app.PayAppUpdateStatusReqVO;
 import cn.iocoder.yudao.module.pay.convert.app.PayAppConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayChannelDO;
@@ -15,25 +22,37 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayMerchantDO;
 import cn.iocoder.yudao.module.pay.service.merchant.PayAppService;
 import cn.iocoder.yudao.module.pay.service.merchant.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.merchant.PayMerchantService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Slf4j
-@Api(tags = "管理后台 - 支付应用信息")
+@Tag(name = "管理后台 - 支付应用信息")
 @RestController
 @RequestMapping("/pay/app")
 @Validated
@@ -47,14 +66,14 @@ public class PayAppController {
     private PayMerchantService merchantService;
 
     @PostMapping("/create")
-    @ApiOperation("创建支付应用信息")
+    @Operation(summary = "创建支付应用信息")
     @PreAuthorize("@ss.hasPermission('pay:app:create')")
     public CommonResult<Long> createApp(@Valid @RequestBody PayAppCreateReqVO createReqVO) {
         return success(appService.createApp(createReqVO));
     }
 
     @PutMapping("/update")
-    @ApiOperation("更新支付应用信息")
+    @Operation(summary = "更新支付应用信息")
     @PreAuthorize("@ss.hasPermission('pay:app:update')")
     public CommonResult<Boolean> updateApp(@Valid @RequestBody PayAppUpdateReqVO updateReqVO) {
         appService.updateApp(updateReqVO);
@@ -62,7 +81,7 @@ public class PayAppController {
     }
 
     @PutMapping("/update-status")
-    @ApiOperation("更新支付应用状态")
+    @Operation(summary = "更新支付应用状态")
     @PreAuthorize("@ss.hasPermission('pay:app:update')")
     public CommonResult<Boolean> updateAppStatus(@Valid @RequestBody PayAppUpdateStatusReqVO updateReqVO) {
         appService.updateAppStatus(updateReqVO.getId(), updateReqVO.getStatus());
@@ -70,8 +89,8 @@ public class PayAppController {
     }
 
     @DeleteMapping("/delete")
-    @ApiOperation("删除支付应用信息")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
+    @Operation(summary = "删除支付应用信息")
+    
     @PreAuthorize("@ss.hasPermission('pay:app:delete')")
     public CommonResult<Boolean> deleteApp(@RequestParam("id") Long id) {
         appService.deleteApp(id);
@@ -79,8 +98,8 @@ public class PayAppController {
     }
 
     @GetMapping("/get")
-    @ApiOperation("获得支付应用信息")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @Operation(summary = "获得支付应用信息")
+    
     @PreAuthorize("@ss.hasPermission('pay:app:query')")
     public CommonResult<PayAppRespVO> getApp(@RequestParam("id") Long id) {
         PayAppDO app = appService.getApp(id);
@@ -88,8 +107,8 @@ public class PayAppController {
     }
 
     @GetMapping("/list")
-    @ApiOperation("获得支付应用信息列表")
-    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
+    @Operation(summary = "获得支付应用信息列表")
+    
     @PreAuthorize("@ss.hasPermission('pay:app:query')")
     public CommonResult<List<PayAppRespVO>> getAppList(@RequestParam("ids") Collection<Long> ids) {
         List<PayAppDO> list = appService.getAppList(ids);
@@ -97,7 +116,7 @@ public class PayAppController {
     }
 
     @GetMapping("/page")
-    @ApiOperation("获得支付应用信息分页")
+    @Operation(summary = "获得支付应用信息分页")
     @PreAuthorize("@ss.hasPermission('pay:app:query')")
     public CommonResult<PageResult<PayAppPageItemRespVO>> getAppPage(@Valid PayAppPageReqVO pageVO) {
         // 得到应用分页列表
@@ -140,7 +159,7 @@ public class PayAppController {
     }
 
     @GetMapping("/export-excel")
-    @ApiOperation("导出支付应用信息 Excel")
+    @Operation(summary = "导出支付应用信息 Excel")
     @PreAuthorize("@ss.hasPermission('pay:app:export')")
     @OperateLog(type = EXPORT)
     public void exportAppExcel(@Valid PayAppExportReqVO exportReqVO,
@@ -152,8 +171,7 @@ public class PayAppController {
     }
 
     @GetMapping("/list-merchant-id")
-    @ApiOperation("根据商户 ID 查询支付应用信息")
-    @ApiImplicitParam(name = "merchantId", value = "商户ID", required = true, example = "1", dataTypeClass = Long.class)
+    @Operation(summary = "根据商户 ID 查询支付应用信息")
     @PreAuthorize("@ss.hasPermission('pay:merchant:query')")
     public CommonResult<List<PayAppRespVO>> getMerchantListByName(@RequestParam Long merchantId) {
         List<PayAppDO> appListDO = appService.getListByMerchantId(merchantId);

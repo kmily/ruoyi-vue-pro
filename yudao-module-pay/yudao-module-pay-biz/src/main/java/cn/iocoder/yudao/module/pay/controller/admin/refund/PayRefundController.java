@@ -2,7 +2,17 @@ package cn.iocoder.yudao.module.pay.controller.admin.refund;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.*;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
+import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundDetailsRespVO;
+import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundExcelVO;
+import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundExportReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundPageItemRespVO;
+import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundPageReqVO;
 import cn.iocoder.yudao.module.pay.convert.refund.PayRefundConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayMerchantDO;
@@ -12,15 +22,11 @@ import cn.iocoder.yudao.module.pay.service.merchant.PayAppService;
 import cn.iocoder.yudao.module.pay.service.merchant.PayMerchantService;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,9 +34,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +42,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-@Api(tags = "管理后台 - 退款订单")
+@Tag(name = "管理后台 - 退款订单")
 @RestController
 @RequestMapping("/pay/refund")
 @Validated
@@ -55,8 +58,8 @@ public class PayRefundController {
     private PayOrderService orderService;
 
     @GetMapping("/get")
-    @ApiOperation("获得退款订单")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @Operation(summary = "获得退款订单")
+    
     @PreAuthorize("@ss.hasPermission('pay:refund:query')")
     public CommonResult<PayRefundDetailsRespVO> getRefund(@RequestParam("id") Long id) {
         PayRefundDO refund = refundService.getRefund(id);
@@ -79,7 +82,7 @@ public class PayRefundController {
     }
 
     @GetMapping("/page")
-    @ApiOperation("获得退款订单分页")
+    @Operation(summary = "获得退款订单分页")
     @PreAuthorize("@ss.hasPermission('pay:refund:query')")
     public CommonResult<PageResult<PayRefundPageItemRespVO>> getRefundPage(@Valid PayRefundPageReqVO pageVO) {
         PageResult<PayRefundDO> pageResult = refundService.getRefundPage(pageVO);
@@ -111,7 +114,7 @@ public class PayRefundController {
     }
 
     @GetMapping("/export-excel")
-    @ApiOperation("导出退款订单 Excel")
+    @Operation(summary = "导出退款订单 Excel")
     @PreAuthorize("@ss.hasPermission('pay:refund:export')")
     @OperateLog(type = EXPORT)
     public void exportRefundExcel(@Valid PayRefundExportReqVO exportReqVO,

@@ -2,10 +2,9 @@ package cn.iocoder.yudao.module.promotion.controller.admin.banner.vo;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
  * Banner Base VO，提供给添加、修改、详细的子 VO 使用
@@ -15,28 +14,28 @@ import jakarta.validation.constraints.NotNull;
 @Data
 public class BannerBaseVO {
 
-    @ApiModelProperty(value = "标题", required = true)
+    @Schema(title  = "标题", required = true)
     @NotNull(message = "标题不能为空")
     private String title;
 
-    @ApiModelProperty(value = "跳转链接", required = true)
+    @Schema(title  = "跳转链接", required = true)
     @NotNull(message = "跳转链接不能为空")
     private String url;
 
-    @ApiModelProperty(value = "图片地址", required = true)
+    @Schema(title  = "图片地址", required = true)
     @NotNull(message = "图片地址不能为空")
     private String picUrl;
 
-    @ApiModelProperty(value = "排序", required = true)
+    @Schema(title  = "排序", required = true)
     @NotNull(message = "排序不能为空")
     private Integer sort;
 
-    @ApiModelProperty(value = "状态", required = true)
+    @Schema(title  = "状态", required = true)
     @NotNull(message = "状态不能为空")
     @InEnum(CommonStatusEnum.class)
     private Integer status;
 
-    @ApiModelProperty(value = "备注")
+    @Schema(title  = "备注")
     private String memo;
 
 }

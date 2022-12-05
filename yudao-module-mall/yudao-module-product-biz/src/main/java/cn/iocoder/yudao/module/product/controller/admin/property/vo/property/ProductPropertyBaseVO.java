@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.module.product.controller.admin.property.vo.property;
 
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
  * 规格名称 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -13,14 +12,14 @@ import jakarta.validation.constraints.NotNull;
 @Data
 public class ProductPropertyBaseVO {
 
-    @ApiModelProperty(value = "规格名称", required = true, example = "颜色")
+    @Schema(title  = "规格名称", required = true, example = "颜色")
     @NotBlank(message = "规格名称不能为空")
     private String name;
 
-    @ApiModelProperty(value = "备注", example = "颜色")
+    @Schema(title  = "备注", example = "颜色")
     private String remark;
 
-    @ApiModelProperty(value = "状态", required = true, example = "1", notes = "参见 CommonStatusEnum 枚举")
+    @Schema(title  = "状态", required = true, example = "1", description = "参见 CommonStatusEnum 枚举")
     @NotNull(message = "状态不能为空")
     private Integer status;
 

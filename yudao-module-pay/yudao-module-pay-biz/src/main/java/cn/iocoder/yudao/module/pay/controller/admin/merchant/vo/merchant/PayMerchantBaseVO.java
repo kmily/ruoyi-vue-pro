@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.merchant;
 
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
 * 支付商户信息 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -12,19 +11,19 @@ import jakarta.validation.constraints.NotNull;
 @Data
 public class PayMerchantBaseVO {
 
-    @ApiModelProperty(value = "商户全称", required = true)
+    @Schema(title  = "商户全称", required = true)
     @NotNull(message = "商户全称不能为空")
     private String name;
 
-    @ApiModelProperty(value = "商户简称", required = true)
+    @Schema(title  = "商户简称", required = true)
     @NotNull(message = "商户简称不能为空")
     private String shortName;
 
-    @ApiModelProperty(value = "开启状态", required = true)
+    @Schema(title  = "开启状态", required = true)
     @NotNull(message = "开启状态不能为空")
     private Integer status;
 
-    @ApiModelProperty(value = "备注")
+    @Schema(title  = "备注")
     private String remark;
 
 }

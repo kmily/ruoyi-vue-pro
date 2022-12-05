@@ -1,16 +1,18 @@
 package cn.iocoder.yudao.module.product.controller.admin.brand.vo;
 
-import lombok.*;
-import io.swagger.annotations.*;
-import jakarta.validation.constraints.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-@ApiModel("管理后台 - 商品品牌更新 Request VO")
+@Schema(title = "管理后台 - 商品品牌更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ProductBrandUpdateReqVO extends ProductBrandBaseVO {
 
-    @ApiModelProperty(value = "品牌编号", required = true, example = "1")
+    @Schema(title  = "品牌编号", required = true, example = "1")
     @NotNull(message = "品牌编号不能为空")
     private Long id;
 

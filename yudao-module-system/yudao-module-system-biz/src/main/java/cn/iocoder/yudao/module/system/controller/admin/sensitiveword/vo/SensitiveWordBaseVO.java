@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -13,19 +13,19 @@ import java.util.List;
 @Data
 public class SensitiveWordBaseVO {
 
-    @ApiModelProperty(value = "敏感词", required = true, example = "敏感词")
+    @Schema(title  = "敏感词", required = true, example = "敏感词")
     @NotNull(message = "敏感词不能为空")
     private String name;
 
-    @ApiModelProperty(value = "标签", required = true, example = "短信,评论")
+    @Schema(title  = "标签", required = true, example = "短信,评论")
     @NotNull(message = "标签不能为空")
     private List<String> tags;
 
-    @ApiModelProperty(value = "状态", required = true, example = "1", notes = "参见 CommonStatusEnum 枚举类")
+    @Schema(title  = "状态", required = true, example = "1", description = "参见 CommonStatusEnum 枚举类")
     @NotNull(message = "状态不能为空")
     private Integer status;
 
-    @ApiModelProperty(value = "描述", example = "污言秽语")
+    @Schema(title  = "描述", example = "污言秽语")
     private String description;
 
 }

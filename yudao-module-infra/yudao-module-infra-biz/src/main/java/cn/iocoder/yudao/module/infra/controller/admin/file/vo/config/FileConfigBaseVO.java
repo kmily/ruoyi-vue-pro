@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.infra.controller.admin.file.vo.config;
 
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
 * 文件配置 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -12,11 +11,11 @@ import jakarta.validation.constraints.NotNull;
 @Data
 public class FileConfigBaseVO {
 
-    @ApiModelProperty(value = "配置名", required = true, example = "S3 - 阿里云")
+    @Schema(title  = "配置名", required = true, example = "S3 - 阿里云")
     @NotNull(message = "配置名不能为空")
     private String name;
 
-    @ApiModelProperty(value = "备注", example = "我是备注")
+    @Schema(title  = "备注", example = "我是备注")
     private String remark;
 
 }

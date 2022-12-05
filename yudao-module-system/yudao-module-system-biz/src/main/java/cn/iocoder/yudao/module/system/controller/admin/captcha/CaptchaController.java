@@ -3,8 +3,8 @@
 //import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 //import com.anji.captcha.model.common.ResponseModel;
 //import com.anji.captcha.model.vo.CaptchaVO;
-//import io.swagger.annotations.Api;
-//import io.swagger.annotations.ApiOperation;
+//import io.swagger.v3.oas.annotations.tags.Tag;
+//import io.swagger.v3.oas.annotations.Operation;
 //import jakarta.annotation.security.PermitAll;
 //import jakarta.servlet.http.HttpServletRequest;
 //import org.springframework.web.bind.annotation.PostMapping;
@@ -20,13 +20,13 @@
 // *
 // * @author 芋道源码
 // */
-//@Api(tags = "管理后台 - 验证码")
+//@Tag(name = "管理后台 - 验证码")
 //@RestController("adminCaptchaController")
 //@RequestMapping("/system/captcha")
 //public class CaptchaController extends com.anji.captcha.controller.CaptchaController {
 //
 //    @PostMapping({"/get"})
-//    @ApiOperation("获得验证码")
+//    @Operation(summary = "获得验证码")
 //    @PermitAll
 //    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
 //    public ResponseModel get(@RequestBody CaptchaVO data, HttpServletRequest request) {
@@ -34,7 +34,7 @@
 //    }
 //
 //    @PostMapping("/check")
-//    @ApiOperation("校验验证码")
+//    @Operation(summary = "校验验证码")
 //    @PermitAll
 //    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
 //    public ResponseModel check(@RequestBody CaptchaVO data, HttpServletRequest request) {

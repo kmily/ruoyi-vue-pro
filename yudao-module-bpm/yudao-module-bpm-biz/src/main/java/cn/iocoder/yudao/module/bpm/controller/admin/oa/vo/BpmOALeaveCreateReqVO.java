@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.oa.vo;
 
-import io.swagger.annotations.ApiModel;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.AssertTrue;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import jakarta.validation.constraints.AssertTrue;
-
-@ApiModel("管理后台 - 请假申请创建 Request VO")
+@Schema(title = "管理后台 - 请假申请创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

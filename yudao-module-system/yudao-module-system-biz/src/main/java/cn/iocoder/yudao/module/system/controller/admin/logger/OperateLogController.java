@@ -1,5 +1,11 @@
 package cn.iocoder.yudao.module.system.controller.admin.logger;
 
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog.OperateLogExcelVO;
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog.OperateLogExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog.OperateLogPageReqVO;
@@ -8,24 +14,18 @@ import cn.iocoder.yudao.module.system.convert.logger.OperateLogConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.service.logger.OperateLogService;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,7 +35,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-@Api(tags = "管理后台 - 操作日志")
+@Tag(name = "管理后台 - 操作日志")
 @RestController
 @RequestMapping("/system/operate-log")
 @Validated
@@ -47,7 +47,7 @@ public class OperateLogController {
     private AdminUserService userService;
 
     @GetMapping("/page")
-    @ApiOperation("查看操作日志分页列表")
+    @Operation(summary = "查看操作日志分页列表")
     @PreAuthorize("@ss.hasPermission('system:operate-log:query')")
     public CommonResult<PageResult<OperateLogRespVO>> pageOperateLog(@Valid OperateLogPageReqVO reqVO) {
         PageResult<OperateLogDO> pageResult = operateLogService.getOperateLogPage(reqVO);
@@ -66,7 +66,7 @@ public class OperateLogController {
         return success(new PageResult<>(list, pageResult.getTotal()));
     }
 
-    @ApiOperation("导出操作日志")
+    @Operation(summary = "导出操作日志")
     @GetMapping("/export")
     @PreAuthorize("@ss.hasPermission('system:operate-log:export')")
     @OperateLog(type = EXPORT)

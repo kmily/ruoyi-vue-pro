@@ -158,29 +158,41 @@
             </dependency>
 
             <dependency>
-                <groupId>com.github.xiaoymin</groupId>
-                <artifactId>knife4j-spring-boot-starter</artifactId>
-                <version>${knife4j.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>mapstruct</artifactId>
-                        <groupId>org.mapstruct</groupId> <!-- 避免冲突 -->
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>guava</artifactId>
-                        <groupId>com.google.guava</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>swagger-annotations</artifactId>
-                        <groupId>io.swagger</groupId>
-                    </exclusion>
-                </exclusions>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-ui</artifactId>
+                <version>1.6.13</version>
             </dependency>
+
             <dependency>
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-annotations</artifactId>
-                <version>${swagger-annotations.version}</version>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-springdoc-ui</artifactId>
+                <version>3.0.3</version>
             </dependency>
+
+<!--            <dependency>-->
+<!--                <groupId>com.github.xiaoymin</groupId>-->
+<!--                <artifactId>knife4j-spring-boot-starter</artifactId>-->
+<!--                <version>${knife4j.version}</version>-->
+<!--                <exclusions>-->
+<!--                    <exclusion>-->
+<!--                        <artifactId>mapstruct</artifactId>-->
+<!--                        <groupId>org.mapstruct</groupId> &lt;!&ndash; 避免冲突 &ndash;&gt;-->
+<!--                    </exclusion>-->
+<!--                    <exclusion>-->
+<!--                        <artifactId>guava</artifactId>-->
+<!--                        <groupId>com.google.guava</groupId>-->
+<!--                    </exclusion>-->
+<!--                    <exclusion>-->
+<!--                        <artifactId>swagger-annotations</artifactId>-->
+<!--                        <groupId>io.swagger</groupId>-->
+<!--                    </exclusion>-->
+<!--                </exclusions>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>io.swagger</groupId>-->
+<!--                <artifactId>swagger-annotations</artifactId>-->
+<!--                <version>${swagger-annotations.version}</version>-->
+<!--            </dependency>-->
 
             <!-- DB 相关 -->
             <dependency>
@@ -262,11 +274,11 @@
                 <artifactId>resilience4j-ratelimiter</artifactId>
                 <version>${resilience4j.version}</version>
             </dependency>
-            <dependency>
-                <groupId>io.github.resilience4j</groupId>
-                <artifactId>resilience4j-spring-boot2</artifactId>
-                <version>${resilience4j.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>io.github.resilience4j</groupId>-->
+<!--                <artifactId>resilience4j-spring-boot2</artifactId>-->
+<!--                <version>${resilience4j.version}</version>-->
+<!--            </dependency>-->
 
             <!-- 监控相关 -->
             <dependency>
@@ -411,11 +423,11 @@
                 <artifactId>mapstruct</artifactId> <!-- use mapstruct-jdk8 for Java 8 or higher -->
                 <version>${mapstruct.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.mapstruct</groupId>
-                <artifactId>mapstruct-jdk8</artifactId>
-                <version>${mapstruct.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.mapstruct</groupId>-->
+<!--                <artifactId>mapstruct-jdk8</artifactId>-->
+<!--                <version>${mapstruct.version}</version>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct-processor</artifactId>

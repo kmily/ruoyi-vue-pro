@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 
 /**
@@ -14,11 +13,11 @@ import java.util.Set;
 @Data
 public class BpmTaskAssignRuleBaseVO {
 
-    @ApiModelProperty(value = "规则类型", required = true, example = "bpm_task_assign_rule_type")
+    @Schema(title  = "规则类型", required = true, example = "bpm_task_assign_rule_type")
     @NotNull(message = "规则类型不能为空")
     private Integer type;
 
-    @ApiModelProperty(value = "规则值数组", required = true, example = "1,2,3")
+    @Schema(title  = "规则值数组", required = true, example = "1,2,3")
     @NotNull(message = "规则值数组不能为空")
     private Set<Long> options;
 

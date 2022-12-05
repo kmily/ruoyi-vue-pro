@@ -5,20 +5,32 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.*;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostCreateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostExcelVO;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostExportReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostSimpleRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.dept.PostConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,7 +39,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-@Api(tags = "管理后台 - 岗位")
+@Tag(name = "管理后台 - 岗位")
 @RestController
 @RequestMapping("/system/post")
 @Validated
@@ -37,7 +49,7 @@ public class PostController {
     private PostService postService;
 
     @PostMapping("/create")
-    @ApiOperation("创建岗位")
+    @Operation(summary = "创建岗位")
     @PreAuthorize("@ss.hasPermission('system:post:create')")
     public CommonResult<Long> createPost(@Valid @RequestBody PostCreateReqVO reqVO) {
         Long postId = postService.createPost(reqVO);
@@ -45,7 +57,7 @@ public class PostController {
     }
 
     @PutMapping("/update")
-    @ApiOperation("修改岗位")
+    @Operation(summary = "修改岗位")
     @PreAuthorize("@ss.hasPermission('system:post:update')")
     public CommonResult<Boolean> updatePost(@Valid @RequestBody PostUpdateReqVO reqVO) {
         postService.updatePost(reqVO);
@@ -53,7 +65,7 @@ public class PostController {
     }
 
     @DeleteMapping("/delete")
-    @ApiOperation("删除岗位")
+    @Operation(summary = "删除岗位")
     @PreAuthorize("@ss.hasPermission('system:post:delete')")
     public CommonResult<Boolean> deletePost(@RequestParam("id") Long id) {
         postService.deletePost(id);
@@ -61,15 +73,14 @@ public class PostController {
     }
 
     @GetMapping(value = "/get")
-    @ApiOperation("获得岗位信息")
-    @ApiImplicitParam(name = "id", value = "岗位编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @Operation(summary = "获得岗位信息")
     @PreAuthorize("@ss.hasPermission('system:post:query')")
     public CommonResult<PostRespVO> getPost(@RequestParam("id") Long id) {
         return success(PostConvert.INSTANCE.convert(postService.getPost(id)));
     }
 
     @GetMapping("/list-all-simple")
-    @ApiOperation(value = "获取岗位精简信息列表", notes = "只包含被开启的岗位，主要用于前端的下拉选项")
+    @Operation(summary = "获取岗位精简信息列表", description = "只包含被开启的岗位，主要用于前端的下拉选项")
     public CommonResult<List<PostSimpleRespVO>> getSimplePosts() {
         // 获得岗位列表，只要开启状态的
         List<PostDO> list = postService.getPosts(null, Collections.singleton(CommonStatusEnum.ENABLE.getStatus()));
@@ -79,14 +90,14 @@ public class PostController {
     }
 
     @GetMapping("/page")
-    @ApiOperation("获得岗位分页列表")
+    @Operation(summary = "获得岗位分页列表")
     @PreAuthorize("@ss.hasPermission('system:post:query')")
     public CommonResult<PageResult<PostRespVO>> getPostPage(@Validated PostPageReqVO reqVO) {
         return success(PostConvert.INSTANCE.convertPage(postService.getPostPage(reqVO)));
     }
 
     @GetMapping("/export")
-    @ApiOperation("岗位管理")
+    @Operation(summary = "岗位管理")
     @PreAuthorize("@ss.hasPermission('system:post:export')")
     @OperateLog(type = EXPORT)
     public void export(HttpServletResponse response, @Validated PostExportReqVO reqVO) throws IOException {

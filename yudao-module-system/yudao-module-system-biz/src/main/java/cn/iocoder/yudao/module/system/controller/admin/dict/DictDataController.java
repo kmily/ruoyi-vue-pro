@@ -1,30 +1,42 @@
 package cn.iocoder.yudao.module.system.controller.admin.dict;
 
-import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.*;
+import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataCreateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataExcelVO;
+import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataExportReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataSimpleRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.dict.DictDataConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 import cn.iocoder.yudao.module.system.service.dict.DictDataService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.io.IOException;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-@Api(tags = "管理后台 - 字典数据")
+@Tag(name = "管理后台 - 字典数据")
 @RestController
 @RequestMapping("/system/dict-data")
 @Validated
@@ -34,7 +46,7 @@ public class DictDataController {
     private DictDataService dictDataService;
 
     @PostMapping("/create")
-    @ApiOperation("新增字典数据")
+    @Operation(summary = "新增字典数据")
     @PreAuthorize("@ss.hasPermission('system:dict:create')")
     public CommonResult<Long> createDictData(@Valid @RequestBody DictDataCreateReqVO reqVO) {
         Long dictDataId = dictDataService.createDictData(reqVO);
@@ -42,7 +54,7 @@ public class DictDataController {
     }
 
     @PutMapping("update")
-    @ApiOperation("修改字典数据")
+    @Operation(summary = "修改字典数据")
     @PreAuthorize("@ss.hasPermission('system:dict:update')")
     public CommonResult<Boolean> updateDictData(@Valid @RequestBody DictDataUpdateReqVO reqVO) {
         dictDataService.updateDictData(reqVO);
@@ -50,8 +62,8 @@ public class DictDataController {
     }
 
     @DeleteMapping("/delete")
-    @ApiOperation("删除字典数据")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @Operation(summary = "删除字典数据")
+    
     @PreAuthorize("@ss.hasPermission('system:dict:delete')")
     public CommonResult<Boolean> deleteDictData(Long id) {
         dictDataService.deleteDictData(id);
@@ -59,7 +71,7 @@ public class DictDataController {
     }
 
     @GetMapping("/list-all-simple")
-    @ApiOperation(value = "获得全部字典数据列表", notes = "一般用于管理后台缓存字典数据在本地")
+    @Operation(summary = "获得全部字典数据列表", description = "一般用于管理后台缓存字典数据在本地")
     // 无需添加权限认证，因为前端全局都需要
     public CommonResult<List<DictDataSimpleRespVO>> getSimpleDictDatas() {
         List<DictDataDO> list = dictDataService.getDictDatas();
@@ -67,22 +79,22 @@ public class DictDataController {
     }
 
     @GetMapping("/page")
-    @ApiOperation("/获得字典类型的分页列表")
+    @Operation(summary = "/获得字典类型的分页列表")
     @PreAuthorize("@ss.hasPermission('system:dict:query')")
     public CommonResult<PageResult<DictDataRespVO>> getDictTypePage(@Valid DictDataPageReqVO reqVO) {
         return success(DictDataConvert.INSTANCE.convertPage(dictDataService.getDictDataPage(reqVO)));
     }
 
     @GetMapping(value = "/get")
-    @ApiOperation("/查询字典数据详细")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @Operation(summary = "/查询字典数据详细")
+    
     @PreAuthorize("@ss.hasPermission('system:dict:query')")
     public CommonResult<DictDataRespVO> getDictData(@RequestParam("id") Long id) {
         return success(DictDataConvert.INSTANCE.convert(dictDataService.getDictData(id)));
     }
 
     @GetMapping("/export")
-    @ApiOperation("导出字典数据")
+    @Operation(summary = "导出字典数据")
     @PreAuthorize("@ss.hasPermission('system:dict:export')")
     @OperateLog(type = EXPORT)
     public void export(HttpServletResponse response, @Valid DictDataExportReqVO reqVO) throws IOException {

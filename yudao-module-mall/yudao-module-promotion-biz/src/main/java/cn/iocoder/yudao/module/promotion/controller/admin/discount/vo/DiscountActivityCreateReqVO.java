@@ -1,15 +1,16 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.discount.vo;
 
-import io.swagger.annotations.ApiModel;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 
-@ApiModel("管理后台 - 限时折扣活动创建 Request VO")
+@Schema(title = "管理后台 - 限时折扣活动创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

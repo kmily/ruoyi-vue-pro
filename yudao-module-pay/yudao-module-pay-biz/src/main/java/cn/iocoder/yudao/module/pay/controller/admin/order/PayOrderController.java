@@ -2,7 +2,17 @@ package cn.iocoder.yudao.module.pay.controller.admin.order;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.module.pay.controller.admin.order.vo.*;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
+import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderDetailsRespVO;
+import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderExcelVO;
+import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderExportReqVO;
+import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderPageItemRespVO;
+import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderPageReqVO;
 import cn.iocoder.yudao.module.pay.convert.order.PayOrderConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayMerchantDO;
@@ -12,15 +22,11 @@ import cn.iocoder.yudao.module.pay.service.merchant.PayAppService;
 import cn.iocoder.yudao.module.pay.service.merchant.PayMerchantService;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderExtensionService;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,9 +34,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +42,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-@Api(tags = "管理后台 - 支付订单")
+@Tag(name = "管理后台 - 支付订单")
 @RestController
 @RequestMapping("/pay/order")
 @Validated
@@ -55,8 +58,7 @@ public class PayOrderController {
     private PayAppService appService;
 
     @GetMapping("/get")
-    @ApiOperation("获得支付订单")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @Operation(summary = "获得支付订单")
     @PreAuthorize("@ss.hasPermission('pay:order:query')")
     public CommonResult<PayOrderDetailsRespVO> getOrder(@RequestParam("id") Long id) {
         PayOrderDO order = orderService.getOrder(id);
@@ -83,7 +85,7 @@ public class PayOrderController {
     }
 
     @GetMapping("/page")
-    @ApiOperation("获得支付订单分页")
+    @Operation(summary = "获得支付订单分页")
     @PreAuthorize("@ss.hasPermission('pay:order:query')")
     public CommonResult<PageResult<PayOrderPageItemRespVO>> getOrderPage(@Valid PayOrderPageReqVO pageVO) {
         PageResult<PayOrderDO> pageResult = orderService.getOrderPage(pageVO);
@@ -114,7 +116,7 @@ public class PayOrderController {
     }
 
     @GetMapping("/export-excel")
-    @ApiOperation("导出支付订单Excel")
+    @Operation(summary = "导出支付订单Excel")
     @PreAuthorize("@ss.hasPermission('pay:order:export')")
     @OperateLog(type = EXPORT)
     public void exportOrderExcel(@Valid PayOrderExportReqVO exportReqVO,

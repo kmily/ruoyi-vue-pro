@@ -1,12 +1,11 @@
 package cn.iocoder.yudao.module.infra.controller.admin.config.vo;
 
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 
 /**
  * 参数配置 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -15,26 +14,26 @@ import jakarta.validation.constraints.Size;
 @Data
 public class ConfigBaseVO {
 
-    @ApiModelProperty(value = "参数分组", required = true, example = "biz")
+    @Schema(title  = "参数分组", required = true, example = "biz")
     @NotEmpty(message = "参数分组不能为空")
     @Size(max = 50, message = "参数名称不能超过50个字符")
     private String category;
 
-    @ApiModelProperty(value = "参数名称", required = true, example = "数据库名")
+    @Schema(title  = "参数名称", required = true, example = "数据库名")
     @NotBlank(message = "参数名称不能为空")
     @Size(max = 100, message = "参数名称不能超过100个字符")
     private String name;
 
-    @ApiModelProperty(value = "参数键值", required = true, example = "1024")
+    @Schema(title  = "参数键值", required = true, example = "1024")
     @NotBlank(message = "参数键值不能为空")
     @Size(max = 500, message = "参数键值长度不能超过500个字符")
     private String value;
 
-    @ApiModelProperty(value = "是否敏感", required = true, example = "true")
+    @Schema(title  = "是否敏感", required = true, example = "true")
     @NotNull(message = "是否敏感不能为空")
     private Boolean visible;
 
-    @ApiModelProperty(value = "备注", example = "备注一下很帅气！")
+    @Schema(title  = "备注", example = "备注一下很帅气！")
     private String remark;
 
 }
