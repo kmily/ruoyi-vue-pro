@@ -50,7 +50,7 @@
         <fastjson.version>1.2.83</fastjson.version>
         <guava.version>31.1-jre</guava.version>
         <guice.version>5.1.0</guice.version>
-        <transmittable-thread-local.version>2.14.0</transmittable-thread-local.version>
+        <transmittable-thread-local.version>2.14.2</transmittable-thread-local.version>
         <commons-net.version>3.8.0</commons-net.version>
         <jsch.version>0.1.55</jsch.version>
         <tika-core.version>2.5.0</tika-core.version>
@@ -130,11 +130,11 @@
                 <artifactId>yudao-spring-boot-starter-biz-error-code</artifactId>
                 <version>${revision}</version>
             </dependency>
-            <dependency>
-                <groupId>cn.iocoder.boot</groupId>
-                <artifactId>yudao-spring-boot-starter-captcha</artifactId>
-                <version>${revision}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>cn.iocoder.boot</groupId>-->
+<!--                <artifactId>yudao-spring-boot-starter-captcha</artifactId>-->
+<!--                <version>${revision}</version>-->
+<!--            </dependency>-->
 
             <!-- Spring 核心 -->
             <dependency>
@@ -440,11 +440,11 @@
                 <version>${tika-core.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.anji-plus</groupId>
-                <artifactId>spring-boot-starter-captcha</artifactId>
-                <version>${aj-captcha.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.anji-plus</groupId>-->
+<!--                <artifactId>spring-boot-starter-captcha</artifactId>-->
+<!--                <version>${aj-captcha.version}</version>-->
+<!--            </dependency>-->
 
             <dependency>
                 <groupId>org.apache.velocity</groupId>

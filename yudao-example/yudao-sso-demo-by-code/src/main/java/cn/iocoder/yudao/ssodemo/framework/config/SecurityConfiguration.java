@@ -31,11 +31,11 @@ public class SecurityConfiguration{
         httpSecurity.csrf().disable() // 禁用 CSRF 保护
                 .authorizeRequests()
                 // 1. 静态资源，可匿名访问
-                .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
+                .requestMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
                 // 2. 登录相关的接口，可匿名访问
-                .antMatchers("/auth/login-by-code").permitAll()
-                .antMatchers("/auth/refresh-token").permitAll()
-                .antMatchers("/auth/logout").permitAll()
+                .requestMatchers("/auth/login-by-code").permitAll()
+                .requestMatchers("/auth/refresh-token").permitAll()
+                .requestMatchers("/auth/logout").permitAll()
                 // last. 兜底规则，必须认证
                 .and().authorizeRequests()
                 .anyRequest().authenticated();
