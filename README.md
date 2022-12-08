@@ -103,7 +103,6 @@
 | `yudao-module-system` | 系统功能的 Module 模块    |
 | `yudao-module-member` | 会员中心的 Module 模块    |
 | `yudao-module-infra`  | 基础设施的 Module 模块    |
-| `yudao-module-tool`   | 研发工具的 Module 模块    |
 
 ### 后端
 
@@ -146,11 +145,4 @@
 | [pinia](https://pinia.vuejs.org/)                                    |    vuex5     | 2.0.27 |
 | [vue-i18n](https://kazupon.github.io/vue-i18n/zh/introduction.html/) |    国际化     | 9.2.2  |
 | [vxe-table](https://vxetable.cn/)                                    |  vue最强表单  | 4.5.6  |
-
-### [管理后台 uni-app 跨端](./yudao-ui-admin-uniapp)
-
-| 框架                                                                  | 说明               | 版本     |
-|----------------------------------------------------------------------|------------------|--------|
-| [uni-app](hhttps://github.com/dcloudio/uni-app)                                 | 跨平台框架           | 2.0.0 |
-| [uni-ui](https://github.com/dcloudio/uni-ui)                                      | 基于 uni-app 的 UI 框架          | 1.4.20  |
 
