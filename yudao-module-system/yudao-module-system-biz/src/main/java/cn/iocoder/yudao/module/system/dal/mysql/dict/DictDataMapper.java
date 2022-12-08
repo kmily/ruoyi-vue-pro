@@ -49,12 +49,4 @@ public interface DictDataMapper extends BaseMapperX<DictDataDO> {
                 .likeIfPresent(DictDataDO::getDictType, reqVO.getDictType())
                 .eqIfPresent(DictDataDO::getStatus, reqVO.getStatus()));
     }
-
-    default int deleteByEntity(DictDataDO dictDataDO) {
-        // 这里更新删除时间，是为了保证字典表的唯一索引
-        dictDataDO.setDeletedTime(LocalDateTime.now());
-        dictDataDO.setDeleted(true);
-        return updateById(dictDataDO);
-    }
-
 }

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -105,7 +106,8 @@ public class DictDataServiceImpl implements DictDataService {
 
         // 删除
         DictDataDO dictDataDO = dictDataMapper.selectById(id);
-        dictDataMapper.deleteByEntity(dictDataDO);
+        dictDataDO.setDeletedTime(LocalDateTime.now());
+        dictDataMapper.deleteById(dictDataDO);
     }
 
     @Override
