@@ -15,15 +15,21 @@ import cn.iocoder.yudao.module.system.dal.mysql.dict.DictDataMapper;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.DICT_DATA_NOT_ENABLE;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.DICT_DATA_NOT_EXISTS;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.DICT_DATA_VALUE_DUPLICATE;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.DICT_TYPE_NOT_ENABLE;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.DICT_TYPE_NOT_EXISTS;
 
 /**
  * 字典数据 Service 实现类
@@ -93,12 +99,16 @@ public class DictDataServiceImpl implements DictDataService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteDictData(Long id) {
         // 校验是否存在
         checkDictDataExists(id);
 
-        // 删除字典数据
-        dictDataMapper.deleteById(id);
+        // 删除
+        DictDataDO dictDataDO = new DictDataDO();
+        dictDataDO.setId(id);
+        dictDataDO.setDeletedTime(LocalDateTime.now());
+        dictDataMapper.deleteById(dictDataDO);
     }
 
     @Override
