@@ -105,7 +105,8 @@ public class DictDataServiceImpl implements DictDataService {
         checkDictDataExists(id);
 
         // 删除
-        DictDataDO dictDataDO = dictDataMapper.selectById(id);
+        DictDataDO dictDataDO = new DictDataDO();
+        dictDataDO.setId(id);
         dictDataDO.setDeletedTime(LocalDateTime.now());
         dictDataMapper.deleteById(dictDataDO);
     }
