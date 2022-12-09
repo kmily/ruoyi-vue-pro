@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.logger.LoginLogDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 /**

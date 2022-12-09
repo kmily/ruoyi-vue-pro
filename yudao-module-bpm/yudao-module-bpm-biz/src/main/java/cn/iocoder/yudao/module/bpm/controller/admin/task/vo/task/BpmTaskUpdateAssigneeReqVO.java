@@ -2,12 +2,9 @@ package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import net.bytebuddy.implementation.bind.annotation.Empty;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(title = "管理后台 - 流程任务的更新负责人的 Request VO")
 @Data

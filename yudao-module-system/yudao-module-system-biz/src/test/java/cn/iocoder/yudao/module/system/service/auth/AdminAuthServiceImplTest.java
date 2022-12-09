@@ -5,8 +5,6 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.AuthLoginReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.AuthLoginRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
@@ -21,11 +19,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
-import javax.validation.Validator;
+import jakarta.annotation.Resource;
+import jakarta.validation.Validator;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
-import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;

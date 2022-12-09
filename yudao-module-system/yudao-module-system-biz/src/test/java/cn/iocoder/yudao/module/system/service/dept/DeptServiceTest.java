@@ -12,11 +12,11 @@ import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import com.google.common.collect.Multimap;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;

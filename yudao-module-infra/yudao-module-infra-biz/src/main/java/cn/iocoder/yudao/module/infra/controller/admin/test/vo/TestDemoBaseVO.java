@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.infra.controller.admin.test.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 /**
 * 字典类型 Base VO，提供给添加、修改、详细的子 VO 使用

@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.product.service.property;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.*;
 import cn.iocoder.yudao.module.product.convert.property.ProductPropertyConvert;
@@ -15,11 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.PROPERTY_EXISTS;

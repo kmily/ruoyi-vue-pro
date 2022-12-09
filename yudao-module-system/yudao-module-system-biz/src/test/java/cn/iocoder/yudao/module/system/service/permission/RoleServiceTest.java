@@ -13,11 +13,11 @@ import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMapper;
 import cn.iocoder.yudao.module.system.enums.permission.DataScopeEnum;
 import cn.iocoder.yudao.module.system.enums.permission.RoleTypeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.RoleProducer;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 

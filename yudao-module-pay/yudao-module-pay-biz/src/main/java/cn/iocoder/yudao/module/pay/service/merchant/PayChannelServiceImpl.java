@@ -25,9 +25,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import javax.validation.Validator;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;;
+import jakarta.validation.Validator;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;

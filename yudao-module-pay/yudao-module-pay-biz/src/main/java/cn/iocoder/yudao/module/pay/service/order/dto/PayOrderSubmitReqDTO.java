@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.pay.service.order.dto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Map;
 

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.merchant;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(title = "管理后台 - 商户更新状态 Request VO")
 @Data

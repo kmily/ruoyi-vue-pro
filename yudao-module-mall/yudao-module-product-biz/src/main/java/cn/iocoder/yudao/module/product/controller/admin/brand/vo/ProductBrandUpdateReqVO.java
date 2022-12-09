@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.product.controller.admin.brand.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Schema(title = "管理后台 - 商品品牌更新 Request VO")
 @Data

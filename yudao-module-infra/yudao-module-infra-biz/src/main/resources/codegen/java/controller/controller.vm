@@ -1,15 +1,15 @@
 package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName};
 
 import org.springframework.web.bind.annotation.*;
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;;
 import org.springframework.validation.annotation.Validated;
 #if ($sceneEnum.scene == 1)import org.springframework.security.access.prepost.PreAuthorize;#end
 
 import io.swagger.annotations.*;
 
-import javax.validation.constraints.*;
-import javax.validation.*;
-import javax.servlet.http.*;
+import jakarta.validation.constraints.*;
+import jakarta.validation.*;
+import jakarta.servlet.http.*;
 import java.util.*;
 import java.io.IOException;
 

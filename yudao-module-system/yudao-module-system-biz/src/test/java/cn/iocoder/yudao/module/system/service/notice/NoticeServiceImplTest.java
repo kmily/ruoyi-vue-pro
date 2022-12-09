@@ -10,10 +10,9 @@ import cn.iocoder.yudao.module.system.dal.mysql.notice.NoticeMapper;
 import cn.iocoder.yudao.module.system.enums.notice.NoticeTypeEnum;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-
-import javax.annotation.Resource;
 
 import java.util.function.Consumer;
 

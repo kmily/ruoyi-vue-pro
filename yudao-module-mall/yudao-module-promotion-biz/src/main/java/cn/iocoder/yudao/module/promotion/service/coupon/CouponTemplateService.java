@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.Cou
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.CouponTemplateUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * 优惠劵模板 Service 接口

@@ -11,11 +11,11 @@ import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.Sensitiv
 import cn.iocoder.yudao.module.system.dal.dataobject.sensitiveword.SensitiveWordDO;
 import cn.iocoder.yudao.module.system.dal.mysql.sensitiveword.SensitiveWordMapper;
 import cn.iocoder.yudao.module.system.mq.producer.sensitiveword.SensitiveWordProducer;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;

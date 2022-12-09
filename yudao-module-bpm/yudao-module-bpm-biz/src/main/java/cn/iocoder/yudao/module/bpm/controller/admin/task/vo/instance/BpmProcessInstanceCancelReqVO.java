@@ -3,9 +3,7 @@ package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import java.util.Map;
+import jakarta.validation.constraints.NotEmpty;
 
 @Schema(title = "管理后台 - 流程实例的取消 Request VO")
 @Data

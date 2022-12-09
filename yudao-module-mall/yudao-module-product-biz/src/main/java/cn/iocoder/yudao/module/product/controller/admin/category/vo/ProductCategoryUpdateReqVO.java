@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.product.controller.admin.category.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Schema(title = "管理后台 - 商品分类更新 Request VO")
 @Data

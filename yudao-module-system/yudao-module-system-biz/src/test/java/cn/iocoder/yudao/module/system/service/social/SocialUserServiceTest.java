@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialUserBindMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialUserMapper;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
+import jakarta.annotation.Resource;
 import me.zhyd.oauth.enums.AuthResponseStatus;
 import me.zhyd.oauth.model.AuthCallback;
 import me.zhyd.oauth.model.AuthResponse;
@@ -20,7 +21,6 @@ import org.mockito.MockedStatic;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.hutool.core.util.RandomUtil.randomLong;

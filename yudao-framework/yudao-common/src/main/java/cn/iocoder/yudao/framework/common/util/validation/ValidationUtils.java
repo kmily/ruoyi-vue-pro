@@ -1,12 +1,11 @@
 package cn.iocoder.yudao.framework.common.util.validation;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
 import org.springframework.util.StringUtils;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validator;
 import java.util.Set;
 import java.util.regex.Pattern;
 

@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleUp
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import org.springframework.lang.Nullable;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;

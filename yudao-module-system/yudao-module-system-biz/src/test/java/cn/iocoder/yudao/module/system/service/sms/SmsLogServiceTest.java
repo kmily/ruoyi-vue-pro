@@ -15,10 +15,10 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;

@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.Sensitiv
 import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sensitiveword.SensitiveWordDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Set;
 

@@ -3,10 +3,10 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import lombok.Data;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 
 // TODO 芋艿：参数校验

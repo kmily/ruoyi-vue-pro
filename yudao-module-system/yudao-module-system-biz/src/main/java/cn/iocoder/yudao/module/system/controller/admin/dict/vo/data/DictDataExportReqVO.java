@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.controller.admin.dict.vo.data;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 @Schema(title = "管理后台 - 字典类型导出 Request VO")
 @Data

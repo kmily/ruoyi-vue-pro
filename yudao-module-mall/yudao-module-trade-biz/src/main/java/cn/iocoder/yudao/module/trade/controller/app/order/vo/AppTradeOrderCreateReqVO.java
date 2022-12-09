@@ -3,9 +3,9 @@ package cn.iocoder.yudao.module.trade.controller.app.order.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 @Schema(title = "用户 App - 交易订单创建 Request VO")

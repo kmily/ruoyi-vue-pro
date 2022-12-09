@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.mq.core.stream.AbstractStreamMessage;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 
 /**
