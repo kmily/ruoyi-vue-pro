@@ -20,7 +20,7 @@ public class BpmSecurityConfiguration {
             @Override
             public void customize(ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry) {
                 // 任务回退接口
-                registry.antMatchers(buildAdminApi("/bpm/task/back")).permitAll();
+                registry.requestMatchers(buildAdminApi("/bpm/task/back")).permitAll();
             }
 
         };
