@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.member.service.auth;
 
-import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
@@ -59,8 +58,8 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     @Resource
     private OAuth2TokenApi oauth2TokenApi;
 
-    @Resource
-    private WxMaService wxMaService;
+//    @Resource
+//    private WxMaService wxMaService;
 
     @Resource
     private PasswordEncoder passwordEncoder;
@@ -125,12 +124,12 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     @Override
     public AppAuthLoginRespVO weixinMiniAppLogin(AppAuthWeixinMiniAppLoginReqVO reqVO) {
         // 获得对应的手机号信息
-        WxMaPhoneNumberInfo phoneNumberInfo;
-        try {
-            phoneNumberInfo = wxMaService.getUserService().getNewPhoneNoInfo(reqVO.getPhoneCode());
-        } catch (Exception exception) {
-            throw exception(AUTH_WEIXIN_MINI_APP_PHONE_CODE_ERROR);
-        }
+        WxMaPhoneNumberInfo phoneNumberInfo = null;
+//        try {
+//            phoneNumberInfo = wxMaService.getUserService().getNewPhoneNoInfo(reqVO.getPhoneCode());
+//        } catch (Exception exception) {
+//            throw exception(AUTH_WEIXIN_MINI_APP_PHONE_CODE_ERROR);
+//        }
         // 获得获得注册用户
         MemberUserDO user = userService.createUserIfAbsent(phoneNumberInfo.getPurePhoneNumber(), getClientIP());
         Assert.notNull(user, "获取用户失败，结果为空");

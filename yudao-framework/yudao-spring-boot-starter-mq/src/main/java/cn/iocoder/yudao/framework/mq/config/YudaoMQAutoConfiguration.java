@@ -24,7 +24,6 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.stream.DefaultStreamMessageListenerContainerX;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
-import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
 import java.util.Properties;

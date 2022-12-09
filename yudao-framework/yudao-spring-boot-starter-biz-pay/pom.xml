@@ -63,6 +63,16 @@
         <dependency>
             <groupId>com.github.binarywang</groupId>
             <artifactId>weixin-java-pay</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcmail-jdk15on</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-collections</groupId>
+                    <artifactId>commons-collections</artifactId>
+                </exclusion>
+            </exclusions>
             <version>4.4.5.B</version>
         </dependency>
         <!-- TODO 芋艿：清理 -->

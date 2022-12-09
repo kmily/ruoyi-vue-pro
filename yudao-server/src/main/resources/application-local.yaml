@@ -5,61 +5,35 @@ server:
 
 spring:
   datasource:
-    druid: # Druid 【监控】相关的全局配置
-      web-stat-filter:
-        enabled: true
-      stat-view-servlet:
-        enabled: true
-        allow: # 设置白名单，不填则允许所有访问
-        url-pattern: /druid/*
-        login-username: # 控制台管理用户名和密码
-        login-password:
-      filter:
-        stat:
-          enabled: true
-          log-slow-sql: true # 慢 SQL 记录
-          slow-sql-millis: 100
-          merge-sql: true
-        wall:
-          config:
-            multi-statement-allow: true
+    type: com.zaxxer.hikari.HikariDataSource
     dynamic: # 多数据源配置
-      druid: # Druid 【连接池】相关的全局配置
-        initial-size: 1 # 初始连接数
-        min-idle: 10 # 最小连接池数量
-        max-active: 20 # 最大连接池数量
-        max-wait: 600000 # 配置获取连接等待超时的时间，单位：毫秒
-        time-between-eviction-runs-millis: 60000 # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位：毫秒
-        min-evictable-idle-time-millis: 300000 # 配置一个连接在池中最小生存的时间，单位：毫秒
-        max-evictable-idle-time-millis: 900000 # 配置一个连接在池中最大生存的时间，单位：毫秒
-        validation-query: SELECT 1 FROM DUAL # 配置检测连接是否有效
-        test-while-idle: true
-        test-on-borrow: false
-        test-on-return: false
       primary: master
       datasource:
         master:
-          name: ruoyi-vue-pro
-          url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.master.name}?allowMultiQueries=true&useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
-          #          url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT # MySQL Connector/J 5.X 连接的示例
-          #          url: jdbc:postgresql://127.0.0.1:5432/${spring.datasource.dynamic.datasource.slave.name} # PostgreSQL 连接的示例
-          #          url: jdbc:oracle:thin:@127.0.0.1:1521:xe # Oracle 连接的示例
-          #          url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=${spring.datasource.dynamic.datasource.master.name} # SQLServer 连接的示例
+          url: jdbc:mysql://192.168.0.93:3306/ruoyi-vue-pro?allowMultiQueries=true&useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
+          driverClassName: com.mysql.cj.jdbc.Driver
           username: dev
           password: dev@123!
-        #          username: sa
-        #          password: JSm:g(*%lU4ZAkz06cd52KqT3)i1?H7W
         slave: # 模拟从库，可根据自己需要修改
-          name: ruoyi-vue-pro
-          url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.master.name}?allowMultiQueries=true&useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
-          #          url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT # MySQL Connector/J 5.X 连接的示例
-          #          url: jdbc:postgresql://127.0.0.1:5432/${spring.datasource.dynamic.datasource.slave.name} # PostgreSQL 连接的示例
-          #          url: jdbc:oracle:thin:@127.0.0.1:1521:xe # Oracle 连接的示例
-          #          url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=${spring.datasource.dynamic.datasource.slave.name} # SQLServer 连接的示例
-          username: root
-          password: root123
-  #          username: sa
-  #          password: JSm:g(*%lU4ZAkz06cd52KqT3)i1?H7W
+          url: jdbc:mysql://192.168.0.93:3306/ruoyi-vue-pro?allowMultiQueries=true&useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
+          driverClassName: com.mysql.cj.jdbc.Driver
+          username: dev
+          password: dev@123!
+      hikari:
+        # 最大连接池数量
+        maxPoolSize: 20
+        # 最小空闲线程数量
+        minIdle: 10
+        # 配置获取连接等待超时的时间
+        connectionTimeout: 10000
+        # 校验超时时间
+        validationTimeout: 5000
+        # 空闲连接存活最大时间，默认10分钟
+        idleTimeout: 60000
+        # 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认30分钟
+        maxLifetime: 900000
+        # 连接测试query（配置检测连接是否有效）
+        connectionTestQuery: SELECT 1
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   data:
