@@ -560,22 +560,22 @@
             </dependency>
 
             <!-- 积木报表-->
-            <dependency>
-                <groupId>org.jeecgframework.jimureport</groupId>
-                <artifactId>jimureport-spring-boot-starter</artifactId>
-                <version>${jimureport.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.alibaba</groupId>
-                        <artifactId>druid</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>xerces</groupId>
-                <artifactId>xercesImpl</artifactId>
-                <version>${xercesImpl.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.jeecgframework.jimureport</groupId>-->
+<!--                <artifactId>jimureport-spring-boot-starter</artifactId>-->
+<!--                <version>${jimureport.version}</version>-->
+<!--                <exclusions>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>com.alibaba</groupId>-->
+<!--                        <artifactId>druid</artifactId>-->
+<!--                    </exclusion>-->
+<!--                </exclusions>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>xerces</groupId>-->
+<!--                <artifactId>xercesImpl</artifactId>-->
+<!--                <version>${xercesImpl.version}</version>-->
+<!--            </dependency>-->
         </dependencies>
     </dependencyManagement>
 
