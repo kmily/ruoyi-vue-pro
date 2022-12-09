@@ -16,23 +16,23 @@
     <properties>
         <revision>1.6.5-snapshot</revision>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>2.7.6</spring.boot.version>
+        <spring.boot.version>3.0.0</spring.boot.version>
         <!-- Web 相关 -->
-        <springdoc.version>1.6.13</springdoc.version>
+        <springdoc.version>2.0.0</springdoc.version>
         <knife4j.version>3.0.3</knife4j.version>
         <servlet.versoin>2.5</servlet.versoin>
         <!-- DB 相关 -->
         <druid.version>1.2.15</druid.version>
-        <mybatis-plus.version>3.5.2</mybatis-plus.version>
+        <mybatis-plus.version>3.5.2.7-SNAPSHOT</mybatis-plus.version>
         <mybatis-plus-generator.version>3.5.2</mybatis-plus-generator.version>
-        <dynamic-datasource.version>3.5.2</dynamic-datasource.version>
+        <dynamic-datasource.version>3.6.0</dynamic-datasource.version>
         <redisson.version>3.18.0</redisson.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.3</lock4j.version>
-        <resilience4j.version>1.7.1</resilience4j.version>
+        <resilience4j.version>2.0.1-SNAPSHOT</resilience4j.version>
         <!-- 监控相关 -->
         <skywalking.version>8.12.0</skywalking.version>
-        <spring-boot-admin.version>2.7.7</spring-boot-admin.version>
+        <spring-boot-admin.version>3.0.0-M5</spring-boot-admin.version>
         <opentracing.version>0.33.0</opentracing.version>
         <!-- Test 测试相关 -->
         <podam.version>7.2.11.RELEASE</podam.version>
@@ -159,20 +159,20 @@
 
             <dependency>
                 <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-webmvc-core</artifactId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${springdoc.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-ui</artifactId>
-                <version>${springdoc.version}</version>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
+                <version>2.2.7</version>
             </dependency>
 
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-security</artifactId>
-                <version>${springdoc.version}</version>
+                <version>1.6.13</version>
             </dependency>
 
             <!-- DB 相关 -->
