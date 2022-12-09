@@ -29,7 +29,7 @@ public class SecurityConfiguration {
     protected SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         // 设置 URL 安全权限
         httpSecurity.csrf().disable() // 禁用 CSRF 保护
-                .authorizeHttpRequests()
+                .authorizeRequests()
                 // 1. 静态资源，可匿名访问
                 .requestMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
                 // 2. 登录相关的接口，可匿名访问
