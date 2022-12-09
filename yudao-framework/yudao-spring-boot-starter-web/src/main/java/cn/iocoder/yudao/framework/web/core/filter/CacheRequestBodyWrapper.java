@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.web.core.filter;
 
-import cn.hutool.extra.servlet.ServletUtil;
+import cn.hutool.extra.servlet.JakartaServletUtil;
 
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
@@ -25,7 +25,7 @@ public class CacheRequestBodyWrapper extends HttpServletRequestWrapper {
 
     public CacheRequestBodyWrapper(HttpServletRequest request) {
         super(request);
-        body = ServletUtil.getBodyBytes(request);
+        body = JakartaServletUtil.getBodyBytes(request);
     }
 
     @Override

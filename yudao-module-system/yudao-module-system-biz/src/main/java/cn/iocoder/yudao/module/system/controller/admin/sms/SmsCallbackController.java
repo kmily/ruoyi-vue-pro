@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.controller.admin.sms;
 
-import cn.hutool.extra.servlet.ServletUtil;
+import cn.hutool.extra.servlet.JakartaServletUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.sms.core.enums.SmsChannelEnum;
@@ -30,7 +30,7 @@ public class SmsCallbackController {
     @Operation(summary = "阿里云短信的回调", description = "参见 https://help.aliyun.com/document_detail/120998.html 文档")
     @OperateLog(enable = false)
     public CommonResult<Boolean> receiveAliyunSmsStatus(HttpServletRequest request) throws Throwable {
-        String text = ServletUtil.getBody(request);
+        String text = JakartaServletUtil.getBody(request);
         smsSendService.receiveSmsStatus(SmsChannelEnum.ALIYUN.getCode(), text);
         return success(true);
     }
@@ -40,7 +40,7 @@ public class SmsCallbackController {
     @Operation(summary = "腾讯云短信的回调", description = "参见 https://cloud.tencent.com/document/product/382/52077 文档")
     @OperateLog(enable = false)
     public CommonResult<Boolean> receiveTencentSmsStatus(HttpServletRequest request) throws Throwable {
-        String text = ServletUtil.getBody(request);
+        String text = JakartaServletUtil.getBody(request);
         smsSendService.receiveSmsStatus(SmsChannelEnum.TENCENT.getCode(), text);
         return success(true);
     }
