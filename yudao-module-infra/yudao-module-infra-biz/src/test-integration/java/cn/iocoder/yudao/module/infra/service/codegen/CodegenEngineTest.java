@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenEngine;
 import cn.iocoder.yudao.module.infra.test.BaseDbUnitTest;
 import org.junit.jupiter.api.Test;
 
-import jakarta.annotation.Resource;;
+import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 

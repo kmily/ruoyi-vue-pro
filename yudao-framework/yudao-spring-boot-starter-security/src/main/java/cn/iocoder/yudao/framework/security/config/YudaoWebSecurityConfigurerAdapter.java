@@ -115,7 +115,7 @@ public class YudaoWebSecurityConfigurerAdapter {
         // 设置每个请求的权限
         httpSecurity.authorizeRequests()
                 // 1.1 静态资源，可匿名访问
-                .requestMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
+                .requestMatchers(HttpMethod.GET, "/*.html", "/*/*.html", "/*/*.css", "/*/*.js").permitAll()
                 // 1.2 设置 @PermitAll 无需认证
                 .requestMatchers(HttpMethod.GET, permitAllUrls.get(HttpMethod.GET).toArray(new String[0])).permitAll()
                 .requestMatchers(HttpMethod.POST, permitAllUrls.get(HttpMethod.POST).toArray(new String[0])).permitAll()
@@ -124,7 +124,7 @@ public class YudaoWebSecurityConfigurerAdapter {
                 // 1.3 基于 yudao.security.permit-all-urls 无需认证
                 .requestMatchers(securityProperties.getPermitAllUrls().toArray(new String[0])).permitAll()
                 // 1.4 设置 App API 无需认证
-                .requestMatchers(buildAppApi("/**")).permitAll()
+                .requestMatchers(buildAppApi("/*")).permitAll()
                 // 1.5 验证码captcha 允许匿名访问
                 .requestMatchers("/captcha/get", "/captcha/check").permitAll()
                 // ②：每个项目的自定义规则

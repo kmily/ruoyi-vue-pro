@@ -28,7 +28,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.Resource;;
+import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;

@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;
 import cn.iocoder.yudao.module.infra.mq.message.file.FileConfigRefreshMessage;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Resource;;
+import jakarta.annotation.Resource;
 
 /**
  * 文件配置相关消息的 Producer

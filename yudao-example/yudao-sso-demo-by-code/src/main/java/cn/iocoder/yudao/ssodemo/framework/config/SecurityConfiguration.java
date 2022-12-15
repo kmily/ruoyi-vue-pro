@@ -31,7 +31,7 @@ public class SecurityConfiguration {
         httpSecurity.csrf().disable() // 禁用 CSRF 保护
                 .authorizeRequests()
                 // 1. 静态资源，可匿名访问
-                .requestMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
+                .requestMatchers(HttpMethod.GET, "/*.html", "/*/*.html", "/*/*.css", "/*/*.js").permitAll()
                 // 2. 登录相关的接口，可匿名访问
                 .requestMatchers("/auth/login-by-code").permitAll()
                 .requestMatchers("/auth/refresh-token").permitAll()

@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -49,7 +49,7 @@ public class ConfigServiceImpl implements ConfigService {
         checkCreateOrUpdate(reqVO.getId(), null); // 不允许更新 key
         // 更新参数配置
         ConfigDO updateObj = ConfigConvert.INSTANCE.convert(reqVO);
-        configMapper.updateById(updateObj);;
+        configMapper.updateById(updateObj);
     }
 
     @Override

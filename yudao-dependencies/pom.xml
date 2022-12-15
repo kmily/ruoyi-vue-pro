@@ -29,7 +29,7 @@
         <redisson.version>3.18.1</redisson.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.3</lock4j.version>
-        <resilience4j.version>2.0.1-SNAPSHOT</resilience4j.version>
+        <resilience4j.version>2.0.2</resilience4j.version>
         <!-- 监控相关 -->
         <skywalking.version>8.12.0</skywalking.version>
         <spring-boot-admin.version>3.0.0-M5</spring-boot-admin.version>

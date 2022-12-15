@@ -28,7 +28,7 @@ import com.google.common.collect.Maps;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;;
+import jakarta.annotation.Resource;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;

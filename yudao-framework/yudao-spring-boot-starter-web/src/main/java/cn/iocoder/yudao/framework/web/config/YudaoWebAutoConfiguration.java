@@ -23,7 +23,7 @@ import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import jakarta.annotation.Resource;;
+import jakarta.annotation.Resource;
 import jakarta.servlet.Filter;
 
 @AutoConfiguration
