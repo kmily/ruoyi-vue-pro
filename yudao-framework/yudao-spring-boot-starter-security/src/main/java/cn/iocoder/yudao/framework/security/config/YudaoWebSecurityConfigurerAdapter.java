@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -33,7 +33,7 @@ import java.util.Set;
  * @author 芋道源码
  */
 @AutoConfiguration
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@EnableMethodSecurity(securedEnabled = true)
 public class YudaoWebSecurityConfigurerAdapter {
 
     @Resource
@@ -99,7 +99,8 @@ public class YudaoWebSecurityConfigurerAdapter {
         // 登出
         httpSecurity
                 // 开启跨域
-                .cors().and()
+                .cors()
+                .and()
                 // CSRF 禁用，因为不使用 Session
                 .csrf().disable()
                 // 基于 token 机制，所以不需要 Session
@@ -113,7 +114,7 @@ public class YudaoWebSecurityConfigurerAdapter {
         // 获得 @PermitAll 带来的 URL 列表，免登录
         Multimap<HttpMethod, String> permitAllUrls = getPermitAllUrlsFromAnnotations();
         // 设置每个请求的权限
-        httpSecurity.authorizeRequests()
+        httpSecurity.authorizeHttpRequests()
                 // 1.1 静态资源，可匿名访问
                 .requestMatchers(HttpMethod.GET, "/*.html", "/*/*.html", "/*/*.css", "/*/*.js").permitAll()
                 // 1.2 设置 @PermitAll 无需认证
@@ -129,10 +130,10 @@ public class YudaoWebSecurityConfigurerAdapter {
                 .requestMatchers("/captcha/get", "/captcha/check").permitAll()
                 // ②：每个项目的自定义规则
                 .and()
-                .authorizeRequests(registry -> // 下面，循环设置自定义规则
+                .authorizeHttpRequests(registry -> // 下面，循环设置自定义规则
                         authorizeRequestsCustomizers.forEach(customizer -> customizer.customize(registry)))
                 // ③：兜底规则，必须认证
-                .authorizeRequests()
+                .authorizeHttpRequests()
                 .anyRequest().authenticated()
         ;
 
@@ -165,18 +166,10 @@ public class YudaoWebSecurityConfigurerAdapter {
             // 根据请求方法，添加到 result 结果
             entry.getKey().getMethodsCondition().getMethods().forEach(requestMethod -> {
                 switch (requestMethod) {
-                    case GET:
-                        result.putAll(HttpMethod.GET, urls);
-                        break;
-                    case POST:
-                        result.putAll(HttpMethod.POST, urls);
-                        break;
-                    case PUT:
-                        result.putAll(HttpMethod.PUT, urls);
-                        break;
-                    case DELETE:
-                        result.putAll(HttpMethod.DELETE, urls);
-                        break;
+                    case GET -> result.putAll(HttpMethod.GET, urls);
+                    case POST -> result.putAll(HttpMethod.POST, urls);
+                    case PUT -> result.putAll(HttpMethod.PUT, urls);
+                    case DELETE -> result.putAll(HttpMethod.DELETE, urls);
                 }
             });
         }

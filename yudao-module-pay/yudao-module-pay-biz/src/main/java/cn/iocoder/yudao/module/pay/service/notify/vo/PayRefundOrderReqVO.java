@@ -16,15 +16,15 @@ import jakarta.validation.constraints.NotNull;
 @AllArgsConstructor
 public class PayRefundOrderReqVO {
 
-    @Schema(title = "商户退款单编号", required = true, example = "10")
+    @Schema(title = "商户退款单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     @NotEmpty(message = "商户退款单编号不能为空")
     private String merchantOrderId;
 
-    @Schema(title = "支付退款编号", required = true, example = "20")
+    @Schema(title = "支付退款编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "20")
     @NotNull(message = "支付退款编号不能为空")
     private Long payRefundId;
 
-    @Schema(title = "退款状态(成功，失败)", required = true, example = "10")
+    @Schema(title = "退款状态(成功，失败)", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     private Integer status;
 
 }

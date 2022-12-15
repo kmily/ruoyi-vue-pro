@@ -13,13 +13,13 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class BpmModelRespVO extends BpmModelBaseVO {
 
-    @Schema(title = "编号", required = true, example = "1024")
+    @Schema(title = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private String id;
 
-    @Schema(title = "BPMN XML", required = true)
+    @Schema(title = "BPMN XML", requiredMode = Schema.RequiredMode.REQUIRED)
     private String bpmnXml;
 
-    @Schema(title = "创建时间", required = true)
+    @Schema(title = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
 }

@@ -10,7 +10,7 @@ import jakarta.validation.constraints.*;
 @ToString(callSuper = true)
 public class TenantUpdateReqVO extends TenantBaseVO {
 
-    @Schema(title = "租户编号", required = true, example = "1024")
+    @Schema(title = "租户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "租户编号不能为空")
     private Long id;
 

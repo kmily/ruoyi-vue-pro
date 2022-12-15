@@ -10,11 +10,11 @@ import jakarta.validation.constraints.*;
 @Data
 public class BpmFormBaseVO {
 
-    @Schema(title = "表单名称", required = true, example = "芋道")
+    @Schema(title = "表单名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     @NotNull(message = "表单名称不能为空")
     private String name;
 
-    @Schema(title = "表单状态", required = true, description = "参见 CommonStatusEnum 枚举", example = "1")
+    @Schema(title = "表单状态", requiredMode = Schema.RequiredMode.REQUIRED, description = "参见 CommonStatusEnum 枚举", example = "1")
     @NotNull(message = "表单状态不能为空")
     private Integer status;
 

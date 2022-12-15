@@ -11,18 +11,18 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class BpmTaskAssignRuleRespVO extends BpmTaskAssignRuleBaseVO {
 
-    @Schema(title = "任务分配规则的编号", required = true, example = "1024")
+    @Schema(title = "任务分配规则的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(title = "流程模型的编号", required = true, example = "2048")
+    @Schema(title = "流程模型的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
     private String modelId;
 
-    @Schema(title = "流程定义的编号", required = true, example = "4096")
+    @Schema(title = "流程定义的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "4096")
     private String processDefinitionId;
 
-    @Schema(title = "流程任务定义的编号", required = true, example = "2048")
+    @Schema(title = "流程任务定义的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
     private String taskDefinitionKey;
-    @Schema(title = "流程任务定义的名字", required = true, example = "关注芋道")
+    @Schema(title = "流程任务定义的名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "关注芋道")
     private String taskDefinitionName;
 
 }

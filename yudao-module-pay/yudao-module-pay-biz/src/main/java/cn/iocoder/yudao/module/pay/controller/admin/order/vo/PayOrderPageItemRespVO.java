@@ -13,10 +13,10 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class PayOrderPageItemRespVO extends PayOrderBaseVO {
 
-    @Schema(title = "支付订单编号", required = true)
+    @Schema(title = "支付订单编号", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long id;
 
-    @Schema(title = "创建时间", required = true)
+    @Schema(title = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
     @Schema(title = "商户名称")

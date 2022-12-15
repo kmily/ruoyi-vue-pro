@@ -10,10 +10,10 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class ProductCategoryRespVO extends ProductCategoryBaseVO {
 
-    @Schema(title = "分类编号", required = true, example = "2")
+    @Schema(title = "分类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private Long id;
 
-    @Schema(title = "创建时间", required = true)
+    @Schema(title = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
 }

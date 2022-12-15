@@ -14,13 +14,13 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class BpmOALeaveRespVO extends BpmOALeaveBaseVO {
 
-    @Schema(title = "请假表单主键", required = true, example = "1024")
+    @Schema(title = "请假表单主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(title = "状态", required = true, example = "1", description = "参见 bpm_process_instance_result 枚举")
+    @Schema(title = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", description = "参见 bpm_process_instance_result 枚举")
     private Integer result;
 
-    @Schema(title = "申请时间", required = true)
+    @Schema(title = "申请时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "申请时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime createTime;

@@ -13,15 +13,15 @@ import java.util.List;
 @Data
 public class SensitiveWordBaseVO {
 
-    @Schema(title = "敏感词", required = true, example = "敏感词")
+    @Schema(title = "敏感词", requiredMode = Schema.RequiredMode.REQUIRED, example = "敏感词")
     @NotNull(message = "敏感词不能为空")
     private String name;
 
-    @Schema(title = "标签", required = true, example = "短信,评论")
+    @Schema(title = "标签", requiredMode = Schema.RequiredMode.REQUIRED, example = "短信,评论")
     @NotNull(message = "标签不能为空")
     private List<String> tags;
 
-    @Schema(title = "状态", required = true, example = "1", description = "参见 CommonStatusEnum 枚举类")
+    @Schema(title = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", description = "参见 CommonStatusEnum 枚举类")
     @NotNull(message = "状态不能为空")
     private Integer status;
 

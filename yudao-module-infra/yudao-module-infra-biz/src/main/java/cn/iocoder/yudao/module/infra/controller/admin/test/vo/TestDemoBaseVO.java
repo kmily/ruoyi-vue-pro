@@ -10,19 +10,19 @@ import jakarta.validation.constraints.*;
 @Data
 public class TestDemoBaseVO {
 
-    @Schema(title = "名字", required = true)
+    @Schema(title = "名字", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "名字不能为空")
     private String name;
 
-    @Schema(title = "状态", required = true)
+    @Schema(title = "状态", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "状态不能为空")
     private Integer status;
 
-    @Schema(title = "类型", required = true)
+    @Schema(title = "类型", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "类型不能为空")
     private Integer type;
 
-    @Schema(title = "分类", required = true)
+    @Schema(title = "分类", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "分类不能为空")
     private Integer category;
 

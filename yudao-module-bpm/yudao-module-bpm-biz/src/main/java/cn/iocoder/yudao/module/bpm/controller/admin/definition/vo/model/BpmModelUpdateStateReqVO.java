@@ -9,11 +9,11 @@ import jakarta.validation.constraints.NotNull;
 @Data
 public class BpmModelUpdateStateReqVO {
 
-    @Schema(title = "编号", required = true, example = "1024")
+    @Schema(title = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "编号不能为空")
     private String id;
 
-    @Schema(title = "状态", required = true, example = "1", description = "见 SuspensionState 枚举")
+    @Schema(title = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", description = "见 SuspensionState 枚举")
     @NotNull(message = "状态不能为空")
     private Integer state;
 

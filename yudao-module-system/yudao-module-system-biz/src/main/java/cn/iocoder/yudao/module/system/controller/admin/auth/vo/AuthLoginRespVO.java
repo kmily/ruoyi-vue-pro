@@ -15,16 +15,16 @@ import java.time.LocalDateTime;
 @Builder
 public class AuthLoginRespVO {
 
-    @Schema(title = "用户编号", required = true, example = "1024")
+    @Schema(title = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long userId;
 
-    @Schema(title = "访问令牌", required = true, example = "happy")
+    @Schema(title = "访问令牌", requiredMode = Schema.RequiredMode.REQUIRED, example = "happy")
     private String accessToken;
 
-    @Schema(title = "刷新令牌", required = true, example = "nice")
+    @Schema(title = "刷新令牌", requiredMode = Schema.RequiredMode.REQUIRED, example = "nice")
     private String refreshToken;
 
-    @Schema(title = "过期时间", required = true)
+    @Schema(title = "过期时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime expiresTime;
 
 }

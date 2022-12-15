@@ -13,28 +13,28 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class OAuth2AccessTokenRespVO {
 
-    @Schema(title = "编号", required = true, example = "1024")
+    @Schema(title = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(title = "访问令牌", required = true, example = "tudou")
+    @Schema(title = "访问令牌", requiredMode = Schema.RequiredMode.REQUIRED, example = "tudou")
     private String accessToken;
 
-    @Schema(title = "刷新令牌", required = true, example = "nice")
+    @Schema(title = "刷新令牌", requiredMode = Schema.RequiredMode.REQUIRED, example = "nice")
     private String refreshToken;
 
-    @Schema(title = "用户编号", required = true, example = "666")
+    @Schema(title = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "666")
     private Long userId;
 
-    @Schema(title = "用户类型", required = true, example = "2", description = "参见 UserTypeEnum 枚举")
+    @Schema(title = "用户类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "2", description = "参见 UserTypeEnum 枚举")
     private Integer userType;
 
-    @Schema(title = "客户端编号", required = true, example = "2")
+    @Schema(title = "客户端编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private String clientId;
 
-    @Schema(title = "创建时间", required = true)
+    @Schema(title = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-    @Schema(title = "过期时间", required = true)
+    @Schema(title = "过期时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime expiresTime;
 
 }

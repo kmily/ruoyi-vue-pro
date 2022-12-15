@@ -13,13 +13,13 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class PayMerchantRespVO extends PayMerchantBaseVO {
 
-    @Schema(title = "商户编号", required = true)
+    @Schema(title = "商户编号", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long id;
 
-    @Schema(title = "创建时间", required = true)
+    @Schema(title = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-    @Schema(title = "商户号", required = true, example = "M233666999")
+    @Schema(title = "商户号", requiredMode = Schema.RequiredMode.REQUIRED, example = "M233666999")
     private String no;
 
 }

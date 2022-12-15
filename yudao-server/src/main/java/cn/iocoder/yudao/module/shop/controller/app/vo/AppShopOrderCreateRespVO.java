@@ -11,10 +11,10 @@ import lombok.Data;
 @AllArgsConstructor
 public class AppShopOrderCreateRespVO {
 
-    @Schema(title = "商城订单编号", required = true, example = "1024")
+    @Schema(title = "商城订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(title = "支付订单编号", required = true, example = "2048")
+    @Schema(title = "支付订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
     private Long payOrderId;
 
 }

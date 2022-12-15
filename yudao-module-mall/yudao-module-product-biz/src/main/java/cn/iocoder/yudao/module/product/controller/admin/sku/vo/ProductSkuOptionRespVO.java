@@ -7,24 +7,24 @@ import lombok.Data;
 @Data
 public class ProductSkuOptionRespVO {
 
-    @Schema(title = "主键", required = true, example = "1024")
+    @Schema(title = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
     @Schema(title = "商品 SKU 名字", example = "红色")
     private String name;
 
-    @Schema(title = "销售价格", required = true, example = "100", description = "单位：分")
+    @Schema(title = "销售价格", requiredMode = Schema.RequiredMode.REQUIRED, example = "100", description = "单位：分")
     private String price;
 
-    @Schema(title = "库存", required = true, example = "100")
+    @Schema(title = "库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     private Integer stock;
 
     // ========== 商品 SPU 信息 ==========
 
-    @Schema(title = "商品 SPU 编号", required = true, example = "1")
+    @Schema(title = "商品 SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long spuId;
 
-    @Schema(title = "商品 SPU 名字", required = true, example = "iPhone 11")
+    @Schema(title = "商品 SPU 名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "iPhone 11")
     private String spuName;
 
 }

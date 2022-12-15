@@ -10,29 +10,29 @@ import java.util.List;
 @Data
 public class AppSpuPageRespVO  {
 
-    @Schema(title = "主键", required = true, example = "1")
+    @Schema(title = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
     @Schema(title = "商品名称")
     private String name;
 
-    @Schema(title = "卖点", required = true)
+    @Schema(title = "卖点", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "卖点不能为空")
     private String sellPoint;
 
-    @Schema(title = "描述", required = true)
+    @Schema(title = "描述", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "描述不能为空")
     private String description;
 
-    @Schema(title = "分类id", required = true)
+    @Schema(title = "分类id", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "分类id不能为空")
     private Long categoryId;
 
-    @Schema(title = "商品主图地址,* 数组，以逗号分隔,最多上传15张", required = true)
+    @Schema(title = "商品主图地址,* 数组，以逗号分隔,最多上传15张", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "商品主图地址,* 数组，以逗号分隔,最多上传15张不能为空")
     private List<String> picUrls;
 
-    @Schema(title = "排序字段", required = true)
+    @Schema(title = "排序字段", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "排序字段不能为空")
     private Integer sort;
 

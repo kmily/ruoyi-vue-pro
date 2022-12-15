@@ -9,11 +9,11 @@ import jakarta.validation.constraints.NotEmpty;
 @Data
 public class BpmProcessInstanceCancelReqVO {
 
-    @Schema(title = "流程实例的编号", required = true, example = "1024")
+    @Schema(title = "流程实例的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotEmpty(message = "流程实例的编号不能为空")
     private String id;
 
-    @Schema(title = "取消原因", required = true, example = "不请假了！")
+    @Schema(title = "取消原因", requiredMode = Schema.RequiredMode.REQUIRED, example = "不请假了！")
     @NotEmpty(message = "取消原因不能为空")
     private String reason;
 

@@ -40,12 +40,12 @@ public class YudaoApiLogAutoConfiguration {
                                                                          @Value("${spring.application.name}") String applicationName,
                                                                          ApiAccessLogFrameworkService apiAccessLogFrameworkService) {
         ApiAccessLogFilter filter = new ApiAccessLogFilter(webProperties, applicationName, apiAccessLogFrameworkService);
-        return createFilterBean(filter, WebFilterOrderEnum.API_ACCESS_LOG_FILTER);
+        return createFilterBean(filter);
     }
 
-    private static <T extends Filter> FilterRegistrationBean<T> createFilterBean(T filter, Integer order) {
+    private static <T extends Filter> FilterRegistrationBean<T> createFilterBean(T filter) {
         FilterRegistrationBean<T> bean = new FilterRegistrationBean<>(filter);
-        bean.setOrder(order);
+        bean.setOrder(WebFilterOrderEnum.API_ACCESS_LOG_FILTER);
         return bean;
     }
 

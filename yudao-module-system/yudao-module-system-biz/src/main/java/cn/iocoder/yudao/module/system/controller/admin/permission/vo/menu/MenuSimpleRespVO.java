@@ -11,16 +11,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MenuSimpleRespVO {
 
-    @Schema(title = "菜单编号", required = true, example = "1024")
+    @Schema(title = "菜单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(title = "菜单名称", required = true, example = "芋道")
+    @Schema(title = "菜单名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     private String name;
 
-    @Schema(title = "父菜单 ID", required = true, example = "1024")
+    @Schema(title = "父菜单 ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long parentId;
 
-    @Schema(title = "类型", required = true, example = "1", description = "参见 MenuTypeEnum 枚举类")
+    @Schema(title = "类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", description = "参见 MenuTypeEnum 枚举类")
     private Integer type;
 
 }

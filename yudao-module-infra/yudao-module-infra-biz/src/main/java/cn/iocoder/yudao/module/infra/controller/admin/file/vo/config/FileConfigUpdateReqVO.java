@@ -14,11 +14,11 @@ import java.util.Map;
 @ToString(callSuper = true)
 public class FileConfigUpdateReqVO extends FileConfigBaseVO {
 
-    @Schema(title = "编号", required = true, example = "1")
+    @Schema(title = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "编号不能为空")
     private Long id;
 
-    @Schema(title = "存储配置", required = true, description = "配置是动态参数，所以使用 Map 接收")
+    @Schema(title = "存储配置", requiredMode = Schema.RequiredMode.REQUIRED, description = "配置是动态参数，所以使用 Map 接收")
     @NotNull(message = "存储配置不能为空")
     private Map<String, Object> config;
 

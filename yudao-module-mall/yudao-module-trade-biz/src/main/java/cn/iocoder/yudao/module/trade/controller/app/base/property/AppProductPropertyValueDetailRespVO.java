@@ -7,16 +7,16 @@ import lombok.Data;
 @Data
 public class AppProductPropertyValueDetailRespVO {
 
-    @Schema(title = "属性的编号", required = true, example = "1")
+    @Schema(title = "属性的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long propertyId;
 
-    @Schema(title = "属性的名称", required = true, example = "颜色")
+    @Schema(title = "属性的名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "颜色")
     private String propertyName;
 
-    @Schema(title = "属性值的编号", required = true, example = "1024")
+    @Schema(title = "属性值的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long valueId;
 
-    @Schema(title = "属性值的名称", required = true, example = "红色")
+    @Schema(title = "属性值的名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "红色")
     private String valueName;
 
 }

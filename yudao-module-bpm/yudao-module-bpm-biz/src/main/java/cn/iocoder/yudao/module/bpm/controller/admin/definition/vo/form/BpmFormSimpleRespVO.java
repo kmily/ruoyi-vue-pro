@@ -7,10 +7,10 @@ import lombok.Data;
 @Data
 public class BpmFormSimpleRespVO {
 
-    @Schema(title = "表单编号", required = true, example = "1024")
+    @Schema(title = "表单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(title = "表单名称", required = true, example = "芋道")
+    @Schema(title = "表单名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     private String name;
 
 }

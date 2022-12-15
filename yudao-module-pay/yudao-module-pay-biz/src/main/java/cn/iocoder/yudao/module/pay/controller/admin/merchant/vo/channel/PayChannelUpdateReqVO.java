@@ -9,7 +9,7 @@ import jakarta.validation.constraints.*;
 @ToString(callSuper = true)
 public class PayChannelUpdateReqVO extends PayChannelBaseVO {
 
-    @Schema(title = "商户编号", required = true)
+    @Schema(title = "商户编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "商户编号不能为空")
     private Long id;
 

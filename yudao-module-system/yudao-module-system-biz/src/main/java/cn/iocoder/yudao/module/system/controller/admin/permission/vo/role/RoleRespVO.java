@@ -16,22 +16,22 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 public class RoleRespVO extends RoleBaseVO {
 
-    @Schema(title = "角色编号", required = true, example = "1")
+    @Schema(title = "角色编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(title = "数据范围", required = true, example = "1", description = "参见 DataScopeEnum 枚举类")
+    @Schema(title = "数据范围", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", description = "参见 DataScopeEnum 枚举类")
     private Integer dataScope;
 
     @Schema(title = "数据范围(指定部门数组)", example = "1")
     private Set<Long> dataScopeDeptIds;
 
-    @Schema(title = "状态", required = true, example = "1", description = "参见 CommonStatusEnum 枚举类")
+    @Schema(title = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", description = "参见 CommonStatusEnum 枚举类")
     private Integer status;
 
-    @Schema(title = "角色类型", required = true, example = "1", description = "参见 RoleTypeEnum 枚举类")
+    @Schema(title = "角色类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", description = "参见 RoleTypeEnum 枚举类")
     private Integer type;
 
-    @Schema(title = "创建时间", required = true, example = "时间戳格式")
+    @Schema(title = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "时间戳格式")
     private LocalDateTime createTime;
 
 }

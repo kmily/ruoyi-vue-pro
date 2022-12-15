@@ -13,13 +13,13 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class RewardActivityRespVO extends RewardActivityBaseVO {
 
-    @Schema(title = "活动编号", required = true, example = "1024")
+    @Schema(title = "活动编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Integer id;
 
-    @Schema(title = "活动状态", required = true, example = "1")
+    @Schema(title = "活动状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status;
 
-    @Schema(title = "创建时间", required = true)
+    @Schema(title = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
 }

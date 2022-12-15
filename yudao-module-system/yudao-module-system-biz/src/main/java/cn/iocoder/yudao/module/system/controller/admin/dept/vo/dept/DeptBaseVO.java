@@ -14,7 +14,7 @@ import jakarta.validation.constraints.Size;
 @Data
 public class DeptBaseVO {
 
-    @Schema(title = "菜单名称", required = true, example = "芋道")
+    @Schema(title = "菜单名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     @NotBlank(message = "部门名称不能为空")
     @Size(max = 30, message = "部门名称长度不能超过30个字符")
     private String name;
@@ -22,7 +22,7 @@ public class DeptBaseVO {
     @Schema(title = "父菜单 ID", example = "1024")
     private Long parentId;
 
-    @Schema(title = "显示顺序不能为空", required = true, example = "1024")
+    @Schema(title = "显示顺序不能为空", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "显示顺序不能为空")
     private Integer sort;
 
@@ -38,7 +38,7 @@ public class DeptBaseVO {
     @Size(max = 50, message = "邮箱长度不能超过50个字符")
     private String email;
 
-    @Schema(title = "状态", required = true, example = "1", description = "见 CommonStatusEnum 枚举")
+    @Schema(title = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", description = "见 CommonStatusEnum 枚举")
     @NotNull(message = "状态不能为空")
 //    @InEnum(value = CommonStatusEnum.class, message = "修改状态必须是 {value}")
     private Integer status;

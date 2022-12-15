@@ -9,7 +9,7 @@ import jakarta.validation.constraints.*;
 @ToString(callSuper = true)
 public class ProductPropertyValueUpdateReqVO extends ProductPropertyValueBaseVO {
 
-    @Schema(title = "主键", required = true, example = "1024")
+    @Schema(title = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "主键不能为空")
     private Long id;
 

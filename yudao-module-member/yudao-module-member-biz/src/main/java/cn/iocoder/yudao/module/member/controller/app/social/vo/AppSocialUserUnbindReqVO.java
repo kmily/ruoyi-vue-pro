@@ -18,12 +18,12 @@ import jakarta.validation.constraints.NotNull;
 @Builder
 public class AppSocialUserUnbindReqVO {
 
-    @Schema(title = "社交平台的类型", required = true, example = "10", description = "参见 SysUserSocialTypeEnum 枚举值")
+    @Schema(title = "社交平台的类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "10", description = "参见 SysUserSocialTypeEnum 枚举值")
     @InEnum(SocialTypeEnum.class)
     @NotNull(message = "社交平台的类型不能为空")
     private Integer type;
 
-    @Schema(title = "社交用户的 openid", required = true, example = "IPRmJ0wvBptiPIlGEZiPewGwiEiE")
+    @Schema(title = "社交用户的 openid", requiredMode = Schema.RequiredMode.REQUIRED, example = "IPRmJ0wvBptiPIlGEZiPewGwiEiE")
     @NotEmpty(message = "社交用户的 openid 不能为空")
     private String openid;
 

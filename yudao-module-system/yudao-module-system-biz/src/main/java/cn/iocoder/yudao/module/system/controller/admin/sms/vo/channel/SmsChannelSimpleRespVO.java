@@ -9,15 +9,15 @@ import jakarta.validation.constraints.NotNull;
 @Data
 public class SmsChannelSimpleRespVO {
 
-    @Schema(title = "编号", required = true, example = "1024")
+    @Schema(title = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "编号不能为空")
     private Long id;
 
-    @Schema(title = "短信签名", required = true, example = "芋道源码")
+    @Schema(title = "短信签名", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
     @NotNull(message = "短信签名不能为空")
     private String signature;
 
-    @Schema(title = "渠道编码", required = true, example = "YUN_PIAN", description = "参见 SmsChannelEnum 枚举类")
+    @Schema(title = "渠道编码", requiredMode = Schema.RequiredMode.REQUIRED, example = "YUN_PIAN", description = "参见 SmsChannelEnum 枚举类")
     private String code;
 
 }

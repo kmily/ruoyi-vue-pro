@@ -9,14 +9,14 @@ import java.time.LocalDateTime;
 @Data
 public class BpmActivityRespVO {
 
-    @Schema(title = "流程活动的标识", required = true, example = "1024")
+    @Schema(title = "流程活动的标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private String key;
-    @Schema(title = "流程活动的类型", required = true, example = "StartEvent")
+    @Schema(title = "流程活动的类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "StartEvent")
     private String type;
 
-    @Schema(title = "流程活动的开始时间", required = true)
+    @Schema(title = "流程活动的开始时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime startTime;
-    @Schema(title = "流程活动的结束时间", required = true)
+    @Schema(title = "流程活动的结束时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime endTime;
 
     @Schema(title = "关联的流程任务的编号", example = "2048", description = "关联的流程任务，只有 UserTask 等类型才有")

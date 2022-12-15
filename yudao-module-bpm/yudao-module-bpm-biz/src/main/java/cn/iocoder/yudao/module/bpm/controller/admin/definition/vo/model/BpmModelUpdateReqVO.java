@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotEmpty;
 @Data
 public class BpmModelUpdateReqVO {
 
-    @Schema(title = "编号", required = true, example = "1024")
+    @Schema(title = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotEmpty(message = "编号不能为空")
     private String id;
 
@@ -22,7 +22,7 @@ public class BpmModelUpdateReqVO {
     @Schema(title = "流程分类", description = "参见 bpm_model_category 数据字典", example = "1")
     private String category;
 
-    @Schema(title = "BPMN XML", required = true)
+    @Schema(title = "BPMN XML", requiredMode = Schema.RequiredMode.REQUIRED)
     private String bpmnXml;
 
     @Schema(title = "表单类型", description = "参见 bpm_model_form_type 数据字典", example = "1")

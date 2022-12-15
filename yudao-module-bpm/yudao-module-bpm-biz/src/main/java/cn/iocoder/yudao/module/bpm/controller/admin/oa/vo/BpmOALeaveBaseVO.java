@@ -14,19 +14,19 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class BpmOALeaveBaseVO {
 
-    @Schema(title = "请假的开始时间", required = true)
+    @Schema(title = "请假的开始时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "开始时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime startTime;
-    @Schema(title = "请假的结束时间", required = true)
+    @Schema(title = "请假的结束时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "结束时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime endTime;
 
-    @Schema(title = "请假类型", required = true, example = "1", description = "参见 bpm_oa_type 枚举")
+    @Schema(title = "请假类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", description = "参见 bpm_oa_type 枚举")
     private Integer type;
 
-    @Schema(title = "原因", required = true, example = "阅读芋道源码")
+    @Schema(title = "原因", requiredMode = Schema.RequiredMode.REQUIRED, example = "阅读芋道源码")
     private String reason;
 
 }

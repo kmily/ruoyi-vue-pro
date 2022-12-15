@@ -167,20 +167,13 @@ public class TencentSmsClient extends AbstractSmsClient {
         SmsTemplateAuditStatusEnum auditStatus;
         Assert.notNull(templateStatus.getStatusCode(),
                 StrUtil.format("短信模版审核状态为 null，模版 id{}", templateStatus.getTemplateId()));
-        switch (templateStatus.getStatusCode().intValue()) {
-            case -1:
-                auditStatus = SmsTemplateAuditStatusEnum.FAIL;
-                break;
-            case 0:
-                auditStatus = SmsTemplateAuditStatusEnum.SUCCESS;
-                break;
-            case 1:
-                auditStatus = SmsTemplateAuditStatusEnum.CHECKING;
-                break;
-            default:
-                throw new IllegalStateException(StrUtil.format("不能解析短信模版审核状态{}，模版 id{}",
-                        templateStatus.getStatusCode(), templateStatus.getTemplateId()));
-        }
+        auditStatus = switch (templateStatus.getStatusCode().intValue()) {
+            case -1 -> SmsTemplateAuditStatusEnum.FAIL;
+            case 0 -> SmsTemplateAuditStatusEnum.SUCCESS;
+            case 1 -> SmsTemplateAuditStatusEnum.CHECKING;
+            default -> throw new IllegalStateException(StrUtil.format("不能解析短信模版审核状态{}，模版 id{}",
+                    templateStatus.getStatusCode(), templateStatus.getTemplateId()));
+        };
         SmsTemplateRespDTO data = new SmsTemplateRespDTO();
         data.setId(String.valueOf(templateStatus.getTemplateId())).setContent(templateStatus.getTemplateContent());
         data.setAuditStatus(auditStatus.getStatus()).setAuditReason(templateStatus.getReviewReply());

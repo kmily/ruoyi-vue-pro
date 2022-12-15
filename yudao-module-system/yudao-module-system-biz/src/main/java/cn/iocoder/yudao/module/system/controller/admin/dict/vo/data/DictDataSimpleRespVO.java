@@ -7,13 +7,13 @@ import lombok.Data;
 @Data
 public class DictDataSimpleRespVO {
 
-    @Schema(title = "字典类型", required = true, example = "gender")
+    @Schema(title = "字典类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "gender")
     private String dictType;
 
-    @Schema(title = "字典键值", required = true, example = "1")
+    @Schema(title = "字典键值", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private String value;
 
-    @Schema(title = "字典标签", required = true, example = "男")
+    @Schema(title = "字典标签", requiredMode = Schema.RequiredMode.REQUIRED, example = "男")
     private String label;
 
     @Schema(title = "颜色类型", example = "default", description = "default、primary、success、info、warning、danger")

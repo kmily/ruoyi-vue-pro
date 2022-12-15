@@ -239,8 +239,7 @@ public class OperateLogAspect {
         }
         operateLogObj.setDuration((int) (LocalDateTimeUtil.between(startTime, LocalDateTime.now()).toMillis()));
         // （正常）处理 resultCode 和 resultMsg 字段
-        if (result instanceof CommonResult) {
-            CommonResult<?> commonResult = (CommonResult<?>) result;
+        if (result instanceof CommonResult<?> commonResult) {
             operateLogObj.setResultCode(commonResult.getCode());
             operateLogObj.setResultMsg(commonResult.getMsg());
         } else {
@@ -297,18 +296,13 @@ public class OperateLogAspect {
         if (requestMethod == null) {
             return null;
         }
-        switch (requestMethod) {
-            case GET:
-                return OperateTypeEnum.GET;
-            case POST:
-                return OperateTypeEnum.CREATE;
-            case PUT:
-                return OperateTypeEnum.UPDATE;
-            case DELETE:
-                return OperateTypeEnum.DELETE;
-            default:
-                return OperateTypeEnum.OTHER;
-        }
+        return switch (requestMethod) {
+            case GET -> OperateTypeEnum.GET;
+            case POST -> OperateTypeEnum.CREATE;
+            case PUT -> OperateTypeEnum.UPDATE;
+            case DELETE -> OperateTypeEnum.DELETE;
+            default -> OperateTypeEnum.OTHER;
+        };
     }
 
     private static RequestMethod[] obtainRequestMethod(ProceedingJoinPoint joinPoint) {

@@ -71,16 +71,12 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
         // "invokeResponse": "weixin://wxpay/bizpayurl?pr=EGYAem7zz"
         String responseV3;
         try {
-            switch (config.getApiVersion()) {
-                case WXPayClientConfig.API_VERSION_V2:
-                    responseV3 = unifiedOrderV2(reqDTO).getCodeUrl();
-                    break;
-                case WXPayClientConfig.API_VERSION_V3:
-                  responseV3 = this.unifiedOrderV3(reqDTO);
-                    break;
-                default:
-                    throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
-            }
+            responseV3 = switch (config.getApiVersion()) {
+                case WXPayClientConfig.API_VERSION_V2 -> unifiedOrderV2(reqDTO).getCodeUrl();
+                case WXPayClientConfig.API_VERSION_V3 -> this.unifiedOrderV3(reqDTO);
+                default ->
+                        throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
+            };
         } catch (WxPayException e) {
             log.error("[unifiedOrder][request({}) 发起支付失败，原因({})]", toJsonString(reqDTO), e);
             return PayCommonResult.build(ObjectUtils.defaultIfNull(e.getErrCode(), e.getReturnCode(), "CustomErrorCode"),
@@ -131,14 +127,11 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
     public PayOrderNotifyRespDTO parseOrderNotify(PayNotifyDataDTO data) throws WxPayException {
         log.info("微信支付回调data数据:{}", data.getBody());
         // 微信支付 v2 回调结果处理
-        switch (config.getApiVersion()) {
-            case WXPayClientConfig.API_VERSION_V2:
-                return parseOrderNotifyV2(data);
-            case WXPayClientConfig.API_VERSION_V3:
-                return parseOrderNotifyV3(data);
-            default:
-                throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
-        }
+        return switch (config.getApiVersion()) {
+            case WXPayClientConfig.API_VERSION_V2 -> parseOrderNotifyV2(data);
+            case WXPayClientConfig.API_VERSION_V3 -> parseOrderNotifyV3(data);
+            default -> throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
+        };
     }
 
     private PayOrderNotifyRespDTO parseOrderNotifyV3(PayNotifyDataDTO data) throws WxPayException {

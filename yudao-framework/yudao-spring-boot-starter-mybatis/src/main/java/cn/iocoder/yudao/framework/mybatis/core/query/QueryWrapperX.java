@@ -149,16 +149,10 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     public QueryWrapperX<T> limit1() {
         Assert.notNull(SqlConstants.DB_TYPE, "获取不到数据库的类型");
         switch (SqlConstants.DB_TYPE) {
-            case ORACLE:
-            case ORACLE_12C:
-                super.eq("ROWNUM", 1);
-                break;
-            case SQL_SERVER:
-            case SQL_SERVER2005:
-                super.select("TOP 1 *"); // 由于 SQL Server 是通过 SELECT TOP 1 实现限制一条，所以只好使用 * 查询剩余字段
-                break;
-            default:
-                super.last("LIMIT 1");
+            case ORACLE, ORACLE_12C -> super.eq("ROWNUM", 1);
+            case SQL_SERVER, SQL_SERVER2005 ->
+                    super.select("TOP 1 *"); // 由于 SQL Server 是通过 SELECT TOP 1 实现限制一条，所以只好使用 * 查询剩余字段
+            default -> super.last("LIMIT 1");
         }
         return this;
     }

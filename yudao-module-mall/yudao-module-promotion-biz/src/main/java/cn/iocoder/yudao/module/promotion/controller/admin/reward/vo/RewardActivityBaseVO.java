@@ -25,16 +25,16 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class RewardActivityBaseVO {
 
-    @Schema(title = "活动标题", required = true, example = "满啦满啦")
+    @Schema(title = "活动标题", requiredMode = Schema.RequiredMode.REQUIRED, example = "满啦满啦")
     @NotNull(message = "活动标题不能为空")
     private String name;
 
-    @Schema(title = "开始时间", required = true)
+    @Schema(title = "开始时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "开始时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime startTime;
 
-    @Schema(title = "结束时间", required = true)
+    @Schema(title = "结束时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "结束时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @Future(message = "结束时间必须大于当前时间")
@@ -43,12 +43,12 @@ public class RewardActivityBaseVO {
     @Schema(title = "备注", example = "biubiubiu")
     private String remark;
 
-    @Schema(title = "条件类型", required = true, example = "1")
+    @Schema(title = "条件类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "条件类型不能为空")
     @InEnum(value = PromotionConditionTypeEnum.class, message = "条件类型必须是 {value}")
     private Integer conditionType;
 
-    @Schema(title = "商品范围", required = true, example = "1")
+    @Schema(title = "商品范围", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "商品范围不能为空")
     @InEnum(value = PromotionConditionTypeEnum.class, message = "商品范围必须是 {value}")
     private Integer productScope;
@@ -66,18 +66,18 @@ public class RewardActivityBaseVO {
     @Data
     public static class Rule {
 
-        @Schema(title = "优惠门槛", required = true, example = "100", description = "1. 满 N 元，单位：分; 2. 满 N 件")
+        @Schema(title = "优惠门槛", requiredMode = Schema.RequiredMode.REQUIRED, example = "100", description = "1. 满 N 元，单位：分; 2. 满 N 件")
         @Min(value = 1L, message = "优惠门槛必须大于等于 1")
         private Integer limit;
 
-        @Schema(title = "优惠价格", required = true, example = "100", description = "单位：分")
+        @Schema(title = "优惠价格", requiredMode = Schema.RequiredMode.REQUIRED, example = "100", description = "单位：分")
         @Min(value = 1L, message = "优惠价格必须大于等于 1")
         private Integer discountPrice;
 
-        @Schema(title = "是否包邮", required = true, example = "true")
+        @Schema(title = "是否包邮", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
         private Boolean freeDelivery;
 
-        @Schema(title = "赠送的积分", required = true, example = "100")
+        @Schema(title = "赠送的积分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
         @Min(value = 1L, message = "赠送的积分必须大于等于 1")
         private Integer point;
 

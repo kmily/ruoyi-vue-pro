@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 public class AppTradeOrderCreateReqVO {
 
-    @Schema(name = "收件地址编号", required = true, example = "1")
+    @Schema(name = "收件地址编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "收件地址不能为空")
     private Long addressId;
 
@@ -22,7 +22,7 @@ public class AppTradeOrderCreateReqVO {
     @Schema(name = "备注", example = "这个是我的订单哟")
     private String remark;
 
-    @Schema(name = "是否来自购物车", required = true, example = "true", description = "true - 来自购物车；false - 立即购买")
+    @Schema(name = "是否来自购物车", requiredMode = Schema.RequiredMode.REQUIRED, example = "true", description = "true - 来自购物车；false - 立即购买")
     @NotNull(message = "是否来自购物车不能为空")
     private Boolean fromCart;
 
@@ -36,11 +36,11 @@ public class AppTradeOrderCreateReqVO {
     @Data
     public static class Item {
 
-        @Schema(name = "商品 SKU 编号", required = true, example = "111")
+        @Schema(name = "商品 SKU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "111")
         @NotNull(message = "商品 SKU 编号不能为空")
         private Long skuId;
 
-        @Schema(name = "商品 SKU 购买数量", required = true, example = "1024")
+        @Schema(name = "商品 SKU 购买数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
         @NotNull(message = "商品 SKU 购买数量不能为空")
         @Min(value = 1, message = "商品 SKU 购买数量必须大于 0")
         private Integer count;

@@ -13,14 +13,14 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class BpmTaskDonePageItemRespVO extends BpmTaskTodoPageItemRespVO {
 
-    @Schema(title = "结束时间", required = true)
+    @Schema(title = "结束时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime endTime;
-    @Schema(title = "持续时间", required = true, example = "1000")
+    @Schema(title = "持续时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "1000")
     private Long durationInMillis;
 
-    @Schema(title = "任务结果", required = true, description = "参见 bpm_process_instance_result", example = "2")
+    @Schema(title = "任务结果", requiredMode = Schema.RequiredMode.REQUIRED, description = "参见 bpm_process_instance_result", example = "2")
     private Integer result;
-    @Schema(title = "审批建议", required = true, example = "不请假了！")
+    @Schema(title = "审批建议", requiredMode = Schema.RequiredMode.REQUIRED, example = "不请假了！")
     private String reason;
 
 }

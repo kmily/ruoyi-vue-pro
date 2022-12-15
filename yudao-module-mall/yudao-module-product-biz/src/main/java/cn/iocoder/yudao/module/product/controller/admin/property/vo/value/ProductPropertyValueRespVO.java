@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class ProductPropertyValueRespVO extends ProductPropertyValueBaseVO {
 
-    @Schema(title = "主键", required = true, example = "10")
+    @Schema(title = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     private Long id;
 
     @Schema(title = "创建时间")

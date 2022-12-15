@@ -9,7 +9,7 @@ import jakarta.validation.constraints.*;
 @ToString(callSuper = true)
 public class ProductBrandUpdateReqVO extends ProductBrandBaseVO {
 
-    @Schema(title = "品牌编号", required = true, example = "1")
+    @Schema(title = "品牌编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "品牌编号不能为空")
     private Long id;
 

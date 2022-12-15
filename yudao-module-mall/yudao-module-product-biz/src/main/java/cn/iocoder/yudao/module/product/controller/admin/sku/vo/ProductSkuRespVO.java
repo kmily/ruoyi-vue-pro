@@ -14,7 +14,7 @@ import java.util.List;
 @ToString(callSuper = true)
 public class ProductSkuRespVO extends ProductSkuBaseVO {
 
-    @Schema(title = "主键", required = true, example = "1024")
+    @Schema(title = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
     @Schema(title = "创建时间")

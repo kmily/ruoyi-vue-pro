@@ -16,11 +16,11 @@ import jakarta.validation.constraints.NotNull;
 @AllArgsConstructor
 public class PayNotifyOrderReqVO {
 
-    @Schema(title = "商户订单编号", required = true, example = "10")
+    @Schema(title = "商户订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     @NotEmpty(message = "商户订单号不能为空")
     private String merchantOrderId;
 
-    @Schema(title = "支付订单编号", required = true, example = "20")
+    @Schema(title = "支付订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "20")
     @NotNull(message = "支付订单编号不能为空")
     private Long payOrderId;
 

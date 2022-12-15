@@ -10,10 +10,10 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class PayAppRespVO extends PayAppBaseVO {
 
-    @Schema(title = "应用编号", required = true)
+    @Schema(title = "应用编号", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long id;
 
-    @Schema(title = "创建时间", required = true)
+    @Schema(title = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
 }

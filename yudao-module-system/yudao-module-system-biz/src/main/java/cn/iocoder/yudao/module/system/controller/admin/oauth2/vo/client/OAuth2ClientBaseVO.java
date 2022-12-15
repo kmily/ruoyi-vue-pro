@@ -18,19 +18,19 @@ import java.util.List;
 @Data
 public class OAuth2ClientBaseVO {
 
-    @Schema(title = "客户端编号", required = true, example = "tudou")
+    @Schema(title = "客户端编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "tudou")
     @NotNull(message = "客户端编号不能为空")
     private String clientId;
 
-    @Schema(title = "客户端密钥", required = true, example = "fan")
+    @Schema(title = "客户端密钥", requiredMode = Schema.RequiredMode.REQUIRED, example = "fan")
     @NotNull(message = "客户端密钥不能为空")
     private String secret;
 
-    @Schema(title = "应用名", required = true, example = "土豆")
+    @Schema(title = "应用名", requiredMode = Schema.RequiredMode.REQUIRED, example = "土豆")
     @NotNull(message = "应用名不能为空")
     private String name;
 
-    @Schema(title = "应用图标", required = true, example = "https://www.iocoder.cn/xx.png")
+    @Schema(title = "应用图标", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xx.png")
     @NotNull(message = "应用图标不能为空")
     @URL(message = "应用图标的地址不正确")
     private String logo;
@@ -38,24 +38,24 @@ public class OAuth2ClientBaseVO {
     @Schema(title = "应用描述", example = "我是一个应用")
     private String description;
 
-    @Schema(title = "状态", required = true, example = "1", description = "参见 CommonStatusEnum 枚举")
+    @Schema(title = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", description = "参见 CommonStatusEnum 枚举")
     @NotNull(message = "状态不能为空")
     private Integer status;
 
-    @Schema(title = "访问令牌的有效期", required = true, example = "8640")
+    @Schema(title = "访问令牌的有效期", requiredMode = Schema.RequiredMode.REQUIRED, example = "8640")
     @NotNull(message = "访问令牌的有效期不能为空")
     private Integer accessTokenValiditySeconds;
 
-    @Schema(title = "刷新令牌的有效期", required = true, example = "8640000")
+    @Schema(title = "刷新令牌的有效期", requiredMode = Schema.RequiredMode.REQUIRED, example = "8640000")
     @NotNull(message = "刷新令牌的有效期不能为空")
     private Integer refreshTokenValiditySeconds;
 
-    @Schema(title = "可重定向的 URI 地址", required = true, example = "https://www.iocoder.cn")
+    @Schema(title = "可重定向的 URI 地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn")
     @NotNull(message = "可重定向的 URI 地址不能为空")
     private List<@NotEmpty(message = "重定向的 URI 不能为空")
         @URL(message = "重定向的 URI 格式不正确") String> redirectUris;
 
-    @Schema(title = "授权类型", required = true, example = "password", description = "参见 OAuth2GrantTypeEnum 枚举")
+    @Schema(title = "授权类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "password", description = "参见 OAuth2GrantTypeEnum 枚举")
     @NotNull(message = "授权类型不能为空")
     private List<String> authorizedGrantTypes;
 

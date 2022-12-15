@@ -13,7 +13,7 @@ import jakarta.validation.constraints.NotNull;
 @ToString(callSuper = true)
 public class ConfigUpdateReqVO extends ConfigBaseVO {
 
-    @Schema(title = "参数配置序号", required = true, example = "1024")
+    @Schema(title = "参数配置序号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "参数配置编号不能为空")
     private Long id;
 

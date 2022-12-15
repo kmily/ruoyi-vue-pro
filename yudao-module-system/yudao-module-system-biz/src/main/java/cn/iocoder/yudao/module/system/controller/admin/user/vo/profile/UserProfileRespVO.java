@@ -18,19 +18,19 @@ import java.util.List;
 @Schema(title = "管理后台 - 用户个人中心信息 Response VO")
 public class UserProfileRespVO extends UserBaseVO {
 
-    @Schema(title = "用户编号", required = true, example = "1")
+    @Schema(title = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(title = "状态", required = true, example = "1", description = "参见 CommonStatusEnum 枚举类")
+    @Schema(title = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", description = "参见 CommonStatusEnum 枚举类")
     private Integer status;
 
-    @Schema(title = "最后登录 IP", required = true, example = "192.168.1.1")
+    @Schema(title = "最后登录 IP", requiredMode = Schema.RequiredMode.REQUIRED, example = "192.168.1.1")
     private String loginIp;
 
-    @Schema(title = "最后登录时间", required = true, example = "时间戳格式")
+    @Schema(title = "最后登录时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "时间戳格式")
     private LocalDateTime loginDate;
 
-    @Schema(title = "创建时间", required = true, example = "时间戳格式")
+    @Schema(title = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "时间戳格式")
     private LocalDateTime createTime;
 
     /**
@@ -56,10 +56,10 @@ public class UserProfileRespVO extends UserBaseVO {
     @Data
     public static class Role {
 
-        @Schema(title = "角色编号", required = true, example = "1")
+        @Schema(title = "角色编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Long id;
 
-        @Schema(title = "角色名称", required = true, example = "普通角色")
+        @Schema(title = "角色名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "普通角色")
         private String name;
 
     }
@@ -68,10 +68,10 @@ public class UserProfileRespVO extends UserBaseVO {
     @Data
     public static class Dept {
 
-        @Schema(title = "部门编号", required = true, example = "1")
+        @Schema(title = "部门编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Long id;
 
-        @Schema(title = "部门名称", required = true, example = "研发部")
+        @Schema(title = "部门名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "研发部")
         private String name;
 
     }
@@ -80,10 +80,10 @@ public class UserProfileRespVO extends UserBaseVO {
     @Data
     public static class Post {
 
-        @Schema(title = "岗位编号", required = true, example = "1")
+        @Schema(title = "岗位编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Long id;
 
-        @Schema(title = "岗位名称", required = true, example = "开发")
+        @Schema(title = "岗位名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "开发")
         private String name;
 
     }
@@ -92,10 +92,10 @@ public class UserProfileRespVO extends UserBaseVO {
     @Data
     public static class SocialUser {
 
-        @Schema(title = "社交平台的类型", required = true, example = "10", description = "参见 SocialTypeEnum 枚举类")
+        @Schema(title = "社交平台的类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "10", description = "参见 SocialTypeEnum 枚举类")
         private Integer type;
 
-        @Schema(title = "社交用户的 openid", required = true, example = "IPRmJ0wvBptiPIlGEZiPewGwiEiE")
+        @Schema(title = "社交用户的 openid", requiredMode = Schema.RequiredMode.REQUIRED, example = "IPRmJ0wvBptiPIlGEZiPewGwiEiE")
         private String openid;
 
     }

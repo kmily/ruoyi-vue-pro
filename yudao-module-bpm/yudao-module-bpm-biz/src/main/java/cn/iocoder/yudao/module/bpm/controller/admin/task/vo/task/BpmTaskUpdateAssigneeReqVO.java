@@ -10,11 +10,11 @@ import jakarta.validation.constraints.NotNull;
 @Data
 public class BpmTaskUpdateAssigneeReqVO {
 
-    @Schema(title = "任务编号", required = true, example = "1024")
+    @Schema(title = "任务编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotEmpty(message = "任务编号不能为空")
     private String id;
 
-    @Schema(title = "新审批人的用户编号", required = true, example = "2048")
+    @Schema(title = "新审批人的用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
     @NotNull(message = "新审批人的用户编号不能为空")
     private Long assigneeUserId;
 

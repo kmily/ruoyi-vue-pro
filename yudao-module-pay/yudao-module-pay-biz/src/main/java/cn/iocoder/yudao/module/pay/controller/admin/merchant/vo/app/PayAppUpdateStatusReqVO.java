@@ -9,11 +9,11 @@ import jakarta.validation.constraints.NotNull;
 @Data
 public class PayAppUpdateStatusReqVO {
 
-    @Schema(title = "商户编号", required = true, example = "1024")
+    @Schema(title = "商户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "商户编号不能为空")
     private Long id;
 
-    @Schema(title = "状态", required = true, example = "1", description = "见 SysCommonStatusEnum 枚举")
+    @Schema(title = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", description = "见 SysCommonStatusEnum 枚举")
     @NotNull(message = "状态不能为空")
     private Integer status;
 

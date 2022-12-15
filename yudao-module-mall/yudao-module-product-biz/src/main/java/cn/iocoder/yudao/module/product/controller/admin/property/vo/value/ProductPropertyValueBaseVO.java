@@ -12,15 +12,15 @@ import jakarta.validation.constraints.NotNull;
 @Data
 public class ProductPropertyValueBaseVO {
 
-    @Schema(title = "规格编号", required = true, example = "1024")
+    @Schema(title = "规格编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "规格编号不能为空")
     private Long propertyId;
 
-    @Schema(title = "规格值名字", required = true, example = "红色")
+    @Schema(title = "规格值名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "红色")
     @NotEmpty(message = "规格值名字不能为空")
     private String name;
 
-    @Schema(title = "状态", required = true, example = "1", description = "参见 CommonStatusEnum 枚举")
+    @Schema(title = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", description = "参见 CommonStatusEnum 枚举")
     @NotNull(message = "状态不能为空")
     private Integer status;
 

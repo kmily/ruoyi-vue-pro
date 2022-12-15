@@ -12,13 +12,13 @@ import java.util.Map;
 @Builder
 public class UserImportRespVO {
 
-    @Schema(title = "创建成功的用户名数组", required = true)
+    @Schema(title = "创建成功的用户名数组", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<String> createUsernames;
 
-    @Schema(title = "更新成功的用户名数组", required = true)
+    @Schema(title = "更新成功的用户名数组", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<String> updateUsernames;
 
-    @Schema(title = "导入失败的用户集合", required = true, description = "key 为用户名，value 为失败原因")
+    @Schema(title = "导入失败的用户集合", requiredMode = Schema.RequiredMode.REQUIRED, description = "key 为用户名，value 为失败原因")
     private Map<String, String> failureUsernames;
 
 }

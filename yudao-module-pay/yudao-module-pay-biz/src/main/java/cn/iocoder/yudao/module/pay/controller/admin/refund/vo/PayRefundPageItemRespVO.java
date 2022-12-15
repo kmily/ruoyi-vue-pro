@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class PayRefundPageItemRespVO extends PayRefundBaseVO {
 
-    @Schema(title = "支付订单编号", required = true)
+    @Schema(title = "支付订单编号", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long id;
 
     @Schema(title = "商户名称")
@@ -25,7 +25,7 @@ public class PayRefundPageItemRespVO extends PayRefundBaseVO {
     @Schema(title = "渠道名称")
     private String channelCodeName;
 
-    @Schema(title = "创建时间", required = true)
+    @Schema(title = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
 }

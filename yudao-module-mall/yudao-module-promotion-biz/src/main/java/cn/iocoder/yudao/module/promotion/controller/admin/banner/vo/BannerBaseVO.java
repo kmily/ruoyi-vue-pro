@@ -15,23 +15,23 @@ import jakarta.validation.constraints.NotNull;
 @Data
 public class BannerBaseVO {
 
-    @Schema(title = "标题", required = true)
+    @Schema(title = "标题", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "标题不能为空")
     private String title;
 
-    @Schema(title = "跳转链接", required = true)
+    @Schema(title = "跳转链接", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "跳转链接不能为空")
     private String url;
 
-    @Schema(title = "图片地址", required = true)
+    @Schema(title = "图片地址", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "图片地址不能为空")
     private String picUrl;
 
-    @Schema(title = "排序", required = true)
+    @Schema(title = "排序", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "排序不能为空")
     private Integer sort;
 
-    @Schema(title = "状态", required = true)
+    @Schema(title = "状态", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "状态不能为空")
     @InEnum(CommonStatusEnum.class)
     private Integer status;

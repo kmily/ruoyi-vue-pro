@@ -12,10 +12,10 @@ import java.util.List;
 @Data
 public class AppProductSpuBaseRespVO {
 
-    @Schema(title = "主键", required = true, example = "1024")
+    @Schema(title = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(title = "商品 SPU 名字", required = true, example = "芋道")
+    @Schema(title = "商品 SPU 名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     private String name;
 
     @Schema(title = "商品主图地址", example = "https://www.iocoder.cn/xx.png")

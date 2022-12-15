@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserSimpleRespVO {
 
-    @Schema(title = "用户编号", required = true, example = "1024")
+    @Schema(title = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(title = "用户昵称", required = true, example = "芋道")
+    @Schema(title = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     private String nickname;
 
 }

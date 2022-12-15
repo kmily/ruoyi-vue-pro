@@ -11,10 +11,10 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class OperateLogRespVO extends OperateLogBaseVO {
 
-    @Schema(title = "日志编号", required = true, example = "1024")
+    @Schema(title = "日志编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(title = "用户昵称", required = true, example = "芋艿")
+    @Schema(title = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
     private String userNickname;
 
 }

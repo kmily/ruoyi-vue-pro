@@ -11,13 +11,13 @@ import java.util.List;
 @Data
 public class BpmProcessDefinitionRespVO {
 
-    @Schema(title = "编号", required = true, example = "1024")
+    @Schema(title = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private String id;
 
-    @Schema(title = "版本", required = true, example = "1")
+    @Schema(title = "版本", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer version;
 
-    @Schema(title = "流程名称", required = true, example = "芋道")
+    @Schema(title = "流程名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     @NotEmpty(message = "流程名称不能为空")
     private String name;
 
@@ -32,10 +32,10 @@ public class BpmProcessDefinitionRespVO {
     private Integer formType;
     @Schema(title = "表单编号", example = "1024", description = "在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空")
     private Long formId;
-    @Schema(title = "表单的配置", required = true,
+    @Schema(title = "表单的配置", requiredMode = Schema.RequiredMode.REQUIRED,
             description = "JSON 字符串。在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空")
     private String formConf;
-    @Schema(title = "表单项的数组", required = true,
+    @Schema(title = "表单项的数组", requiredMode = Schema.RequiredMode.REQUIRED,
             description = "JSON 字符串的数组。在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空")
     private List<String> formFields;
     @Schema(title = "自定义表单的提交路径，使用 Vue 的路由地址", example = "/bpm/oa/leave/create",
@@ -45,7 +45,7 @@ public class BpmProcessDefinitionRespVO {
             description = "在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空")
     private String formCustomViewPath;
 
-    @Schema(title = "中断状态", required = true, example = "1", description = "参见 SuspensionState 枚举")
+    @Schema(title = "中断状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", description = "参见 SuspensionState 枚举")
     private Integer suspensionState;
 
 }

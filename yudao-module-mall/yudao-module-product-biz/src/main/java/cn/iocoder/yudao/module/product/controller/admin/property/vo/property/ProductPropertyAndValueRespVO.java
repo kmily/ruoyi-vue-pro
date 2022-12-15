@@ -15,10 +15,10 @@ import java.util.List;
 @ToString(callSuper = true)
 public class ProductPropertyAndValueRespVO extends ProductPropertyBaseVO {
 
-    @Schema(title = "规格的编号", required = true, example = "1024")
+    @Schema(title = "规格的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(title = "创建时间", required = true)
+    @Schema(title = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
     /**

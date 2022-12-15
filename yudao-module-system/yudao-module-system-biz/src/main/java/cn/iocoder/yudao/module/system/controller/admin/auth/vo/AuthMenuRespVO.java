@@ -15,13 +15,13 @@ import java.util.List;
 @Builder
 public class AuthMenuRespVO {
 
-    @Schema(title = "菜单名称", required = true, example = "芋道")
+    @Schema(title = "菜单名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     private Long id;
 
-    @Schema(title = "父菜单 ID", required = true, example = "1024")
+    @Schema(title = "父菜单 ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long parentId;
 
-    @Schema(title = "菜单名称", required = true, example = "芋道")
+    @Schema(title = "菜单名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     private String name;
 
     @Schema(title = "路由地址", example = "post", description = "仅菜单类型为菜单或者目录时，才需要传")
@@ -33,10 +33,10 @@ public class AuthMenuRespVO {
     @Schema(title = "菜单图标", example = "/menu/list", description = "仅菜单类型为菜单或者目录时，才需要传")
     private String icon;
 
-    @Schema(title = "是否可见", required = true, example = "false")
+    @Schema(title = "是否可见", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
     private Boolean visible;
 
-    @Schema(title = "是否缓存", required = true, example = "false")
+    @Schema(title = "是否缓存", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
     private Boolean keepAlive;
 
     /**

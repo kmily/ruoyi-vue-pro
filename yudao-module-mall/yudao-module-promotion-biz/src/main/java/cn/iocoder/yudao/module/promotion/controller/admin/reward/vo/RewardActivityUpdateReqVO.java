@@ -9,7 +9,7 @@ import jakarta.validation.constraints.*;
 @ToString(callSuper = true)
 public class RewardActivityUpdateReqVO extends RewardActivityBaseVO {
 
-    @Schema(title = "活动编号", required = true, example = "1024")
+    @Schema(title = "活动编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "活动编号不能为空")
     private Long id;
 

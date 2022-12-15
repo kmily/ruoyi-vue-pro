@@ -23,10 +23,9 @@ public class YudaoJacksonAutoConfiguration {
         return new BeanPostProcessor() {
             @Override
             public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-                if (!(bean instanceof ObjectMapper)) {
+                if (!(bean instanceof ObjectMapper objectMapper)) {
                     return bean;
                 }
-                ObjectMapper objectMapper = (ObjectMapper) bean;
                 SimpleModule simpleModule = new SimpleModule();
                 /*
                  * 1. 新增Long类型序列化规则，数值超过2^53-1，在JS会出现精度丢失问题，因此Long自动序列化为字符串类型

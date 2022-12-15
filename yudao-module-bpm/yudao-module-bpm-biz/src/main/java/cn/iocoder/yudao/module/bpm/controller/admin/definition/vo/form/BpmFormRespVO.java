@@ -14,18 +14,18 @@ import java.util.List;
 @ToString(callSuper = true)
 public class BpmFormRespVO extends BpmFormBaseVO {
 
-    @Schema(title = "表单编号", required = true, example = "1024")
+    @Schema(title = "表单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(title = "表单的配置", required = true, description = "JSON 字符串")
+    @Schema(title = "表单的配置", requiredMode = Schema.RequiredMode.REQUIRED, description = "JSON 字符串")
     @NotNull(message = "表单的配置不能为空")
     private String conf;
 
-    @Schema(title = "表单项的数组", required = true, description = "JSON 字符串的数组")
+    @Schema(title = "表单项的数组", requiredMode = Schema.RequiredMode.REQUIRED, description = "JSON 字符串的数组")
     @NotNull(message = "表单项的数组不能为空")
     private List<String> fields;
 
-    @Schema(title = "创建时间", required = true)
+    @Schema(title = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
 }

@@ -14,7 +14,7 @@ import jakarta.validation.constraints.Size;
 @Data
 public class MenuBaseVO {
 
-    @Schema(title = "菜单名称", required = true, example = "芋道")
+    @Schema(title = "菜单名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     @NotBlank(message = "菜单名称不能为空")
     @Size(max = 50, message = "菜单名称长度不能超过50个字符")
     private String name;
@@ -23,15 +23,15 @@ public class MenuBaseVO {
     @Size(max = 100)
     private String permission;
 
-    @Schema(title = "类型", required = true, example = "1", description = "参见 MenuTypeEnum 枚举类")
+    @Schema(title = "类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", description = "参见 MenuTypeEnum 枚举类")
     @NotNull(message = "菜单类型不能为空")
     private Integer type;
 
-    @Schema(title = "显示顺序不能为空", required = true, example = "1024")
+    @Schema(title = "显示顺序不能为空", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "显示顺序不能为空")
     private Integer sort;
 
-    @Schema(title = "父菜单 ID", required = true, example = "1024")
+    @Schema(title = "父菜单 ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "父菜单 ID 不能为空")
     private Long parentId;
 
@@ -46,7 +46,7 @@ public class MenuBaseVO {
     @Size(max = 200, message = "组件路径不能超过255个字符")
     private String component;
 
-    @Schema(title = "状态", required = true, example = "1", description = "见 CommonStatusEnum 枚举")
+    @Schema(title = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", description = "见 CommonStatusEnum 枚举")
     @NotNull(message = "状态不能为空")
     private Integer status;
 

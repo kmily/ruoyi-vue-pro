@@ -11,34 +11,34 @@ import jakarta.validation.constraints.NotNull;
 @Data
 public class SmsTemplateBaseVO {
 
-    @Schema(title = "短信类型", required = true, example = "1", description = "参见 SmsTemplateTypeEnum 枚举类")
+    @Schema(title = "短信类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", description = "参见 SmsTemplateTypeEnum 枚举类")
     @NotNull(message = "短信类型不能为空")
     private Integer type;
 
-    @Schema(title = "开启状态", required = true, example = "1", description = "参见 CommonStatusEnum 枚举类")
+    @Schema(title = "开启状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", description = "参见 CommonStatusEnum 枚举类")
     @NotNull(message = "开启状态不能为空")
     private Integer status;
 
-    @Schema(title = "模板编码", required = true, example = "test_01")
+    @Schema(title = "模板编码", requiredMode = Schema.RequiredMode.REQUIRED, example = "test_01")
     @NotNull(message = "模板编码不能为空")
     private String code;
 
-    @Schema(title = "模板名称", required = true, example = "yudao")
+    @Schema(title = "模板名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")
     @NotNull(message = "模板名称不能为空")
     private String name;
 
-    @Schema(title = "模板内容", required = true, example = "你好，{name}。你长的太{like}啦！")
+    @Schema(title = "模板内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "你好，{name}。你长的太{like}啦！")
     @NotNull(message = "模板内容不能为空")
     private String content;
 
     @Schema(title = "备注", example = "哈哈哈")
     private String remark;
 
-    @Schema(title = "短信 API 的模板编号", required = true, example = "4383920")
+    @Schema(title = "短信 API 的模板编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "4383920")
     @NotNull(message = "短信 API 的模板编号不能为空")
     private String apiTemplateId;
 
-    @Schema(title = "短信渠道编号", required = true, example = "10")
+    @Schema(title = "短信渠道编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     @NotNull(message = "短信渠道编号不能为空")
     private Long channelId;
 

@@ -13,13 +13,13 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class ErrorCodeRespVO extends ErrorCodeBaseVO {
 
-    @Schema(title = "错误码编号", required = true, example = "1024")
+    @Schema(title = "错误码编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(title = "错误码类型", required = true, example = "1", description = "参见 ErrorCodeTypeEnum 枚举类")
+    @Schema(title = "错误码类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", description = "参见 ErrorCodeTypeEnum 枚举类")
     private Integer type;
 
-    @Schema(title = "创建时间", required = true)
+    @Schema(title = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
 }

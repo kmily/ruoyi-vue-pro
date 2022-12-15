@@ -14,7 +14,7 @@ import java.util.List;
 @ToString(callSuper = true)
 public class ProductSpuRespVO extends ProductSpuBaseVO {
 
-    @Schema(title = "主键", required = true, example = "1")
+    @Schema(title = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
     @Schema(title = "创建时间")

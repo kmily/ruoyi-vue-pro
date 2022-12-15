@@ -134,8 +134,7 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
         }
         if (selectBody instanceof PlainSelect) {
             processPlainSelect((PlainSelect) selectBody);
-        } else if (selectBody instanceof WithItem) {
-            WithItem withItem = (WithItem) selectBody;
+        } else if (selectBody instanceof WithItem withItem) {
             processSelectBody(withItem.getSubSelect().getSelectBody());
         } else {
             SetOperationList operationList = (SetOperationList) selectBody;
@@ -185,8 +184,7 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
 
         List<Table> mainTables = new ArrayList<>();
         // 无 join 时的处理逻辑
-        if (fromItem instanceof Table) {
-            Table fromTable = (Table) fromItem;
+        if (fromItem instanceof Table fromTable) {
             mainTables.add(fromTable);
         } else if (fromItem instanceof SubJoin) {
             // SubJoin 类型则还需要添加上 where 条件
@@ -229,36 +227,30 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
         }
         if (where.toString().indexOf("SELECT") > 0) {
             // 有子查询
-            if (where instanceof BinaryExpression) {
+            if (where instanceof BinaryExpression expression) {
                 // 比较符号 , and , or , 等等
-                BinaryExpression expression = (BinaryExpression) where;
                 processWhereSubSelect(expression.getLeftExpression());
                 processWhereSubSelect(expression.getRightExpression());
-            } else if (where instanceof InExpression) {
+            } else if (where instanceof InExpression expression) {
                 // in
-                InExpression expression = (InExpression) where;
                 Expression inExpression = expression.getRightExpression();
                 if (inExpression instanceof SubSelect) {
                     processSelectBody(((SubSelect) inExpression).getSelectBody());
                 }
-            } else if (where instanceof ExistsExpression) {
+            } else if (where instanceof ExistsExpression expression) {
                 // exists
-                ExistsExpression expression = (ExistsExpression) where;
                 processWhereSubSelect(expression.getRightExpression());
-            } else if (where instanceof NotExpression) {
+            } else if (where instanceof NotExpression expression) {
                 // not exists
-                NotExpression expression = (NotExpression) where;
                 processWhereSubSelect(expression.getExpression());
-            } else if (where instanceof Parenthesis) {
-                Parenthesis expression = (Parenthesis) where;
+            } else if (where instanceof Parenthesis expression) {
                 processWhereSubSelect(expression.getExpression());
             }
         }
     }
 
     protected void processSelectItem(SelectItem selectItem) {
-        if (selectItem instanceof SelectExpressionItem) {
-            SelectExpressionItem selectExpressionItem = (SelectExpressionItem) selectItem;
+        if (selectItem instanceof SelectExpressionItem selectExpressionItem) {
             if (selectExpressionItem.getExpression() instanceof SubSelect) {
                 processSelectBody(((SubSelect) selectExpressionItem.getExpression()).getSelectBody());
             } else if (selectExpressionItem.getExpression() instanceof Function) {
@@ -296,15 +288,13 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
             fromItem = ((ParenthesisFromItem) fromItem).getFromItem();
         }
 
-        if (fromItem instanceof SubSelect) {
-            SubSelect subSelect = (SubSelect) fromItem;
+        if (fromItem instanceof SubSelect subSelect) {
             if (subSelect.getSelectBody() != null) {
                 processSelectBody(subSelect.getSelectBody());
             }
         } else if (fromItem instanceof ValuesList) {
             logger.debug("Perform a subQuery, if you do not give us feedback");
-        } else if (fromItem instanceof LateralSubSelect) {
-            LateralSubSelect lateralSubSelect = (LateralSubSelect) fromItem;
+        } else if (fromItem instanceof LateralSubSelect lateralSubSelect) {
             if (lateralSubSelect.getSubSelect() != null) {
                 SubSelect subSelect = lateralSubSelect.getSubSelect();
                 if (subSelect.getSelectBody() != null) {
@@ -358,11 +348,11 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
 
             // 获取当前 join 的表，subJoint 可以看作是一张表
             List<Table> joinTables = null;
-            if (joinItem instanceof Table) {
+            if (joinItem instanceof Table item) {
                 joinTables = new ArrayList<>();
-                joinTables.add((Table) joinItem);
-            } else if (joinItem instanceof SubJoin) {
-                joinTables = processSubJoin((SubJoin) joinItem);
+                joinTables.add(item);
+            } else if (joinItem instanceof SubJoin item) {
+                joinTables = processSubJoin(item);
             }
 
             if (joinTables != null) {

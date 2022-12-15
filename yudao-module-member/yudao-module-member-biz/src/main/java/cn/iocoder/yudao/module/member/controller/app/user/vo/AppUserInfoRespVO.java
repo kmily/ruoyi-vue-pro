@@ -11,12 +11,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AppUserInfoRespVO {
 
-    @Schema(title = "用户昵称", required = true, example = "芋艿")
+    @Schema(title = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
     private String nickname;
 
-    @Schema(title = "用户头像", required = true, example = "/infra/file/get/35a12e57-4297-4faa-bf7d-7ed2f211c952")
+    @Schema(title = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "/infra/file/get/35a12e57-4297-4faa-bf7d-7ed2f211c952")
     private String avatar;
 
-    @Schema(title = "用户手机号", required = true, example = "15601691300")
+    @Schema(title = "用户手机号", requiredMode = Schema.RequiredMode.REQUIRED, example = "15601691300")
     private String mobile;
 }

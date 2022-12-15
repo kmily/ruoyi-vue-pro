@@ -10,26 +10,26 @@ import jakarta.validation.constraints.*;
 @Data
 public class PayAppBaseVO {
 
-    @Schema(title = "应用名", required = true)
+    @Schema(title = "应用名", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "应用名不能为空")
     private String name;
 
-    @Schema(title = "开启状态", required = true)
+    @Schema(title = "开启状态", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "开启状态不能为空")
     private Integer status;
 
     @Schema(title = "备注")
     private String remark;
 
-    @Schema(title = "支付结果的回调地址", required = true)
+    @Schema(title = "支付结果的回调地址", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "支付结果的回调地址不能为空")
     private String payNotifyUrl;
 
-    @Schema(title = "退款结果的回调地址", required = true)
+    @Schema(title = "退款结果的回调地址", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "退款结果的回调地址不能为空")
     private String refundNotifyUrl;
 
-    @Schema(title = "商户编号", required = true)
+    @Schema(title = "商户编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "商户编号不能为空")
     private Long merchantId;
 

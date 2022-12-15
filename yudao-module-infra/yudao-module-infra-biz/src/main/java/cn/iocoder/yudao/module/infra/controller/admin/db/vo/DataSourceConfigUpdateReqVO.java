@@ -9,11 +9,11 @@ import jakarta.validation.constraints.*;
 @ToString(callSuper = true)
 public class DataSourceConfigUpdateReqVO extends DataSourceConfigBaseVO {
 
-    @Schema(title = "主键编号", required = true, example = "1024")
+    @Schema(title = "主键编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "主键编号不能为空")
     private Long id;
 
-    @Schema(title = "密码", required = true, example = "123456")
+    @Schema(title = "密码", requiredMode = Schema.RequiredMode.REQUIRED, example = "123456")
     @NotNull(message = "密码不能为空")
     private String password;
 
