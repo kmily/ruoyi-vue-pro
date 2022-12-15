@@ -92,7 +92,7 @@ public class AliyunSmsClient extends AbstractSmsClient {
             resp.setMobile(status.getPhoneNumber()).setReceiveTime(status.getReportTime());
             resp.setSerialNo(status.getBizId()).setLogId(Long.valueOf(status.getOutId()));
             return resp;
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     @Override

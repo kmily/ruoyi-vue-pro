@@ -33,7 +33,7 @@ public interface OperateLogConvert {
             MapUtils.findAndThen(userMap, operateLog.getUserId(), user -> excelVO.setUserNickname(user.getNickname()));
             excelVO.setSuccessStr(SUCCESS.getCode().equals(operateLog.getResultCode()) ? "成功" : "失败");
             return excelVO;
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     OperateLogExcelVO convert02(OperateLogDO bean);

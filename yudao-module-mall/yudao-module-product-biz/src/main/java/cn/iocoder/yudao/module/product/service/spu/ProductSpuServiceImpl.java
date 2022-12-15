@@ -156,7 +156,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
                         ProductPropertyViewRespVO.Tuple2 tuple2 = new ProductPropertyViewRespVO.Tuple2(pv.getValueId(), propertyValueMaps.get(pv.getValueId()).getName());
                         propertyValues.add(tuple2);
                     });
-                    productPropertyViewRespVO.setPropertyValues(propertyValues.stream().distinct().collect(Collectors.toList()));
+                    productPropertyViewRespVO.setPropertyValues(propertyValues.stream().distinct().toList());
                     productPropertyViews.add(productPropertyViewRespVO);
                 });
                 respVO.setProductPropertyViews(productPropertyViews);
@@ -203,7 +203,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         List<AppSpuPageRespVO> collect = productSpuDOPageResult.getList()
                 .stream()
                 .map(ProductSpuConvert.INSTANCE::convertAppResp)
-                .collect(Collectors.toList());
+                .toList();
         pageResult.setList(collect);
         pageResult.setTotal(productSpuDOPageResult.getTotal());
         return pageResult;

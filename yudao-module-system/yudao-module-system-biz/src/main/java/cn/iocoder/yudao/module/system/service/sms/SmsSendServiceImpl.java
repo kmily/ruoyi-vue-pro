@@ -146,7 +146,7 @@ public class SmsSendServiceImpl implements SmsSendService {
                 throw exception(SMS_SEND_MOBILE_TEMPLATE_PARAM_MISS, key);
             }
             return new KeyValue<>(key, value);
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     @VisibleForTesting

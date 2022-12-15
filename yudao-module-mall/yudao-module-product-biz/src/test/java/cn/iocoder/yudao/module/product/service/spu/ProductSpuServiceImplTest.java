@@ -178,7 +178,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         // 准备sku参数
         ArrayList<ProductSkuDO> productSkuDOS = Lists.newArrayList();
         lists.forEach(pp -> {
-            List<ProductSkuDO.Property> property = pp.stream().map(ppv -> new ProductSkuDO.Property(ppv.getPropertyId(), ppv.getId())).collect(Collectors.toList());
+            List<ProductSkuDO.Property> property = pp.stream().map(ppv -> new ProductSkuDO.Property(ppv.getPropertyId(), ppv.getId())).toList();
             ProductSkuDO productSkuDO = randomPojo(ProductSkuDO.class, o -> {
                 o.setProperties(property);
             });
@@ -213,7 +213,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         productSpuMapper.insertBatch(createReqVO);
 
         // 调用
-        List<ProductSpuDO> spuList = productSpuService.getSpuList(createReqVO.stream().map(ProductSpuDO::getId).collect(Collectors.toList()));
+        List<ProductSpuDO> spuList = productSpuService.getSpuList(createReqVO.stream().map(ProductSpuDO::getId).toList());
         Assertions.assertIterableEquals(createReqVO, spuList);
     }
 
@@ -350,7 +350,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
         List<AppSpuPageRespVO> collect = result.getList()
                 .stream()
                 .map(ProductSpuConvert.INSTANCE::convertAppResp)
-                .collect(Collectors.toList());
+                .toList();
 
         Assertions.assertIterableEquals(collect, spuPage.getList());
         assertEquals(spuPage.getTotal(), result.getTotal());
@@ -370,7 +370,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             if (res == null) { // 结果集为null表示第一次循环既list为第一个List
                 for (T t : list) { // 便利第一个List
                     // 利用stream生成List，第一个List的笛卡尔积集合约等于自己本身（需要创建一个List并把对象添加到当中），存放到临时结果集
-                    temp.add(Stream.of(t).collect(Collectors.toList()));
+                    temp.add(Stream.of(t).toList());
                 }
                 res = temp; // 将临时结果集赋值给结果集
                 continue; // 跳过本次循环
@@ -379,7 +379,7 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
             for (T t : list) { // 便利
                 for (List<T> rl : res) { // 便利前面的笛卡尔积集合
                     // 利用stream生成List
-                    temp.add(Stream.concat(rl.stream(), Stream.of(t)).collect(Collectors.toList()));
+                    temp.add(Stream.concat(rl.stream(), Stream.of(t)).toList());
                 }
             }
             res = temp; // 将临时结果集赋值给结果集

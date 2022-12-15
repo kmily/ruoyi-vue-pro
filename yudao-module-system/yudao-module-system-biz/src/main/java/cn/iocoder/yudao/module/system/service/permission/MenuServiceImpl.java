@@ -219,7 +219,7 @@ public class MenuServiceImpl implements MenuService {
         // 创建新数组，避免缓存被修改
         return menuCache.values().stream().filter(menu -> menuTypes.contains(menu.getType())
                 && menusStatuses.contains(menu.getStatus()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -232,7 +232,7 @@ public class MenuServiceImpl implements MenuService {
         return menuCache.values().stream().filter(menu -> menuIds.contains(menu.getId())
                 && menuTypes.contains(menu.getType())
                 && menusStatuses.contains(menu.getStatus()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

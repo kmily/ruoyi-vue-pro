@@ -48,12 +48,12 @@ public class DataPermissionRuleFactoryImpl implements DataPermissionRuleFactory 
         // 4. 已配置，只选择部分规则
         if (ArrayUtil.isNotEmpty(dataPermission.includeRules())) {
             return rules.stream().filter(rule -> ArrayUtil.contains(dataPermission.includeRules(), rule.getClass()))
-                    .collect(Collectors.toList()); // 一般规则不会太多，所以不采用 HashSet 查询
+                    .toList(); // 一般规则不会太多，所以不采用 HashSet 查询
         }
         // 5. 已配置，只排除部分规则
         if (ArrayUtil.isNotEmpty(dataPermission.excludeRules())) {
             return rules.stream().filter(rule -> !ArrayUtil.contains(dataPermission.excludeRules(), rule.getClass()))
-                    .collect(Collectors.toList()); // 一般规则不会太多，所以不采用 HashSet 查询
+                    .toList(); // 一般规则不会太多，所以不采用 HashSet 查询
         }
         // 6. 已配置，全部规则
         return rules;

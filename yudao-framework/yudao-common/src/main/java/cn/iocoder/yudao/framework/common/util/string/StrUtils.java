@@ -42,7 +42,7 @@ public class StrUtils {
 
     public static List<Long> splitToLong(String value,  CharSequence separator) {
         long[] longs = StrUtil.splitToLong(value, separator);
-        return Arrays.stream(longs).boxed().collect(Collectors.toList());
+        return Arrays.stream(longs).boxed().toList();
     }
 
 }

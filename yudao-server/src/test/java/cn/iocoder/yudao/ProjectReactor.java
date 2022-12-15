@@ -97,7 +97,7 @@ public class ProjectReactor {
                         && !file.getPath().contains(separator + "dist" + separator)
                         && !file.getPath().contains(".iml")
                         && !file.getPath().contains(".html.gz"))
-                .collect(Collectors.toList());
+                .toList();
         return files;
     }
 

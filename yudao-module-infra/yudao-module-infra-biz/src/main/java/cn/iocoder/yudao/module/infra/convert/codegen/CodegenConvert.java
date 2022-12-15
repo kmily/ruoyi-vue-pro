@@ -80,7 +80,7 @@ public interface CodegenConvert {
             respVO.setFilePath(entry.getKey());
             respVO.setCode(entry.getValue());
             return respVO;
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
 }

@@ -118,8 +118,7 @@ public class RandomUtils {
     @SafeVarargs
     public static <T> List<T> randomPojoList(Class<T> clazz, Consumer<T>... consumers) {
         int size = RandomUtil.randomInt(1, RANDOM_COLLECTION_LENGTH);
-        return Stream.iterate(0, i -> i).limit(size).map(o -> randomPojo(clazz, consumers))
-                .collect(Collectors.toList());
+        return Stream.iterate(0, i -> i).limit(size).map(o -> randomPojo(clazz, consumers)).toList();
     }
 
 }

@@ -138,8 +138,7 @@ public class BpmFormServiceTest extends BaseDbUnitTest {
     private List<String> randomFields() {
         int size = RandomUtil.randomInt(1, 3);
         return Stream.iterate(0, i -> i).limit(size)
-                .map(i -> JsonUtils.toJsonString(randomPojo(BpmFormFieldRespDTO.class)))
-                .collect(Collectors.toList());
+                .map(i -> JsonUtils.toJsonString(randomPojo(BpmFormFieldRespDTO.class))).toList();
     }
 
 }

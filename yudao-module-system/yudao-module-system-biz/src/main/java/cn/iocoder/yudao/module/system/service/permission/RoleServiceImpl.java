@@ -228,7 +228,7 @@ public class RoleServiceImpl implements RoleService {
             return Collections.emptyList();
         }
         return roleCache.values().stream().filter(roleDO -> ids.contains(roleDO.getId()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
