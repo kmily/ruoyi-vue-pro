@@ -5,15 +5,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
-@Schema(title = "管理后台 - 定时任务创建 Request VO")
+@Schema(description = "管理后台 - 定时任务创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class JobCreateReqVO extends JobBaseVO {
 
-    @Schema(title = "处理器的名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "sysUserSessionTimeoutJob")
+    @Schema(description = "处理器的名字", required = true, example = "sysUserSessionTimeoutJob")
     @NotNull(message = "处理器的名字不能为空")
     private String handlerName;
 

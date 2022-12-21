@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 /**
  * Banner Base VO，提供给添加、修改、详细的子 VO 使用
@@ -15,28 +15,28 @@ import jakarta.validation.constraints.NotNull;
 @Data
 public class BannerBaseVO {
 
-    @Schema(title = "标题", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "标题", required = true)
     @NotNull(message = "标题不能为空")
     private String title;
 
-    @Schema(title = "跳转链接", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "跳转链接", required = true)
     @NotNull(message = "跳转链接不能为空")
     private String url;
 
-    @Schema(title = "图片地址", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "图片地址", required = true)
     @NotNull(message = "图片地址不能为空")
     private String picUrl;
 
-    @Schema(title = "排序", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "排序", required = true)
     @NotNull(message = "排序不能为空")
     private Integer sort;
 
-    @Schema(title = "状态", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "状态", required = true)
     @NotNull(message = "状态不能为空")
     @InEnum(CommonStatusEnum.class)
     private Integer status;
 
-    @Schema(title = "备注")
+    @Schema(description = "备注")
     private String memo;
 
 }

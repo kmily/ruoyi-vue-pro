@@ -5,20 +5,20 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 
-@Schema(title = "管理后台 - 文件配置创建 Request VO")
+@Schema(description = "管理后台 - 文件配置创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class FileConfigCreateReqVO extends FileConfigBaseVO {
 
-    @Schema(title = "存储器", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", description = "参见 FileStorageEnum 枚举类")
+    @Schema(description = "存储器,参见 FileStorageEnum 枚举类参见 FileStorageEnum 枚举类", required = true, example = "1")
     @NotNull(message = "存储器不能为空")
     private Integer storage;
 
-    @Schema(title = "存储配置", requiredMode = Schema.RequiredMode.REQUIRED, description = "配置是动态参数，所以使用 Map 接收")
+    @Schema(description = "存储配置,配置是动态参数，所以使用 Map 接收", required = true)
     @NotNull(message = "存储配置不能为空")
     private Map<String, Object> config;
 

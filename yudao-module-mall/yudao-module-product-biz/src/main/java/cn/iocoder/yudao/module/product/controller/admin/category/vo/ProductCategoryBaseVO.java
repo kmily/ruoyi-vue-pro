@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.product.controller.admin.category.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
 * 商品分类 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -12,25 +12,25 @@ import jakarta.validation.constraints.NotNull;
 @Data
 public class ProductCategoryBaseVO {
 
-    @Schema(title = "父分类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "父分类编号", required = true, example = "1")
     @NotNull(message = "父分类编号不能为空")
     private Long parentId;
 
-    @Schema(title = "分类名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "办公文具")
+    @Schema(description = "分类名称", required = true, example = "办公文具")
     @NotBlank(message = "分类名称不能为空")
     private String name;
 
-    @Schema(title = "分类图片", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "分类图片", required = true)
     @NotBlank(message = "分类图片不能为空")
     private String picUrl;
 
-    @Schema(title = "分类排序", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "分类排序", required = true, example = "1")
     private Integer sort;
 
-    @Schema(title = "分类描述", requiredMode = Schema.RequiredMode.REQUIRED, example = "描述")
+    @Schema(description = "分类描述", required = true, example = "描述")
     private String description;
 
-    @Schema(title = "开启状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
+    @Schema(description = "开启状态", required = true, example = "0")
     @NotNull(message = "开启状态不能为空")
     private Integer status;
 

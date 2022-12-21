@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 /**
@@ -13,18 +13,18 @@ import java.util.Set;
 @Data
 public class TenantPackageBaseVO {
 
-    @Schema(title = "套餐名", requiredMode = Schema.RequiredMode.REQUIRED, example = "VIP")
+    @Schema(description = "套餐名", required = true, example = "VIP")
     @NotNull(message = "套餐名不能为空")
     private String name;
 
-    @Schema(title = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1", description = "参见 CommonStatusEnum 枚举")
+    @Schema(description = "状态,参见 CommonStatusEnum 枚举", required = true, example = "1")
     @NotNull(message = "状态不能为空")
     private Integer status;
 
-    @Schema(title = "备注", example = "好")
+    @Schema(description = "备注", example = "好")
     private String remark;
 
-    @Schema(title = "关联的菜单编号", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "关联的菜单编号", required = true)
     @NotNull(message = "关联的菜单编号不能为空")
     private Set<Long> menuIds;
 

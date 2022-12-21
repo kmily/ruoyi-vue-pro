@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import jakarta.validation.constraints.*;
+import javax.validation.constraints.*;
 
 /**
 * 支付渠道 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -10,26 +10,26 @@ import jakarta.validation.constraints.*;
 @Data
 public class PayChannelBaseVO {
 
-    @Schema(title = "渠道编码", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "渠道编码", required = true)
     @NotNull(message = "渠道编码不能为空")
     private String code;
 
-    @Schema(title = "开启状态", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "开启状态", required = true)
     @NotNull(message = "开启状态不能为空")
     private Integer status;
 
-    @Schema(title = "备注")
+    @Schema(description = "备注")
     private String remark;
 
-    @Schema(title = "渠道费率，单位：百分比", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "渠道费率，单位：百分比", required = true)
     @NotNull(message = "渠道费率，单位：百分比不能为空")
     private Double feeRate;
 
-    @Schema(title = "商户编号", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "商户编号", required = true)
     @NotNull(message = "商户编号不能为空")
     private Long merchantId;
 
-    @Schema(title = "应用编号", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "应用编号", required = true)
     @NotNull(message = "应用编号不能为空")
     private Long appId;
 

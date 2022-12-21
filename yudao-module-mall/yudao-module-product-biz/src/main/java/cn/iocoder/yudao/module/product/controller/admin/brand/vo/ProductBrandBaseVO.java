@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.product.controller.admin.brand.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 /**
 * 商品品牌 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -11,22 +11,22 @@ import jakarta.validation.constraints.NotNull;
 @Data
 public class ProductBrandBaseVO {
 
-    @Schema(title = "品牌名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
+    @Schema(description = "品牌名称", required = true, example = "芋道")
     @NotNull(message = "品牌名称不能为空")
     private String name;
 
-    @Schema(title = "品牌图片", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "品牌图片", required = true)
     @NotNull(message = "品牌图片不能为空")
     private String picUrl;
 
-    @Schema(title = "品牌排序", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "品牌排序", required = true, example = "1")
     @NotNull(message = "品牌排序不能为空")
     private Integer sort;
 
-    @Schema(title = "品牌描述", example = "描述")
+    @Schema(description = "品牌描述", example = "描述")
     private String description;
 
-    @Schema(title = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
+    @Schema(description = "状态", required = true, example = "0")
     @NotNull(message = "状态不能为空")
     private Integer status;
 

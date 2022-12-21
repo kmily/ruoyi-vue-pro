@@ -4,18 +4,18 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Schema(title = "管理后台 - 支付渠道 Response VO")
+@Schema(description = "管理后台 - 支付渠道 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class PayChannelRespVO extends PayChannelBaseVO {
 
-    @Schema(title = "商户编号", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "商户编号", required = true)
     private Long id;
 
-    @Schema(title = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "创建时间", required = true)
     private LocalDateTime createTime;
 
-    @Schema(title = "配置", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "配置", required = true)
     private String config;
 }

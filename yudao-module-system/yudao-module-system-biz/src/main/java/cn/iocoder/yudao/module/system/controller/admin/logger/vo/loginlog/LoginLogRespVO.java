@@ -5,26 +5,26 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-@Schema(title = "管理后台 - 登录日志 Response VO")
+@Schema(description = "管理后台 - 登录日志 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class LoginLogRespVO extends LoginLogBaseVO {
 
-    @Schema(title = "日志编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @Schema(description = "日志编号", required = true, example = "1024")
     private Long id;
 
-    @Schema(title = "用户编号", example = "666")
+    @Schema(description = "用户编号", example = "666")
     private Long userId;
 
-    @Schema(title = "用户类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "2", description = "参见 UserTypeEnum 枚举")
+    @Schema(description = "用户类型,参见 UserTypeEnum 枚举", required = true, example = "2")
     @NotNull(message = "用户类型不能为空")
     private Integer userType;
 
-    @Schema(title = "登录时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "登录时间", required = true)
     private LocalDateTime createTime;
 
 }

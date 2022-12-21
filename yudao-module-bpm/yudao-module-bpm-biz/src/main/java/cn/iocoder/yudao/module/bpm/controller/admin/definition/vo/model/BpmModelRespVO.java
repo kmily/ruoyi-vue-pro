@@ -7,19 +7,19 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
-@Schema(title = "管理后台 - 流程模型的创建 Request VO")
+@Schema(description = "管理后台 - 流程模型的创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class BpmModelRespVO extends BpmModelBaseVO {
 
-    @Schema(title = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @Schema(description = "编号", required = true, example = "1024")
     private String id;
 
-    @Schema(title = "BPMN XML", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "BPMN XML", required = true)
     private String bpmnXml;
 
-    @Schema(title = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "创建时间", required = true)
     private LocalDateTime createTime;
 
 }

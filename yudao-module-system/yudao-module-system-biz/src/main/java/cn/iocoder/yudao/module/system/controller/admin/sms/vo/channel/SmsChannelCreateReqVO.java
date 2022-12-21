@@ -5,15 +5,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
-@Schema(title = "管理后台 - 短信渠道创建 Request VO")
+@Schema(description = "管理后台 - 短信渠道创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class SmsChannelCreateReqVO extends SmsChannelBaseVO {
 
-    @Schema(title = "渠道编码", requiredMode = Schema.RequiredMode.REQUIRED, example = "YUN_PIAN", description = "参见 SmsChannelEnum 枚举类")
+    @Schema(description = "渠道编码,参见 SmsChannelEnum 枚举类", required = true, example = "YUN_PIAN")
     @NotNull(message = "渠道编码不能为空")
     private String code;
 

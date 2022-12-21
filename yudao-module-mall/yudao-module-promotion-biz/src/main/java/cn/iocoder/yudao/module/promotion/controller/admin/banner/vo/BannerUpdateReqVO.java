@@ -5,18 +5,18 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author xia
  */
-@Schema(title = "管理后台 - Banner更新 Request VO")
+@Schema(description = "管理后台 - Banner更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class BannerUpdateReqVO extends BannerBaseVO {
 
-    @Schema(title = "banner 编号", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "banner 编号", required = true)
     @NotNull(message = "banner 编号不能为空")
     private Long id;
 
