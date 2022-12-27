@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.column;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
 * 代码生成字段定义 Base VO，提供给添加、修改、详细的子 VO 使用

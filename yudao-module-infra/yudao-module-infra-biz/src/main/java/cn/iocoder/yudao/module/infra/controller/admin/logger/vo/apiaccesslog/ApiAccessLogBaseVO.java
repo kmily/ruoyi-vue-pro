@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apiaccesslog;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -15,7 +16,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class ApiAccessLogBaseVO {
 
-    @Schema(description = "链路追踪编号", required = true, example = "66600cb6-7852-11eb-9439-0242ac130002")
+    @Schema(description = "链路追踪编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "66600cb6-7852-11eb-9439-0242ac130002")
     @NotNull(message = "链路追踪编号不能为空")
     private String traceId;
 
