@@ -208,10 +208,19 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<RoleDO> getRoles(@Nullable Collection<Integer> statuses) {
+        List<RoleDO> roleList = null;
         if (CollUtil.isEmpty(statuses)) {
-    		return roleMapper.selectList();
-		}
-        return roleMapper.selectListByStatus(statuses);
+            roleList = roleMapper.selectList();
+        } else {
+            roleList = roleMapper.selectListByStatus(statuses);
+        }
+
+        //用户设置角色接口调用的是此方法，如果非超级管理员，则删除超级管理员的角色可见性
+        if (!permissionService.hasAnyRoles(getLoginUserId(),RoleCodeEnum.SUPER_ADMIN.getCode())) {
+            roleList.removeIf(roleDO -> roleDO.getCode().equals(RoleCodeEnum.SUPER_ADMIN.getCode()));
+        }
+
+        return roleList;
     }
 
     @Override
