@@ -14,6 +14,12 @@ import java.util.Collection;
 public class CodegenProperties {
 
     /**
+     * 生成的 Java 代码的模块前缀
+     */
+    @NotNull(message = "Java 代码的模块前缀不能为空")
+    private String moduleNamePrefix;
+
+    /**
      * 生成的 Java 代码的基础包
      */
     @NotNull(message = "Java 代码的基础包不能为空")
