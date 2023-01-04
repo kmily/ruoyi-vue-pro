@@ -13,6 +13,7 @@ import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import com.google.common.collect.Multimap;
 import jakarta.annotation.Resource;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -46,6 +47,12 @@ public class DeptServiceTest extends BaseDbUnitTest {
     private DeptMapper deptMapper;
     @MockBean
     private DeptProducer deptProducer;
+
+    @BeforeEach
+    public void setUp() {
+        // 清理租户上下文
+        TenantContextHolder.clear();
+    }
 
     @Test
     @SuppressWarnings("unchecked")
