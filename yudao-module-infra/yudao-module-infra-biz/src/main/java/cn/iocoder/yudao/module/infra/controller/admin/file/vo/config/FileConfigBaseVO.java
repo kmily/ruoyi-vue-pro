@@ -11,7 +11,7 @@ import jakarta.validation.constraints.NotNull;
 @Data
 public class FileConfigBaseVO {
 
-    @Schema(description = "配置名", required = true, example = "S3 - 阿里云")
+    @Schema(description = "配置名", requiredMode = Schema.RequiredMode.REQUIRED, example = "S3 - 阿里云")
     @NotNull(message = "配置名不能为空")
     private String name;
 

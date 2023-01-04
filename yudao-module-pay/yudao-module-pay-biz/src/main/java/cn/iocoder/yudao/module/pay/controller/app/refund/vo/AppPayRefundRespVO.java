@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 public class AppPayRefundRespVO {
 
-    @Schema(description = "退款订单编号", required = true, example = "10")
+    @Schema(description = "退款订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     private Long refundId;
 
 }

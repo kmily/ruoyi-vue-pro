@@ -4,6 +4,8 @@ import cn.iocoder.yudao.framework.security.core.filter.TokenAuthenticationFilter
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import jakarta.annotation.Resource;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -21,8 +23,6 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import jakarta.annotation.Resource;
-import jakarta.annotation.security.PermitAll;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -96,6 +96,8 @@ public class YudaoWebSecurityConfigurerAdapter {
      */
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+        // 获得 @PermitAll 带来的 URL 列表，免登录
+        Multimap<HttpMethod, String> permitAllUrls = getPermitAllUrlsFromAnnotations();
         // 登出
         httpSecurity
                 // 开启跨域
@@ -104,40 +106,40 @@ public class YudaoWebSecurityConfigurerAdapter {
                 // CSRF 禁用，因为不使用 Session
                 .csrf().disable()
                 // 基于 token 机制，所以不需要 Session
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .headers().frameOptions().disable().and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .headers().frameOptions().disable()
+                .and()
                 // 一堆自定义的 Spring Security 处理器
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
-                .accessDeniedHandler(accessDeniedHandler);
-        // 登录、登录暂时不使用 Spring Security 的拓展点，主要考虑一方面拓展多用户、多种登录方式相对复杂，一方面用户的学习成本较高
-
-        // 获得 @PermitAll 带来的 URL 列表，免登录
-        Multimap<HttpMethod, String> permitAllUrls = getPermitAllUrlsFromAnnotations();
-        // 设置每个请求的权限
-        httpSecurity.authorizeHttpRequests()
-                // 1.1 静态资源，可匿名访问
-                .requestMatchers(HttpMethod.GET, "/*.html", "/*/*.html", "/*/*.css", "/*/*.js").permitAll()
-                // 1.2 设置 @PermitAll 无需认证
-                .requestMatchers(HttpMethod.GET, permitAllUrls.get(HttpMethod.GET).toArray(new String[0])).permitAll()
-                .requestMatchers(HttpMethod.POST, permitAllUrls.get(HttpMethod.POST).toArray(new String[0])).permitAll()
-                .requestMatchers(HttpMethod.PUT, permitAllUrls.get(HttpMethod.PUT).toArray(new String[0])).permitAll()
-                .requestMatchers(HttpMethod.DELETE, permitAllUrls.get(HttpMethod.DELETE).toArray(new String[0])).permitAll()
-                // 1.3 基于 yudao.security.permit-all-urls 无需认证
-                .requestMatchers(securityProperties.getPermitAllUrls().toArray(new String[0])).permitAll()
-                // 1.4 设置 App API 无需认证
-                .requestMatchers(buildAppApi("/*")).permitAll()
-                // 1.5 验证码captcha 允许匿名访问
-                .requestMatchers("/captcha/get", "/captcha/check").permitAll()
-                // ②：每个项目的自定义规则
+                .accessDeniedHandler(accessDeniedHandler)
+                // 登录、登录暂时不使用 Spring Security 的拓展点，主要考虑一方面拓展多用户、多种登录方式相对复杂，一方面用户的学习成本较高
                 .and()
-                // 下面，循环设置自定义规则
-                .authorizeHttpRequests(registry ->
-                        authorizeRequestsCustomizers.forEach(customizer -> customizer.customize(registry)))
+
+                // 设置每个请求的权限
+                .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
+                        // 1.1 静态资源，可匿名访问
+                        .requestMatchers(HttpMethod.GET, "/*.html", "/*/*.html", "/*/*.css", "/*/*.js").permitAll()
+                        // 1.2 设置 @PermitAll 无需认证
+                        .requestMatchers(HttpMethod.GET, permitAllUrls.get(HttpMethod.GET).toArray(new String[0])).permitAll()
+                        .requestMatchers(HttpMethod.POST, permitAllUrls.get(HttpMethod.POST).toArray(new String[0])).permitAll()
+                        .requestMatchers(HttpMethod.PUT, permitAllUrls.get(HttpMethod.PUT).toArray(new String[0])).permitAll()
+                        .requestMatchers(HttpMethod.DELETE, permitAllUrls.get(HttpMethod.DELETE).toArray(new String[0])).permitAll()
+                        // 1.3 基于 yudao.security.permit-all-urls 无需认证
+                        .requestMatchers(securityProperties.getPermitAllUrls().toArray(new String[0])).permitAll()
+                        // 1.4 设置 App API 无需认证
+                        .requestMatchers(buildAppApi("/**")).permitAll()
+                        // 1.5 验证码captcha 允许匿名访问
+                        .requestMatchers("/captcha/get", "/captcha/check").permitAll()
+                );
+        // ②：每个项目的自定义规则
+        httpSecurity.authorizeHttpRequests(registry -> // 下面，循环设置自定义规则
+                        authorizeRequestsCustomizers.forEach(customizer -> customizer.customize(registry))
+                )
                 // ③：兜底规则，必须认证
                 .authorizeHttpRequests()
                 .anyRequest()
-                .authenticated()
-        ;
+                .authenticated();
 
         // 添加 Token Filter
         httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
@@ -172,6 +174,7 @@ public class YudaoWebSecurityConfigurerAdapter {
                     case POST -> result.putAll(HttpMethod.POST, urls);
                     case PUT -> result.putAll(HttpMethod.PUT, urls);
                     case DELETE -> result.putAll(HttpMethod.DELETE, urls);
+                    default -> result.putAll(HttpMethod.OPTIONS, urls);
                 }
             });
         }
