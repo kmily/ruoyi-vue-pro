@@ -23,7 +23,7 @@ public class BannerApplicationRunner implements ApplicationRunner {
             log.info("""
                       
                       ----------------------------------------------------------
-                            项目启动成功！
+                            spring boot 3 项目启动成功 --- 暂未开发完全！
                             接口文档: {}
                             开发文档: {}
                             视频教程: {}

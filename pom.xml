@@ -18,7 +18,7 @@
         <module>yudao-module-infra</module>
         <module>yudao-module-pay</module>
 <!--        <module>yudao-module-bpm</module>-->
-        <module>yudao-module-visualization</module>
+<!--        <module>yudao-module-visualization</module>-->
 <!--        <module>yudao-module-mall</module>-->
         <!-- 示例项目 -->
         <module>yudao-example</module>
@@ -29,7 +29,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>1.6.5-snapshot</revision>
+        <revision>2.0.0-alpha</revision>
         <!-- Maven 相关 -->
         <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>

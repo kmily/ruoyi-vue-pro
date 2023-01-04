@@ -130,11 +130,13 @@ public class YudaoWebSecurityConfigurerAdapter {
                 .requestMatchers("/captcha/get", "/captcha/check").permitAll()
                 // ②：每个项目的自定义规则
                 .and()
-                .authorizeHttpRequests(registry -> // 下面，循环设置自定义规则
+                // 下面，循环设置自定义规则
+                .authorizeHttpRequests(registry ->
                         authorizeRequestsCustomizers.forEach(customizer -> customizer.customize(registry)))
                 // ③：兜底规则，必须认证
                 .authorizeHttpRequests()
-                .anyRequest().authenticated()
+                .anyRequest()
+                .authenticated()
         ;
 
         // 添加 Token Filter
