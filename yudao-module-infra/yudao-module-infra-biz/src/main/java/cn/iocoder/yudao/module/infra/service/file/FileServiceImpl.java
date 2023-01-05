@@ -41,9 +41,7 @@ public class FileServiceImpl implements FileService {
     public String createFile(String name, String path, byte[] content) {
         // 计算默认的 path 名
         String type = FileTypeUtils.getMineType(content, name);
-        if (StrUtil.isEmpty(path)) {
-            path = FileUtils.generatePath(content, name);
-        }
+        path = StrUtil.isEmpty(path) ? FileUtils.generatePath(content, name) : path + FileUtils.generatePath(content, name);
         // 如果 name 为空，则使用 path 填充
         if (StrUtil.isEmpty(name)) {
             name = path;
