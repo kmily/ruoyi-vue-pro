@@ -131,6 +131,8 @@ public class YudaoWebSecurityConfigurerAdapter {
                         .requestMatchers(buildAppApi("/**")).permitAll()
                         // 1.5 验证码captcha 允许匿名访问
                         .requestMatchers("/captcha/get", "/captcha/check").permitAll()
+                        // 1.6 webSocket 允许匿名访问
+                        .requestMatchers("/websocket/message").permitAll()
                 );
         // ②：每个项目的自定义规则
         httpSecurity.authorizeHttpRequests(registry -> // 下面，循环设置自定义规则
