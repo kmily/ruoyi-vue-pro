@@ -20,6 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.mvc.condition.PathPatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
@@ -165,10 +166,11 @@ public class YudaoWebSecurityConfigurerAdapter {
             if (!handlerMethod.hasMethodAnnotation(PermitAll.class)) {
                 continue;
             }
-            if (entry.getKey().getPatternsCondition() == null) {
+            PathPatternsRequestCondition pathPatternsCondition = entry.getKey().getPathPatternsCondition();
+            if (pathPatternsCondition == null) {
                 continue;
             }
-            Set<String> urls = entry.getKey().getPatternsCondition().getPatterns();
+            Set<String> urls = pathPatternsCondition.getPatternValues();
             // 根据请求方法，添加到 result 结果
             entry.getKey().getMethodsCondition().getMethods().forEach(requestMethod -> {
                 switch (requestMethod) {
@@ -176,7 +178,6 @@ public class YudaoWebSecurityConfigurerAdapter {
                     case POST -> result.putAll(HttpMethod.POST, urls);
                     case PUT -> result.putAll(HttpMethod.PUT, urls);
                     case DELETE -> result.putAll(HttpMethod.DELETE, urls);
-                    default -> result.putAll(HttpMethod.OPTIONS, urls);
                 }
             });
         }

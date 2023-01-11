@@ -1,4 +1,4 @@
 cn.iocoder.yudao.framework.apilog.config.YudaoApiLogAutoConfiguration
 cn.iocoder.yudao.framework.jackson.config.YudaoJacksonAutoConfiguration
-cn.iocoder.yudao.framework.swagger.config.YudaoSwaggerAutoConfiguration
+com.github.xiaoymin.knife4j.spring.configuration.Knife4jAutoConfiguration
 cn.iocoder.yudao.framework.web.config.YudaoWebAutoConfiguration

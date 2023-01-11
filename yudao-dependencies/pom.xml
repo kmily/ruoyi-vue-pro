@@ -428,11 +428,11 @@
                 <version>${tika-core.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.anji-plus</groupId>
-                <artifactId>spring-boot-starter-captcha</artifactId>
-                <version>${aj-captcha.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.anji-plus</groupId>-->
+<!--                <artifactId>spring-boot-starter-captcha</artifactId>-->
+<!--                <version>${aj-captcha.version}</version>-->
+<!--            </dependency>-->
 
             <dependency>
                 <groupId>org.apache.velocity</groupId>
