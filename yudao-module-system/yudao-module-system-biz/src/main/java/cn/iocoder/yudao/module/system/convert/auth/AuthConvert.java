@@ -41,9 +41,7 @@ public interface AuthConvert {
      */
     default List<AuthMenuRespVO> buildMenuTree(List<MenuDO> menuList) {
         // 排序，保证菜单的有序性
-//        menuList.sort(Comparator.comparing(MenuDO::getSort));
-        // TODO 上面报错，这个排序未生效，待解决
-        menuList.stream().sorted(Comparator.comparing(MenuDO::getSort));
+        menuList.sort(Comparator.comparing(MenuDO::getSort));
         // 构建菜单树
         // 使用 LinkedHashMap 的原因，是为了排序 。实际也可以用 Stream API ，就是太丑了。
         Map<Long, AuthMenuRespVO> treeNodeMap = new LinkedHashMap<>();
