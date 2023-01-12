@@ -22,6 +22,9 @@ import cn.iocoder.yudao.module.system.service.member.MemberService;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2TokenService;
 import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
+import com.anji.captcha.model.common.ResponseModel;
+import com.anji.captcha.model.vo.CaptchaVO;
+import com.anji.captcha.service.CaptchaService;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.annotation.Resource;
 import jakarta.validation.Validator;
+
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -56,8 +60,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     private MemberService memberService;
     @Resource
     private Validator validator;
-//    @Resource
-//    private CaptchaService captchaService;
+    @Resource
+    private CaptchaService captchaService;
     @Resource
     private SmsCodeApi smsCodeApi;
 
@@ -182,17 +186,15 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         }
         // 校验验证码
         ValidationUtils.validate(validator, reqVO, AuthLoginReqVO.CodeEnableGroup.class);
-//        CaptchaVO captchaVO = new CaptchaVO();
-//        captchaVO.setCaptchaVerification(reqVO.getCaptchaVerification());
-//        ResponseModel response = captchaService.verification(captchaVO);
+        CaptchaVO captchaVO = new CaptchaVO();
+        captchaVO.setCaptchaVerification(reqVO.getCaptchaVerification());
+        ResponseModel response = captchaService.verification(captchaVO);
         // 验证不通过
-//        if (!response.isSuccess()) {
-//            // 创建登录失败日志（验证码不正确)
-//            createLoginLog(null, reqVO.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME, LoginResultEnum.CAPTCHA_CODE_ERROR);
-//            throw exception(AUTH_LOGIN_CAPTCHA_CODE_ERROR, response.getRepMsg());
-//        }
-        // TODO
-        throw exception(AUTH_LOGIN_CAPTCHA_CODE_ERROR,"验证码不支持boot3");
+        if (!response.isSuccess()) {
+            // 创建登录失败日志（验证码不正确)
+            createLoginLog(null, reqVO.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME, LoginResultEnum.CAPTCHA_CODE_ERROR);
+            throw exception(AUTH_LOGIN_CAPTCHA_CODE_ERROR, response.getRepMsg());
+        }
     }
 
     private AuthLoginRespVO createTokenAfterLoginSuccess(Long userId, String username, LoginLogTypeEnum logType) {

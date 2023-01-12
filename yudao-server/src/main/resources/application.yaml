@@ -114,7 +114,7 @@ yudao:
     version: ${yudao.info.version}
     base-package: ${yudao.info.base-package}
   captcha:
-    enable: false # 验证码的开关，默认为 true
+    enable: true # 验证码的开关，默认为 true
   codegen:
     base-package: ${yudao.info.base-package}
     db-schemas: ${spring.datasource.dynamic.datasource.master.name}
