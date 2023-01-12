@@ -191,7 +191,7 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | [Spring Boot](https://spring.io/projects/spring-boot)                                       | 应用开发框架           | 3.0.1       | [文档](https://github.com/YunaiV/SpringBoot-Labs)                |
 | [MySQL](https://www.mysql.com/cn/)                                                          | 数据库服务器           | 5.7 / 8.0+  |                                                                |
 | [Druid](https://github.com/alibaba/druid)                                                   | JDBC 连接池、监控组件    | 1.2.15      | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
-| [MyBatis Plus](https://mp.baomidou.com/)                                                    | MyBatis 增强工具包    | 3.5.3       | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao)         |
+| [MyBatis Plus](https://mp.baomidou.com/)                                                    | MyBatis 增强工具包    | 3.5.3.1     | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao)         |
 | [Dynamic Datasource](https://dynamic-datasource.com/)                                       | 动态数据源            | 3.6.1       | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
 | [Redis](https://redis.io/)                                                                  | key-value 数据库    | 5.0 / 6.0   |                                                                |
 | [Redisson](https://github.com/redisson/redisson)                                            | Redis 客户端        | 3.18.0      | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao)           |
@@ -227,7 +227,7 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | [TypeScript](https://www.typescriptlang.org/docs/)                   |  TypeScript  | 4.9.4  |
 | [pinia](https://pinia.vuejs.org/)                                    |    vuex5     | 2.0.28 |
 | [vue-i18n](https://kazupon.github.io/vue-i18n/zh/introduction.html/) |     国际化      | 9.2.2  |
-| [vxe-table](https://vxetable.cn/)                                    |   vue最强表单    | 4.3.7  |
+| [vxe-table](https://vxetable.cn/)                                    |   vue最强表单    | 4.3.9  |
 
 ### [管理后台 uni-app 跨端](./yudao-ui-admin-uniapp)
 
