@@ -24,21 +24,21 @@ public class SecurityConfiguration {
             public void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry) {
                 // Swagger 接口文档
                 registry.requestMatchers("/swagger-ui.html").anonymous()
-                        .requestMatchers("/swagger-resources/*").anonymous()
-                        .requestMatchers("/webjars/*").anonymous()
+                        .requestMatchers("/swagger-resources/**").anonymous()
+                        .requestMatchers("/webjars/**").anonymous()
                         .requestMatchers("/*/api-docs").anonymous();
                 // 积木报表
-                registry.requestMatchers("/jmreport/*").permitAll();
+                registry.requestMatchers("/jmreport/**").anonymous();
                 // Spring Boot Actuator 的安全配置
                 registry.requestMatchers("/actuator").anonymous()
-                        .requestMatchers("/actuator/*").anonymous();
+                        .requestMatchers("/actuator/**").anonymous();
                 // Druid 监控
-                registry.requestMatchers("/druid/*").anonymous();
+                registry.requestMatchers("/druid/**").anonymous();
                 // Spring Boot Admin Server 的安全配置
                 registry.requestMatchers(adminSeverContextPath).anonymous()
-                        .requestMatchers(adminSeverContextPath + "/*").anonymous();
+                        .requestMatchers(adminSeverContextPath + "/**").anonymous();
                 // 文件读取
-                registry.requestMatchers(buildAdminApi("/infra/file/*/get/*")).permitAll();
+                registry.requestMatchers(buildAdminApi("/infra/file/*/get/**")).permitAll();
             }
 
         };

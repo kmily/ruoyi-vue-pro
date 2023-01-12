@@ -45,7 +45,6 @@ public class YudaoSwaggerAutoConfiguration {
                 .description(properties.getDescription())
                 .version(properties.getVersion())
                 .license(new License().name("MIT").url("https://gitee.com/zhijiantianya/ruoyi-vue-pro/blob/master/LICENSE"));
-        //鉴权组件(随便起名的)
         SecurityScheme securityScheme = new SecurityScheme()
                 .type(SecurityScheme.Type.APIKEY)
                 .scheme("bearer")//固定写法
@@ -55,7 +54,6 @@ public class YudaoSwaggerAutoConfiguration {
         Components components = new Components()
                 .addSecuritySchemes("Bearer", securityScheme);
 
-        //鉴权限制要求(随便起名的)
         SecurityRequirement securityRequirement = new SecurityRequirement()
                 .addList(HttpHeaders.AUTHORIZATION, Arrays.asList("read", "write"));
 

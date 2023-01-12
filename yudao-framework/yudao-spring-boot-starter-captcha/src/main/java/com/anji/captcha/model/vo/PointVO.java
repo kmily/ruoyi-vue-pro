@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 /**
  * Created by raodeming on 2020/5/16.
@@ -38,7 +37,7 @@ public class PointVO {
     }
 
     public PointVO parse(String jsonStr) {
-        Map<String, Object> m = new HashMap();
+        Map<String, Object> m = new HashMap<>();
         Arrays.stream(jsonStr
                 .replaceFirst(",\\{", "\\{")
                 .replaceFirst("\\{", "")

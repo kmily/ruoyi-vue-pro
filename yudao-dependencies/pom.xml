@@ -18,7 +18,6 @@
         <!-- 统一依赖管理 -->
         <spring.boot.version>3.0.1</spring.boot.version>
         <!-- Web 相关 -->
-        <springdoc.version>2.0.2</springdoc.version>
         <knife4j.version>4.0.0</knife4j.version>
         <servlet.versoin>2.5</servlet.versoin>
         <!-- DB 相关 -->
@@ -26,7 +25,7 @@
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
         <mybatis-plus-generator.version>3.5.3.1</mybatis-plus-generator.version>
         <dynamic-datasource.version>3.6.1</dynamic-datasource.version>
-        <redisson.version>3.19.0</redisson.version>
+        <redisson.version>3.19.1</redisson.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.3</lock4j.version>
         <resilience4j.version>2.0.2</resilience4j.version>
@@ -39,7 +38,7 @@
         <jedis-mock.version>1.0.5</jedis-mock.version>
         <mockito-inline.version>4.11.0</mockito-inline.version>
         <!-- Bpm 工作流相关 -->
-        <flowable.version>6.8.0</flowable.version>
+        <flowable.version>7.0.0.M1</flowable.version>
         <!-- 工具类相关 -->
         <jsoup.version>1.15.3</jsoup.version>
         <lombok.version>1.18.24</lombok.version>
