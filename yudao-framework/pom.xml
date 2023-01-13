@@ -37,6 +37,7 @@
         <module>yudao-spring-boot-starter-biz-ip</module>
 
         <module>yudao-spring-boot-starter-captcha</module>
+        <module>yudao-spring-boot-starter-websocket</module>
     </modules>
 
     <artifactId>yudao-framework</artifactId>

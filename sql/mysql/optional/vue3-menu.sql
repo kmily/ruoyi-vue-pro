@@ -185,5 +185,6 @@ INSERT INTO `system_menu` VALUES (1264, '客户端查询', 'system:oauth2-client
 INSERT INTO `system_menu` VALUES (1265, '客户端创建', 'system:oauth2-client:create', 3, 2, 1263, '', '', '', 0, b'1', b'1', '', '2022-05-10 16:26:33', '1', '2022-05-11 00:31:23', b'0');
 INSERT INTO `system_menu` VALUES (1266, '客户端更新', 'system:oauth2-client:update', 3, 3, 1263, '', '', '', 0, b'1', b'1', '', '2022-05-10 16:26:33', '1', '2022-05-11 00:31:28', b'0');
 INSERT INTO `system_menu` VALUES (1267, '客户端删除', 'system:oauth2-client:delete', 3, 4, 1263, '', '', '', 0, b'1', b'1', '', '2022-05-10 16:26:33', '1', '2022-05-11 00:31:33', b'0');
+INSERT INTO `system_menu` VALUES (1283, 'webSocket连接', '', 2, 14, 2, 'webSocket', 'ep:turn-off', 'infra/webSocket/index', 0, b'1', b'1', '1', '2023-01-01 11:43:04', '1', '2023-01-01 11:43:04', b'0');
 
 SET FOREIGN_KEY_CHECKS = 1;
