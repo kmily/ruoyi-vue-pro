@@ -52,7 +52,7 @@
         <dependency>
             <groupId>com.alipay.sdk</groupId>
             <artifactId>alipay-sdk-java</artifactId>
-            <version>4.35.9.ALL</version>
+            <version>4.35.32.ALL</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.bouncycastle</groupId>
@@ -73,7 +73,7 @@
                     <artifactId>commons-collections</artifactId>
                 </exclusion>
             </exclusions>
-            <version>4.4.5.B</version>
+            <version>4.4.7.B</version>
         </dependency>
         <!-- TODO 芋艿：清理 -->
 
