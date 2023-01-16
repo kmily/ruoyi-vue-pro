@@ -42,11 +42,11 @@
         </dependency>
 
         <!-- 数据报表 -->
-<!--        <dependency>-->
-<!--            <groupId>cn.iocoder.boot</groupId>-->
-<!--            <artifactId>yudao-module-visualization-biz</artifactId>-->
-<!--            <version>${revision}</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-visualization-biz</artifactId>
+            <version>${revision}</version>
+        </dependency>
         <!-- 工作流 -->
 <!--        <dependency>-->
 <!--            <groupId>cn.iocoder.boot</groupId>-->
@@ -76,7 +76,12 @@
 <!--            <artifactId>yudao-module-trade-biz</artifactId>-->
 <!--            <version>${revision}</version>-->
 <!--        </dependency>-->
-
+        <!-- scan -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-scan-biz</artifactId>
+            <version>${revision}</version>
+        </dependency>
         <!-- spring boot 配置所需依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -20,6 +20,7 @@
 <!--        <module>yudao-module-bpm</module>-->
         <module>yudao-module-visualization</module>
 <!--        <module>yudao-module-mall</module>-->
+        <module>yudao-module-scan</module>
         <!-- 示例项目 -->
         <module>yudao-example</module>
     </modules>

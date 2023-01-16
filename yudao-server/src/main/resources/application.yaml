@@ -124,6 +124,7 @@ yudao:
       - /admin-api/system/sms/callback/* # 短信回调接口，无法带上租户编号
       - /admin-api/pay/notify/callback/* # 支付回调通知，不携带租户编号
       - /jmreport/* # 积木报表，无法携带租户编号
+      - /app-api/scan/report/exportpdf
     ignore-tables:
       - system_tenant
       - system_tenant_package
