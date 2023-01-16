@@ -41,7 +41,7 @@ public class RedisController {
         Properties info = stringRedisTemplate.execute((RedisCallback<Properties>) RedisServerCommands::info);
         Long dbSize = stringRedisTemplate.execute(RedisServerCommands::dbSize);
         Properties commandStats = stringRedisTemplate.execute((
-                RedisCallback<Properties>) connection -> connection.info("commandstats"));
+                RedisCallback<Properties>) connection -> connection.commands().info());
         assert commandStats != null; // 断言，避免警告
         // 拼接结果返回
         return success(RedisConvert.INSTANCE.build(info, dbSize, commandStats));
@@ -69,7 +69,7 @@ public class RedisController {
         // scan 扫描 key
         Set<String> keys = new LinkedHashSet<>();
         stringRedisTemplate.execute((RedisCallback<Set<String>>) connection -> {
-            try (Cursor<byte[]> cursor = connection.scan(ScanOptions.scanOptions().match(key).count(100).build())) {
+            try (Cursor<byte[]> cursor = connection.commands().scan(ScanOptions.scanOptions().match(key).count(100).build())) {
                 cursor.forEachRemaining(value -> keys.add(StrUtil.utf8Str(value)));
             } catch (Exception e) {
                 throw new RuntimeException(e);
