@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.system.controller.admin.captcha;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.servlet.ServletUtil;
+import cn.hutool.extra.servlet.JakartaServletUtil;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-
 
 /**
  * 验证码
@@ -51,7 +49,7 @@ public class CaptchaController {
     }
 
     public static String getRemoteId(HttpServletRequest request) {
-        String ip = ServletUtil.getClientIP(request);
+        String ip = JakartaServletUtil.getClientIP(request);
         String ua = request.getHeader("user-agent");
         if (StrUtil.isNotBlank(ip)) {
             return ip + ua;
