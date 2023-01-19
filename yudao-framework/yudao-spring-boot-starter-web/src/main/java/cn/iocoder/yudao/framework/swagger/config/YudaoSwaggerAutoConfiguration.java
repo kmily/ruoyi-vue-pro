@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.swagger.core.SpringFoxHandlerProviderBeanPostP
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
@@ -12,7 +11,14 @@ import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.ExampleBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestParameterBuilder;
-import springfox.documentation.service.*;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.ApiKey;
+import springfox.documentation.service.AuthorizationScope;
+import springfox.documentation.service.Contact;
+import springfox.documentation.service.ParameterType;
+import springfox.documentation.service.RequestParameter;
+import springfox.documentation.service.SecurityReference;
+import springfox.documentation.service.SecurityScheme;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -33,8 +39,6 @@ import static springfox.documentation.builders.RequestHandlerSelectors.basePacka
 @EnableSwagger2
 @EnableKnife4j
 @ConditionalOnClass({Docket.class, ApiInfoBuilder.class})
-// 允许使用 swagger.enable=false 禁用 Swagger
-@ConditionalOnProperty(prefix = "yudao.swagger", value = "enable", matchIfMissing = true)
 @EnableConfigurationProperties(SwaggerProperties.class)
 public class YudaoSwaggerAutoConfiguration {
 
@@ -59,7 +63,9 @@ public class YudaoSwaggerAutoConfiguration {
                 .securitySchemes(securitySchemes())
                 .securityContexts(securityContexts())
                 // ④ 全局参数（多租户 header）
-                .globalRequestParameters(globalRequestParameters());
+                .globalRequestParameters(globalRequestParameters())
+                // 是否启用 swagger
+                .enable(properties.isEnable());
     }
 
     // ========== apiInfo ==========
