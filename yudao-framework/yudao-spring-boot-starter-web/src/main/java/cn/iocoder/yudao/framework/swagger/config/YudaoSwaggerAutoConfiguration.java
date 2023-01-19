@@ -8,21 +8,18 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.ExampleBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestParameterBuilder;
+import springfox.documentation.builders.*;
 import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_TENANT_ID;
-import static springfox.documentation.builders.RequestHandlerSelectors.basePackage;
 
 /**
  * Swagger2 自动配置类
@@ -51,7 +48,8 @@ public class YudaoSwaggerAutoConfiguration {
                 .apiInfo(apiInfo(properties))
                 // ② 设置扫描指定 package 包下的
                 .select()
-                .apis(basePackage(properties.getBasePackage()))
+                // 支持扫描多包
+                .apis(t -> properties.getBasePackages().stream().map(RequestHandlerSelectors::basePackage).anyMatch(predicate -> predicate.test(t)))
 //                .apis(basePackage("cn.iocoder.yudao.module.system")) // 可用于 swagger 无法展示时使用
                 .paths(PathSelectors.any())
                 .build()

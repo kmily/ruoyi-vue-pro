@@ -102,7 +102,8 @@ yudao:
     title: 管理后台
     description: 提供管理员管理的所有功能
     version: ${yudao.info.version}
-    base-package: ${yudao.info.base-package}
+    base-packages:
+      - ${yudao.info.base-package}
   captcha:
     enable: true # 验证码的开关，默认为 true
   codegen:

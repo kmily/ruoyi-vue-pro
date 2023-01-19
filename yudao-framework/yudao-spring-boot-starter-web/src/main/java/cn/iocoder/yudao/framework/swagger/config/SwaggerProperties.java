@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
 
 /**
  * Swagger 配置属性
@@ -38,6 +39,6 @@ public class SwaggerProperties {
      * 扫描的包
      */
     @NotEmpty(message = "扫描的 package 不能为空")
-    private String basePackage;
+    private List<String> basePackages;
 
 }
