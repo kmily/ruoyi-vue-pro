@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.swagger.config;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.swagger.core.SpringFoxHandlerProviderBeanPostProcessor;
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -8,6 +9,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.util.ClassUtils;
+import springfox.documentation.RequestHandler;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -21,9 +24,12 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_TENANT_ID;
-import static springfox.documentation.builders.RequestHandlerSelectors.basePackage;
+import static java.util.Optional.ofNullable;
 
 /**
  * Swagger2 自动配置类
@@ -121,6 +127,26 @@ public class YudaoSwaggerAutoConfiguration {
                 .required(true)
                 .build());
         return tenantParameter;
+    }
+
+    private static Function<Class<?>, Boolean> handlerPackage(final String basePackage) {
+        return input -> {
+            // 循环判断匹配
+            for (String strPackage : basePackage.split(StrUtil.COMMA)) {
+                if (ClassUtils.getPackageName(input).startsWith(strPackage)) {
+                    return true;
+                }
+            }
+            return false;
+        };
+    }
+
+    private static Predicate<RequestHandler> basePackage(String basePackage) {
+        return input -> declaringClass(input).map(handlerPackage(basePackage)).orElse(true);
+    }
+
+    private static Optional<Class<?>> declaringClass(RequestHandler input) {
+        return ofNullable(input.declaringClass());
     }
 
 }
