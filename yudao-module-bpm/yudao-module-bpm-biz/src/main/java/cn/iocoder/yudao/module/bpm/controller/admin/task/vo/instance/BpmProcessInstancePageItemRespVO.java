@@ -14,7 +14,7 @@ public class BpmProcessInstancePageItemRespVO {
     @ApiModelProperty(value = "流程实例的编号", required = true, example = "1024")
     private String id;
 
-    @ApiModelProperty(value = "流程名称", required = true, example = "芋道")
+    @ApiModelProperty(value = "流程名称", required = true, example = "地府")
     private String name;
 
     @ApiModelProperty(value = "流程定义的编号", required = true, example = "2048")
@@ -47,7 +47,7 @@ public class BpmProcessInstancePageItemRespVO {
         @ApiModelProperty(value = "流程任务的编号", required = true, example = "1024")
         private String id;
 
-        @ApiModelProperty(value = "任务名称", required = true, example = "芋道")
+        @ApiModelProperty(value = "任务名称", required = true, example = "地府")
         private String name;
 
     }

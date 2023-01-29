@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class BpmUserGroupPageReqVO extends PageParam {
 
-    @ApiModelProperty(value = "组名", example = "芋道")
+    @ApiModelProperty(value = "组名", example = "地府")
     private String name;
 
     @ApiModelProperty(value = "状态", example = "1")

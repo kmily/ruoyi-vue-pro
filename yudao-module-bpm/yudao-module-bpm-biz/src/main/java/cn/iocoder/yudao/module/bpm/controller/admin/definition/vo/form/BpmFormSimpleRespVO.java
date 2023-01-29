@@ -11,7 +11,7 @@ public class BpmFormSimpleRespVO {
     @ApiModelProperty(value = "表单编号", required = true, example = "1024")
     private Long id;
 
-    @ApiModelProperty(value = "表单名称", required = true, example = "芋道")
+    @ApiModelProperty(value = "表单名称", required = true, example = "地府")
     private String name;
 
 }

@@ -15,7 +15,7 @@ public class BpmProcessInstanceRespVO {
     @ApiModelProperty(value = "流程实例的编号", required = true, example = "1024")
     private String id;
 
-    @ApiModelProperty(value = "流程名称", required = true, example = "芋道")
+    @ApiModelProperty(value = "流程名称", required = true, example = "地府")
     private String name;
 
     @ApiModelProperty(value = "流程分类", required = true, notes = "参见 bpm_model_category 数据字典", example = "1")

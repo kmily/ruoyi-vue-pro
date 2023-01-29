@@ -15,7 +15,7 @@ public class BpmUserGroupSimpleRespVO {
     @ApiModelProperty(value = "用户组编号", required = true, example = "1024")
     private Long id;
 
-    @ApiModelProperty(value = "用户组名字", required = true, example = "芋道")
+    @ApiModelProperty(value = "用户组名字", required = true, example = "地府")
     private String name;
 
 }

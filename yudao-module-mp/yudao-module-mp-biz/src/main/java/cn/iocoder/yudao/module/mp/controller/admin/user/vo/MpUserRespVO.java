@@ -25,7 +25,7 @@ public class MpUserRespVO  {
     @ApiModelProperty(value = "取消关注时间")
     private LocalDateTime unsubscribeTime;
 
-    @ApiModelProperty(value = "昵称", example = "芋道")
+    @ApiModelProperty(value = "昵称", example = "地府")
     private String nickname;
     @ApiModelProperty(value = "头像地址", example = "https://www.iocoder.cn/1.png")
     private String headImageUrl;

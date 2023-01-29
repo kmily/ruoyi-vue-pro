@@ -11,7 +11,7 @@ import javax.validation.constraints.*;
 @Data
 public class BpmFormBaseVO {
 
-    @ApiModelProperty(value = "表单名称", required = true, example = "芋道")
+    @ApiModelProperty(value = "表单名称", required = true, example = "地府")
     @NotNull(message = "表单名称不能为空")
     private String name;
 

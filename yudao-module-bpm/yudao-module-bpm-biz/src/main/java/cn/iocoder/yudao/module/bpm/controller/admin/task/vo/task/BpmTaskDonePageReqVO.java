@@ -18,7 +18,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class BpmTaskDonePageReqVO extends PageParam {
 
-    @ApiModelProperty(value = "流程任务名", example = "芋道")
+    @ApiModelProperty(value = "流程任务名", example = "地府")
     private String name;
 
     @ApiModelProperty(value = "开始的创建收间")

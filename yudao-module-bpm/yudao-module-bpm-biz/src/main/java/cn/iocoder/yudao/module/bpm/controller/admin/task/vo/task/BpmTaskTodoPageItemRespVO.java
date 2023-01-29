@@ -13,7 +13,7 @@ public class BpmTaskTodoPageItemRespVO {
     @ApiModelProperty(value = "任务编号", required = true, example = "1024")
     private String id;
 
-    @ApiModelProperty(value = "任务名字", required = true, example = "芋道")
+    @ApiModelProperty(value = "任务名字", required = true, example = "地府")
     private String name;
 
     @ApiModelProperty(value = "接收时间", required = true)

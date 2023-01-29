@@ -18,7 +18,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class BpmProcessInstanceMyPageReqVO extends PageParam {
 
-    @ApiModelProperty(value = "流程名称", example = "芋道")
+    @ApiModelProperty(value = "流程名称", example = "地府")
     private String name;
 
     @ApiModelProperty(value = "流程定义的编号", example = "2048")

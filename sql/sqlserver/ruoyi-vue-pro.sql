@@ -3723,7 +3723,7 @@ GO
 SET IDENTITY_INSERT [dbo].[pay_app] ON
 GO
 
-INSERT INTO [dbo].[pay_app] ([id], [name], [status], [remark], [pay_notify_url], [refund_notify_url], [merchant_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'6', N'芋道', N'0', N'我是一个公众号', N'http://127.0.0.1:28080/api/shop/order/pay-notify', N'http://127.0.0.1', N'1', N'', N'2021-10-23 08:49:25.0000000', N'', N'2022-02-27 04:14:53.0000000', N'1', N'0')
+INSERT INTO [dbo].[pay_app] ([id], [name], [status], [remark], [pay_notify_url], [refund_notify_url], [merchant_id], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'6', N'地府', N'0', N'我是一个公众号', N'http://127.0.0.1:28080/api/shop/order/pay-notify', N'http://127.0.0.1', N'1', N'', N'2021-10-23 08:49:25.0000000', N'', N'2022-02-27 04:14:53.0000000', N'1', N'0')
 GO
 
 SET IDENTITY_INSERT [dbo].[pay_app] OFF
@@ -4036,7 +4036,7 @@ GO
 SET IDENTITY_INSERT [dbo].[pay_merchant] ON
 GO
 
-INSERT INTO [dbo].[pay_merchant] ([id], [no], [name], [short_name], [status], [remark], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1', N'M233666999', N'芋道源码', N'芋艿', N'0', N'我是备注', N'', N'2021-10-23 08:31:14.0000000', N'', N'2022-02-27 04:15:20.0000000', N'1', N'0')
+INSERT INTO [dbo].[pay_merchant] ([id], [no], [name], [short_name], [status], [remark], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'1', N'M233666999', N'地府源码', N'芋艿', N'0', N'我是备注', N'', N'2021-10-23 08:31:14.0000000', N'', N'2022-02-27 04:15:20.0000000', N'1', N'0')
 GO
 
 SET IDENTITY_INSERT [dbo].[pay_merchant] OFF
@@ -5216,7 +5216,7 @@ GO
 SET IDENTITY_INSERT [dbo].[system_dept] ON
 GO
 
-INSERT INTO [dbo].[system_dept] ([id], [name], [parent_id], [sort], [leader_user_id], [phone], [email], [status], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'100', N'芋道源码', N'0', N'0', N'1', N'15888888888', N'ry@qq.com', N'0', N'admin', N'2021-01-05 17:03:47.0000000', N'103', N'2022-01-14 01:04:05.0000000', N'1', N'0')
+INSERT INTO [dbo].[system_dept] ([id], [name], [parent_id], [sort], [leader_user_id], [phone], [email], [status], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'100', N'地府源码', N'0', N'0', N'1', N'15888888888', N'ry@qq.com', N'0', N'admin', N'2021-01-05 17:03:47.0000000', N'103', N'2022-01-14 01:04:05.0000000', N'1', N'0')
 GO
 
 INSERT INTO [dbo].[system_dept] ([id], [name], [parent_id], [sort], [leader_user_id], [phone], [email], [status], [creator], [create_time], [updater], [update_time], [tenant_id], [deleted]) VALUES (N'101', N'深圳总公司', N'100', N'1', N'104', N'15888888888', N'ry@qq.com', N'0', N'admin', N'2021-01-05 17:03:47.0000000', N'1', N'2022-02-22 19:47:48.0000000', N'1', N'0')

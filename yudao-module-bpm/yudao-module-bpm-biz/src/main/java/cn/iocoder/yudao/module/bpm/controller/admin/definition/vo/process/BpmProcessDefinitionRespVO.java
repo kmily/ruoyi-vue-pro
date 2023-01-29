@@ -18,7 +18,7 @@ public class BpmProcessDefinitionRespVO {
     @ApiModelProperty(value = "版本", required = true, example = "1")
     private Integer version;
 
-    @ApiModelProperty(value = "流程名称", required = true, example = "芋道")
+    @ApiModelProperty(value = "流程名称", required = true, example = "地府")
     @NotEmpty(message = "流程名称不能为空")
     private String name;
 

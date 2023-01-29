@@ -14,7 +14,7 @@ public class BpmModelUpdateReqVO {
     @NotEmpty(message = "编号不能为空")
     private String id;
 
-    @ApiModelProperty(value = "流程名称", example = "芋道")
+    @ApiModelProperty(value = "流程名称", example = "地府")
     private String name;
 
     @ApiModelProperty(value = "流程描述", example = "我是描述")
