@@ -1,5 +1,6 @@
 package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
 #foreach ($column in $columns)
@@ -10,8 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 #end
 #end
-import io.swagger.annotations.*;
-import jakarta.validation.constraints.*;
+import javax.validation.constraints.*;
 ## 处理 Date 字段的引入
 #foreach ($column in $columns)
 #if (${column.createOperation} && ${column.updateOperation} && ${column.listOperationResult}

@@ -21,12 +21,6 @@
             <artifactId>yudao-common</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
         <!-- Web 相关 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
