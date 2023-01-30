@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.system.mq.message.mail.MailTemplateRefreshMessage
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * Mail 邮件相关消息的 Producer

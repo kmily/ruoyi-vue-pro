@@ -34,14 +34,9 @@ spring:
 --- #################### 接口文档配置 ####################
 
 springdoc:
-  api-docs:
-    enabled: true
-    path: /v3/api-docs
   swagger-ui:
     enabled: true
     path: /swagger-ui
-  api-docs:
-    path: /v3/api-docs
 
 knife4j:
   enable: true
@@ -49,11 +44,6 @@ knife4j:
     language: zh-CN
     enable-swagger-models: true
     enable-document-manage: true
-
-knife4j:
-  enable: true
-  setting:
-    language: zh_cn
 
 # 工作流 Flowable 配置
 flowable:

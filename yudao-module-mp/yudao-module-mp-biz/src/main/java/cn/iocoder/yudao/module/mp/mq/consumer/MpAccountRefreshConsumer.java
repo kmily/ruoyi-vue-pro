@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.mp.service.account.MpAccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * 针对 {@link MpAccountRefreshMessage} 的消费者
