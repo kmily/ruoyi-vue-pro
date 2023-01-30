@@ -75,7 +75,8 @@ export const constantRoutes = [
         meta: {title: '首页', icon: 'dashboard', affix: true}
       }
     ]
-  }, {
+  },
+  {
     path: '/user',
     component: Layout,
     hidden: true,
@@ -85,9 +86,14 @@ export const constantRoutes = [
         component: (resolve) => require(['@/views/system/user/profile/index'], resolve),
         name: 'Profile',
         meta: {title: '个人中心', icon: 'user'}
-      }
-    ]
-  }, {
+      }, {
+        path: 'notify-message',
+        component: (resolve) => require(['@/views/system/notify/my/index'], resolve),
+        name: 'MyNotifyMessage',
+        meta: { title: '我的站内信', icon: 'message' },
+    }]
+  },
+  {
     path: '/dict',
     component: Layout,
     hidden: true,

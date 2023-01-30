@@ -38,6 +38,7 @@
 
         <module>yudao-spring-boot-starter-captcha</module>
         <module>yudao-spring-boot-starter-websocket</module>
+        <module>yudao-spring-boot-starter-desensitize</module>
     </modules>
 
     <artifactId>yudao-framework</artifactId>
