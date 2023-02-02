@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.dal.redis;
 
 import cn.iocoder.yudao.framework.redis.core.RedisKeyDefine;
+import cn.iocoder.yudao.module.system.dal.dataobject.mqtttopic.MqttTopicDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 
 import java.time.Duration;
@@ -26,4 +27,11 @@ public interface RedisKeyConstants {
             "social_auth_state:%s", // 参数为 state
             STRING, String.class, Duration.ofHours(24)); // 值为 state
 
+    RedisKeyDefine MQTT_TOPIC = new RedisKeyDefine(
+            "MQTT主题缓存",
+            "mqtt_topic:%s",
+            STRING,
+            MqttTopicDO.class,
+            RedisKeyDefine.TimeoutTypeEnum.FOREVER
+    );
 }
