@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.system.api.mqtttopic.dto.MqttTopicRespDTO;
 public interface MqttTopicApi {
 
     /**
-     * 从redis缓存中获取主题信息
+     * 根据订阅主题从redis缓存中获取对应主题信息
      *
      * @param subTopic 订阅主题
      */
