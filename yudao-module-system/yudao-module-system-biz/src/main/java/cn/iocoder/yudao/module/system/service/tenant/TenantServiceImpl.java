@@ -30,7 +30,7 @@ import cn.iocoder.yudao.module.system.service.tenant.handler.TenantInfoHandler;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantMenuHandler;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,9 +55,9 @@ import static java.util.Collections.singleton;
 @Slf4j
 public class TenantServiceImpl implements TenantService {
 
-    @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
-    @Autowired(required = false) // 由于 yudao.tenant.enable 配置项，可以关闭多租户的功能，所以这里只能不强制注入
-    private TenantProperties tenantProperties;
+    // 由于 yudao.tenant.enable 配置项，可以关闭多租户的功能，所以这里只能不强制注入
+    @Resource
+    private ObjectProvider<TenantProperties> tenantPropertiesObjectProvider;
 
     @Resource
     private TenantMapper tenantMapper;
@@ -261,6 +261,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
     private boolean isTenantDisable() {
+        TenantProperties tenantProperties = tenantPropertiesObjectProvider.getIfAvailable();
         return tenantProperties == null || Boolean.FALSE.equals(tenantProperties.getEnable());
     }
 
