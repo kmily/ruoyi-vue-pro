@@ -63,6 +63,8 @@ public class CodegenServiceImpl implements CodegenService {
     public List<Long> createCodegenList(Long userId, CodegenCreateListReqVO reqVO) {
         List<Long> ids = new ArrayList<>(reqVO.getTableNames().size());
         // 遍历添加。虽然效率会低一点，但是没必要做成完全批量，因为不会这么大量
+        //表名去重-前端选择组件有问题
+        reqVO.setTableNames(CollUtil.distinct(reqVO.getTableNames()));
         reqVO.getTableNames().forEach(tableName -> ids.add(createCodegen(userId, reqVO.getDataSourceConfigId(), tableName)));
         return ids;
     }

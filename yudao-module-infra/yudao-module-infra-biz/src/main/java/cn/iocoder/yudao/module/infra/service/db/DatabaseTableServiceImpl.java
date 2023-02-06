@@ -33,7 +33,7 @@ public class DatabaseTableServiceImpl implements DatabaseTableService {
         List<TableInfo> tables = getTableList0(dataSourceConfigId, null);
         return tables.stream().filter(tableInfo -> (StrUtil.isEmpty(nameLike) || tableInfo.getName().contains(nameLike))
                         && (StrUtil.isEmpty(commentLike) || tableInfo.getComment().contains(commentLike)))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
