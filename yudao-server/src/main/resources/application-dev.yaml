@@ -48,13 +48,13 @@ spring:
           url: jdbc:mysql://localhost:3306/sysadmin?useSSL=false&serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
           driver-class-name: com.mysql.cj.jdbc.Driver
           username: root
-          password: 203718zhc
+          password: 123456
         slave: # 模拟从库，可根据自己需要修改 # 模拟从库，可根据自己需要修改
           name: sysAdmin
           url: jdbc:mysql://localhost:3306/${spring.datasource.dynamic.datasource.master.name}?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
           driver-class-name: com.mysql.cj.jdbc.Driver
           username: root
-          password: 203718zhc
+          password: 123456
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   redis:
