@@ -160,6 +160,9 @@ public interface ErrorCodeConstants {
     // ========== 站内信模版 1002027000 ==========
 
     // ========== 站内信发送 1002028000 ==========
-    ErrorCode NOTIFY_SEND_TEMPLATE_PARAM_MISS = new ErrorCode(1002025000, "模板参数({})缺失");
+    ErrorCode NOTIFY_SEND_TEMPLATE_PARAM_MISS = new ErrorCode(1002028000, "模板参数({})缺失");
+
+    // ========== mqtt主题 1002029000 ==========
+    ErrorCode MQTT_TOPIC_NOT_EXISTS = new ErrorCode(1002029000, "mqtt主题不存在");
 
 }

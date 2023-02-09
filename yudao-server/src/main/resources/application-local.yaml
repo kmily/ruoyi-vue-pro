@@ -73,6 +73,28 @@ spring:
     database: 0 # 数据库索引
 #    password: 123456 # 密码，建议生产环境开启
 
+  # emq消息队列
+  mqtt:
+    enable: false # MQTT开关，true为启用，默认false关闭
+    # 推送信息的连接地址
+    url: tcp://127.0.0.1:1883
+    # 用户名
+    username: mqttAdmin
+    # 密码
+    password: 123456
+    # 设置会话心跳时间，默认60秒。服务器会每隔（1.5 * KeepAlive）秒的时间向客户端发送心跳判断客户端是否在线，但这个方法并没有重连的机制
+    keepAliveInterval: 60
+    # 连接服务器默认客户端标识
+    clientId: mqttAdmin
+    # 设置操作完成的超时时长，默认3000毫秒
+    completionTimeout: 0
+    # 共享订阅主题分组，保证不同客户端都可以消费到消息
+    shareTopic: $share/g999/
+    # 配置订阅的主题，多个逗号隔开 如 $SYS/brokers/+/clients/+/+,sss/fff/#,aaa/bbb/+
+    defaultTopic: $SYS/brokers/+/clients/+/+
+    # 默认服务质量, 0 1 2
+    defaultQos: 1
+
 --- #################### 定时任务相关配置 ####################
 
 # Quartz 配置项，对应 QuartzProperties 配置类
