@@ -55,4 +55,13 @@ public class BpmTaskAssignRuleController {
         taskAssignRuleService.updateTaskAssignRule(reqVO);
         return success(true);
     }
+
+    @DeleteMapping("/delete")
+    @Operation(summary = "更新任务分配规则")
+    @Parameter(name = "id", description = "编号", required = true)
+    @PreAuthorize("@ss.hasPermission('bpm:task-assign-rule:delete')")
+    public CommonResult<Boolean> deleteTaskAssignRule(@RequestParam("id") Long id) {
+        taskAssignRuleService.deleteTaskAssignRule(id);
+        return success(true);
+    }
 }

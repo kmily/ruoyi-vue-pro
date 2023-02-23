@@ -46,6 +46,7 @@ export const DICT_TYPE = {
   BPM_PROCESS_INSTANCE_STATUS: 'bpm_process_instance_status',
   BPM_PROCESS_INSTANCE_RESULT: 'bpm_process_instance_result',
   BPM_TASK_ASSIGN_SCRIPT: 'bpm_task_assign_script',
+  BPM_TASK_ASSIGN_RELATION: 'bpm_task_assign_relation',
   BPM_OA_LEAVE_TYPE: 'bpm_oa_leave_type',
 
   // ========== PAY 模块 ==========

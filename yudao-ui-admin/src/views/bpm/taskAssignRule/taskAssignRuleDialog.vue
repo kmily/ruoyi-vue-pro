@@ -1,10 +1,24 @@
 <template>
   <div>
     <!-- 列表弹窗 -->
-    <el-dialog title="任务分配规则" :visible.sync="visible" width="800px" append-to-body>
-      <el-table v-loading="loading" :data="list">
+    <el-dialog title="任务分配规则" :visible.sync="visible" width="900px" append-to-body>
+      <el-table v-loading="loading" :data="list" :span-method="objectSpanMethod">
         <el-table-column label="任务名" align="center" prop="taskDefinitionName" width="120" fixed />
         <el-table-column label="任务标识" align="center" prop="taskDefinitionKey" width="120" show-tooltip-when-overflow />
+        <el-table-column align="center" prop="relation" width="60" show-tooltip-when-overflow >
+          <template slot="header" >
+            <span>
+            条件关系
+            <el-tooltip placement="top">
+              <div slot="content">按顺序执行'或'、'且'、'去除'逻辑，<br/>每个任务第一条规则固定执行'或'逻辑。</div>
+              <i class="el-icon-question"></i>
+            </el-tooltip>
+          </span>
+          </template>
+          <template v-slot="scope">
+            <dict-tag :type="DICT_TYPE.BPM_TASK_ASSIGN_RELATION" :value="scope.row.relation" />
+          </template>
+        </el-table-column>
         <el-table-column label="规则类型" align="center" prop="type" width="120">
           <template v-slot="scope">
             <dict-tag :type="DICT_TYPE.BPM_TASK_ASSIGN_RULE_TYPE" :value="scope.row.type" />
@@ -17,10 +31,19 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column v-if="modelId" label="操作" align="center" width="80" fixed="right">
+        <el-table-column v-if="modelId" label="操作" align="center" width="120" fixed="right">
           <template v-slot="scope">
             <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdateTaskAssignRule(scope.row)"
                        v-hasPermi="['bpm:task-assign-rule:update']">修改</el-button>
+            <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDeleteTaskAssignRule(scope.row)"
+                       v-if="scope.row.id"
+                       v-hasPermi="['bpm:task-assign-rule:delete']">删除</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column v-if="modelId" align="center" width="50" fixed="right">
+          <template v-slot="scope">
+            <el-button size="mini" type="text" icon="el-icon-circle-plus-outline" @click="handleAddTaskAssignRule(scope.row)"
+                       v-hasPermi="['bpm:task-assign-rule:create']"></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -33,6 +56,22 @@
         </el-form-item>
         <el-form-item label="任务标识" prop="taskDefinitionKey">
           <el-input v-model="form.taskDefinitionKey" disabled />
+        </el-form-item>
+        <el-form-item prop="relation">
+          <span slot="label">
+            条件关系
+            <el-popover
+              placement="top-start"
+              title="提示"
+              width="250"
+              trigger="hover"
+              content="或：取并集；且：取交集；去除：取差集。">
+              <i class="el-icon-question" slot="reference"></i>
+            </el-popover>
+          </span>
+          <el-select v-model="form.relation" clearable style="width: 100%">
+            <el-option v-for="dict in taskAssignRelationDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
+          </el-select>
         </el-form-item>
         <el-form-item label="规则类型" prop="type">
           <el-select v-model="form.type" clearable style="width: 100%">
@@ -80,7 +119,12 @@
 
 <script>
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
-import {createTaskAssignRule, getTaskAssignRuleList, updateTaskAssignRule} from "@/api/bpm/taskAssignRule";
+import {
+  createTaskAssignRule,
+  deleteTaskAssignRule,
+  getTaskAssignRuleList,
+  updateTaskAssignRule
+} from '@/api/bpm/taskAssignRule'
 import {listSimpleRoles} from "@/api/system/role";
 import {listSimpleDepts} from "@/api/system/dept";
 
@@ -105,6 +149,8 @@ export default {
       // 任务分配规则表单
       row: undefined, // 选中的流程模型
       list: [], // 选中流程模型的任务分配规则们
+      spanArr: [],//用于存放每一行记录的合并数
+      position: 0,
       loading: false, // 加载中
       open: false, // 是否打开
       form: {}, // 表单
@@ -130,6 +176,7 @@ export default {
       modelFormTypeDictDatas: getDictDatas(DICT_TYPE.BPM_MODEL_FORM_TYPE),
       taskAssignRuleTypeDictDatas: getDictDatas(DICT_TYPE.BPM_TASK_ASSIGN_RULE_TYPE),
       taskAssignScriptDictDatas: getDictDatas(DICT_TYPE.BPM_TASK_ASSIGN_SCRIPT),
+      taskAssignRelationDictDatas: getDictDatas(DICT_TYPE.BPM_TASK_ASSIGN_RELATION),
     };
   },
   methods: {
@@ -191,6 +238,9 @@ export default {
       }).then(response => {
         this.loading = false;
         this.list = response.data;
+        this.spanArr = []
+        this.position = 0
+        this.getSpanArr()
       })
     },
     /** 处理修改任务分配规则的按钮操作 */
@@ -223,6 +273,33 @@ export default {
         this.form.scripts.push(...row.options);
       }
       this.open = true;
+    },
+    // 添加
+    handleAddTaskAssignRule(row) {
+      // 先重置标识
+      this.resetAssignRuleForm();
+      // 设置表单
+      this.form = {
+        ...row,
+        options: [],
+        roleIds: [],
+        deptIds: [],
+        postIds: [],
+        userIds: [],
+        userGroupIds: [],
+        scripts: [],
+      };
+      this.form.type = undefined
+      this.form.id = undefined
+      this.form.relation = undefined
+      this.open = true;
+    },
+    //删除
+    handleDeleteTaskAssignRule(row) {
+      deleteTaskAssignRule(row.id).then(response => {
+        this.$modal.msgSuccess("删除成功");
+        this.getList();
+      });
     },
     /** 提交任务分配规则的表单 */
     submitAssignRuleForm() {
@@ -331,7 +408,35 @@ export default {
         label: node.name,
         children: node.children
       }
-    }
+    },
+    //合并单元格
+    objectSpanMethod({row, column, rowIndex, columnIndex}) {
+      if (columnIndex === 0 || columnIndex === 1 || columnIndex === 6) {
+        const _row = this.spanArr[rowIndex];
+        const _col = _row > 0 ? 1 : 0;
+        return {
+          // [0,0] 表示这一行不显示， [2,1]表示合并2行
+          rowspan: _row,
+          colspan: _col
+        };
+      }
+    },
+    getSpanArr() {
+      this.list.forEach((item, index) => {
+        if (index === 0) {
+          this.spanArr.push(1);
+          this.position = 0
+        } else {
+          if (this.list[index].taskDefinitionName === this.list[index - 1].taskDefinitionName) {
+            this.spanArr[this.position] += 1;
+            this.spanArr.push(0);
+          } else {
+            this.spanArr.push(1);
+            this.position = index;
+          }
+        }
+      })
+    },
   }
 };
 </script>

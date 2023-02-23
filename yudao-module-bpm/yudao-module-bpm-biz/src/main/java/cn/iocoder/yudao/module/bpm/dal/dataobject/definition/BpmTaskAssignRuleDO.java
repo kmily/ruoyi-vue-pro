@@ -80,4 +80,9 @@ public class BpmTaskAssignRuleDO extends BaseDO {
     @TableField(typeHandler = JsonLongSetTypeHandler.class)
     private Set<Long> options;
 
+    /**
+     * 条件类型
+     */
+    private Integer relation;
+
 }

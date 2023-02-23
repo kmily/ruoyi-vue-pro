@@ -24,10 +24,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
@@ -73,7 +70,7 @@ public class BpmTaskAssignRuleServiceImplTest extends BaseDbUnitTest {
         mockGetUserMap(asSet(11L, 22L));
 
         // 调用
-        Set<Long> results = bpmTaskRuleService.calculateTaskCandidateUsers(null, rule);
+        Set<Long> results = bpmTaskRuleService.calculateTaskCandidateUsers(null, Collections.singletonList(rule));
         // 断言
         assertEquals(asSet(11L, 22L), results);
     }
@@ -90,7 +87,7 @@ public class BpmTaskAssignRuleServiceImplTest extends BaseDbUnitTest {
         mockGetUserMap(asSet(11L, 22L));
 
         // 调用
-        Set<Long> results = bpmTaskRuleService.calculateTaskCandidateUsers(null, rule);
+        Set<Long> results = bpmTaskRuleService.calculateTaskCandidateUsers(null, Collections.singletonList(rule));
         // 断言
         assertEquals(asSet(11L, 22L), results);
     }
@@ -107,7 +104,7 @@ public class BpmTaskAssignRuleServiceImplTest extends BaseDbUnitTest {
         mockGetUserMap(asSet(11L, 22L));
 
         // 调用
-        Set<Long> results = bpmTaskRuleService.calculateTaskCandidateUsers(null, rule);
+        Set<Long> results = bpmTaskRuleService.calculateTaskCandidateUsers(null, Collections.singletonList(rule));
         // 断言
         assertEquals(asSet(11L, 22L), results);
     }
@@ -124,7 +121,7 @@ public class BpmTaskAssignRuleServiceImplTest extends BaseDbUnitTest {
         mockGetUserMap(asSet(11L, 22L));
 
         // 调用
-        Set<Long> results = bpmTaskRuleService.calculateTaskCandidateUsers(null, rule);
+        Set<Long> results = bpmTaskRuleService.calculateTaskCandidateUsers(null, Collections.singletonList(rule));
         // 断言
         assertEquals(asSet(11L, 22L), results);
     }
@@ -138,7 +135,7 @@ public class BpmTaskAssignRuleServiceImplTest extends BaseDbUnitTest {
         mockGetUserMap(asSet(1L, 2L));
 
         // 调用
-        Set<Long> results = bpmTaskRuleService.calculateTaskCandidateUsers(null, rule);
+        Set<Long> results = bpmTaskRuleService.calculateTaskCandidateUsers(null, Collections.singletonList(rule));
         // 断言
         assertEquals(asSet(1L, 2L), results);
     }
@@ -155,7 +152,7 @@ public class BpmTaskAssignRuleServiceImplTest extends BaseDbUnitTest {
         mockGetUserMap(asSet(11L, 12L, 21L, 22L));
 
         // 调用
-        Set<Long> results = bpmTaskRuleService.calculateTaskCandidateUsers(null, rule);
+        Set<Long> results = bpmTaskRuleService.calculateTaskCandidateUsers(null, Collections.singletonList(rule));
         // 断言
         assertEquals(asSet(11L, 12L, 21L, 22L), results);
     }
@@ -194,7 +191,7 @@ public class BpmTaskAssignRuleServiceImplTest extends BaseDbUnitTest {
         mockGetUserMap(asSet(11L, 22L));
 
         // 调用
-        Set<Long> results = bpmTaskRuleService.calculateTaskCandidateUsers(null, rule);
+        Set<Long> results = bpmTaskRuleService.calculateTaskCandidateUsers(null, Collections.singletonList(rule));
         // 断言
         assertEquals(asSet(11L, 22L), results);
     }

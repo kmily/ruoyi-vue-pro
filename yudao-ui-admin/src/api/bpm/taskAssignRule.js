@@ -23,3 +23,11 @@ export function updateTaskAssignRule(data) {
     data: data
   })
 }
+
+// 删除
+export function deleteTaskAssignRule(id) {
+  return request({
+    url: '/bpm/task-assign-rule/delete?id=' + id,
+    method: 'delete'
+  })
+}
