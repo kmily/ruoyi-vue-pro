@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Mapper
+// TODO 芋艿：@TenantDS
 public interface RoleMenuMapper extends BaseMapperX<RoleMenuDO> {
 
     @Repository

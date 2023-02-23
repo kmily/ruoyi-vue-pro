@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.dal.mysql.social;
 
+import cn.iocoder.yudao.framework.tenant.core.db.dynamic.TenantDS;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -10,6 +11,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Mapper
+@TenantDS
 public interface SocialUserMapper extends BaseMapperX<SocialUserDO> {
 
     default SocialUserDO selectByTypeAndCodeAnState(Integer type, String code, String state) {

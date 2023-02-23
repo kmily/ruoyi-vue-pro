@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 @Mapper
+// TODO 芋艿：@TenantDS
 public interface DeptMapper extends BaseMapperX<DeptDO> {
 
     default List<DeptDO> selectList(DeptListReqVO reqVO) {

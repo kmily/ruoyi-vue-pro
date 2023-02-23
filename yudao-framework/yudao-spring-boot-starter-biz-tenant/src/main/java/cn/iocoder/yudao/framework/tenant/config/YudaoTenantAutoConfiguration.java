@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnoreAspect;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantDatabaseInterceptor;
+import cn.iocoder.yudao.framework.tenant.core.db.dynamic.TenantDsProcessor;
 import cn.iocoder.yudao.framework.tenant.core.job.TenantJob;
 import cn.iocoder.yudao.framework.tenant.core.job.TenantJobHandlerDecorator;
 import cn.iocoder.yudao.framework.tenant.core.mq.TenantRedisMessageInterceptor;
@@ -17,6 +18,10 @@ import cn.iocoder.yudao.framework.tenant.core.web.TenantContextWebFilter;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import cn.iocoder.yudao.module.system.api.tenant.TenantApi;
+import com.baomidou.dynamic.datasource.processor.DsHeaderProcessor;
+import com.baomidou.dynamic.datasource.processor.DsProcessor;
+import com.baomidou.dynamic.datasource.processor.DsSessionProcessor;
+import com.baomidou.dynamic.datasource.processor.DsSpelExpressionProcessor;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import org.springframework.beans.BeansException;
@@ -62,6 +67,13 @@ public class YudaoTenantAutoConfiguration {
         // 需要加在首个，主要是为了在分页插件前面。这个是 MyBatis Plus 的规定
         MyBatisUtils.addInterceptor(interceptor, inner, 0);
         return inner;
+    }
+
+    @Bean
+    public DsProcessor dsProcessor() {
+        TenantDsProcessor tenantDsProcessor = new TenantDsProcessor();
+        tenantDsProcessor.setNextProcessor(new DsSpelExpressionProcessor());
+        return tenantDsProcessor;
     }
 
     // ========== WEB ==========

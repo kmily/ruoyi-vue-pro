@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.dal.mysql.dept;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.tenant.core.db.dynamic.TenantDS;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
@@ -12,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Mapper
+@TenantDS
 public interface PostMapper extends BaseMapperX<PostDO> {
 
     default List<PostDO> selectList(Collection<Long> ids, Collection<Integer> statuses) {

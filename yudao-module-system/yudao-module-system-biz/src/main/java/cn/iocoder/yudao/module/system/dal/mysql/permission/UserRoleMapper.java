@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Mapper
+// TODO 芋艿：@TenantDS
 public interface UserRoleMapper extends BaseMapperX<UserRoleDO> {
 
     default List<UserRoleDO> selectListByUserId(Long userId) {

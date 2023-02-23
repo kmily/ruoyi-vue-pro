@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.dal.mysql.user;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.tenant.core.db.dynamic.TenantDS;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
@@ -12,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Mapper
+@TenantDS
 public interface AdminUserMapper extends BaseMapperX<AdminUserDO> {
 
     default AdminUserDO selectByUsername(String username) {
