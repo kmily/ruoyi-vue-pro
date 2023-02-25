@@ -30,8 +30,16 @@ public interface RedisKeyConstants {
      * 角色的缓存
      *
      * KEY 格式：role::{id}
-     * 数据格式：String
+     * 数据类型：String 角色编号
      */
     String ROLE = "role";
+
+    /**
+     * 用户拥有的角色编号的缓存
+     *
+     * KEY 格式：user_role_ids::{userId}
+     * 数据类型：String 角色编号集合
+     */
+    String USER_ROLE_ID = "user_role_id";
 
 }

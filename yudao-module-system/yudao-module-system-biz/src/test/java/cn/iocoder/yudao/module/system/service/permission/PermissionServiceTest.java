@@ -99,44 +99,6 @@ public class PermissionServiceTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testGetRoleMenuListFromCache_superAdmin() {
-        // 准备参数
-        Collection<Long> roleIds = singletonList(100L);
-        Collection<Integer> menuTypes = asList(2, 3);
-        Collection<Integer> menusStatuses = asList(0, 1);
-        // mock 方法
-        List<RoleDO> roleList = singletonList(randomPojo(RoleDO.class, o -> o.setId(100L)));
-        when(roleService.getRoleListFromCache(eq(roleIds))).thenReturn(roleList);
-        when(roleService.hasAnySuperAdmin(same(roleList))).thenReturn(true);
-        List<MenuDO> menuList = randomPojoList(MenuDO.class);
-        when(menuService.getMenuListFromCache(eq(menuTypes), eq(menusStatuses))).thenReturn(menuList);
-
-        // 调用
-        List<MenuDO> result = permissionService.getRoleMenuListFromCache(roleIds, menuTypes, menusStatuses);
-        // 断言
-        assertSame(menuList, result);
-    }
-
-    @Test
-    public void testGetRoleMenuListFromCache_normal() {
-        // 准备参数
-        Collection<Long> roleIds = asSet(100L, 200L);
-        Collection<Integer> menuTypes = asList(2, 3);
-        Collection<Integer> menusStatuses = asList(0, 1);
-        // mock 方法
-        Multimap<Long, Long> roleMenuCache = ImmutableMultimap.<Long, Long>builder().put(100L, 1000L)
-                .put(200L, 2000L).put(200L, 2001L).build();
-        permissionService.setRoleMenuCache(roleMenuCache);
-        List<MenuDO> menuList = randomPojoList(MenuDO.class);
-        when(menuService.getMenuListFromCache(eq(asList(1000L, 2000L, 2001L)), eq(menuTypes), eq(menusStatuses))).thenReturn(menuList);
-
-        // 调用
-        List<MenuDO> result = permissionService.getRoleMenuListFromCache(roleIds, menuTypes, menusStatuses);
-        // 断言
-        assertSame(menuList, result);
-    }
-
-    @Test
     public void testGetUserRoleIdsFromCache() {
         // 准备参数
         Long userId = 1L;
