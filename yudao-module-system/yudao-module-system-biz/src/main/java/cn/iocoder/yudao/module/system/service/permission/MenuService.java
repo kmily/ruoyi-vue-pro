@@ -106,4 +106,12 @@ public interface MenuService {
      */
     MenuDO getMenu(Long id);
 
+    /**
+     * 获得菜单数组
+     *
+     * @param ids 菜单编号数组
+     * @return 菜单数组
+     */
+    List<MenuDO> getMenuList(Collection<Long> ids);
+
 }

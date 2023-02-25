@@ -14,12 +14,12 @@ import java.util.List;
 // TODO 芋艿：@TenantDS
 public interface RoleMenuMapper extends BaseMapperX<RoleMenuDO> {
 
-    @Repository
-    class BatchInsertMapper extends ServiceImpl<RoleMenuMapper, RoleMenuDO> {
-    }
-
     default List<RoleMenuDO> selectListByRoleId(Long roleId) {
         return selectList(RoleMenuDO::getRoleId, roleId);
+    }
+
+    default List<RoleMenuDO> selectListByRoleId(Collection<Long> roleIds) {
+        return selectList(RoleMenuDO::getRoleId, roleIds);
     }
 
     default void deleteListByRoleIdAndMenuIds(Long roleId, Collection<Long> menuIds) {

@@ -212,6 +212,11 @@ public class MenuServiceImpl implements MenuService {
         return menuMapper.selectById(id);
     }
 
+    @Override
+    public List<MenuDO> getMenuList(Collection<Long> ids) {
+        return menuMapper.selectBatchIds(ids);
+    }
+
     /**
      * 校验父菜单是否合法
      *

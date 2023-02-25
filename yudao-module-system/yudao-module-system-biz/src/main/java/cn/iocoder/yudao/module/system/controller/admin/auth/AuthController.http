@@ -24,9 +24,3 @@ tenant-id: {{adminTenentId}}
 GET {{baseUrl}}/system/auth/get-permission-info
 Authorization: Bearer {{token}}
 tenant-id: {{adminTenentId}}
-
-### 请求 /list-menus 接口 => 成功
-GET {{baseUrl}}/system/list-menus
-Authorization: Bearer {{token}}
-#Authorization: Bearer a6aa7714a2e44c95aaa8a2c5adc2a67a
-tenant-id: {{adminTenentId}}

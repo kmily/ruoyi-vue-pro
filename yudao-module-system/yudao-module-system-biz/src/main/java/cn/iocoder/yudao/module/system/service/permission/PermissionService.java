@@ -5,8 +5,11 @@ import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import org.springframework.lang.Nullable;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import static java.util.Collections.singleton;
 
 /**
  * 权限 Service 接口
@@ -50,7 +53,17 @@ public interface PermissionService {
      * @param roleId 角色编号
      * @return 菜单编号集合
      */
-    Set<Long> getRoleMenuIds(Long roleId);
+    default Set<Long> getRoleMenuListByRoleId(Long roleId) {
+        return getRoleMenuListByRoleId(singleton(roleId));
+    }
+
+    /**
+     * 获得角色们拥有的菜单编号集合
+     *
+     * @param roleIds 角色编号数组
+     * @return 菜单编号集合
+     */
+    Set<Long> getRoleMenuListByRoleId(Collection<Long> roleIds);
 
     /**
      * 获得拥有多个角色的用户编号集合
@@ -58,7 +71,7 @@ public interface PermissionService {
      * @param roleIds 角色编号集合
      * @return 用户编号集合
      */
-    Set<Long> getUserRoleIdListByRoleIds(Collection<Long> roleIds);
+    Set<Long> getUserRoleIdListByRoleId(Collection<Long> roleIds);
 
     /**
      * 设置角色菜单

@@ -166,7 +166,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         when(menuService.getMenuList()).thenReturn(menuList);
 
         // 调用
-        Set<Long> menuIds = permissionService.getRoleMenuIds(roleId);
+        Set<Long> menuIds = permissionService.getRoleMenuListByRoleId(roleId);
         // 断言
         assertEquals(singleton(1L), menuIds);
     }
@@ -182,7 +182,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         roleMenuMapper.insert(roleMenu02);
 
         // 调用
-        Set<Long> menuIds = permissionService.getRoleMenuIds(roleId);
+        Set<Long> menuIds = permissionService.getRoleMenuListByRoleId(roleId);
         // 断言
         assertEquals(asSet(1L, 2L), menuIds);
     }
@@ -260,7 +260,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         userRoleMapper.insert(roleMenuDO02);
 
         // 调用
-        Set<Long> result = permissionService.getUserRoleIdListByRoleIds(roleIds);
+        Set<Long> result = permissionService.getUserRoleIdListByRoleId(roleIds);
         // 断言
         assertEquals(asSet(1L, 2L), result);
     }

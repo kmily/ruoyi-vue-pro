@@ -186,21 +186,20 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public Set<Long> getRoleMenuIds(Long roleId) {
+    public Set<Long> getRoleMenuListByRoleId(Collection<Long> roleIds) {
         // 如果是管理员的情况下，获取全部菜单编号
-        if (roleService.hasAnySuperAdmin(Collections.singleton(roleId))) {
+        if (roleService.hasAnySuperAdmin(roleIds)) {
             return convertSet(menuService.getMenuList(), MenuDO::getId);
         }
         // 如果是非管理员的情况下，获得拥有的菜单编号
-        return convertSet(roleMenuMapper.selectListByRoleId(roleId), RoleMenuDO::getMenuId);
+        return convertSet(roleMenuMapper.selectListByRoleId(roleIds), RoleMenuDO::getMenuId);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void assignRoleMenu(Long roleId, Set<Long> menuIds) {
         // 获得角色拥有菜单编号
-        Set<Long> dbMenuIds = convertSet(roleMenuMapper.selectListByRoleId(roleId),
-                RoleMenuDO::getMenuId);
+        Set<Long> dbMenuIds = convertSet(roleMenuMapper.selectListByRoleId(roleId), RoleMenuDO::getMenuId);
         // 计算新增和删除的菜单编号
         Collection<Long> createMenuIds = CollUtil.subtract(menuIds, dbMenuIds);
         Collection<Long> deleteMenuIds = CollUtil.subtract(dbMenuIds, menuIds);
@@ -234,7 +233,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public Set<Long> getUserRoleIdListByRoleIds(Collection<Long> roleIds) {
+    public Set<Long> getUserRoleIdListByRoleId(Collection<Long> roleIds) {
         return convertSet(userRoleMapper.selectListByRoleIds(roleIds),
                 UserRoleDO::getUserId);
     }
