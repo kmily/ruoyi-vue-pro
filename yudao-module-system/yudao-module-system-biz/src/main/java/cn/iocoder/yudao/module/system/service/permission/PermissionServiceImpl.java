@@ -9,7 +9,6 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.system.api.permission.dto.DeptDataPermissionRespDTO;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleMenuDO;
@@ -71,7 +70,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    @Cacheable(value = RedisKeyConstants.MENU_ROLE_ID, key = "#menuId")
+    @Cacheable(value = RedisKeyConstants.MENU_ROLE_ID_LIST, key = "#menuId")
     public Set<Long> getMenuRoleIdListByMenuIdFromCache(Long menuId) {
         return convertSet(roleMenuMapper.selectListByMenuId(menuId), RoleMenuDO::getRoleId);
     }
@@ -104,7 +103,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    @Cacheable(value = RedisKeyConstants.USER_ROLE_ID, key = "#userId")
+    @Cacheable(value = RedisKeyConstants.USER_ROLE_ID_LIST, key = "#userId")
     public Set<Long> getUserRoleIdListByUserIdFromCache(Long userId) {
         return getUserRoleIdListByUserId(userId);
     }
@@ -261,7 +260,7 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         // 获得用户的部门编号的缓存，通过 Guava 的 Suppliers 惰性求值，即有且仅有第一次发起 DB 的查询
-        Supplier<Long> userDeptIdCache = Suppliers.memoize(() -> userService.getUser(userId).getDeptId());
+        Supplier<Long> userDeptId = Suppliers.memoize(() -> userService.getUser(userId).getDeptId());
         // 遍历每个角色，计算
         for (RoleDO role : roles) {
             // 为空时，跳过
@@ -278,20 +277,19 @@ public class PermissionServiceImpl implements PermissionService {
                 CollUtil.addAll(result.getDeptIds(), role.getDataScopeDeptIds());
                 // 自定义可见部门时，保证可以看到自己所在的部门。否则，一些场景下可能会有问题。
                 // 例如说，登录时，基于 t_user 的 username 查询会可能被 dept_id 过滤掉
-                CollUtil.addAll(result.getDeptIds(), userDeptIdCache.get());
+                CollUtil.addAll(result.getDeptIds(), userDeptId.get());
                 continue;
             }
             // 情况三，DEPT_ONLY
             if (Objects.equals(role.getDataScope(), DataScopeEnum.DEPT_ONLY.getScope())) {
-                CollectionUtils.addIfNotNull(result.getDeptIds(), userDeptIdCache.get());
+                CollectionUtils.addIfNotNull(result.getDeptIds(), userDeptId.get());
                 continue;
             }
             // 情况四，DEPT_DEPT_AND_CHILD
             if (Objects.equals(role.getDataScope(), DataScopeEnum.DEPT_AND_CHILD.getScope())) {
-                List<DeptDO> depts = deptService.getDeptListByParentIdFromCache(userDeptIdCache.get(), true);
-                CollUtil.addAll(result.getDeptIds(), CollectionUtils.convertList(depts, DeptDO::getId));
+                CollUtil.addAll(result.getDeptIds(), deptService.getChildDeptIdListFromCache(userDeptId.get()));
                 // 添加本身部门编号
-                CollUtil.addAll(result.getDeptIds(), userDeptIdCache.get());
+                CollUtil.addAll(result.getDeptIds(), userDeptId.get());
                 continue;
             }
             // 情况五，SELF

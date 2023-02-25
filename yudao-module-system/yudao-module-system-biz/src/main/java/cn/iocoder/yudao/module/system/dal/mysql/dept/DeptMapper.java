@@ -2,14 +2,16 @@ package cn.iocoder.yudao.module.system.dal.mysql.dept;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.tenant.core.db.dynamic.TenantDS;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper
-// TODO 芋艿：@TenantDS
+@TenantDS
 public interface DeptMapper extends BaseMapperX<DeptDO> {
 
     default List<DeptDO> selectList(DeptListReqVO reqVO) {
@@ -24,6 +26,10 @@ public interface DeptMapper extends BaseMapperX<DeptDO> {
 
     default Long selectCountByParentId(Long parentId) {
         return selectCount(DeptDO::getParentId, parentId);
+    }
+
+    default List<DeptDO> selectListByParentId(Collection<Long> parentIds) {
+        return selectList(DeptDO::getParentId, parentIds);
     }
 
 }

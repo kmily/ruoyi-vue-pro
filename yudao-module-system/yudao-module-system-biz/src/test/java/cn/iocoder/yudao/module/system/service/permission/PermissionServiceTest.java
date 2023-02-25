@@ -18,7 +18,6 @@ import cn.iocoder.yudao.module.system.mq.producer.permission.PermissionProducer;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -37,7 +36,6 @@ import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -471,7 +469,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         when(userService.getUser(eq(1L))).thenReturn(new AdminUserDO().setDeptId(3L), null, null); // 最后返回 null 的目的，看看会不会重复调用
         // mock 方法（部门）
         DeptDO deptDO = randomPojo(DeptDO.class);
-        when(deptService.getDeptListByParentIdFromCache(eq(3L), eq(true)))
+        when(deptService.getChildDeptIdListFromCache(eq(3L), eq(true)))
                 .thenReturn(singletonList(deptDO));
 
         // 调用

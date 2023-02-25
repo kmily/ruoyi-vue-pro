@@ -7,10 +7,7 @@ import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqV
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 部门 Service 接口
@@ -18,11 +15,6 @@ import java.util.Map;
  * @author 芋道源码
  */
 public interface DeptService {
-
-    /**
-     * 初始化部门的本地缓存
-     */
-    void initLocalCache();
 
     /**
      * 创建部门
@@ -55,13 +47,23 @@ public interface DeptService {
     List<DeptDO> getDeptList(DeptListReqVO reqVO);
 
     /**
-     * 获得所有子部门，从缓存中
+     * 获得指定部门的所有子部门
      *
-     * @param parentId 部门编号
-     * @param recursive 是否递归获取所有
+     * @param id 部门编号
      * @return 子部门列表
      */
-    List<DeptDO> getDeptListByParentIdFromCache(Long parentId, boolean recursive);
+    List<DeptDO> getChildDeptList(Long id);
+
+    /**
+     * 获得所有子部门，从缓存中
+     *
+     * 注意，该缓存不是实时更新，最多会有 1 分钟延迟。
+     * 一般来说，不会影响使用，因为部门的变更，不会频繁发生。
+     *
+     * @param id 父部门编号
+     * @return 子部门列表
+     */
+    Set<Long> getChildDeptIdListFromCache(Long id);
 
     /**
      * 获得部门信息数组

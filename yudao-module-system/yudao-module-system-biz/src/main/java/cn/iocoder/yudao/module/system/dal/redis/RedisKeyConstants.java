@@ -40,7 +40,7 @@ public interface RedisKeyConstants {
      * KEY 格式：user_role_ids::{userId}
      * 数据类型：String 角色编号集合
      */
-    String USER_ROLE_ID = "user_role_id";
+    String USER_ROLE_ID_LIST = "user_role_ids";
 
     /**
      * 拥有指定菜单的角色编号的缓存
@@ -48,6 +48,18 @@ public interface RedisKeyConstants {
      * KEY 格式：user_role_ids::{menuId}
      * 数据类型：String 角色编号集合
      */
-    String MENU_ROLE_ID = "menu_role_id";
+    String MENU_ROLE_ID_LIST = "menu_role_ids";
+
+    /**
+     * 指定部门的所有子部门编号数组的缓存
+     *
+     * KEY 格式：dept_children_ids::{id}
+     * 数据类型：String 子部门编号集合
+     */
+    String DEPT_CHILDREN_ID_LIST = "dept_children_ids";
+    /**
+     * {@link #DEPT_CHILDREN_ID_LIST} 的过期时间
+     */
+    String DEPT_CHILDREN_ID_LIST_EXPIRE = "30s";
 
 }
