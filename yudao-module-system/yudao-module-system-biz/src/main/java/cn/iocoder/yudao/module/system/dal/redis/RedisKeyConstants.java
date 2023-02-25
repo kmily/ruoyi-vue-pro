@@ -42,4 +42,12 @@ public interface RedisKeyConstants {
      */
     String USER_ROLE_ID = "user_role_id";
 
+    /**
+     * 拥有指定菜单的角色编号的缓存
+     *
+     * KEY 格式：user_role_ids::{menuId}
+     * 数据类型：String 角色编号集合
+     */
+    String MENU_ROLE_ID = "menu_role_id";
+
 }

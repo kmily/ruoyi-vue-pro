@@ -16,10 +16,7 @@ import static java.util.Collections.singleton;
  */
 public interface PermissionService {
 
-    /**
-     * 初始化权限的本地缓存
-     */
-    void initLocalCache();
+    // ========== 角色-菜单的相关方法  ==========
 
     /**
      * 获得角色拥有的菜单编号集合
@@ -38,6 +35,14 @@ public interface PermissionService {
      * @return 菜单编号集合
      */
     Set<Long> getRoleMenuListByRoleId(Collection<Long> roleIds);
+
+    /**
+     * 获得拥有指定菜单的角色编号数组，从缓存中获取
+     *
+     * @param menuId 菜单编号
+     * @return 角色编号数组
+     */
+    Set<Long> getMenuRoleIdListByMenuIdFromCache(Long menuId);
 
     /**
      * 获得拥有多个角色的用户编号集合
@@ -133,5 +138,9 @@ public interface PermissionService {
      * @return 部门数据权限
      */
     DeptDataPermissionRespDTO getDeptDataPermission(Long userId);
+
+    // ========== 用户-角色的相关方法  ==========
+
+    // ========== 用户-部门的相关方法  ==========
 
 }

@@ -8,7 +8,6 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
-import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.system.api.permission.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
@@ -19,26 +18,20 @@ import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMenuMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
 import cn.iocoder.yudao.module.system.enums.permission.DataScopeEnum;
-import cn.iocoder.yudao.module.system.mq.producer.permission.PermissionProducer;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -52,17 +45,6 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
 @Service
 @Slf4j
 public class PermissionServiceImpl implements PermissionService {
-
-    /**
-     * 菜单编号与角色编号的缓存映射
-     * key：菜单编号
-     * value：角色编号的数组
-     *
-     * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
-     */
-    @Getter
-    @Setter // 单元测试需要
-    private volatile Multimap<Long, Long> menuRoleCache;
 
     @Resource
     private RoleMenuMapper roleMenuMapper;
@@ -78,33 +60,6 @@ public class PermissionServiceImpl implements PermissionService {
     @Resource
     private AdminUserService userService;
 
-    @Resource
-    private PermissionProducer permissionProducer;
-
-    @Override
-    @PostConstruct
-    public void initLocalCache() {
-        initLocalCacheForRoleMenu();
-    }
-
-    /**
-     * 刷新 RoleMenu 本地缓存
-     */
-    @VisibleForTesting
-    void initLocalCacheForRoleMenu() {
-        // 注意：忽略自动多租户，因为要全局初始化缓存
-        TenantUtils.executeIgnore(() -> {
-            // 第一步：查询数据
-            List<RoleMenuDO> roleMenus = roleMenuMapper.selectList();
-            log.info("[initLocalCacheForRoleMenu][缓存角色与菜单，数量为:{}]", roleMenus.size());
-
-            // 第二步：构建缓存
-            ImmutableMultimap.Builder<Long, Long> menuRoleCacheBuilder = ImmutableMultimap.builder();
-            roleMenus.forEach(roleMenuDO -> menuRoleCacheBuilder.put(roleMenuDO.getMenuId(), roleMenuDO.getRoleId()));
-            menuRoleCache = menuRoleCacheBuilder.build();
-        });
-    }
-
     @Override
     public Set<Long> getRoleMenuListByRoleId(Collection<Long> roleIds) {
         // 如果是管理员的情况下，获取全部菜单编号
@@ -113,6 +68,12 @@ public class PermissionServiceImpl implements PermissionService {
         }
         // 如果是非管理员的情况下，获得拥有的菜单编号
         return convertSet(roleMenuMapper.selectListByRoleId(roleIds), RoleMenuDO::getMenuId);
+    }
+
+    @Override
+    @Cacheable(value = RedisKeyConstants.MENU_ROLE_ID, key = "#menuId")
+    public Set<Long> getMenuRoleIdListByMenuIdFromCache(Long menuId) {
+        return convertSet(roleMenuMapper.selectListByMenuId(menuId), RoleMenuDO::getRoleId);
     }
 
     @Override
@@ -135,15 +96,6 @@ public class PermissionServiceImpl implements PermissionService {
         if (!CollectionUtil.isEmpty(deleteMenuIds)) {
             roleMenuMapper.deleteListByRoleIdAndMenuIds(roleId, deleteMenuIds);
         }
-        // 发送刷新消息. 注意，需要事务提交后，在进行发送刷新消息。不然 db 还未提交，结果缓存先刷新了
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-
-            @Override
-            public void afterCommit() {
-                permissionProducer.sendRoleMenuRefreshMessage();
-            }
-
-        });
     }
 
     @Override
@@ -215,22 +167,11 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void processMenuDeleted(Long menuId) {
         roleMenuMapper.deleteListByMenuId(menuId);
-        // 发送刷新消息. 注意，需要事务提交后，在进行发送刷新消息。不然 db 还未提交，结果缓存先刷新了
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-
-            @Override
-            public void afterCommit() {
-                permissionProducer.sendRoleMenuRefreshMessage();
-            }
-
-        });
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void processUserDeleted(Long userId) {
         userRoleMapper.deleteListByUserId(userId);
     }
@@ -274,10 +215,17 @@ public class PermissionServiceImpl implements PermissionService {
             return false;
         }
 
-        // 获得是否拥有该权限，任一一个
+        // 判断是否有权限
         Set<Long> roleIds = convertSet(roles, RoleDO::getId);
-        return menuList.stream().anyMatch(menu -> CollUtil.containsAny(roleIds,
-                menuRoleCache.get(menu.getId())));
+        for (MenuDO menu : menuList) {
+            // 拥有该角色的菜单编号数组
+            Set<Long> menuRoleIds = getSelf().getMenuRoleIdListByMenuIdFromCache(menu.getId());
+            // 如果有交集，说明有权限
+            if (CollUtil.containsAny(menuRoleIds, roleIds)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
