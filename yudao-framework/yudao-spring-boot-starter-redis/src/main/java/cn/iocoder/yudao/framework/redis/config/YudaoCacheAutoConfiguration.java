@@ -10,6 +10,8 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
+import static cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration.buildRedisSerializer;
+
 /**
  * Cache 配置类，基于 Redis 实现
  */
@@ -28,7 +30,8 @@ public class YudaoCacheAutoConfiguration {
     public RedisCacheConfiguration redisCacheConfiguration(CacheProperties cacheProperties) {
         // 设置使用 JSON 序列化方式
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig();
-        config = config.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(RedisSerializer.json()));
+        config = config.serializeValuesWith(
+                RedisSerializationContext.SerializationPair.fromSerializer(buildRedisSerializer()));
 
         // 设置 CacheProperties.Redis 的属性
         CacheProperties.Redis redisProperties = cacheProperties.getRedis();

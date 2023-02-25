@@ -26,4 +26,12 @@ public interface RedisKeyConstants {
             "social_auth_state:%s", // 参数为 state
             STRING, String.class, Duration.ofHours(24)); // 值为 state
 
+    /**
+     * 角色的缓存
+     *
+     * KEY 格式：role::{id}
+     * 数据格式：String
+     */
+    String ROLE = "role";
+
 }

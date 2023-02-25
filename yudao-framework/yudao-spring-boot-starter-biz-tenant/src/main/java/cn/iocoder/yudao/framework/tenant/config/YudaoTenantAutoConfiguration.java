@@ -18,9 +18,7 @@ import cn.iocoder.yudao.framework.tenant.core.web.TenantContextWebFilter;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import cn.iocoder.yudao.module.system.api.tenant.TenantApi;
-import com.baomidou.dynamic.datasource.processor.DsHeaderProcessor;
 import com.baomidou.dynamic.datasource.processor.DsProcessor;
-import com.baomidou.dynamic.datasource.processor.DsSessionProcessor;
 import com.baomidou.dynamic.datasource.processor.DsSpelExpressionProcessor;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
@@ -136,12 +134,13 @@ public class YudaoTenantAutoConfiguration {
     @Bean
     @Primary // 引入租户时，tenantRedisCacheManager 为主 Bean
     public RedisCacheManager tenantRedisCacheManager(RedisTemplate<String, Object> redisTemplate,
-                                                     RedisCacheConfiguration redisCacheConfiguration) {
+                                                     RedisCacheConfiguration redisCacheConfiguration,
+                                                     TenantProperties tenantProperties) {
         // 创建 RedisCacheWriter 对象
         RedisConnectionFactory connectionFactory = Objects.requireNonNull(redisTemplate.getConnectionFactory());
         RedisCacheWriter cacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(connectionFactory);
         // 创建 TenantRedisCacheManager 对象
-        return new TenantRedisCacheManager(cacheWriter, redisCacheConfiguration);
+        return new TenantRedisCacheManager(cacheWriter, redisCacheConfiguration, tenantProperties);
     }
 
 }

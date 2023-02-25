@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.framework.tenant.core.redis;
 
+import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.tenant.config.TenantProperties;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
+import jodd.io.StreamUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -17,17 +20,20 @@ import org.springframework.data.redis.cache.RedisCacheWriter;
 @Slf4j
 public class TenantRedisCacheManager extends RedisCacheManager {
 
+    private final TenantProperties tenantProperties;
+
     public TenantRedisCacheManager(RedisCacheWriter cacheWriter,
-                                   RedisCacheConfiguration defaultCacheConfiguration) {
+                                   RedisCacheConfiguration defaultCacheConfiguration,
+                                   TenantProperties tenantProperties) {
         super(cacheWriter, defaultCacheConfiguration);
+        this.tenantProperties = tenantProperties;
     }
 
     @Override
     public Cache getCache(String name) {
-        // 如果开启多租户，则 name 拼接租户后缀
-        if (!TenantContextHolder.isIgnore()
-            && TenantContextHolder.getTenantId() != null) {
-            name = name + ":" + TenantContextHolder.getTenantId();
+        // 如果不忽略多租户的 Cache，则自动拼接租户后缀
+        if (!tenantProperties.getIgnoreCaches().contains(name)) {
+            name = name + StrUtil.COLON + TenantContextHolder.getRequiredTenantId();
         }
 
         // 继续基于父方法

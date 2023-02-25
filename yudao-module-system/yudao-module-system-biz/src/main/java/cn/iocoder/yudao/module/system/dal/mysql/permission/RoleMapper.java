@@ -4,17 +4,20 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.tenant.core.db.dynamic.TenantDS;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RolePageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
+import com.baomidou.dynamic.datasource.annotation.Master;
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.lang.Nullable;
 
 import java.util.Collection;
 import java.util.List;
 
 @Mapper
-// TODO 芋艿：@TenantDS
+@TenantDS
 public interface RoleMapper extends BaseMapperX<RoleDO> {
 
     default PageResult<RoleDO> selectPage(RolePageReqVO reqVO) {
@@ -42,7 +45,7 @@ public interface RoleMapper extends BaseMapperX<RoleDO> {
         return selectOne(RoleDO::getCode, code);
     }
 
-    default List<RoleDO> selectListByStatus(@Nullable Collection<Integer> statuses) {
+    default List<RoleDO> selectListByStatus(Collection<Integer> statuses) {
         return selectList(RoleDO::getStatus, statuses);
     }
 

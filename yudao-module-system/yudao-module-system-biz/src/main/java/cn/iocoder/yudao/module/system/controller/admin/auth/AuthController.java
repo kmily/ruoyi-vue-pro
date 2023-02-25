@@ -96,8 +96,9 @@ public class AuthController {
             return null;
         }
         // 获得角色列表
-        Set<Long> roleIds = permissionService.getUserRoleIdsFromCache(getLoginUserId(), singleton(CommonStatusEnum.ENABLE.getStatus()));
-        List<RoleDO> roleList = roleService.getRoleListFromCache(roleIds);
+        Set<Long> roleIds = permissionService.getUserRoleIdsFromCache(getLoginUserId(),
+                singleton(CommonStatusEnum.ENABLE.getStatus()));
+        List<RoleDO> roleList = roleService.getRoleList(roleIds);
         // 获得菜单列表
         List<MenuDO> menuList = permissionService.getRoleMenuListFromCache(roleIds,
                 SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType(), MenuTypeEnum.BUTTON.getType()),

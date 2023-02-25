@@ -158,8 +158,7 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         // 判断角色是否包含超级管理员。如果是超级管理员，获取到全部
-        List<RoleDO> roleList = roleService.getRoleListFromCache(roleIds);
-        if (roleService.hasAnySuperAdmin(roleList)) {
+        if (roleService.hasAnySuperAdmin(roleIds)) {
             return menuService.getMenuListFromCache(menuTypes, menusStatuses);
         }
 

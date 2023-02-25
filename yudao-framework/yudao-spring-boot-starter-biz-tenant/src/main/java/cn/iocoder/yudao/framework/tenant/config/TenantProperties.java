@@ -39,4 +39,11 @@ public class TenantProperties {
      */
     private Set<String> ignoreTables = Collections.emptySet();
 
+    /**
+     * 需要忽略多租户的 {@link org.springframework.cache.Cache}
+     *
+     * 即默认所有 Cache 都开启多租户的功能
+     */
+    private Set<String> ignoreCaches = Collections.emptySet();
+
 }
