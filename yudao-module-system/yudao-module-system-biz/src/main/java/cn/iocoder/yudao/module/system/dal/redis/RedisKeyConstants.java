@@ -62,4 +62,12 @@ public interface RedisKeyConstants {
      */
     String DEPT_CHILDREN_ID_LIST_EXPIRE = "30s";
 
+    /**
+     * 拥有权限对应的菜单编号数组的缓存
+     *
+     * KEY 格式：permission_menu_ids::{permission}
+     * 数据类型：String 菜单编号数组
+     */
+    String PERMISSION_MENU_ID_LIST = "permission_menu_ids";
+
 }
