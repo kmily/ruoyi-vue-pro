@@ -5,9 +5,11 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplatePageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyTemplateDO;
+import com.baomidou.dynamic.datasource.annotation.Master;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
+@Master
 public interface NotifyTemplateMapper extends BaseMapperX<NotifyTemplateDO> {
 
     default NotifyTemplateDO selectByCode(String code) {

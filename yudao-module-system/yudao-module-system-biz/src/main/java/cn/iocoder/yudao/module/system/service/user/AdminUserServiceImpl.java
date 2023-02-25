@@ -75,7 +75,6 @@ public class AdminUserServiceImpl implements AdminUserService {
     private FileApi fileApi;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public Long createUser(UserCreateReqVO reqVO) {
         // 校验账户配合
         tenantService.handleTenantInfo(tenant -> {

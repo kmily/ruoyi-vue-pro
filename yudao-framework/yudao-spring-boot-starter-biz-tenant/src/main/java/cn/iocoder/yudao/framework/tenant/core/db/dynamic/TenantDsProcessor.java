@@ -21,6 +21,10 @@ public class TenantDsProcessor extends DsProcessor {
     @Override
     public String doDetermineDatasource(MethodInvocation invocation, String key) {
         Long tenantId = TenantContextHolder.getRequiredTenantId();
+        // TODO 芋艿：临时测试
+        if (tenantId != 1) {
+            tenantId = 2L;
+        }
         return "tenant_" + tenantId + "_ds";
     }
 

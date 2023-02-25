@@ -5,9 +5,11 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
+import com.baomidou.dynamic.datasource.annotation.Master;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
+@Master
 public interface SmsChannelMapper extends BaseMapperX<SmsChannelDO> {
 
     default PageResult<SmsChannelDO> selectPage(SmsChannelPageReqVO reqVO) {

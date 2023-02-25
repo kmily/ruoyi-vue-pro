@@ -5,9 +5,11 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.log.MailLogPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailLogDO;
+import com.baomidou.dynamic.datasource.annotation.Master;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
+@Master
 public interface MailLogMapper extends BaseMapperX<MailLogDO> {
 
     default PageResult<MailLogDO> selectPage(MailLogPageReqVO reqVO) {

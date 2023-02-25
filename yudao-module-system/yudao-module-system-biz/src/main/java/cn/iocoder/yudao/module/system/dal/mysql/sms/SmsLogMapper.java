@@ -6,11 +6,13 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsLogDO;
+import com.baomidou.dynamic.datasource.annotation.Master;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
 @Mapper
+@Master
 public interface SmsLogMapper extends BaseMapperX<SmsLogDO> {
 
     default PageResult<SmsLogDO> selectPage(SmsLogPageReqVO reqVO) {

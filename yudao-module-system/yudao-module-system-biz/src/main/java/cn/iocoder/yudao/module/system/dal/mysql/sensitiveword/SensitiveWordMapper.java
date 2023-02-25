@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sensitiveword.SensitiveWordDO;
+import com.baomidou.dynamic.datasource.annotation.Master;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
  * @author 永不言败
  */
 @Mapper
+@Master
 public interface SensitiveWordMapper extends BaseMapperX<SensitiveWordDO> {
 
     default PageResult<SensitiveWordDO> selectPage(SensitiveWordPageReqVO reqVO) {

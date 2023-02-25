@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodeExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodePageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.errorcode.ErrorCodeDO;
+import com.baomidou.dynamic.datasource.annotation.Master;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Mapper
+@Master
 public interface ErrorCodeMapper extends BaseMapperX<ErrorCodeDO> {
 
     default PageResult<ErrorCodeDO> selectPage(ErrorCodePageReqVO reqVO) {

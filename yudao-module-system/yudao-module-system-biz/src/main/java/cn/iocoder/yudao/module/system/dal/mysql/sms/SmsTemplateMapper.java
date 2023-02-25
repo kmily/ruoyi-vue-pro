@@ -6,11 +6,13 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplatePageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
+import com.baomidou.dynamic.datasource.annotation.Master;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
 @Mapper
+@Master
 public interface SmsTemplateMapper extends BaseMapperX<SmsTemplateDO> {
 
     default SmsTemplateDO selectByCode(String code) {

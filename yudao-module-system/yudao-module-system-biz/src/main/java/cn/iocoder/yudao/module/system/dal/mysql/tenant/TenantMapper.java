@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
+import com.baomidou.dynamic.datasource.annotation.Master;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
  * @author 芋道源码
  */
 @Mapper
+@Master
 public interface TenantMapper extends BaseMapperX<TenantDO> {
 
     default PageResult<TenantDO> selectPage(TenantPageReqVO reqVO) {

@@ -29,6 +29,8 @@ import cn.iocoder.yudao.module.system.service.permission.RoleService;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantInfoHandler;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantMenuHandler;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
+import com.baomidou.dynamic.datasource.annotation.DSTransactional;
+import com.baomidou.dynamic.datasource.annotation.Master;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -95,7 +97,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @DSTransactional // 多数据源，使用 @DSTransactional 保证本地事务，以及数据源的切换
     public Long createTenant(TenantCreateReqVO createReqVO) {
         // 校验套餐被禁用
         TenantPackageDO tenantPackage = tenantPackageService.validTenantPackage(createReqVO.getPackageId());
@@ -135,7 +137,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @DSTransactional // 多数据源，使用 @DSTransactional 保证本地事务，以及数据源的切换
     public void updateTenant(TenantUpdateReqVO updateReqVO) {
         // 校验存在
         TenantDO tenant = validateUpdateTenant(updateReqVO.getId());
@@ -152,7 +154,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @DSTransactional // 多数据源，使用 @DSTransactional 保证本地事务，以及数据源的切换
     public void updateTenantRoleMenu(Long tenantId, Set<Long> menuIds) {
         TenantUtils.execute(tenantId, () -> {
             // 获得所有角色

@@ -3,9 +3,11 @@ package cn.iocoder.yudao.module.system.dal.mysql.sms;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsCodeDO;
+import com.baomidou.dynamic.datasource.annotation.Master;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
+@Master
 public interface SmsCodeMapper extends BaseMapperX<SmsCodeDO> {
 
     /**

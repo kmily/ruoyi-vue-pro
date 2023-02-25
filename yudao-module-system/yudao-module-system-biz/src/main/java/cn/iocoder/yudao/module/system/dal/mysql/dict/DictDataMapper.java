@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
+import com.baomidou.dynamic.datasource.annotation.Master;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -14,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Mapper
+@Master
 public interface DictDataMapper extends BaseMapperX<DictDataDO> {
 
     default DictDataDO selectByDictTypeAndValue(String dictType, String value) {
