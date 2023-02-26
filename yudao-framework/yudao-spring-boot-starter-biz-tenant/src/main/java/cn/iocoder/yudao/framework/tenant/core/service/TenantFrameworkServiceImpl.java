@@ -2,7 +2,10 @@ package cn.iocoder.yudao.framework.tenant.core.service;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.util.cache.CacheUtils;
+import cn.iocoder.yudao.module.infra.api.db.dto.DataSourceConfigRespDTO;
 import cn.iocoder.yudao.module.system.api.tenant.TenantApi;
+import cn.iocoder.yudao.module.system.api.tenant.dto.TenantDataSourceConfigRespDTO;
+import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourceProperty;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +59,28 @@ public class TenantFrameworkServiceImpl implements TenantFrameworkService {
 
             });
 
+    /**
+     * 针对 {@link #getDataSourceProperty(Long)} 的缓存
+     */
+    private final LoadingCache<Long, DataSourceProperty> dataSourcePropertyCache = CacheUtils.buildAsyncReloadingCache(
+            Duration.ofMinutes(1L), // 过期时间 1 分钟
+            new CacheLoader<Long, DataSourceProperty>() {
+
+                @Override
+                public DataSourceProperty load(Long id) {
+                    // 获得租户对应的数据源配置
+                    TenantDataSourceConfigRespDTO dataSourceConfig = tenantApi.getTenantDataSourceConfig(id);
+                    if (dataSourceConfig == null) {
+                        return null;
+                    }
+                    // 转换成 dynamic-datasource 配置
+                    return new DataSourceProperty()
+                            .setPoolName(dataSourceConfig.getName()).setUrl(dataSourceConfig.getUrl())
+                            .setUsername(dataSourceConfig.getUsername()).setPassword(dataSourceConfig.getPassword());
+                }
+
+            });
+
     @Override
     @SneakyThrows
     public List<Long> getTenantIds() {
@@ -68,6 +93,12 @@ public class TenantFrameworkServiceImpl implements TenantFrameworkService {
         if (serviceException != SERVICE_EXCEPTION_NULL) {
             throw serviceException;
         }
+    }
+
+    @Override
+    @SneakyThrows
+    public DataSourceProperty getDataSourceProperty(Long id) {
+        return dataSourcePropertyCache.get(id);
     }
 
 }

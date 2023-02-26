@@ -4,6 +4,7 @@ import java.util.*;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
+import cn.iocoder.yudao.module.infra.api.db.dto.DataSourceConfigRespDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import cn.iocoder.yudao.module.infra.controller.admin.db.vo.*;
@@ -26,5 +27,7 @@ public interface DataSourceConfigConvert {
     DataSourceConfigRespVO convert(DataSourceConfigDO bean);
 
     List<DataSourceConfigRespVO> convertList(List<DataSourceConfigDO> list);
+
+    DataSourceConfigRespDTO convert02(DataSourceConfigDO bean);
 
 }

@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.framework.tenant.core.service;
 
+import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourceProperty;
+
 import java.util.List;
 
 /**
@@ -22,5 +24,13 @@ public interface TenantFrameworkService {
      * @param id 租户编号
      */
     void validTenant(Long id);
+
+    /**
+     * 获得租户对应的数据源配置
+     *
+     * @param id 租户编号
+     * @return 数据源配置
+     */
+    DataSourceProperty getDataSourceProperty(Long id);
 
 }

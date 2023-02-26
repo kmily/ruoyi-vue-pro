@@ -79,4 +79,13 @@ public class TenantDO extends BaseDO {
      */
     private Integer accountCount;
 
+    /**
+     * 数据源配置编号
+     *
+     * 多租户采用“分库”方案时，通过该字段配置所在数据源
+     *
+     * 关联 DataSourceConfigDO 的 id 字段
+     */
+    private Long datasourceConfigId;
+
 }

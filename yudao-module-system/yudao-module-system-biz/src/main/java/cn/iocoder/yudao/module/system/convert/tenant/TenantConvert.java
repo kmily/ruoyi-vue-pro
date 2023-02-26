@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.system.convert.tenant;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.infra.api.db.dto.DataSourceConfigRespDTO;
+import cn.iocoder.yudao.module.system.api.tenant.dto.TenantDataSourceConfigRespDTO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantExcelVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantRespVO;
@@ -41,5 +43,7 @@ public interface TenantConvert {
         reqVO.setNickname(bean.getContactName()).setMobile(bean.getContactMobile());
         return reqVO;
     }
+
+    TenantDataSourceConfigRespDTO convert(DataSourceConfigRespDTO bean);
 
 }

@@ -18,6 +18,9 @@ import cn.iocoder.yudao.framework.tenant.core.web.TenantContextWebFilter;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import cn.iocoder.yudao.module.system.api.tenant.TenantApi;
+import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
+import com.baomidou.dynamic.datasource.creator.DataSourceCreator;
+import com.baomidou.dynamic.datasource.creator.DefaultDataSourceCreator;
 import com.baomidou.dynamic.datasource.processor.DsProcessor;
 import com.baomidou.dynamic.datasource.processor.DsSpelExpressionProcessor;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
@@ -36,6 +39,7 @@ import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import javax.sql.DataSource;
 import java.util.Objects;
 
 @AutoConfiguration
@@ -68,7 +72,12 @@ public class YudaoTenantAutoConfiguration {
     }
 
     @Bean
-    public DsProcessor dsProcessor() {
+    public DsProcessor dsProcessor(
+//            TenantFrameworkService tenantFrameworkService,
+//                                   DataSource dataSource,
+//                                   DefaultDataSourceCreator dataSourceCreator
+    ) {
+//        TenantDsProcessor tenantDsProcessor = new TenantDsProcessor(tenantFrameworkService, dataSourceCreator);
         TenantDsProcessor tenantDsProcessor = new TenantDsProcessor();
         tenantDsProcessor.setNextProcessor(new DsSpelExpressionProcessor());
         return tenantDsProcessor;
