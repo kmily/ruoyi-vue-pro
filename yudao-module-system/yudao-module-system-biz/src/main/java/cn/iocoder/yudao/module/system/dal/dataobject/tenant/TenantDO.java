@@ -86,6 +86,6 @@ public class TenantDO extends BaseDO {
      *
      * 关联 DataSourceConfigDO 的 id 字段
      */
-    private Long datasourceConfigId;
+    private Long dataSourceConfigId;
 
 }

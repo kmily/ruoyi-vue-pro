@@ -41,3 +41,11 @@ export function getDataSourceConfigList() {
     method: 'get',
   })
 }
+
+// 获取数据源配置精简信息列表
+export function getSimpleDataSourceConfigList() {
+  return request({
+    url: '/infra/data-source-config/list-all-simple',
+    method: 'get',
+  })
+}

@@ -11,7 +11,6 @@ import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptUpdateRe
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.DeptMapper;
 import cn.iocoder.yudao.module.system.enums.dept.DeptIdEnum;
-import cn.iocoder.yudao.module.system.mq.producer.dept.DeptProducer;
 import com.google.common.collect.Multimap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

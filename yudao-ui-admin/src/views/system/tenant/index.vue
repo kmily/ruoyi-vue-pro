@@ -45,25 +45,30 @@
     <el-table v-loading="loading" :data="list">
       <el-table-column label="租户编号" align="center" prop="id" />
       <el-table-column label="租户名" align="center" prop="name" />
-      <el-table-column label="租户套餐" align="center" prop="packageId">
+      <el-table-column label="租户套餐" align="center" prop="packageId" width="100">
         <template v-slot="scope">
           <el-tag v-if="scope.row.packageId === 0" type="danger">系统租户</el-tag>
-          <el-tag v-else> {{getPackageName(scope.row.packageId)}} </el-tag>
+          <el-tag v-else> {{ getPackageName(scope.row.packageId )}} </el-tag>
         </template>
       </el-table-column>
       <el-table-column label="联系人" align="center" prop="contactName" />
-      <el-table-column label="联系手机" align="center" prop="contactMobile" />
+      <el-table-column label="联系手机" align="center" prop="contactMobile" width="120" />
       <el-table-column label="账号额度" align="center" prop="accountCount">
         <template v-slot="scope">
           <el-tag> {{scope.row.accountCount}} </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="过期时间" align="center" prop="expireTime" width="180">
+      <el-table-column label="过期时间" align="center" prop="expireTime" width="180" >
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.expireTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="绑定域名" align="center" prop="domain" width="180" />
+      <el-table-column label="数据源" align="center" prop="dataSourceConfigId" width="100" >
+        <template v-slot="scope">
+          <el-tag type="success"> {{ getDataSourceConfigName(scope.row.dataSourceConfigId )}} </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="租户状态" align="center" prop="status">
         <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
@@ -74,7 +79,7 @@
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="110">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['system:tenant:update']">修改</el-button>
@@ -120,6 +125,12 @@
         <el-form-item label="绑定域名" prop="domain">
           <el-input v-model="form.domain" placeholder="请输入绑定域名" />
         </el-form-item>
+        <el-form-item label="数据源" prop="dataSourceConfigId">
+          <el-select v-model="form.dataSourceConfigId" placeholder="请选择数据源" clearable>
+            <el-option v-for="config in dataSourceConfigs"
+                       :key="config.id" :label="config.name" :value="config.id"/>
+          </el-select>
+        </el-form-item>
         <el-form-item label="租户状态" prop="status">
           <el-radio-group v-model="form.status">
             <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
@@ -139,6 +150,7 @@
 import { createTenant, updateTenant, deleteTenant, getTenant, getTenantPage, exportTenantExcel } from "@/api/system/tenant";
 import { CommonStatusEnum } from '@/utils/constants'
 import {getTenantPackageList} from "@/api/system/tenantPackage";
+import {getSimpleDataSourceConfigList} from "@/api/infra/dataSourceConfig";
 
 export default {
   name: "Tenant",
@@ -183,7 +195,12 @@ export default {
         accountCount: [{ required: true, message: "账号额度不能为空", trigger: "blur" }],
         expireTime: [{ required: true, message: "过期时间不能为空", trigger: "blur" }],
         domain: [{ required: true, message: "绑定域名不能为空", trigger: "blur" }],
-      }
+        username: [{ required: true, message: "账号不能为空", trigger: "blur" }],
+        password: [{ required: true, message: "密码不能为空", trigger: "blur" }],
+        datasourceConfigId: [{ required: true, message: "数据源不能为空", trigger: "blur" }],
+      },
+      // 数据源配置
+      dataSourceConfigs: [],
     };
   },
   created() {
@@ -192,6 +209,10 @@ export default {
     getTenantPackageList().then(response => {
       this.packageList = response.data;
     })
+    // 获得数据源配置列表
+    getSimpleDataSourceConfigList().then(response => {
+      this.dataSourceConfigs = response.data;
+    });
   },
   methods: {
     /** 查询列表 */
@@ -221,6 +242,7 @@ export default {
         expireTime: undefined,
         domain: undefined,
         status: CommonStatusEnum.ENABLE,
+        dataSourceConfigId: 0, // 默认 0 为 master 主数据源
       };
       this.resetForm("form");
     },
@@ -306,6 +328,15 @@ export default {
         }
       }
       return '未知套餐';
+    },
+    /** 套餐名格式化 */
+    getDataSourceConfigName(dataSourceConfigId) {
+      for (const item of this.dataSourceConfigs) {
+        if (item.id === dataSourceConfigId) {
+          return item.name;
+        }
+      }
+      return '未知数据源';
     }
   }
 };

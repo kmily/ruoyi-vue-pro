@@ -43,4 +43,8 @@ public class TenantBaseVO {
     @NotNull(message = "账号数量不能为空")
     private Integer accountCount;
 
+    @Schema(description = "数据源配置编号", required = true, example = "4096")
+    @NotNull(message = "数据源配置编号不能为空")
+    private Long dataSourceConfigId;
+
 }

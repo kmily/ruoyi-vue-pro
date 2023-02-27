@@ -36,7 +36,8 @@
 
 <script>
 import { getSchemaTableList, createCodegenList } from "@/api/infra/codegen";
-import {getDataSourceConfigList} from "@/api/infra/dataSourceConfig";
+import { getSimpleDataSourceConfigList } from "@/api/infra/dataSourceConfig";
+
 export default {
   data() {
     return {
@@ -65,7 +66,7 @@ export default {
     show() {
       this.visible = true;
       // 加载数据源
-      getDataSourceConfigList().then(response => {
+      getSimpleDataSourceConfigList().then(response => {
         this.dataSourceConfigs = response.data;
         this.queryParams.dataSourceConfigId = this.dataSourceConfigs[0].id;
         // 加载表列表

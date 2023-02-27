@@ -30,4 +30,6 @@ public interface DataSourceConfigConvert {
 
     DataSourceConfigRespDTO convert02(DataSourceConfigDO bean);
 
+    List<DataSourceConfigSimpleRespVO> convertList02(List<DataSourceConfigDO> list);
+
 }

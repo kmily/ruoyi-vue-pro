@@ -43,7 +43,7 @@ public class TenantApiImpl implements TenantApi {
         }
         // 获得租户的数据源配置
         return TenantConvert.INSTANCE.convert(
-                dataSourceConfigServiceApi.getDataSourceConfig(tenant.getDatasourceConfigId()));
+                dataSourceConfigServiceApi.getDataSourceConfig(tenant.getDataSourceConfigId()));
     }
 
 }
