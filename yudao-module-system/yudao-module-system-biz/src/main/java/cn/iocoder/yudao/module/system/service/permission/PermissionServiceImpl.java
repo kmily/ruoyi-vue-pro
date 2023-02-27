@@ -7,7 +7,6 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
-import cn.iocoder.yudao.framework.tenant.core.db.dynamic.TenantDS;
 import cn.iocoder.yudao.module.system.api.permission.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
@@ -206,19 +205,18 @@ public class PermissionServiceImpl implements PermissionService {
      * @param permission 权限标识
      * @return 是否拥有
      */
-    // TODO 芋艿：要想想咋继续优化
     private boolean hasAnyPermission(List<RoleDO> roles, String permission) {
-        List<MenuDO> menuList = menuService.getMenuListByPermissionFromCache(permission);
+        List<Long> menuIds = menuService.getMenuIdListByPermissionFromCache(permission);
         // 采用严格模式，如果权限找不到对应的 Menu 的话，也认为没有权限
-        if (CollUtil.isEmpty(menuList)) {
+        if (CollUtil.isEmpty(menuIds)) {
             return false;
         }
 
         // 判断是否有权限
         Set<Long> roleIds = convertSet(roles, RoleDO::getId);
-        for (MenuDO menu : menuList) {
+        for (Long menuId : menuIds) {
             // 拥有该角色的菜单编号数组
-            Set<Long> menuRoleIds = getSelf().getMenuRoleIdListByMenuIdFromCache(menu.getId());
+            Set<Long> menuRoleIds = getSelf().getMenuRoleIdListByMenuIdFromCache(menuId);
             // 如果有交集，说明有权限
             if (CollUtil.containsAny(menuRoleIds, roleIds)) {
                 return true;

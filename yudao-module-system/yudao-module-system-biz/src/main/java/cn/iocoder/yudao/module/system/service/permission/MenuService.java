@@ -62,12 +62,12 @@ public interface MenuService {
     List<MenuDO> getMenuList(MenuListReqVO reqVO);
 
     /**
-     * 获得权限对应的菜单数组
+     * 获得权限对应的菜单编号数组
      *
      * @param permission 权限标识
      * @return 数组
      */
-    List<MenuDO> getMenuListByPermissionFromCache(String permission);
+    List<Long> getMenuIdListByPermissionFromCache(String permission);
 
     /**
      * 获得菜单

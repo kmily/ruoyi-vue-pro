@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.service.permission;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuUpdateReqVO;
@@ -10,9 +11,9 @@ import cn.iocoder.yudao.module.system.dal.mysql.permission.MenuMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
 import cn.iocoder.yudao.module.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
-import com.baomidou.dynamic.datasource.annotation.Master;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO.ID_ROOT;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
@@ -44,6 +46,7 @@ public class MenuServiceImpl implements MenuService {
     private TenantService tenantService;
 
     @Override
+    @CacheEvict(value = RedisKeyConstants.PERMISSION_MENU_ID_LIST, key = "#reqVO.permission")
     public Long createMenu(MenuCreateReqVO reqVO) {
         // 校验父菜单存在
         validateParentMenu(reqVO.getParentId(), null);
@@ -59,6 +62,8 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @CacheEvict(value = RedisKeyConstants.PERMISSION_MENU_ID_LIST,
+            allEntries = true) // allEntries 清空所有缓存，因为 permission 如果变更，涉及到新老两个 permission。直接清理，简单有效
     public void updateMenu(MenuUpdateReqVO reqVO) {
         // 校验更新的菜单是否存在
         if (menuMapper.selectById(reqVO.getId()) == null) {
@@ -77,19 +82,21 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteMenu(Long menuId) {
+    @CacheEvict(value = RedisKeyConstants.PERMISSION_MENU_ID_LIST,
+            allEntries = true) // allEntries 清空所有缓存，因为此时不知道 id 对应的 permission 是多少。直接清理，简单有效
+    public void deleteMenu(Long id) {
         // 校验是否还有子菜单
-        if (menuMapper.selectCountByParentId(menuId) > 0) {
+        if (menuMapper.selectCountByParentId(id) > 0) {
             throw exception(MENU_EXISTS_CHILDREN);
         }
         // 校验删除的菜单是否存在
-        if (menuMapper.selectById(menuId) == null) {
+        if (menuMapper.selectById(id) == null) {
             throw exception(MENU_NOT_EXISTS);
         }
         // 标记删除
-        menuMapper.deleteById(menuId);
+        menuMapper.deleteById(id);
         // 删除授予给角色的权限
-        permissionService.processMenuDeleted(menuId);
+        permissionService.processMenuDeleted(id);
     }
 
     @Override
@@ -112,8 +119,9 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Cacheable(value = RedisKeyConstants.PERMISSION_MENU_ID_LIST, key = "#permission")
-    public List<MenuDO> getMenuListByPermissionFromCache(String permission) {
-        return menuMapper.selectListByPermission(permission);
+    public List<Long> getMenuIdListByPermissionFromCache(String permission) {
+        List<MenuDO> menus = menuMapper.selectListByPermission(permission);
+        return convertList(menus, MenuDO::getId);
     }
 
     @Override
