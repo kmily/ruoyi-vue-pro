@@ -23,6 +23,7 @@ import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
+import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -75,6 +76,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     private FileApi fileApi;
 
     @Override
+    @DSTransactional // 多租户多 DB 场景：使用 @DSTransactional 实现事务，避免 @Transactional 无法切换数据源
     public Long createUser(UserCreateReqVO reqVO) {
         // 校验账户配合
         tenantService.handleTenantInfo(tenant -> {
