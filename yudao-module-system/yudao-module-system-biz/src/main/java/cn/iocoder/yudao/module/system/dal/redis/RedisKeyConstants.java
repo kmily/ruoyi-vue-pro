@@ -57,10 +57,6 @@ public interface RedisKeyConstants {
      * 数据类型：String 子部门编号集合
      */
     String DEPT_CHILDREN_ID_LIST = "dept_children_ids";
-    /**
-     * {@link #DEPT_CHILDREN_ID_LIST} 的过期时间
-     */
-    String DEPT_CHILDREN_ID_LIST_EXPIRE = "30s";
 
     /**
      * 拥有权限对应的菜单编号数组的缓存

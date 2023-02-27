@@ -39,31 +39,12 @@ public interface DeptService {
     void deleteDept(Long id);
 
     /**
-     * 筛选部门列表
-     *
-     * @param reqVO 筛选条件请求 VO
-     * @return 部门列表
-     */
-    List<DeptDO> getDeptList(DeptListReqVO reqVO);
-
-    /**
-     * 获得指定部门的所有子部门
+     * 获得部门信息
      *
      * @param id 部门编号
-     * @return 子部门列表
+     * @return 部门信息
      */
-    List<DeptDO> getChildDeptList(Long id);
-
-    /**
-     * 获得所有子部门，从缓存中
-     *
-     * 注意，该缓存不是实时更新，最多会有 1 分钟延迟。
-     * 一般来说，不会影响使用，因为部门的变更，不会频繁发生。
-     *
-     * @param id 父部门编号
-     * @return 子部门列表
-     */
-    Set<Long> getChildDeptIdListFromCache(Long id);
+    DeptDO getDept(Long id);
 
     /**
      * 获得部门信息数组
@@ -72,6 +53,14 @@ public interface DeptService {
      * @return 部门信息数组
      */
     List<DeptDO> getDeptList(Collection<Long> ids);
+
+    /**
+     * 筛选部门列表
+     *
+     * @param reqVO 筛选条件请求 VO
+     * @return 部门列表
+     */
+    List<DeptDO> getDeptList(DeptListReqVO reqVO);
 
     /**
      * 获得指定编号的部门 Map
@@ -88,12 +77,20 @@ public interface DeptService {
     }
 
     /**
-     * 获得部门信息
+     * 获得指定部门的所有子部门
      *
      * @param id 部门编号
-     * @return 部门信息
+     * @return 子部门列表
      */
-    DeptDO getDept(Long id);
+    List<DeptDO> getChildDeptList(Long id);
+
+    /**
+     * 获得所有子部门，从缓存中
+     *
+     * @param id 父部门编号
+     * @return 子部门列表
+     */
+    Set<Long> getChildDeptIdListFromCache(Long id);
 
     /**
      * 校验部门们是否有效。如下情况，视为无效：

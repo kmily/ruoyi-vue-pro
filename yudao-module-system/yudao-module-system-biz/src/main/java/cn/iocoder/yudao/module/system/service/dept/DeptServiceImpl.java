@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.service.dept;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptCreateReqVO;
@@ -11,7 +12,9 @@ import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.DeptMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
 import cn.iocoder.yudao.module.system.enums.dept.DeptIdEnum;
+import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -37,6 +40,8 @@ public class DeptServiceImpl implements DeptService {
     private DeptMapper deptMapper;
 
     @Override
+    @CacheEvict(cacheNames = RedisKeyConstants.DEPT_CHILDREN_ID_LIST,
+            allEntries = true) // allEntries 清空所有缓存，因为操作一个部门，涉及到多个缓存
     public Long createDept(DeptCreateReqVO reqVO) {
         // 校验正确性
         if (reqVO.getParentId() == null) {
@@ -50,6 +55,8 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
+    @CacheEvict(cacheNames = RedisKeyConstants.DEPT_CHILDREN_ID_LIST,
+            allEntries = true) // allEntries 清空所有缓存，因为操作一个部门，涉及到多个缓存
     public void updateDept(DeptUpdateReqVO reqVO) {
         // 校验正确性
         if (reqVO.getParentId() == null) {
@@ -62,6 +69,8 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
+    @CacheEvict(cacheNames = RedisKeyConstants.DEPT_CHILDREN_ID_LIST,
+            allEntries = true) // allEntries 清空所有缓存，因为操作一个部门，涉及到多个缓存
     public void deleteDept(Long id) {
         // 校验是否存在
         validateDeptExists(id);
@@ -71,6 +80,72 @@ public class DeptServiceImpl implements DeptService {
         }
         // 删除部门
         deptMapper.deleteById(id);
+    }
+
+    private void validateForCreateOrUpdate(Long id, Long parentId, String name) {
+        // 校验自己存在
+        validateDeptExists(id);
+        // 校验父部门的有效性
+        validateParentDept(id, parentId);
+        // 校验部门名的唯一性
+        validateDeptNameUnique(id, parentId, name);
+    }
+
+    @VisibleForTesting
+    void validateDeptExists(Long id) {
+        if (id == null) {
+            return;
+        }
+        DeptDO dept = deptMapper.selectById(id);
+        if (dept == null) {
+            throw exception(DEPT_NOT_FOUND);
+        }
+    }
+
+    @VisibleForTesting
+    void validateParentDept(Long id, Long parentId) {
+        if (parentId == null || DeptIdEnum.ROOT.getId().equals(parentId)) {
+            return;
+        }
+        // 不能设置自己为父部门
+        if (parentId.equals(id)) {
+            throw exception(DEPT_PARENT_ERROR);
+        }
+        // 父岗位不存在
+        DeptDO dept = deptMapper.selectById(parentId);
+        if (dept == null) {
+            throw exception(DEPT_PARENT_NOT_EXITS);
+        }
+        // 父部门不能是原来的子部门
+        List<DeptDO> children = getChildDeptList(id);
+        if (children.stream().anyMatch(dept1 -> dept1.getId().equals(parentId))) {
+            throw exception(DEPT_PARENT_IS_CHILD);
+        }
+    }
+
+    @VisibleForTesting
+    void validateDeptNameUnique(Long id, Long parentId, String name) {
+        DeptDO dept = deptMapper.selectByParentIdAndName(parentId, name);
+        if (dept == null) {
+            return;
+        }
+        // 如果 id 为空，说明不用比较是否为相同 id 的岗位
+        if (id == null) {
+            throw exception(DEPT_NAME_DUPLICATE);
+        }
+        if (ObjectUtil.notEqual(dept.getId(), id)) {
+            throw exception(DEPT_NAME_DUPLICATE);
+        }
+    }
+
+    @Override
+    public DeptDO getDept(Long id) {
+        return deptMapper.selectById(id);
+    }
+
+    @Override
+    public List<DeptDO> getDeptList(Collection<Long> ids) {
+        return deptMapper.selectBatchIds(ids);
     }
 
     @Override
@@ -99,82 +174,10 @@ public class DeptServiceImpl implements DeptService {
 
     @Override
     @DataPermission(enable = false) // 禁用数据权限，避免简历不正确的缓存
-    @Cacheable(cacheNames = RedisKeyConstants.DEPT_CHILDREN_ID_LIST
-            + "#" + RedisKeyConstants.DEPT_CHILDREN_ID_LIST_EXPIRE, key = "#id")
+    @Cacheable(cacheNames = RedisKeyConstants.DEPT_CHILDREN_ID_LIST, key = "#id")
     public Set<Long> getChildDeptIdListFromCache(Long id) {
-        // 补充说明：为什么该缓存会有 1 分钟的延迟？主要有两点：
-        // 1. Spring Cache 无法方便的批量清理，所以使用 Redis 自动过期的方式。
-        // 2. 变更父节点的时候，影响父子节点的数量很多，包括原父节点及其父节点，以及新父节点及其父节点。
-        // 如果你真的对延迟比较敏感，可以考虑采用使用 allEntries = true 的方式，清理所有缓存。
         List<DeptDO> children = getChildDeptList(id);
         return convertSet(children, DeptDO::getId);
-    }
-
-    private void validateForCreateOrUpdate(Long id, Long parentId, String name) {
-        // 校验自己存在
-        validateDeptExists(id);
-        // 校验父部门的有效性
-        validateParentDeptEnable(id, parentId);
-        // 校验部门名的唯一性
-        validateDeptNameUnique(id, parentId, name);
-    }
-
-    private void validateParentDeptEnable(Long id, Long parentId) {
-        if (parentId == null || DeptIdEnum.ROOT.getId().equals(parentId)) {
-            return;
-        }
-        // 不能设置自己为父部门
-        if (parentId.equals(id)) {
-            throw exception(DEPT_PARENT_ERROR);
-        }
-        // 父岗位不存在
-        DeptDO dept = deptMapper.selectById(parentId);
-        if (dept == null) {
-            throw exception(DEPT_PARENT_NOT_EXITS);
-        }
-        // 父部门被禁用
-        if (!CommonStatusEnum.ENABLE.getStatus().equals(dept.getStatus())) {
-            throw exception(DEPT_NOT_ENABLE);
-        }
-        // 父部门不能是原来的子部门
-        List<DeptDO> children = getChildDeptList(id);
-        if (children.stream().anyMatch(dept1 -> dept1.getId().equals(parentId))) {
-            throw exception(DEPT_PARENT_IS_CHILD);
-        }
-    }
-
-    private void validateDeptExists(Long id) {
-        if (id == null) {
-            return;
-        }
-        DeptDO dept = deptMapper.selectById(id);
-        if (dept == null) {
-            throw exception(DEPT_NOT_FOUND);
-        }
-    }
-
-    private void validateDeptNameUnique(Long id, Long parentId, String name) {
-        DeptDO menu = deptMapper.selectByParentIdAndName(parentId, name);
-        if (menu == null) {
-            return;
-        }
-        // 如果 id 为空，说明不用比较是否为相同 id 的岗位
-        if (id == null) {
-            throw exception(DEPT_NAME_DUPLICATE);
-        }
-        if (!menu.getId().equals(id)) {
-            throw exception(DEPT_NAME_DUPLICATE);
-        }
-    }
-
-    @Override
-    public List<DeptDO> getDeptList(Collection<Long> ids) {
-        return deptMapper.selectBatchIds(ids);
-    }
-
-    @Override
-    public DeptDO getDept(Long id) {
-        return deptMapper.selectById(id);
     }
 
     @Override
