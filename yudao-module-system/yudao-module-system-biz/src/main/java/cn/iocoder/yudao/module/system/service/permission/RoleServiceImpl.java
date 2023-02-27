@@ -52,7 +52,7 @@ public class RoleServiceImpl implements RoleService {
     private RoleMapper roleMapper;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Long createRole(RoleCreateReqVO reqVO, Integer type) {
         // 校验角色
         validateRoleDuplicate(reqVO.getName(), reqVO.getCode(), null);
@@ -116,64 +116,6 @@ public class RoleServiceImpl implements RoleService {
         permissionService.processRoleDeleted(id);
     }
 
-    @Override
-    public List<RoleDO> getRoleListByStatus(@Nullable Collection<Integer> statuses) {
-        return roleMapper.selectListByStatus(statuses);
-    }
-
-    @Override
-    public List<RoleDO> getRoleList() {
-        return roleMapper.selectList();
-    }
-
-    @Override
-    public RoleDO getRole(Long id) {
-        return roleMapper.selectById(id);
-    }
-
-    @Override
-    @Cacheable(value = RedisKeyConstants.ROLE, key = "#id", unless = "#result == null")
-    public RoleDO getRoleFromCache(Long id) {
-        return roleMapper.selectById(id);
-    }
-
-    @Override
-    public List<RoleDO> getRoleList(Collection<Long> ids) {
-        return roleMapper.selectBatchIds(ids);
-    }
-
-    @Override
-    public List<RoleDO> getRoleListFromCache(Collection<Long> ids) {
-        if (CollectionUtil.isEmpty(ids)) {
-            return Collections.emptyList();
-        }
-        // 这里采用 for 循环从缓存中获取，主要考虑 Spring CacheManager 无法批量操作的问题
-        RoleServiceImpl self = getSelf();
-        return convertList(ids, self::getRoleFromCache);
-    }
-
-
-    @Override
-    public boolean hasAnySuperAdmin(Collection<Long> ids) {
-        if (CollectionUtil.isEmpty(ids)) {
-            return false;
-        }
-        return ids.stream().anyMatch(id -> {
-            RoleDO role = getRoleFromCache(id);
-            return role != null && RoleCodeEnum.isSuperAdmin(role.getCode());
-        });
-    }
-
-    @Override
-    public PageResult<RoleDO> getRolePage(RolePageReqVO reqVO) {
-        return roleMapper.selectPage(reqVO);
-    }
-
-    @Override
-    public List<RoleDO> getRoleList(RoleExportReqVO reqVO) {
-        return roleMapper.selectList(reqVO);
-    }
-
     /**
      * 校验角色的唯一字段是否重复
      *
@@ -221,6 +163,65 @@ public class RoleServiceImpl implements RoleService {
         if (RoleTypeEnum.SYSTEM.getType().equals(roleDO.getType())) {
             throw exception(ROLE_CAN_NOT_UPDATE_SYSTEM_TYPE_ROLE);
         }
+    }
+
+    @Override
+    public RoleDO getRole(Long id) {
+        return roleMapper.selectById(id);
+    }
+
+    @Override
+    @Cacheable(value = RedisKeyConstants.ROLE, key = "#id", unless = "#result == null")
+    public RoleDO getRoleFromCache(Long id) {
+        return roleMapper.selectById(id);
+    }
+
+
+    @Override
+    public List<RoleDO> getRoleListByStatus(Collection<Integer> statuses) {
+        return roleMapper.selectListByStatus(statuses);
+    }
+
+    @Override
+    public List<RoleDO> getRoleList() {
+        return roleMapper.selectList();
+    }
+
+    @Override
+    public List<RoleDO> getRoleList(Collection<Long> ids) {
+        return roleMapper.selectBatchIds(ids);
+    }
+
+    @Override
+    public List<RoleDO> getRoleListFromCache(Collection<Long> ids) {
+        if (CollectionUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        // 这里采用 for 循环从缓存中获取，主要考虑 Spring CacheManager 无法批量操作的问题
+        RoleServiceImpl self = getSelf();
+        return convertList(ids, self::getRoleFromCache);
+    }
+
+    @Override
+    public PageResult<RoleDO> getRolePage(RolePageReqVO reqVO) {
+        return roleMapper.selectPage(reqVO);
+    }
+
+    @Override
+    public List<RoleDO> getRoleList(RoleExportReqVO reqVO) {
+        return roleMapper.selectList(reqVO);
+    }
+
+    @Override
+    public boolean hasAnySuperAdmin(Collection<Long> ids) {
+        if (CollectionUtil.isEmpty(ids)) {
+            return false;
+        }
+        RoleServiceImpl self = getSelf();
+        return ids.stream().anyMatch(id -> {
+            RoleDO role = self.getRoleFromCache(id);
+            return role != null && RoleCodeEnum.isSuperAdmin(role.getCode());
+        });
     }
 
     @Override
