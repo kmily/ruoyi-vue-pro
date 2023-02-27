@@ -10,16 +10,16 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="主键编号" align="center" prop="id" />
-      <el-table-column label="数据源名称" align="center" prop="name" />
+      <el-table-column label="主键编号" align="center" prop="id" width="100" />
+      <el-table-column label="数据源名称" align="center" prop="name" width="120"/>
       <el-table-column label="数据源连接" align="center" prop="url" />
-      <el-table-column label="用户名" align="center" prop="username" />
+      <el-table-column label="用户名" align="center" prop="username" width="100" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="120">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['infra:data-source-config:update']">修改</el-button>
@@ -36,7 +36,7 @@
           <el-input v-model="form.name" placeholder="请输入参数名称" />
         </el-form-item>
         <el-form-item label="数据源连接" prop="url">
-          <el-input v-model="form.url" placeholder="请输入数据源连接" />
+          <el-input type="textarea" v-model="form.url" placeholder="请输入数据源连接" :rows="6" />
         </el-form-item>
         <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" placeholder="请输入用户名" />

@@ -76,7 +76,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+//    @Transactional(rollbackFor = Exception.class) // TODO 芋艿：不能使用 MySQL 事务
     public void assignRoleMenu(Long roleId, Set<Long> menuIds) {
         // 获得角色拥有菜单编号
         Set<Long> dbMenuIds = convertSet(roleMenuMapper.selectListByRoleId(roleId), RoleMenuDO::getMenuId);
@@ -129,7 +129,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    //    @Transactional(rollbackFor = Exception.class) // TODO 芋艿：不能使用 MySQL 事务
     public void assignUserRole(Long userId, Set<Long> roleIds) {
         // 获得角色拥有角色编号
         Set<Long> dbRoleIds = convertSet(userRoleMapper.selectListByUserId(userId),
