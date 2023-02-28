@@ -3,6 +3,7 @@
     <el-upload
         multiple
         :action="uploadFileUrl"
+        :data="data"
         list-type="picture-card"
         :on-success="handleUploadSuccess"
         :before-upload="handleBeforeUpload"
@@ -48,6 +49,8 @@ import { getAccessToken } from "@/utils/auth";
 export default {
   props: {
     value: [String, Object, Array],
+    //前端给后端提交的其他数据，看了后端的接口可以提供比如指定名称或路径等数据
+    data: Object,
     // 图片数量限制
     limit: {
       type: Number,
