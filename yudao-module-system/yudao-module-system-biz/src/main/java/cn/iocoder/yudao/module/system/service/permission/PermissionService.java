@@ -16,6 +16,44 @@ import static java.util.Collections.singleton;
  */
 public interface PermissionService {
 
+    /**
+     * 判断是否有权限，任一一个即可
+     *
+     * @param userId 用户编号
+     * @param permissions 权限
+     * @return 是否
+     */
+    boolean hasAnyPermissions(Long userId, String... permissions);
+
+    /**
+     * 判断是否有角色，任一一个即可
+     *
+     * @param roles 角色数组
+     * @return 是否
+     */
+    boolean hasAnyRoles(Long userId, String... roles);
+
+    /**
+     * 处理角色删除时，删除关联授权数据
+     *
+     * @param roleId 角色编号
+     */
+    void processRoleDeleted(Long roleId);
+
+    /**
+     * 处理菜单删除时，删除关联授权数据
+     *
+     * @param menuId 菜单编号
+     */
+    void processMenuDeleted(Long menuId);
+
+    /**
+     * 处理用户删除是，删除关联授权数据
+     *
+     * @param userId 用户编号
+     */
+    void processUserDeleted(Long userId);
+
     // ========== 角色-菜单的相关方法  ==========
 
     /**
@@ -43,6 +81,8 @@ public interface PermissionService {
      * @return 角色编号数组
      */
     Set<Long> getMenuRoleIdListByMenuIdFromCache(Long menuId);
+
+    // ========== 用户-角色的相关方法  ==========
 
     /**
      * 获得拥有多个角色的用户编号集合
@@ -84,6 +124,8 @@ public interface PermissionService {
      */
     void assignUserRole(Long userId, Set<Long> roleIds);
 
+    // ========== 用户-部门的相关方法  ==========
+
     /**
      * 设置角色的数据权限
      *
@@ -94,53 +136,11 @@ public interface PermissionService {
     void assignRoleDataScope(Long roleId, Integer dataScope, Set<Long> dataScopeDeptIds);
 
     /**
-     * 处理角色删除时，删除关联授权数据
-     *
-     * @param roleId 角色编号
-     */
-    void processRoleDeleted(Long roleId);
-
-    /**
-     * 处理菜单删除时，删除关联授权数据
-     *
-     * @param menuId 菜单编号
-     */
-    void processMenuDeleted(Long menuId);
-
-    /**
-     * 处理用户删除是，删除关联授权数据
-     *
-     * @param userId 用户编号
-     */
-    void processUserDeleted(Long userId);
-
-    /**
-     * 判断是否有权限，任一一个即可
-     *
-     * @param userId 用户编号
-     * @param permissions 权限
-     * @return 是否
-     */
-    boolean hasAnyPermissions(Long userId, String... permissions);
-
-    /**
-     * 判断是否有角色，任一一个即可
-     *
-     * @param roles 角色数组
-     * @return 是否
-     */
-    boolean hasAnyRoles(Long userId, String... roles);
-
-    /**
      * 获得登陆用户的部门数据权限
      *
      * @param userId 用户编号
      * @return 部门数据权限
      */
     DeptDataPermissionRespDTO getDeptDataPermission(Long userId);
-
-    // ========== 用户-角色的相关方法  ==========
-
-    // ========== 用户-部门的相关方法  ==========
 
 }

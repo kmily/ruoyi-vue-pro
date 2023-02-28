@@ -59,6 +59,75 @@ public class PermissionServiceImpl implements PermissionService {
     private AdminUserService userService;
 
     @Override
+    public boolean hasAnyPermissions(Long userId, String... permissions) {
+        // 如果为空，说明已经有权限
+        if (ArrayUtil.isEmpty(permissions)) {
+            return true;
+        }
+
+        // 获得当前登录的角色。如果为空，说明没有权限
+        List<RoleDO> roles = getEnableUserRoleListByUserIdFromCache(userId);
+        if (CollUtil.isEmpty(roles)) {
+            return false;
+        }
+
+        // 情况一：遍历判断每个权限，如果有一满足，说明有权限
+        for (String permission : permissions) {
+            if (hasAnyPermission(roles, permission)) {
+                return true;
+            }
+        }
+
+        // 情况二：如果是超管，也说明有权限
+        return roleService.hasAnySuperAdmin(convertSet(roles, RoleDO::getId));
+    }
+
+    /**
+     * 判断指定角色，是否拥有该 permission 权限
+     *
+     * @param roles 指定角色数组
+     * @param permission 权限标识
+     * @return 是否拥有
+     */
+    private boolean hasAnyPermission(List<RoleDO> roles, String permission) {
+        List<Long> menuIds = menuService.getMenuIdListByPermissionFromCache(permission);
+        // 采用严格模式，如果权限找不到对应的 Menu 的话，也认为没有权限
+        if (CollUtil.isEmpty(menuIds)) {
+            return false;
+        }
+
+        // 判断是否有权限
+        Set<Long> roleIds = convertSet(roles, RoleDO::getId);
+        for (Long menuId : menuIds) {
+            // 拥有该角色的菜单编号数组
+            Set<Long> menuRoleIds = getSelf().getMenuRoleIdListByMenuIdFromCache(menuId);
+            // 如果有交集，说明有权限
+            if (CollUtil.containsAny(menuRoleIds, roleIds)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean hasAnyRoles(Long userId, String... roles) {
+        // 如果为空，说明已经有权限
+        if (ArrayUtil.isEmpty(roles)) {
+            return true;
+        }
+
+        // 获得当前登录的角色。如果为空，说明没有权限
+        List<RoleDO> roleList = getEnableUserRoleListByUserIdFromCache(userId);
+        if (CollUtil.isEmpty(roleList)) {
+            return false;
+        }
+
+        // 判断是否有角色
+        Set<String> userRoles = convertSet(roleList, RoleDO::getCode);
+        return CollUtil.containsAny(userRoles, Sets.newHashSet(roles));
+    }
+
+    @Override
     public Set<Long> getRoleMenuListByRoleId(Collection<Long> roleIds) {
         // 如果是管理员的情况下，获取全部菜单编号
         if (roleService.hasAnySuperAdmin(roleIds)) {
@@ -172,75 +241,6 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public void processUserDeleted(Long userId) {
         userRoleMapper.deleteListByUserId(userId);
-    }
-
-    @Override
-    public boolean hasAnyPermissions(Long userId, String... permissions) {
-        // 如果为空，说明已经有权限
-        if (ArrayUtil.isEmpty(permissions)) {
-            return true;
-        }
-
-        // 获得当前登录的角色。如果为空，说明没有权限
-        List<RoleDO> roles = getEnableUserRoleListByUserIdFromCache(userId);
-        if (CollUtil.isEmpty(roles)) {
-            return false;
-        }
-
-        // 情况一：遍历判断每个权限，如果有一满足，说明有权限
-        for (String permission : permissions) {
-            if (hasAnyPermission(roles, permission)) {
-                return true;
-            }
-        }
-
-        // 情况二：如果是超管，也说明有权限
-        return roleService.hasAnySuperAdmin(convertSet(roles, RoleDO::getId));
-    }
-
-    /**
-     * 判断指定角色，是否拥有该 permission 权限
-     *
-     * @param roles 指定角色数组
-     * @param permission 权限标识
-     * @return 是否拥有
-     */
-    private boolean hasAnyPermission(List<RoleDO> roles, String permission) {
-        List<Long> menuIds = menuService.getMenuIdListByPermissionFromCache(permission);
-        // 采用严格模式，如果权限找不到对应的 Menu 的话，也认为没有权限
-        if (CollUtil.isEmpty(menuIds)) {
-            return false;
-        }
-
-        // 判断是否有权限
-        Set<Long> roleIds = convertSet(roles, RoleDO::getId);
-        for (Long menuId : menuIds) {
-            // 拥有该角色的菜单编号数组
-            Set<Long> menuRoleIds = getSelf().getMenuRoleIdListByMenuIdFromCache(menuId);
-            // 如果有交集，说明有权限
-            if (CollUtil.containsAny(menuRoleIds, roleIds)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean hasAnyRoles(Long userId, String... roles) {
-        // 如果为空，说明已经有权限
-        if (ArrayUtil.isEmpty(roles)) {
-            return true;
-        }
-
-        // 获得当前登录的角色。如果为空，说明没有权限
-        List<RoleDO> roleList = getEnableUserRoleListByUserIdFromCache(userId);
-        if (CollUtil.isEmpty(roleList)) {
-            return false;
-        }
-
-        // 判断是否有角色
-        Set<String> userRoles = convertSet(roleList, RoleDO::getCode);
-        return CollUtil.containsAny(userRoles, Sets.newHashSet(roles));
     }
 
     @Override
