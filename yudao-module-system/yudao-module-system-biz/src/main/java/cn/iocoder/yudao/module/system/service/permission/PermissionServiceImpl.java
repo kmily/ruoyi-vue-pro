@@ -18,18 +18,19 @@ import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
 import cn.iocoder.yudao.module.system.enums.permission.DataScopeEnum;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
+import com.baomidou.dynamic.datasource.annotation.DSTransactional;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -99,7 +100,7 @@ public class PermissionServiceImpl implements PermissionService {
         // 判断是否有权限
         Set<Long> roleIds = convertSet(roles, RoleDO::getId);
         for (Long menuId : menuIds) {
-            // 拥有该角色的菜单编号数组
+            // 获得拥有该菜单的角色编号集合
             Set<Long> menuRoleIds = getSelf().getMenuRoleIdListByMenuIdFromCache(menuId);
             // 如果有交集，说明有权限
             if (CollUtil.containsAny(menuRoleIds, roleIds)) {
@@ -127,8 +128,59 @@ public class PermissionServiceImpl implements PermissionService {
         return CollUtil.containsAny(userRoles, Sets.newHashSet(roles));
     }
 
+    // ========== 角色-菜单的相关方法  ==========
+
+    @Override
+    @DSTransactional // 多数据源，使用 @DSTransactional 保证本地事务，以及数据源的切换
+    @CacheEvict(value = RedisKeyConstants.MENU_ROLE_ID_LIST,
+            allEntries = true) // allEntries 清空所有缓存，主要一次更新涉及到的 menuIds 较多，反倒批量会更快
+    public void assignRoleMenu(Long roleId, Set<Long> menuIds) {
+        // 获得角色拥有菜单编号
+        Set<Long> dbMenuIds = convertSet(roleMenuMapper.selectListByRoleId(roleId), RoleMenuDO::getMenuId);
+        // 计算新增和删除的菜单编号
+        Collection<Long> createMenuIds = CollUtil.subtract(menuIds, dbMenuIds);
+        Collection<Long> deleteMenuIds = CollUtil.subtract(dbMenuIds, menuIds);
+        // 执行新增和删除。对于已经授权的菜单，不用做任何处理
+        if (CollUtil.isNotEmpty(createMenuIds)) {
+            roleMenuMapper.insertBatch(CollectionUtils.convertList(createMenuIds, menuId -> {
+                RoleMenuDO entity = new RoleMenuDO();
+                entity.setRoleId(roleId);
+                entity.setMenuId(menuId);
+                return entity;
+            }));
+        }
+        if (CollUtil.isNotEmpty(deleteMenuIds)) {
+            roleMenuMapper.deleteListByRoleIdAndMenuIds(roleId, deleteMenuIds);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @Caching(evict = {
+            @CacheEvict(value = RedisKeyConstants.MENU_ROLE_ID_LIST,
+                    allEntries = true), // allEntries 清空所有缓存，此处无法方便获得 roleId 对应的 menu 缓存们
+            @CacheEvict(value = RedisKeyConstants.USER_ROLE_ID_LIST,
+                    allEntries = true) // allEntries 清空所有缓存，此处无法方便获得 roleId 对应的 user 缓存们
+    })
+    public void processRoleDeleted(Long roleId) {
+        // 标记删除 UserRole
+        userRoleMapper.deleteListByRoleId(roleId);
+        // 标记删除 RoleMenu
+        roleMenuMapper.deleteListByRoleId(roleId);
+    }
+
+    @Override
+    @CacheEvict(value = RedisKeyConstants.MENU_ROLE_ID_LIST, key = "#menuId")
+    public void processMenuDeleted(Long menuId) {
+        roleMenuMapper.deleteListByMenuId(menuId);
+    }
+
     @Override
     public Set<Long> getRoleMenuListByRoleId(Collection<Long> roleIds) {
+        if (CollUtil.isEmpty(roleIds)) {
+            return Collections.emptySet();
+        }
+
         // 如果是管理员的情况下，获取全部菜单编号
         if (roleService.hasAnySuperAdmin(roleIds)) {
             return convertSet(menuService.getMenuList(), MenuDO::getId);
@@ -143,26 +195,36 @@ public class PermissionServiceImpl implements PermissionService {
         return convertSet(roleMenuMapper.selectListByMenuId(menuId), RoleMenuDO::getRoleId);
     }
 
+    // ========== 用户-角色的相关方法  ==========
+
     @Override
-//    @Transactional(rollbackFor = Exception.class) // TODO 芋艿：不能使用 MySQL 事务
-    public void assignRoleMenu(Long roleId, Set<Long> menuIds) {
-        // 获得角色拥有菜单编号
-        Set<Long> dbMenuIds = convertSet(roleMenuMapper.selectListByRoleId(roleId), RoleMenuDO::getMenuId);
-        // 计算新增和删除的菜单编号
-        Collection<Long> createMenuIds = CollUtil.subtract(menuIds, dbMenuIds);
-        Collection<Long> deleteMenuIds = CollUtil.subtract(dbMenuIds, menuIds);
-        // 执行新增和删除。对于已经授权的菜单，不用做任何处理
-        if (!CollectionUtil.isEmpty(createMenuIds)) {
-            roleMenuMapper.insertBatch(CollectionUtils.convertList(createMenuIds, menuId -> {
-                RoleMenuDO entity = new RoleMenuDO();
+    @DSTransactional // 多数据源，使用 @DSTransactional 保证本地事务，以及数据源的切换
+    @CacheEvict(value = RedisKeyConstants.USER_ROLE_ID_LIST, key = "#userId")
+    public void assignUserRole(Long userId, Set<Long> roleIds) {
+        // 获得角色拥有角色编号
+        Set<Long> dbRoleIds = convertSet(userRoleMapper.selectListByUserId(userId),
+                UserRoleDO::getRoleId);
+        // 计算新增和删除的角色编号
+        Collection<Long> createRoleIds = CollUtil.subtract(roleIds, dbRoleIds);
+        Collection<Long> deleteMenuIds = CollUtil.subtract(dbRoleIds, roleIds);
+        // 执行新增和删除。对于已经授权的角色，不用做任何处理
+        if (!CollectionUtil.isEmpty(createRoleIds)) {
+            userRoleMapper.insertBatch(CollectionUtils.convertList(createRoleIds, roleId -> {
+                UserRoleDO entity = new UserRoleDO();
+                entity.setUserId(userId);
                 entity.setRoleId(roleId);
-                entity.setMenuId(menuId);
                 return entity;
             }));
         }
         if (!CollectionUtil.isEmpty(deleteMenuIds)) {
-            roleMenuMapper.deleteListByRoleIdAndMenuIds(roleId, deleteMenuIds);
+            userRoleMapper.deleteListByUserIdAndRoleIdIds(userId, deleteMenuIds);
         }
+    }
+
+    @Override
+    @CacheEvict(value = RedisKeyConstants.USER_ROLE_ID_LIST, key = "#userId")
+    public void processUserDeleted(Long userId) {
+        userRoleMapper.deleteListByUserId(userId);
     }
 
     @Override
@@ -187,7 +249,8 @@ public class PermissionServiceImpl implements PermissionService {
      * @param userId 用户编号
      * @return 用户拥有的角色
      */
-    private List<RoleDO> getEnableUserRoleListByUserIdFromCache(Long userId) {
+    @VisibleForTesting
+    List<RoleDO> getEnableUserRoleListByUserIdFromCache(Long userId) {
         // 获得用户拥有的角色编号
         Set<Long> roleIds = getSelf().getUserRoleIdListByUserIdFromCache(userId);
         // 获得角色数组，并移除被禁用的
@@ -196,51 +259,11 @@ public class PermissionServiceImpl implements PermissionService {
         return roles;
     }
 
-    @Override
-    //    @Transactional(rollbackFor = Exception.class) // TODO 芋艿：不能使用 MySQL 事务
-    public void assignUserRole(Long userId, Set<Long> roleIds) {
-        // 获得角色拥有角色编号
-        Set<Long> dbRoleIds = convertSet(userRoleMapper.selectListByUserId(userId),
-                UserRoleDO::getRoleId);
-        // 计算新增和删除的角色编号
-        Collection<Long> createRoleIds = CollUtil.subtract(roleIds, dbRoleIds);
-        Collection<Long> deleteMenuIds = CollUtil.subtract(dbRoleIds, roleIds);
-        // 执行新增和删除。对于已经授权的角色，不用做任何处理
-        if (!CollectionUtil.isEmpty(createRoleIds)) {
-            userRoleMapper.insertBatch(CollectionUtils.convertList(createRoleIds, roleId -> {
-                UserRoleDO entity = new UserRoleDO();
-                entity.setUserId(userId);
-                entity.setRoleId(roleId);
-                return entity;
-            }));
-        }
-        if (!CollectionUtil.isEmpty(deleteMenuIds)) {
-            userRoleMapper.deleteListByUserIdAndRoleIdIds(userId, deleteMenuIds);
-        }
-    }
+    // ========== 用户-部门的相关方法  ==========
 
     @Override
     public void assignRoleDataScope(Long roleId, Integer dataScope, Set<Long> dataScopeDeptIds) {
         roleService.updateRoleDataScope(roleId, dataScope, dataScopeDeptIds);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void processRoleDeleted(Long roleId) {
-        // 标记删除 UserRole
-        userRoleMapper.deleteListByRoleId(roleId);
-        // 标记删除 RoleMenu
-        roleMenuMapper.deleteListByRoleId(roleId);
-    }
-
-    @Override
-    public void processMenuDeleted(Long menuId) {
-        roleMenuMapper.deleteListByMenuId(menuId);
-    }
-
-    @Override
-    public void processUserDeleted(Long userId) {
-        userRoleMapper.deleteListByUserId(userId);
     }
 
     @Override

@@ -27,6 +27,14 @@ public interface RedisKeyConstants {
             STRING, String.class, Duration.ofHours(24)); // 值为 state
 
     /**
+     * 指定部门的所有子部门编号数组的缓存
+     *
+     * KEY 格式：dept_children_ids::{id}
+     * 数据类型：String 子部门编号集合
+     */
+    String DEPT_CHILDREN_ID_LIST = "dept_children_ids";
+
+    /**
      * 角色的缓存
      *
      * KEY 格式：role::{id}
@@ -49,14 +57,6 @@ public interface RedisKeyConstants {
      * 数据类型：String 角色编号集合
      */
     String MENU_ROLE_ID_LIST = "menu_role_ids";
-
-    /**
-     * 指定部门的所有子部门编号数组的缓存
-     *
-     * KEY 格式：dept_children_ids::{id}
-     * 数据类型：String 子部门编号集合
-     */
-    String DEPT_CHILDREN_ID_LIST = "dept_children_ids";
 
     /**
      * 拥有权限对应的菜单编号数组的缓存
