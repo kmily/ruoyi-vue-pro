@@ -116,6 +116,8 @@ public interface BpmTaskConvert {
         Map<Long, AdminUserRespDTO> userMap, Map<Long, DeptRespDTO> deptMap) {
         return CollectionUtils.convertList(tasks, task -> {
             BpmTaskRespVO respVO = convert3(task);
+            respVO.setCreateTime(LocalDateTimeUtil.of(task.getCreateTime()));
+            respVO.setEndTime(LocalDateTimeUtil.of(task.getEndTime()));
             BpmTaskExtDO taskExtDO = bpmTaskExtDOMap.get(task.getId());
             copyTo(taskExtDO, respVO);
             if (processInstance != null) {
