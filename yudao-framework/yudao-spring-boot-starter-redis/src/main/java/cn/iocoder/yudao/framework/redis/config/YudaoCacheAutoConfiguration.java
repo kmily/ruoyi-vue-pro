@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.redis.config;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.redis.core.TimeoutRedisCacheManager;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
@@ -35,8 +36,11 @@ public class YudaoCacheAutoConfiguration {
     @Bean
     @Primary
     public RedisCacheConfiguration redisCacheConfiguration(CacheProperties cacheProperties) {
-        // 设置使用 JSON 序列化方式
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig();
+        // 设置使用 : 单冒号，而不是双 :: 冒号，避免 Redis Desktop Manager 多余空格
+        // 详细可见 https://blog.csdn.net/chuixue24/article/details/103928965 博客
+        config = config.computePrefixWith(cacheName -> cacheName + StrUtil.COLON);
+        // 设置使用 JSON 序列化方式
         config = config.serializeValuesWith(
                 RedisSerializationContext.SerializationPair.fromSerializer(buildRedisSerializer()));
 

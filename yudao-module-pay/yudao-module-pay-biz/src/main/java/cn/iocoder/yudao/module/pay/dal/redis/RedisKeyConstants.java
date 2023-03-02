@@ -12,7 +12,7 @@ public interface RedisKeyConstants {
     /**
      * 通知任务的分布式锁
      *
-     * KEY 格式：pay_notify::{id}
+     * KEY 格式：pay_notify:{id}
      * VALUE 数据类型：HASH {@link RLock}
      * 过期时间：动态传参
      */

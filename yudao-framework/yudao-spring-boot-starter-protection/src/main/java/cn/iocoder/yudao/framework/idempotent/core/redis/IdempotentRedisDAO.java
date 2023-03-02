@@ -16,7 +16,7 @@ public class IdempotentRedisDAO {
     /**
      * 幂等操作的 Redis Key 模板
      *
-     * KEY 格式：idempotent::{uuid}
+     * KEY 格式：idempotent:{uuid}
      * VALUE 格式：空字符串
      * 过期时间：动态传参
      */
