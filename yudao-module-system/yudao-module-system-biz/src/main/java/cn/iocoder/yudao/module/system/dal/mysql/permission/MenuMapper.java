@@ -4,11 +4,13 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
+import com.baomidou.dynamic.datasource.annotation.Master;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
 @Mapper
+@Master
 public interface MenuMapper extends BaseMapperX<MenuDO> {
 
     default MenuDO selectByParentIdAndName(Long parentId, String name) {

@@ -26,7 +26,7 @@ public class TenantRedisCacheManager extends TimeoutRedisCacheManager {
      *
      * 原因：如果只补充租户编号，可读性较差
      */
-    private static final String PREFIX = "t";
+    public static final String PREFIX = "t";
 
     private final TenantProperties tenantProperties;
 

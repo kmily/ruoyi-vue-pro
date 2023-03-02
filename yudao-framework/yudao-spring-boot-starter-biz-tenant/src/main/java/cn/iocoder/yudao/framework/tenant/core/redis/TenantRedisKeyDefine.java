@@ -40,7 +40,7 @@ public class TenantRedisKeyDefine extends RedisKeyDefine {
 
     @Override
     public String formatKey(Object... args) {
-        args = ArrayUtil.append(args, TenantContextHolder.getRequiredTenantId());
+        args = ArrayUtil.append(args, TenantRedisCacheManager.PREFIX + TenantContextHolder.getRequiredTenantId());
         return super.formatKey(args);
     }
 
