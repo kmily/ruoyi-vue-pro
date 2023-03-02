@@ -17,7 +17,7 @@ import java.util.Set;
  * 第二步，将【多个】任务候选人们，设置到 DelegateExecution 的 collectionVariable 变量中，以便 BpmUserTaskActivityBehavior 使用它
  *
  * @author kemengkai
- * @date 2022-04-21 16:57
+ * @since 2022-04-21 16:57
  */
 @Slf4j
 public class BpmParallelMultiInstanceBehavior extends ParallelMultiInstanceBehavior {

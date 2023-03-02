@@ -20,7 +20,7 @@ import me.zhyd.oauth.utils.UrlBuilder;
  * 由于 JustAuth 定位是面向 Web 为主的三方登录，所以微信小程序只能自己封装
  *
  * @author timfruit
- * @date 2021-10-29
+ * @since 2021-10-29
  */
 public class AuthWeChatMiniAppRequest extends AuthDefaultRequest {
 

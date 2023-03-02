@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Primary;
  * 社交自动装配类
  *
  * @author timfruit
- * @date 2021-10-30
+ * @since 2021-10-30
  */
 @Slf4j
 @AutoConfiguration

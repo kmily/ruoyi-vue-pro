@@ -18,7 +18,7 @@ import java.lang.reflect.Method;
  * 为使得拓展配置 {@link AuthConfig} 和默认配置齐平，所以自定义本工厂类
  *
  * @author timfruit
- * @date 2021-10-31
+ * @since 2021-10-31
  */
 public class YudaoAuthRequestFactory extends AuthRequestFactory {
 
