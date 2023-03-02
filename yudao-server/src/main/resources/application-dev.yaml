@@ -44,11 +44,13 @@ spring:
       primary: master
       datasource:
         master:
-          url: jdbc:mysql://400-infra.server.iocoder.cn:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
+          url: jdbc:mysql://400-infra.server.iocoder.cn:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=CTT&allowPublicKeyRetrieval=true
+          driver-class-name: com.mysql.jdbc.Driver
           username: root
           password: 3WLiVUBEwTbvAfsh
         slave: # 模拟从库，可根据自己需要修改 # 模拟从库，可根据自己需要修改
-          url: jdbc:mysql://400-infra.server.iocoder.cn:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
+          url: jdbc:mysql://400-infra.server.iocoder.cn:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=CTT&allowPublicKeyRetrieval=true
+          driver-class-name: com.mysql.jdbc.Driver
           username: root
           password: 3WLiVUBEwTbvAfsh
 
