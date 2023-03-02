@@ -20,6 +20,13 @@ public class PayNotifyLockRedisDAO {
     @Resource
     private RedissonClient redissonClient;
 
+    /**
+     * 获得分布式锁，执行逻辑
+     *
+     * @param id 通知任务编号
+     * @param timeoutMillis 过期时间
+     * @param runnable 逻辑
+     */
     public void lock(Long id, Long timeoutMillis, Runnable runnable) {
         String lockKey = formatKey(id);
         RLock lock = redissonClient.getLock(lockKey);
@@ -33,7 +40,7 @@ public class PayNotifyLockRedisDAO {
     }
 
     private static String formatKey(Long id) {
-        return String.format(PAY_NOTIFY_LOCK.getKeyTemplate(), id);
+        return String.format(PAY_NOTIFY_LOCK, id);
     }
 
 }

@@ -3,15 +3,12 @@ package cn.iocoder.yudao.module.infra.controller.admin.redis;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.redis.core.RedisKeyDefine;
-import cn.iocoder.yudao.framework.redis.core.RedisKeyRegistry;
-import cn.iocoder.yudao.module.infra.controller.admin.redis.vo.RedisKeyDefineRespVO;
 import cn.iocoder.yudao.module.infra.controller.admin.redis.vo.RedisKeyValueRespVO;
 import cn.iocoder.yudao.module.infra.controller.admin.redis.vo.RedisMonitorRespVO;
 import cn.iocoder.yudao.module.infra.convert.redis.RedisConvert;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.redis.connection.RedisServerCommands;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisCallback;
@@ -50,9 +47,9 @@ public class RedisController {
     @GetMapping("/get-key-define-list")
     @Operation(summary = "获得 Redis Key 模板列表")
     @PreAuthorize("@ss.hasPermission('infra:redis:get-key-list')")
-    public CommonResult<List<RedisKeyDefineRespVO>> getKeyDefineList() {
-        List<RedisKeyDefine> keyDefines = RedisKeyRegistry.list();
-        return success(RedisConvert.INSTANCE.convertList(keyDefines));
+    @Deprecated // 建议使用 https://blog.jetbrains.com/datagrip/2022/11/02/datagrip-2022-3-eap-2-redis-support/ 连接 Redis 查询
+    public CommonResult<List<Object>> getKeyDefineList() {
+        return success(Collections.emptyList());
     }
 
     @GetMapping("/get-key-list")
