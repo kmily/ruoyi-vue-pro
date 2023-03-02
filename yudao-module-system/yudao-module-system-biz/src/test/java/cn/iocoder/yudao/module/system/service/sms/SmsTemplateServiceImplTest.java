@@ -55,25 +55,6 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
     private SmsClientFactory smsClientFactory;
     @MockBean
     private SmsClient smsClient;
-    @MockBean
-    private SmsProducer smsProducer;
-
-    @Test
-    void testInitLocalCache() {
-        // mock 数据
-        SmsTemplateDO smsTemplate01 = randomSmsTemplateDO();
-        smsTemplateMapper.insert(smsTemplate01);
-        SmsTemplateDO smsTemplate02 = randomSmsTemplateDO();
-        smsTemplateMapper.insert(smsTemplate02);
-
-        // 调用
-        smsTemplateService.initLocalCache();
-        // 断言 deptCache 缓存
-        Map<String, SmsTemplateDO> smsTemplateCache = smsTemplateService.getSmsTemplateCache();
-        assertEquals(2, smsTemplateCache.size());
-        assertPojoEquals(smsTemplate01, smsTemplateCache.get(smsTemplate01.getCode()));
-        assertPojoEquals(smsTemplate02, smsTemplateCache.get(smsTemplate02.getCode()));
-    }
 
     @Test
     public void testParseTemplateContentParams() {
@@ -116,8 +97,6 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
         assertPojoEquals(reqVO, smsTemplate);
         assertEquals(Lists.newArrayList("operation", "code"), smsTemplate.getParams());
         assertEquals(channelDO.getCode(), smsTemplate.getChannelCode());
-        // 校验调用
-        verify(smsProducer, times(1)).sendSmsTemplateRefreshMessage();
     }
 
     @Test
@@ -151,8 +130,6 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
         assertPojoEquals(reqVO, smsTemplate);
         assertEquals(Lists.newArrayList("operation", "code"), smsTemplate.getParams());
         assertEquals(channelDO.getCode(), smsTemplate.getChannelCode());
-        // 校验调用
-        verify(smsProducer, times(1)).sendSmsTemplateRefreshMessage();
     }
 
     @Test
@@ -176,8 +153,6 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
         smsTemplateService.deleteSmsTemplate(id);
        // 校验数据不存在了
        assertNull(smsTemplateMapper.selectById(id));
-        // 校验调用
-        verify(smsProducer, times(1)).sendSmsTemplateRefreshMessage();
     }
 
     @Test

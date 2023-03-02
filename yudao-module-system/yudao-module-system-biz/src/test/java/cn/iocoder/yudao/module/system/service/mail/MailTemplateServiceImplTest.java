@@ -43,24 +43,6 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
     @Resource
     private MailTemplateMapper mailTemplateMapper;
 
-    @MockBean
-    private MailProducer mailProducer;
-
-    @Test
-    public void testInitLocalCache() {
-        MailTemplateDO templateDO01 = randomPojo(MailTemplateDO.class);
-        mailTemplateMapper.insert(templateDO01);
-        MailTemplateDO templateDO02 = randomPojo(MailTemplateDO.class);
-        mailTemplateMapper.insert(templateDO02);
-
-        // 调用
-        mailTemplateService.initLocalCache();
-        // 断言 mailTemplateCache 缓存
-        Map<String, MailTemplateDO> mailTemplateCache = mailTemplateService.getMailTemplateCache();
-        assertPojoEquals(templateDO01, mailTemplateCache.get(templateDO01.getCode()));
-        assertPojoEquals(templateDO02, mailTemplateCache.get(templateDO02.getCode()));
-    }
-
     @Test
     public void testCreateMailTemplate_success() {
         // 准备参数
@@ -73,7 +55,6 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
         // 校验记录的属性是否正确
         MailTemplateDO mailTemplate = mailTemplateMapper.selectById(mailTemplateId);
         assertPojoEquals(reqVO, mailTemplate);
-        verify(mailProducer).sendMailTemplateRefreshMessage();
     }
 
     @Test
@@ -91,7 +72,6 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
         // 校验是否更新正确
         MailTemplateDO mailTemplate = mailTemplateMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, mailTemplate);
-        verify(mailProducer).sendMailTemplateRefreshMessage();
     }
 
     @Test
@@ -115,7 +95,6 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
         mailTemplateService.deleteMailTemplate(id);
         // 校验数据不存在了
         assertNull(mailTemplateMapper.selectById(id));
-        verify(mailProducer).sendMailTemplateRefreshMessage();
     }
 
     @Test
@@ -199,7 +178,6 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
         // mock 数据
         MailTemplateDO dbMailTemplate = randomPojo(MailTemplateDO.class);
         mailTemplateMapper.insert(dbMailTemplate);
-        mailTemplateService.initLocalCache();
         // 准备参数
         String code = dbMailTemplate.getCode();
 
