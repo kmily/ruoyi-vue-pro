@@ -66,4 +66,12 @@ public interface RedisKeyConstants {
      */
     String OAUTH_CLIENT = "oauth_client";
 
+    /**
+     * 站内信模版的缓存
+     *
+     * KEY 格式：notify_template::{code}
+     * VALUE 数据格式：String 模版信息
+     */
+    String NOTIFY_TEMPLATE = "notify_template";
+
 }

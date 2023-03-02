@@ -171,7 +171,8 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    @Cacheable(value = RedisKeyConstants.ROLE, key = "#id", unless = "#result == null")
+    @Cacheable(value = RedisKeyConstants.ROLE, key = "#id",
+            unless = "#result == null")
     public RoleDO getRoleFromCache(Long id) {
         return roleMapper.selectById(id);
     }

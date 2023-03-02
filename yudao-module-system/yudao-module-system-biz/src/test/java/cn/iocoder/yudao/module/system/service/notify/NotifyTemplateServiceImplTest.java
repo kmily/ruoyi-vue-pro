@@ -8,9 +8,7 @@ import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.Notify
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplateUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.notify.NotifyTemplateMapper;
-import cn.iocoder.yudao.module.system.mq.producer.notify.NotifyProducer;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
@@ -25,7 +23,6 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServic
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.NOTIFY_TEMPLATE_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
 
 /**
 * {@link NotifyTemplateServiceImpl} 的单元测试类
@@ -41,9 +38,6 @@ public class NotifyTemplateServiceImplTest extends BaseDbUnitTest {
     @Resource
     private NotifyTemplateMapper notifyTemplateMapper;
 
-    @MockBean
-    private NotifyProducer notifyProducer;
-
     @Test
     public void testCreateNotifyTemplate_success() {
         // 准备参数
@@ -57,7 +51,6 @@ public class NotifyTemplateServiceImplTest extends BaseDbUnitTest {
         // 校验记录的属性是否正确
         NotifyTemplateDO notifyTemplate = notifyTemplateMapper.selectById(notifyTemplateId);
         assertPojoEquals(reqVO, notifyTemplate);
-        verify(notifyProducer).sendNotifyTemplateRefreshMessage();
     }
 
     @Test
@@ -76,7 +69,6 @@ public class NotifyTemplateServiceImplTest extends BaseDbUnitTest {
         // 校验是否更新正确
         NotifyTemplateDO notifyTemplate = notifyTemplateMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, notifyTemplate);
-        verify(notifyProducer).sendNotifyTemplateRefreshMessage();
     }
 
     @Test
@@ -100,7 +92,6 @@ public class NotifyTemplateServiceImplTest extends BaseDbUnitTest {
         notifyTemplateService.deleteNotifyTemplate(id);
        // 校验数据不存在了
        assertNull(notifyTemplateMapper.selectById(id));
-       verify(notifyProducer).sendNotifyTemplateRefreshMessage();
     }
 
     @Test
@@ -164,7 +155,6 @@ public class NotifyTemplateServiceImplTest extends BaseDbUnitTest {
         // mock 数据
         NotifyTemplateDO dbNotifyTemplate = randomPojo(NotifyTemplateDO.class);
         notifyTemplateMapper.insert(dbNotifyTemplate);
-        notifyTemplateService.initLocalCache();
         // 准备参数
         String code = dbNotifyTemplate.getCode();
 
@@ -173,7 +163,7 @@ public class NotifyTemplateServiceImplTest extends BaseDbUnitTest {
         // 断言
         assertPojoEquals(dbNotifyTemplate, notifyTemplate);
     }
-    
+
     @Test
     public void testFormatNotifyTemplateContent() {
         // 准备参数
