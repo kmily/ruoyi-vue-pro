@@ -192,6 +192,9 @@ yudao:
     ignore-caches:
       - permission_menu_ids
       - oauth_client
+      - notify_template
+      - mail_account
+      - mail_template
   sms-code: # 短信验证码相关的配置项
     expire-times: 10m
     send-frequency: 1m
