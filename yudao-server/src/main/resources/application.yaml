@@ -39,14 +39,14 @@ spring:
 
 springdoc:
   api-docs:
-    enabled: true
+    enabled: true # 1. 是否开启 Swagger 接文档的元数据
     path: /v3/api-docs
   swagger-ui:
-    enabled: true
-    path: /swagger-ui
+    enabled: true # 2.1 是否开启 Swagger 文档的官方 UI 界面
+    path: /swagger-ui.html
 
 knife4j:
-  enable: true
+  enable: true # 2.2 是否开启 Swagger 文档的 Knife4j UI 界面
   setting:
     language: zh_cn
 
