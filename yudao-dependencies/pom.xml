@@ -23,7 +23,7 @@
         <springdoc.version>1.6.14</springdoc.version>
         <knife4j.version>4.0.0</knife4j.version>
         <!-- DB 相关 -->
-        <druid.version>1.2.15</druid.version>
+        <druid.version>1.2.16</druid.version>
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
         <mybatis-plus-generator.version>3.5.3.1</mybatis-plus-generator.version>
         <dynamic-datasource.version>3.6.1</dynamic-datasource.version>
@@ -47,7 +47,7 @@
         <lombok.version>1.18.24</lombok.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
         <hutool.version>5.8.12</hutool.version>
-        <easyexcel.verion>3.2.0</easyexcel.verion>
+        <easyexcel.verion>3.2.1</easyexcel.verion>
         <velocity.version>2.3</velocity.version>
         <screw.version>1.0.5</screw.version>
         <fastjson.version>1.2.83</fastjson.version>
@@ -57,15 +57,15 @@
         <commons-net.version>3.8.0</commons-net.version>
         <jsch.version>0.1.55</jsch.version>
         <tika-core.version>2.6.0</tika-core.version>
-        <netty-all.version>4.1.86.Final</netty-all.version>
-        <ip2region.version>2.6.6</ip2region.version>
+        <netty-all.version>4.1.89.Final</netty-all.version>
+        <ip2region.version>2.7.0</ip2region.version>
         <!-- 三方云服务相关 -->
         <okio.version>3.0.0</okio.version>
         <okhttp3.version>4.10.0</okhttp3.version>
-        <minio.version>8.5.1</minio.version>
+        <minio.version>8.5.2</minio.version>
         <aliyun-java-sdk-core.version>4.6.3</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.2.1</aliyun-java-sdk-dysmsapi.version>
-        <tencentcloud-sdk-java.version>3.1.676</tencentcloud-sdk-java.version>
+        <tencentcloud-sdk-java.version>3.1.706</tencentcloud-sdk-java.version>
         <justauth.version>1.4.0</justauth.version>
         <jimureport.version>1.5.6</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
