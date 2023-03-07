@@ -39,6 +39,7 @@
 | 项目名                | 说明                     | 传送门                                                                                                                                |
 |--------------------|------------------------|------------------------------------------------------------------------------------------------------------------------------------|
 | `ruoyi-vue-pro`    | Spring Boot 多模块        | **[Gitee](https://gitee.com/zhijiantianya/ruoyi-vue-pro)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/ruoyi-vue-pro)    |
+| `yudao-boot-lite`  | Spring Boot 多模块 精简版  | **[Gitee](https://gitee.com/yudaocode/yudao-boot-lite)**     |
 | `yudao-cloud`      | Spring Cloud 微服务       | **[Gitee](https://gitee.com/zhijiantianya/yudao-cloud)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/yudao-cloud)        |
 | `Spring-Boot-Labs` | Spring Boot & Cloud 入门 | **[Gitee](https://gitee.com/yudaocode/SpringBoot-Labs)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/yudaocode/SpringBoot-Labs) |
 
@@ -226,7 +227,7 @@ ps：核心功能已经实现，正在对接微信小程序中...
 > * [`yudao-ui-admin-vue3`](https://gitee.com/yudaocode/yudao-ui-admin-vue3)：基于 Vue3 + element-plus 实现的管理后台
 > * `yudao-ui-admin`：基于 Vue2 + element-ui 实现的管理后台
 > * [`yudao-ui-go-view`](https://gitee.com/yudaocode/yudao-ui-go-view)：基于 Vue3 + naive-ui 实现的大屏报表
-> * `yudao-ui-admin-uniapp`：基于 uni-app + uni-ui 实现的管理后台的小程序 
+> * [`yudao-ui-admin-uniapp`](https://gitee.com/yudaocode/yudao-ui-admin-uniapp)：基于 uni-app + uni-ui 实现的管理后台的小程序 
 > * `yudao-ui-app`：基于 uni-app + uview 实现的用户 App
 
 ### 后端
