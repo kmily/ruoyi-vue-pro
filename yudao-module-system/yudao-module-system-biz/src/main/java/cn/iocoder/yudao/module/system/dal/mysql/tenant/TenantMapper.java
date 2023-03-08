@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPa
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -40,6 +41,20 @@ public interface TenantMapper extends BaseMapperX<TenantDO> {
 
     default TenantDO selectByName(String name) {
         return selectOne(TenantDO::getName, name);
+    }
+
+    default TenantDO selectByDomain(String domain) {
+        return selectOne(new LambdaQueryWrapperX<TenantDO>()
+                .gt(TenantDO::getExpireTime, LocalDateTime.now())
+                .likeLeft(TenantDO::getDomain, domain)
+                .last("limit 1"));
+    }
+
+    default TenantDO selectFirstNotExpired() {
+        return selectOne(new LambdaQueryWrapperX<TenantDO>()
+                .gt(TenantDO::getExpireTime, LocalDateTime.now())
+                .orderByAsc(TenantDO::getId)
+                .last("limit 1"));
     }
 
     default Long selectCountByPackageId(Long packageId) {

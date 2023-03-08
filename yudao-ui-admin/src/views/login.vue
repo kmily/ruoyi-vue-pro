@@ -23,7 +23,7 @@
           <div>
             <el-form ref="loginForm" :model="loginForm" :rules="LoginRules" class="login-form">
               <el-form-item prop="tenantName" v-if="tenantEnable">
-                <el-input v-model="loginForm.tenantName" type="text" auto-complete="off" placeholder='租户'>
+                <el-input v-model="loginForm.tenantName" type="text" auto-complete="off" placeholder='租户' disabled>
                   <svg-icon slot="prefix" icon-class="tree" class="el-input__icon input-icon"/>
                 </el-input>
               </el-form-item>
@@ -101,16 +101,16 @@
 
 <script>
 import {sendSmsCode, socialAuthRedirect} from "@/api/login";
-import {getTenantIdByName} from "@/api/system/tenant";
+import {getTenantByDomain} from "@/api/system/tenant";
 import {SystemUserSocialTypeEnum} from "@/utils/constants";
 import {getCaptchaEnable, getTenantEnable} from "@/utils/ruoyi";
 import {
   getPassword,
-  getRememberMe, getTenantName,
+  getRememberMe,
   getUsername,
-  removePassword, removeRememberMe, removeTenantName,
+  removePassword, removeRememberMe,
   removeUsername,
-  setPassword, setRememberMe, setTenantId, setTenantName,
+  setPassword, setRememberMe, setTenantId,
   setUsername
 } from "@/utils/auth";
 
@@ -136,7 +136,7 @@ export default {
         mobile: "",
         mobileCode: "",
         rememberMe: false,
-        tenantName: "芋道源码",
+        tenantName: "",
       },
       scene: 21,
 
@@ -159,25 +159,6 @@ export default {
             }, trigger: "blur"
           }
         ],
-        tenantName: [
-          {required: true, trigger: "blur", message: "租户不能为空"},
-          {
-            validator: (rule, value, callback) => {
-              // debugger
-              getTenantIdByName(value).then(res => {
-                const tenantId = res.data;
-                if (tenantId && tenantId >= 0) {
-                  // 设置租户
-                  setTenantId(tenantId)
-                  callback();
-                } else {
-                  callback('租户不存在');
-                }
-              });
-            },
-            trigger: 'blur'
-          }
-        ]
       },
       loading: false,
       redirect: undefined,
@@ -189,10 +170,13 @@ export default {
     // 租户开关
     this.tenantEnable = getTenantEnable();
     if (this.tenantEnable) {
-      getTenantIdByName(this.loginForm.tenantName).then(res => { // 设置租户
-        const tenantId = res.data;
-        if (tenantId && tenantId >= 0) {
-          setTenantId(tenantId)
+      getTenantByDomain().then(res => { // 设置租户
+        const {id, name} = res.data;
+        if (id && id >= 0) {
+          setTenantId(id)
+        }
+        if(name){
+          this.loginForm.tenantName = name;
         }
       });
     }
@@ -218,13 +202,11 @@ export default {
       const username = getUsername();
       const password = getPassword();
       const rememberMe = getRememberMe();
-      const tenantName = getTenantName();
       this.loginForm = {
         ...this.loginForm,
         username: username ? username : this.loginForm.username,
         password: password ? password : this.loginForm.password,
         rememberMe: rememberMe ? getRememberMe() : false,
-        tenantName: tenantName ? tenantName : this.loginForm.tenantName,
       };
     },
     handleLogin(captchaParams) {
@@ -236,12 +218,10 @@ export default {
             setUsername(this.loginForm.username)
             setPassword(this.loginForm.password)
             setRememberMe(this.loginForm.rememberMe)
-            setTenantName(this.loginForm.tenantName)
           } else {
             removeUsername()
             removePassword()
             removeRememberMe()
-            removeTenantName()
           }
           this.loginForm.captchaVerification = captchaParams.captchaVerification
           // 发起登陆
@@ -258,40 +238,16 @@ export default {
     async doSocialLogin(socialTypeEnum) {
       // 设置登录中
       this.loading = true;
-      let tenant = false;
-      if (this.tenantEnable) {
-        await this.$prompt('请输入租户名称', "提示", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消"
-        }).then(async ({value}) => {
-          await getTenantIdByName(value).then(res => {
-            const tenantId = res.data;
-            tenant = true
-            if (tenantId && tenantId >= 0) {
-              setTenantId(tenantId)
-            }
-          });
-        }).catch(() => {
-          // 取消登录按钮 loading状态
-          this.loading = false;
-
-          return false
-        });
-      } else {
-        tenant = true
-      }
-     if(tenant){
-       // 计算 redirectUri
-       const redirectUri = location.origin + '/social-login?'
-         + encodeURIComponent('type=' + socialTypeEnum.type + '&redirect=' + (this.redirect || "/")); // 重定向不能丢
-       // const redirectUri = 'http://127.0.0.1:48080/api/gitee/callback';
-       // const redirectUri = 'http://127.0.0.1:48080/api/dingtalk/callback';
-       // 进行跳转
-       socialAuthRedirect(socialTypeEnum.type, encodeURIComponent(redirectUri)).then((res) => {
-         // console.log(res.url);
-         window.location.href = res.data;
-       });
-     }
+      // 计算 redirectUri
+      const redirectUri = location.origin + '/social-login?'
+        + encodeURIComponent('type=' + socialTypeEnum.type + '&redirect=' + (this.redirect || "/")); // 重定向不能丢
+      // const redirectUri = 'http://127.0.0.1:48080/api/gitee/callback';
+      // const redirectUri = 'http://127.0.0.1:48080/api/dingtalk/callback';
+      // 进行跳转
+      socialAuthRedirect(socialTypeEnum.type, encodeURIComponent(redirectUri)).then((res) => {
+        // console.log(res.url);
+        window.location.href = res.data;
+      });
     },
     /** ========== 以下为升级短信登录 ========== */
     getSmsCode() {

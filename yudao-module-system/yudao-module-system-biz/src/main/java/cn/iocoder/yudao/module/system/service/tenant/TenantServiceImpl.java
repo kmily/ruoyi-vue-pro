@@ -11,10 +11,7 @@ import cn.iocoder.yudao.framework.tenant.config.TenantProperties;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantExportReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.*;
 import cn.iocoder.yudao.module.system.convert.tenant.TenantConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
@@ -213,7 +210,19 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public TenantDO getTenantByName(String name) {
-        return tenantMapper.selectByName(name);
+        return tenantMapper.selectByDomain(name);
+    }
+
+    @Override
+    public TenantSimpleRespVO getTenantByDomain(String domain) {
+        //1. 根据域名查询租户
+        TenantDO tenantDO = tenantMapper.selectByDomain(domain);
+        //2. 域名查询不到租房时，查询第一个未过期的租户
+        if (tenantDO == null) {
+            tenantDO = tenantMapper.selectFirstNotExpired();
+        }
+
+        return TenantConvert.INSTANCE.convertSimple(tenantDO);
     }
 
     @Override
