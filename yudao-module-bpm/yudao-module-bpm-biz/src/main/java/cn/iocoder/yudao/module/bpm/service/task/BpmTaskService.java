@@ -85,6 +85,22 @@ public interface BpmTaskService {
     void rejectTask(Long userId, @Valid BpmTaskRejectReqVO reqVO);
 
     /**
+     * 回退任务
+     *
+     * @param reqVO 回退任务信息
+     */
+    CommonResult<Boolean> backTask(Long userId, BpmTaskBackReqVO reqVO);
+
+    /**
+     * 获取可回退的任务信息
+     *
+     * @param reqVO 请求参数
+     *
+     * @return 返回任务信息
+     */
+    CommonResult<List<BpmBackTaskRespVO>> getBackTaskRule(BpmBackTaskReqVO reqVO);
+
+    /**
      * 将流程任务分配给指定用户
      *
      * @param userId 用户编号

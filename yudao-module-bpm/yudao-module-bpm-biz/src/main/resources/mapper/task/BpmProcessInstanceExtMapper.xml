@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmProcessInstanceExtMapper">
+
+    <resultMap id="procInstExtDoBaseMap" type="cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmProcessInstanceExtDO">
+        <id property="id" column="id" javaType="Long" jdbcType="BIGINT"></id>
+        <result property="startUserId" column="start_user_id" javaType="Long" jdbcType="BIGINT"></result>
+        <result property="name" column="name" javaType="String" jdbcType="VARCHAR"></result>
+        <result property="processInstanceId" column="process_instance_id" javaType="String" jdbcType="VARCHAR"></result>
+        <result property="processDefinitionId" column="process_definition_id" javaType="String"
+                jdbcType="VARCHAR"></result>
+        <result property="category" column="category" javaType="String" jdbcType="VARCHAR"></result>
+        <result property="status" column="status" javaType="Integer" jdbcType="TINYINT"></result>
+        <result property="result" column="result" javaType="Integer" jdbcType="TINYINT"></result>
+        <result property="endTime" column="end_time"></result>
+        <result property="formVariables" column="form_variables" javaType="Map" jdbcType="VARCHAR"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"></result>
+        <result property="createTime" column="create_time"></result>
+        <result property="updater" column="updater" javaType="String" jdbcType="VARCHAR"></result>
+        <result property="updateTime" column="update_time"></result>
+        <result property="deleted" column="deleted" javaType="Boolean" jdbcType="BIT"></result>
+    </resultMap>
+
+    <select id="selectTodoTaskPage" resultMap="procInstExtDoBaseMap">
+        SELECT bpie.`id`,
+        bpie.`start_user_id`,
+        bpie.`name`,
+        bpie.`process_instance_id`,
+        bpie.`process_definition_id`,
+        bpie.`category`,
+        bpie.`status`,
+        bpie.`result`,
+        bpie.`end_time`,
+        bpie.`form_variables`,
+        bpie.`creator`,
+        bpie.`create_time`,
+        bpie.`updater`,
+        bpie.`update_time`,
+        bpie.`deleted`,
+        bpie.`tenant_id`,
+        bte.`task_def_key`,
+        bte.`assignee_user_id`,
+        bte.`task_id`,
+        bte.`comment`
+        FROM bpm_process_instance_ext bpie
+        JOIN bpm_task_ext bte ON bte.process_instance_id = bpie.process_instance_id
+        WHERE bte.`deleted` = FALSE
+        AND bte.`create_time` > '2023-01-20 23:59:59'
+        AND (bte.`assignee_user_id` = #{startUserId}
+        AND bte.`result` = 1
+        <if test="pageVo.blurSearch != null and pageVo.blurSearch != ''">
+            AND (bpie.name LIKE '%${pageVo.blurSearch}%'
+            OR bte.name LIKE '%${pageVo.blurSearch}%'
+            OR bpie.`form_variables` LIKE '%${pageVo.blurSearch}%'
+            <if test="userIds != null and userIds.size() > 0">
+                OR bte.assignee_user_id IN
+                <foreach collection="userIds" item="userId" open="(" separator=", " close=")">
+                    #{userId}
+                </foreach>
+            </if>
+            )
+        </if>
+        <if test="pageVo.processDefinitionId != null">
+            AND bpie.`process_definition_id` = #{pageVo.processDefinitionId}
+        </if>
+        <if test="pageVo.category != null and pageVo.category != '' ">
+            AND bpie.category = #{pageVo.category}
+        </if>
+        <if test="pageVo.name != null and pageVo.name != ''">
+            AND bpie.`name` LIKE '%${pageVo.name}%'
+        </if>
+        <if test="pageVo.status != null">
+            AND bpie.`status` LIKE '%${pageVo.status}%'
+        </if>
+        <if test="pageVo.beginCreateTime != null and pageVo.endCreateTime != null">
+            AND bte.`create_time` BETWEEN #{pageVo.beginCreateTime} AND #{pageVo.endCreateTime}
+        </if>
+        AND bte.name &lt;&gt; '申请人')
+        GROUP BY bte.process_instance_id, bte.create_time
+        ORDER BY bte.create_time DESC
+    </select>
+    <select id="selectMyPage" resultMap="procInstExtDoBaseMap">
+        SELECT bpie.`id`,
+        bpie.`start_user_id`,
+        bpie.`name`,
+        bpie.`process_instance_id`,
+        bpie.`process_definition_id`,
+        bpie.`category`,
+        bpie.`status`,
+        bpie.`result`,
+        bpie.`end_time`,
+        bpie.`form_variables`,
+        bpie.`creator`,
+        bpie.`create_time`,
+        bpie.`updater`,
+        bpie.`update_time`,
+        bpie.`deleted`,
+        bpie.`tenant_id`,
+        bte.`task_def_key`,
+        bte.`assignee_user_id`,
+        bte.`task_id`,
+        bte.`comment`
+        FROM bpm_process_instance_ext bpie
+        JOIN bpm_task_ext bte ON bte.process_instance_id = bpie.process_instance_id
+        WHERE bte.`create_time` > '2023-01-20 23:59:59'
+        AND (bte.`deleted` = FALSE
+        <if test="startUserId != null">
+            AND bpie.`start_user_id` = #{startUserId}
+        </if>
+        <if test="pageVo.blurSearch != null and pageVo.blurSearch != ''">
+            AND (bpie.name LIKE '%${pageVo.blurSearch}%'
+            OR bte.name LIKE '%${pageVo.blurSearch}%'
+            OR bpie.`form_variables` LIKE '%${pageVo.blurSearch}%'
+            <if test="userIds != null and userIds.size() > 0">
+                OR bte.assignee_user_id IN
+                <foreach collection="userIds" item="userId" open="(" separator=", " close=")">
+                    #{userId}
+                </foreach>
+            </if>
+            )
+        </if>
+        <if test="pageVo.processDefinitionId != null">
+            AND bpie.`process_definition_id` = #{pageVo.processDefinitionId}
+        </if>
+        <if test="pageVo.category != null and pageVo.category != '' ">
+            AND bpie.category = #{pageVo.category}
+        </if>
+        <if test="pageVo.name != null and pageVo.name != ''">
+            AND bpie.`name` LIKE '%${pageVo.name}%'
+        </if>
+        <if test="pageVo.status != null">
+            AND bpie.`status` LIKE '%${pageVo.status}%'
+        </if>
+        <if test="pageVo.result != null">
+            AND bpie.`result` LIKE '%${pageVo.result}%'
+        </if>
+        <if test="pageVo.beginCreateTime != null and pageVo.endCreateTime != null">
+            AND bte.`create_time` BETWEEN #{pageVo.beginCreateTime} AND #{pageVo.endCreateTime}
+        </if>
+        )
+        GROUP BY bpie.process_instance_id, bpie.`create_time`
+        ORDER BY bpie.`create_time` DESC
+    </select>
+    <select id="selectDoneTaskPage" resultMap="procInstExtDoBaseMap">
+        SELECT bpie.`id`,
+        bpie.`start_user_id`,
+        bpie.`name`,
+        bpie.`process_instance_id`,
+        bpie.`process_definition_id`,
+        bpie.`category`,
+        bpie.`status`,
+        bpie.`result`,
+        bpie.`end_time`,
+        bpie.`form_variables`,
+        bpie.`creator`,
+        bpie.`create_time`,
+        bpie.`updater`,
+        bpie.`update_time`,
+        bpie.`deleted`,
+        bpie.`tenant_id`,
+        bte.`task_def_key`,
+        bte.`assignee_user_id`,
+        bte.`task_id`,
+        bte.`comment`
+        FROM bpm_process_instance_ext bpie
+        JOIN bpm_task_ext bte ON bte.process_instance_id = bpie.process_instance_id
+        WHERE bte.`deleted` = FALSE AND bte.`create_time` > '2023-01-20 23:59:59'
+        AND (bte.`assignee_user_id` = #{startUserId}
+        AND bte.`result` &lt;&gt; 1 AND bte.`result` &lt;&gt; 4
+        <if test="pageVo.blurSearch != null and pageVo.blurSearch != ''">
+            AND (bpie.name LIKE '%${pageVo.blurSearch}%'
+            OR bte.name LIKE '%${pageVo.blurSearch}%'
+            OR bpie.`form_variables` LIKE '%${pageVo.blurSearch}%'
+            <if test="userIds != null and userIds.size() > 0">
+                OR bte.assignee_user_id IN
+                <foreach collection="userIds" item="userId" open="(" separator=", " close=")">
+                    #{userId}
+                </foreach>
+            </if>
+            )
+        </if>
+        <if test="pageVo.processDefinitionId != null">
+            AND bpie.`process_definition_id` = #{pageVo.processDefinitionId}
+        </if>
+        <if test="pageVo.category != null and pageVo.category != '' ">
+            AND bpie.category = #{pageVo.category}
+        </if>
+        <if test="pageVo.name != null and pageVo.name != ''">
+            AND bpie.`name` LIKE '%${pageVo.name}%'
+        </if>
+        <if test="pageVo.status != null">
+            AND bpie.`status` LIKE '%${pageVo.status}%'
+        </if>
+        <if test="pageVo.beginCreateTime != null and pageVo.endCreateTime != null">
+            AND bte.`create_time` BETWEEN #{pageVo.beginCreateTime} AND #{pageVo.endCreateTime}
+        </if>
+        AND bte.comment NOT LIKE '%抄送%'
+        AND bte.name &lt;&gt; '申请人')
+        GROUP BY bte.process_instance_id, bte.end_time
+        ORDER BY bte.end_time DESC
+    </select>
+    <select id="selectCcMyTaskPage" resultMap="procInstExtDoBaseMap">
+        SELECT bpie.`id`,
+        bpie.`start_user_id`,
+        bpie.`name`,
+        bpie.`process_instance_id`,
+        bpie.`process_definition_id`,
+        bpie.`category`,
+        bpie.`status`,
+        bpie.`result`,
+        bpie.`end_time`,
+        bpie.`form_variables`,
+        bpie.`creator`,
+        bpie.`create_time`,
+        bpie.`updater`,
+        bpie.`update_time`,
+        bpie.`deleted`,
+        bpie.`tenant_id`,
+        bte.`task_def_key`,
+        bte.`assignee_user_id`,
+        bte.`task_id`,
+        bte.`comment`
+        FROM bpm_process_instance_ext bpie
+        JOIN bpm_task_ext bte ON bte.process_instance_id = bpie.process_instance_id
+        WHERE bte.`deleted` = FALSE AND bte.`create_time` > '2023-01-20 23:59:59'
+        AND (bte.`assignee_user_id` = #{userId}
+        AND bte.`result` &lt;&gt; 1
+        AND bte.`name` LIKE '%抄送%'
+        <if test="pageVo.blurSearch != null and pageVo.blurSearch != ''">
+            AND (bpie.name LIKE '%${pageVo.blurSearch}%'
+            OR bte.name LIKE '%${pageVo.blurSearch}%'
+            OR bpie.`form_variables` LIKE '%${pageVo.blurSearch}%'
+            <if test="userIds != null and userIds.size() > 0">
+                OR bte.assignee_user_id IN
+                <foreach collection="userIds" item="userId" open="(" separator=", " close=")">
+                    #{userId}
+                </foreach>
+            </if>
+            )
+        </if>
+        <if test="pageVo.processDefinitionId != null">
+            AND bpie.`process_definition_id` = #{pageVo.processDefinitionId}
+        </if>
+        <if test="pageVo.category != null and pageVo.category != '' ">
+            AND bpie.category = #{pageVo.category}
+        </if>
+        <if test="pageVo.name != null and pageVo.name != ''">
+            AND bpie.`name` LIKE '%${pageVo.name}%'
+        </if>
+        <if test="pageVo.status != null">
+            AND bpie.`status` LIKE '%${pageVo.status}%'
+        </if>
+        <if test="pageVo.beginCreateTime != null and pageVo.endCreateTime != null">
+            AND bte.`create_time` BETWEEN #{pageVo.beginCreateTime} AND #{pageVo.endCreateTime}
+        </if>
+        AND bte.`comment` NOT LIKE '%系统自动取消%'
+        AND bte.name &lt;&gt; '申请人')
+        ORDER BY bte.end_time DESC
+    </select>
+</mapper>

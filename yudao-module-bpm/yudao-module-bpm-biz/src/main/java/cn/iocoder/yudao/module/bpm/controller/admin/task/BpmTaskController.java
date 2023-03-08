@@ -4,16 +4,15 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -73,6 +72,20 @@ public class BpmTaskController {
     public CommonResult<Boolean> updateTaskAssignee(@Valid @RequestBody BpmTaskUpdateAssigneeReqVO reqVO) {
         taskService.updateTaskAssignee(getLoginUserId(), reqVO);
         return success(true);
+    }
+
+    @PutMapping("/back")
+    @Operation(summary = "回退/驳回")
+    @PreAuthorize("@ss.hasPermission('bpm:task:update')")
+    public CommonResult<Boolean> backTask(@Valid @RequestBody BpmTaskBackReqVO reqVO) {
+        return taskService.backTask(getLoginUserId(), reqVO);
+    }
+
+    @PostMapping("/get/back/taskRule")
+    @Operation(summary = "获取可回退的任务规则")
+    @PreAuthorize("@ss.hasPermission('bpm:task:update')")
+    public CommonResult<List<BpmBackTaskRespVO>> getBackTaskRule(@Valid @RequestBody BpmBackTaskReqVO reqVo) {
+        return taskService.getBackTaskRule(reqVo);
     }
 
 }

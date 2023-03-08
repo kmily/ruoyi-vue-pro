@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmTaskExtMapper">
+
+    <select id="selectDoneTaskPage" resultType="cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO">
+        SELECT *
+        FROM bpm_task_ext bte
+        JOIN bpm_process_instance_ext bpie ON bte.process_instance_id = bpie.process_instance_id
+        WHERE bte.`deleted` = FALSE AND bte.`create_time` > '2023-01-20 23:59:59' AND
+        (bte.`assignee_user_id` = #{startUserId}
+        AND bte.`result` &lt;&gt; 1 AND bte.`result` &lt;&gt; 4
+        <if test="pageVo.blurSearch != null and pageVo.blurSearch != ''">
+            AND (bpie.name LIKE '%${pageVo.blurSearch}%'
+            OR bte.name LIKE '%${pageVo.blurSearch}%'
+            OR bpie.`form_variables` LIKE '%${pageVo.blurSearch}%'
+            <if test="userIds != null and userIds.size() > 0">
+                OR bte.assignee_user_id IN
+                <foreach collection="userIds" item="userId" open="(" separator=", " close=")">
+                    #{userId}
+                </foreach>
+            </if>
+            )
+        </if>
+        <if test="pageVo.name != null and pageVo.name != ''">
+            AND bpie.`name` LIKE '%${pageVo.name}%'
+        </if>
+        <if test="pageVo.beginCreateTime != null and pageVo.endCreateTime != null">
+            AND bte.`create_time` BETWEEN #{pageVo.beginCreateTime} AND #{pageVo.endCreateTime}
+        </if>
+        AND bte.comment NOT LIKE '%抄送%'
+        AND bte.name &lt;&gt; '申请人')
+        ORDER BY bte.end_time DESC
+    </select>
+    <select id="selectDoneTaskPage2" resultType="cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO">
+        SELECT bte.id,
+        bte.task_def_key,
+        bte.assignee_user_id,
+        bte.name,
+        bte.task_id,
+        bte.result,
+        bte.comment,
+        bte.end_time,
+        bte.process_instance_id,
+        bte.process_definition_id,
+        bte.creator,
+        bte.create_time,
+        bte.updater,
+        bte.update_time,
+        bte.deleted,
+        bte.tenant_id,
+        bpie.start_user_id,
+        bpie.category,
+        bpie.status,
+        bpie.form_variables
+        FROM bpm_task_ext bte
+        JOIN bpm_process_instance_ext bpie ON bte.process_instance_id = bpie.process_instance_id
+        WHERE bte.`deleted` = FALSE AND bte.`create_time` > '2023-01-20 23:59:59' AND
+        (bte.`assignee_user_id` = #{userId}
+        AND bte.`result` &lt;&gt; 1 AND bte.`result` &lt;&gt; 4
+        <if test="pageVo.processDefinitionId != null">
+            AND bpie.`process_definition_id` = #{pageVo.processDefinitionId}
+        </if>
+        <if test="pageVo.category != null and pageVo.category != '' ">
+            AND bpie.category = #{pageVo.category}
+        </if>
+        <if test="pageVo.name != null and pageVo.name != ''">
+            AND bpie.`name` LIKE '%${pageVo.name}%'
+        </if>
+        <if test="pageVo.beginCreateTime != null and pageVo.endCreateTime != null">
+            AND bte.`create_time` BETWEEN #{pageVo.beginCreateTime} AND #{pageVo.endCreateTime}
+        </if>
+        AND bte.comment NOT LIKE '%抄送%'
+        AND bte.name &lt;&gt; '申请人')
+        GROUP BY bte.process_instance_id, bte.end_time
+        ORDER BY bte.end_time DESC
+    </select>
+    <select id="selectCcMyTaskPage" resultType="cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO">
+        SELECT *
+        FROM bpm_task_ext bte
+        JOIN bpm_process_instance_ext bpie ON bte.process_instance_id = bpie.process_instance_id
+        WHERE bte.`deleted` = FALSE AND bte.`create_time` > '2023-01-20 23:59:59'
+        AND (bte.`assignee_user_id` = #{startUserId}
+        AND bte.`result` &lt;&gt; 1
+        AND bte.`name` LIKE '%抄送%'
+        <if test="pageVo.blurSearch != null and pageVo.blurSearch != ''">
+            AND (bpie.name LIKE '%${pageVo.blurSearch}%'
+            OR bte.name LIKE '%${pageVo.blurSearch}%'
+            OR bpie.`form_variables` LIKE '%${pageVo.blurSearch}%'
+            <if test="userIds != null and userIds.size() > 0">
+                OR bte.assignee_user_id IN
+                <foreach collection="userIds" item="userId" open="(" separator=", " close=")">
+                    #{userId}
+                </foreach>
+            </if>
+            )
+        </if>
+        <if test="pageVo.name != null and pageVo.name != ''">
+            AND bpie.`name` LIKE '%${pageVo.name}%'
+        </if>
+        <if test="pageVo.beginCreateTime != null and pageVo.endCreateTime != null">
+            AND bte.`create_time` BETWEEN #{pageVo.beginCreateTime} AND #{pageVo.endCreateTime}
+        </if>
+        AND bte.`comment` NOT LIKE '%系统自动取消%'
+        AND bte.name &lt;&gt; '申请人')
+        ORDER BY bte.end_time DESC
+    </select>
+    <select id="selectTodoTaskPage" resultType="cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO">
+        SELECT *
+        FROM bpm_task_ext bte
+        JOIN bpm_process_instance_ext bpie ON bte.process_instance_id = bpie.process_instance_id
+        WHERE bte.`deleted` = FALSE AND bte.`create_time` > '2023-01-20 23:59:59' AND
+        (bte.`assignee_user_id` = #{userId}
+        AND bte.`result` = 1
+        <if test="pageVo.name != null and pageVo.name != ''">
+            AND bpie.`name` LIKE '%${pageVo.name}%'
+        </if>
+        <if test="pageVo.beginCreateTime != null and pageVo.endCreateTime != null">
+            AND bte.`create_time` BETWEEN #{pageVo.beginCreateTime} AND #{pageVo.endCreateTime}
+        </if>
+        AND bte.name &lt;&gt; '申请人')
+        ORDER BY bte.create_time DESC
+    </select>
+    <select id="selectTodoTaskPage2" resultType="cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO">
+        SELECT *
+        FROM bpm_task_ext bte
+        JOIN bpm_process_instance_ext bpie ON bte.process_instance_id = bpie.process_instance_id
+        WHERE bte.`deleted` = FALSE AND bte.`create_time` > '2023-01-20 23:59:59'
+        AND (bte.`assignee_user_id` = #{startUserId}
+        AND bte.`result` = 1
+        <if test="pageVo.blurSearch != null and pageVo.blurSearch != ''">
+            AND (bpie.name LIKE '%${pageVo.blurSearch}%'
+            OR bte.name LIKE '%${pageVo.blurSearch}%'
+            OR bpie.`form_variables` LIKE '%${pageVo.blurSearch}%'
+            <if test="userIds != null and userIds.size() > 0">
+                OR bte.assignee_user_id IN
+                <foreach collection="userIds" item="userId" open="(" separator=", " close=")">
+                    #{userId}
+                </foreach>
+            </if>
+            )
+        </if>
+        <if test="pageVo.name != null and pageVo.name != ''">
+            AND bpie.`name` LIKE '%${pageVo.name}%'
+        </if>
+        <if test="pageVo.beginCreateTime != null and pageVo.endCreateTime != null">
+            AND bte.`create_time` BETWEEN #{pageVo.beginCreateTime} AND #{pageVo.endCreateTime}
+        </if>
+        AND bte.name &lt;&gt; '申请人')
+        ORDER BY bte.create_time DESC
+    </select>
+    <select id="selectCcMyTaskPage2" resultType="cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO">
+        SELECT *
+        FROM bpm_task_ext bte
+        JOIN bpm_process_instance_ext bpie ON bte.process_instance_id = bpie.process_instance_id
+        WHERE bte.`deleted` = FALSE AND bte.`create_time` > '2023-01-20 23:59:59' AND
+        (bte.`assignee_user_id` = #{userId}
+        AND bte.`result` &lt;&gt; 1
+        AND bte.`name` LIKE '%抄送%'
+        <if test="pageVo.processDefinitionId != null">
+            AND bpie.`process_definition_id` = #{pageVo.processDefinitionId}
+        </if>
+        <if test="pageVo.category != null and pageVo.category != '' ">
+            AND bpie.category = #{pageVo.category}
+        </if>
+        <if test="pageVo.name != null and pageVo.name != ''">
+            AND bpie.`name` LIKE '%${pageVo.name}%'
+        </if>
+        <if test="pageVo.beginCreateTime != null and pageVo.endCreateTime != null">
+            AND bte.`create_time` BETWEEN #{pageVo.beginCreateTime} AND #{pageVo.endCreateTime}
+        </if>
+        AND bte.`comment` NOT LIKE '%系统自动取消%'
+        AND bte.name &lt;&gt; '申请人')
+        ORDER BY bte.end_time DESC
+    </select>
+</mapper>

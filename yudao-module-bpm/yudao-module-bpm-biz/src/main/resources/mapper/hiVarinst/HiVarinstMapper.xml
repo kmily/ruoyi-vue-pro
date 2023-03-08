@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.bpm.dal.mysql.task.HiVarinstMapper">
+
+    <!--
+        一般情况下，尽可能使用 Mapper 进行 CRUD 增删改查即可。
+        无法满足的场景，例如说多表关联查询，才使用 XML 编写 SQL。
+        代码生成器暂时只生成 Mapper XML 文件本身，更多推荐 MybatisX 快速开发插件来生成查询。
+        文档可见：https://www.iocoder.cn/MyBatis/x-plugins/
+     -->
+    <update id="updateById">
+        UPDATE act_hi_varinst
+        <set>
+            <if test="entity.rev != null">
+                REV_ = #{entity.rev},
+            </if>
+            <if test="entity.procInstId != null">
+                PROC_INST_ID_ = #{entity.procInstId},
+            </if>
+            <if test="entity.executionId != null">
+                EXECUTION_ID_ = #{entity.executionId},
+            </if>
+            <if test="entity.taskId != null">
+                TASK_ID_ = #{entity.taskId},
+            </if>
+            <if test="entity.name != null">
+                NAME_ = #{entity.name},
+            </if>
+            <if test="entity.varType != null">
+                VAR_TYPE_ = #{entity.varType},
+            </if>
+            <if test="entity.scopeId != null">
+                SCOPE_ID_ = #{entity.scopeId},
+            </if>
+            <if test="entity.subScopeId != null">
+                SUB_SCOPE_ID_ = #{entity.subScopeId},
+            </if>
+            <if test="entity.scopeType != null">
+                SCOPE_TYPE_ = #{entity.scopeType},
+            </if>
+            <if test="entity.bytearrayId != null">
+                BYTEARRAY_ID_ = #{entity.bytearrayId},
+            </if>
+            <if test="entity.doubleValue != null">
+                DOUBLE_ = #{entity.doubleValue},
+            </if>
+            <if test="entity.longValue != null">
+                LONG_ = #{entity.longValue},
+            </if>
+            <if test="entity.text != null">
+                TEXT_ = #{entity.text},
+            </if>
+            TEXT2_ = #{entity.text2},
+            CREATE_TIME_ = #{entity.createTime},
+            LAST_UPDATED_TIME_ = #{entity.lastUpdatedTime}
+        </set>
+        WHERE ID_ = #{entity.id}
+    </update>
+</mapper>

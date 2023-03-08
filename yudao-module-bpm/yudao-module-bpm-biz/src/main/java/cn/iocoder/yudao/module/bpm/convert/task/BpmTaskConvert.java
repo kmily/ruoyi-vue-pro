@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.bpm.convert.task;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmBackTaskRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskDonePageItemRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskTodoPageItemRespVO;
@@ -10,6 +11,7 @@ import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -43,7 +45,7 @@ public interface BpmTaskConvert {
      *
      * @return
      */
-    public static <T> T copy(Object source, Class<T> target) {
+    static <T> T copy(Object source, Class<T> target) {
         if (source == null || target == null) {
             return null;
         }
@@ -168,4 +170,9 @@ public interface BpmTaskConvert {
         return reqDTO;
     }
 
+    @Mappings({@Mapping(source = "bean.id", target = "taskDefKey"),
+        @Mapping(source = "bean.name", target = "taskDefName")})
+    BpmBackTaskRespVO convert(UserTask bean);
+
+    List<BpmBackTaskRespVO> convertList(List<UserTask> beanList);
 }
