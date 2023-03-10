@@ -102,7 +102,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @DSTransactional // 多租户多 DB 场景：使用 @DSTransactional 实现事务，避免 @Transactional 无法切换数据源
     public void updateUser(UserUpdateReqVO reqVO) {
         // 校验正确性
         validateUserForCreateOrUpdate(reqVO.getId(), reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
