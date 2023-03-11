@@ -145,6 +145,9 @@ public class DeptServiceImpl implements DeptService {
 
     @Override
     public List<DeptDO> getDeptList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
         return deptMapper.selectBatchIds(ids);
     }
 

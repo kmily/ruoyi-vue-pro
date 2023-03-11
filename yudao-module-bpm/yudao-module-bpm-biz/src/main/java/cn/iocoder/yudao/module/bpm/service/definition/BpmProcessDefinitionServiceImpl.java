@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.flowable.core.util.FlowableUtils;
+import cn.iocoder.yudao.framework.tenant.core.db.dynamic.TenantDS;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionListReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionPageItemRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionPageReqVO;
@@ -49,6 +50,7 @@ import static java.util.Collections.emptyList;
 @Service
 @Validated
 @Slf4j
+@TenantDS // 工作流的 Service 必须添加 @TenantDS 注解。原因是，Flowable 使用事务，无法切换数据源，需要提使用 @TenantDS 切到它的数据源
 public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionService {
 
     private static final String BPMN_FILE_SUFFIX = ".bpmn";
@@ -124,6 +126,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         Deployment deploy = repositoryService.createDeployment()
                 .key(createReqDTO.getKey()).name(createReqDTO.getName()).category(createReqDTO.getCategory())
                 .addBytes(createReqDTO.getKey() + BPMN_FILE_SUFFIX, createReqDTO.getBpmnBytes())
+                .tenantId(FlowableUtils.getTenantId())
                 .deploy();
 
         // 设置 ProcessDefinition 的 category 分类
@@ -234,6 +237,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
             definitionQuery.active();
         }
         // 执行查询
+        definitionQuery.processDefinitionTenantId(FlowableUtils.getTenantId());
         List<ProcessDefinition> processDefinitions = definitionQuery.list();
         if (CollUtil.isEmpty(processDefinitions)) {
             return Collections.emptyList();

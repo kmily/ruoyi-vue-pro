@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.framework.flowable.core.util;
 
+import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
@@ -24,6 +26,21 @@ public class FlowableUtils {
 
     public static void clearAuthenticatedUserId() {
         Authentication.setAuthenticatedUserId(null);
+    }
+
+    /**
+     * 获得租户编号
+     *
+     * 因为 Flowable 的租户编号是字符串，所以封装该方法
+     *
+     * @return 租户编号
+     */
+    public static String getTenantId() {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        if (loginUser == null || loginUser.getTenantId() == null) {
+            return null;
+        }
+        return String.valueOf(loginUser.getTenantId());
     }
 
     // ========== BPMN 相关的工具方法 ==========

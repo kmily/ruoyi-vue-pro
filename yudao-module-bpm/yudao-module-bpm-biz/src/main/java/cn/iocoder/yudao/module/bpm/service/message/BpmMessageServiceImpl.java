@@ -8,7 +8,10 @@ import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenProcess
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.SmsSendApi;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -32,6 +35,7 @@ public class BpmMessageServiceImpl implements BpmMessageService {
     private WebProperties webProperties;
 
     @Override
+    @Async // 必须使用异步，因为是在 Flowable 事务内调用，无法切换数据源
     public void sendMessageWhenProcessInstanceApprove(BpmMessageSendWhenProcessInstanceApproveReqDTO reqDTO) {
         Map<String, Object> templateParams = new HashMap<>();
         templateParams.put("processInstanceName", reqDTO.getProcessInstanceName());
@@ -41,6 +45,7 @@ public class BpmMessageServiceImpl implements BpmMessageService {
     }
 
     @Override
+    @Async // 必须使用异步，因为是在 Flowable 事务内调用，无法切换数据源
     public void sendMessageWhenProcessInstanceReject(BpmMessageSendWhenProcessInstanceRejectReqDTO reqDTO) {
         Map<String, Object> templateParams = new HashMap<>();
         templateParams.put("processInstanceName", reqDTO.getProcessInstanceName());
@@ -51,6 +56,7 @@ public class BpmMessageServiceImpl implements BpmMessageService {
     }
 
     @Override
+    @Async // 必须使用异步，因为是在 Flowable 事务内调用，无法切换数据源
     public void sendMessageWhenTaskAssigned(BpmMessageSendWhenTaskCreatedReqDTO reqDTO) {
         Map<String, Object> templateParams = new HashMap<>();
         templateParams.put("processInstanceName", reqDTO.getProcessInstanceName());

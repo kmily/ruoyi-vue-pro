@@ -7,6 +7,8 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
+import cn.iocoder.yudao.framework.flowable.core.util.FlowableUtils;
+import cn.iocoder.yudao.framework.tenant.core.db.dynamic.TenantDS;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
 import cn.iocoder.yudao.module.bpm.convert.definition.BpmModelConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
@@ -47,6 +49,7 @@ import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 @Service
 @Validated
 @Slf4j
+@TenantDS // 工作流的 Service 必须添加 @TenantDS 注解。原因是，Flowable 使用事务，无法切换数据源，需要提使用 @TenantDS 切到它的数据源
 public class BpmModelServiceImpl implements BpmModelService {
 
     @Resource
@@ -71,7 +74,8 @@ public class BpmModelServiceImpl implements BpmModelService {
             modelQuery.modelCategory(pageVO.getCategory());
         }
         // 执行查询
-        List<Model> models = modelQuery.orderByCreateTime().desc()
+        List<Model> models = modelQuery.modelTenantId(FlowableUtils.getTenantId())
+                .orderByCreateTime().desc()
                 .listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
 
         // 获得 Form Map
@@ -107,6 +111,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 创建流程定义
         Model model = repositoryService.newModel();
         BpmModelConvert.INSTANCE.copy(model, createReqVO);
+        model.setTenantId(FlowableUtils.getTenantId());
         // 保存流程定义
         repositoryService.saveModel(model);
         // 保存 BPMN XML

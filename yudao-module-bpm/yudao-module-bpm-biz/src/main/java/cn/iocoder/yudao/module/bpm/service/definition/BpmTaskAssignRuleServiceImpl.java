@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.framework.flowable.core.util.FlowableUtils;
+import cn.iocoder.yudao.framework.tenant.core.db.dynamic.TenantDS;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule.BpmTaskAssignRuleCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule.BpmTaskAssignRuleRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule.BpmTaskAssignRuleUpdateReqVO;
@@ -53,6 +54,7 @@ import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 @Service
 @Validated
 @Slf4j
+@TenantDS // 工作流的 Service 必须添加 @TenantDS 注解。原因是，Flowable 使用事务，无法切换数据源，需要提使用 @TenantDS 切到它的数据源
 public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
 
     @Resource
