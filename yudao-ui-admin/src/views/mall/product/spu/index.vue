@@ -18,6 +18,14 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
+      <el-form-item label="商品名称1" prop="name1">
+        <el-input
+          v-model="queryParams.name"
+          placeholder="请输入商品名称"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
       <el-form-item label="商品编码" prop="code">
         <el-input
           v-model="queryParams.code"
