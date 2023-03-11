@@ -18,10 +18,10 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="商品名称1" prop="name1">
+      <el-form-item label="商品名称2" prop="name2">
         <el-input
           v-model="queryParams.name"
-          placeholder="请输入商品名称"
+          placeholder="请输入商品名称2"
           clearable
           @keyup.enter.native="handleQuery"
         />
