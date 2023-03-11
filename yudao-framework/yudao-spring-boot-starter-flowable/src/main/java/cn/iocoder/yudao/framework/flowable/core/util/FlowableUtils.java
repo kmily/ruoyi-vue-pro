@@ -31,6 +31,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 @Slf4j
 public class FlowableUtils {
 
+    // TODO @ke：是不是方法返回 null，交给业务抛出 DEFAULT_FLOW_NULL 异常
     private static final ErrorCode DEFAULT_FLOW_NULL = new ErrorCode(100203000, "没有默认流转路径");
 
     // ========== User 相关的工具方法 ==========
@@ -58,7 +59,7 @@ public class FlowableUtils {
         model.getProcesses().forEach(process -> {
             process.getFlowElements().forEach(flowElement -> {
                 if (flowElement.getClass().isAssignableFrom(clazz)) {
-                    result.add((T)flowElement);
+                    result.add((T) flowElement);
                 }
             });
         });
@@ -226,8 +227,9 @@ public class FlowableUtils {
      * @param flowElement 任务节点
      * @param taskVarMap  审批数据
      */
-    private static FlowElement getExclusiveGateway(FlowElement flowElement, Map<String, Object> taskVarMap,
-        String defaultFlow) {
+    private static FlowElement getExclusiveGateway(FlowElement flowElement,
+                                                   Map<String, Object> taskVarMap,
+                                                   String defaultFlow) {
         // 获取所有网关分支
         List<SequenceFlow> targetFlows = ((ExclusiveGateway)flowElement).getOutgoingFlows();
         Boolean elExpressionFlag = Boolean.FALSE;

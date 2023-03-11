@@ -247,11 +247,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (StrUtil.isBlank(reqVO.getReason())) {
             reqVO.setReason("");
         }
-        // 校验任务存在
+        // 校验任务存在，并且是自己审批
         checkTask(userId, reqVO.getTaskId());
         // 获取审批流程所有任务
         List<BpmActivityDO> bpmActivityDOList = bpmActivityMapper.listAllByProcInstId(reqVO.getProcInstId());
         // 获取任务id
+        // TODO @ke：使用 CollUtils 里的 convertList；另外，这个是不是放到跟它逻辑相关的地方
         List<String> taskIdList = bpmActivityDOList.stream().filter(
                 bpmActivityDO -> bpmActivityDO.getActivityId().equals(reqVO.getOldTaskDefKey())
                     && bpmActivityDO.getRev().equals(1)
@@ -260,7 +261,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 获取未完成的任务, 用于获取执行任务的父id, 并且用未完成的数量计算已完成的任务数量
         List<Execution> executionList = runtimeService.createExecutionQuery().processInstanceId(reqVO.getProcInstId())
             .activityId(reqVO.getOldTaskDefKey()).list();
-        // 判断是否有未完成的任务
+        // 判断是否有未完成的任务。TODO @ke：为啥 executionList 为空，就是未完成呀？
         if (CollUtil.isEmpty(executionList)) {
             throw exception(EXECUTION_NOT_EXISTS);
         }
@@ -284,6 +285,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         return CommonResult.success(true);
     }
 
+    // TODO @ke：这里只返回 List<BpmBackTaskRespVO>，不用返回 CommonResult
     @Override
     public CommonResult<List<BpmBackTaskRespVO>> getBackTaskRule(BpmBackTaskReqVO reqVO) {
         List<UserTask> resultUserTaskList = new ArrayList<>();
@@ -294,21 +296,26 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (ObjectUtil.isNull(userTask)) {
             throw exception(BACK_TASK_NOT_ONE_USER_TASK);
         }
+        // TODO @ke：这个判断，是啥目的呀？
         if (!"申请人".equals(userTask.getName())) {
             resultUserTaskList.add(userTask);
         }
         // 获取审批流程表单数据
+        // TODO @ke：createHistoricVariableInstanceQuery 这个查询，可以封装一个小方法哈。
         List<HistoricVariableInstance> hisVarList = historyService.createHistoricVariableInstanceQuery()
             .processInstanceId(reqVO.getProcInstId()).list();
+        // TODO @ke：使用 CollUtils.convertMap 实现
         Map<String, Object> formVariables = new HashMap<>(hisVarList.size() + 50);
         for (HistoricVariableInstance hisVarInst : hisVarList) {
             formVariables.put(hisVarInst.getVariableName(), hisVarInst.getValue());
         }
+        // TODO @ke：这块逻辑的目的，可以写下注释哈；感觉整体逻辑，是从开头，不断获取下面的节点，直到碰到 oldTaskDefKey？
         List<UserTask> flow = FlowableUtils.getFlow(bpmnModel, userTask, formVariables);
         for (; ; ) {
             if (ObjectUtil.isNull(flow)) {
                 throw exception(BACK_TASK_NOT_USER_TASK);
             }
+            // TODO @ke：tmpList 命名，改改；
             List<String> tmpList = convertList(flow, UserTask::getId);
             if (tmpList.contains(reqVO.getOldTaskDefKey())) {
                 break;
@@ -319,6 +326,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         return CommonResult.success(BpmTaskConvert.INSTANCE.convertList(resultUserTaskList));
     }
 
+    // TODO @ke：自己调用自己，事务不生效。
+    // TODO @ke：这里，应该不值更新 Variable 把？？是不是可以搞个更合适的名字
     @TenantIgnore
     @DataPermission(enable = false)
     @Transactional(rollbackFor = Exception.class)
@@ -328,7 +337,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         Boolean delHiActInstResult = true;
         Boolean delHiTaskInstResult = true;
         Boolean delTaskResult = true;
+        // TODO @ke：isNotEmpty 已经判断了数量
         if (CollUtil.isNotEmpty(taskIdList) && taskIdList.size() > 0) {
+            // TODO @ke：最好删一个，判断一个
             // 逻辑删除扩展表任务
             delTaskResult = taskExtMapper.delByTaskIds(taskIdList);
             // 逻辑删除hiActInst表任务
@@ -340,15 +351,16 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (!delHiActInstResult || !delHiTaskInstResult || !delTaskResult) {
             throw exception(BACK_TASK_NOT_ERROR);
         }
+        // TODO @ke：建议把 nr 改成 number
         /*
-         * 修改ACT_HI_VARINST表数据, 由于回退任务时, 引擎不会自动修改之前执行的任务数据,
-         * 因此需要手动修改执行对应的任务数据
+         * 修改ACT_HI_VARINST表数据, 由于回退任务时, 引擎不会自动修改之前执行的任务数据，因此需要手动修改执行对应的任务数据
          * nrOfCompletedInstances：已完成的实例 nr是number单词缩写 需要修改
          * nrOfActiveInstances：未完成的实例个数 需要修改
          **/
         // 转为map
         Map<String, HistoricVariableInstance> historicVariableInstanceMap =
             convertMap(historicVariableInstanceList, HistoricVariableInstance::getVariableName);
+        // TODO @ke:ke使用 HistoricVariableInstance 接口么
         HistoricVariableInstanceEntityImpl nrOfInstances =
             (HistoricVariableInstanceEntityImpl)historicVariableInstanceMap.get("nrOfInstances");
         HistoricVariableInstanceEntityImpl nrOfCompletedInstances =
@@ -359,6 +371,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     executionList);
             hiVarinstMapper.updateById(nrOfCompletedInstancesVar);
         }
+        // TODO @ke:ke使用 HistoricVariableInstance 接口么
         HistoricVariableInstanceEntityImpl nrOfActiveInstances =
             (HistoricVariableInstanceEntityImpl)historicVariableInstanceMap.get("nrOfActiveInstances");
         if (ObjectUtil.isNotEmpty(nrOfActiveInstances)) {

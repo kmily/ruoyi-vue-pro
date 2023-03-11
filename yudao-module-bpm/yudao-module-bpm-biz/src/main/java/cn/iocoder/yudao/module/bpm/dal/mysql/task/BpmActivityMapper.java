@@ -8,10 +8,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-/**
- * @author kemengkai
- * @create 2022-05-09 09:26
- */
+// TODO @ke：可以使用 mybatis plus 来写查询么？
 @Mapper
 public interface BpmActivityMapper extends BaseMapperX<BpmActivityDO> {
 
