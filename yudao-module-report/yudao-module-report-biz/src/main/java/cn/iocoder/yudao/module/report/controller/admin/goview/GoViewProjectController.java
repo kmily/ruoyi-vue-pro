@@ -18,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -59,7 +60,7 @@ public class GoViewProjectController {
     @GetMapping("/get")
     @Operation(summary = "获得项目")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('report:go-view-project:query')")
+    @PermitAll
     public CommonResult<GoViewProjectRespVO> getProject(@RequestParam("id") Long id) {
         GoViewProjectDO project = goViewProjectService.getProject(id);
         return success(GoViewProjectConvert.INSTANCE.convert(project));
