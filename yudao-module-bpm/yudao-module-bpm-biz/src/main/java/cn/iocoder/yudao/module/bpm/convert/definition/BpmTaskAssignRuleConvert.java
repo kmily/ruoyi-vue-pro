@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.convert.definition;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule.BpmTaskAssignRuleCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule.BpmTaskAssignRuleRespVO;
@@ -9,6 +10,7 @@ import org.flowable.bpmn.model.UserTask;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -17,17 +19,28 @@ public interface BpmTaskAssignRuleConvert {
     BpmTaskAssignRuleConvert INSTANCE = Mappers.getMapper(BpmTaskAssignRuleConvert.class);
 
     default List<BpmTaskAssignRuleRespVO> convertList(List<UserTask> tasks, List<BpmTaskAssignRuleDO> rules) {
-        Map<String, BpmTaskAssignRuleDO> ruleMap = CollectionUtils.convertMap(rules, BpmTaskAssignRuleDO::getTaskDefinitionKey);
-        // 以 UserTask 为主维度，原因是：流程图编辑后，一些规则实际就没用了。
-        return CollectionUtils.convertList(tasks, task -> {
-            BpmTaskAssignRuleRespVO respVO = convert(ruleMap.get(task.getId()));
-            if (respVO == null) {
-                respVO = new BpmTaskAssignRuleRespVO();
-                respVO.setTaskDefinitionKey(task.getId());
+        if (CollUtil.isEmpty(tasks)) {
+            return new ArrayList<>();
+        }
+        Map<String, List<BpmTaskAssignRuleDO>> ruleMap = CollectionUtils.convertMultiMap(rules, BpmTaskAssignRuleDO::getTaskDefinitionKey);
+        List<BpmTaskAssignRuleRespVO> list = new ArrayList<>();
+        tasks.forEach(userTask -> {
+            List<BpmTaskAssignRuleDO> bpmTaskAssignRuleDOS = ruleMap.get(userTask.getId());
+            if (CollUtil.isEmpty(bpmTaskAssignRuleDOS)) {
+                BpmTaskAssignRuleRespVO respVO = new BpmTaskAssignRuleRespVO();
+                respVO.setTaskDefinitionKey(userTask.getId());
+                respVO.setTaskDefinitionName(userTask.getName());
+                list.add(respVO);
+                return;
             }
-            respVO.setTaskDefinitionName(task.getName());
-            return respVO;
+            bpmTaskAssignRuleDOS.forEach(bpmTaskAssignRuleDO -> {
+                BpmTaskAssignRuleRespVO respVO = convert(bpmTaskAssignRuleDO);
+                respVO.setTaskDefinitionName(userTask.getName());
+                list.add(respVO);
+            });
+
         });
+        return list;
     }
 
     BpmTaskAssignRuleRespVO convert(BpmTaskAssignRuleDO bean);

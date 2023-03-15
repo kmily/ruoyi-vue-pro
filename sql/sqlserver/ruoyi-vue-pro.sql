@@ -1023,6 +1023,7 @@ CREATE TABLE [dbo].[bpm_task_assign_rule] (
   [task_definition_key] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
   [type] tinyint  NOT NULL,
   [options] nvarchar(1024) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
+  [relation] tinyint DEFAULT 0,
   [creator] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [create_time] datetime2(7)  NOT NULL,
   [updater] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
@@ -1075,6 +1076,13 @@ EXEC sp_addextendedproperty
 'SCHEMA', N'dbo',
 'TABLE', N'bpm_task_assign_rule',
 'COLUMN', N'options'
+GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'条件关系',
+'SCHEMA', N'dbo',
+'TABLE', N'bpm_task_assign_rule',
+'COLUMN', N'relation'
 GO
 
 EXEC sp_addextendedproperty
@@ -5799,6 +5807,15 @@ GO
 INSERT INTO [dbo].[system_dict_data] ([id], [sort], [label], [value], [dict_type], [status], [color_type], [css_class], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1160', N'5', N'refresh_token', N'refresh_token', N'system_oauth2_grant_type', N'0', N'info', N'', N'刷新模式', N'1', N'2022-05-12 00:24:02.0000000', N'1', N'2022-05-11 16:26:11.0000000', N'0')
 GO
 
+INSERT INTO [dbo].[system_dict_data] ([id], [sort], [label], [value], [dict_type], [status], [color_type], [css_class], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1229', N'0', N'或', N'0', N'bpm_task_assign_relation', N'0', N'default', N'', N'', N'1', N'2022-05-12 00:24:02.0000000', N'1', N'2022-05-12 00:24:02.0000000', N'0')
+GO
+
+INSERT INTO [dbo].[system_dict_data] ([id], [sort], [label], [value], [dict_type], [status], [color_type], [css_class], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1230', N'1', N'且', N'1', N'bpm_task_assign_relation', N'0', N'default', N'', N'', N'1', N'2022-05-12 00:24:02.0000000', N'1', N'2022-05-12 00:24:02.0000000', N'0')
+GO
+
+INSERT INTO [dbo].[system_dict_data] ([id], [sort], [label], [value], [dict_type], [status], [color_type], [css_class], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1231', N'2', N'去除', N'2', N'bpm_task_assign_relation', N'0', N'default', N'', N'', N'1', N'2022-05-12 00:24:02.0000000', N'1', N'2022-05-12 00:24:02.0000000', N'0')
+GO
+
 SET IDENTITY_INSERT [dbo].[system_dict_data] OFF
 GO
 
@@ -6070,6 +6087,9 @@ INSERT INTO [dbo].[system_dict_type] ([id], [name], [type], [status], [remark], 
 GO
 
 INSERT INTO [dbo].[system_dict_type] ([id], [name], [type], [status], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'147', N'OAuth 2.0 授权类型', N'system_oauth2_grant_type', N'0', N'OAuth 2.0 授权类型（模式）', N'1', N'2022-05-12 00:20:52.0000000', N'1', N'2022-05-11 16:25:49.0000000', N'0')
+GO
+
+INSERT INTO [dbo].[system_dict_type] ([id], [name], [type], [status], [remark], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'168', N'工作流任务分配条件关系', N'bpm_task_assign_relation', N'0', N'', N'1', N'2022-05-12 00:20:52.0000000', N'1', N'2022-05-12 00:20:52.0000000', N'0');
 GO
 
 SET IDENTITY_INSERT [dbo].[system_dict_type] OFF
@@ -7215,6 +7235,9 @@ INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [pa
 GO
 
 INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'1267', N'客户端删除', N'system:oauth2-client:delete', N'3', N'4', N'1263', N'', N'', N'', N'0', N'1', N'1', N'', N'2022-05-10 16:26:33.0000000', N'1', N'2022-05-11 00:31:33.0000000', N'0')
+GO
+
+INSERT INTO [dbo].[system_menu] ([id], [name], [permission], [type], [sort], [parent_id], [path], [icon], [component], [status], [visible], [keep_alive], [creator], [create_time], [updater], [update_time], [deleted]) VALUES (N'2161', N'流程任务分配规则删除', N'bpm:task-assign-rule:delete', n'3', N'23', N'1193', N'', N'', N'', N'0', b'1', b'1', b'1', N'2022-05-10 16:26:33.0000000', N'1', N'2022-05-10 16:26:33.0000000', N'0');
 GO
 
 SET IDENTITY_INSERT [dbo].[system_menu] OFF

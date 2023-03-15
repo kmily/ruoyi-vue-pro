@@ -21,4 +21,7 @@ public class BpmTaskAssignRuleBaseVO {
     @NotNull(message = "规则值数组不能为空")
     private Set<Long> options;
 
+    @Schema(description = "条件关系", required = true, example = "bpm_task_assign_relation")
+    private Integer relation;
+
 }

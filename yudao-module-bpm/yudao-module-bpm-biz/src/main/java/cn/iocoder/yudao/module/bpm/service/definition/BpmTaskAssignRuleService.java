@@ -61,6 +61,12 @@ public interface BpmTaskAssignRuleService {
     void updateTaskAssignRule(@Valid BpmTaskAssignRuleUpdateReqVO reqVO);
 
     /**
+     * 删除任务分配规则
+     * @param id
+     */
+    void deleteTaskAssignRule(Long id);
+
+    /**
      * 判断指定流程模型和流程定义的分配规则是否相等
      *
      * @param modelId 流程模型编号

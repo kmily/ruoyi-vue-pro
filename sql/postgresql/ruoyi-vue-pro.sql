@@ -720,6 +720,7 @@ CREATE TABLE "bpm_task_assign_rule" (
   "task_definition_key" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
   "type" int2 NOT NULL,
   "options" varchar(1024) COLLATE "pg_catalog"."default" NOT NULL,
+  "relation" int DEFAULT 0,
   "creator" varchar(64) COLLATE "pg_catalog"."default",
   "create_time" timestamp(6) NOT NULL,
   "updater" varchar(64) COLLATE "pg_catalog"."default",
@@ -734,6 +735,7 @@ COMMENT ON COLUMN "bpm_task_assign_rule"."process_definition_id" IS '流程定�
 COMMENT ON COLUMN "bpm_task_assign_rule"."task_definition_key" IS '流程任务定义的 key';
 COMMENT ON COLUMN "bpm_task_assign_rule"."type" IS '规则类型';
 COMMENT ON COLUMN "bpm_task_assign_rule"."options" IS '规则值，JSON 数组';
+COMMENT ON COLUMN "bpm_task_assign_rule"."relation" IS '条件关系';
 COMMENT ON COLUMN "bpm_task_assign_rule"."creator" IS '创建者';
 COMMENT ON COLUMN "bpm_task_assign_rule"."create_time" IS '创建时间';
 COMMENT ON COLUMN "bpm_task_assign_rule"."updater" IS '更新者';
@@ -2351,6 +2353,9 @@ INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "st
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1158, 3, 'implicit', 'implicit', 'system_oauth2_grant_type', 0, 'success', '', '简化模式', '1', '2022-05-12 00:23:40', '1', '2022-05-11 16:26:05', 0);
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1159, 4, 'client_credentials', 'client_credentials', 'system_oauth2_grant_type', 0, 'default', '', '客户端模式', '1', '2022-05-12 00:23:51', '1', '2022-05-11 16:26:08', 0);
 INSERT INTO "system_dict_data" ("id", "sort", "label", "value", "dict_type", "status", "color_type", "css_class", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1160, 5, 'refresh_token', 'refresh_token', 'system_oauth2_grant_type', 0, 'info', '', '刷新模式', '1', '2022-05-12 00:24:02', '1', '2022-05-11 16:26:11', 0);
+INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1229, 0, '或', '0', 'bpm_task_assign_relation', 0, 'default', '', NULL, '1', '2023-02-22 17:17:09', '1', '2023-02-22 17:17:09', 0);
+INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1230, 1, '且', '1', 'bpm_task_assign_relation', 0, 'default', '', NULL, '1', '2023-02-22 17:17:16', '1', '2023-02-22 17:17:16', 0);
+INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (1231, 2, '去除', '2', 'bpm_task_assign_relation', 0, 'default', '', NULL, '1', '2023-02-22 17:17:23', '1', '2023-02-22 17:17:23', 0);
 COMMIT;
 
 -- ----------------------------
@@ -2446,6 +2451,7 @@ INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creat
 INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (145, '角色类型', 'system_role_type', 0, '角色类型', '1', '2022-02-16 13:01:46', '1', '2022-02-16 13:01:46', 0);
 INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (146, '文件存储器', 'infra_file_storage', 0, '文件存储器', '1', '2022-03-15 00:24:38', '1', '2022-03-15 00:24:38', 0);
 INSERT INTO "system_dict_type" ("id", "name", "type", "status", "remark", "creator", "create_time", "updater", "update_time", "deleted") VALUES (147, 'OAuth 2.0 授权类型', 'system_oauth2_grant_type', 0, 'OAuth 2.0 授权类型（模式）', '1', '2022-05-12 00:20:52', '1', '2022-05-11 16:25:49', 0);
+INSERT INTO `system_dict_type` (`id`, `name`, `type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (168, '工作流任务分配条件关系', 'bpm_task_assign_relation', 0, '', '1', '2023-02-22 17:16:58', '1', '2023-02-22 17:16:58', '0');
 COMMIT;
 
 -- ----------------------------
@@ -2807,6 +2813,7 @@ INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_i
 INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1267, '客户端删除', 'system:oauth2-client:delete', 3, 4, 1263, '', '', '', 0, 't', 't', '', '2022-05-10 16:26:33', '1', '2022-05-11 00:31:33', 0);
 INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1117, '支付管理', '', 1, 11, 0, '/pay', 'money', NULL, 0, 't', 't', '1', '2021-12-25 16:43:41', '1', '2022-05-13 01:02:25.244', 0);
 INSERT INTO "system_menu" ("id", "name", "permission", "type", "sort", "parent_id", "path", "icon", "component", "status", "visible", "keep_alive", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1, '系统管理', '', 1, 10, 0, '/system', 'system', NULL, 0, 't', 't', 'admin', '2021-01-05 17:03:48', '1', '2022-05-13 01:02:57.073', 0);
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`, `visible`, `keep_alive`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (2161, '流程任务分配规则删除', 'bpm:task-assign-rule:delete', 3, 23, 1193, '', '', '', 0, '1', '1', '1', '2023-02-22 17:37:30', '1', '2023-02-22 17:37:30', 0);
 COMMIT;
 
 -- ----------------------------

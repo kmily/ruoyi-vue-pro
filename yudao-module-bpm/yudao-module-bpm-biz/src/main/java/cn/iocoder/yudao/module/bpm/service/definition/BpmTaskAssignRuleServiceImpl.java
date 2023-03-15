@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmTaskAssignRuleMapper;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.DictTypeConstants;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskAssignRuleRelationEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.PostApi;
@@ -126,12 +127,6 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
     public Long createTaskAssignRule(@Valid BpmTaskAssignRuleCreateReqVO reqVO) {
         // 校验参数
         validTaskAssignRuleOptions(reqVO.getType(), reqVO.getOptions());
-        // 校验是否已经配置
-        BpmTaskAssignRuleDO existRule =
-            taskRuleMapper.selectListByModelIdAndTaskDefinitionKey(reqVO.getModelId(), reqVO.getTaskDefinitionKey());
-        if (existRule != null) {
-            throw exception(TASK_ASSIGN_RULE_EXISTS, reqVO.getModelId(), reqVO.getTaskDefinitionKey());
-        }
 
         // 存储
         BpmTaskAssignRuleDO rule = BpmTaskAssignRuleConvert.INSTANCE.convert(reqVO)
@@ -159,6 +154,19 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
     }
 
     @Override
+    public void deleteTaskAssignRule(Long id) {
+        // 校验
+        BpmTaskAssignRuleDO existRule = taskRuleMapper.selectById(id);
+        if (existRule == null) {
+            throw exception(TASK_ASSIGN_RULE_NOT_EXISTS);
+        }
+        if (!Objects.equals(BpmTaskAssignRuleDO.PROCESS_DEFINITION_ID_NULL, existRule.getProcessDefinitionId())) {
+            throw exception(TASK_UPDATE_FAIL_NOT_MODEL);
+        }
+        taskRuleMapper.deleteById(id);
+    }
+
+    @Override
     public boolean isTaskAssignRulesEquals(String modelId, String processDefinitionId) {
         // 调用 VO 接口的原因是，过滤掉流程模型不需要的规则，保持和 copyTaskAssignRules 方法的一致性
         List<BpmTaskAssignRuleRespVO> modelRules = getTaskAssignRuleList(modelId, null);
@@ -168,16 +176,25 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
         }
 
         // 遍历，匹配对应的规则
-        Map<String, BpmTaskAssignRuleRespVO> processInstanceRuleMap =
-            CollectionUtils.convertMap(processInstanceRules, BpmTaskAssignRuleRespVO::getTaskDefinitionKey);
-        for (BpmTaskAssignRuleRespVO modelRule : modelRules) {
-            BpmTaskAssignRuleRespVO processInstanceRule = processInstanceRuleMap.get(modelRule.getTaskDefinitionKey());
-            if (processInstanceRule == null) {
+        Map<String, List<BpmTaskAssignRuleRespVO>> processInstanceRuleMap =
+                CollectionUtils.convertMultiMap(processInstanceRules, BpmTaskAssignRuleRespVO::getTaskDefinitionKey);
+        Map<String, List<BpmTaskAssignRuleRespVO>> modelRuleMap =
+                CollectionUtils.convertMultiMap(modelRules, BpmTaskAssignRuleRespVO::getTaskDefinitionKey);
+
+        for (Map.Entry<String, List<BpmTaskAssignRuleRespVO>> entry : modelRuleMap.entrySet()) {
+            List<BpmTaskAssignRuleRespVO> modelAssignRuleRespVOList = entry.getValue();
+            List<BpmTaskAssignRuleRespVO> processInstanceAssignRuleRespVOList = processInstanceRuleMap.get(entry.getKey());
+            if (modelAssignRuleRespVOList.size() != processInstanceAssignRuleRespVOList.size()) {
                 return false;
             }
-            if (!ObjectUtil.equals(modelRule.getType(), processInstanceRule.getType()) || !ObjectUtil.equal(
-                modelRule.getOptions(), processInstanceRule.getOptions())) {
-                return false;
+            for (int i = 0; i < modelAssignRuleRespVOList.size(); i++) {
+                BpmTaskAssignRuleRespVO modelAssignRuleRespVO = modelAssignRuleRespVOList.get(i);
+                BpmTaskAssignRuleRespVO processInstanceAssignRuleRespVO = processInstanceAssignRuleRespVOList.get(i);
+                if (!ObjectUtil.equals(modelAssignRuleRespVO.getType(), processInstanceAssignRuleRespVO.getType())
+                        || !ObjectUtil.equal(modelAssignRuleRespVO.getOptions(), processInstanceAssignRuleRespVO.getOptions())
+                        || !ObjectUtil.equal(modelAssignRuleRespVO.getRelation(), processInstanceAssignRuleRespVO.getRelation())) {
+                    return false;
+                }
             }
         }
         return true;
@@ -234,50 +251,68 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
     @Override
     @DataPermission(enable = false) // 忽略数据权限，不然分配会存在问题
     public Set<Long> calculateTaskCandidateUsers(DelegateExecution execution) {
-        BpmTaskAssignRuleDO rule = getTaskRule(execution);
-        return calculateTaskCandidateUsers(execution, rule);
+        List<BpmTaskAssignRuleDO> rules = getTaskRule(execution);
+        return calculateTaskCandidateUsers(execution, rules);
     }
 
     @VisibleForTesting
-    BpmTaskAssignRuleDO getTaskRule(DelegateExecution execution) {
+    List<BpmTaskAssignRuleDO> getTaskRule(DelegateExecution execution) {
         List<BpmTaskAssignRuleDO> taskRules = getTaskAssignRuleListByProcessDefinitionId(
                 execution.getProcessDefinitionId(), execution.getCurrentActivityId());
         if (CollUtil.isEmpty(taskRules)) {
             throw new FlowableException(format("流程任务({}/{}/{}) 找不到符合的任务规则",
                     execution.getId(), execution.getProcessDefinitionId(), execution.getCurrentActivityId()));
         }
-        if (taskRules.size() > 1) {
-            throw new FlowableException(format("流程任务({}/{}/{}) 找到过多任务规则({})",
-                    execution.getId(), execution.getProcessDefinitionId(), execution.getCurrentActivityId()));
-        }
-        return taskRules.get(0);
+        return taskRules;
     }
 
     @VisibleForTesting
-    Set<Long> calculateTaskCandidateUsers(DelegateExecution execution, BpmTaskAssignRuleDO rule) {
-        Set<Long> assigneeUserIds = null;
-        if (Objects.equals(BpmTaskAssignRuleTypeEnum.ROLE.getType(), rule.getType())) {
-            assigneeUserIds = calculateTaskCandidateUsersByRole(rule);
-        } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.DEPT_MEMBER.getType(), rule.getType())) {
-            assigneeUserIds = calculateTaskCandidateUsersByDeptMember(rule);
-        } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.DEPT_LEADER.getType(), rule.getType())) {
-            assigneeUserIds = calculateTaskCandidateUsersByDeptLeader(rule);
-        } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.POST.getType(), rule.getType())) {
-            assigneeUserIds = calculateTaskCandidateUsersByPost(rule);
-        } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.USER.getType(), rule.getType())) {
-            assigneeUserIds = calculateTaskCandidateUsersByUser(rule);
-        } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.USER_GROUP.getType(), rule.getType())) {
-            assigneeUserIds = calculateTaskCandidateUsersByUserGroup(rule);
-        } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.SCRIPT.getType(), rule.getType())) {
-            assigneeUserIds = calculateTaskCandidateUsersByScript(execution, rule);
+    Set<Long> calculateTaskCandidateUsers(DelegateExecution execution, List<BpmTaskAssignRuleDO> rules) {
+        Set<Long> assigneeUserIds = new HashSet<>();
+        int index = 0;
+        for (BpmTaskAssignRuleDO rule : rules) {
+            Set<Long> ruleAssigneeUserIds = null;
+            if (Objects.equals(BpmTaskAssignRuleTypeEnum.ROLE.getType(), rule.getType())) {
+                ruleAssigneeUserIds = calculateTaskCandidateUsersByRole(rule);
+            } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.DEPT_MEMBER.getType(), rule.getType())) {
+                ruleAssigneeUserIds = calculateTaskCandidateUsersByDeptMember(rule);
+            } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.DEPT_LEADER.getType(), rule.getType())) {
+                ruleAssigneeUserIds = calculateTaskCandidateUsersByDeptLeader(rule);
+            } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.POST.getType(), rule.getType())) {
+                ruleAssigneeUserIds = calculateTaskCandidateUsersByPost(rule);
+            } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.USER.getType(), rule.getType())) {
+                ruleAssigneeUserIds = calculateTaskCandidateUsersByUser(rule);
+            } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.USER_GROUP.getType(), rule.getType())) {
+                ruleAssigneeUserIds = calculateTaskCandidateUsersByUserGroup(rule);
+            } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.SCRIPT.getType(), rule.getType())) {
+                ruleAssigneeUserIds = calculateTaskCandidateUsersByScript(execution, rule);
+            }
+            if (CollUtil.isEmpty(ruleAssigneeUserIds)) {
+                continue;
+            }
+            if (index == 0) {
+                //第一条固定采用与操作，否则可能一直为空
+                assigneeUserIds.addAll(ruleAssigneeUserIds);
+            } else {
+                if (BpmTaskAssignRuleRelationEnum.OR.getStatus().equals(rule.getRelation())) {
+                    assigneeUserIds.addAll(ruleAssigneeUserIds);
+                } else if (BpmTaskAssignRuleRelationEnum.AND.getStatus().equals(rule.getRelation())) {
+                    assigneeUserIds.retainAll(ruleAssigneeUserIds);
+                } else if (BpmTaskAssignRuleRelationEnum.NOT.getStatus().equals(rule.getRelation())) {
+                    assigneeUserIds.removeAll(ruleAssigneeUserIds);
+                } else {
+                    assigneeUserIds.addAll(ruleAssigneeUserIds);
+                }
+            }
+            index++;
         }
 
         // 移除被禁用的用户
         removeDisableUsers(assigneeUserIds);
         // 如果候选人为空，抛出异常
         if (CollUtil.isEmpty(assigneeUserIds)) {
-            log.error("[calculateTaskCandidateUsers][流程任务({}/{}/{}) 任务规则({}) 找不到候选人]", execution.getId(),
-                    execution.getProcessDefinitionId(), execution.getCurrentActivityId(), toJsonString(rule));
+            log.error("[calculateTaskCandidateUsers][流程任务({}/{}/{}) 找不到候选人]", execution.getId(),
+                    execution.getProcessDefinitionId(), execution.getCurrentActivityId());
             throw exception(TASK_CREATE_FAIL_NO_CANDIDATE_USER);
         }
         return assigneeUserIds;
