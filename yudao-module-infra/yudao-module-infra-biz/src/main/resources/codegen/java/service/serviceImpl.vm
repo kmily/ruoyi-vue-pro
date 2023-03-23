@@ -41,8 +41,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         // 校验存在
         validate${simpleClassName}Exists(updateReqVO.getId());
         // 更新
-        ${table.className}DO updateObj = ${table.className}Convert.INSTANCE.convert(updateReqVO);
-        ${classNameVar}Mapper.updateById(updateObj);
+        ${classNameVar}Mapper.updateById(updateReqVO);
     }
 
     @Override
