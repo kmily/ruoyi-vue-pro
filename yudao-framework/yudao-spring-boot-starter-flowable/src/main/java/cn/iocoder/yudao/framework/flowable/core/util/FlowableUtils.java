@@ -60,12 +60,28 @@ public class FlowableUtils {
             process.getFlowElements().forEach(flowElement -> {
                 if (flowElement.getClass().isAssignableFrom(clazz)) {
                     result.add((T) flowElement);
+                }else if (flowElement.getClass().isAssignableFrom(SubProcess.class)) {
+                    getSubProcessElements((SubProcess) flowElement, clazz, result);
                 }
             });
         });
         return result;
     }
-
+    /**
+     * 获取子流程中的指定元素们
+     * @param process
+     * @param clazz 指定元素。例如说，{@link org.flowable.bpmn.model.UserTask}、{@link org.flowable.bpmn.model.Gateway} 等等
+     * @param result 元素们
+     */
+    private static <T extends FlowElement> void getSubProcessElements(SubProcess process, Class<T> clazz, List<T> result) {
+        process.getFlowElements().forEach(flowElement -> {
+            if (flowElement.getClass().isAssignableFrom(clazz)) {
+                result.add((T) flowElement);
+            } else if (flowElement.getClass().isAssignableFrom(SubProcess.class)) {
+                getSubProcessElements((SubProcess) flowElement, clazz, result);
+            }
+        });
+    }
     /**
      * 获得 BPMN 流程中，开始节点
      *
