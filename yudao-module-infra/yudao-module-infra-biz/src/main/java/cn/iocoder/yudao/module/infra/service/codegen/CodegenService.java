@@ -91,4 +91,11 @@ public interface CodegenService {
      */
     List<DatabaseTableRespVO> getDatabaseTableList(Long dataSourceConfigId, String name, String comment);
 
+    /**
+     * 伪造假的sql数据，每一条即是一个插入语句
+     * @param tableId 表单id
+     * @param num 数据量
+     * @return sql集合
+     */
+    List<String> fakeData(Long tableId, Integer num);
 }

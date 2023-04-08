@@ -16,10 +16,10 @@ import cn.iocoder.yudao.module.infra.convert.codegen.CodegenConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
 import cn.iocoder.yudao.module.infra.service.codegen.CodegenService;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.validation.constraints.PositiveOrZero;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -138,4 +139,16 @@ public class CodegenController {
         ServletUtils.writeAttachment(response, "codegen.zip", outputStream.toByteArray());
     }
 
+    @Operation(summary = "生成sql假数据")
+    @GetMapping("/fake-data")
+
+    @PreAuthorize("@ss.hasPermission('infra:codegen:preview')")
+    @Parameters({
+            @Parameter(name = "tableId", description = "表编号", required = true, example = "1024"),
+            @Parameter(name = "num", description = "数据源配置的编号", required = false, example = "1"),
+    })
+    public CommonResult<List<String>> fakeData(@RequestParam("tableId") Long tableId,
+                                               @PositiveOrZero @RequestParam(value = "num", required = false, defaultValue = "1") Integer num) throws IOException {
+        return success(codegenService.fakeData(tableId, num));
+    }
 }

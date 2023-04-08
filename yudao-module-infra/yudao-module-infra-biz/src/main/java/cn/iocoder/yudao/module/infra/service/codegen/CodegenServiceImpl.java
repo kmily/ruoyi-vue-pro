@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.infra.service.codegen;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -14,8 +15,15 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.codegen.CodegenColumnMapper;
 import cn.iocoder.yudao.module.infra.dal.mysql.codegen.CodegenTableMapper;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
+import cn.iocoder.yudao.module.infra.enums.codegen.FieldTypeEnum;
+import cn.iocoder.yudao.module.infra.enums.codegen.MockTypeEnum;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenBuilder;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenEngine;
+import cn.iocoder.yudao.module.infra.service.codegen.inner.DataGeneratorFactory;
+import cn.iocoder.yudao.module.infra.service.codegen.inner.generator.DataGenerator;
+import cn.iocoder.yudao.module.infra.service.codegen.inner.generator.sql.MySQLDialect;
+import cn.iocoder.yudao.module.infra.service.codegen.inner.generator.sql.SQLDialect;
+import cn.iocoder.yudao.module.infra.service.codegen.inner.generator.sql.SQLDialectFactory;
 import cn.iocoder.yudao.module.infra.service.db.DatabaseTableService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.baomidou.mybatisplus.generator.config.po.TableField;
@@ -24,10 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
@@ -243,6 +248,122 @@ public class CodegenServiceImpl implements CodegenService {
                 codegenTableMapper.selectListByDataSourceConfigId(dataSourceConfigId), CodegenTableDO::getTableName);
         tables.removeIf(table -> existsTables.contains(table.getName()));
         return CodegenConvert.INSTANCE.convertList04(tables);
+    }
+
+    @Override
+    public List<String> fakeData(Long tableId, Integer num) {
+        //获取表单信息
+        CodegenTableDO table = getCodegenTablePage(tableId);
+        //获取列表信息
+        List<CodegenColumnDO> columns = getCodegenColumnListByTableId(tableId);
+        // 初始化结果数据
+        List<Map<String, Object>> dataList = generateData(num, columns);
+        //构建结果
+        return buildInsertSql(table, columns, dataList);
+    }
+
+    private List<Map<String, Object>> generateData(Integer num, List<CodegenColumnDO> columns) {
+        List<Map<String, Object>> resultList = new ArrayList<>(num);
+        for (int i = 0; i < num; i++) {
+            resultList.add(new HashMap<>());
+        }
+        // 依次生成每一列
+        for (CodegenColumnDO field : columns) {
+            MockTypeEnum mockTypeEnum = Optional.ofNullable(MockTypeEnum.getEnumByValue(field.getMockType()))
+                    .orElse(MockTypeEnum.NONE);
+            DataGenerator dataGenerator = DataGeneratorFactory.getGenerator(mockTypeEnum);
+            List<String> mockDataList = dataGenerator.doGenerate(field, num);
+            String fieldName = field.getColumnName();
+            // 填充结果列表
+            if (CollectionUtil.isNotEmpty(mockDataList)) {
+                for (int i = 0; i < num; i++) {
+                    resultList.get(i).put(fieldName, mockDataList.get(i));
+                }
+            }
+        }
+        return resultList;
+    }
+
+
+    /**
+     * 根据列的属性获取值字符串
+     *
+     * @param field
+     * @param value
+     * @return
+     */
+    public static String getValueStr(CodegenColumnDO field, Object value) {
+        if (field == null || value == null) {
+            return "''";
+        }
+        FieldTypeEnum fieldTypeEnum = Optional.ofNullable(FieldTypeEnum.getEnumByValue(field.getDataType()))
+                .orElse(FieldTypeEnum.TEXT);
+        String result = String.valueOf(value);
+        switch (fieldTypeEnum) {
+            case DATETIME:
+            case TIMESTAMP:
+                return result.equalsIgnoreCase("CURRENT_TIMESTAMP") ? result : String.format("'%s'", value);
+            case DATE:
+            case TIME:
+            case CHAR:
+            case VARCHAR:
+            case TINYTEXT:
+            case TEXT:
+            case MEDIUMTEXT:
+            case LONGTEXT:
+            case TINYBLOB:
+            case BLOB:
+            case MEDIUMBLOB:
+            case LONGBLOB:
+            case BINARY:
+            case VARBINARY:
+                return String.format("'%s'", value);
+            default:
+                return result;
+        }
+    }
+
+    /**
+     * 构造插入数据 SQL
+     * e.g. INSERT INTO report (id, content) VALUES (1, '这个有点问题吧');
+     *
+     * @param table    表概要
+     * @param dataList 数据列表
+     * @return 生成的 SQL 列表字符串
+     */
+    public List<String> buildInsertSql(CodegenTableDO table, List<CodegenColumnDO> fieldList, List<Map<String, Object>> dataList) {
+        SQLDialect sqlDialect = SQLDialectFactory.getDialect(MySQLDialect.class.getName());
+        // 构造模板
+        String template = "insert into %s (%s) values (%s);";
+        // 构造表名
+        String tableName = sqlDialect.wrapTableName(table.getTableName());
+        // 过滤掉不模拟的字段
+        fieldList = fieldList.stream()
+                .filter(field -> {
+                    MockTypeEnum mockTypeEnum = Optional.ofNullable(MockTypeEnum.getEnumByValue(field.getMockType()))
+                            .orElse(MockTypeEnum.NONE);
+                    return !MockTypeEnum.NONE.equals(mockTypeEnum);
+                })
+                .collect(Collectors.toList());
+        int total = dataList.size();
+        List<String> resultStringBuilder = new ArrayList<>(total);
+        for (int i = 0; i < total; i++) {
+            Map<String, Object> dataRow = dataList.get(i);
+            String keyStr = fieldList.stream()
+                    .map(field -> sqlDialect.wrapFieldName(field.getColumnName()))
+                    .collect(Collectors.joining(", "));
+            String valueStr = fieldList.stream()
+                    .map(field -> getValueStr(field, dataRow.get(field.getColumnName())))
+                    .collect(Collectors.joining(", "));
+            // 填充模板
+            String result = String.format(template, tableName, keyStr, valueStr);
+            resultStringBuilder.add(result);
+            // 最后一个字段后没有换行
+            /*if (i != total - 1) {
+                resultStringBuilder.append("\n");
+            }*/
+        }
+        return resultStringBuilder;
     }
 
 }
