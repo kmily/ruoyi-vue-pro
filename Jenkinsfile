@@ -1,6 +1,6 @@
 #!groovy
 pipeline {
-
+    echo ":"
     agent any
 
     parameters {
