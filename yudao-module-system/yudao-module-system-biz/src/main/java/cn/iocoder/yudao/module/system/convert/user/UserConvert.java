@@ -52,4 +52,7 @@ public interface UserConvert {
 
     List<AdminUserRespDTO> convertList4(List<AdminUserDO> users);
 
+    UserSelectListVO.Dept convertToSelectListDept(DeptDO deptDO);
+
+    UserSelectListVO convertToSelectList(AdminUserDO user);
 }

@@ -10,6 +10,23 @@ export function listUser(query) {
   })
 }
 
+// 查询用户列表(用于用户选择框)
+export function listSimpleUserToUserSelect(query) {
+  return request({
+    url: '/system/user/listSimpleUserToUserSelect',
+    method: 'get',
+    params: query
+  })
+}
+
+// 根据id列表查询用户列表(用于用户选择框)
+export function listSimpleUserToUserSelectByIds(query) {
+  return request({
+    url: '/system/user/listSimpleUserToUserSelectByIds/?ids='+ query.toString(),
+    method: 'get',
+  })
+}
+
 // 获取用户精简信息列表
 export function listSimpleUsers() {
   return request({

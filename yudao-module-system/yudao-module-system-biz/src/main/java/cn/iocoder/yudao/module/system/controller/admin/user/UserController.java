@@ -118,6 +118,51 @@ public class UserController {
         return success(UserConvert.INSTANCE.convertList04(list));
     }
 
+
+    @GetMapping("/listSimpleUserToUserSelect")
+    @ApiOperation("获得用户分页列表")
+    public CommonResult<PageResult<UserSelectListVO>> listSimpleUser(@Valid UserPageReqVO reqVO) {
+        // 获得用户分页列表
+        PageResult<AdminUserDO> pageResult = userService.getUserPage(reqVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(new PageResult<>(pageResult.getTotal())); // 返回空
+        }
+
+        // 获得拼接需要的数据
+        Collection<Long> deptIds = convertList(pageResult.getList(), AdminUserDO::getDeptId);
+        Map<Long, DeptDO> deptMap = deptService.getDeptMap(deptIds);
+        // 拼接结果返回
+        List<UserSelectListVO> userList = new ArrayList<>(pageResult.getList().size());
+        pageResult.getList().forEach(user -> {
+            UserSelectListVO respVO = UserConvert.INSTANCE.convertToSelectList(user);
+            respVO.setDept(UserConvert.INSTANCE.convertToSelectListDept(deptMap.get(user.getDeptId())));
+            userList.add(respVO);
+        });
+        return success(new PageResult<>(userList, pageResult.getTotal()));
+    }
+    @GetMapping("/listSimpleUserToUserSelectByIds")
+    @ApiOperation("获得用户分页列表")
+    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = Long.class)
+    public CommonResult<List<UserSelectListVO>> listSimpleUserToUserSelectByIds(@RequestParam("ids")List<Long> ids) {
+        // 获得用户分页列表
+        List<AdminUserDO> adminUserDOList = userService.getUsers(ids);
+        if (CollUtil.isEmpty(adminUserDOList)) {
+            return success(new ArrayList<>(0)); // 返回空
+        }
+
+        // 获得拼接需要的数据
+        Collection<Long> deptIds = convertList(adminUserDOList, AdminUserDO::getDeptId);
+        Map<Long, DeptDO> deptMap = deptService.getDeptMap(deptIds);
+        // 拼接结果返回
+        List<UserSelectListVO> userList = new ArrayList<>(adminUserDOList.size());
+        adminUserDOList.forEach(user -> {
+            UserSelectListVO respVO = UserConvert.INSTANCE.convertToSelectList(user);
+            respVO.setDept(UserConvert.INSTANCE.convertToSelectListDept(deptMap.get(user.getDeptId())));
+            userList.add(respVO);
+        });
+        return success(userList);
+    }
+
     @GetMapping("/get")
     @Operation(summary = "获得用户详情")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
