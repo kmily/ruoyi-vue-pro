@@ -118,7 +118,7 @@ public class PayAppController {
 
         // 利用反射将渠道数据复制到返回的数据结构中去
         List<PayAppPageItemRespVO> appList = new ArrayList<>(pageResult.getList().size());
-        pageResult.getList().forEach(app -> {
+        for (PayAppDO app : pageResult.getList()) {
             // 写入应用信息的数据
             PayAppPageItemRespVO respVO = PayAppConvert.INSTANCE.pageConvert(app);
             // 写入商户的数据
@@ -134,7 +134,10 @@ public class PayAppController {
             }
             respVO.setChannelCodes(channelCodes);
             appList.add(respVO);
-        });
+            if (channels.size() > 0) {
+                iterator = channels.iterator();
+            }
+        }
 
         return success(new PageResult<>(appList, pageResult.getTotal()));
     }
