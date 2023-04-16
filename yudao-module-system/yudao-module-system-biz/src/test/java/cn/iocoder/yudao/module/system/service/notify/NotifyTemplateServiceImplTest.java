@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -173,7 +173,7 @@ public class NotifyTemplateServiceImplTest extends BaseDbUnitTest {
         // 断言
         assertPojoEquals(dbNotifyTemplate, notifyTemplate);
     }
-    
+
     @Test
     public void testFormatNotifyTemplateContent() {
         // 准备参数

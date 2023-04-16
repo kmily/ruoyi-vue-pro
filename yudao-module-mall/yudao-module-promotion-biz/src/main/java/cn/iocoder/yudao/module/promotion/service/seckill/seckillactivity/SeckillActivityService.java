@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.promotion.service.seckill.seckillactivity;
 
 import java.util.*;
-import javax.validation.*;
+import jakarta.validation.*;
 
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityPageReqVO;

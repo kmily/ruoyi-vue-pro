@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.system.service.notify.NotifyTemplateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * 针对 {@link NotifyTemplateRefreshMessage} 的消费者

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.time;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalTime;
 
 /**

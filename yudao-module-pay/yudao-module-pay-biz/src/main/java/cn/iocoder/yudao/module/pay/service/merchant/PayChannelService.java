@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.PayChann
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayChannelDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 

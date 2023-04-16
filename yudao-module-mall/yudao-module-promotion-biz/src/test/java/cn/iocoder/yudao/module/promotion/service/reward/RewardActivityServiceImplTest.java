@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Set;

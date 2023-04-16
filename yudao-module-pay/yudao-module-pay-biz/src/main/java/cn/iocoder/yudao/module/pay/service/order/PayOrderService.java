@@ -11,8 +11,8 @@ import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitReqVO
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitRespVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

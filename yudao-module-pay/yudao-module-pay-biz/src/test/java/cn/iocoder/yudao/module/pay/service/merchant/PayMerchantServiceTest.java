@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.pay.dal.mysql.merchant.PayMerchantMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 

@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * 针对 {@link DeptRefreshMessage} 的消费者

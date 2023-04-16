@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.product.dal.mysql.brand.ProductBrandMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import java.time.LocalDateTime;
 

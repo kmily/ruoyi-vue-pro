@@ -5,8 +5,8 @@ import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.Strings;
 
-import javax.validation.constraints.NotNull;
-import javax.websocket.Session;
+import jakarta.validation.constraints.NotNull;
+import jakarta.websocket.Session;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
