@@ -1,0 +1,11 @@
+alter sequence system_user_role_seq restart with 19;
+alter sequence system_sms_template_seq restart with 14;
+alter sequence system_role_menu_seq restart with 1695;
+alter sequence system_dept_seq restart with 112;
+alter sequence system_menu_seq restart with 1268;
+alter sequence system_dict_data_seq restart with 1161;
+alter sequence system_dict_type_seq restart with 148;
+alter sequence system_user_seq restart with 2;
+alter sequence infra_config_seq restart with 7;
+alter sequence infra_file_config_seq restart with 12;
+alter sequence infra_job_seq restart with 6;
