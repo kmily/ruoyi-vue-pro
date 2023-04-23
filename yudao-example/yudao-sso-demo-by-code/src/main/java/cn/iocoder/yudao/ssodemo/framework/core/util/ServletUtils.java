@@ -1,10 +1,14 @@
 package cn.iocoder.yudao.ssodemo.framework.core.util;
 
-import cn.hutool.extra.servlet.ServletUtil;
+import cn.hutool.core.exceptions.UtilException;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.json.JSONUtil;
 import org.springframework.http.MediaType;
 
 import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * 客户端工具类
@@ -22,11 +26,20 @@ public class ServletUtils {
     @SuppressWarnings("deprecation") // 必须使用 APPLICATION_JSON_UTF8_VALUE，否则会乱码
     public static void writeJSON(HttpServletResponse response, Object object) {
         String content = JSONUtil.toJsonStr(object);
-        ServletUtil.write(response, content, MediaType.APPLICATION_JSON_UTF8_VALUE);
+        write(response, content, MediaType.APPLICATION_JSON_UTF8_VALUE);
     }
 
-    public static void write(HttpServletResponse response, String text, String contentType) {
-        ServletUtil.write(response, text, contentType);
+    public static void write(HttpServletResponse response, String text, String contentType){
+        response.setContentType(contentType);
+        PrintWriter writer = null;
+        try {
+            writer = response.getWriter();
+            writer.write(text);
+            writer.flush();
+        } catch (IOException var8) {
+            throw new UtilException(var8);
+        } finally {
+            IoUtil.close(writer);
+        }
     }
-
 }
