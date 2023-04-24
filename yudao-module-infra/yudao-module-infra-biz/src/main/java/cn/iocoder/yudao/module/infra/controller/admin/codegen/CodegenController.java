@@ -141,13 +141,12 @@ public class CodegenController {
 
     @Operation(summary = "生成sql假数据")
     @GetMapping("/fake-data")
-
     @PreAuthorize("@ss.hasPermission('infra:codegen:preview')")
     @Parameters({
             @Parameter(name = "tableId", description = "表编号", required = true, example = "1024"),
             @Parameter(name = "num", description = "数据源配置的编号", required = false, example = "1"),
     })
-    public CommonResult<List<String>> fakeData(@RequestParam("tableId") Long tableId,
+    public CommonResult<String> fakeData(@RequestParam("tableId") Long tableId,
                                                @PositiveOrZero @RequestParam(value = "num", required = false, defaultValue = "1") Integer num) throws IOException {
         return success(codegenService.fakeData(tableId, num));
     }

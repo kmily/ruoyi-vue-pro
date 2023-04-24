@@ -256,7 +256,7 @@ public class CodegenServiceImpl implements CodegenService {
     }
 
     @Override
-    public List<String> fakeData(Long tableId, Integer num) {
+    public String fakeData(Long tableId, Integer num) {
         //获取表单信息
         CodegenTableDO table = getCodegenTablePage(tableId);
         //获取列表信息
@@ -336,7 +336,7 @@ public class CodegenServiceImpl implements CodegenService {
      * @param dataList 数据列表
      * @return 生成的 SQL 列表字符串
      */
-    public List<String> buildInsertSql(CodegenTableDO table, List<CodegenColumnDO> fieldList, List<Map<String, Object>> dataList) {
+    public String buildInsertSql(CodegenTableDO table, List<CodegenColumnDO> fieldList, List<Map<String, Object>> dataList) {
         SQLDialect sqlDialect = SQLDialectFactory.getDialect(MySQLDialect.class.getName());
         // 构造模板
         String template = "insert into %s (%s) values (%s);";
@@ -351,7 +351,7 @@ public class CodegenServiceImpl implements CodegenService {
                 })
                 .collect(Collectors.toList());
         int total = dataList.size();
-        List<String> resultStringBuilder = new ArrayList<>(total);
+        StringBuilder resultStringBuilder = new StringBuilder();
         for (int i = 0; i < total; i++) {
             Map<String, Object> dataRow = dataList.get(i);
             String keyStr = fieldList.stream()
@@ -362,13 +362,13 @@ public class CodegenServiceImpl implements CodegenService {
                     .collect(Collectors.joining(", "));
             // 填充模板
             String result = String.format(template, tableName, keyStr, valueStr);
-            resultStringBuilder.add(result);
+            resultStringBuilder.append(result);
             // 最后一个字段后没有换行
-            /*if (i != total - 1) {
+            if (i != total - 1) {
                 resultStringBuilder.append("\n");
-            }*/
+            }
         }
-        return resultStringBuilder;
+        return resultStringBuilder.toString();
     }
 
 }

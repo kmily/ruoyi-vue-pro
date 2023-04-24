@@ -97,5 +97,5 @@ public interface CodegenService {
      * @param num 数据量
      * @return sql集合
      */
-    List<String> fakeData(Long tableId, Integer num);
+    String fakeData(Long tableId, Integer num);
 }
