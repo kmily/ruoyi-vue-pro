@@ -57,6 +57,15 @@ public class CodegenColumnBaseVO {
     @Schema(description = "数据示例", example = "1024")
     private String example;
 
+    @Schema(description = "数据模拟类型", example = "1")
+    private Integer mockType;
+
+    @Schema(description = "模拟参数", example = "1")
+    private String mockParams;
+
+    @Schema(description = "默认值", example = "默认值")
+    private String defaultValue;
+
     @Schema(description = "是否为 Create 创建操作的字段", required = true, example = "true")
     @NotNull(message = "是否为 Create 创建操作的字段不能为空")
     private Boolean createOperation;

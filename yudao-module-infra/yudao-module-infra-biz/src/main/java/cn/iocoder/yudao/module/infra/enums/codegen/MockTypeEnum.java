@@ -74,24 +74,6 @@ public enum MockTypeEnum {
         return null;
     }
 
-    /**
-     * 根据 value 获取枚举
-     *
-     * @param value 标签值
-     * @return 模拟类型
-     */
-    public static MockTypeEnum getEnumByLabel(String value) {
-        if (ObjectUtil.isNull(value)) {
-            return null;
-        }
-        for (MockTypeEnum mockTypeEnum : MockTypeEnum.values()) {
-            if (mockTypeEnum.getLabel().equals(value)) {
-                return mockTypeEnum;
-            }
-        }
-        return null;
-    }
-
     public Integer getType() {
         return type;
     }

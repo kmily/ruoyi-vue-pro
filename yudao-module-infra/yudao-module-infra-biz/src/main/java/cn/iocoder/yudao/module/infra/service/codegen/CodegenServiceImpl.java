@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenCreateListReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenMockTypeRespVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenUpdateReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.CodegenTablePageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.DatabaseTableRespVO;
@@ -282,8 +283,14 @@ public class CodegenServiceImpl implements CodegenService {
     }
 
     @Override
-    public List<String> getMockTypes() {
-        return MockTypeEnum.getLabels();
+    public List<CodegenMockTypeRespVO> getMockTypes() {
+        List<CodegenMockTypeRespVO> result = new LinkedList<>();
+        for (MockTypeEnum mockTypeEnum : MockTypeEnum.values()) {
+            CodegenMockTypeRespVO vo = new CodegenMockTypeRespVO();
+            vo.setType(mockTypeEnum.getType());
+            vo.setLable(mockTypeEnum.getLabel());
+        }
+        return result;
     }
 
     private List<Map<String, Object>> generateData(Integer num, List<CodegenColumnDO> columns) {

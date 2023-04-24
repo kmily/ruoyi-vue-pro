@@ -5,10 +5,7 @@ import cn.hutool.core.util.ZipUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
-import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenCreateListReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenDetailRespVO;
-import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenPreviewRespVO;
-import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenUpdateReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.*;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.CodegenTablePageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.CodegenTableRespVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.DatabaseTableRespVO;
@@ -156,7 +153,7 @@ public class CodegenController {
     @Operation(summary = "获取模拟类型")
     @GetMapping("/fake-data/types")
     @PreAuthorize("@ss.hasPermission('infra:codegen:preview')")
-    public CommonResult<List<String>> getMockTypes(){
+    public CommonResult<List<CodegenMockTypeRespVO>> getMockTypes(){
         return success(codegenService.getMockTypes());
     }
 
@@ -166,8 +163,10 @@ public class CodegenController {
     @Parameters({
             @Parameter(name = "mockType", description = "模拟类型的标签", required = true)
     })
-    public CommonResult<List<String>> getMockParamsByMockType(@RequestParam("mockType") String mockTypeLabel){
-        MockTypeEnum mockType = MockTypeEnum.getEnumByLabel(mockTypeLabel);
+    public CommonResult<List<String>> getMockParamsByMockType(@RequestParam("mockType") Integer mockTypeType){
+        MockTypeEnum mockType = MockTypeEnum.getEnumByValue(mockTypeType);
         return success(codegenService.getMockParamsByMockType(mockType));
     }
+
+
 }
