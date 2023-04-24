@@ -66,7 +66,7 @@ public class ProjectReactor {
         // 写入文件
         files.forEach(file -> {
             // 解决占位文件.gitkeep和占位空文件获取文件类型的空指针异常
-            if(file.getName().equals(".gitkeep") || file.length()==0){
+            if(file.length() == 0){
                 copyFile(file, projectBaseDir, projectBaseDirNew, packageNameNew, artifactIdNew);
                 return;
             }
