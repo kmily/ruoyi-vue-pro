@@ -28,6 +28,7 @@ import cn.iocoder.yudao.module.infra.service.codegen.inner.generator.sql.SQLDial
 import cn.iocoder.yudao.module.infra.service.codegen.inner.generator.sql.SQLDialectFactory;
 import cn.iocoder.yudao.module.infra.service.db.DatabaseTableService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.generator.config.po.TableField;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import org.springframework.stereotype.Service;
@@ -318,7 +319,18 @@ public class CodegenServiceImpl implements CodegenService {
      * @return 生成的 SQL 列表字符串
      */
     public String buildInsertSql(CodegenTableDO table, List<CodegenColumnDO> fieldList, List<Map<String, Object>> dataList) {
-        SQLDialect sqlDialect = SQLDialectFactory.getDialect(MySQLDialect.class.getName());
+        String name = null;
+        DbType dbType = databaseTableService.getDbType(table.getDataSourceConfigId());
+        if (dbType == null) {
+            return "未知数据库";
+        }
+        if (dbType == DbType.MYSQL) {
+            name = MySQLDialect.class.getName();
+        } else {
+            return "不支持该数据库";
+        }
+
+        SQLDialect sqlDialect = SQLDialectFactory.getDialect(name);
         // 构造模板
         String template = "insert into %s (%s) values (%s);";
         // 构造表名
