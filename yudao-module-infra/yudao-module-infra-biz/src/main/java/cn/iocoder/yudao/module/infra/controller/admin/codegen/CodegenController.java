@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.DatabaseT
 import cn.iocoder.yudao.module.infra.convert.codegen.CodegenConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
+import cn.iocoder.yudao.module.infra.enums.codegen.MockTypeEnum;
 import cn.iocoder.yudao.module.infra.service.codegen.CodegenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,6 +34,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -149,5 +151,23 @@ public class CodegenController {
     public CommonResult<String> fakeData(@RequestParam("tableId") Long tableId,
                                                @PositiveOrZero @RequestParam(value = "num", required = false, defaultValue = "1") Integer num) throws IOException {
         return success(codegenService.fakeData(tableId, num));
+    }
+
+    @Operation(summary = "获取模拟类型")
+    @GetMapping("/fake-data/types")
+    @PreAuthorize("@ss.hasPermission('infra:codegen:preview')")
+    public CommonResult<List<String>> getMockTypes(){
+        return success(codegenService.getMockTypes());
+    }
+
+    @Operation(summary = "通过模拟类型获取响应的列表参数")
+    @GetMapping("/fake-data/params")
+    @PreAuthorize("@ss.hasPermission('infra:codegen:preview')")
+    @Parameters({
+            @Parameter(name = "mockType", description = "模拟类型的标签", required = true)
+    })
+    public CommonResult<List<String>> getMockParamsByMockType(@RequestParam("mockType") String mockTypeLabel){
+        MockTypeEnum mockType = MockTypeEnum.getEnumByLabel(mockTypeLabel);
+        return success(codegenService.getMockParamsByMockType(mockType));
     }
 }

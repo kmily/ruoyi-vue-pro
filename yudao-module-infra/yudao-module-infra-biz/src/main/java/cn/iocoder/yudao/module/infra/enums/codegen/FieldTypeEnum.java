@@ -2,7 +2,10 @@ package cn.iocoder.yudao.module.infra.enums.codegen;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -75,6 +78,44 @@ public enum FieldTypeEnum {
             }
         }
         return null;
+    }
+
+    /**
+     * 根据列的属性获取值字符串
+     *
+     * @param field 字段
+     * @param value 结果值
+     * @return 按照数据库指定类型转换后的结果值
+     */
+    public static String getValueStr(CodegenColumnDO field, Object value) {
+        if (field == null || value == null) {
+            return "''";
+        }
+        FieldTypeEnum fieldTypeEnum = Optional.ofNullable(getEnumByValue(field.getDataType()))
+                .orElse(TEXT);
+        String result = String.valueOf(value);
+        switch (fieldTypeEnum) {
+            case DATETIME:
+            case TIMESTAMP:
+                return result.equalsIgnoreCase("CURRENT_TIMESTAMP") ? result : String.format("'%s'", value);
+            case DATE:
+            case TIME:
+            case CHAR:
+            case VARCHAR:
+            case TINYTEXT:
+            case TEXT:
+            case MEDIUMTEXT:
+            case LONGTEXT:
+            case TINYBLOB:
+            case BLOB:
+            case MEDIUMBLOB:
+            case LONGBLOB:
+            case BINARY:
+            case VARBINARY:
+                return String.format("'%s'", value);
+            default:
+                return result;
+        }
     }
 
     public String getValue() {

@@ -18,6 +18,7 @@ public enum MockParamsRandomTypeEnum {
     URL("网址"),
     EMAIL("邮箱"),
     IP("IP"),
+    UUID("UUID"),
     INTEGER("整数"),
     DECIMAL("小数"),
     UNIVERSITY("大学"),

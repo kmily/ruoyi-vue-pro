@@ -7,9 +7,11 @@ import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.CodegenTa
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.DatabaseTableRespVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
+import cn.iocoder.yudao.module.infra.enums.codegen.MockTypeEnum;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 代码生成 Service 接口
@@ -93,9 +95,25 @@ public interface CodegenService {
 
     /**
      * 伪造假的sql数据，每一条即是一个插入语句
+     *
      * @param tableId 表单id
      * @param num 数据量
      * @return sql集合
      */
     String fakeData(Long tableId, Integer num);
+
+    /**
+     * 根据mock类型获取下拉列表
+     *
+     * @param mockType mock类型
+     * @return 下拉列表
+     */
+    List<String> getMockParamsByMockType(MockTypeEnum mockType);
+
+    /**
+     * 获取模拟类型
+     *
+     * @return 模拟类型
+     */
+    List<String> getMockTypes();
 }

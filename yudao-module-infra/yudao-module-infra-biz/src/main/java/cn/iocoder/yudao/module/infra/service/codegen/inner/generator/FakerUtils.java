@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.infra.service.codegen.inner.generator;
 
-import java.sql.Timestamp;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
-
 import cn.iocoder.yudao.module.infra.enums.codegen.MockParamsRandomTypeEnum;
 import net.datafaker.Faker;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
+
+import java.sql.Timestamp;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 /**
  * 随机数生成工具
@@ -25,13 +25,12 @@ public class FakerUtils {
     /**
      * 获取随机值
      *
-     * @param randomTypeEnum
-     * @return
+     * @param randomTypeEnum 业务定义随机类型
+     * @return 通过类型生成的随机字符串
      */
     public static String getRandomValue(MockParamsRandomTypeEnum randomTypeEnum) {
-        String defaultValue = RandomStringUtils.randomAlphanumeric(2, 6);
         if (randomTypeEnum == null) {
-            return defaultValue;
+            return RandomStringUtils.randomAlphanumeric(2, 6);
         }
         switch (randomTypeEnum) {
             case NAME:
@@ -44,6 +43,8 @@ public class FakerUtils {
                 return EN_FAKER.internet().url();
             case IP:
                 return ZH_FAKER.internet().ipV4Address();
+            case UUID:
+                return ZH_FAKER.internet().uuidv3();
             case INTEGER:
                 return String.valueOf(ZH_FAKER.number().randomNumber());
             case DECIMAL:
@@ -61,7 +62,7 @@ public class FakerUtils {
             case PHONE:
                 return ZH_FAKER.phoneNumber().cellPhone();
             default:
-                return defaultValue;
+                return RandomStringUtils.randomAlphanumeric(2, 6);
         }
     }
 

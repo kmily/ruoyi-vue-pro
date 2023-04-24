@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.infra.dal.mysql.codegen.CodegenColumnMapper;
 import cn.iocoder.yudao.module.infra.dal.mysql.codegen.CodegenTableMapper;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.FieldTypeEnum;
+import cn.iocoder.yudao.module.infra.enums.codegen.MockParamsRandomTypeEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.MockTypeEnum;
 import cn.iocoder.yudao.module.infra.framework.codegen.config.CodegenProperties;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenBuilder;
@@ -267,9 +268,27 @@ public class CodegenServiceImpl implements CodegenService {
         return buildInsertSql(table, columns, dataList);
     }
 
+    @Override
+    public List<String> getMockParamsByMockType(MockTypeEnum mockType) {
+        if (mockType == null) {
+            return null;
+        }
+        //随机
+        if (mockType.equals(MockTypeEnum.RANDOM)) {
+            return MockParamsRandomTypeEnum.getValues();
+        }
+        return null;
+    }
+
+    @Override
+    public List<String> getMockTypes() {
+        return MockTypeEnum.getLabels();
+    }
+
     private List<Map<String, Object>> generateData(Integer num, List<CodegenColumnDO> columns) {
         List<Map<String, Object>> resultList = new ArrayList<>(num);
         for (int i = 0; i < num; i++) {
+            //每一行用Map记录
             resultList.add(new HashMap<>());
         }
         // 依次生成每一列
@@ -289,44 +308,6 @@ public class CodegenServiceImpl implements CodegenService {
         return resultList;
     }
 
-
-    /**
-     * 根据列的属性获取值字符串
-     *
-     * @param field
-     * @param value
-     * @return
-     */
-    public static String getValueStr(CodegenColumnDO field, Object value) {
-        if (field == null || value == null) {
-            return "''";
-        }
-        FieldTypeEnum fieldTypeEnum = Optional.ofNullable(FieldTypeEnum.getEnumByValue(field.getDataType()))
-                .orElse(FieldTypeEnum.TEXT);
-        String result = String.valueOf(value);
-        switch (fieldTypeEnum) {
-            case DATETIME:
-            case TIMESTAMP:
-                return result.equalsIgnoreCase("CURRENT_TIMESTAMP") ? result : String.format("'%s'", value);
-            case DATE:
-            case TIME:
-            case CHAR:
-            case VARCHAR:
-            case TINYTEXT:
-            case TEXT:
-            case MEDIUMTEXT:
-            case LONGTEXT:
-            case TINYBLOB:
-            case BLOB:
-            case MEDIUMBLOB:
-            case LONGBLOB:
-            case BINARY:
-            case VARBINARY:
-                return String.format("'%s'", value);
-            default:
-                return result;
-        }
-    }
 
     /**
      * 构造插入数据 SQL
@@ -358,7 +339,7 @@ public class CodegenServiceImpl implements CodegenService {
                     .map(field -> sqlDialect.wrapFieldName(field.getColumnName()))
                     .collect(Collectors.joining(", "));
             String valueStr = fieldList.stream()
-                    .map(field -> getValueStr(field, dataRow.get(field.getColumnName())))
+                    .map(field -> FieldTypeEnum.getValueStr(field, dataRow.get(field.getColumnName())))
                     .collect(Collectors.joining(", "));
             // 填充模板
             String result = String.format(template, tableName, keyStr, valueStr);
