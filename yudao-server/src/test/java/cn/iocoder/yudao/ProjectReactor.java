@@ -65,6 +65,11 @@ public class ProjectReactor {
         log.info("[main][需要重写的文件数量：{}，预计需要 15-30 秒]", files.size());
         // 写入文件
         files.forEach(file -> {
+            // 解决占位文件.gitkeep和占位空文件获取文件类型的空指针异常
+            if(file.length() == 0){
+                copyFile(file, projectBaseDir, projectBaseDirNew, packageNameNew, artifactIdNew);
+                return;
+            }
             // 如果是白名单的文件类型，不进行重写，直接拷贝
             String fileType = FileTypeUtil.getType(file);
             if (WHITE_FILE_TYPES.contains(fileType)) {
