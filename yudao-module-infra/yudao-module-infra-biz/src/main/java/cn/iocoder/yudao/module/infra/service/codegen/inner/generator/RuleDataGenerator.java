@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.infra.service.codegen.inner.generator;
 
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
+import cn.iocoder.yudao.module.infra.enums.codegen.MockTypeEnum;
 import com.mifmif.common.regex.Generex;
 
 import java.util.ArrayList;
@@ -23,5 +24,10 @@ public class RuleDataGenerator implements DataGenerator {
             list.add(randomStr);
         }
         return list;
+    }
+
+    @Override
+    public int getOrder() {
+        return MockTypeEnum.RULE.getType();
     }
 }

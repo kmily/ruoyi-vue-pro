@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.infra.service.codegen.inner.generator;
 
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
+import org.springframework.core.Ordered;
 
 import java.util.Collections;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
  *
  * @author https://github.com/liyupi
  */
-public interface DataGenerator {
+public interface DataGenerator extends Ordered{
 
     /**
      * 生成

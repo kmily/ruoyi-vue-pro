@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.infra.service.codegen.inner.generator;
 
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.enums.codegen.MockParamsRandomTypeEnum;
+import cn.iocoder.yudao.module.infra.enums.codegen.MockTypeEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,5 +27,10 @@ public class RandomDataGenerator implements DataGenerator {
             list.add(randomString);
         }
         return list;
+    }
+
+    @Override
+    public int getOrder() {
+        return MockTypeEnum.RANDOM.getType();
     }
 }

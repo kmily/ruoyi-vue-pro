@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.infra.service.codegen.inner.generator;
 
 import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
+import cn.iocoder.yudao.module.infra.enums.codegen.MockTypeEnum;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -42,5 +43,10 @@ public class DefaultDataGenerator implements DataGenerator {
             }
         }
         return list;
+    }
+
+    @Override
+    public int getOrder() {
+        return MockTypeEnum.NONE.getType();
     }
 }

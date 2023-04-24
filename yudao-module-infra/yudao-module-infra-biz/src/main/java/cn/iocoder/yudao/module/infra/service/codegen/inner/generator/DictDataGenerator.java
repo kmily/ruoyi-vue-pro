@@ -1,11 +1,17 @@
 package cn.iocoder.yudao.module.infra.service.codegen.inner.generator;
 
+import cn.iocoder.yudao.module.infra.enums.codegen.MockTypeEnum;
+
 /**
  * 系统词典数据生成器
  *
  * @author https://github.com/liyupi
  */
 public class DictDataGenerator implements DataGenerator {
+    @Override
+    public int getOrder() {
+        return MockTypeEnum.DICT.getType();
+    }
     /*private static final DictDataService dictService = SpringUtil.getBean(DictDataService.class);
 
     private final static Gson GSON = new Gson();

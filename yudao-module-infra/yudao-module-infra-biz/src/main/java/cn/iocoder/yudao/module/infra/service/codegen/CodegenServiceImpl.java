@@ -69,6 +69,8 @@ public class CodegenServiceImpl implements CodegenService {
 
     @Resource
     private CodegenProperties codegenProperties;
+    @Resource
+    private DataGeneratorFactory dataGeneratorFactory;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -301,9 +303,7 @@ public class CodegenServiceImpl implements CodegenService {
         }
         // 依次生成每一列
         for (CodegenColumnDO field : columns) {
-            MockTypeEnum mockTypeEnum = Optional.ofNullable(MockTypeEnum.getEnumByValue(field.getMockType()))
-                    .orElse(MockTypeEnum.NONE);
-            DataGenerator dataGenerator = DataGeneratorFactory.getGenerator(mockTypeEnum);
+            DataGenerator dataGenerator = dataGeneratorFactory.getGenerator(field.getMockType());
             List<String> mockDataList = dataGenerator.doGenerate(field, num);
             String fieldName = field.getColumnName();
             // 填充结果列表
