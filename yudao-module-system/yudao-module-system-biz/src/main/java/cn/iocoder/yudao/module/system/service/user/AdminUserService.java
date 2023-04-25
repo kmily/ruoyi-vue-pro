@@ -209,4 +209,11 @@ public interface AdminUserService {
      */
     boolean isPasswordMatch(String rawPassword, String encodedPassword);
 
+    /**
+     * 如果用户不存在，创建用户
+     * @param purePhoneNumber
+     * @param clientIP
+     * @return
+     */
+    AdminUserDO createUserIfAbsent(String purePhoneNumber, String clientIP);
 }

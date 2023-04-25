@@ -26,4 +26,8 @@ public interface DictTypeConstants {
     String SMS_SEND_STATUS = "system_sms_send_status"; // 短信发送状态
     String SMS_RECEIVE_STATUS = "system_sms_receive_status"; // 短信接收状态
 
+    String OA_PRODUCT_UNIT = "oa_product_unit"; //产品单位
+    String OA_PRODUCT_TYPE = "oa_product_type"; //产品类型
+
+
 }

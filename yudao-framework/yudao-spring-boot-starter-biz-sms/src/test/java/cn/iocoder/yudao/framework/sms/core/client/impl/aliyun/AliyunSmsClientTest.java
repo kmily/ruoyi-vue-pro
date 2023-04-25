@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.framework.sms.core.client.impl.aliyun;
 
 import cn.hutool.core.util.ReflectUtil;
-import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
@@ -12,6 +11,7 @@ import cn.iocoder.yudao.framework.sms.core.enums.SmsTemplateAuditStatusEnum;
 import cn.iocoder.yudao.framework.sms.core.property.SmsChannelProperties;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.sms.core.enums.SmsFrameworkErrorCodeConstants;
+import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import com.aliyuncs.AcsRequest;
 import com.aliyuncs.IAcsClient;
 import com.aliyuncs.dysmsapi.model.v20170525.QuerySmsTemplateRequest;

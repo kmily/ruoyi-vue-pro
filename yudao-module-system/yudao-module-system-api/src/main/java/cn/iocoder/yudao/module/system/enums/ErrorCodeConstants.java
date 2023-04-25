@@ -163,4 +163,8 @@ public interface ErrorCodeConstants {
     // ========== 站内信发送 1002028000 ==========
     ErrorCode NOTIFY_SEND_TEMPLATE_PARAM_MISS = new ErrorCode(1002025000, "模板参数({})缺失");
 
+    // ========== OA
+    ErrorCode CUSTOMER_NOT_EXISTS = new ErrorCode(1002027000, "客户不存在");
+    ErrorCode SIGN_REQ_NOT_EXISTS = new ErrorCode(1002028000, "注册申请不存在");
+    ErrorCode PRODUCT_NOT_EXISTS = new ErrorCode(1002029000, "产品不存在");
 }

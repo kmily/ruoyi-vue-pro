@@ -38,7 +38,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.obtainAuthorization;
 import static java.util.Collections.singleton;
 
-@Tag(name = "管理后台 - 认证")
+@Tag(name = "认证")
 @RestController
 @RequestMapping("/system/auth")
 @Validated
@@ -63,6 +63,7 @@ public class AuthController {
     @Operation(summary = "使用账号密码登录")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<AuthLoginRespVO> login(@RequestBody @Valid AuthLoginReqVO reqVO) {
+        System.out.println(reqVO);
         return success(authService.login(reqVO));
     }
 

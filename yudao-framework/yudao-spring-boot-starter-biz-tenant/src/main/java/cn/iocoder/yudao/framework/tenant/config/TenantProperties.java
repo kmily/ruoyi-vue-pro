@@ -3,8 +3,8 @@ package cn.iocoder.yudao.framework.tenant.config;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
+
 
 /**
  * 多租户配置
@@ -14,11 +14,10 @@ import java.util.Set;
 @ConfigurationProperties(prefix = "yudao.tenant")
 @Data
 public class TenantProperties {
-
     /**
      * 租户是否开启
      */
-    private static final Boolean ENABLE_DEFAULT = true;
+    private static final Boolean ENABLE_DEFAULT = false;
 
     /**
      * 是否开启
@@ -37,6 +36,6 @@ public class TenantProperties {
      *
      * 即默认所有表都开启多租户的功能，所以记得添加对应的 tenant_id 字段哟
      */
-    private Set<String> ignoreTables = Collections.emptySet();
+    private Set<String> ignoreTables = Collections.EMPTY_SET;
 
 }

@@ -9,7 +9,7 @@
       <div class="field">
         <!-- [移动端]标题 -->
         <h2 class="mobile-title">
-          <h3 class="title">芋道后台管理系统</h3>
+          <h3 class="title">OA后台管理系统</h3>
         </h2>
 
         <!-- 表单 -->
@@ -24,20 +24,20 @@
             <el-form ref="loginForm" :model="loginForm" :rules="LoginRules" class="login-form">
               <el-form-item prop="tenantName" v-if="tenantEnable">
                 <el-input v-model="loginForm.tenantName" type="text" auto-complete="off" placeholder='租户'>
-                  <svg-icon slot="prefix" icon-class="tree" class="el-input__icon input-icon"/>
+                  <svg-icon slot="prefix" icon-class="tree" class="el-input__icon input-icon" />
                 </el-input>
               </el-form-item>
               <!-- 账号密码登录 -->
               <div v-if="loginForm.loginType === 'uname'">
                 <el-form-item prop="username">
                   <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号">
-                    <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon"/>
+                    <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
                   </el-input>
                 </el-form-item>
                 <el-form-item prop="password">
                   <el-input v-model="loginForm.password" type="password" auto-complete="off" placeholder="密码"
-                            @keyup.enter.native="getCode">
-                    <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon"/>
+                    @keyup.enter.native="getCode">
+                    <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
                   </el-input>
                 </el-form-item>
                 <el-checkbox v-model="loginForm.rememberMe" style="margin:0 0 25px 0;">记住密码</el-checkbox>
@@ -47,18 +47,18 @@
               <div v-if="loginForm.loginType === 'sms'">
                 <el-form-item prop="mobile">
                   <el-input v-model="loginForm.mobile" type="text" auto-complete="off" placeholder="请输入手机号">
-                    <svg-icon slot="prefix" icon-class="phone" class="el-input__icon input-icon"/>
+                    <svg-icon slot="prefix" icon-class="phone" class="el-input__icon input-icon" />
                   </el-input>
                 </el-form-item>
                 <el-form-item prop="mobileCode">
                   <el-input v-model="loginForm.mobileCode" type="text" auto-complete="off" placeholder="短信验证码"
-                            class="sms-login-mobile-code-prefix"
-                            @keyup.enter.native="handleLogin">
+                    class="sms-login-mobile-code-prefix" @keyup.enter.native="handleLogin">
                     <template>
-                      <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon"/>
+                      <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
                     </template>
                     <template slot="append">
-                      <span v-if="mobileCodeTimer <= 0" class="getMobileCode" @click="getSmsCode" style="cursor: pointer;">获取验证码</span>
+                      <span v-if="mobileCodeTimer <= 0" class="getMobileCode" @click="getSmsCode"
+                        style="cursor: pointer;">获取验证码</span>
                       <span v-if="mobileCodeTimer > 0" class="getMobileCode">{{ mobileCodeTimer }}秒后可重新获取</span>
                     </template>
                   </el-input>
@@ -68,19 +68,20 @@
               <!-- 下方的登录按钮 -->
               <el-form-item style="width:100%;">
                 <el-button :loading="loading" size="medium" type="primary" style="width:100%;"
-                    @click.native.prevent="getCode">
+                  @click.native.prevent="getCode">
                   <span v-if="!loading">登 录</span>
                   <span v-else>登 录 中...</span>
                 </el-button>
               </el-form-item>
 
               <!--  社交登录 -->
-             <el-form-item style="width:100%;">
-                  <div class="oauth-login" style="display:flex">
-                    <div class="oauth-login-item" v-for="item in SysUserSocialTypeEnum" :key="item.type" @click="doSocialLogin(item)">
-                      <img :src="item.img" height="25px" width="25px" alt="登录" >
-                      <span>{{item.title}}</span>
-                    </div>
+              <el-form-item style="width:100%;">
+                <div class="oauth-login" style="display:flex">
+                  <div class="oauth-login-item" v-for="item in SysUserSocialTypeEnum" :key="item.type"
+                    @click="doSocialLogin(item)">
+                    <img :src="item.img" height="25px" width="25px" alt="登录">
+                    <span>{{ item.title }}</span>
+                  </div>
                 </div>
               </el-form-item>
             </el-form>
@@ -90,8 +91,8 @@
     </div>
 
     <!-- 图形验证码 -->
-    <Verify ref="verify" :captcha-type="'blockPuzzle'" :img-size="{width:'400px',height:'200px'}"
-            @success="handleLogin" />
+    <Verify ref="verify" :captcha-type="'blockPuzzle'" :img-size="{ width: '400px', height: '200px' }"
+      @success="handleLogin" />
 
     <!-- footer -->
     <div class="footer">
@@ -101,10 +102,10 @@
 </template>
 
 <script>
-import {sendSmsCode, socialAuthRedirect} from "@/api/login";
-import {getTenantIdByName} from "@/api/system/tenant";
-import {SystemUserSocialTypeEnum} from "@/utils/constants";
-import {getCaptchaEnable, getTenantEnable} from "@/utils/ruoyi";
+import { sendSmsCode, socialAuthRedirect } from "@/api/login";
+import { getTenantIdByName } from "@/api/system/tenant";
+import { SystemUserSocialTypeEnum } from "@/utils/constants";
+import { getCaptchaEnable, getTenantEnable } from "@/utils/ruoyi";
 import {
   getPassword,
   getRememberMe, getTenantName,
@@ -116,7 +117,7 @@ import {
 } from "@/utils/auth";
 
 import Verify from '@/components/Verifition/Verify';
-import {resetUserPwd} from "@/api/system/user";
+import { resetUserPwd } from "@/api/system/user";
 
 export default {
   name: "Login",
@@ -143,13 +144,13 @@ export default {
 
       LoginRules: {
         username: [
-          {required: true, trigger: "blur", message: "用户名不能为空"}
+          { required: true, trigger: "blur", message: "用户名不能为空" }
         ],
         password: [
-          {required: true, trigger: "blur", message: "密码不能为空"}
+          { required: true, trigger: "blur", message: "密码不能为空" }
         ],
         mobile: [
-          {required: true, trigger: "blur", message: "手机号不能为空"},
+          { required: true, trigger: "blur", message: "手机号不能为空" },
           {
             validator: function (rule, value, callback) {
               if (/^(?:(?:\+|00)86)?1(?:3[\d]|4[5-79]|5[0-35-9]|6[5-7]|7[0-8]|8[\d]|9[189])\d{8}$/.test(value) === false) {
@@ -161,7 +162,7 @@ export default {
           }
         ],
         tenantName: [
-          {required: true, trigger: "blur", message: "租户不能为空"},
+          { required: true, trigger: "blur", message: "租户不能为空" },
           {
             validator: (rule, value, callback) => {
               // debugger
@@ -248,7 +249,7 @@ export default {
           // 发起登陆
           // console.log("发起登录", this.loginForm);
           this.$store.dispatch(this.loginForm.loginType === "sms" ? "SmsLogin" : "Login", this.loginForm).then(() => {
-            this.$router.push({path: this.redirect || "/"}).catch(() => {
+            this.$router.push({ path: this.redirect || "/" }).catch(() => {
             });
           }).catch(() => {
             this.loading = false;
@@ -264,7 +265,7 @@ export default {
         await this.$prompt('请输入租户名称', "提示", {
           confirmButtonText: "确定",
           cancelButtonText: "取消"
-        }).then(async ({value}) => {
+        }).then(async ({ value }) => {
           await getTenantIdByName(value).then(res => {
             const tenantId = res.data;
             tenant = true
@@ -281,18 +282,18 @@ export default {
       } else {
         tenant = true
       }
-     if(tenant){
-       // 计算 redirectUri
-       const redirectUri = location.origin + '/social-login?'
-         + encodeURIComponent('type=' + socialTypeEnum.type + '&redirect=' + (this.redirect || "/")); // 重定向不能丢
-       // const redirectUri = 'http://127.0.0.1:48080/api/gitee/callback';
-       // const redirectUri = 'http://127.0.0.1:48080/api/dingtalk/callback';
-       // 进行跳转
-       socialAuthRedirect(socialTypeEnum.type, encodeURIComponent(redirectUri)).then((res) => {
-         // console.log(res.url);
-         window.location.href = res.data;
-       });
-     }
+      if (tenant) {
+        // 计算 redirectUri
+        const redirectUri = location.origin + '/social-login?'
+          + encodeURIComponent('type=' + socialTypeEnum.type + '&redirect=' + (this.redirect || "/")); // 重定向不能丢
+        // const redirectUri = 'http://127.0.0.1:48080/api/gitee/callback';
+        // const redirectUri = 'http://127.0.0.1:48080/api/dingtalk/callback';
+        // 进行跳转
+        socialAuthRedirect(socialTypeEnum.type, encodeURIComponent(redirectUri)).then((res) => {
+          // console.log(res.url);
+          window.location.href = res.data;
+        });
+      }
     },
     /** ========== 以下为升级短信登录 ========== */
     getSmsCode() {
@@ -321,21 +322,25 @@ export default {
 .oauth-login {
   display: flex;
   align-items: center;
-  cursor:pointer;
+  cursor: pointer;
 }
+
 .oauth-login-item {
   display: flex;
   align-items: center;
   margin-right: 10px;
 }
+
 .oauth-login-item img {
   height: 25px;
   width: 25px;
 }
+
 .oauth-login-item span:hover {
   text-decoration: underline red;
   color: red;
 }
+
 .sms-login-mobile-code-prefix {
   :deep(.el-input__prefix) {
     top: 22%;

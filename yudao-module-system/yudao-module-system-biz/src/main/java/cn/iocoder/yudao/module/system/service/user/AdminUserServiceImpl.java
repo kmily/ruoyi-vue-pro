@@ -444,6 +444,11 @@ public class AdminUserServiceImpl implements AdminUserService {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
+    @Override
+    public AdminUserDO createUserIfAbsent(String purePhoneNumber, String clientIP) {
+        return null;
+    }
+
     /**
      * 对密码进行加密
      *

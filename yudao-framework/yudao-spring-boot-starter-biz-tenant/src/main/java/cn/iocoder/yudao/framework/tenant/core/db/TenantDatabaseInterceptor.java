@@ -20,6 +20,7 @@ public class TenantDatabaseInterceptor implements TenantLineHandler {
     private final Set<String> ignoreTables = new HashSet<>();
 
     public TenantDatabaseInterceptor(TenantProperties properties) {
+
         // 不同 DB 下，大小写的习惯不同，所以需要都添加进去
         properties.getIgnoreTables().forEach(table -> {
             ignoreTables.add(table.toLowerCase());

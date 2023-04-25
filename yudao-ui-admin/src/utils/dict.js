@@ -84,6 +84,19 @@ export const DICT_TYPE = {
   PROMOTION_COUPON_TAKE_TYPE: 'promotion_coupon_take_type', // 优惠劵的领取方式
   PROMOTION_ACTIVITY_STATUS: 'promotion_activity_status', // 优惠活动的状态
   PROMOTION_CONDITION_TYPE: 'promotion_condition_type', // 营销的条件类型枚举
+
+  //==========OA ==
+  OA_CUSTOMER_TYPE: 'oa_customer_type',  //客户类型
+  OA_ATTENDANCE_TYPE: 'oa_attendance_type', //打卡类型
+  OA_ATTENDANCE_PERIOD: 'oa_attendance_period', //打卡时间段
+  OA_VISIT_TYPE: 'oa_visit_type', //拜访类型
+  OA_EXPENSE_TYPE: 'oa_expense_type', //报销类型
+  OA_PRODUCT_UNIT:  'oa_product_unit', //产品单位
+  OA_PRODUCT_TYPE:  'oa_product_type', //产品类型
+
+  OA_CONTRACT_IMPL_STATE: "oa_contract_impl_state", //工程实施进度
+  OA_CONTRACT_IMPL_SCOPE: "oa_contract_impl_scope", //工程实施范围
+
 }
 
 /**
