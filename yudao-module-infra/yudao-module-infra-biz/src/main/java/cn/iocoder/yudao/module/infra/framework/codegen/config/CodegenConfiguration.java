@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.infra.enums.codegen.MockTypeEnum;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.DataGeneratorFactory;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.generator.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -12,8 +13,8 @@ import org.springframework.context.annotation.Configuration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
+@Slf4j
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(CodegenProperties.class)
 public class CodegenConfiguration {
@@ -34,7 +35,12 @@ public class CodegenConfiguration {
         mockTypeDataGeneratorMap.put(MockTypeEnum.INCREASE.getType(), new IncreaseDataGenerator());
         //不允许覆盖默认处理器
         dataGenerators.orderedStream().forEach(
-                (Consumer<DataGenerator>) dataGenerator -> mockTypeDataGeneratorMap.putIfAbsent(dataGenerator.getOrder(), dataGenerator)
+                (Consumer<DataGenerator>) dataGenerator -> {
+                    DataGenerator dataGeneratorOld = mockTypeDataGeneratorMap.putIfAbsent(dataGenerator.getOrder(), dataGenerator);
+                    if (dataGeneratorOld != null && dataGeneratorOld != dataGenerator) {
+                        log.warn("[codegen-fake-data]There is already a data generator of the same type，one is {}，other is {}", dataGenerator.getClass().getSimpleName(), dataGeneratorOld.getClass().getSimpleName());
+                    }
+                }
         );
         return new DataGeneratorFactory(mockTypeDataGeneratorMap);
     }
