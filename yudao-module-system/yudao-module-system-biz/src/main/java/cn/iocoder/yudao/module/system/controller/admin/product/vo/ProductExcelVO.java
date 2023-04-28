@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.controller.admin.product.vo;
 
-import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
@@ -37,21 +36,15 @@ public class ProductExcelVO {
     @ExcelProperty("备注")
     private String remark;
 
-    @ExcelProperty("创建者")
-    private String createBy;
-
-    @ExcelProperty("创建时间")
-    private LocalDateTime createTime;
-
-    @ExcelProperty("更新者")
-    private String updateBy;
-
     @ExcelProperty(value = "产品类型", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.OA_PRODUCT_TYPE)
+    @DictFormat("oa_product_type") // TODO 代码优化：建议设置到对应的 XXXDictTypeConstants 枚举类中
     private String productType;
 
     @ExcelProperty(value = "单位", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.OA_PRODUCT_UNIT)
+    @DictFormat("oa_product_unit") // TODO 代码优化：建议设置到对应的 XXXDictTypeConstants 枚举类中
     private String productUnit;
+
+    @ExcelProperty("创建时间")
+    private LocalDateTime createTime;
 
 }

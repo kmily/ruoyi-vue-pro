@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.oa.controller.app.social.vo.AppSocialUserBindReqV
 import cn.iocoder.yudao.module.oa.controller.app.social.vo.AppSocialUserUnbindReqVO;
 import cn.iocoder.yudao.module.oa.convert.social.SocialUserConvert;
 import cn.iocoder.yudao.module.system.api.social.SocialUserApi;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
@@ -18,7 +19,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 
 @Tag(name = "用户 App - 社交用户")
 @RestController
-@RequestMapping("/system/social-user")
+@RequestMapping("/oa/social-user")
 @Validated
 public class AppSocialUserController {
 

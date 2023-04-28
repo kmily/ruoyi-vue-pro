@@ -2,12 +2,9 @@ package cn.iocoder.yudao.module.oa.service.user;
 
 import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.module.oa.controller.app.auth.vo.*;
 import cn.iocoder.yudao.module.oa.controller.app.user.vo.AppUserUpdateMobileReqVO;
-import cn.iocoder.yudao.module.oa.service.auth.AppAuthService;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.user.AdminUserMapper;
-import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -57,7 +54,6 @@ public class AppUserServiceImpl implements AppUserService {
         user.setPassword(encodePassword(password)); // 加密密码
         adminUserMapper.insert(user);
         return user;
-        // TODO: 2023/04/24 不允许创建
     }
 
     /**
@@ -104,4 +100,5 @@ public class AppUserServiceImpl implements AppUserService {
     public boolean isPasswordMatch(String rawPassword, String encodedPassword) {
         return false;
     }
+
 }

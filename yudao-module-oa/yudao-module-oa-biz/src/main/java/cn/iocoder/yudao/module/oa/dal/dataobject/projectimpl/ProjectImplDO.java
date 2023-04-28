@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.oa.dal.dataobject.projectimpl;
 
-import com.sun.xml.bind.v2.TODO;
 import lombok.*;
 import java.util.*;
 import com.baomidou.mybatisplus.annotation.*;
@@ -31,12 +30,6 @@ public class ProjectImplDO extends BaseDO {
      */
     private Long contractId;
     /**
-     * 实施范围
-     *
-     * 枚举 {@link TODO oa_contract_impl_scope 对应的类}
-     */
-    private String implType;
-    /**
      * 实施内容
      */
     private String implContent;
@@ -44,5 +37,9 @@ public class ProjectImplDO extends BaseDO {
      * 备注
      */
     private String remark;
+    /**
+     * 实施范围
+     */
+    private String implScope;
 
 }

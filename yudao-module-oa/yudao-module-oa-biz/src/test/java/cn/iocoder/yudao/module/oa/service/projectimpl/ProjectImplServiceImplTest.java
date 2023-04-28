@@ -111,13 +111,17 @@ public class ProjectImplServiceImplTest extends BaseDbUnitTest {
        // mock 数据
        ProjectImplDO dbProjectImpl = randomPojo(ProjectImplDO.class, o -> { // 等会查询到
            o.setContractId(null);
+           o.setImplScope(null);
        });
        projectImplMapper.insert(dbProjectImpl);
        // 测试 contractId 不匹配
        projectImplMapper.insert(cloneIgnoreId(dbProjectImpl, o -> o.setContractId(null)));
+       // 测试 implScope 不匹配
+       projectImplMapper.insert(cloneIgnoreId(dbProjectImpl, o -> o.setImplScope(null)));
        // 准备参数
        ProjectImplPageReqVO reqVO = new ProjectImplPageReqVO();
        reqVO.setContractId(null);
+       reqVO.setImplScope(null);
 
        // 调用
        PageResult<ProjectImplDO> pageResult = projectImplService.getProjectImplPage(reqVO);
@@ -133,13 +137,17 @@ public class ProjectImplServiceImplTest extends BaseDbUnitTest {
        // mock 数据
        ProjectImplDO dbProjectImpl = randomPojo(ProjectImplDO.class, o -> { // 等会查询到
            o.setContractId(null);
+           o.setImplScope(null);
        });
        projectImplMapper.insert(dbProjectImpl);
        // 测试 contractId 不匹配
        projectImplMapper.insert(cloneIgnoreId(dbProjectImpl, o -> o.setContractId(null)));
+       // 测试 implScope 不匹配
+       projectImplMapper.insert(cloneIgnoreId(dbProjectImpl, o -> o.setImplScope(null)));
        // 准备参数
        ProjectImplExportReqVO reqVO = new ProjectImplExportReqVO();
        reqVO.setContractId(null);
+       reqVO.setImplScope(null);
 
        // 调用
        List<ProjectImplDO> list = projectImplService.getProjectImplList(reqVO);

@@ -1,15 +1,13 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.product;
 
-import cn.iocoder.yudao.module.system.enums.product.ProductTypeEnum;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.sun.xml.bind.v2.TODO;
 import lombok.*;
-import java.util.*;
+
 import java.math.BigDecimal;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
  * 产品 DO
@@ -47,14 +45,6 @@ public class ProductDO extends BaseDO {
      */
     private String remark;
     /**
-     * 创建者
-     */
-    private String createBy;
-    /**
-     * 更新者
-     */
-    private String updateBy;
-    /**
      * id
      */
     @TableId
@@ -62,7 +52,7 @@ public class ProductDO extends BaseDO {
     /**
      * 产品类型
      *
-     * 枚举 {@link ProductTypeEnum 对应的类}
+     * 枚举 {@link TODO oa_product_type 对应的类}
      */
     private String productType;
     /**

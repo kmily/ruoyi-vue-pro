@@ -1,12 +1,11 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.customer;
 
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.sun.xml.bind.v2.TODO;
 import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
  * 客户管理 DO
@@ -47,14 +46,6 @@ public class CustomerDO extends BaseDO {
      * 税号
      */
     private String taxNumber;
-    /**
-     * 创建者
-     */
-    private String createBy;
-    /**
-     * 更新者
-     */
-    private String updateBy;
     /**
      * id
      */

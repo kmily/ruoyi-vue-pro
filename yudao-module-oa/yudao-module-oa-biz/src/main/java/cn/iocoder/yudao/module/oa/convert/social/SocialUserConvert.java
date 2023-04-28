@@ -1,4 +1,5 @@
 package cn.iocoder.yudao.module.oa.convert.social;
+
 import cn.iocoder.yudao.module.oa.controller.app.social.vo.AppSocialUserBindReqVO;
 import cn.iocoder.yudao.module.oa.controller.app.social.vo.AppSocialUserUnbindReqVO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;

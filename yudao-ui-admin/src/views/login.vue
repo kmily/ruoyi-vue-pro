@@ -138,7 +138,7 @@ export default {
         mobile: "",
         mobileCode: "",
         rememberMe: false,
-        tenantName: "芋道源码",
+        tenantName: "三锐科技",
       },
       scene: 21,
 

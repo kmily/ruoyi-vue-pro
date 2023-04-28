@@ -33,12 +33,6 @@ public class ProductBaseVO {
     @Schema(description = "备注", example = "随便")
     private String remark;
 
-    @Schema(description = "创建者")
-    private String createBy;
-
-    @Schema(description = "更新者")
-    private String updateBy;
-
     @Schema(description = "产品类型", required = true, example = "1")
     @NotNull(message = "产品类型不能为空")
     private String productType;

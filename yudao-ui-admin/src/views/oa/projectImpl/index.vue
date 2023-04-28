@@ -6,6 +6,9 @@
       <el-form-item label="合同id" prop="contractId">
         <el-input v-model="queryParams.contractId" placeholder="请输入合同id" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
+      <el-form-item label="实施范围" prop="implScope">
+        <el-input v-model="queryParams.implScope" placeholder="请输入实施范围" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -29,13 +32,9 @@
     <el-table v-loading="loading" :data="list">
       <el-table-column label="id" align="center" prop="id" />
       <el-table-column label="合同id" align="center" prop="contractId" />
-      <el-table-column label="实施范围" align="center" prop="implType">
-        <template v-slot="scope">
-          <dict-tag :type="DICT_TYPE.OA_CONTRACT_IMPL_SCOPE" :value="scope.row.implType" />
-        </template>
-      </el-table-column>
       <el-table-column label="实施内容" align="center" prop="implContent" />
       <el-table-column label="备注" align="center" prop="remark" />
+      <el-table-column label="实施范围" align="center" prop="implScope" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
@@ -55,17 +54,14 @@
         <el-form-item label="合同id" prop="contractId">
           <el-input v-model="form.contractId" placeholder="请输入合同id" />
         </el-form-item>
-        <el-form-item label="实施范围" prop="implType">
-          <el-select v-model="form.implType" placeholder="请选择实施范围">
-            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.OA_CONTRACT_IMPL_SCOPE)"
-                       :key="dict.value" :label="dict.label" :value="dict.value" />
-          </el-select>
-        </el-form-item>
         <el-form-item label="实施内容">
           <editor v-model="form.implContent" :min-height="192"/>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" placeholder="请输入备注" />
+        </el-form-item>
+        <el-form-item label="实施范围" prop="implScope">
+          <el-input v-model="form.implScope" placeholder="请输入实施范围" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -106,13 +102,14 @@ export default {
         pageNo: 1,
         pageSize: 10,
         contractId: null,
+        implScope: null,
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
         contractId: [{ required: true, message: "合同id不能为空", trigger: "blur" }],
-        implType: [{ required: true, message: "实施范围不能为空", trigger: "change" }],
+        implScope: [{ required: true, message: "实施范围不能为空", trigger: "blur" }],
       }
     };
   },
@@ -140,9 +137,9 @@ export default {
       this.form = {
         id: undefined,
         contractId: undefined,
-        implType: undefined,
         implContent: undefined,
         remark: undefined,
+        implScope: undefined,
       };
       this.resetForm("form");
     },

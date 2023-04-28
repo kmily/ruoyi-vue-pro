@@ -1,32 +1,28 @@
 package cn.iocoder.yudao.module.system.service.product;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
-import javax.annotation.Resource;
-
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-
-import cn.iocoder.yudao.module.system.controller.admin.product.vo.*;
+import cn.iocoder.yudao.module.system.controller.admin.product.vo.ProductCreateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.product.vo.ProductExportReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.product.vo.ProductPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.product.vo.ProductUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.product.ProductDO;
 import cn.iocoder.yudao.module.system.dal.mysql.product.ProductMapper;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import org.springframework.context.annotation.Import;
-import java.util.*;
-import java.time.LocalDateTime;
+import java.util.List;
 
-import static cn.hutool.core.util.RandomUtil.*;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.*;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.PRODUCT_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
 * {@link ProductServiceImpl} 的单元测试类
@@ -113,6 +109,8 @@ public class ProductServiceImplTest extends BaseDbUnitTest {
            o.setProductCode(null);
            o.setProductModel(null);
            o.setProductType(null);
+           o.setCreator(null);
+           o.setCreateTime(null);
        });
        productMapper.insert(dbProduct);
        // 测试 productCode 不匹配
@@ -121,11 +119,17 @@ public class ProductServiceImplTest extends BaseDbUnitTest {
        productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setProductModel(null)));
        // 测试 productType 不匹配
        productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setProductType(null)));
+       // 测试 creator 不匹配
+       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setCreator(null)));
+       // 测试 createTime 不匹配
+       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setCreateTime(null)));
        // 准备参数
        ProductPageReqVO reqVO = new ProductPageReqVO();
        reqVO.setProductCode(null);
        reqVO.setProductModel(null);
        reqVO.setProductType(null);
+       reqVO.setCreator(null);
+       reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
        // 调用
        PageResult<ProductDO> pageResult = productService.getProductPage(reqVO);
@@ -143,6 +147,8 @@ public class ProductServiceImplTest extends BaseDbUnitTest {
            o.setProductCode(null);
            o.setProductModel(null);
            o.setProductType(null);
+           o.setCreator(null);
+           o.setCreateTime(null);
        });
        productMapper.insert(dbProduct);
        // 测试 productCode 不匹配
@@ -151,11 +157,17 @@ public class ProductServiceImplTest extends BaseDbUnitTest {
        productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setProductModel(null)));
        // 测试 productType 不匹配
        productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setProductType(null)));
+       // 测试 creator 不匹配
+       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setCreator(null)));
+       // 测试 createTime 不匹配
+       productMapper.insert(cloneIgnoreId(dbProduct, o -> o.setCreateTime(null)));
        // 准备参数
        ProductExportReqVO reqVO = new ProductExportReqVO();
        reqVO.setProductCode(null);
        reqVO.setProductModel(null);
        reqVO.setProductType(null);
+       reqVO.setCreator(null);
+       reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
        // 调用
        List<ProductDO> list = productService.getProductList(reqVO);

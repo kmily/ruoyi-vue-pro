@@ -8,23 +8,21 @@ import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.oa.controller.app.auth.vo.*;
 import cn.iocoder.yudao.module.oa.service.auth.AppAuthService;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.AuthSmsSendReqVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-@Tag(name = "小程序用户认证 - 认证")
+@Tag(name = "用户 APP - 认证")
 @RestController
 @RequestMapping("/oa/auth")
 @Validated
@@ -38,10 +36,11 @@ public class AppAuthController {
     private SecurityProperties securityProperties;
 
     @PostMapping("/login")
-    @Operation(summary = "使用手机 + 密码登录")
-    public CommonResult<AppAuthLoginRespVO> login(@RequestBody @Valid AppAuthLoginReqVO reqVO) {
-//        return success(authService.login(reqVO));
-        return  null;
+    @PermitAll
+    @Operation(summary = "使用账号 + 密码登录")
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
+    public CommonResult<AppAuthLoginRespVO> login(@RequestBody @Valid AppAuthUsernamePasswordLoginReqVO reqVO) {
+        return success(authService.login(reqVO));
     }
 
     @PostMapping("/logout")
@@ -73,7 +72,7 @@ public class AppAuthController {
 
     @PostMapping("/send-sms-code")
     @Operation(summary = "发送手机验证码")
-    public CommonResult<Boolean> sendSmsCode(@RequestBody @Valid AppAuthSmsSendReqVO reqVO) {
+    public CommonResult<Boolean> sendSmsCode(@RequestBody @Valid AuthSmsSendReqVO reqVO) {
         authService.sendSmsCode(getLoginUserId(), reqVO);
         return success(true);
     }
@@ -95,28 +94,10 @@ public class AppAuthController {
     }
 
     // ========== 社交登录相关 ==========
-
-    @GetMapping("/social-auth-redirect")
-    @Operation(summary = "社交授权的跳转")
-    @Parameters({
-            @Parameter(name = "type", description = "社交类型", required = true),
-            @Parameter(name = "redirectUri", description = "回调路径")
-    })
-    public CommonResult<String> socialAuthRedirect(@RequestParam("type") Integer type,
-                                                   @RequestParam("redirectUri") String redirectUri) {
-        return CommonResult.success(authService.getSocialAuthorizeUrl(type, redirectUri));
-    }
-
     @PostMapping("/social-login")
     @Operation(summary = "社交快捷登录，使用 code 授权码", description = "适合未登录的用户，但是社交账号已绑定用户")
     public CommonResult<AppAuthLoginRespVO> socialLogin(@RequestBody @Valid AppAuthSocialLoginReqVO reqVO) {
         return success(authService.socialLogin(reqVO));
-    }
-
-    @PostMapping("/weixin-mini-app-login")
-    @Operation(summary = "微信小程序的一键登录")
-    public CommonResult<AppAuthLoginRespVO> weixinMiniAppLogin(@RequestBody @Valid AppAuthWeixinMiniAppLoginReqVO reqVO) {
-        return success(authService.weixinMiniAppLogin(reqVO));
     }
 
 }

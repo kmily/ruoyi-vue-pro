@@ -1,18 +1,27 @@
 package cn.iocoder.yudao.module.oa.service.auth;
 
 import cn.iocoder.yudao.module.oa.controller.app.auth.vo.*;
-import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.AuthLoginRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.AuthSmsSendReqVO;
 
 import javax.validation.Valid;
 
 public interface AppAuthService {
+    /**
+     * 用户名 + 密码登录
+     *
+     * @param reqVO 登录信息
+     * @return 登录结果
+     */
+    AppAuthLoginRespVO login(@Valid AppAuthUsernamePasswordLoginReqVO reqVO);
+
     /**
      * 手机 + 密码登录
      *
      * @param reqVO 登录信息
      * @return 登录结果
      */
-    AppAuthLoginRespVO login(@Valid AppAuthLoginReqVO reqVO);
+    AppAuthLoginRespVO phonePasswordLogin(@Valid AppAuthLoginReqVO reqVO);
 
     /**
      * 基于 token 退出登录
@@ -43,16 +52,8 @@ public interface AppAuthService {
      * @param reqVO 登录信息
      * @return 登录结果
      */
-    AppAuthLoginRespVO weixinMiniAppLogin(AppAuthWeixinMiniAppLoginReqVO reqVO);
+    AppAuthLoginRespVO weChatMiniAppLogin(AppAuthWeChatMiniAppLoginReqVO reqVO);
 
-    /**
-     * 获得社交认证 URL
-     *
-     * @param type 社交平台类型
-     * @param redirectUri 跳转地址
-     * @return 认证 URL
-     */
-    String getSocialAuthorizeUrl(Integer type, String redirectUri);
 
     /**
      * 修改用户密码
@@ -73,7 +74,7 @@ public interface AppAuthService {
      * @param userId 用户编号
      * @param reqVO 发送信息
      */
-    void sendSmsCode(Long userId, AppAuthSmsSendReqVO reqVO);
+    void sendSmsCode(Long userId, AuthSmsSendReqVO reqVO);
 
     /**
      * 刷新访问令牌

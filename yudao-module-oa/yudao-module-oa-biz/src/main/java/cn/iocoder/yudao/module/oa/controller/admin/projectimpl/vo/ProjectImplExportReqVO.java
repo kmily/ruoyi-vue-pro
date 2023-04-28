@@ -12,4 +12,7 @@ public class ProjectImplExportReqVO {
     @Schema(description = "合同id", example = "10972")
     private Long contractId;
 
+    @Schema(description = "实施范围")
+    private String implScope;
+
 }

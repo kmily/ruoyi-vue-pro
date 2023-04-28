@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.system.controller.admin.customer.vo;
 
-import lombok.*;
-import java.util.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Schema(description = "管理后台 - 客户管理分页 Request VO")
 @Data
@@ -18,7 +19,7 @@ public class CustomerPageReqVO extends PageParam {
     private String contactPhone;
 
     @Schema(description = "创建者")
-    private String createBy;
+    private String creator;
 
     @Schema(description = "名称", example = "张三")
     private String customerName;

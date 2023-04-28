@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 
@@ -64,7 +65,6 @@ public class SocialUserServiceImpl implements SocialUserService {
         if (socialUser != null) {
             return socialUser;
         }
-
         // 请求获取
         AuthUser authUser = getAuthUser(type, code, state);
         Assert.notNull(authUser, "三方用户不能为空");

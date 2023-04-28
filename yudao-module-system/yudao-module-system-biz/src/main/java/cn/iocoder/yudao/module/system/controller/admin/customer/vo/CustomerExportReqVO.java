@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.module.system.controller.admin.customer.vo;
 
-import lombok.*;
-import java.util.*;
 import io.swagger.v3.oas.annotations.media.Schema;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import lombok.Data;
 
 @Schema(description = "管理后台 - 客户管理 Excel 导出 Request VO，参数和 CustomerPageReqVO 是一致的")
 @Data
@@ -16,7 +14,7 @@ public class CustomerExportReqVO {
     private String contactPhone;
 
     @Schema(description = "创建者")
-    private String createBy;
+    private String creator;
 
     @Schema(description = "名称", example = "张三")
     private String customerName;

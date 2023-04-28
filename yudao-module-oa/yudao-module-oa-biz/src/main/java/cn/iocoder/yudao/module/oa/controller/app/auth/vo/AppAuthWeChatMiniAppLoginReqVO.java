@@ -13,7 +13,7 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AppAuthWeixinMiniAppLoginReqVO {
+public class AppAuthWeChatMiniAppLoginReqVO {
 
     @Schema(description = "手机 code,小程序通过 wx.getPhoneNumber 方法获得", required = true, example = "hello")
     @NotEmpty(message = "手机 code 不能为空")

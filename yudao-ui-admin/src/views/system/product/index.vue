@@ -15,6 +15,13 @@
                        :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
+      <el-form-item label="创建者" prop="creator">
+        <el-input v-model="queryParams.creator" placeholder="请输入创建者" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="创建时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -41,13 +48,6 @@
       <el-table-column label="单价" align="center" prop="price" />
       <el-table-column label="底价" align="center" prop="reservePrice" />
       <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="创建者" align="center" prop="createBy" />
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template v-slot="scope">
-          <span>{{ parseTime(scope.row.createTime) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="更新者" align="center" prop="updateBy" />
       <el-table-column label="产品类型" align="center" prop="productType">
         <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.OA_PRODUCT_TYPE" :value="scope.row.productType" />
@@ -56,6 +56,11 @@
       <el-table-column label="单位" align="center" prop="productUnit">
         <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.OA_PRODUCT_UNIT" :value="scope.row.productUnit" />
+        </template>
+      </el-table-column>
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+        <template v-slot="scope">
+          <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -88,12 +93,6 @@
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" placeholder="请输入备注" />
-        </el-form-item>
-        <el-form-item label="创建者" prop="createBy">
-          <el-input v-model="form.createBy" placeholder="请输入创建者" />
-        </el-form-item>
-        <el-form-item label="更新者" prop="updateBy">
-          <el-input v-model="form.updateBy" placeholder="请输入更新者" />
         </el-form-item>
         <el-form-item label="产品类型" prop="productType">
           <el-select v-model="form.productType" placeholder="请选择产品类型">
@@ -146,6 +145,8 @@ export default {
         productCode: null,
         productModel: null,
         productType: null,
+        creator: null,
+        createTime: [],
       },
       // 表单参数
       form: {},
@@ -184,8 +185,6 @@ export default {
         price: undefined,
         reservePrice: undefined,
         remark: undefined,
-        createBy: undefined,
-        updateBy: undefined,
         id: undefined,
         productType: undefined,
         productUnit: undefined,

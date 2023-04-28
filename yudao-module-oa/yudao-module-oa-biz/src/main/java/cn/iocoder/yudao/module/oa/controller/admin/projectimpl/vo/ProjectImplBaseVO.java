@@ -16,14 +16,14 @@ public class ProjectImplBaseVO {
     @NotNull(message = "合同id不能为空")
     private Long contractId;
 
-    @Schema(description = "实施范围", required = true, example = "1")
-    @NotNull(message = "实施范围不能为空")
-    private String implType;
-
     @Schema(description = "实施内容")
     private String implContent;
 
     @Schema(description = "备注", example = "随便")
     private String remark;
+
+    @Schema(description = "实施范围", required = true)
+    @NotNull(message = "实施范围不能为空")
+    private String implScope;
 
 }

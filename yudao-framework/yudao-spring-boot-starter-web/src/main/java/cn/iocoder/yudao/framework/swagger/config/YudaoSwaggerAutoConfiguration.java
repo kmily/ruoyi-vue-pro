@@ -108,6 +108,7 @@ public class YudaoSwaggerAutoConfiguration {
         return buildGroupedOpenApi("all", "");
     }
 
+
     public static GroupedOpenApi buildGroupedOpenApi(String group) {
         return buildGroupedOpenApi(group, group);
     }
@@ -132,7 +133,7 @@ public class YudaoSwaggerAutoConfiguration {
                 .name(HEADER_TENANT_ID) // header 名
                 .description("租户编号") // 描述
                 .in(String.valueOf(SecurityScheme.In.HEADER)) // 请求 header
-                .schema(new IntegerSchema()._default(1L).name(HEADER_TENANT_ID).description("租户编号")); // 默认：使用租户编号为 1
+                .schema(new IntegerSchema()._default(150L).name(HEADER_TENANT_ID).description("租户编号")); // 默认：使用租户编号为 1
     }
 
     /**

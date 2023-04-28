@@ -22,4 +22,14 @@
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
+    <description>
+        OA系统模块主要包含以下业务
+        1.打卡考勤
+        2.报销管理
+        3.客户管理
+        4.合同管理
+        5.商机管理
+        6.产品反馈
+    </description>
+
 </project>

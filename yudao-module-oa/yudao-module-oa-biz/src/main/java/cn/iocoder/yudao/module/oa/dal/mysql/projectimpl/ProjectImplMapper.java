@@ -20,12 +20,14 @@ public interface ProjectImplMapper extends BaseMapperX<ProjectImplDO> {
     default PageResult<ProjectImplDO> selectPage(ProjectImplPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ProjectImplDO>()
                 .eqIfPresent(ProjectImplDO::getContractId, reqVO.getContractId())
+                .eqIfPresent(ProjectImplDO::getImplScope, reqVO.getImplScope())
                 .orderByDesc(ProjectImplDO::getId));
     }
 
     default List<ProjectImplDO> selectList(ProjectImplExportReqVO reqVO) {
         return selectList(new LambdaQueryWrapperX<ProjectImplDO>()
                 .eqIfPresent(ProjectImplDO::getContractId, reqVO.getContractId())
+                .eqIfPresent(ProjectImplDO::getImplScope, reqVO.getImplScope())
                 .orderByDesc(ProjectImplDO::getId));
     }
 

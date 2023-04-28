@@ -72,5 +72,4 @@ public interface AuthConvert {
     SmsCodeSendReqDTO convert(AuthSmsSendReqVO reqVO);
 
     SmsCodeUseReqDTO convert(AuthSmsLoginReqVO reqVO, Integer scene, String usedIp);
-
 }

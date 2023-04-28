@@ -21,10 +21,11 @@ create table `oa_customer` (
   tax_number        varchar(50)                                comment '税号',
   remark            varchar(255)                               comment '备注',
   deleted           bit(1)          not null default b'0'      comment '是否删除',
-  create_by         varchar(64)     default ''                 comment '创建者',
-  create_time       datetime                                   comment '创建时间',
-  update_by         varchar(64)     default ''                 comment '更新者',
-  update_time       datetime                                   comment '更新时间',
+  creator           varchar(64)     default ''                 comment '创建者',
+  createTime        datetime                                   comment '创建时间',
+  updater           varchar(64)     default ''                 comment '更新者',
+  updateTime        datetime                                   comment '更新时间',
+  tenant_id         bigint          not null default 0         comment '租户编号',
   primary key (id)
 ) engine=innodb auto_increment=1 comment = '客户表';
 
@@ -49,10 +50,11 @@ create table `oa_attendance` (
   leave_handover    varchar(255)                               comment '请假工作交接',
   
   deleted           bit(1)          not null default b'0'      comment '是否删除',
-  create_by         varchar(64)     default ''                 comment '创建者',
-  create_time       datetime                                   comment '创建时间',
-  update_by         varchar(64)     default ''                 comment '更新者',
-  update_time       datetime                                   comment '更新时间',
+  creator           varchar(64)     default ''                 comment '创建者',
+  createTime        datetime                                   comment '创建时间',
+  updater           varchar(64)     default ''                 comment '更新者',
+  updateTime        datetime                                   comment '更新时间',
+  tenant_id         bigint          not null default 0         comment '租户编号',
   primary key (id)
 ) engine=innodb auto_increment=1 comment = '考勤打卡';
 
@@ -78,10 +80,11 @@ create table `oa_expenses` (
   approval_status   tinyint(1)      default 0                  comment '审批状态 0.未审批 1.部门主管 2.总经理 3.财务 4.通过 -1.拒绝',
   remark            varchar(255)                               comment '备注',
   deleted           bit(1)          not null default b'0'      comment '是否删除',
-  create_by         varchar(64)     default ''                 comment '创建者',
-  create_time       datetime                                   comment '创建时间',
-  update_by         varchar(64)     default ''                 comment '更新者',
-  update_time       datetime                                   comment '更新时间',
+  creator           varchar(64)     default ''                 comment '创建者',
+  createTime        datetime                                   comment '创建时间',
+  updater           varchar(64)     default ''                 comment '更新者',
+  updateTime        datetime                                   comment '更新时间',
+  tenant_id         bigint          not null default 0         comment '租户编号',
   primary key (id)
 ) engine=innodb auto_increment=1 comment = '报销申请';
 
@@ -114,10 +117,11 @@ create table `oa_borrow` (
   approval_status   tinyint(1)      default 0                  comment '审批状态',
   remark            varchar(255)                               comment '备注',
   deleted           bit(1)          not null default b'0'      comment '是否删除',
-  create_by         varchar(64)     default ''                 comment '创建者',
-  create_time       datetime                                   comment '创建时间',
-  update_by         varchar(64)     default ''                 comment '更新者',
-  update_time       datetime                                   comment '更新时间',
+  creator           varchar(64)     default ''                 comment '创建者',
+  createTime        datetime                                   comment '创建时间',
+  updater           varchar(64)     default ''                 comment '更新者',
+  updateTime        datetime                                   comment '更新时间',
+  tenant_id         bigint          not null default 0         comment '租户编号',
   primary key (id)
 ) engine=innodb auto_increment=1 comment = '借支申请';
 
@@ -135,10 +139,11 @@ create table `oa_product` (
   reserve_price     decimal(10,1)   default 0                  comment '底价',
   remark            varchar(255)                               comment '备注',
   deleted           bit(1)          not null default b'0'      comment '是否删除',
-  create_by         varchar(64)     default ''                 comment '创建者',
-  create_time       datetime                                   comment '创建时间',
-  update_by         varchar(64)     default ''                 comment '更新者',
-  update_time       datetime                                   comment '更新时间',
+  creator           varchar(64)     default ''                 comment '创建者',
+  createTime        datetime                                   comment '创建时间',
+  updater           varchar(64)     default ''                 comment '更新者',
+  updateTime        datetime                                   comment '更新时间',
+  tenant_id         bigint          not null default 0         comment '租户编号',
   primary key (id)
 ) engine=innodb auto_increment=1 comment = '产品';
 
@@ -165,10 +170,11 @@ create table `oa_contract` (
   approval_status   tinyint(1)      default 0                  comment '审批状态',
   remark            varchar(255)                               comment '备注',
   deleted           bit(1)          not null default b'0'      comment '是否删除',
-  create_by         varchar(64)     default ''                 comment '创建者',
-  create_time       datetime                                   comment '创建时间',
-  update_by         varchar(64)     default ''                 comment '更新者',
-  update_time       datetime                                   comment '更新时间',
+  creator           varchar(64)     default ''                 comment '创建者',
+  createTime        datetime                                   comment '创建时间',
+  updater           varchar(64)     default ''                 comment '更新者',
+  updateTime        datetime                                   comment '更新时间',
+  tenant_id         bigint          not null default 0         comment '租户编号',
   primary key (id)
 ) engine=innodb auto_increment=1 comment = '合同';
 
@@ -210,10 +216,10 @@ create table `oa_project_impl_log` (
   contract_id       bigint(20)      not null                   comment '合同id',
   --   1.调研 2.部署 3.上线 4.试运行 5.验收 6.维护 
   impl_status       char(1)         default '1'                comment '工程进度',
-  create_by         varchar(64)     default ''                 comment '创建者',
-  create_time       datetime                                   comment '创建时间',
-  update_by         varchar(64)     default ''                 comment '更新者',
-  update_time       datetime                                   comment '更新时间',
+  creator           varchar(64)     default ''                 comment '创建者',
+  createTime        datetime                                   comment '创建时间',
+  updater           varchar(64)     default ''                 comment '更新者',
+  updateTime        datetime                                   comment '更新时间',
   primary key (id)
 )engine=innodb auto_increment=1 comment = '工程日志列表';
 
@@ -231,10 +237,11 @@ create table `oa_opportunity` (
   status            char(1)         default '1'                comment '商机状态',
   remark            varchar(255)                               comment '备注',
   deleted           bit(1)          not null default b'0'      comment '是否删除',
-  create_by         varchar(64)     default ''                 comment '创建者',
-  create_time       datetime                                   comment '创建时间',
-  update_by         varchar(64)     default ''                 comment '更新者',
-  update_time       datetime                                   comment '更新时间',
+  creator           varchar(64)     default ''                 comment '创建者',
+  createTime        datetime                                   comment '创建时间',
+  updater           varchar(64)     default ''                 comment '更新者',
+  updateTime        datetime                                   comment '更新时间',
+  tenant_id         bigint          not null default 0         comment '租户编号',
   primary key (id)
 )engine=innodb auto_increment=1 comment = '商机';
 
@@ -246,10 +253,10 @@ create table `oa_opportunity_follow_log` (
   id                bigint(20)      not null auto_increment    comment 'id',
   business_id       bigint(20)                                 comment '商机id',
   log_content       varchar(500)                               comment '跟进日志内容',
-  create_by         varchar(64)     default ''                 comment '创建者',
-  create_time       datetime                                   comment '创建时间',
-  update_by         varchar(64)     default ''                 comment '更新者',
-  update_time       datetime                                   comment '更新时间',
+  creator           varchar(64)     default ''                 comment '创建者',
+  createTime        datetime                                   comment '创建时间',
+  updater           varchar(64)     default ''                 comment '更新者',
+  updateTime        datetime                                   comment '更新时间',
   primary key (id)
 )engine=innodb auto_increment=1 comment = '商机-跟进日志';
 
@@ -265,10 +272,11 @@ create table `oa_feedback` (
   contact_phone     varchar(11)                                comment '联系电话',
   append_files      varchar(500)                               comment '附件',
   deleted           bit(1)          not null default b'0'      comment '是否删除',
-  create_by         varchar(64)     default ''                 comment '创建者',
-  create_time       datetime                                   comment '创建时间',
-  update_by         varchar(64)     default ''                 comment '更新者',
-  update_time       datetime                                   comment '更新时间',
+  creator           varchar(64)     default ''                 comment '创建者',
+  createTime        datetime                                   comment '创建时间',
+  updater           varchar(64)     default ''                 comment '更新者',
+  updateTime        datetime                                   comment '更新时间',
+  tenant_id         bigint          not null default 0         comment '租户编号',
   primary key (id)
 )engine=innodb auto_increment=1 comment = '产品反馈';
 
@@ -280,10 +288,10 @@ create table `oa_feedback_follow_log` (
   id                bigint(20)      not null auto_increment    comment 'id',
   feedback_id       bigint(20)      not null                   comment '产品反馈id',
   log_content       varchar(500)                               comment '跟进日志内容',
-  create_by         varchar(64)     default ''                 comment '创建者',
-  create_time       datetime                                   comment '创建时间',
-  update_by         varchar(64)     default ''                 comment '更新者',
-  update_time       datetime                                   comment '更新时间',
+  creator           varchar(64)     default ''                 comment '创建者',
+  createTime        datetime                                   comment '创建时间',
+  updater           varchar(64)     default ''                 comment '更新者',
+  updateTime        datetime                                   comment '更新时间',
   primary key (id)
 )engine=innodb auto_increment=1 comment = '产品反馈-跟进日志';
 
@@ -303,29 +311,10 @@ create table `oa_quarterly_assessment` (
   next_quarter_work text                                       comment '下季度工作安排',
   append_files      varchar(2000)                              comment '上传附件',
   deleted           bit(1)          not null default b'0'      comment '是否删除',
-  create_by         varchar(64)     default ''                 comment '创建者',
-  create_time       datetime                                   comment '创建时间',
-  update_by         varchar(64)     default ''                 comment '更新者',
-  update_time       datetime                                   comment '更新时间',
+  creator           varchar(64)     default ''                 comment '创建者',
+  createTime        datetime                                   comment '创建时间',
+  updater           varchar(64)     default ''                 comment '更新者',
+  updateTime        datetime                                   comment '更新时间',
+  tenant_id         bigint          not null default 0         comment '租户编号',
   primary key (id)
 ) engine=innodb auto_increment=1 comment = '季度考核';
-
--- ----------------------------
--- 16、用户注册申请
--- ----------------------------
-drop table if exists oa_sign_req;
-create table `oa_sign_req` (
-  id                bigint(20)      not null auto_increment    comment '申请id,主键(自增策略)',
-  open_id           varchar(100)                               comment 'openId',
-  email             varchar(50)     default ''                 comment '邮箱',
-  phonenumber       varchar(11)     default ''                 comment '手机号码',
-  user_name         varchar(30)                                comment '姓名',
-  sex               char(1)         default '0'                comment '性别',
-  remark            varchar(255)                               comment '备注信息',
-  --  1.未绑定 2.已绑定 3.已拒绝
-  status            char(1)         default '1'                comment '处理状态',
-  create_time       datetime                                   comment '提交时间',
-  update_time       datetime                                   comment '更新时间',
-  deleted           bit(1)          not null default b'0'      comment '是否删除',
-  primary key (id)
-)engine=innodb auto_increment=1 comment = '微信用户注册申请';
