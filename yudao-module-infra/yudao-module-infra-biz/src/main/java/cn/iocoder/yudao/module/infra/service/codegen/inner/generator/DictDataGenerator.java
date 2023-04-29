@@ -103,6 +103,11 @@ public class DictDataGenerator implements DataGenerator {
     }
 
     @Override
+    public String getName() {
+        return MockTypeEnum.DICT.getLabel();
+    }
+
+    @Override
     public List<String> doGenerate(CodegenColumnDO field, int rowNum) {
         //curl命令的参数
         String mockParams = field.getMockParams();

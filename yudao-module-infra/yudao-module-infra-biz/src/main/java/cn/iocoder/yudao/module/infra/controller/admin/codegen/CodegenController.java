@@ -163,8 +163,7 @@ public class CodegenController {
     @Parameters({
             @Parameter(name = "mockType", description = "模拟类型的标签", required = true)
     })
-    public CommonResult<List<String>> getMockParamsByMockType(@RequestParam("mockType") Integer mockTypeType){
-        MockTypeEnum mockType = MockTypeEnum.getEnumByValue(mockTypeType);
+    public CommonResult<List<String>> getMockParamsByMockType(@RequestParam("mockType") Integer mockType){
         return success(codegenService.getMockParamsByMockType(mockType));
     }
 

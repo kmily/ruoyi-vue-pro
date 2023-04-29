@@ -11,7 +11,12 @@ import java.util.List;
  *
  * @author https://github.com/liyupi
  */
-public interface DataGenerator extends Ordered{
+public interface DataGenerator extends Ordered {
+
+    /**
+     * 生成处理器名称
+     */
+    String getName();
 
     /**
      * 生成
@@ -20,8 +25,8 @@ public interface DataGenerator extends Ordered{
      * @param rowNum 行数
      * @return 生成的数据列表
      */
-   default List<String> doGenerate(CodegenColumnDO field, int rowNum) {
-       return Collections.emptyList();
-   }
+    default List<String> doGenerate(CodegenColumnDO field, int rowNum) {
+        return Collections.emptyList();
+    }
 
 }

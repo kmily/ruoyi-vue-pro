@@ -31,4 +31,9 @@ public class FixedDataGenerator implements DataGenerator {
     public int getOrder() {
         return MockTypeEnum.FIXED.getType();
     }
+
+    @Override
+    public String getName() {
+        return MockTypeEnum.FIXED.getLabel();
+    }
 }

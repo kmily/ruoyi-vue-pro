@@ -1,4 +1,6 @@
 package cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.column;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -58,6 +60,7 @@ public class CodegenColumnBaseVO {
     private String example;
 
     @Schema(description = "数据模拟类型", example = "1")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Integer mockType;
 
     @Schema(description = "模拟参数", example = "1")

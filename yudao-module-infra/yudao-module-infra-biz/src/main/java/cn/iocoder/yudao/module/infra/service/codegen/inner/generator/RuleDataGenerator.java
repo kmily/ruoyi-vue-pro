@@ -15,6 +15,11 @@ import java.util.List;
 public class RuleDataGenerator implements DataGenerator {
 
     @Override
+    public String getName() {
+        return MockTypeEnum.RULE.getLabel();
+    }
+
+    @Override
     public List<String> doGenerate(CodegenColumnDO field, int rowNum) {
         String mockParams = field.getMockParams();
         List<String> list = new ArrayList<>(rowNum);

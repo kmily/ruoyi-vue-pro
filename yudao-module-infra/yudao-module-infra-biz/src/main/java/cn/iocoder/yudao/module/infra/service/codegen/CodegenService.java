@@ -8,11 +8,9 @@ import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.CodegenTa
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.DatabaseTableRespVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
-import cn.iocoder.yudao.module.infra.enums.codegen.MockTypeEnum;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 代码生成 Service 接口
@@ -109,7 +107,7 @@ public interface CodegenService {
      * @param mockType mock类型
      * @return 下拉列表
      */
-    List<String> getMockParamsByMockType(MockTypeEnum mockType);
+    List<String> getMockParamsByMockType(Integer mockType);
 
     /**
      * 获取模拟类型

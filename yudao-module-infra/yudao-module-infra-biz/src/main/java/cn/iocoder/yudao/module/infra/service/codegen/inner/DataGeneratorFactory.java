@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.infra.service.codegen.inner;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.module.infra.enums.codegen.MockTypeEnum;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.generator.DataGenerator;
+import cn.iocoder.yudao.module.infra.service.codegen.inner.generator.DefaultDataGenerator;
 
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -17,10 +20,25 @@ public class DataGeneratorFactory {
     /**
      * 模拟类型 => 生成器映射
      */
-    private final Map<Integer, DataGenerator> MOCK_TYPE_DATA_GENERATOR_MAP;
+    private final List<DataGenerator> MOCK_TYPE_DATA_GENERATOR_COLL;
 
-    public DataGeneratorFactory(Map<Integer, DataGenerator> mockTypeDataGeneratorMap) {
-        MOCK_TYPE_DATA_GENERATOR_MAP = mockTypeDataGeneratorMap;
+    /**
+     * 默认兜底
+     */
+    private final DataGenerator DEFAULT;
+
+    public DataGeneratorFactory(List<DataGenerator> mockTypeDataGeneratorMap) {
+        MOCK_TYPE_DATA_GENERATOR_COLL = mockTypeDataGeneratorMap;
+        DEFAULT = new DefaultDataGenerator();
+    }
+
+    /**
+     * 生成一个新的List防止有人动数据生成器
+     *
+     * @return 返回现在所有的数据生成器
+     */
+    public List<DataGenerator> getDataGeneratorList() {
+        return new LinkedList<>(MOCK_TYPE_DATA_GENERATOR_COLL);
     }
 
     /**
@@ -31,7 +49,10 @@ public class DataGeneratorFactory {
      */
     public DataGenerator getGenerator(Integer type) {
         Integer mockType = Optional.ofNullable(type).orElse(MockTypeEnum.NONE.getType());
-        return Optional.ofNullable(MOCK_TYPE_DATA_GENERATOR_MAP.get(mockType)).orElse(MOCK_TYPE_DATA_GENERATOR_MAP.get(MockTypeEnum.NONE.getType()));
+        return MOCK_TYPE_DATA_GENERATOR_COLL.stream()
+                .filter(dataGenerator -> ObjectUtil.equals(dataGenerator.getOrder(), mockType))
+                .findFirst()
+                .orElse(DEFAULT);
     }
 
 }

@@ -69,6 +69,7 @@ public class CodegenServiceImpl implements CodegenService {
 
     @Resource
     private CodegenProperties codegenProperties;
+
     @Resource
     private DataGeneratorFactory dataGeneratorFactory;
 
@@ -273,12 +274,12 @@ public class CodegenServiceImpl implements CodegenService {
     }
 
     @Override
-    public List<String> getMockParamsByMockType(MockTypeEnum mockType) {
+    public List<String> getMockParamsByMockType(Integer mockType) {
         if (mockType == null) {
             return null;
         }
         //随机
-        if (mockType.equals(MockTypeEnum.RANDOM)) {
+        if (mockType.equals(MockTypeEnum.RANDOM.getType())) {
             return MockParamsRandomTypeEnum.getValues();
         }
         return null;
@@ -286,13 +287,15 @@ public class CodegenServiceImpl implements CodegenService {
 
     @Override
     public List<CodegenMockTypeRespVO> getMockTypes() {
+        List<DataGenerator> dataGeneratorList = dataGeneratorFactory.getDataGeneratorList();
         List<CodegenMockTypeRespVO> result = new LinkedList<>();
-        for (MockTypeEnum mockTypeEnum : MockTypeEnum.values()) {
+        for (DataGenerator dataGenerator : dataGeneratorList) {
             CodegenMockTypeRespVO vo = new CodegenMockTypeRespVO();
-            vo.setType(mockTypeEnum.getType());
-            vo.setLable(mockTypeEnum.getLabel());
+            vo.setType(dataGenerator.getOrder());
+            vo.setLable(dataGenerator.getName());
+            result.add(vo);
         }
-        return result;
+        return result.stream().sorted().collect(Collectors.toList());
     }
 
     private List<Map<String, Object>> generateData(Integer num, List<CodegenColumnDO> columns) {

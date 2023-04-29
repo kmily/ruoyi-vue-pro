@@ -17,6 +17,11 @@ import java.util.List;
 public class DefaultDataGenerator implements DataGenerator {
 
     @Override
+    public String getName() {
+        return MockTypeEnum.NONE.getLabel();
+    }
+
+    @Override
     public List<String> doGenerate(CodegenColumnDO field, int rowNum) {
         List<String> list = new ArrayList<>(rowNum);
         // 主键采用递增策略

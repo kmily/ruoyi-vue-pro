@@ -16,6 +16,11 @@ import java.util.Optional;
 public class RandomDataGenerator implements DataGenerator {
 
     @Override
+    public String getName() {
+        return MockTypeEnum.RANDOM.getLabel();
+    }
+
+    @Override
     public List<String> doGenerate(CodegenColumnDO field, int rowNum) {
         String mockParams = field.getMockParams();
         List<String> list = new ArrayList<>(rowNum);
