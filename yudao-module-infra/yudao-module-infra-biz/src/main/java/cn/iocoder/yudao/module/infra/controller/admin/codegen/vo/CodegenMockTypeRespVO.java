@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.infra.controller.admin.codegen.vo;
 
 import cn.hutool.core.util.NumberUtil;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
@@ -12,8 +10,6 @@ import org.jetbrains.annotations.NotNull;
 public class CodegenMockTypeRespVO implements Comparable<CodegenMockTypeRespVO> {
 
     @Schema(description = "类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @JsonSerialize(using = ToStringSerializer.class)
-
     private Integer type;
 
     @Schema(description = "标签", requiredMode = Schema.RequiredMode.REQUIRED, example = "不模拟")
