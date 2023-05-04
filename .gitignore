@@ -35,10 +35,11 @@ nbdist/
 
 ######################################################################
 # Others
+logs/
 *.log
 *.xml.versionsBackup
 *.swp
-logs
+
 
 !*/build/*.java
 !*/build/*.html
