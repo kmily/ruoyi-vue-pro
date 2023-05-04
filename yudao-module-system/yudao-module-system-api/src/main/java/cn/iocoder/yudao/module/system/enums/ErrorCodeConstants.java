@@ -164,7 +164,8 @@ public interface ErrorCodeConstants {
     ErrorCode NOTIFY_SEND_TEMPLATE_PARAM_MISS = new ErrorCode(1002025000, "模板参数({})缺失");
 
     // ========== OA
-    ErrorCode CUSTOMER_NOT_EXISTS = new ErrorCode(1002027000, "客户不存在");
-    ErrorCode SIGN_REQ_NOT_EXISTS = new ErrorCode(1002028000, "注册申请不存在");
-    ErrorCode PRODUCT_NOT_EXISTS = new ErrorCode(1002029000, "产品不存在");
+    ErrorCode CUSTOMER_NOT_EXISTS = new ErrorCode(1002029010, "客户不存在");
+    ErrorCode SIGN_REQ_NOT_EXISTS = new ErrorCode(1002029020, "注册申请不存在");
+    ErrorCode PRODUCT_NOT_EXISTS = new ErrorCode(1002029030, "产品不存在");
+    ErrorCode AUTH_WE_CHAT_MINI_APP_PHONE_CODE_ERROR = new ErrorCode(1002029040, "获得手机号失败");
 }

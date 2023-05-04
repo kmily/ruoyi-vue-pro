@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.oa.convert.user;
+package cn.iocoder.yudao.module.system.convert.user;
 
 import cn.iocoder.yudao.module.system.api.user.dto.AppUserRespDTO;
 import cn.iocoder.yudao.module.system.controller.app.user.vo.profile.AppUserProfileRespVO;
@@ -14,8 +14,9 @@ import org.mapstruct.factory.Mappers;
 import java.util.List;
 
 @Mapper
-public interface UserConvert {
-    UserConvert INSTANCE = Mappers.getMapper(UserConvert.class);
+public interface AppUserConvert {
+
+    AppUserConvert INSTANCE = Mappers.getMapper(AppUserConvert.class);
 
     AppUserProfileRespVO convert03(AdminUserDO bean);
 
@@ -30,4 +31,5 @@ public interface UserConvert {
     List<AppUserProfileRespVO.Role> convertList(List<RoleDO> list);
     List<AppUserProfileRespVO.Post> convertList02(List<PostDO> list);
     List<AppUserProfileRespVO.SocialUser> convertList03(List<SocialUserDO> list);
+
 }

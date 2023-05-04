@@ -1,11 +1,11 @@
-package cn.iocoder.yudao.module.oa.convert.auth;
+package cn.iocoder.yudao.module.system.convert.auth;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.system.controller.app.auth.vo.AppAuthLoginRespVO;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeSendReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.*;
+import cn.iocoder.yudao.module.system.controller.app.auth.vo.AppAuthLoginRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
@@ -20,9 +20,9 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO.ID_ROOT;
 
 @Mapper
-public interface AuthConvert {
+public interface AppAuthConvert {
 
-    AuthConvert INSTANCE = Mappers.getMapper(AuthConvert.class);
+    AppAuthConvert INSTANCE = Mappers.getMapper(AppAuthConvert.class);
 
     AppAuthLoginRespVO convert(OAuth2AccessTokenDO bean);
 
@@ -48,7 +48,7 @@ public interface AuthConvert {
         // 构建菜单树
         // 使用 LinkedHashMap 的原因，是为了排序 。实际也可以用 Stream API ，就是太丑了。
         Map<Long, AuthMenuRespVO> treeNodeMap = new LinkedHashMap<>();
-        menuList.forEach(menu -> treeNodeMap.put(menu.getId(), AuthConvert.INSTANCE.convertTreeNode(menu)));
+        menuList.forEach(menu -> treeNodeMap.put(menu.getId(), AppAuthConvert.INSTANCE.convertTreeNode(menu)));
         // 处理父子关系
         treeNodeMap.values().stream().filter(node -> !node.getParentId().equals(ID_ROOT)).forEach(childNode -> {
             // 获得父节点
