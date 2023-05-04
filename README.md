@@ -3,8 +3,8 @@
 ### 项目地址
 https://gitee.com/gz3ray/ruoyi-vue-pro-oa
 ### 后台地址
-公网访问地址:https://oa.3ray.info:23457
-内网访问地址:http://192.168.0.197:8201
+* 公网访问地址:https://oa.3ray.info:23457
+* 内网访问地址:http://192.168.0.197:8201
 #### 登录信息
 * 租户名: 三锐科技
 * 用户名: sanray
