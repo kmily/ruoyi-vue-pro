@@ -146,7 +146,7 @@ public class CodegenController {
             @Parameter(name = "num", description = "数据源配置的编号", required = false, example = "1"),
     })
     public CommonResult<String> fakeData(@RequestParam("tableId") Long tableId,
-                                               @PositiveOrZero @RequestParam(value = "num", required = false, defaultValue = "1") Integer num) throws IOException {
+                                               @PositiveOrZero @RequestParam(value = "num", required = false, defaultValue = "1") Integer num) {
         return success(codegenService.fakeData(tableId, num));
     }
 
