@@ -11,6 +11,11 @@ import java.time.LocalDateTime;
 #end
 #end
 import com.baomidou.mybatisplus.annotation.*;
+#if (!${baseDOFields.contains("tenantId")}) // 对于数据表中含有tenantId字段的，自动导入TenantBaseDO包
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+#else
+import ${BaseDOClassName};
+#end
 import ${BaseDOClassName};
 
 /**
@@ -26,7 +31,7 @@ import ${BaseDOClassName};
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ${table.className}DO extends BaseDO {
+public class ${table.className}DO extends#if (!${baseDOFields.contains("tenantId")}) BaseDO #else TenantBaseDO #end{// 对于数据表中含有tenantId字段的，自动继承TenantBaseDO类
 
 #foreach ($column in $columns)
 #if (!${baseDOFields.contains(${column.javaField})})##排除 BaseDO 的字段
