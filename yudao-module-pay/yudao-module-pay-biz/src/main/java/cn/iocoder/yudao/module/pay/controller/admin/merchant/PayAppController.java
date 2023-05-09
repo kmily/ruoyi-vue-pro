@@ -109,8 +109,6 @@ public class PayAppController {
         // 得到所有的应用编号，查出所有的渠道
         Collection<Long> payAppIds = CollectionUtils.convertList(pageResult.getList(), PayAppDO::getId);
         List<PayChannelDO> channels = channelService.getChannelListByAppIds(payAppIds);
-        // TODO @aquan：可以基于 appId 简历一个 multiMap。这样下面，直接 get 到之后，CollUtil buildSet 即可
-//        Iterator<PayChannelDO> iterator = channels.iterator();
 
         // 得到所有的商户信息
         Collection<Long> merchantIds = CollectionUtils.convertList(pageResult.getList(), PayAppDO::getMerchantId);
@@ -125,30 +123,11 @@ public class PayAppController {
             respVO.setPayMerchant(PayAppConvert.INSTANCE.convert(deptMap.get(app.getMerchantId())));
             // 写入支付渠道信息的数据
             Set<String> channelCodes = new HashSet<>(PayChannelEnum.values().length);
-//            while (iterator.hasNext()) {
-//                PayChannelDO channelDO = iterator.next();
-//                if (channelDO.getAppId().equals(app.getId())) {
-//                    channelCodes.add(channelDO.getCode());
-//                    iterator.remove();
-//                }
-//            }
-            /**
-             * 以下方法解决支付配置模块中，多个应用对应多种支付渠道时，之前iterator无法全部遍历，导致配置无法加载的问题
-             */
-            // 方法1：
-//            for (PayChannelDO channelDO: channels){
-//                if (channelDO.getAppId().equals(app.getId())) {
-//                    channelCodes.add(channelDO.getCode());
-//                }
-//            }
-
-            // 方法2：
             channels.forEach(channelDO ->{
                 if (channelDO.getAppId().equals(app.getId())) {
                     channelCodes.add(channelDO.getCode());
                 }
             });
-
             respVO.setChannelCodes(channelCodes);
             appList.add(respVO);
         });
