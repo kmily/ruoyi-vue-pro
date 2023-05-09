@@ -31,7 +31,7 @@ import ${BaseDOClassName};
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ${table.className}DO extends#if (!${baseDOFields.contains("tenantId")}) BaseDO #else TenantBaseDO #end{// 对于数据表中含有tenantId字段的，自动继承TenantBaseDO类
+public class ${table.className}DO extends#if (!${baseDOFields.contains("tenantId")}) BaseDO #else TenantBaseDO #end{ // 对于数据表中含有tenantId字段的，自动继承TenantBaseDO类
 
 #foreach ($column in $columns)
 #if (!${baseDOFields.contains(${column.javaField})})##排除 BaseDO 的字段
