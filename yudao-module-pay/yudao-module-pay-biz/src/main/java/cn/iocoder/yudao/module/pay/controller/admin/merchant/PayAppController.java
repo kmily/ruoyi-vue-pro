@@ -136,11 +136,11 @@ public class PayAppController {
              * 以下方法解决支付配置模块中，多个应用对应多种支付渠道时，之前iterator无法全部遍历，导致配置无法加载的问题
              */
             // 方法1：
-            for (PayChannelDO channelDO: channels){
-                if (channelDO.getAppId().equals(app.getId())) {
-                    channelCodes.add(channelDO.getCode());
-                }
-            }
+//            for (PayChannelDO channelDO: channels){
+//                if (channelDO.getAppId().equals(app.getId())) {
+//                    channelCodes.add(channelDO.getCode());
+//                }
+//            }
 
             // 方法2：
             channels.forEach(channelDO ->{
