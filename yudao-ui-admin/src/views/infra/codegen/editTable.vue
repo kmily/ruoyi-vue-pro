@@ -4,6 +4,9 @@
       <el-tab-pane label="基本信息" name="basic">
         <basic-info-form ref="basicInfo" :info="table" />
       </el-tab-pane>
+      <el-tab-pane label="生成信息" name="genInfo">
+        <gen-info-form ref="genInfo" :info="table" :tables="tables" :menus="menus"/>
+      </el-tab-pane>
       <el-tab-pane label="字段信息" name="cloum">
         <el-table ref="dragTable" :data="columns" row-key="columnId" :max-height="tableHeight">
           <el-table-column
@@ -99,10 +102,10 @@
             <template v-slot="scope">
               <el-select v-model="scope.row.dictType" clearable filterable placeholder="请选择">
                 <el-option
-                    v-for="dict in dictOptions"
-                    :key="dict.id"
-                    :label="dict.name"
-                    :value="dict.type"
+                  v-for="dict in dictOptions"
+                  :key="dict.id"
+                  :label="dict.name"
+                  :value="dict.type"
                 />
               </el-select>
             </template>
@@ -114,9 +117,9 @@
           </el-table-column>
         </el-table>
       </el-tab-pane>
-      <el-tab-pane label="生成信息" name="genInfo">
-        <gen-info-form ref="genInfo" :info="table" :tables="tables" :menus="menus"/>
-      </el-tab-pane>
+      <!--      <el-tab-pane label="生成信息" name="genInfo">-->
+      <!--        <gen-info-form ref="genInfo" :info="table" :tables="tables" :menus="menus"/>-->
+      <!--      </el-tab-pane>-->
     </el-tabs>
     <el-form label-width="100px">
       <el-form-item style="text-align: center;margin-left:-100px;margin-top:10px;">
