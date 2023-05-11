@@ -24,6 +24,7 @@ target/
 *.iws
 *.iml
 *.ipr
+.fastRequest/*
 
 ### NetBeans ###
 nbproject/private/
@@ -45,6 +46,9 @@ nbdist/
 
 ### JRebel ###
 rebel.xml
+
+### flatten ###
+*.flattened-pom.xml
 
 application-my.yaml
 
