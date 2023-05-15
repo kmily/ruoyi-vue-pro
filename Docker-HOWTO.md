@@ -52,9 +52,9 @@ docker exec -i yudao-mysql \
 
 注意：这里用docker compose exec 会出现 `the input device is not a TTY` 报错
 
-## Server:Port
+## 宿主机绑定服务默认端口Server:Port
 
 - admin: http://localhost:8080
 - API: http://localhost:48080
-- mysql: root/123456, port: 3308
-- redis: port: 6379
+- mysql: root/123456, port: 13306
+- redis: port: 16379
