@@ -1,6 +1,6 @@
 <template xmlns="">
   <div class="container">
-    <div class="logo"></div>
+    <!-- <div class="logo"></div> -->
     <!-- 登录区域 -->
     <div class="content">
       <!-- 配图 -->
@@ -17,7 +17,7 @@
           <el-tabs class="form" v-model="loginForm.loginType" style=" float:none;">
             <el-tab-pane label="账号密码登录" name="uname">
             </el-tab-pane>
-            <el-tab-pane label="短信验证码登录" name="sms">
+            <el-tab-pane label="短信验证码登录" v-if="false" name="sms">
             </el-tab-pane>
           </el-tabs>
           <div>
@@ -75,7 +75,7 @@
               </el-form-item>
 
               <!--  社交登录 -->
-             <el-form-item style="width:100%;">
+             <el-form-item style="width:100%;" v-show="false" >
                   <div class="oauth-login" style="display:flex">
                     <div class="oauth-login-item" v-for="item in SysUserSocialTypeEnum" :key="item.type" @click="doSocialLogin(item)">
                       <img :src="item.img" height="25px" width="25px" alt="登录" >
@@ -85,7 +85,7 @@
               </el-form-item>
 
               <!-- 教程说明 -->
-              <el-form-item style="width:100%; margin-top:-25px">
+              <el-form-item  v-show="false"  style="width:100%;margin-top:-25px">
                 <el-link href="https://doc.iocoder.cn/" target="_blank">📚开发指南</el-link>
                 <el-link href="https://doc.iocoder.cn/video/" target="_blank" style="padding-left: 10px">🔥视频教程</el-link>
                 <el-link href="https://www.iocoder.cn/Interview/good-collection/" target="_blank" style="padding-left: 10px">⚡面试手册</el-link>
