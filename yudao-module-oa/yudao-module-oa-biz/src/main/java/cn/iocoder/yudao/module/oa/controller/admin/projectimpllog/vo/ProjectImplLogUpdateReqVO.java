@@ -16,6 +16,6 @@ public class ProjectImplLogUpdateReqVO extends ProjectImplLogBaseVO {
     private Long id;
 
     @Schema(description = "更新者")
-    private String updateBy;
+    private String updater;
 
 }

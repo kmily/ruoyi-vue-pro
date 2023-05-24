@@ -15,7 +15,7 @@ public class CodegenSQLParserTest extends BaseDbUnitTest {
                 "  `type` tinyint(4) NOT NULL COMMENT '类型',\n" +
                 "  `category` tinyint(4) NOT NULL COMMENT '分类',\n" +
                 "  `remark` varchar(500) DEFAULT NULL COMMENT '备注',\n" +
-                "  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',\n" +
+                "  `creator` varchar(64) DEFAULT '' COMMENT '创建者',\n" +
                 "  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',\n" +
                 "  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',\n" +
                 "  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',\n" +

@@ -21,6 +21,6 @@ public class ContractPageReqVO extends PageParam {
     private Boolean approvalStatus;
 
     @Schema(description = "创建者")
-    private String createBy;
+    private String creator;
 
 }

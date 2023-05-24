@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.module.oa.dal.mysql.opportunity;
 
-import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.oa.controller.admin.opportunity.vo.OpportunityExportReqVO;
+import cn.iocoder.yudao.module.oa.controller.admin.opportunity.vo.OpportunityPageReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.opportunity.OpportunityDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.oa.controller.admin.opportunity.vo.*;
+
+import java.util.List;
 
 /**
  * 商机 Mapper
@@ -21,7 +22,7 @@ public interface OpportunityMapper extends BaseMapperX<OpportunityDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<OpportunityDO>()
                 .eqIfPresent(OpportunityDO::getBusinessTitle, reqVO.getBusinessTitle())
                 .eqIfPresent(OpportunityDO::getStatus, reqVO.getStatus())
-                .eqIfPresent(OpportunityDO::getCreateBy, reqVO.getCreateBy())
+                .eqIfPresent(OpportunityDO::getCreator, reqVO.getCreator())
                 .orderByDesc(OpportunityDO::getId));
     }
 
@@ -29,7 +30,7 @@ public interface OpportunityMapper extends BaseMapperX<OpportunityDO> {
         return selectList(new LambdaQueryWrapperX<OpportunityDO>()
                 .eqIfPresent(OpportunityDO::getBusinessTitle, reqVO.getBusinessTitle())
                 .eqIfPresent(OpportunityDO::getStatus, reqVO.getStatus())
-                .eqIfPresent(OpportunityDO::getCreateBy, reqVO.getCreateBy())
+                .eqIfPresent(OpportunityDO::getCreator, reqVO.getCreator())
                 .orderByDesc(OpportunityDO::getId));
     }
 

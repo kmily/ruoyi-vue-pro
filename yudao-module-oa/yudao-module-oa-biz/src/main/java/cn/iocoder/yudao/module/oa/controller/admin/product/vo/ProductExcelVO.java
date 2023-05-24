@@ -1,16 +1,13 @@
 package cn.iocoder.yudao.module.oa.controller.admin.product.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import java.math.BigDecimal;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-
-import com.alibaba.excel.annotation.ExcelProperty;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
+import cn.iocoder.yudao.module.oa.enums.DictTypeConstants;
+import com.alibaba.excel.annotation.ExcelProperty;
+import lombok.Data;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 
 /**
@@ -37,11 +34,11 @@ public class ProductExcelVO {
     private String remark;
 
     @ExcelProperty(value = "产品类型", converter = DictConvert.class)
-    @DictFormat("oa_product_type") // TODO 代码优化：建议设置到对应的 XXXDictTypeConstants 枚举类中
+    @DictFormat(DictTypeConstants.OA_PRODUCT_TYPE)
     private String productType;
 
     @ExcelProperty(value = "单位", converter = DictConvert.class)
-    @DictFormat("oa_product_unit") // TODO 代码优化：建议设置到对应的 XXXDictTypeConstants 枚举类中
+    @DictFormat(DictTypeConstants.OA_PRODUCT_UNIT)
     private String productUnit;
 
     @ExcelProperty("创建时间")

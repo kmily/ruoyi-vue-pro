@@ -1,32 +1,28 @@
 package cn.iocoder.yudao.module.oa.service.borrow;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
-import javax.annotation.Resource;
-
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-
-import cn.iocoder.yudao.module.oa.controller.admin.borrow.vo.*;
+import cn.iocoder.yudao.module.oa.controller.admin.borrow.vo.BorrowCreateReqVO;
+import cn.iocoder.yudao.module.oa.controller.admin.borrow.vo.BorrowExportReqVO;
+import cn.iocoder.yudao.module.oa.controller.admin.borrow.vo.BorrowPageReqVO;
+import cn.iocoder.yudao.module.oa.controller.admin.borrow.vo.BorrowUpdateReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.borrow.BorrowDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.borrow.BorrowMapper;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import org.springframework.context.annotation.Import;
-import java.util.*;
-import java.time.LocalDateTime;
+import java.util.List;
 
-import static cn.hutool.core.util.RandomUtil.*;
-import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.*;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.BORROW_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
 * {@link BorrowServiceImpl} 的单元测试类
@@ -116,9 +112,9 @@ public class BorrowServiceImplTest extends BaseDbUnitTest {
            o.setStatus(null);
            o.setApprovalStatus(null);
            o.setRemark(null);
-           o.setCreateBy(null);
+           o.setCreator(null);
            o.setCreateTime(null);
-           o.setUpdateBy(null);
+           o.setUpdater(null);
        });
        borrowMapper.insert(dbBorrow);
        // 测试 borrowReason 不匹配
@@ -133,12 +129,12 @@ public class BorrowServiceImplTest extends BaseDbUnitTest {
        borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setApprovalStatus(null)));
        // 测试 remark 不匹配
        borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setRemark(null)));
-       // 测试 createBy 不匹配
-       borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setCreateBy(null)));
+       // 测试 creator 不匹配
+       borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setCreator(null)));
        // 测试 createTime 不匹配
        borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setCreateTime(null)));
-       // 测试 updateBy 不匹配
-       borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setUpdateBy(null)));
+       // 测试 updater 不匹配
+       borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setUpdater(null)));
        // 准备参数
        BorrowPageReqVO reqVO = new BorrowPageReqVO();
        reqVO.setBorrowReason(null);
@@ -147,9 +143,9 @@ public class BorrowServiceImplTest extends BaseDbUnitTest {
        reqVO.setStatus(null);
        reqVO.setApprovalStatus(null);
        reqVO.setRemark(null);
-       reqVO.setCreateBy(null);
+       reqVO.setCreator(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
-       reqVO.setUpdateBy(null);
+       reqVO.setUpdater(null);
 
        // 调用
        PageResult<BorrowDO> pageResult = borrowService.getBorrowPage(reqVO);
@@ -170,9 +166,9 @@ public class BorrowServiceImplTest extends BaseDbUnitTest {
            o.setStatus(null);
            o.setApprovalStatus(null);
            o.setRemark(null);
-           o.setCreateBy(null);
+           o.setCreator(null);
            o.setCreateTime(null);
-           o.setUpdateBy(null);
+           o.setUpdater(null);
        });
        borrowMapper.insert(dbBorrow);
        // 测试 borrowReason 不匹配
@@ -187,12 +183,12 @@ public class BorrowServiceImplTest extends BaseDbUnitTest {
        borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setApprovalStatus(null)));
        // 测试 remark 不匹配
        borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setRemark(null)));
-       // 测试 createBy 不匹配
-       borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setCreateBy(null)));
+       // 测试 creator 不匹配
+       borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setCreator(null)));
        // 测试 createTime 不匹配
        borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setCreateTime(null)));
-       // 测试 updateBy 不匹配
-       borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setUpdateBy(null)));
+       // 测试 updater 不匹配
+       borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setUpdater(null)));
        // 准备参数
        BorrowExportReqVO reqVO = new BorrowExportReqVO();
        reqVO.setBorrowReason(null);
@@ -201,9 +197,9 @@ public class BorrowServiceImplTest extends BaseDbUnitTest {
        reqVO.setStatus(null);
        reqVO.setApprovalStatus(null);
        reqVO.setRemark(null);
-       reqVO.setCreateBy(null);
+       reqVO.setCreator(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
-       reqVO.setUpdateBy(null);
+       reqVO.setUpdater(null);
 
        // 调用
        List<BorrowDO> list = borrowService.getBorrowList(reqVO);

@@ -36,7 +36,7 @@
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
         </template>
       </el-table-column>
-      <el-table-column label="创建者" align="center" prop="createBy" width="100" />
+      <el-table-column label="创建者" align="center" prop="creator" width="100" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="100">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>

@@ -57,6 +57,6 @@ public class ContractExcelVO {
     private Boolean approvalStatus;
 
     @ExcelProperty("创建者")
-    private String createBy;
+    private String creator;
 
 }

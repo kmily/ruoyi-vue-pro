@@ -1,14 +1,10 @@
 package cn.iocoder.yudao.module.oa.controller.admin.borrow.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import java.math.BigDecimal;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-
 import com.alibaba.excel.annotation.ExcelProperty;
+import lombok.Data;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * 借支申请 Excel VO
@@ -40,12 +36,12 @@ public class BorrowExcelVO {
     private String remark;
 
     @ExcelProperty("创建者")
-    private String createBy;
+    private String creator;
 
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
     @ExcelProperty("更新者")
-    private String updateBy;
+    private String updater;
 
 }

@@ -1,32 +1,27 @@
 package cn.iocoder.yudao.module.oa.service.expenses;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
-import javax.annotation.Resource;
-
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-
-import cn.iocoder.yudao.module.oa.controller.admin.expenses.vo.*;
+import cn.iocoder.yudao.module.oa.controller.admin.expenses.vo.ExpensesCreateReqVO;
+import cn.iocoder.yudao.module.oa.controller.admin.expenses.vo.ExpensesExportReqVO;
+import cn.iocoder.yudao.module.oa.controller.admin.expenses.vo.ExpensesPageReqVO;
+import cn.iocoder.yudao.module.oa.controller.admin.expenses.vo.ExpensesUpdateReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.expenses.ExpensesDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.expenses.ExpensesMapper;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import org.springframework.context.annotation.Import;
-import java.util.*;
-import java.time.LocalDateTime;
+import java.util.List;
 
-import static cn.hutool.core.util.RandomUtil.*;
-import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.*;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.EXPENSES_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
 * {@link ExpensesServiceImpl} 的单元测试类
@@ -113,7 +108,7 @@ public class ExpensesServiceImplTest extends BaseDbUnitTest {
            o.setExpensesType(null);
            o.setExhibitName(null);
            o.setApprovalStatus(null);
-           o.setCreateBy(null);
+           o.setCreator(null);
        });
        expensesMapper.insert(dbExpenses);
        // 测试 expensesType 不匹配
@@ -122,14 +117,14 @@ public class ExpensesServiceImplTest extends BaseDbUnitTest {
        expensesMapper.insert(cloneIgnoreId(dbExpenses, o -> o.setExhibitName(null)));
        // 测试 approvalStatus 不匹配
        expensesMapper.insert(cloneIgnoreId(dbExpenses, o -> o.setApprovalStatus(null)));
-       // 测试 createBy 不匹配
-       expensesMapper.insert(cloneIgnoreId(dbExpenses, o -> o.setCreateBy(null)));
+       // 测试 creator 不匹配
+       expensesMapper.insert(cloneIgnoreId(dbExpenses, o -> o.setCreator(null)));
        // 准备参数
        ExpensesPageReqVO reqVO = new ExpensesPageReqVO();
        reqVO.setExpensesType(null);
        reqVO.setExhibitName(null);
        reqVO.setApprovalStatus(null);
-       reqVO.setCreateBy(null);
+       reqVO.setCreator(null);
 
        // 调用
        PageResult<ExpensesDO> pageResult = expensesService.getExpensesPage(reqVO);
@@ -147,7 +142,7 @@ public class ExpensesServiceImplTest extends BaseDbUnitTest {
            o.setExpensesType(null);
            o.setExhibitName(null);
            o.setApprovalStatus(null);
-           o.setCreateBy(null);
+           o.setCreator(null);
        });
        expensesMapper.insert(dbExpenses);
        // 测试 expensesType 不匹配
@@ -156,14 +151,14 @@ public class ExpensesServiceImplTest extends BaseDbUnitTest {
        expensesMapper.insert(cloneIgnoreId(dbExpenses, o -> o.setExhibitName(null)));
        // 测试 approvalStatus 不匹配
        expensesMapper.insert(cloneIgnoreId(dbExpenses, o -> o.setApprovalStatus(null)));
-       // 测试 createBy 不匹配
-       expensesMapper.insert(cloneIgnoreId(dbExpenses, o -> o.setCreateBy(null)));
+       // 测试 creator 不匹配
+       expensesMapper.insert(cloneIgnoreId(dbExpenses, o -> o.setCreator(null)));
        // 准备参数
        ExpensesExportReqVO reqVO = new ExpensesExportReqVO();
        reqVO.setExpensesType(null);
        reqVO.setExhibitName(null);
        reqVO.setApprovalStatus(null);
-       reqVO.setCreateBy(null);
+       reqVO.setCreator(null);
 
        // 调用
        List<ExpensesDO> list = expensesService.getExpensesList(reqVO);

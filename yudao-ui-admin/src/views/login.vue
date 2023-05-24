@@ -132,8 +132,8 @@ export default {
       mobileCodeTimer: 0,
       loginForm: {
         loginType: "uname",
-        username: "admin",
-        password: "admin123",
+        username: "sanray",
+        password: "3ray6666",
         captchaVerification: "",
         mobile: "",
         mobileCode: "",

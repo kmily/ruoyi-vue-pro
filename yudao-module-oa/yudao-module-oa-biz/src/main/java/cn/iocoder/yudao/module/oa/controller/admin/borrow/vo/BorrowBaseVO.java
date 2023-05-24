@@ -1,13 +1,10 @@
 package cn.iocoder.yudao.module.oa.controller.admin.borrow.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import javax.validation.constraints.*;
 
 /**
 * 借支申请 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -37,9 +34,9 @@ public class BorrowBaseVO {
     private String remark;
 
     @Schema(description = "创建者")
-    private String createBy;
+    private String creator;
 
     @Schema(description = "更新者")
-    private String updateBy;
+    private String updater;
 
 }

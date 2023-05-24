@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.oa.controller.admin.product.vo.ProductCreateReqVO
 import cn.iocoder.yudao.module.oa.controller.admin.product.vo.ProductExportReqVO;
 import cn.iocoder.yudao.module.oa.controller.admin.product.vo.ProductPageReqVO;
 import cn.iocoder.yudao.module.oa.controller.admin.product.vo.ProductUpdateReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.product.ProductDO;
+import cn.iocoder.yudao.module.oa.dal.dataobject.product.ProductDO;
 
 import javax.validation.Valid;
 import java.util.Collection;

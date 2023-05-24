@@ -1,32 +1,27 @@
 package cn.iocoder.yudao.module.oa.service.opportunity;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
-import javax.annotation.Resource;
-
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-
-import cn.iocoder.yudao.module.oa.controller.admin.opportunity.vo.*;
+import cn.iocoder.yudao.module.oa.controller.admin.opportunity.vo.OpportunityCreateReqVO;
+import cn.iocoder.yudao.module.oa.controller.admin.opportunity.vo.OpportunityExportReqVO;
+import cn.iocoder.yudao.module.oa.controller.admin.opportunity.vo.OpportunityPageReqVO;
+import cn.iocoder.yudao.module.oa.controller.admin.opportunity.vo.OpportunityUpdateReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.opportunity.OpportunityDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.opportunity.OpportunityMapper;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import org.springframework.context.annotation.Import;
-import java.util.*;
-import java.time.LocalDateTime;
+import java.util.List;
 
-import static cn.hutool.core.util.RandomUtil.*;
-import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.*;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.OPPORTUNITY_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
 * {@link OpportunityServiceImpl} 的单元测试类
@@ -112,20 +107,20 @@ public class OpportunityServiceImplTest extends BaseDbUnitTest {
        OpportunityDO dbOpportunity = randomPojo(OpportunityDO.class, o -> { // 等会查询到
            o.setBusinessTitle(null);
            o.setStatus(null);
-           o.setCreateBy(null);
+           o.setCreator(null);
        });
        opportunityMapper.insert(dbOpportunity);
        // 测试 businessTitle 不匹配
        opportunityMapper.insert(cloneIgnoreId(dbOpportunity, o -> o.setBusinessTitle(null)));
        // 测试 status 不匹配
        opportunityMapper.insert(cloneIgnoreId(dbOpportunity, o -> o.setStatus(null)));
-       // 测试 createBy 不匹配
-       opportunityMapper.insert(cloneIgnoreId(dbOpportunity, o -> o.setCreateBy(null)));
+       // 测试 creator 不匹配
+       opportunityMapper.insert(cloneIgnoreId(dbOpportunity, o -> o.setCreator(null)));
        // 准备参数
        OpportunityPageReqVO reqVO = new OpportunityPageReqVO();
        reqVO.setBusinessTitle(null);
        reqVO.setStatus(null);
-       reqVO.setCreateBy(null);
+       reqVO.setCreator(null);
 
        // 调用
        PageResult<OpportunityDO> pageResult = opportunityService.getOpportunityPage(reqVO);
@@ -142,20 +137,20 @@ public class OpportunityServiceImplTest extends BaseDbUnitTest {
        OpportunityDO dbOpportunity = randomPojo(OpportunityDO.class, o -> { // 等会查询到
            o.setBusinessTitle(null);
            o.setStatus(null);
-           o.setCreateBy(null);
+           o.setCreator(null);
        });
        opportunityMapper.insert(dbOpportunity);
        // 测试 businessTitle 不匹配
        opportunityMapper.insert(cloneIgnoreId(dbOpportunity, o -> o.setBusinessTitle(null)));
        // 测试 status 不匹配
        opportunityMapper.insert(cloneIgnoreId(dbOpportunity, o -> o.setStatus(null)));
-       // 测试 createBy 不匹配
-       opportunityMapper.insert(cloneIgnoreId(dbOpportunity, o -> o.setCreateBy(null)));
+       // 测试 creator 不匹配
+       opportunityMapper.insert(cloneIgnoreId(dbOpportunity, o -> o.setCreator(null)));
        // 准备参数
        OpportunityExportReqVO reqVO = new OpportunityExportReqVO();
        reqVO.setBusinessTitle(null);
        reqVO.setStatus(null);
-       reqVO.setCreateBy(null);
+       reqVO.setCreator(null);
 
        // 调用
        List<OpportunityDO> list = opportunityService.getOpportunityList(reqVO);

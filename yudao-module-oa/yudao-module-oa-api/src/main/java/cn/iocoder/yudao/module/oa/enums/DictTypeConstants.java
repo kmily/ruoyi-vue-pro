@@ -14,9 +14,14 @@ public interface DictTypeConstants {
 
     String USER_SEX = "system_user_sex"; // 用户性别
 
+    String OA_CUSTOMER_TYPE = "oa_customer_type"; //客户类型
 
-    String OA_VISIT_TYPE = "oa-visit_type"; //拜访类型
-    String OA_ATTENDANCE_TYPE = "oa-attendance_type"; //打卡类型
+    String OA_PRODUCT_UNIT = "oa_product_unit"; //产品单位
+    String OA_PRODUCT_TYPE = "oa_product_type"; //产品类型
+
+
+    String OA_VISIT_TYPE = "oa_visit_type"; //拜访类型
+    String OA_ATTENDANCE_TYPE = "oa_attendance_type"; //打卡类型
     String OA_EXPENSE_TYPE = "oa_expense_type"; //报销类型
 
     String OA_CONTRACT_IMPL_STATE = "oa_contract_impl_state"; //工程实施进度

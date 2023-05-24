@@ -32,13 +32,13 @@ public class BorrowExportReqVO {
     private String remark;
 
     @Schema(description = "创建者")
-    private String createBy;
+    private String creator;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
     @Schema(description = "更新者")
-    private String updateBy;
+    private String updater;
 
 }

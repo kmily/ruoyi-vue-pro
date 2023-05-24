@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.oa.controller.admin.projectimpllog.vo;
 
-import lombok.*;
-import java.util.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Schema(description = "管理后台 - 工程日志列表分页 Request VO")
 @Data
@@ -18,6 +19,6 @@ public class ProjectImplLogPageReqVO extends PageParam {
     private String implStatus;
 
     @Schema(description = "创建者")
-    private String createBy;
+    private String creator;
 
 }

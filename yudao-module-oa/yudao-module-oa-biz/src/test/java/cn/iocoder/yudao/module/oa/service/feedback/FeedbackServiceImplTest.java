@@ -1,32 +1,28 @@
 package cn.iocoder.yudao.module.oa.service.feedback;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
-import javax.annotation.Resource;
-
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-
-import cn.iocoder.yudao.module.oa.controller.admin.feedback.vo.*;
+import cn.iocoder.yudao.module.oa.controller.admin.feedback.vo.FeedbackCreateReqVO;
+import cn.iocoder.yudao.module.oa.controller.admin.feedback.vo.FeedbackExportReqVO;
+import cn.iocoder.yudao.module.oa.controller.admin.feedback.vo.FeedbackPageReqVO;
+import cn.iocoder.yudao.module.oa.controller.admin.feedback.vo.FeedbackUpdateReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.feedback.FeedbackDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.feedback.FeedbackMapper;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import org.springframework.context.annotation.Import;
-import java.util.*;
-import java.time.LocalDateTime;
+import java.util.List;
 
-import static cn.hutool.core.util.RandomUtil.*;
-import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.*;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.FEEDBACK_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
 * {@link FeedbackServiceImpl} 的单元测试类
@@ -110,17 +106,17 @@ public class FeedbackServiceImplTest extends BaseDbUnitTest {
     public void testGetFeedbackPage() {
        // mock 数据
        FeedbackDO dbFeedback = randomPojo(FeedbackDO.class, o -> { // 等会查询到
-           o.setCreateBy(null);
+           o.setCreator(null);
            o.setCreateTime(null);
        });
        feedbackMapper.insert(dbFeedback);
-       // 测试 createBy 不匹配
-       feedbackMapper.insert(cloneIgnoreId(dbFeedback, o -> o.setCreateBy(null)));
+       // 测试 creator 不匹配
+       feedbackMapper.insert(cloneIgnoreId(dbFeedback, o -> o.setCreator(null)));
        // 测试 createTime 不匹配
        feedbackMapper.insert(cloneIgnoreId(dbFeedback, o -> o.setCreateTime(null)));
        // 准备参数
        FeedbackPageReqVO reqVO = new FeedbackPageReqVO();
-       reqVO.setCreateBy(null);
+       reqVO.setCreator(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
        // 调用
@@ -136,17 +132,17 @@ public class FeedbackServiceImplTest extends BaseDbUnitTest {
     public void testGetFeedbackList() {
        // mock 数据
        FeedbackDO dbFeedback = randomPojo(FeedbackDO.class, o -> { // 等会查询到
-           o.setCreateBy(null);
+           o.setCreator(null);
            o.setCreateTime(null);
        });
        feedbackMapper.insert(dbFeedback);
-       // 测试 createBy 不匹配
-       feedbackMapper.insert(cloneIgnoreId(dbFeedback, o -> o.setCreateBy(null)));
+       // 测试 creator 不匹配
+       feedbackMapper.insert(cloneIgnoreId(dbFeedback, o -> o.setCreator(null)));
        // 测试 createTime 不匹配
        feedbackMapper.insert(cloneIgnoreId(dbFeedback, o -> o.setCreateTime(null)));
        // 准备参数
        FeedbackExportReqVO reqVO = new FeedbackExportReqVO();
-       reqVO.setCreateBy(null);
+       reqVO.setCreator(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
        // 调用

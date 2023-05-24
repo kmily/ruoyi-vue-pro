@@ -6,8 +6,8 @@ import cn.iocoder.yudao.module.oa.controller.admin.product.vo.ProductCreateReqVO
 import cn.iocoder.yudao.module.oa.controller.admin.product.vo.ProductExportReqVO;
 import cn.iocoder.yudao.module.oa.controller.admin.product.vo.ProductPageReqVO;
 import cn.iocoder.yudao.module.oa.controller.admin.product.vo.ProductUpdateReqVO;
+import cn.iocoder.yudao.module.oa.dal.dataobject.product.ProductDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.product.ProductMapper;
-import cn.iocoder.yudao.module.system.dal.dataobject.product.ProductDO;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
@@ -21,7 +21,7 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEq
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.PRODUCT_NOT_EXISTS;
+import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.PRODUCT_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -128,8 +128,6 @@ public class ProductServiceImplTest extends BaseDbUnitTest {
        reqVO.setProductCode(null);
        reqVO.setProductModel(null);
        reqVO.setProductType(null);
-       reqVO.setCreator(null);
-       reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
        // 调用
        PageResult<ProductDO> pageResult = productService.getProductPage(reqVO);

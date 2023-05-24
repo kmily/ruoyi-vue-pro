@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.oa.controller.admin.product.vo.ProductCreateReqVO
 import cn.iocoder.yudao.module.oa.controller.admin.product.vo.ProductExcelVO;
 import cn.iocoder.yudao.module.oa.controller.admin.product.vo.ProductRespVO;
 import cn.iocoder.yudao.module.oa.controller.admin.product.vo.ProductUpdateReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.product.ProductDO;
+import cn.iocoder.yudao.module.oa.dal.dataobject.product.ProductDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

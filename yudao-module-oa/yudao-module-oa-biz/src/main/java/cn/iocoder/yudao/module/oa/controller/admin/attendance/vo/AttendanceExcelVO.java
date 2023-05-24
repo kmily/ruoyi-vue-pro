@@ -1,16 +1,11 @@
 package cn.iocoder.yudao.module.oa.controller.admin.attendance.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-
-import com.alibaba.excel.annotation.ExcelProperty;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
+import com.alibaba.excel.annotation.ExcelProperty;
+import lombok.Data;
+
+import java.time.LocalDateTime;
 
 
 /**
@@ -26,7 +21,7 @@ public class AttendanceExcelVO {
 
     @ExcelProperty(value = "打卡类型", converter = DictConvert.class)
     @DictFormat("attendance_type") // TODO 代码优化：建议设置到对应的 XXXDictTypeConstants 枚举类中
-    private String attendanceType;
+    private int attendanceType;
 
     @ExcelProperty(value = "打卡时间段", converter = DictConvert.class)
     @DictFormat("attendance_period") // TODO 代码优化：建议设置到对应的 XXXDictTypeConstants 枚举类中
@@ -58,12 +53,12 @@ public class AttendanceExcelVO {
     private String leaveHandover;
 
     @ExcelProperty("创建者")
-    private String createBy;
+    private String creator;
 
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
     @ExcelProperty("更新者")
-    private String updateBy;
+    private String updater;
 
 }

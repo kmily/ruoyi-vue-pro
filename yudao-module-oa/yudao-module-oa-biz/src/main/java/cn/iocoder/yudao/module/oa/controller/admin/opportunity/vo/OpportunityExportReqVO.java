@@ -16,6 +16,6 @@ public class OpportunityExportReqVO {
     private String status;
 
     @Schema(description = "创建者")
-    private String createBy;
+    private String creator;
 
 }

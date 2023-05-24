@@ -9,8 +9,8 @@
             :value="dict.value" />
         </el-select>
       </el-form-item>
-      <el-form-item label="创建者" prop="createBy">
-        <el-input v-model="queryParams.createBy" placeholder="请输入创建者" clearable @keyup.enter.native="handleQuery" />
+      <el-form-item label="创建者" prop="creator">
+        <el-input v-model="queryParams.creator" placeholder="请输入创建者" clearable @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>

@@ -1,13 +1,10 @@
 package cn.iocoder.yudao.module.oa.controller.admin.product.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import javax.validation.constraints.*;
 
 /**
 * 产品 Base VO，提供给添加、修改、详细的子 VO 使用

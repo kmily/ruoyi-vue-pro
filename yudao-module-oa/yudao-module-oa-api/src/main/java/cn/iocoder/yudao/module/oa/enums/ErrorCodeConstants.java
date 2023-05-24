@@ -19,6 +19,7 @@ public interface ErrorCodeConstants {
     ErrorCode AUTH_WE_CHAT_MINI_APP_PHONE_CODE_ERROR = new ErrorCode(1005000008, "获得手机号失败");
 
 
+    // ============OA模块 1005001000 =============
     ErrorCode ATTENDANCE_NOT_EXISTS = new ErrorCode(1005001000, "考勤打卡不存在");
     ErrorCode EXPENSES_NOT_EXISTS = new ErrorCode(1005001001, "报销申请不存在");
     ErrorCode EXPENSES_DETAIL_NOT_EXISTS = new ErrorCode(1005001002, "报销明细不存在");
@@ -28,4 +29,9 @@ public interface ErrorCodeConstants {
     ErrorCode PROJECT_IMPL_LOG_NOT_EXISTS = new ErrorCode(1005001006, "工程日志列表不存在");
     ErrorCode OPPORTUNITY_NOT_EXISTS = new ErrorCode(1005001007, "商机不存在");
     ErrorCode FEEDBACK_NOT_EXISTS = new ErrorCode(1005001008, "产品反馈不存在");
+    ErrorCode CUSTOMER_NOT_EXISTS = new ErrorCode(1005001009, "客户不存在");
+    ErrorCode SIGN_REQ_NOT_EXISTS = new ErrorCode(1005001010, "注册申请不存在");
+    ErrorCode PRODUCT_NOT_EXISTS = new ErrorCode(1005001011, "产品不存在");
+    ErrorCode PRODUCT_CODE_EXISTS = new ErrorCode(1005001012, "产品编码已存在");
+
 }

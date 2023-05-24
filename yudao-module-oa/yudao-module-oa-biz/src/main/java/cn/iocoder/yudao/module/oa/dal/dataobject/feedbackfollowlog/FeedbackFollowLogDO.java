@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.oa.dal.dataobject.feedbackfollowlog;
 
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
 
 /**
  * 反馈跟进日志 DO
@@ -38,10 +37,10 @@ public class FeedbackFollowLogDO extends BaseDO {
     /**
      * 创建者
      */
-    private String createBy;
+    private String creator;
     /**
      * 更新者
      */
-    private String updateBy;
+    private String updater;
 
 }

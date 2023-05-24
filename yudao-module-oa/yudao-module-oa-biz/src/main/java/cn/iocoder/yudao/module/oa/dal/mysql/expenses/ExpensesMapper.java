@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.module.oa.dal.mysql.expenses;
 
-import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.oa.controller.admin.expenses.vo.ExpensesExportReqVO;
+import cn.iocoder.yudao.module.oa.controller.admin.expenses.vo.ExpensesPageReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.expenses.ExpensesDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.oa.controller.admin.expenses.vo.*;
+
+import java.util.List;
 
 /**
  * 报销申请 Mapper
@@ -22,7 +23,7 @@ public interface ExpensesMapper extends BaseMapperX<ExpensesDO> {
                 .eqIfPresent(ExpensesDO::getExpensesType, reqVO.getExpensesType())
                 .likeIfPresent(ExpensesDO::getExhibitName, reqVO.getExhibitName())
                 .eqIfPresent(ExpensesDO::getApprovalStatus, reqVO.getApprovalStatus())
-                .eqIfPresent(ExpensesDO::getCreateBy, reqVO.getCreateBy())
+                .eqIfPresent(ExpensesDO::getCreator, reqVO.getCreator())
                 .orderByDesc(ExpensesDO::getId));
     }
 
@@ -31,7 +32,7 @@ public interface ExpensesMapper extends BaseMapperX<ExpensesDO> {
                 .eqIfPresent(ExpensesDO::getExpensesType, reqVO.getExpensesType())
                 .likeIfPresent(ExpensesDO::getExhibitName, reqVO.getExhibitName())
                 .eqIfPresent(ExpensesDO::getApprovalStatus, reqVO.getApprovalStatus())
-                .eqIfPresent(ExpensesDO::getCreateBy, reqVO.getCreateBy())
+                .eqIfPresent(ExpensesDO::getCreator, reqVO.getCreator())
                 .orderByDesc(ExpensesDO::getId));
     }
 

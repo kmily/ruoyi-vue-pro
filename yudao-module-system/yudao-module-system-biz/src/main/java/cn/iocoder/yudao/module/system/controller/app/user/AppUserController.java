@@ -13,7 +13,6 @@ import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import cn.iocoder.yudao.module.system.service.user.AppUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,9 +42,6 @@ public class AppUserController {
     private AdminUserService userService;
     @Resource
     private DeptService deptService;
-
-    @Resource
-    private AppUserService appUserService;
 
     @GetMapping("/page")
     @Operation(summary = "获得用户分页列表")

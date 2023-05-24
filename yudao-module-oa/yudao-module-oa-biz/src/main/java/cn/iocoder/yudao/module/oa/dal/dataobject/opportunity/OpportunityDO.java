@@ -55,10 +55,10 @@ public class OpportunityDO extends BaseDO {
     /**
      * 创建者
      */
-    private String createBy;
+    private String creator;
     /**
      * 更新者
      */
-    private String updateBy;
+    private String updater;
 
 }

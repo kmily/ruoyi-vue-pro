@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.oa.controller.admin.product.vo.*;
 import cn.iocoder.yudao.module.oa.convert.product.ProductConvert;
 import cn.iocoder.yudao.module.oa.service.product.ProductService;
-import cn.iocoder.yudao.module.system.dal.dataobject.product.ProductDO;
+import cn.iocoder.yudao.module.oa.dal.dataobject.product.ProductDO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,7 +27,7 @@ import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.E
 
 @Tag(name = "管理后台 - 产品")
 @RestController
-@RequestMapping("/system/product")
+@RequestMapping("/oa/product")
 @Validated
 public class ProductController {
 
@@ -36,14 +36,14 @@ public class ProductController {
 
     @PostMapping("/create")
     @Operation(summary = "创建产品")
-    @PreAuthorize("@ss.hasPermission('system:product:create')")
+    @PreAuthorize("@ss.hasPermission('oa:product:create')")
     public CommonResult<Long> createProduct(@Valid @RequestBody ProductCreateReqVO createReqVO) {
         return success(productService.createProduct(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新产品")
-    @PreAuthorize("@ss.hasPermission('system:product:update')")
+    @PreAuthorize("@ss.hasPermission('oa:product:update')")
     public CommonResult<Boolean> updateProduct(@Valid @RequestBody ProductUpdateReqVO updateReqVO) {
         productService.updateProduct(updateReqVO);
         return success(true);
@@ -52,7 +52,7 @@ public class ProductController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除产品")
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('system:product:delete')")
+    @PreAuthorize("@ss.hasPermission('oa:product:delete')")
     public CommonResult<Boolean> deleteProduct(@RequestParam("id") Long id) {
         productService.deleteProduct(id);
         return success(true);
@@ -61,7 +61,7 @@ public class ProductController {
     @GetMapping("/get")
     @Operation(summary = "获得产品")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('system:product:query')")
+    @PreAuthorize("@ss.hasPermission('oa:product:query')")
     public CommonResult<ProductRespVO> getProduct(@RequestParam("id") Long id) {
         ProductDO product = productService.getProduct(id);
         return success(ProductConvert.INSTANCE.convert(product));
@@ -70,7 +70,7 @@ public class ProductController {
     @GetMapping("/list")
     @Operation(summary = "获得产品列表")
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthorize("@ss.hasPermission('system:product:query')")
+    @PreAuthorize("@ss.hasPermission('oa:product:query')")
     public CommonResult<List<ProductRespVO>> getProductList(@RequestParam("ids") Collection<Long> ids) {
         List<ProductDO> list = productService.getProductList(ids);
         return success(ProductConvert.INSTANCE.convertList(list));
@@ -78,7 +78,7 @@ public class ProductController {
 
     @GetMapping("/page")
     @Operation(summary = "获得产品分页")
-    @PreAuthorize("@ss.hasPermission('system:product:query')")
+    @PreAuthorize("@ss.hasPermission('oa:product:query')")
     public CommonResult<PageResult<ProductRespVO>> getProductPage(@Valid ProductPageReqVO pageVO) {
         PageResult<ProductDO> pageResult = productService.getProductPage(pageVO);
         return success(ProductConvert.INSTANCE.convertPage(pageResult));
@@ -86,7 +86,7 @@ public class ProductController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出产品 Excel")
-    @PreAuthorize("@ss.hasPermission('system:product:export')")
+    @PreAuthorize("@ss.hasPermission('oa:product:export')")
     @OperateLog(type = EXPORT)
     public void exportProductExcel(@Valid ProductExportReqVO exportReqVO,
               HttpServletResponse response) throws IOException {

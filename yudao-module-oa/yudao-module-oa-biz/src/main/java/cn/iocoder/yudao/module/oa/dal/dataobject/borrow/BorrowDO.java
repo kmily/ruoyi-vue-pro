@@ -1,13 +1,12 @@
 package cn.iocoder.yudao.module.oa.dal.dataobject.borrow;
 
-import lombok.*;
-import java.util.*;
-import java.math.BigDecimal;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
+
+import java.math.BigDecimal;
 
 /**
  * 借支申请 DO
@@ -56,10 +55,10 @@ public class BorrowDO extends BaseDO {
     /**
      * 创建者
      */
-    private String createBy;
+    private String creator;
     /**
      * 更新者
      */
-    private String updateBy;
+    private String updater;
 
 }

@@ -1,12 +1,15 @@
 package cn.iocoder.yudao.module.oa.dal.dataobject.attendance;
 
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.oa.enums.attendance.AttendancePeriodEnum;
 import cn.iocoder.yudao.module.oa.enums.attendance.AttendanceTypeEnum;
 import cn.iocoder.yudao.module.oa.enums.attendance.VisitCustomerTypeEnum;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+
 import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
  * 考勤打卡 DO
@@ -33,7 +36,7 @@ public class AttendanceDO extends BaseDO {
      *
      * 枚举 {@link AttendancePeriodEnum 对应的类}
      */
-    private String attendanceType;
+    private int attendanceType;
     /**
      * 打卡时间段
      *
@@ -77,10 +80,10 @@ public class AttendanceDO extends BaseDO {
     /**
      * 创建者
      */
-    private String createBy;
+    private String creator;
     /**
      * 更新者
      */
-    private String updateBy;
+    private String updater;
 
 }

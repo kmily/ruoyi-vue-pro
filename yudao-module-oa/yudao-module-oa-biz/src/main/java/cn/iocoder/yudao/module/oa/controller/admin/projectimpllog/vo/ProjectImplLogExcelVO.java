@@ -33,7 +33,7 @@ public class ProjectImplLogExcelVO {
     private String implStatus;
 
     @ExcelProperty("创建者")
-    private String createBy;
+    private String creator;
 
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;

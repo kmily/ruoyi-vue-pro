@@ -17,6 +17,6 @@ public class ContractRespVO extends ContractBaseVO {
     private Boolean approvalStatus;
 
     @Schema(description = "创建者")
-    private String createBy;
+    private String creator;
 
 }

@@ -1,32 +1,27 @@
 package cn.iocoder.yudao.module.oa.service.projectimpllog;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
-import javax.annotation.Resource;
-
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-
-import cn.iocoder.yudao.module.oa.controller.admin.projectimpllog.vo.*;
+import cn.iocoder.yudao.module.oa.controller.admin.projectimpllog.vo.ProjectImplLogCreateReqVO;
+import cn.iocoder.yudao.module.oa.controller.admin.projectimpllog.vo.ProjectImplLogExportReqVO;
+import cn.iocoder.yudao.module.oa.controller.admin.projectimpllog.vo.ProjectImplLogPageReqVO;
+import cn.iocoder.yudao.module.oa.controller.admin.projectimpllog.vo.ProjectImplLogUpdateReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.projectimpllog.ProjectImplLogDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.projectimpllog.ProjectImplLogMapper;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import org.springframework.context.annotation.Import;
-import java.util.*;
-import java.time.LocalDateTime;
+import java.util.List;
 
-import static cn.hutool.core.util.RandomUtil.*;
-import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.*;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.PROJECT_IMPL_LOG_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
 * {@link ProjectImplLogServiceImpl} 的单元测试类
@@ -112,20 +107,20 @@ public class ProjectImplLogServiceImplTest extends BaseDbUnitTest {
        ProjectImplLogDO dbProjectImplLog = randomPojo(ProjectImplLogDO.class, o -> { // 等会查询到
            o.setContractId(null);
            o.setImplStatus(null);
-           o.setCreateBy(null);
+           o.setCreator(null);
        });
        projectImplLogMapper.insert(dbProjectImplLog);
        // 测试 contractId 不匹配
        projectImplLogMapper.insert(cloneIgnoreId(dbProjectImplLog, o -> o.setContractId(null)));
        // 测试 implStatus 不匹配
        projectImplLogMapper.insert(cloneIgnoreId(dbProjectImplLog, o -> o.setImplStatus(null)));
-       // 测试 createBy 不匹配
-       projectImplLogMapper.insert(cloneIgnoreId(dbProjectImplLog, o -> o.setCreateBy(null)));
+       // 测试 creator 不匹配
+       projectImplLogMapper.insert(cloneIgnoreId(dbProjectImplLog, o -> o.setCreator(null)));
        // 准备参数
        ProjectImplLogPageReqVO reqVO = new ProjectImplLogPageReqVO();
        reqVO.setContractId(null);
        reqVO.setImplStatus(null);
-       reqVO.setCreateBy(null);
+       reqVO.setCreator(null);
 
        // 调用
        PageResult<ProjectImplLogDO> pageResult = projectImplLogService.getProjectImplLogPage(reqVO);
@@ -142,20 +137,20 @@ public class ProjectImplLogServiceImplTest extends BaseDbUnitTest {
        ProjectImplLogDO dbProjectImplLog = randomPojo(ProjectImplLogDO.class, o -> { // 等会查询到
            o.setContractId(null);
            o.setImplStatus(null);
-           o.setCreateBy(null);
+           o.setCreator(null);
        });
        projectImplLogMapper.insert(dbProjectImplLog);
        // 测试 contractId 不匹配
        projectImplLogMapper.insert(cloneIgnoreId(dbProjectImplLog, o -> o.setContractId(null)));
        // 测试 implStatus 不匹配
        projectImplLogMapper.insert(cloneIgnoreId(dbProjectImplLog, o -> o.setImplStatus(null)));
-       // 测试 createBy 不匹配
-       projectImplLogMapper.insert(cloneIgnoreId(dbProjectImplLog, o -> o.setCreateBy(null)));
+       // 测试 creator 不匹配
+       projectImplLogMapper.insert(cloneIgnoreId(dbProjectImplLog, o -> o.setCreator(null)));
        // 准备参数
        ProjectImplLogExportReqVO reqVO = new ProjectImplLogExportReqVO();
        reqVO.setContractId(null);
        reqVO.setImplStatus(null);
-       reqVO.setCreateBy(null);
+       reqVO.setCreator(null);
 
        // 调用
        List<ProjectImplLogDO> list = projectImplLogService.getProjectImplLogList(reqVO);

@@ -1,31 +1,27 @@
 package cn.iocoder.yudao.module.oa.service.attendance;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
-import javax.annotation.Resource;
-
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-
-import cn.iocoder.yudao.module.oa.controller.admin.attendance.vo.*;
+import cn.iocoder.yudao.module.oa.controller.admin.attendance.vo.AttendanceCreateReqVO;
+import cn.iocoder.yudao.module.oa.controller.admin.attendance.vo.AttendanceExportReqVO;
+import cn.iocoder.yudao.module.oa.controller.admin.attendance.vo.AttendancePageReqVO;
+import cn.iocoder.yudao.module.oa.controller.admin.attendance.vo.AttendanceUpdateReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.attendance.AttendanceDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.attendance.AttendanceMapper;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import org.springframework.context.annotation.Import;
-import java.util.*;
-import java.time.LocalDateTime;
+import java.util.List;
 
-import static cn.hutool.core.util.RandomUtil.*;
-import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.*;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.ATTENDANCE_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
 * {@link AttendanceServiceImpl} 的单元测试类
@@ -109,18 +105,18 @@ public class AttendanceServiceImplTest extends BaseDbUnitTest {
     public void testGetAttendancePage() {
        // mock 数据
        AttendanceDO dbAttendance = randomPojo(AttendanceDO.class, o -> { // 等会查询到
-           o.setAttendanceType(null);
-           o.setCreateBy(null);
+           o.setAttendanceType(1);
+           o.setCreator(null);
        });
        attendanceMapper.insert(dbAttendance);
        // 测试 attendanceType 不匹配
-       attendanceMapper.insert(cloneIgnoreId(dbAttendance, o -> o.setAttendanceType(null)));
-       // 测试 createBy 不匹配
-       attendanceMapper.insert(cloneIgnoreId(dbAttendance, o -> o.setCreateBy(null)));
+       attendanceMapper.insert(cloneIgnoreId(dbAttendance, o -> o.setAttendanceType(100)));
+       // 测试 creator 不匹配
+       attendanceMapper.insert(cloneIgnoreId(dbAttendance, o -> o.setCreator(null)));
        // 准备参数
        AttendancePageReqVO reqVO = new AttendancePageReqVO();
-       reqVO.setAttendanceType(null);
-       reqVO.setCreateBy(null);
+       reqVO.setAttendanceType(1);
+       reqVO.setCreator(null);
 
        // 调用
        PageResult<AttendanceDO> pageResult = attendanceService.getAttendancePage(reqVO);
@@ -135,18 +131,18 @@ public class AttendanceServiceImplTest extends BaseDbUnitTest {
     public void testGetAttendanceList() {
        // mock 数据
        AttendanceDO dbAttendance = randomPojo(AttendanceDO.class, o -> { // 等会查询到
-           o.setAttendanceType(null);
-           o.setCreateBy(null);
+           o.setAttendanceType(1);
+           o.setCreator(null);
        });
        attendanceMapper.insert(dbAttendance);
        // 测试 attendanceType 不匹配
-       attendanceMapper.insert(cloneIgnoreId(dbAttendance, o -> o.setAttendanceType(null)));
-       // 测试 createBy 不匹配
-       attendanceMapper.insert(cloneIgnoreId(dbAttendance, o -> o.setCreateBy(null)));
+       attendanceMapper.insert(cloneIgnoreId(dbAttendance, o -> o.setAttendanceType(1000)));
+       // 测试 creator 不匹配
+       attendanceMapper.insert(cloneIgnoreId(dbAttendance, o -> o.setCreator(null)));
        // 准备参数
        AttendanceExportReqVO reqVO = new AttendanceExportReqVO();
-       reqVO.setAttendanceType(null);
-       reqVO.setCreateBy(null);
+       reqVO.setAttendanceType(1);
+       reqVO.setCreator(null);
 
        // 调用
        List<AttendanceDO> list = attendanceService.getAttendanceList(reqVO);

@@ -1,14 +1,13 @@
 package cn.iocoder.yudao.module.oa.controller.admin.attendance.vo;
 
+import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
+import cn.iocoder.yudao.module.oa.enums.DictTypeConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import javax.validation.constraints.*;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -21,7 +20,8 @@ public class AttendanceBaseVO {
 
     @Schema(description = "打卡类型", required = true, example = "1")
     @NotNull(message = "打卡类型不能为空")
-    private String attendanceType;
+    @DictFormat(DictTypeConstants.OA_ATTENDANCE_TYPE)
+    private int attendanceType;
 
     @Schema(description = "打卡时间段")
     private String attendancePeriod;
@@ -53,9 +53,9 @@ public class AttendanceBaseVO {
     private String leaveHandover;
 
     @Schema(description = "创建者")
-    private String createBy;
+    private String creator;
 
     @Schema(description = "更新者")
-    private String updateBy;
+    private String updater;
 
 }

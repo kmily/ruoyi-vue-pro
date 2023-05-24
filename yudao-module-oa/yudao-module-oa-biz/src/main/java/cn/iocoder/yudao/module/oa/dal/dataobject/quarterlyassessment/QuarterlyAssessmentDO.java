@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.oa.dal.dataobject.quarterlyassessment;
 
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
 
 /**
  * 季度考核 DO
@@ -58,10 +57,10 @@ public class QuarterlyAssessmentDO extends BaseDO {
     /**
      * 创建者
      */
-    private String createBy;
+    private String creator;
     /**
      * 更新者
      */
-    private String updateBy;
+    private String updater;
 
 }

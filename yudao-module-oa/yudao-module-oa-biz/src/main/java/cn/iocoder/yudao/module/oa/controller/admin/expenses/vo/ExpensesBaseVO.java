@@ -59,9 +59,9 @@ public class ExpensesBaseVO {
     private String remark;
 
     @Schema(description = "创建者")
-    private String createBy;
+    private String creator;
 
     @Schema(description = "更新者")
-    private String updateBy;
+    private String updater;
 
 }

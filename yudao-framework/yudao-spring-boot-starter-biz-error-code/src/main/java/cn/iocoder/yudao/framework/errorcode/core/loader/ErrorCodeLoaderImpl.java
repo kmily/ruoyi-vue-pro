@@ -27,7 +27,7 @@ public class ErrorCodeLoaderImpl implements ErrorCodeLoader {
     /**
      * 刷新错误码的频率，单位：毫秒
      */
-    private static final int REFRESH_ERROR_CODE_PERIOD = 60 * 1000;
+    private static final int REFRESH_ERROR_CODE_PERIOD = 10 * 1000;
 
     /**
      * 应用分组
@@ -55,6 +55,7 @@ public class ErrorCodeLoaderImpl implements ErrorCodeLoader {
 
     private void loadErrorCodes0() {
         // 加载错误码
+        log.info("加载错误码loadErrorCodes0");
         List<ErrorCodeRespDTO> errorCodeRespDTOs = errorCodeApi.getErrorCodeList(applicationName, maxUpdateTime);
         if (CollUtil.isEmpty(errorCodeRespDTOs)) {
             return;

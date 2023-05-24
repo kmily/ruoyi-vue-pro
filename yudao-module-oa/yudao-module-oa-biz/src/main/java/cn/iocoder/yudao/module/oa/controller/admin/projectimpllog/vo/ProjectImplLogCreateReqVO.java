@@ -12,6 +12,6 @@ import javax.validation.constraints.*;
 public class ProjectImplLogCreateReqVO extends ProjectImplLogBaseVO {
 
     @Schema(description = "更新者")
-    private String updateBy;
+    private String updater;
 
 }

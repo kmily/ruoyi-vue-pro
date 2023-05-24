@@ -61,12 +61,12 @@ public class ExpensesExcelVO {
     private String remark;
 
     @ExcelProperty("创建者")
-    private String createBy;
+    private String creator;
 
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
     @ExcelProperty("更新者")
-    private String updateBy;
+    private String updater;
 
 }

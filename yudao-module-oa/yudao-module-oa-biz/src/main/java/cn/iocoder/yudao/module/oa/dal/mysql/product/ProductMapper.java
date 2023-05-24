@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.oa.controller.admin.product.vo.ProductExportReqVO;
 import cn.iocoder.yudao.module.oa.controller.admin.product.vo.ProductPageReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.product.ProductDO;
+import cn.iocoder.yudao.module.oa.dal.dataobject.product.ProductDO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -23,8 +23,6 @@ public interface ProductMapper extends BaseMapperX<ProductDO> {
                 .eqIfPresent(ProductDO::getProductCode, reqVO.getProductCode())
                 .eqIfPresent(ProductDO::getProductModel, reqVO.getProductModel())
                 .eqIfPresent(ProductDO::getProductType, reqVO.getProductType())
-                .eqIfPresent(ProductDO::getCreator, reqVO.getCreator())
-                .betweenIfPresent(ProductDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(ProductDO::getId));
     }
 
@@ -38,4 +36,8 @@ public interface ProductMapper extends BaseMapperX<ProductDO> {
                 .orderByDesc(ProductDO::getId));
     }
 
+    default List<ProductDO> selectByCode(String code){
+        return selectList(new LambdaQueryWrapperX<ProductDO>()
+                .eq(ProductDO::getProductCode, code));
+    }
 }
