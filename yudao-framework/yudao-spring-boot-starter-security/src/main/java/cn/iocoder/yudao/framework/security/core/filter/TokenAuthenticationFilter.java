@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.security.core.filter;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
@@ -15,6 +16,7 @@ import cn.iocoder.yudao.module.system.api.oauth2.dto.OAuth2AccessTokenCheckRespD
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.util.AntPathMatcher;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -28,7 +30,6 @@ import java.io.IOException;
  *
  * @author 芋道源码
  */
-@RequiredArgsConstructor
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final SecurityProperties securityProperties;
@@ -36,30 +37,40 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     private final GlobalExceptionHandler globalExceptionHandler;
 
     private final OAuth2TokenApi oauth2TokenApi;
+    private final AntPathMatcher pathMatcher;
 
+    public TokenAuthenticationFilter(SecurityProperties securityProperties, GlobalExceptionHandler globalExceptionHandler, OAuth2TokenApi oauth2TokenApi) {
+        this.securityProperties = securityProperties;
+        this.globalExceptionHandler = globalExceptionHandler;
+        this.oauth2TokenApi = oauth2TokenApi;
+        this.pathMatcher=new AntPathMatcher();
+    }
     @Override
     @SuppressWarnings("NullableProblems")
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getTokenHeader());
-        if (StrUtil.isNotEmpty(token)) {
-            Integer userType = WebFrameworkUtils.getLoginUserType(request);
-            try {
-                // 1.1 基于 token 构建登录用户
-                LoginUser loginUser = buildLoginUserByToken(token, userType);
-                // 1.2 模拟 Login 功能，方便日常开发调试
-                if (loginUser == null) {
-                    loginUser = mockLoginUser(request, token, userType);
-                }
+        //白名单过滤
+        if(!isIgnoreUrl(request)) {
+            String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getTokenHeader());
+            if (StrUtil.isNotEmpty(token)) {
+                Integer userType = WebFrameworkUtils.getLoginUserType(request);
+                try {
+                    // 1.1 基于 token 构建登录用户
+                    LoginUser loginUser = buildLoginUserByToken(token, userType);
+                    // 1.2 模拟 Login 功能，方便日常开发调试
+                    if (loginUser == null) {
+                        loginUser = mockLoginUser(request, token, userType);
+                    }
 
-                // 2. 设置当前用户
-                if (loginUser != null) {
-                    SecurityFrameworkUtils.setLoginUser(loginUser, request);
+                    // 2. 设置当前用户
+                    if (loginUser != null) {
+                        SecurityFrameworkUtils.setLoginUser(loginUser, request);
+                    }
+                } catch (Throwable ex) {
+                    CommonResult<?> result = globalExceptionHandler.allExceptionHandler(request, ex);
+                    ServletUtils.writeJSON(response, result);
+                    return;
                 }
-            } catch (Throwable ex) {
-                CommonResult<?> result = globalExceptionHandler.allExceptionHandler(request, ex);
-                ServletUtils.writeJSON(response, result);
-                return;
             }
         }
 
@@ -109,5 +120,17 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         return new LoginUser().setId(userId).setUserType(userType)
                 .setTenantId(WebFrameworkUtils.getTenantId(request));
     }
-
+    private boolean isIgnoreUrl(HttpServletRequest request) {
+        // 快速匹配，保证性能
+        if (CollUtil.contains(securityProperties.getPermitAllUrls(), request.getRequestURI())) {
+            return true;
+        }
+        // 逐个 Ant 路径匹配
+        for (String url : securityProperties.getPermitAllUrls()) {
+            if (pathMatcher.match(url, request.getRequestURI())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
