@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.infra.service.codegen;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenCreateListReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenMockTypeRespVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenUpdateReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.CodegenTablePageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.DatabaseTableRespVO;
@@ -91,4 +92,27 @@ public interface CodegenService {
      */
     List<DatabaseTableRespVO> getDatabaseTableList(Long dataSourceConfigId, String name, String comment);
 
+    /**
+     * 伪造假的sql数据，每一条即是一个插入语句
+     *
+     * @param tableId 表单id
+     * @param num 数据量
+     * @return sql集合
+     */
+    String fakeData(Long tableId, Integer num);
+
+    /**
+     * 根据mock类型获取下拉列表
+     *
+     * @param mockType mock类型
+     * @return 下拉列表
+     */
+    List<String> getMockParamsByMockType(Integer mockType);
+
+    /**
+     * 获取模拟类型
+     *
+     * @return 模拟类型
+     */
+    List<CodegenMockTypeRespVO> getMockTypes();
 }

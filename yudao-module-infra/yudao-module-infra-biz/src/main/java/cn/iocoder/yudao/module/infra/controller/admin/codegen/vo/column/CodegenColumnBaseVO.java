@@ -6,9 +6,9 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 
 /**
-* 代码生成字段定义 Base VO，提供给添加、修改、详细的子 VO 使用
-* 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
-*/
+ * 代码生成字段定义 Base VO，提供给添加、修改、详细的子 VO 使用
+ * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
+ */
 @Data
 public class CodegenColumnBaseVO {
 
@@ -57,6 +57,15 @@ public class CodegenColumnBaseVO {
 
     @Schema(description = "数据示例", example = "1024")
     private String example;
+
+    @Schema(description = "数据模拟类型", example = "1")
+    private Integer mockType;
+
+    @Schema(description = "模拟参数", example = "1")
+    private String mockParams;
+
+    @Schema(description = "默认值", example = "默认值")
+    private String defaultValue;
 
     @Schema(description = "是否为 Create 创建操作的字段", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     @NotNull(message = "是否为 Create 创建操作的字段不能为空")
