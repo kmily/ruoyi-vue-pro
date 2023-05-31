@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.product.controller.admin.sku.vo;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,11 +36,6 @@ public class ProductSkuBaseVO {
     @NotNull(message = "图片地址不能为空")
     private String picUrl;
 
-    @Schema(description = "SKU 状态", required = true, example = "1")
-    @NotNull(message = "SKU 状态不能为空")
-    @InEnum(CommonStatusEnum.class)
-    private Integer status;
-
     @Schema(description = "库存", required = true, example = "1")
     @NotNull(message = "库存不能为空")
     private Integer stock;
@@ -50,26 +43,44 @@ public class ProductSkuBaseVO {
     @Schema(description = "预警预存", example = "1")
     private Integer warnStock;
 
-    @Schema(description = "商品重量", example = "1") // 单位：kg 千克
+    @Schema(description = "商品重量,单位：kg 千克", example = "1")
     private Double weight;
 
-    @Schema(description = "商品体积", example = "1024") // 单位：m^3 平米
+    @Schema(description = "商品体积,单位：m^3 平米", example = "1024")
     private Double volume;
 
-    @Schema(description = "商品属性")
+    @Schema(description = "一级分销的佣金，单位：分", example = "1024")
+    private Integer subCommissionFirstPrice;
+
+    @Schema(description = "二级分销的佣金，单位：分", example = "1024")
+    private Integer subCommissionSecondPrice;
+
+    // TODO @puhui999：这里要写 swagger 注解哈
+    /**
+     * 商品属性
+     */
     @Data
-    @AllArgsConstructor
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class Property {
 
-        @Schema(description = "属性编号", required = true, example = "1")
-        @NotNull(message = "属性编号不能为空")
+        /**
+         * 属性编号
+         */
         private Long propertyId;
+        /**
+         * 属性名字
+         */
+        private String propertyName;
 
-        @Schema(description = "属性值编号", required = true, example = "1024")
-        @NotNull(message = "属性值编号不能为空")
+        /**
+         * 属性值编号
+         */
         private Long valueId;
+        /**
+         * 属性值名字
+         */
+        private String valueName;
 
     }
-
 }

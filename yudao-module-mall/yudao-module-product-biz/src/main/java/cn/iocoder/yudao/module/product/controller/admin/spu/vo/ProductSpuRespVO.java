@@ -7,34 +7,41 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
+/**
+ * 商品 SPU Response VO
+ * TODO 移除ProductSpuPageRespVO相关应用跟换为ProductSpuRespVO已继承ProductSpuBaseVO 补全表格展示所需属性
+ * @author HUIHUI
+ */
 @Schema(description = "管理后台 - 商品 SPU Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ProductSpuRespVO extends ProductSpuBaseVO {
 
-    @Schema(description = "主键", required = true, example = "1")
+    // TODO @puhui999：swagger 的 required 和 example 写下
+
+    @Schema(description = "spuId")
     private Long id;
 
-    @Schema(description = "创建时间")
-    private LocalDateTime createTime;
+    @Schema(description = "商品价格")
+    private Integer price;
 
-    // ========== SKU 相关字段 =========
-
-    @Schema(description = "库存", required = true, example = "true")
-    private Integer totalStock;
-
-    @Schema(description = " 最小价格，单位使用：分", required = true, example = "1024")
-    private Integer minPrice;
-
-    @Schema(description = "最大价格，单位使用：分", required = true, example = "1024")
-    private Integer maxPrice;
-
-    @Schema(description = "商品销量", example = "1024")
+    @Schema(description = "商品销量")
     private Integer salesCount;
 
-    // ========== 统计相关字段 =========
+    @Schema(description = "市场价，单位使用：分")
+    private Integer marketPrice;
 
-    @Schema(description = "点击量", example = "1024")
-    private Integer clickCount;
+    @Schema(description = "成本价，单位使用：分")
+    private Integer costPrice;
+
+    @Schema(description = "商品库存")
+    private Integer stock;
+
+    @Schema(description = "商品创建时间")
+    private LocalDateTime createTime;
+
+    @Schema(description = "商品状态")
+    private Integer status;
+
 }

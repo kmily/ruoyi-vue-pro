@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.service.property;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.ProductPropertyCreateReqVO;
@@ -67,6 +68,7 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         // 更新
         ProductPropertyDO updateObj = ProductPropertyConvert.INSTANCE.convert(updateReqVO);
         productPropertyMapper.updateById(updateObj);
+        // TODO 芋艿：更新时，需要看看 sku 表
     }
 
     @Override
@@ -92,6 +94,10 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
 
     @Override
     public List<ProductPropertyDO> getPropertyList(ProductPropertyListReqVO listReqVO) {
+        // 增加使用属性 id 查询
+        if (CollUtil.isNotEmpty(listReqVO.getPropertyIds())){
+            return productPropertyMapper.selectBatchIds(listReqVO.getPropertyIds());
+        }
         return productPropertyMapper.selectList(listReqVO);
     }
 

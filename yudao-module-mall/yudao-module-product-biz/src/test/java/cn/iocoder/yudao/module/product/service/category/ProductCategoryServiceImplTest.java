@@ -18,8 +18,9 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEq
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
-import static cn.iocoder.yudao.module.product.dal.dataobject.category.ProductCategoryDO.PARENT_ID_NULL;
+
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.CATEGORY_NOT_EXISTS;
+import static cn.iocoder.yudao.module.product.enums.ProductConstants.PARENT_ID_NULL;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -39,10 +40,7 @@ public class ProductCategoryServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateCategory_success() {
         // 准备参数
-        ProductCategoryCreateReqVO reqVO = randomPojo(ProductCategoryCreateReqVO.class,o -> {
-            // 设置PC端图片可为空
-            o.setBigPicUrl(null);
-        });
+        ProductCategoryCreateReqVO reqVO = randomPojo(ProductCategoryCreateReqVO.class);
 
         // mock 父类
         ProductCategoryDO parentProductCategory = randomPojo(ProductCategoryDO.class, o -> {

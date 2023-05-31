@@ -9,10 +9,6 @@ import lombok.*;
 /**
  * 商品分类 DO
  *
- * 商品分类一共两类：
- * 1）一级分类：{@link #parentId} 等于 0
- * 2）二级 + 三级分类：{@link #parentId} 不等于 0
- *
  * @author 芋道源码
  */
 @TableName("product_category")
@@ -23,12 +19,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductCategoryDO extends BaseDO {
-
-    /**
-     * 父分类编号 - 根分类
-     */
-    public static final Long PARENT_ID_NULL = 0L;
-
     /**
      * 分类编号
      */
@@ -43,25 +33,26 @@ public class ProductCategoryDO extends BaseDO {
      */
     private String name;
     /**
-     * 分类图片
+     * 移动端分类图
      *
-     * 一级分类：推荐 200 x 100 分辨率
-     * 二级 + 三级分类：推荐 100 x 100 分辨率
+     * 建议 180*180 分辨率
      */
     private String picUrl;
+    /**
+     * PC 端分类图
+     *
+     * 建议 468*340 分辨率
+     */
+    private String bigPicUrl;
     /**
      * 分类排序
      */
     private Integer sort;
     /**
      * 开启状态
-     * <p>
+     *
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
-    /**
-     * PC端分类图
-     */
-    private String bigPicUrl;
 
 }
