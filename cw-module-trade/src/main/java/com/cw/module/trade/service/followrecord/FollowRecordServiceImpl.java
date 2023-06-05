@@ -5,6 +5,8 @@ import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
+
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.cw.module.trade.controller.admin.followrecord.vo.*;
 import com.cw.module.trade.dal.dataobject.followrecord.FollowRecordDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -55,7 +57,7 @@ public class FollowRecordServiceImpl implements FollowRecordService {
 
     private void validateFollowRecordExists(Long id) {
         if (followRecordMapper.selectById(id) == null) {
-            throw exception(FOLLOW_RECORD_NOT_EXISTS);
+//            throw exception(FOLLOW_RECORD_NOT_EXISTS);
         }
     }
 
@@ -79,4 +81,9 @@ public class FollowRecordServiceImpl implements FollowRecordService {
         return followRecordMapper.selectList(exportReqVO);
     }
 
+    @Override
+    public List<FollowRecordDO> listFollowRecord(Long thirdOrderId) {
+        return followRecordMapper.selectList(Wrappers.lambdaQuery(
+                new FollowRecordDO().setFollowThridOrderId(thirdOrderId)));
+    }
 }

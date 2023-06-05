@@ -22,7 +22,6 @@ public interface NotifyMsgMapper extends BaseMapperX<NotifyMsgDO> {
                 .betweenIfPresent(NotifyMsgDO::getCreateTime, reqVO.getCreateTime())
                 .betweenIfPresent(NotifyMsgDO::getAcceptTime, reqVO.getAcceptTime())
                 .eqIfPresent(NotifyMsgDO::getAcceptInfo, reqVO.getAcceptInfo())
-                .eqIfPresent(NotifyMsgDO::getTradeAccount, reqVO.getTradeAccount())
                 .orderByDesc(NotifyMsgDO::getId));
     }
 
@@ -31,7 +30,6 @@ public interface NotifyMsgMapper extends BaseMapperX<NotifyMsgDO> {
                 .betweenIfPresent(NotifyMsgDO::getCreateTime, reqVO.getCreateTime())
                 .betweenIfPresent(NotifyMsgDO::getAcceptTime, reqVO.getAcceptTime())
                 .eqIfPresent(NotifyMsgDO::getAcceptInfo, reqVO.getAcceptInfo())
-                .eqIfPresent(NotifyMsgDO::getTradeAccount, reqVO.getTradeAccount())
                 .orderByDesc(NotifyMsgDO::getId));
     }
 

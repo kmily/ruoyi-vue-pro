@@ -55,7 +55,7 @@ public class NotifyMsgServiceImpl implements NotifyMsgService {
 
     private void validateNotifyMsgExists(Long id) {
         if (notifyMsgMapper.selectById(id) == null) {
-            throw exception(NOTIFY_MSG_NOT_EXISTS);
+//            throw exception(NOTIFY_MSG_NOT_EXISTS);
         }
     }
 

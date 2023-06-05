@@ -33,5 +33,8 @@ public class AccountBaseVO {
     
     /** 关联账号 */
     private Long followAccount;
+    
+    /** 每日凌晨余额，为了计算每日亏损是否超标 */
+    private String zeroBalance;
 
 }

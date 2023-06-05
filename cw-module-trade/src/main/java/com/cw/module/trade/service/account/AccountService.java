@@ -83,4 +83,11 @@ public interface AccountService {
      */
     List<AccountDO> listMonitorAccount();
 
+    /**
+     * * 查找需要跟随的账号
+     * @date 2023年5月23日
+     * @author wuqiaoxin
+     */
+    List<AccountDO> listFollowAccount(Long accountId);
+
 }

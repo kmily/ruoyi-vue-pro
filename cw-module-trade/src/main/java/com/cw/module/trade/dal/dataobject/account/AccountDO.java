@@ -2,9 +2,17 @@ package com.cw.module.trade.dal.dataobject.account;
 
 import lombok.*;
 import java.util.*;
+
+import org.apache.logging.log4j.util.Strings;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.tb.utils.json.JsonUtil;
+
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
@@ -53,4 +61,36 @@ public class AccountDO extends BaseDO {
     
     /** 关联账号 */
     private Long followAccount;
+    
+    /** 每日凌晨余额，为了计算每日亏损是否超标 */
+    private String zeroBalance;
+    
+    public BigDecimal formatTypeBalance(String asset) {
+        BigDecimal assetBalance = new BigDecimal(0);
+        if(Strings.isBlank(asset) || Strings.isBlank(this.balance)) {
+            return assetBalance;
+        }
+        ArrayNode notifyBalance = JsonUtil.string2ArrayNode(this.balance);
+        for(JsonNode balance :  notifyBalance) {
+            if(asset.equals(balance.get("asset").asText())) {
+                return new BigDecimal(balance.get("balance").asText());
+            }
+        }
+        return assetBalance;
+    }
+    
+    public BigDecimal formatTypeAvailableBalance(String asset) {
+        BigDecimal assetBalance = new BigDecimal(0);
+        if(Strings.isBlank(asset) || Strings.isBlank(this.balance)) {
+            return assetBalance;
+        }
+        ArrayNode notifyBalance = JsonUtil.string2ArrayNode(this.balance);
+        for(JsonNode balance :  notifyBalance) {
+            if(asset.equals(balance.get("asset").asText())) {
+                return new BigDecimal(balance.get("withdrawAvailable").asText());
+            }
+        }
+        return assetBalance;
+    }
+    
 }

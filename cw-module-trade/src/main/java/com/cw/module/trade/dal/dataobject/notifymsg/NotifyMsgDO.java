@@ -1,12 +1,18 @@
 package com.cw.module.trade.dal.dataobject.notifymsg;
 
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
+import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * 账号通知记录 DO
@@ -31,7 +37,7 @@ public class NotifyMsgDO extends BaseDO {
     /**
      * 接受时间
      */
-    private LocalDateTime acceptTime;
+    private Date acceptTime;
     /**
      * 接受内容
      */
@@ -39,6 +45,6 @@ public class NotifyMsgDO extends BaseDO {
     /**
      * 关联交易账号
      */
-    private Long tradeAccount;
+    private Long accountId;
 
 }

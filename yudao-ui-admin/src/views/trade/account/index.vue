@@ -58,12 +58,12 @@
           <el-input v-model="form.appSecret" placeholder="请输入api访问秘钥" />
         </el-form-item>
         <el-form-item label="关联用户" prop="relateUser">
-          <el-select style="width:100%" v-model="form.relateUser" placeholder="请输入账号管理用户ID" >
+          <el-select style="width:100%" v-model="form.relateUser" placeholder="请输入账号关联用户ID" >
             <el-option v-for="item in sysUsers" :label="item.nickname" :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="跟随账号" prop="relateCfg">
-          <el-input v-model="relateCfg.relateAccount" placeholder="请输入账号管理用户ID" />
+          <el-input v-model="form.followAccount" placeholder="请输入跟随账号ID" />
         </el-form-item>
         <el-form-item label="跟随模式" prop="mode" >
           <el-select style="width:100%" v-model="relateCfg.mode" placeholder="请选择关联模式" >

@@ -8,9 +8,12 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.binance.client.RequestOptions;
 import com.binance.client.SyncRequestClient;
 import com.binance.client.model.enums.NewOrderRespType;
@@ -22,30 +25,47 @@ import com.cw.module.trade.controller.admin.account.vo.AccountCreateReqVO;
 import com.cw.module.trade.controller.admin.account.vo.AccountExportReqVO;
 import com.cw.module.trade.controller.admin.account.vo.AccountPageReqVO;
 import com.cw.module.trade.controller.admin.account.vo.AccountUpdateReqVO;
+import com.cw.module.trade.controller.admin.syncrecord.vo.SyncRecordCreateReqVO;
 import com.cw.module.trade.convert.account.AccountConvert;
 import com.cw.module.trade.dal.dataobject.account.AccountDO;
 import com.cw.module.trade.dal.mysql.account.AccountMapper;
+import com.cw.module.trade.handler.WebSocketHandlerFactory;
+import com.cw.module.trade.service.syncrecord.SyncRecordService;
+import com.tb.utils.NumberUtils;
 
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import lombok.extern.slf4j.Slf4j;
+import me.zhyd.oauth.log.Log;
 
 /**
  * 交易账号 Service 实现类
  *
  * @author chengjiale
  */
+@Slf4j
 @Service
 @Validated
 public class AccountServiceImpl implements AccountService {
 
     @Resource
     private AccountMapper accountMapper;
+    
+    @Autowired
+    private SyncRecordService syncRecordServiceImpl;
 
     @Override
     public Long createAccount(AccountCreateReqVO createReqVO) {
         // 插入
         AccountDO account = AccountConvert.INSTANCE.convert(createReqVO);
         accountMapper.insert(account);
+        
+        // 将新增账号添加到监听队列中去,并且同步主账户的交易对的杠杆倍率
+        WebSocketHandlerFactory.get().addHandler(account);
+        if(NumberUtils.gtz(account.getFollowAccount())) {
+            WebSocketHandlerFactory.get().syncAToBAccount(
+                    accountMapper.selectById(account.getFollowAccount()), account);
+        }
         // 返回
         return account.getId();
     }
@@ -55,8 +75,16 @@ public class AccountServiceImpl implements AccountService {
         // 校验存在
         validateAccountExists(updateReqVO.getId());
         // 更新
+        AccountDO originalAccount = accountMapper.selectById(updateReqVO.getId());
         AccountDO updateObj = AccountConvert.INSTANCE.convert(updateReqVO);
         accountMapper.updateById(updateObj);
+        
+        // 跟随账户变更后需要重新设置交易对的杠杆倍率
+        if(NumberUtils.gtz(updateReqVO.getFollowAccount()) &&
+                NumberUtils.equals(updateReqVO.getFollowAccount(), originalAccount.getFollowAccount())) {
+            WebSocketHandlerFactory.get().syncAToBAccount(
+                    accountMapper.selectById(updateReqVO.getFollowAccount()), originalAccount);
+        }
     }
 
     @Override
@@ -95,17 +123,43 @@ public class AccountServiceImpl implements AccountService {
     
     @Override
     public String syncBalance(Long accountId) {
-        AccountDO account = accountMapper.selectById(accountId);
-        RequestOptions options = new RequestOptions();
-        SyncRequestClient syncRequestClient = SyncRequestClient.create(account.getAppKey(), 
-                account.getAppSecret(), options);
-        String balance = JSONUtil.toJsonStr(syncRequestClient.getBalance());
-        account.setBalance(balance);
-        account.setLastBalanceQueryTime(System.currentTimeMillis());
-        accountMapper.updateById(account);
-        return balance;
+        if(NumberUtils.gtz(accountId)) {
+            AccountDO account = accountMapper.selectById(accountId);
+            return syncThirdBalance(account);
+        }
+        List<AccountDO> accounts = accountMapper.selectList();
+        for(AccountDO account : accounts) {
+            syncThirdBalance(account);
+        }
+        return "";
     }
 
+    private String syncThirdBalance(AccountDO account) {
+        try {
+            RequestOptions options = new RequestOptions();
+            SyncRequestClient syncRequestClient = SyncRequestClient.create(account.getAppKey(), 
+                    account.getAppSecret(), options);
+            String balance = JSONUtil.toJsonStr(syncRequestClient.getBalance());
+            account.setBalance(balance);
+            account.setLastBalanceQueryTime(System.currentTimeMillis());
+            accountMapper.updateById(account);
+            
+            // 保存同步记录
+            SyncRecordCreateReqVO syncRecord = new SyncRecordCreateReqVO();
+            syncRecord.setAccountId(account.getId());
+            syncRecord.setType("balance");
+            syncRecord.setThirdData(balance);
+            syncRecordServiceImpl.createSyncRecord(syncRecord);
+            
+            return balance;
+        } catch (Exception e) {
+            log.error("同步账号余额发生错误,账号：{}, 异常:{}", account, e);
+        }
+        return "";
+    }
+
+    
+    
     public Boolean buy(Long accountId) {
         RequestOptions options = new RequestOptions();
         AccountDO account = getAccount(accountId);
@@ -139,6 +193,10 @@ public class AccountServiceImpl implements AccountService {
         return accountMapper.listMonitorAccount();
     }
     
+    @Override
+    public List<AccountDO> listFollowAccount(Long accountId) {
+        return accountMapper.selectList(Wrappers.lambdaQuery(new AccountDO().setFollowAccount(accountId)));
+    }
     
     
 }

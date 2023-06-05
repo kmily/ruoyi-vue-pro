@@ -1,4 +1,4 @@
-package com.cw.module.trade.controller.admin.notifymsg.vo;
+package com.cw.module.trade.controller.admin.position.vo;
 
 import lombok.*;
 import java.util.*;
@@ -9,24 +9,26 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@Schema(description = "管理后台 - 账号通知记录分页 Request VO")
+@Schema(description = "管理后台 - 账户持仓信息分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class NotifyMsgPageReqVO extends PageParam {
+public class PositionPageReqVO extends PageParam {
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
-    @Schema(description = "接受时间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime[] acceptTime;
-
-    @Schema(description = "接受内容")
-    private String acceptInfo;
-
-    @Schema(description = "关联交易账号", example = "31122")
+    @Schema(description = "账户id", example = "2873")
     private Long accountId;
+
+    @Schema(description = "交易对")
+    private String symbol;
+
+    @Schema(description = "持仓数量")
+    private Object quantity;
+
+    @Schema(description = "第三方数据")
+    private String thirdData;
 
 }

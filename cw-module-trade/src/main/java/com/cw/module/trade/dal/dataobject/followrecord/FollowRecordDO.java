@@ -1,12 +1,18 @@
 package com.cw.module.trade.dal.dataobject.followrecord;
 
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
+import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * 账号跟随记录 DO
@@ -37,13 +43,21 @@ public class FollowRecordDO extends BaseDO {
      */
     private Long followAccount;
     /**
+     * 第三方订单id
+     */
+    private Long thirdOrderId;
+    /**
+     * 跟随第三方订单id
+     */
+    private Long followThridOrderId;
+    /**
      * 操作账号
      */
     private Long operateAccount;
     /**
      * 操作时间
      */
-    private LocalDateTime operateTime;
+    private Date operateTime;
     /**
      * 操作内容
      */

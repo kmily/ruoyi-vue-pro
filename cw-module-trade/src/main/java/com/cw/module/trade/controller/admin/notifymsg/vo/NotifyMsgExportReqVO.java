@@ -25,6 +25,6 @@ public class NotifyMsgExportReqVO {
     private String acceptInfo;
 
     @Schema(description = "关联交易账号", example = "31122")
-    private Long tradeAccount;
+    private Long accountId;
 
 }

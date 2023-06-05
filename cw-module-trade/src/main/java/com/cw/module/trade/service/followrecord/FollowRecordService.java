@@ -67,4 +67,11 @@ public interface FollowRecordService {
      */
     List<FollowRecordDO> getFollowRecordList(FollowRecordExportReqVO exportReqVO);
 
+    /**
+     * * 根据第三方订单号查找跟随订单
+     * @date 2023年5月25日
+     * @author wuqiaoxin
+     */
+    List<FollowRecordDO> listFollowRecord(Long thirdOrderId);
+
 }

@@ -1,21 +1,20 @@
-package com.cw.module.trade.controller.admin.notifymsg.vo;
+package com.cw.module.trade.controller.admin.position.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
-import java.time.LocalDateTime;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 
 /**
- * 账号通知记录 Excel VO
+ * 账户持仓信息 Excel VO
  *
  * @author chengjiale
  */
 @Data
-public class NotifyMsgExcelVO {
+public class PositionExcelVO {
 
     @ExcelProperty("主键ID")
     private Long id;
@@ -23,13 +22,16 @@ public class NotifyMsgExcelVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
-    @ExcelProperty("接受时间")
-    private LocalDateTime acceptTime;
-
-    @ExcelProperty("接受内容")
-    private String acceptInfo;
-
-    @ExcelProperty("关联交易账号")
+    @ExcelProperty("账户id")
     private Long accountId;
+
+    @ExcelProperty("交易对")
+    private String symbol;
+
+    @ExcelProperty("持仓数量")
+    private Object quantity;
+
+    @ExcelProperty("第三方数据")
+    private String thirdData;
 
 }

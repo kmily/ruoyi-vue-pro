@@ -1,15 +1,13 @@
 package com.cw.module.trade.controller.admin.followrecord.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import javax.validation.constraints.*;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+
+import java.util.Date;
+
 import org.springframework.format.annotation.DateTimeFormat;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
 /**
 * 账号跟随记录 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -23,13 +21,19 @@ public class FollowRecordBaseVO {
 
     @Schema(description = "跟随账号", example = "25533")
     private Long followAccount;
+    
+    @Schema(description = "第三方订单id", example = "25533")
+    private Long thirdOrderId;
+    
+    @Schema(description = "跟随第三方订单id", example = "25533")
+    private Long followThridOrderId;
 
     @Schema(description = "操作账号", example = "15154")
     private Long operateAccount;
 
     @Schema(description = "操作时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime operateTime;
+    private Date operateTime;
 
     @Schema(description = "操作内容")
     private String operateInfo;
