@@ -23,7 +23,7 @@ public class AppAuthSocialLoginReqVO {
     @NotNull(message = "社交平台的类型不能为空")
     private Integer type;
 
-    @Schema(description = "授权码", required = true, example = "1024")
+    @Schema(description = "授权码，小程序通过 wx.login 方法获得", required = true, example = "1024")
     @NotEmpty(message = "授权码不能为空")
     private String code;
 

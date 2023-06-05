@@ -65,6 +65,7 @@ public class AppAuthServiceImpl implements AppAuthService{
     @Override
     public AppAuthLoginRespVO login(AppAuthUsernamePasswordLoginReqVO reqVO) {
         AdminUserDO user = adminAuthService.authenticate(reqVO.getUsername(), reqVO.getPassword());
+
         // 创建 Token 令牌，记录登录日志
         return createTokenAfterLoginSuccess(user, user.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME);
     }
@@ -119,6 +120,7 @@ public class AppAuthServiceImpl implements AppAuthService{
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.AUTH_THIRD_LOGIN_NOT_BIND);
         }
 
+        log.info("socialLogin id:" + userId);
         AdminUserDO user = userService.getUser(userId);
         if(user == null){
             throw exception(USER_NOT_EXISTS);

@@ -55,7 +55,6 @@ public class ErrorCodeLoaderImpl implements ErrorCodeLoader {
 
     private void loadErrorCodes0() {
         // 加载错误码
-        log.info("加载错误码loadErrorCodes0");
         List<ErrorCodeRespDTO> errorCodeRespDTOs = errorCodeApi.getErrorCodeList(applicationName, maxUpdateTime);
         if (CollUtil.isEmpty(errorCodeRespDTOs)) {
             return;

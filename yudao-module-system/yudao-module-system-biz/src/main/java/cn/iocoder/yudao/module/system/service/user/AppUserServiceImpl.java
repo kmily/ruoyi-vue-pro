@@ -82,7 +82,7 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public AdminUserDO getUser(Long id) {
-        return null;
+        return adminUserMapper.selectById(id);
     }
 
     @Override

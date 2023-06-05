@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.oa.controller.app.attendance.vo;
+package cn.iocoder.yudao.module.oa.controller.app.attendance;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
