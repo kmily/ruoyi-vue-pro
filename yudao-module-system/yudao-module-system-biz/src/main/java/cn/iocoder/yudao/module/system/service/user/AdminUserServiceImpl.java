@@ -10,6 +10,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.datapermission.core.util.DataPermissionUtils;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
+import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
@@ -17,10 +18,12 @@ import cn.iocoder.yudao.module.system.convert.user.UserConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.UserPostDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.module.system.dal.mysql.dept.DeptMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.UserPostMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.user.AdminUserMapper;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
+import cn.iocoder.yudao.module.system.service.notice.NoticeService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import com.google.common.annotations.VisibleForTesting;
@@ -74,6 +77,12 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Resource
     private FileApi fileApi;
 
+    @Resource
+    private NoticeService noticeService;
+
+    @Resource
+    private DeptMapper deptMapper;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createUser(UserCreateReqVO reqVO) {
@@ -97,6 +106,8 @@ public class AdminUserServiceImpl implements AdminUserService {
             userPostMapper.insertBatch(convertList(user.getPostIds(),
                     postId -> new UserPostDO().setUserId(user.getId()).setPostId(postId)));
         }
+
+        addUserStateNotice(user);
         return user.getId();
     }
 
@@ -179,6 +190,29 @@ public class AdminUserServiceImpl implements AdminUserService {
         userMapper.updateById(updateObj);
     }
 
+    // 员工入职离职通知
+    public void addUserStateNotice(AdminUserDO userDO){
+        NoticeCreateReqVO reqVO;
+        reqVO = new NoticeCreateReqVO();
+        reqVO.setStatus(0);
+        reqVO.setType(1);
+        DeptDO deptDO = deptMapper.selectById(userDO.getDeptId());
+        if(deptDO == null) return;
+
+        String title;
+        String content;
+        if(userDO.getStatus() == CommonStatusEnum.ENABLE.getStatus()){
+            title = "员工 " + userDO.getUsername() + " 已入职 " + deptDO.getName();
+
+        }else {
+            title = "员工 " + userDO.getUsername() + " 已从 " + deptDO.getName() + " 离职";
+        }
+        content = "<p>" + title + "</p>";
+        reqVO.setTitle(title);
+        reqVO.setContent(content);
+        noticeService.createNotice(reqVO);
+    }
+
     @Override
     public void updateUserStatus(Long id, Integer status) {
         // 校验用户存在
@@ -188,6 +222,11 @@ public class AdminUserServiceImpl implements AdminUserService {
         updateObj.setId(id);
         updateObj.setStatus(status);
         userMapper.updateById(updateObj);
+
+        updateObj = userMapper.selectById(id);
+        if(updateObj != null){
+            addUserStateNotice(updateObj);
+        }
     }
 
     @Override
