@@ -24,10 +24,12 @@ import cn.iocoder.yudao.module.system.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import cn.iocoder.yudao.module.system.enums.oauth2.OAuth2ClientConstants;
+import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2TokenService;
 import cn.iocoder.yudao.module.system.service.user.AppUserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -37,6 +39,7 @@ import java.util.Objects;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_PASSWORD_FAILED;
 
 @Service
 @Slf4j
@@ -60,6 +63,8 @@ public class AppAuthServiceImpl implements AppAuthService{
     private AdminUserMapper userMapper;
     @Resource
     private AdminAuthService adminAuthService;
+    @Resource
+    private PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -150,15 +155,48 @@ public class AppAuthServiceImpl implements AppAuthService{
         // 创建 Token 令牌，记录登录日志
         return createTokenAfterLoginSuccess(user, user.getMobile(), LoginLogTypeEnum.LOGIN_SOCIAL);
     }
+    public AdminUserDO checkOldPassword(Long id, String oldPassword) {
+        AdminUserDO user = userMapper.selectById(id);
+        if (user == null) {
+            throw exception(USER_NOT_EXISTS);
+        }
+        // 参数：未加密密码，编码后的密码
+        if (!passwordEncoder.matches(oldPassword,user.getPassword())) {
+            throw exception(USER_PASSWORD_FAILED);
+        }
+        return user;
+    }
 
     @Override
     public void updatePassword(Long userId, AppAuthUpdatePasswordReqVO userReqVO) {
+        // 检验旧密码
+        AdminUserDO userDO = checkOldPassword(userId, userReqVO.getOldPassword());
 
+        // 更新用户密码
+        userMapper.updateById(AdminUserDO.builder().id(userDO.getId())
+                .password(passwordEncoder.encode(userReqVO.getPassword())).build());
+    }
+
+    public AdminUserDO checkUserIfExists(String mobile) {
+        AdminUserDO user = userMapper.selectByMobile(mobile);
+        if (user == null) {
+            throw exception(USER_NOT_EXISTS);
+        }
+        return user;
     }
 
     @Override
     public void resetPassword(AppAuthResetPasswordReqVO userReqVO) {
+        // 检验用户是否存在
+        AdminUserDO userDO = checkUserIfExists(userReqVO.getMobile());
 
+        // 使用验证码
+        smsCodeApi.useSmsCode(AppAuthConvert.INSTANCE.convert(userReqVO, SmsSceneEnum.MEMBER_FORGET_PASSWORD,
+                getClientIP()));
+
+        // 更新密码
+        userMapper.updateById(AdminUserDO.builder().id(userDO.getId())
+                .password(passwordEncoder.encode(userReqVO.getPassword())).build());
     }
 
     @Override

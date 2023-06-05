@@ -24,7 +24,7 @@ public class AuthSmsSendReqVO {
     @Mobile
     private String mobile;
 
-    @Schema(description = "短信场景", required = true, example = "1")
+    @Schema(description = "短信场景", required = true, example = "22 App用户发送验证码")
     @NotNull(message = "发送场景不能为空")
     @InEnum(SmsSceneEnum.class)
     private Integer scene;

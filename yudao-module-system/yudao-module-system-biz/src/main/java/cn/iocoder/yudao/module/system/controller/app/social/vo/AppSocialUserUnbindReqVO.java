@@ -23,8 +23,8 @@ public class AppSocialUserUnbindReqVO {
     @NotNull(message = "社交平台的类型不能为空")
     private Integer type;
 
-    @Schema(description = "社交用户的 openid", required = true, example = "IPRmJ0wvBptiPIlGEZiPewGwiEiE")
-    @NotEmpty(message = "社交用户的 openid 不能为空")
-    private String openid;
+    @Schema(description = "社交用户的 code", required = true, example = "IPRmJ0wvBptiPIlGEZiPewGwiEiE")
+    @NotEmpty(message = "授权码")
+    private String code;
 
 }

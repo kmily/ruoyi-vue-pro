@@ -21,7 +21,6 @@ public enum SmsSceneEnum implements IntArrayValuable {
     MEMBER_FORGET_PASSWORD(3, "user-sms-update-mobile", "会员用户 - 忘记密码"),
 
     ADMIN_MEMBER_LOGIN(21, "admin-sms-login", "后台用户 - 手机号登录"),
-
     APP_LOGIN(22, "app-sms-login", "APP 用户手机验证码");
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(SmsSceneEnum::getScene).toArray();
