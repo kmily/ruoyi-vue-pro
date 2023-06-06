@@ -146,11 +146,14 @@ public class WebSocketHandlerFactory {
             String symbol = order.getSymbol();
             ExchangeInfoEntry symbolRule = this.exchangeInformation.getSymbols().stream().filter(
                     item -> symbol.equals(item.getSymbol())).findFirst().orElse(null);
+            BigDecimal tickSize = symbolRule.getFiltersFormat().get("PRICE_FILTER_tickSize");
+            int scale = symbolRule.getFiltersFormat().get("LOT_SIZE_stepSize").scale();
             if("NEW".equals(executionType)) {
                 if(CollectionUtil.isEmpty(listFollowAccount)) {
                     log.info("当前未有需要跟随的账号,通知数据为:{}", data);
                     return ;
                 }
+                BigDecimal newPrice = MarkWebSocketHandlerFactory.get().getNewPrices().get(symbol);
                 // 新订单
                 for(AccountDO account : listFollowAccount) {
                     sw.start("账号"+account.getId()+"跟随耗时");
@@ -170,35 +173,60 @@ public class WebSocketHandlerFactory {
                                 positionServiceImpl.selectLastestPosition(notifyAccount.getId(), order.getSymbol());
                         PositionDO followLastestPosition = 
                                 positionServiceImpl.selectLastestPosition(notifyAccount.getId(), order.getSymbol());
-                        if(lastestPosition.getQuantity().compareTo(new BigDecimal(0)) != 0
-                                && followLastestPosition.getQuantity().compareTo(new BigDecimal(0)) == 0) {
+                        if(lastestPosition.hasPosition() && !followLastestPosition.hasPosition()) {
                             desc.append("主账户有持仓，跟随账户未有持仓，不进行跟单操作。");
                         } else {
+                            // 计算触发价格
                             BigDecimal followOrderPrice = new BigDecimal(0);
+                            BigDecimal followStopPrice = null;
+                            if(order.getStopPrice() != null) {
+                                if(OrderSide.BUY.toString().equals(order.getSide())) {
+                                    followStopPrice = order.getStopPrice().subtract(
+                                            tickSize);
+                                } else if (OrderSide.SELL.toString().equals(order.getSide())) {
+                                    followStopPrice = order.getStopPrice().add(
+                                            tickSize);
+                                }
+                            }
                             // 计算金额
                             if(OrderSide.BUY.toString().equals(order.getSide())) {
-                                followOrderPrice = order.getPrice()
-                                        .subtract(symbolRule.getFiltersFormat().get("PRICE_FILTER_tickSize"));
+                                if(lastestPosition.hasSubZeroPosition() 
+                                        && followLastestPosition.hasSubZeroPosition()
+                                        && newPrice.compareTo(followLastestPosition.getEntryPrice()) != 1 ) {
+                                    followOrderPrice = order.getPrice()
+                                            .add(tickSize);
+                                } else {
+                                    followOrderPrice = order.getPrice()
+                                            .subtract(tickSize);
+                                }
                             } else if (OrderSide.SELL.toString().equals(order.getSide())) {
-                                followOrderPrice = order.getPrice()
-                                        .add(symbolRule.getFiltersFormat().get("PRICE_FILTER_tickSize"));
+                                if(lastestPosition.hasOverZeroPosition() 
+                                        && followLastestPosition.hasOverZeroPosition()
+                                        && newPrice.compareTo(followLastestPosition.getEntryPrice()) != -1 ) {
+                                    followOrderPrice = order.getPrice()
+                                            .subtract(tickSize);
+                                } else {
+                                    followOrderPrice = order.getPrice()
+                                            .add(tickSize);
+                                }
                             }
+                            
                             // 计算数量
                             BigDecimal followOrderQty = new BigDecimal(0);
                             if(lastestPosition.getQuantity().compareTo(new BigDecimal(0)) == 0) {
                                 BigDecimal positionProp  = order.getPrice()
                                         .multiply(order.getOrigQty()).divide(notifyAccount.formatTypeBalance("USDT"));
-                                int scale = symbolRule.getFiltersFormat().get("LOT_SIZE_stepSize").scale();
                                 BigDecimal accountBalance = account.formatTypeBalance("USDT");
                                 BigDecimal followAmount = positionProp.multiply(accountBalance);
                                 followOrderQty = followAmount.divide(followOrderPrice).setScale(scale, RoundingMode.DOWN);
                             } else {
                                 followOrderQty = order.getOrigQty().
                                         divide(lastestPosition.getQuantity().abs())
-                                        .multiply(followLastestPosition.getQuantity().abs());
+                                        .multiply(followLastestPosition.getQuantity().abs())
+                                        .setScale(scale, RoundingMode.DOWN);
                             }
                             postOrder(order, account, reqVo, desc, followOrderPrice,
-                                    followOrderQty);
+                                    followOrderQty, followStopPrice);
                         }
                     } catch (Exception e) {
                         log.error("跟随下单出现错误:{}", e);
@@ -268,7 +296,7 @@ public class WebSocketHandlerFactory {
     }
 
     private Boolean postOrder(OrderUpdate order, AccountDO account, FollowRecordCreateReqVO reqVo,
-            StringBuilder desc, BigDecimal followOrderPrice, BigDecimal followOrderQty) {
+            StringBuilder desc, BigDecimal followOrderPrice, BigDecimal followOrderQty, BigDecimal stopPrice) {
         JsonObject params = new JsonObject();
         params.addProperty("symbol", order.getSymbol());
         params.addProperty("side", order.getSide());
@@ -290,7 +318,7 @@ public class WebSocketHandlerFactory {
                 followOrderPrice.toString(), // price    委托价格
                 order.getIsReduceOnly().toString(),   // reduceOnly true, false; 非双开模式下默认false；双开模式下不接受此参数； 使用closePosition不支持此参数。
                 null,   // newClientOrderId 用户自定义的订单号，不可以重复出现在挂单中。如空缺系统会自动赋值。必须满足正则规则 ^[\.A-Z\:/a-z0-9_-]{1,36}$
-                order.getStopPrice().toString(),   // stopPrice 触发价, 仅 STOP, STOP_MARKET, TAKE_PROFIT, TAKE_PROFIT_MARKET 需要此参数
+                stopPrice.toString(),   // stopPrice 触发价, 仅 STOP, STOP_MARKET, TAKE_PROFIT, TAKE_PROFIT_MARKET 需要此参数
                 WorkingType.valueOf(order.getWorkingType()),   // workingType stopPrice 触发类型: MARK_PRICE(标记价格), CONTRACT_PRICE(合约最新价). 默认 CONTRACT_PRICE
                 NewOrderRespType.RESULT); //newOrderRespType "ACK", "RESULT", 默认 "ACK"
         reqVo.setOperateResult(JsonUtil.object2String(orderResp));

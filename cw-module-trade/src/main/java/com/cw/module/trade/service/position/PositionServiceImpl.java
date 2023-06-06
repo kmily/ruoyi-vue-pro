@@ -28,6 +28,7 @@ import com.cw.module.trade.dal.mysql.position.PositionMapper;
 import com.cw.module.trade.handler.WebSocketHandlerFactory;
 import com.cw.module.trade.service.account.AccountService;
 import com.cw.module.trade.service.syncrecord.SyncRecordService;
+import com.tb.utils.NumberUtils;
 import com.tb.utils.json.JsonUtil;
 
 import cn.hutool.core.collection.CollectionUtil;
@@ -134,22 +135,34 @@ public class PositionServiceImpl implements PositionService {
         List<String> symbols = positionMapper.selectAccountSymbolPosition(accountId);
         symbols.removeAll(positions.keySet());
         for(Position position : positions.values()) {
-            PositionDO symbolPosition = new PositionDO();
-            symbolPosition.setAccountId(accountId);
-            symbolPosition.setSymbol(position.getSymbol());
-            symbolPosition.setQuantity(position.getPositionAmt());
-            symbolPosition.setThirdData(JsonUtil.object2String(position));
-            positionMapper.insert(symbolPosition);
+            updatePositon(accountId, position.getSymbol(), new BigDecimal(position.getEntryPrice()), 
+                    position.getPositionAmt(), JsonUtil.object2String(position));
         }
         // 清仓数据处理
         if(CollectionUtil.isNotEmpty(symbols)) {
             for(String symbol : symbols) {
-                PositionDO symbolPosition = new PositionDO();
-                symbolPosition.setAccountId(accountId);
-                symbolPosition.setSymbol(symbol);
-                symbolPosition.setQuantity(new BigDecimal(0));
-                positionMapper.insert(symbolPosition);
+                updatePositon(accountId, symbol, new BigDecimal(0), new BigDecimal(0), "");
             }
+        }
+    }
+    
+    private void updatePositon(Long accountId, String symbol, 
+            BigDecimal entryPrice, BigDecimal quantity, String thirdData) {
+        PositionDO updateDO = positionMapper.selectOne(Wrappers.<PositionDO>lambdaQuery()
+                .eq(PositionDO::getAccountId, accountId)
+                .eq(PositionDO::getSymbol, symbol).last(" order by id desc limit 1"));
+        if(updateDO == null) {
+            updateDO = new PositionDO();
+            updateDO.setAccountId(accountId);
+            updateDO.setSymbol(symbol);
+        }
+        updateDO.setEntryPrice(entryPrice);
+        updateDO.setQuantity(quantity);
+        updateDO.setThirdData(thirdData);
+        if(NumberUtils.gtz(updateDO.getId())) {
+            positionMapper.updateById(updateDO);
+        } else {
+            positionMapper.insert(updateDO);
         }
     }
 

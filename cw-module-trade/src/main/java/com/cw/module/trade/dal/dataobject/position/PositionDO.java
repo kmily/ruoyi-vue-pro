@@ -40,9 +40,27 @@ public class PositionDO extends BaseDO {
      * 持仓数量
      */
     private BigDecimal quantity;
+    
+    /** 持仓成本价 */
+    private BigDecimal entryPrice;
     /**
      * 第三方数据
      */
     private String thirdData;
+    
+    /** 是否拥有持仓 */
+    public boolean hasPosition() {
+        return this.quantity != null && this.quantity.compareTo(new BigDecimal(0)) != 0;
+    }
+    
+    /** 是否拥有做多持仓 */
+    public boolean hasOverZeroPosition() {
+        return this.quantity != null && this.quantity.compareTo(new BigDecimal(0)) == 1;
+    }
+    
+    /** 是否拥有做空持仓 */
+    public boolean hasSubZeroPosition() {
+        return this.quantity != null && this.quantity.compareTo(new BigDecimal(0)) == -1;
+    }
 
 }
