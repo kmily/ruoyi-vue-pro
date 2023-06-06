@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
@@ -13,6 +14,7 @@ import org.apache.commons.compress.utils.Lists;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 
 import com.binance.client.SyncRequestClient;
 import com.binance.client.model.enums.NewOrderRespType;
@@ -121,6 +123,8 @@ public class WebSocketHandlerFactory {
     
     
     public void followOrder(UserDataUpdateEvent data) {
+        cn.hutool.core.date.StopWatch sw = new cn.hutool.core.date.StopWatch("账户操作同步处理");
+        sw.start("记录通知记录");
         // 记录通知记录
         NotifyMsgCreateReqVO notifyCreateReqVO = new NotifyMsgCreateReqVO();
         Long notifyAccountId = data.getSysAccountId();
@@ -128,10 +132,13 @@ public class WebSocketHandlerFactory {
         notifyCreateReqVO.setAcceptTime(new Date());
         notifyCreateReqVO.setAcceptInfo(JsonUtil.object2String(data));
         Long notifyId = notifyMsgServiceImpl.createNotifyMsg(notifyCreateReqVO);
+        sw.stop();
         
         // 判断是否需要跟随下单 TODO 先简单判断一下订单是否为空，等之后拿到更多数据后再进行更多的判断
         OrderUpdate order = data.getOrderUpdate();
+        sw.start("查询跟随账户");
         List<AccountDO> listFollowAccount = accountServiceImpl.listFollowAccount(notifyAccountId);
+        sw.stop();
         if("ORDER_TRADE_UPDATE".equals(data.getEventType())) {
             
             AccountDO notifyAccount = accountServiceImpl.getAccount(notifyAccountId);
@@ -146,6 +153,7 @@ public class WebSocketHandlerFactory {
                 }
                 // 新订单
                 for(AccountDO account : listFollowAccount) {
+                    sw.start("账号"+account.getId()+"跟随耗时");
                     // 下单则需要保存跟随记录
                     FollowRecordCreateReqVO reqVo = new FollowRecordCreateReqVO();
                     reqVo.setAccountNotifyId(notifyId);
@@ -198,8 +206,8 @@ public class WebSocketHandlerFactory {
                     }
                     reqVo.setOperateSuccess(success);
                     reqVo.setOperateDesc(desc.toString());
-                    
                     followRecordServiceImpl.createFollowRecord(reqVo);
+                    sw.stop();
                 }
             } else if ("AMENDMENT".equals(executionType)) {
                 // 订单修改 TODO
@@ -211,16 +219,19 @@ public class WebSocketHandlerFactory {
             } else if("EXPIRED".equals(executionType)) {
                 // 订单失效 TODO
             } else if("TRADE".equals(executionType)) {
+                sw.start("账号"+notifyAccountId+"同步持仓");
                 // 订单交易 同步仓位信息，为二次交易提供信息 系统每分钟同步持仓信息，这里暂时不同步
-                // positionServiceImpl.syncAccountPositionById(notifyAccountId);
+                positionServiceImpl.syncAccountPositionById(notifyAccountId);
+                sw.stop();
             }
         } else if("ACCOUNT_CONFIG_UPDATE".equals(data.getEventType())) {
             if(Strings.isNotBlank(data.getSymbol())) {
+                sw.start("同步杠杆");
                 changeInitialLeverage(listFollowAccount, data.getSymbol(), data.getLever());
+                sw.stop();
             }
         }
-        
-        
+        log.info(sw.prettyPrint(TimeUnit.MILLISECONDS));
     }
 
     private void orderCancel(Long notifyAccountId, Long notifyId, OrderUpdate order) {

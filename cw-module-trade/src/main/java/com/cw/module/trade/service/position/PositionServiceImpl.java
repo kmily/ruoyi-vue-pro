@@ -115,6 +115,7 @@ public class PositionServiceImpl implements PositionService {
         SyncRequestClient syncRequestClient = WebSocketHandlerFactory.get().getClients().get(accountId);
         AccountInformation accountInformation = syncRequestClient.getAccountInformation();
         
+        accountInformation.setSymbolLeverage(null);
         // 保存同步记录
         SyncRecordCreateReqVO syncRecord = new SyncRecordCreateReqVO();
         syncRecord.setAccountId(accountId);
