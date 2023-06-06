@@ -1,4 +1,4 @@
-<configuration>
+<configuration  scan="false" scanPeriod="60 seconds" debug="false">
     <!-- 引用 Spring Boot 的 logback 基础配置 -->
     <include resource="org/springframework/boot/logging/logback/defaults.xml" />
     <!-- 变量 yudao.info.base-package，基础业务包 -->
@@ -14,7 +14,6 @@
             </layout>
         </encoder>
     </appender>
-
     <!-- 文件 Appender -->
     <!-- 参考 Spring Boot 的 file-appender.xml 编写 -->
     <appender name="FILE"  class="ch.qos.logback.core.rolling.RollingFileAppender">
