@@ -16,4 +16,5 @@ public interface AppSocialUserConvert {
 
     SocialUserUnbindReqDTO convert(Long userId, Integer userType, AppSocialUserUnbindReqVO reqVO);
 
+    SocialUserUnbindReqDTO convert(Long userId, Integer userType, Integer type, String unionId);
 }
