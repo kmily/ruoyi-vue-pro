@@ -1,4 +1,4 @@
-<configuration  scan="false" scanPeriod="60 seconds" debug="false">
+<configuration>
     <!-- 引用 Spring Boot 的 logback 基础配置 -->
     <include resource="org/springframework/boot/logging/logback/defaults.xml" />
     <!-- 变量 yudao.info.base-package，基础业务包 -->
