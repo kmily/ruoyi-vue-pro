@@ -121,6 +121,9 @@ public class AppAuthServiceImpl implements AppAuthService{
 
         Long userId = socialUserApi.getBindUserId(UserTypeEnum.MEMBER.getValue(), reqVO.getType(),
                 reqVO.getCode(), reqVO.getState());
+
+        log.info("userId", userId);
+
         if (userId == null) {
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.AUTH_THIRD_LOGIN_NOT_BIND);
         }
