@@ -16,7 +16,7 @@ https://gitee.com/gz3ray/ruoyi-vue-pro-oa
 
 #### 测试接口地址
 基础设施 ->系统接口 -> oa
-1. 用户APP-认证 -> 账号+密码登录 
+1. ~~用户APP-认证 -> 账号+密码登录~~ 
 2. 用户APP-社交用户 -> 社交绑定，使用code授权码 
 3. 用户APP-通知公告 -> 获取通知公告列表
 4. 用户APP-认证 -> 修改密码
@@ -24,3 +24,5 @@ https://gitee.com/gz3ray/ruoyi-vue-pro-oa
 #注意事项：
 > 1. 请求Header需要添加参数租户id tenant-id， 默认值 三锐科技 = 150
 
+#更新日志
+1.APP端禁用用户名+密码方式登录，增加手机号验证码登录

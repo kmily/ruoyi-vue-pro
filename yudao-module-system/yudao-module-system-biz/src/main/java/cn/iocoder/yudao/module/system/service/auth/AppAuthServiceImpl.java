@@ -111,7 +111,24 @@ public class AppAuthServiceImpl implements AppAuthService{
 
     @Override
     public AppAuthLoginRespVO smsLogin(AppAuthSmsLoginReqVO reqVO) {
-        return null;
+        // 校验验证码
+        String userIp = getClientIP();
+        smsCodeApi.useSmsCode(AppAuthConvert.INSTANCE.convert(reqVO, SmsSceneEnum.APP_LOGIN.getScene(), userIp));
+
+        // 获得获得注册用户
+        // AdminUserDO user =  userService.createUserIfAbsent(reqVO.getMobile(), userIp);
+        // 不允许自动创建
+        AdminUserDO user = userService.getUserByMobile(reqVO.getMobile());
+        Assert.notNull(user, "获取用户失败，结果为空");
+
+        // 如果 socialType 非空，说明需要绑定社交用户
+        if (reqVO.getSocialType() != null) {
+            socialUserApi.bindSocialUser(new SocialUserBindReqDTO(user.getId(), getUserType().getValue(),
+                    reqVO.getSocialType(), reqVO.getSocialCode(), reqVO.getSocialState()));
+        }
+
+        // 创建 Token 令牌，记录登录日志
+        return createTokenAfterLoginSuccess(user, reqVO.getMobile(), LoginLogTypeEnum.LOGIN_SMS);
     }
 
     @Override
