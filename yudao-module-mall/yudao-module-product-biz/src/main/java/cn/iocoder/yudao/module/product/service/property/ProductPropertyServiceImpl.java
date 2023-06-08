@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.Pro
 import cn.iocoder.yudao.module.product.convert.property.ProductPropertyConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 import cn.iocoder.yudao.module.product.dal.mysql.property.ProductPropertyMapper;
+import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,9 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
     @Resource
     @Lazy // 延迟加载，解决循环依赖问题
     private ProductPropertyValueService productPropertyValueService;
+
+    @Resource
+    private ProductSkuService productSkuService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -67,6 +71,8 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         // 更新
         ProductPropertyDO updateObj = ProductPropertyConvert.INSTANCE.convert(updateReqVO);
         productPropertyMapper.updateById(updateObj);
+        // TODO @puhui：是不是只要传递变量，不传递整个 updateObj 变量哈
+        productSkuService.updateSkuProperty(updateObj);
     }
 
     @Override

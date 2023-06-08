@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.product.dal.dataobject.favorite;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
+import cn.iocoder.yudao.module.product.enums.favorite.ProductFavoriteTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -39,7 +40,11 @@ public class ProductFavoriteDO extends BaseDO {
      * 关联 {@link ProductSpuDO#getId()}
      */
     private Long spuId;
-
-    // TODO 芋艿：type 1 收藏；2 点赞
+    /**
+     * 类型
+     *
+     * 枚举 {@link ProductFavoriteTypeEnum}
+     */
+    private Integer type;
 
 }

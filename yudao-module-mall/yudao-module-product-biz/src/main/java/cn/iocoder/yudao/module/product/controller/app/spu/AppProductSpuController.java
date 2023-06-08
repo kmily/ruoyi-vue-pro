@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.product.controller.app.spu;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuDetailRespVO;
@@ -49,8 +48,8 @@ public class AppProductSpuController {
     @GetMapping("/page")
     @Operation(summary = "获得商品 SPU 分页")
     public CommonResult<PageResult<AppProductSpuPageItemRespVO>> getSpuPage(@Valid AppProductSpuPageReqVO pageVO) {
-        PageResult<ProductSpuDO> pageResult = productSpuService.getSpuPage(pageVO, ProductSpuStatusEnum.ENABLE.getStatus());
-        return success(ProductSpuConvert.INSTANCE.convertPage02(pageResult));
+        PageResult<ProductSpuDO> pageResult = productSpuService.getSpuPage(pageVO);
+        return success(ProductSpuConvert.INSTANCE.convertPageForGetSpuPage(pageResult));
     }
 
     @GetMapping("/get-detail")
@@ -67,13 +66,12 @@ public class AppProductSpuController {
         }
 
         // 查询商品 SKU
-        List<ProductSkuDO> skus = productSkuService.getSkuListBySpuIdAndStatus(spu.getId(),
-                CommonStatusEnum.ENABLE.getStatus());
+        List<ProductSkuDO> skus = productSkuService.getSkuListBySpuId(spu.getId());
         // 查询商品属性
         List<ProductPropertyValueDetailRespBO> propertyValues = productPropertyValueService
                 .getPropertyValueDetailList(ProductSkuConvert.INSTANCE.convertPropertyValueIds(skus));
         // 拼接
-        return success(ProductSpuConvert.INSTANCE.convert(spu, skus, propertyValues));
+        return success(ProductSpuConvert.INSTANCE.convertForGetSpuDetail(spu, skus, propertyValues));
     }
 
 }

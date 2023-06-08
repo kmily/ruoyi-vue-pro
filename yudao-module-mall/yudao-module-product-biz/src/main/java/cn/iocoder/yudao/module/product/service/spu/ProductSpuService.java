@@ -75,7 +75,15 @@ public interface ProductSpuService {
     List<ProductSpuDO> getSpuList();
 
     /**
-     * 获得商品 SPU 分页
+     * 获得所有商品 SPU 列表
+     *
+     * @param reqVO 导出条件
+     * @return 商品 SPU 列表
+     */
+    List<ProductSpuDO> getSpuList(ProductSpuExportReqVO reqVO);
+
+    /**
+     * 获得商品 SPU 分页，提供给挂你兰后台使用
      *
      * @param pageReqVO 分页查询
      * @return 商品spu分页
@@ -83,13 +91,12 @@ public interface ProductSpuService {
     PageResult<ProductSpuDO> getSpuPage(ProductSpuPageReqVO pageReqVO);
 
     /**
-     * 获得商品 SPU 分页
+     * 获得商品 SPU 分页，提供给用户 App 使用
      *
      * @param pageReqVO 分页查询
-     * @param status 状态
      * @return 商品 SPU 分页
      */
-    PageResult<ProductSpuDO> getSpuPage(AppProductSpuPageReqVO pageReqVO, Integer status);
+    PageResult<ProductSpuDO> getSpuPage(AppProductSpuPageReqVO pageReqVO);
 
     /**
      * 更新商品 SPU 库存（增量）
@@ -97,5 +104,35 @@ public interface ProductSpuService {
      * @param stockIncrCounts SPU 编号与库存变化（增量）的映射
      */
     void updateSpuStock(Map<Long, Integer> stockIncrCounts);
+
+    /**
+     * 得到spu详细
+     *
+     * @param id id
+     * @return {@link ProductSpuDetailRespVO}
+     */
+    ProductSpuDetailRespVO getSpuDetail(Long id);
+
+    /**
+     * 更新状态
+     *
+     * @param updateReqVO 更新请求签证官
+     */
+    void updateStatus(ProductSpuUpdateStatusReqVO updateReqVO);
+
+    /**
+     * 获取spu列表标签对应的Count数量
+     *
+     * @return {@link Map}<{@link Integer}, {@link Integer}>
+     */
+    Map<Integer, Long> getTabsCount();
+
+    /**
+     * 通过分类 id 查询 spu 个数
+     *
+     * @param id 分类 id
+     * @return spu
+     */
+    Long getSpuCountByCategoryId(Long id);
 
 }

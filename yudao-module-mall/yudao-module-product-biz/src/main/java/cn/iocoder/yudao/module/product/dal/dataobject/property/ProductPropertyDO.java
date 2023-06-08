@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.property;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -30,6 +31,10 @@ public class ProductPropertyDO extends BaseDO {
      * 名称
      */
     private String name;
+    /**
+     * 状态
+     */
+    private Integer status;
     /**
      * 备注
      */
