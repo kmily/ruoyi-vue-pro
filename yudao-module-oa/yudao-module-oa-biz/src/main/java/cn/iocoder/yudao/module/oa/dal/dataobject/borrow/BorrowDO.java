@@ -43,11 +43,11 @@ public class BorrowDO extends BaseDO {
     /**
      * 申请单状态
      */
-    private Boolean status;
+    private int status;
     /**
      * 审批状态
      */
-    private Boolean approvalStatus;
+    private int approvalStatus;
     /**
      * 备注
      */

@@ -32,7 +32,7 @@ public class ProductBaseVO {
 
     @Schema(description = "产品类型", required = true, example = "1")
     @NotNull(message = "产品类型不能为空")
-    private String productType;
+    private int productType;
 
     @Schema(description = "单位")
     private String productUnit;

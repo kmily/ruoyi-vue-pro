@@ -25,10 +25,10 @@ public class BorrowBaseVO {
 
     @Schema(description = "申请单状态", required = true, example = "2")
     @NotNull(message = "申请单状态不能为空")
-    private Boolean status;
+    private int status;
 
     @Schema(description = "审批状态", example = "1")
-    private Boolean approvalStatus;
+    private int approvalStatus;
 
     @Schema(description = "备注", example = "你猜")
     private String remark;

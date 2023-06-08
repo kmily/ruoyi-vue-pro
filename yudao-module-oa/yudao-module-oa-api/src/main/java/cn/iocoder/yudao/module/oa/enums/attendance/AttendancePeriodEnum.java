@@ -11,6 +11,6 @@ import lombok.Getter;
 public enum AttendancePeriodEnum {
     MORNING(0, "上午打卡"),
     AFTERNOON(1, "下午打卡");
-    private final Integer status;
+    private final int status;
     private final String name;
 }

@@ -1,15 +1,12 @@
 package cn.iocoder.yudao.module.oa.dal.dataobject.contract;
 
-import lombok.*;
-import java.util.*;
-import java.math.BigDecimal;
-import java.math.BigDecimal;
-import java.math.BigDecimal;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
+
+import java.math.BigDecimal;
 
 /**
  * 合同 DO
@@ -74,11 +71,11 @@ public class ContractDO extends BaseDO {
     /**
      * 合同状态
      */
-    private Boolean status;
+    private int status;
     /**
      * 审批状态
      */
-    private Boolean approvalStatus;
+    private int approvalStatus;
     /**
      * 备注
      */

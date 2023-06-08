@@ -11,10 +11,10 @@ public class ContractExportReqVO {
     private String contractNo;
 
     @Schema(description = "合同状态", example = "1")
-    private Boolean status;
+    private int status;
 
     @Schema(description = "审批状态", example = "1")
-    private Boolean approvalStatus;
+    private int approvalStatus;
 
     @Schema(description = "创建者")
     private String creator;

@@ -42,7 +42,7 @@ public class CustomerBaseVO {
 
     @Schema(description = "类型", required = true, example = "1")
     @NotNull(message = "类型不能为空")
-    private String customerType;
+    private int customerType;
 
     @Schema(description = "省")
     private String province;

@@ -9,9 +9,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum AttendanceTypeEnum{
-    WORK(1, "上班打卡"),
-    VISIT_CUSTOMER(2, "拜访客户"),
-    LEAVE(3 , "请假"),
+    WORK(0, "上班打卡"),
+    VISIT_CUSTOMER(1, "拜访客户"),
+    LEAVE(2 , "请假"),
     ;
 
     private final int type;

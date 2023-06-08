@@ -1,15 +1,10 @@
 package cn.iocoder.yudao.module.oa.controller.admin.contract.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.math.BigDecimal;
-import java.math.BigDecimal;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import javax.validation.constraints.*;
 
 /**
 * 合同 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -48,6 +43,6 @@ public class ContractBaseVO {
     private String implContactPhone;
 
     @Schema(description = "合同状态", example = "1")
-    private Boolean status;
+    private int status;
 
 }

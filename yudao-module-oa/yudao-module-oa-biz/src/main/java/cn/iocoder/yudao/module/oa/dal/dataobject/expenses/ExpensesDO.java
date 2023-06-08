@@ -1,15 +1,14 @@
 package cn.iocoder.yudao.module.oa.dal.dataobject.expenses;
 
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.sun.xml.bind.v2.TODO;
 import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
  * 报销申请 DO
@@ -68,11 +67,11 @@ public class ExpensesDO extends BaseDO {
     /**
      * 申请单状态
      */
-    private Boolean status;
+    private int status;
     /**
      * 审批状态
      */
-    private Boolean approvalStatus;
+    private int approvalStatus;
     /**
      * 备注
      */

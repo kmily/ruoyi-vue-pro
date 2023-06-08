@@ -106,24 +106,16 @@ public class ContractServiceImplTest extends BaseDbUnitTest {
        // mock 数据
        ContractDO dbContract = randomPojo(ContractDO.class, o -> { // 等会查询到
            o.setContractNo(null);
-           o.setStatus(null);
-           o.setApprovalStatus(null);
            o.setCreator(null);
        });
        contractMapper.insert(dbContract);
        // 测试 contractNo 不匹配
        contractMapper.insert(cloneIgnoreId(dbContract, o -> o.setContractNo(null)));
-       // 测试 status 不匹配
-       contractMapper.insert(cloneIgnoreId(dbContract, o -> o.setStatus(null)));
-       // 测试 approvalStatus 不匹配
-       contractMapper.insert(cloneIgnoreId(dbContract, o -> o.setApprovalStatus(null)));
        // 测试 creator 不匹配
        contractMapper.insert(cloneIgnoreId(dbContract, o -> o.setCreator(null)));
        // 准备参数
        ContractPageReqVO reqVO = new ContractPageReqVO();
        reqVO.setContractNo(null);
-       reqVO.setStatus(null);
-       reqVO.setApprovalStatus(null);
        reqVO.setCreator(null);
 
        // 调用
@@ -140,24 +132,16 @@ public class ContractServiceImplTest extends BaseDbUnitTest {
        // mock 数据
        ContractDO dbContract = randomPojo(ContractDO.class, o -> { // 等会查询到
            o.setContractNo(null);
-           o.setStatus(null);
-           o.setApprovalStatus(null);
            o.setCreator(null);
        });
        contractMapper.insert(dbContract);
        // 测试 contractNo 不匹配
        contractMapper.insert(cloneIgnoreId(dbContract, o -> o.setContractNo(null)));
-       // 测试 status 不匹配
-       contractMapper.insert(cloneIgnoreId(dbContract, o -> o.setStatus(null)));
-       // 测试 approvalStatus 不匹配
-       contractMapper.insert(cloneIgnoreId(dbContract, o -> o.setApprovalStatus(null)));
        // 测试 creator 不匹配
        contractMapper.insert(cloneIgnoreId(dbContract, o -> o.setCreator(null)));
        // 准备参数
        ContractExportReqVO reqVO = new ContractExportReqVO();
        reqVO.setContractNo(null);
-       reqVO.setStatus(null);
-       reqVO.setApprovalStatus(null);
        reqVO.setCreator(null);
 
        // 调用

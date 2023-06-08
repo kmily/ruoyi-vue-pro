@@ -27,10 +27,10 @@ public class BorrowExcelVO {
     private BigDecimal repaymentFee;
 
     @ExcelProperty("申请单状态")
-    private Boolean status;
+    private int status;
 
     @ExcelProperty("审批状态")
-    private Boolean approvalStatus;
+    private int approvalStatus;
 
     @ExcelProperty("备注")
     private String remark;

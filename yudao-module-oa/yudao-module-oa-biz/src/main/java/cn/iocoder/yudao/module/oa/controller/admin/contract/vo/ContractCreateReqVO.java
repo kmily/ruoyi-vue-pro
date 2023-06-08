@@ -16,7 +16,7 @@ public class ContractCreateReqVO extends ContractBaseVO {
     private String contractNo;
 
     @Schema(description = "审批状态", example = "1")
-    private Boolean approvalStatus;
+    private int approvalStatus;
 
     @Schema(description = "备注", example = "你说的对")
     private String remark;

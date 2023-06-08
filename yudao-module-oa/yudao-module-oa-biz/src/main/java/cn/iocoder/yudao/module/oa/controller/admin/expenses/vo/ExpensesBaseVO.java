@@ -1,15 +1,12 @@
 package cn.iocoder.yudao.module.oa.controller.admin.expenses.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import javax.validation.constraints.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -50,10 +47,10 @@ public class ExpensesBaseVO {
 
     @Schema(description = "申请单状态", required = true, example = "2")
     @NotNull(message = "申请单状态不能为空")
-    private Boolean status;
+    private int status;
 
     @Schema(description = "审批状态", example = "2")
-    private Boolean approvalStatus;
+    private int approvalStatus;
 
     @Schema(description = "备注", example = "你说的对")
     private String remark;

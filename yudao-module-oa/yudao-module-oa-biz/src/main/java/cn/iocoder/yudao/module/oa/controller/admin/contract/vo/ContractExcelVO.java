@@ -1,16 +1,9 @@
 package cn.iocoder.yudao.module.oa.controller.admin.contract.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import java.math.BigDecimal;
-import java.math.BigDecimal;
-import java.math.BigDecimal;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-
 import com.alibaba.excel.annotation.ExcelProperty;
+import lombok.Data;
+
+import java.math.BigDecimal;
 
 /**
  * 合同 Excel VO
@@ -51,10 +44,10 @@ public class ContractExcelVO {
     private String implContactPhone;
 
     @ExcelProperty("合同状态")
-    private Boolean status;
+    private int status;
 
     @ExcelProperty("审批状态")
-    private Boolean approvalStatus;
+    private int approvalStatus;
 
     @ExcelProperty("创建者")
     private String creator;

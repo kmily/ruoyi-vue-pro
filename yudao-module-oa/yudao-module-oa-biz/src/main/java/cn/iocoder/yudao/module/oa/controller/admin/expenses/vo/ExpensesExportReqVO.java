@@ -16,7 +16,7 @@ public class ExpensesExportReqVO {
     private String exhibitName;
 
     @Schema(description = "审批状态", example = "2")
-    private Boolean approvalStatus;
+    private int approvalStatus;
 
     @Schema(description = "创建者")
     private String creator;

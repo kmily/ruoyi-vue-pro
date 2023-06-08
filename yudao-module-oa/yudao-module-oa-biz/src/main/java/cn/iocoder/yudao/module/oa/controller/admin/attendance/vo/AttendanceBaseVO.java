@@ -7,6 +7,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -26,6 +27,15 @@ public class AttendanceBaseVO {
     @Schema(description = "打卡时间段")
     private String attendancePeriod;
 
+    @Schema(description = "打卡地点")
+    private String address;
+
+    @Schema(description = "经度")
+    private BigDecimal longitude;
+
+    @Schema(description = "纬度")
+    private BigDecimal latitude;
+
     @Schema(description = "工作内容")
     private String workContent;
 
@@ -33,7 +43,7 @@ public class AttendanceBaseVO {
     private Long customerId;
 
     @Schema(description = "拜访类型", example = "2")
-    private String visitType;
+    private int visitType;
 
     @Schema(description = "拜访事由", example = "不香")
     private String visitReason;

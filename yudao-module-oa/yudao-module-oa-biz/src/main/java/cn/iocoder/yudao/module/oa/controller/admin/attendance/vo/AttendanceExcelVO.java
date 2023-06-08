@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
@@ -27,6 +28,15 @@ public class AttendanceExcelVO {
     @DictFormat("attendance_period") // TODO 代码优化：建议设置到对应的 XXXDictTypeConstants 枚举类中
     private String attendancePeriod;
 
+    @ExcelProperty("打卡地点")
+    private String address;
+
+    @ExcelProperty("经度")
+    private BigDecimal longitude;
+
+    @ExcelProperty("纬度")
+    private BigDecimal latitude;
+
     @ExcelProperty("工作内容")
     private String workContent;
 
@@ -35,7 +45,7 @@ public class AttendanceExcelVO {
 
     @ExcelProperty(value = "拜访类型", converter = DictConvert.class)
     @DictFormat("visit_customer_type") // TODO 代码优化：建议设置到对应的 XXXDictTypeConstants 枚举类中
-    private String visitType;
+    private int visitType;
 
     @ExcelProperty("拜访事由")
     private String visitReason;

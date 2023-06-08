@@ -22,7 +22,7 @@ create table `oa_customer` (
   remark            varchar(255)                               comment '备注',
   deleted           bit(1)          not null default b'0'      comment '是否删除',
   creator           varchar(64)     default ''                 comment '创建者',
-  create_time        datetime                                  comment '创建时间',
+  create_time       datetime                                   comment '创建时间',
   updater           varchar(64)     default ''                 comment '更新者',
   update_time       datetime                                   comment '更新时间',
   tenant_id         bigint          not null default 0         comment '租户编号',
@@ -36,8 +36,13 @@ drop table if exists oa_attendance;
 create table `oa_attendance` (
   id                bigint(20)      not null auto_increment    comment 'id',
   attendance_type   tinyint         default 1                  comment '打卡类型',
+
+  address           varchar(255)                               comment '打卡地点',
+  longitude         decimal(20,12)                             comment '经度',
+  latitude          decimal(20,12)                             comment '纬度',
+
   --  上班打卡
-  attendance_period varchar(1)                                 comment '打卡时间段',
+  attendance_period tinyint                                    comment '打卡时间段',
   work_content      varchar(1000)   default ''                 comment '工作内容',
   --  拜访客户
   customer_id       bigint(20)                                 comment '拜访客户id',
@@ -76,8 +81,8 @@ create table `oa_expenses` (
   fee_remark        varchar(255)                               comment '费用说明',
   
   fee               decimal(10,1)   not null                   comment '报销总费用',
-  status            tinyint(1)      not null                   comment '申请单状态 0.草稿 1.审批 2.执行 3.完成',
-  approval_status   tinyint(1)      default 0                  comment '审批状态 0.未审批 1.部门主管 2.总经理 3.财务 4.通过 -1.拒绝',
+  status            tinyint         not null                   comment '申请单状态 0.草稿 1.审批 2.执行 3.完成',
+  approval_status   int             default 0                  comment '审批状态 0.未审批 1.部门主管 2.总经理 3.财务 4.通过 -1.拒绝',
   remark            varchar(255)                               comment '备注',
   deleted           bit(1)          not null default b'0'      comment '是否删除',
   creator           varchar(64)     default ''                 comment '创建者',
@@ -112,9 +117,9 @@ create table `oa_borrow` (
   borrow_reason     varchar(255)                               comment '说明',
   borrow_fee        decimal(10,1)   not null                   comment '借支总费用',
   repayment_fee     decimal(10,1)                              comment '已还款费用',
-  status            tinyint(1)      not null                   comment '申请单状态',
+  status            tinyint         not null                   comment '申请单状态',
   --   0.未审批 1.部门主管 2.总经理 3.财务 4.通过 -1.拒绝
-  approval_status   tinyint(1)      default 0                  comment '审批状态',
+  approval_status   tinyint         default 0                  comment '审批状态',
   remark            varchar(255)                               comment '备注',
   deleted           bit(1)          not null default b'0'      comment '是否删除',
   creator           varchar(64)     default ''                 comment '创建者',
@@ -166,9 +171,9 @@ create table `oa_contract` (
   impl_contact_name varchar(30)                                comment '工程实施联系人',
   impl_contact_phone varchar(11)                               comment '工程实施联系电话',
   --   0.草稿 1.审批 2.执行 3.完成, 4.作废
-  status            tinyint(1)      default 0                  comment '合同状态',
+  status            tinyint         default 0                  comment '合同状态',
   --   0.未审批 1.部门主管 2.客服经理 3.通过 -1.拒绝
-  approval_status   tinyint(1)      default 0                  comment '审批状态',
+  approval_status   tinyint         default 0                  comment '审批状态',
   remark            varchar(255)                               comment '备注',
   deleted           bit(1)          not null default b'0'      comment '是否删除',
   creator           varchar(64)     default ''                 comment '创建者',

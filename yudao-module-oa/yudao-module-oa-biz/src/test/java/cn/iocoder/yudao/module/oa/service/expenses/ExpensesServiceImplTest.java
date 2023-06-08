@@ -107,7 +107,6 @@ public class ExpensesServiceImplTest extends BaseDbUnitTest {
        ExpensesDO dbExpenses = randomPojo(ExpensesDO.class, o -> { // 等会查询到
            o.setExpensesType(null);
            o.setExhibitName(null);
-           o.setApprovalStatus(null);
            o.setCreator(null);
        });
        expensesMapper.insert(dbExpenses);
@@ -115,15 +114,13 @@ public class ExpensesServiceImplTest extends BaseDbUnitTest {
        expensesMapper.insert(cloneIgnoreId(dbExpenses, o -> o.setExpensesType(null)));
        // 测试 exhibitName 不匹配
        expensesMapper.insert(cloneIgnoreId(dbExpenses, o -> o.setExhibitName(null)));
-       // 测试 approvalStatus 不匹配
-       expensesMapper.insert(cloneIgnoreId(dbExpenses, o -> o.setApprovalStatus(null)));
+
        // 测试 creator 不匹配
        expensesMapper.insert(cloneIgnoreId(dbExpenses, o -> o.setCreator(null)));
        // 准备参数
        ExpensesPageReqVO reqVO = new ExpensesPageReqVO();
        reqVO.setExpensesType(null);
        reqVO.setExhibitName(null);
-       reqVO.setApprovalStatus(null);
        reqVO.setCreator(null);
 
        // 调用
@@ -141,7 +138,6 @@ public class ExpensesServiceImplTest extends BaseDbUnitTest {
        ExpensesDO dbExpenses = randomPojo(ExpensesDO.class, o -> { // 等会查询到
            o.setExpensesType(null);
            o.setExhibitName(null);
-           o.setApprovalStatus(null);
            o.setCreator(null);
        });
        expensesMapper.insert(dbExpenses);
@@ -149,15 +145,12 @@ public class ExpensesServiceImplTest extends BaseDbUnitTest {
        expensesMapper.insert(cloneIgnoreId(dbExpenses, o -> o.setExpensesType(null)));
        // 测试 exhibitName 不匹配
        expensesMapper.insert(cloneIgnoreId(dbExpenses, o -> o.setExhibitName(null)));
-       // 测试 approvalStatus 不匹配
-       expensesMapper.insert(cloneIgnoreId(dbExpenses, o -> o.setApprovalStatus(null)));
        // 测试 creator 不匹配
        expensesMapper.insert(cloneIgnoreId(dbExpenses, o -> o.setCreator(null)));
        // 准备参数
        ExpensesExportReqVO reqVO = new ExpensesExportReqVO();
        reqVO.setExpensesType(null);
        reqVO.setExhibitName(null);
-       reqVO.setApprovalStatus(null);
        reqVO.setCreator(null);
 
        // 调用

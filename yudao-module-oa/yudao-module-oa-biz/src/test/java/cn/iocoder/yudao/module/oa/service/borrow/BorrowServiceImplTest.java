@@ -109,8 +109,6 @@ public class BorrowServiceImplTest extends BaseDbUnitTest {
            o.setBorrowReason(null);
            o.setBorrowFee(null);
            o.setRepaymentFee(null);
-           o.setStatus(null);
-           o.setApprovalStatus(null);
            o.setRemark(null);
            o.setCreator(null);
            o.setCreateTime(null);
@@ -123,10 +121,6 @@ public class BorrowServiceImplTest extends BaseDbUnitTest {
        borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setBorrowFee(null)));
        // 测试 repaymentFee 不匹配
        borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setRepaymentFee(null)));
-       // 测试 status 不匹配
-       borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setStatus(null)));
-       // 测试 approvalStatus 不匹配
-       borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setApprovalStatus(null)));
        // 测试 remark 不匹配
        borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setRemark(null)));
        // 测试 creator 不匹配
@@ -140,8 +134,6 @@ public class BorrowServiceImplTest extends BaseDbUnitTest {
        reqVO.setBorrowReason(null);
        reqVO.setBorrowFee(null);
        reqVO.setRepaymentFee(null);
-       reqVO.setStatus(null);
-       reqVO.setApprovalStatus(null);
        reqVO.setRemark(null);
        reqVO.setCreator(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
@@ -163,8 +155,6 @@ public class BorrowServiceImplTest extends BaseDbUnitTest {
            o.setBorrowReason(null);
            o.setBorrowFee(null);
            o.setRepaymentFee(null);
-           o.setStatus(null);
-           o.setApprovalStatus(null);
            o.setRemark(null);
            o.setCreator(null);
            o.setCreateTime(null);
@@ -177,10 +167,6 @@ public class BorrowServiceImplTest extends BaseDbUnitTest {
        borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setBorrowFee(null)));
        // 测试 repaymentFee 不匹配
        borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setRepaymentFee(null)));
-       // 测试 status 不匹配
-       borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setStatus(null)));
-       // 测试 approvalStatus 不匹配
-       borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setApprovalStatus(null)));
        // 测试 remark 不匹配
        borrowMapper.insert(cloneIgnoreId(dbBorrow, o -> o.setRemark(null)));
        // 测试 creator 不匹配
@@ -194,8 +180,6 @@ public class BorrowServiceImplTest extends BaseDbUnitTest {
        reqVO.setBorrowReason(null);
        reqVO.setBorrowFee(null);
        reqVO.setRepaymentFee(null);
-       reqVO.setStatus(null);
-       reqVO.setApprovalStatus(null);
        reqVO.setRemark(null);
        reqVO.setCreator(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
