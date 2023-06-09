@@ -8,9 +8,12 @@ import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
 import cn.iocoder.yudao.module.product.api.property.ProductPropertyValueApi;
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.*;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemRespVO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
+import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,11 +23,14 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "用户 App - 交易订单")
@@ -40,24 +46,21 @@ public class AppTradeOrderController {
     @Resource
     private ProductPropertyValueApi productPropertyValueApi;
 
-    @GetMapping("/get-create-info")
-    @Operation(summary = "基于商品，确认创建订单")
+    @Resource
+    private TradeOrderProperties tradeOrderProperties;
+
+    @GetMapping("/settlement")
+    @Operation(summary = "获得订单结算信息")
     @PreAuthenticated
-    public CommonResult<AppTradeOrderGetCreateInfoRespVO> getOrderCreateInfo(AppTradeOrderCreateReqVO createReqVO) {
-//        return success(tradeOrderService.getOrderConfirmCreateInfo(UserSecurityContextHolder.getUserId(), skuId, quantity, couponCardId));
-        return null;
+    public CommonResult<AppTradeOrderSettlementRespVO> settlementOrder(@Valid AppTradeOrderSettlementReqVO settlementReqVO) {
+        return success(tradeOrderService.settlementOrder(getLoginUserId(), settlementReqVO));
     }
 
     @PostMapping("/create")
     @Operation(summary = "创建订单")
     @PreAuthenticated
-    public CommonResult<Long> createOrder(@RequestBody AppTradeOrderCreateReqVO createReqVO,
-                                          HttpServletRequest servletRequest) {
-        // 获取登录用户、用户 IP 地址
-        Long loginUserId = getLoginUserId();
-        String clientIp = ServletUtils.getClientIP(servletRequest);
-        // 创建交易订单，预支付记录
-        Long orderId = tradeOrderService.createOrder(loginUserId, clientIp, createReqVO);
+    public CommonResult<Long> createOrder(@RequestBody AppTradeOrderCreateReqVO createReqVO) {
+        Long orderId = tradeOrderService.createOrder(getLoginUserId(), getClientIP(), createReqVO);
         return success(orderId);
     }
 
@@ -81,11 +84,12 @@ public class AppTradeOrderController {
         List<ProductPropertyValueDetailRespDTO> propertyValueDetails = productPropertyValueApi
                 .getPropertyValueDetailList(TradeOrderConvert.INSTANCE.convertPropertyValueIds(orderItems));
         // 最终组合
-        return success(TradeOrderConvert.INSTANCE.convert02(order, orderItems, propertyValueDetails));
+        return success(TradeOrderConvert.INSTANCE.convert02(order, orderItems,
+                propertyValueDetails, tradeOrderProperties));
     }
 
     @GetMapping("/page")
-    @Operation(summary = "获得订单交易分页")
+    @Operation(summary = "获得交易订单分页")
     public CommonResult<PageResult<AppTradeOrderPageItemRespVO>> getOrderPage(AppTradeOrderPageReqVO reqVO) {
         // 查询订单
         PageResult<TradeOrderDO> pageResult = tradeOrderService.getOrderPage(getLoginUserId(), reqVO);
@@ -97,6 +101,40 @@ public class AppTradeOrderController {
                 .getPropertyValueDetailList(TradeOrderConvert.INSTANCE.convertPropertyValueIds(orderItems));
         // 最终组合
         return success(TradeOrderConvert.INSTANCE.convertPage02(pageResult, orderItems, propertyValueDetails));
+    }
+
+    @GetMapping("/get-count")
+    @Operation(summary = "获得交易订单数量")
+    public CommonResult<Map<String, Long>> getOrderCount() {
+        Map<String, Long> orderCount = new HashMap<>();
+        // 全部
+        orderCount.put("allCount", tradeOrderService.getOrderCount(getLoginUserId(), null, null));
+        // 待付款（未支付）
+        orderCount.put("unpaidCount", tradeOrderService.getOrderCount(getLoginUserId(), TradeOrderStatusEnum.UNPAID.getStatus(), null));
+        // 待发货
+        orderCount.put("undeliveredCount", tradeOrderService.getOrderCount(getLoginUserId(), TradeOrderStatusEnum.UNDELIVERED.getStatus(), null));
+        // 待收货
+        orderCount.put("deliveredCount", tradeOrderService.getOrderCount(getLoginUserId(),  TradeOrderStatusEnum.DELIVERED.getStatus(), null));
+        // 待评价
+        orderCount.put("uncommentedCount", tradeOrderService.getOrderCount(getLoginUserId(), TradeOrderStatusEnum.COMPLETED.getStatus(), false));
+        return success(orderCount);
+    }
+
+    // ========== 订单项 ==========
+
+    @GetMapping("/item/get")
+    @Operation(summary = "获得交易订单项")
+    @Parameter(name = "id", description = "交易订单项编号")
+    public CommonResult<AppTradeOrderItemRespVO> getOrderItem(@RequestParam("id") Long id) {
+        TradeOrderItemDO item = tradeOrderService.getOrderItem(getLoginUserId(), id);
+        return success(TradeOrderConvert.INSTANCE.convert03(item));
+    }
+
+    // TODO 芋艿：待实现
+    @PostMapping("/item/create-comment")
+    @Operation(summary = "创建交易订单项的评价")
+    public CommonResult<Long> createOrderItemComment() {
+        return success(0L);
     }
 
 }

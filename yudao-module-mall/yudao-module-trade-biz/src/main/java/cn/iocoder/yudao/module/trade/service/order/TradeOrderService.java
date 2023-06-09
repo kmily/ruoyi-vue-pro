@@ -5,6 +5,8 @@ import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliver
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 
@@ -22,6 +24,15 @@ import static java.util.Collections.singleton;
 public interface TradeOrderService {
 
     // =================== Order ===================
+
+    /**
+     * 获得订单结算信息
+     *
+     * @param userId 登录用户
+     * @param settlementReqVO 订单结算请求
+     * @return 订单结算结果
+     */
+    AppTradeOrderSettlementRespVO settlementOrder(Long userId, AppTradeOrderSettlementReqVO settlementReqVO);
 
     /**
      * 【会员】创建交易订单
@@ -90,6 +101,16 @@ public interface TradeOrderService {
      * @return 交易订单
      */
     PageResult<TradeOrderDO> getOrderPage(Long userId, AppTradeOrderPageReqVO reqVO);
+
+    /**
+     * 【会员】获得交易订单数量
+     *
+     * @param userId       用户编号
+     * @param status       订单状态。如果为空，则不进行筛选
+     * @param commonStatus 评价状态。如果为空，则不进行筛选
+     * @return 订单数量
+     */
+    Long getOrderCount(Long userId, Integer status, Boolean commonStatus);
 
     // =================== Order Item ===================
 

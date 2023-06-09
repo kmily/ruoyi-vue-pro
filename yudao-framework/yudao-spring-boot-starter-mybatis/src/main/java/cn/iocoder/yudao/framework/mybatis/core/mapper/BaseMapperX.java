@@ -46,6 +46,18 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         return selectOne(new LambdaQueryWrapper<T>().eq(field1, value1).eq(field2, value2));
     }
 
+    default T selectOne(SFunction<T, ?> field1, Object value1, SFunction<T, ?> field2, Object value2,
+                        SFunction<T, ?> field3, Object value3) {
+        return selectOne(new LambdaQueryWrapper<T>().eq(field1, value1).eq(field2, value2)
+                .eq(field3, value3));
+    }
+
+    default T selectOne(SFunction<T, ?> field1, Object value1, SFunction<T, ?> field2, Object value2,
+                        SFunction<T, ?> field3, Object value3, SFunction<T, ?> field4, Object value4) {
+        return selectOne(new LambdaQueryWrapper<T>().eq(field1, value1).eq(field2, value2)
+                .eq(field3, value3).eq(field4, value4));
+    }
+
     default Long selectCount() {
         return selectCount(new QueryWrapper<T>());
     }
@@ -101,8 +113,18 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         Db.saveBatch(entities, size);
     }
 
+    // @芋艿 是不是叫  updateByDo 或者  updateByEntity 更合适；回复：因为是使用实体作为条件去批量更新，所以没加 ByEntity，保持和 mybatis plus 风格一致
     default void updateBatch(T update) {
         update(update, new QueryWrapper<>());
+    }
+
+    /**
+     * 根据ID 批量更新，适合大量数据更新
+     *
+     * @param entities 实体们
+     */
+    default void updateBatch(Collection<T> entities) {
+        Db.updateBatchById(entities);
     }
 
     default void updateBatch(Collection<T> entities, int size) {
