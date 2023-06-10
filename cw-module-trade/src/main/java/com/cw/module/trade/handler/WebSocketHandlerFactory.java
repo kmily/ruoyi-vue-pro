@@ -308,6 +308,9 @@ public class WebSocketHandlerFactory {
         // 根据订单id查询出来跟随的记录
         List<FollowRecordDO> listFollowRecord = followRecordServiceImpl.listFollowRecord(order.getOrderId());
         for(FollowRecordDO record : listFollowRecord) {
+            if(!NumberUtils.gtz(record.getThirdOrderId())) {
+                continue;
+            }
             AccountDO account = accountServiceImpl.getAccount(record.getOperateAccount());
             
             FollowRecordCreateReqVO reqVo = new FollowRecordCreateReqVO();
