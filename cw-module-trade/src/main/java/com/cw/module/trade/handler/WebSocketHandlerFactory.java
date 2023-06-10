@@ -383,15 +383,19 @@ public class WebSocketHandlerFactory {
      * @author wuqiaoxin
      */
     public void syncAToBAccount(AccountDO accountA, AccountDO AccountB) {
-        AccountInformation accountAInfo = clients.get(accountA.getId()).getAccountInformation();
-        AccountInformation accountBInfo = clients.get(AccountB.getId()).getAccountInformation();
-        Set<String> symbols = accountAInfo.getSymbolLeverage().keySet();
-        for(String symbol : symbols) {
-            if(!NumberUtils.equals(accountAInfo.getSymbolLeverage().get(symbol),
-                    accountBInfo.getSymbolLeverage().get(symbol))) {
-                clients.get(AccountB.getId()).changeInitialLeverage(symbol, 
-                        accountAInfo.getSymbolLeverage().get(symbol));
+        try {
+            AccountInformation accountAInfo = clients.get(accountA.getId()).getAccountInformation();
+            AccountInformation accountBInfo = clients.get(AccountB.getId()).getAccountInformation();
+            Set<String> symbols = accountAInfo.getSymbolLeverage().keySet();
+            for(String symbol : symbols) {
+                if(!NumberUtils.equals(accountAInfo.getSymbolLeverage().get(symbol),
+                        accountBInfo.getSymbolLeverage().get(symbol))) {
+                    clients.get(AccountB.getId()).changeInitialLeverage(symbol, 
+                            accountAInfo.getSymbolLeverage().get(symbol));
+                }
             }
+        } catch (Exception e) {
+            log.warn("定时同步杠杆信息出错:", e);
         }
     }
     
