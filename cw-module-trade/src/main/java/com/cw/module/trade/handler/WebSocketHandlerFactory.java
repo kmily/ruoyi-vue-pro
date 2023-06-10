@@ -185,7 +185,8 @@ public class WebSocketHandlerFactory {
                     log.info("当前未有需要跟随的账号,通知数据为:{}", data);
                     return ;
                 }
-                BigDecimal newPrice = MarkWebSocketHandlerFactory.get().getNewPrices().get(symbol);
+//                BigDecimal newPrice = MarkWebSocketHandlerFactory.get().getNewPrices().get(symbol);
+                BigDecimal newPrice = order.getPrice();
                 log.info("当前需要跟单的账号有:{}", JsonUtil.object2String(accounts));
                 // 新订单
                 for(AccountDO account : listFollowAccount) {
