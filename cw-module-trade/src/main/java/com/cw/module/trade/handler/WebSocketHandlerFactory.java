@@ -139,7 +139,7 @@ public class WebSocketHandlerFactory {
             }
             Asset usdtBalance = assets.stream().filter(
                     item -> "USDT".equals(item.getAsset())).findFirst().orElse(null);
-//            accountDayInitBalance.put(account.getId(), usdtBalance.getBalance());
+            accountDayInitBalance.put(account.getId(), usdtBalance.getBalance());
         }
         getTradeRuler(monitorAccounts.get(0));
     }
@@ -208,7 +208,8 @@ public class WebSocketHandlerFactory {
                                 positionServiceImpl.selectLastestPosition(notifyAccount.getId(), order.getSymbol());
                         PositionDO followLastestPosition = 
                                 positionServiceImpl.selectLastestPosition(notifyAccount.getId(), order.getSymbol());
-                        if(lastestPosition.hasPosition() && !followLastestPosition.hasPosition()) {
+                        if(lastestPosition != null && followLastestPosition != null &&
+                                lastestPosition.hasPosition() && !followLastestPosition.hasPosition()) {
                             desc.append("主账户有持仓，跟随账户未有持仓，不进行跟单操作。");
                         } else if (stopFollowAccout.contains(account.getId())) {
                             desc.append("账户当日亏损已达到设定值，不进行跟单操作。");
