@@ -364,6 +364,9 @@ public class WebSocketHandlerFactory {
         String followOrderQtyStr = followOrderQty == null || 
                 followOrderQty.compareTo(BigDecimal.ZERO) == 0 ? null : followOrderQty.toString();
         String reduceOnly = null;
+        OrderType orderType = OrderType.lookup(order.getType());
+        TimeInForce timeInForce = OrderType.MARKET.equals(orderType) ? null : TimeInForce.valueOf(order.getTimeInForce());
+        
         params.addProperty("symbol", order.getSymbol());
         params.addProperty("side", order.getSide());
         params.addProperty("positionSide", order.getPositionSide());
@@ -380,8 +383,8 @@ public class WebSocketHandlerFactory {
                     order.getSymbol(),  //symbol    交易对
                     OrderSide.valueOf(order.getSide()), //side  买卖方向
                     PositionSide.format(order.getPositionSide()), //positionSide  持仓方向，单向持仓模式下非必填，默认且仅可填BOTH;在双向持仓模式下必填,且仅可选择 LONG 或 SHORT
-                    OrderType.lookup(order.getType()),    // orderType 订单类型 LIMIT, MARKET, STOP, TAKE_PROFIT, STOP_MARKET, TAKE_PROFIT_MARKET, TRAILING_STOP_MARKET
-                    TimeInForce.valueOf(order.getTimeInForce()) ,    // timeInForce  有效方法
+                    orderType,    // orderType 订单类型 LIMIT, MARKET, STOP, TAKE_PROFIT, STOP_MARKET, TAKE_PROFIT_MARKET, TRAILING_STOP_MARKET
+                    timeInForce,    // timeInForce  有效方法
                     followOrderQtyStr,    // quantity     下单数量,使用closePosition不支持此参数。
                     followOrderPriceStr, // price    委托价格
                     reduceOnly,   // reduceOnly true, false; 非双开模式下默认false；双开模式下不接受此参数； 使用closePosition不支持此参数。
