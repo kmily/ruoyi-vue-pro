@@ -473,7 +473,7 @@ public class WebSocketHandlerFactory {
             }
             
             FollowRecordCreateReqVO reqVo = new FollowRecordCreateReqVO();
-            reqVo.setOperateAccount(accountId);L
+            reqVo.setOperateAccount(accountId);
             reqVo.setOperateTime(new Date());
             reqVo.setOperateDesc("清仓前取消现有所有订单");
             JsonObject params = new JsonObject();
