@@ -350,7 +350,7 @@ public class WebSocketHandlerFactory {
         String followOrderPriceStr = followOrderPrice == null || 
                 followOrderPrice.compareTo(BigDecimal.ZERO) == 0 ? null : stopPrice.toString();
         String followOrderQtyStr = followOrderQty == null || 
-                followOrderQty.compareTo(BigDecimal.ZERO) == 0 ? null : stopPrice.toString();
+                followOrderQty.compareTo(BigDecimal.ZERO) == 0 ? null : followOrderQty.toString();
         String reduceOnly = null;
         params.addProperty("symbol", order.getSymbol());
         params.addProperty("side", order.getSide());
