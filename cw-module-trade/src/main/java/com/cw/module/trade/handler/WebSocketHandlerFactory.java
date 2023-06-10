@@ -208,8 +208,8 @@ public class WebSocketHandlerFactory {
                                 positionServiceImpl.selectLastestPosition(notifyAccount.getId(), order.getSymbol());
                         PositionDO followLastestPosition = 
                                 positionServiceImpl.selectLastestPosition(notifyAccount.getId(), order.getSymbol());
-                        if(lastestPosition != null && followLastestPosition != null &&
-                                lastestPosition.hasPosition() && !followLastestPosition.hasPosition()) {
+                        if(lastestPosition != null &&  lastestPosition.hasPosition() 
+                                && (followLastestPosition == null || !followLastestPosition.hasPosition())) {
                             desc.append("主账户有持仓，跟随账户未有持仓，不进行跟单操作。");
                         } else if (stopFollowAccout.contains(account.getId())) {
                             desc.append("账户当日亏损已达到设定值，不进行跟单操作。");
@@ -228,7 +228,7 @@ public class WebSocketHandlerFactory {
                             }
                             // 计算金额
                             if(OrderSide.BUY.toString().equals(order.getSide())) {
-                                if(lastestPosition.hasSubZeroPosition() 
+                                if(lastestPosition != null && lastestPosition.hasSubZeroPosition() 
                                         && followLastestPosition.hasSubZeroPosition()
                                         && newPrice.compareTo(followLastestPosition.getEntryPrice()) != 1 ) {
                                     followOrderPrice = order.getPrice()
@@ -238,7 +238,7 @@ public class WebSocketHandlerFactory {
                                             .subtract(tickSize);
                                 }
                             } else if (OrderSide.SELL.toString().equals(order.getSide())) {
-                                if(lastestPosition.hasOverZeroPosition() 
+                                if(lastestPosition != null && lastestPosition.hasOverZeroPosition() 
                                         && followLastestPosition.hasOverZeroPosition()
                                         && newPrice.compareTo(followLastestPosition.getEntryPrice()) != -1 ) {
                                     followOrderPrice = order.getPrice()
@@ -251,7 +251,7 @@ public class WebSocketHandlerFactory {
                             
                             // 计算数量
                             BigDecimal followOrderQty = new BigDecimal(0);
-                            if(lastestPosition.getQuantity().compareTo(new BigDecimal(0)) == 0) {
+                            if(lastestPosition == null || lastestPosition.getQuantity().compareTo(new BigDecimal(0)) == 0) {
                                 BigDecimal positionProp  = order.getPrice()
                                         .multiply(order.getOrigQty()).divide(notifyAccount.formatTypeBalance("USDT"));
                                 BigDecimal accountBalance = account.formatTypeBalance("USDT");
