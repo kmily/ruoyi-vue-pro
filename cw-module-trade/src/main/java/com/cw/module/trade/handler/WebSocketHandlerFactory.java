@@ -252,7 +252,9 @@ public class WebSocketHandlerFactory {
                             
                             // 计算数量
                             BigDecimal followOrderQty = new BigDecimal(0);
-                            if(lastestPosition == null || lastestPosition.getQuantity().compareTo(new BigDecimal(0)) == 0) {
+                            if(order.getOrigQty() != null && order.getOrigQty().compareTo(BigDecimal.ZERO) == 0) {
+                                followOrderQty = followLastestPosition.getQuantity();
+                            } else if(lastestPosition == null || lastestPosition.getQuantity().compareTo(new BigDecimal(0)) == 0) {
                                 BigDecimal positionProp  = order.getPrice()
                                         .multiply(order.getOrigQty()).divide(notifyAccount.formatTypeBalance("USDT"), 2, RoundingMode.HALF_DOWN);
                                 log.info("[跟随下单]：通知账户的比例:{}", positionProp);
