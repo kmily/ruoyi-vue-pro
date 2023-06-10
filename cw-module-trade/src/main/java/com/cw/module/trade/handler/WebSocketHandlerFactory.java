@@ -551,21 +551,25 @@ public class WebSocketHandlerFactory {
             params1.addProperty("stopPrice", 0);
             params1.addProperty("workingType", WorkingType.CONTRACT_PRICE.toString());
             params1.addProperty("newOrderRespType", NewOrderRespType.RESULT.toString());
-            Order orderResp = clients.get(accountId).postOrder(
-                    position.getSymbol(),  //symbol    交易对
-                    side, //side  买卖方向
-                    PositionSide.BOTH, //positionSide  持仓方向，单向持仓模式下非必填，默认且仅可填BOTH;在双向持仓模式下必填,且仅可选择 LONG 或 SHORT
-                    OrderType.LIMIT,    // orderType 订单类型 LIMIT, MARKET, STOP, TAKE_PROFIT, STOP_MARKET, TAKE_PROFIT_MARKET, TRAILING_STOP_MARKET
-                    TimeInForce.GTC ,    // timeInForce  有效方法
-                    position.getPositionAmt().toString(),    // quantity     下单数量,使用closePosition不支持此参数。
-                    orderPrice.toString(), // price    委托价格
-                    null,   // reduceOnly true, false; 非双开模式下默认false；双开模式下不接受此参数； 使用closePosition不支持此参数。
-                    null,   // newClientOrderId 用户自定义的订单号，不可以重复出现在挂单中。如空缺系统会自动赋值。必须满足正则规则 ^[\.A-Z\:/a-z0-9_-]{1,36}$
-                    null,   // stopPrice 触发价, 仅 STOP, STOP_MARKET, TAKE_PROFIT, TAKE_PROFIT_MARKET 需要此参数
-                    WorkingType.CONTRACT_PRICE,   // workingType stopPrice 触发类型: MARK_PRICE(标记价格), CONTRACT_PRICE(合约最新价). 默认 CONTRACT_PRICE
-                    NewOrderRespType.RESULT); //newOrderRespType "ACK", "RESULT", 默认 "ACK"
-            reqVo1.setOperateResult(JsonUtil.object2String(orderResp));
-            reqVo1.setThirdOrderId(orderResp.getOrderId());
+            try {
+                Order orderResp = clients.get(accountId).postOrder(
+                        position.getSymbol(),  //symbol    交易对
+                        side, //side  买卖方向
+                        PositionSide.BOTH, //positionSide  持仓方向，单向持仓模式下非必填，默认且仅可填BOTH;在双向持仓模式下必填,且仅可选择 LONG 或 SHORT
+                        OrderType.LIMIT,    // orderType 订单类型 LIMIT, MARKET, STOP, TAKE_PROFIT, STOP_MARKET, TAKE_PROFIT_MARKET, TRAILING_STOP_MARKET
+                        TimeInForce.GTC ,    // timeInForce  有效方法
+                        position.getPositionAmt().toString(),    // quantity     下单数量,使用closePosition不支持此参数。
+                        orderPrice.toString(), // price    委托价格
+                        null,   // reduceOnly true, false; 非双开模式下默认false；双开模式下不接受此参数； 使用closePosition不支持此参数。
+                        null,   // newClientOrderId 用户自定义的订单号，不可以重复出现在挂单中。如空缺系统会自动赋值。必须满足正则规则 ^[\.A-Z\:/a-z0-9_-]{1,36}$
+                        null,   // stopPrice 触发价, 仅 STOP, STOP_MARKET, TAKE_PROFIT, TAKE_PROFIT_MARKET 需要此参数
+                        WorkingType.CONTRACT_PRICE,   // workingType stopPrice 触发类型: MARK_PRICE(标记价格), CONTRACT_PRICE(合约最新价). 默认 CONTRACT_PRICE
+                        NewOrderRespType.RESULT); //newOrderRespType "ACK", "RESULT", 默认 "ACK"
+                reqVo1.setOperateResult(JsonUtil.object2String(orderResp));
+                reqVo1.setThirdOrderId(orderResp.getOrderId());
+            } catch (Exception e) {
+                log.error("[清仓报错]:{}", e);
+            }
             reqVo1.setOperateInfo(JsonUtil.object2String(params1));
             
             followRecordServiceImpl.createFollowRecord(reqVo1);
