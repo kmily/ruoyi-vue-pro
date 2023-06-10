@@ -348,7 +348,7 @@ public class WebSocketHandlerFactory {
         JsonObject params = new JsonObject();
         String stopPriceStr = stopPrice == null || stopPrice.compareTo(BigDecimal.ZERO) == 0 ? null : stopPrice.toString();
         String followOrderPriceStr = followOrderPrice == null || 
-                followOrderPrice.compareTo(BigDecimal.ZERO) == 0 ? null : stopPrice.toString();
+                followOrderPrice.compareTo(BigDecimal.ZERO) == 0 ? null : followOrderPrice.toString();
         String followOrderQtyStr = followOrderQty == null || 
                 followOrderQty.compareTo(BigDecimal.ZERO) == 0 ? null : followOrderQty.toString();
         String reduceOnly = null;
