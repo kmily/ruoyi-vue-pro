@@ -119,7 +119,6 @@ public class WebSocketHandlerFactory {
             log.info("当前未有需要监听的账号");
             return ;
         }
-        accounts.addAll(monitorAccounts);
         for(AccountDO account : monitorAccounts) {
             addHandler(account);
 
