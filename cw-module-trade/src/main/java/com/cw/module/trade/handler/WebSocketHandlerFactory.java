@@ -343,6 +343,8 @@ public class WebSocketHandlerFactory {
             StringBuilder desc, BigDecimal followOrderPrice, BigDecimal followOrderQty, BigDecimal stopPrice) {
         JsonObject params = new JsonObject();
         String stopPriceStr = stopPrice == null || stopPrice.compareTo(BigDecimal.ZERO) == 0 ? null : stopPrice.toString();
+        String followOrderPriceStr = followOrderPrice == null || 
+                followOrderPrice.compareTo(BigDecimal.ZERO) == 0 ? null : stopPrice.toString();
         String reduceOnly = null;
         params.addProperty("symbol", order.getSymbol());
         params.addProperty("side", order.getSide());
@@ -350,7 +352,7 @@ public class WebSocketHandlerFactory {
         params.addProperty("type", order.getType());
         params.addProperty("timeInForce", order.getTimeInForce());
         params.addProperty("quantity", followOrderQty.toString());
-        params.addProperty("price", followOrderPrice.toString());
+        params.addProperty("price", followOrderPriceStr);
         params.addProperty("reduceOnly", reduceOnly);
         params.addProperty("stopPrice", stopPriceStr);
         params.addProperty("workingType", order.getWorkingType());
@@ -363,7 +365,7 @@ public class WebSocketHandlerFactory {
                     OrderType.lookup(order.getType()),    // orderType 订单类型 LIMIT, MARKET, STOP, TAKE_PROFIT, STOP_MARKET, TAKE_PROFIT_MARKET, TRAILING_STOP_MARKET
                     TimeInForce.valueOf(order.getTimeInForce()) ,    // timeInForce  有效方法
                     followOrderQty.toString(),    // quantity     下单数量,使用closePosition不支持此参数。
-                    followOrderPrice.toString(), // price    委托价格
+                    followOrderPriceStr, // price    委托价格
                     reduceOnly,   // reduceOnly true, false; 非双开模式下默认false；双开模式下不接受此参数； 使用closePosition不支持此参数。
                     null,   // newClientOrderId 用户自定义的订单号，不可以重复出现在挂单中。如空缺系统会自动赋值。必须满足正则规则 ^[\.A-Z\:/a-z0-9_-]{1,36}$
                     stopPriceStr,   // stopPrice 触发价, 仅 STOP, STOP_MARKET, TAKE_PROFIT, TAKE_PROFIT_MARKET 需要此参数
