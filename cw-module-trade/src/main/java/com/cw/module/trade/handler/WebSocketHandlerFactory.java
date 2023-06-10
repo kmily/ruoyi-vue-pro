@@ -526,6 +526,8 @@ public class WebSocketHandlerFactory {
             // 
             OrderSide side = position.getPositionAmt().compareTo(new BigDecimal(0)) == 1 ?
                     OrderSide.SELL : OrderSide.BUY;
+            PositionSide positionSide = position.getPositionAmt().compareTo(new BigDecimal(0)) == 1 ?
+                    PositionSide.LONG : PositionSide.SHORT;
             BigDecimal newPrice = MarkWebSocketHandlerFactory.get().getNewPrices().get(position.getSymbol());
             BigDecimal orderPrice = position.getPositionAmt().compareTo(new BigDecimal(0)) == 1 ?
                     newPrice.multiply(new BigDecimal(0.85)) : newPrice.multiply(new BigDecimal(1.15));
@@ -545,7 +547,7 @@ public class WebSocketHandlerFactory {
             params1.addProperty("symbol", position.getSymbol());
             params1.addProperty("side", side.toString());
             params1.addProperty("type", OrderType.LIMIT.toString());
-            params1.addProperty("positionSide", PositionSide.BOTH.toString());
+            params1.addProperty("positionSide", positionSide.toString());
             params1.addProperty("timeInForce", TimeInForce.GTC.toString());
             params1.addProperty("quantity", position.getPositionAmt().abs());
             params1.addProperty("price", orderPrice.toString());
@@ -557,7 +559,7 @@ public class WebSocketHandlerFactory {
                 Order orderResp = clients.get(accountId).postOrder(
                         position.getSymbol(),  //symbol    交易对
                         side, //side  买卖方向
-                        PositionSide.BOTH, //positionSide  持仓方向，单向持仓模式下非必填，默认且仅可填BOTH;在双向持仓模式下必填,且仅可选择 LONG 或 SHORT
+                        positionSide, //positionSide  持仓方向，单向持仓模式下非必填，默认且仅可填BOTH;在双向持仓模式下必填,且仅可选择 LONG 或 SHORT
                         OrderType.LIMIT,    // orderType 订单类型 LIMIT, MARKET, STOP, TAKE_PROFIT, STOP_MARKET, TAKE_PROFIT_MARKET, TRAILING_STOP_MARKET
                         TimeInForce.GTC ,    // timeInForce  有效方法
                         position.getPositionAmt().abs().toString(),    // quantity     下单数量,使用closePosition不支持此参数。
