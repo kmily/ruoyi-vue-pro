@@ -448,8 +448,11 @@ public class WebSocketHandlerFactory {
                         inout = inout.add(income.getIncome());
                     }
                 }
-
+                
                 BigDecimal initBalance = zeroBalance.add(inout);
+                if(initBalance.compareTo(BigDecimal.ZERO) == 0) {
+                    continue;
+                }
                 if(initBalance.subtract(lastestBalance).divide(initBalance).compareTo(rait) == 1) {
                     stopFollowAccout.add(accountId);
                 } else {
