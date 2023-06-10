@@ -342,8 +342,7 @@ public class WebSocketHandlerFactory {
             StringBuilder desc, BigDecimal followOrderPrice, BigDecimal followOrderQty, BigDecimal stopPrice) {
         JsonObject params = new JsonObject();
         String stopPriceStr = stopPrice == null || stopPrice.compareTo(BigDecimal.ZERO) == 0 ? null : stopPrice.toString();
-        String reduceOnly = !PositionSide.BOTH.equals(PositionSide.format(order.getPositionSide())) 
-                && Boolean.TRUE.equals(order.getIsReduceOnly()) ? "true" : null;
+        String reduceOnly = null;
         params.addProperty("symbol", order.getSymbol());
         params.addProperty("side", order.getSide());
         params.addProperty("positionSide", order.getPositionSide());
