@@ -259,7 +259,7 @@ public class WebSocketHandlerFactory {
                                 followOrderQty = followAmount.divide(followOrderPrice).setScale(scale, RoundingMode.DOWN);
                             } else {
                                 followOrderQty = order.getOrigQty().
-                                        divide(lastestPosition.getQuantity().abs())
+                                        divide(lastestPosition.getQuantity().abs(), 2, RoundingMode.HALF_DOWN)
                                         .multiply(followLastestPosition.getQuantity().abs())
                                         .setScale(scale, RoundingMode.DOWN);
                             }
@@ -336,6 +336,7 @@ public class WebSocketHandlerFactory {
     private Boolean postOrder(OrderUpdate order, AccountDO account, FollowRecordCreateReqVO reqVo,
             StringBuilder desc, BigDecimal followOrderPrice, BigDecimal followOrderQty, BigDecimal stopPrice) {
         JsonObject params = new JsonObject();
+        String stopPriceStr = stopPrice == null || stopPrice.compareTo(BigDecimal.ZERO) == 0 ? null : stopPrice.toString();
         params.addProperty("symbol", order.getSymbol());
         params.addProperty("side", order.getSide());
         params.addProperty("positionSide", order.getPositionSide());
@@ -357,7 +358,7 @@ public class WebSocketHandlerFactory {
                 followOrderPrice.toString(), // price    委托价格
                 order.getIsReduceOnly().toString(),   // reduceOnly true, false; 非双开模式下默认false；双开模式下不接受此参数； 使用closePosition不支持此参数。
                 null,   // newClientOrderId 用户自定义的订单号，不可以重复出现在挂单中。如空缺系统会自动赋值。必须满足正则规则 ^[\.A-Z\:/a-z0-9_-]{1,36}$
-                stopPrice.toString(),   // stopPrice 触发价, 仅 STOP, STOP_MARKET, TAKE_PROFIT, TAKE_PROFIT_MARKET 需要此参数
+                stopPriceStr,   // stopPrice 触发价, 仅 STOP, STOP_MARKET, TAKE_PROFIT, TAKE_PROFIT_MARKET 需要此参数
                 WorkingType.valueOf(order.getWorkingType()),   // workingType stopPrice 触发类型: MARK_PRICE(标记价格), CONTRACT_PRICE(合约最新价). 默认 CONTRACT_PRICE
                 NewOrderRespType.RESULT); //newOrderRespType "ACK", "RESULT", 默认 "ACK"
         reqVo.setOperateResult(JsonUtil.object2String(orderResp));
