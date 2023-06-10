@@ -125,12 +125,12 @@ public class WebSocketHandlerFactory {
         for(AccountDO account : monitorAccounts) {
             addHandler(account);
 
-            List<AccountDO> listFollowAccount = accountServiceImpl.listFollowAccount(account.getId());
-            if(CollectionUtils.isNotEmpty(listFollowAccount)) {
-                for(AccountDO followaccount : listFollowAccount) {
-                    syncAToBAccount(account, followaccount);
-                }
-            }
+//            List<AccountDO> listFollowAccount = accountServiceImpl.listFollowAccount(account.getId());
+//            if(CollectionUtils.isNotEmpty(listFollowAccount)) {
+//                for(AccountDO followaccount : listFollowAccount) {
+//                    syncAToBAccount(account, followaccount);
+//                }
+//            }
             List<Asset> assets = null;
             if(Strings.isBlank(account.getZeroBalance())) {
                 assets = JsonUtil.string2List(account.getBalance(), Asset.class);
@@ -259,7 +259,7 @@ public class WebSocketHandlerFactory {
                                 log.info("[跟随下单]：当前账号的余额:{}", accountBalance);
                                 BigDecimal followAmount = positionProp.multiply(accountBalance);
                                 log.info("[跟随下单]：当前账号的跟随金额:{}", followAmount);
-                                followOrderQty = followAmount.divide(followOrderPrice).setScale(scale, RoundingMode.DOWN);
+                                followOrderQty = followAmount.divide(followOrderPrice, scale, RoundingMode.DOWN);
                                 log.info("[跟随下单]：当前账号的跟随数量:{}", followOrderQty);
                             } else {
                                 followOrderQty = order.getOrigQty().
