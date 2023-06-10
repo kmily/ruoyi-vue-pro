@@ -218,7 +218,7 @@ public class WebSocketHandlerFactory {
                             BigDecimal followStopPrice = null;
                             if(order.getStopPrice() != null && order.getStopPrice().compareTo(BigDecimal.ZERO) != 0) {
                                 if(OrderSide.BUY.toString().equals(order.getSide())) {
-                                    if(followLastestPosition != null 
+                                    if(followLastestPosition != null && followLastestPosition.hasPosition()
                                             && order.getStopPrice().compareTo(followLastestPosition.getEntryPrice()) == -1) {
                                         followStopPrice = order.getStopPrice().add(
                                                 tickSize);
@@ -227,7 +227,7 @@ public class WebSocketHandlerFactory {
                                                 tickSize);
                                     }
                                 } else if (OrderSide.SELL.toString().equals(order.getSide())) {
-                                    if(followLastestPosition != null 
+                                    if(followLastestPosition != null && followLastestPosition.hasPosition()
                                             && order.getStopPrice().compareTo(followLastestPosition.getEntryPrice()) != -1) {
                                         followStopPrice = order.getStopPrice().subtract(
                                                 tickSize);
