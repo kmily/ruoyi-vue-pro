@@ -467,7 +467,7 @@ public class WebSocketHandlerFactory {
                 }
                 if(initBalance.subtract(lastestBalance).divide(initBalance, 2, RoundingMode.HALF_DOWN).compareTo(rait) == 1) {
                     stopFollowAccout.add(accountId);
-                } else {x
+                } else {
                     stopFollowAccout.remove(accountId);
                 }
             } catch (Exception e) {
