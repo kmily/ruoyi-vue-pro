@@ -13,7 +13,6 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.compress.utils.Lists;
 import org.apache.logging.log4j.util.Strings;
-import org.hibernate.validator.internal.util.privilegedactions.NewProxyInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -45,7 +44,6 @@ import com.cw.module.trade.service.account.AccountService;
 import com.cw.module.trade.service.followrecord.FollowRecordService;
 import com.cw.module.trade.service.notifymsg.NotifyMsgService;
 import com.cw.module.trade.service.position.PositionService;
-import com.github.xiaoymin.knife4j.core.util.CollectionUtils;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonObject;
 import com.tb.utils.DateUtils;
@@ -344,6 +342,7 @@ public class WebSocketHandlerFactory {
             StringBuilder desc, BigDecimal followOrderPrice, BigDecimal followOrderQty, BigDecimal stopPrice) {
         JsonObject params = new JsonObject();
         String stopPriceStr = stopPrice == null || stopPrice.compareTo(BigDecimal.ZERO) == 0 ? null : stopPrice.toString();
+        String reduceOnly = Boolean.TRUE.equals(order.getIsReduceOnly()) ? "true" : null;
         params.addProperty("symbol", order.getSymbol());
         params.addProperty("side", order.getSide());
         params.addProperty("positionSide", order.getPositionSide());
@@ -351,7 +350,7 @@ public class WebSocketHandlerFactory {
         params.addProperty("timeInForce", order.getTimeInForce());
         params.addProperty("quantity", followOrderQty.toString());
         params.addProperty("price", followOrderPrice.toString());
-        params.addProperty("reduceOnly", order.getIsReduceOnly());
+        params.addProperty("reduceOnly", reduceOnly);
         params.addProperty("stopPrice", stopPriceStr);
         params.addProperty("workingType", order.getWorkingType());
         params.addProperty("newOrderRespType", NewOrderRespType.RESULT.toString());
@@ -363,7 +362,7 @@ public class WebSocketHandlerFactory {
                 TimeInForce.valueOf(order.getTimeInForce()) ,    // timeInForce  有效方法
                 followOrderQty.toString(),    // quantity     下单数量,使用closePosition不支持此参数。
                 followOrderPrice.toString(), // price    委托价格
-                order.getIsReduceOnly().toString(),   // reduceOnly true, false; 非双开模式下默认false；双开模式下不接受此参数； 使用closePosition不支持此参数。
+                reduceOnly,   // reduceOnly true, false; 非双开模式下默认false；双开模式下不接受此参数； 使用closePosition不支持此参数。
                 null,   // newClientOrderId 用户自定义的订单号，不可以重复出现在挂单中。如空缺系统会自动赋值。必须满足正则规则 ^[\.A-Z\:/a-z0-9_-]{1,36}$
                 stopPriceStr,   // stopPrice 触发价, 仅 STOP, STOP_MARKET, TAKE_PROFIT, TAKE_PROFIT_MARKET 需要此参数
                 WorkingType.valueOf(order.getWorkingType()),   // workingType stopPrice 触发类型: MARK_PRICE(标记价格), CONTRACT_PRICE(合约最新价). 默认 CONTRACT_PRICE
@@ -531,9 +530,9 @@ public class WebSocketHandlerFactory {
                     TimeInForce.GTC ,    // timeInForce  有效方法
                     position.getPositionAmt().toString(),    // quantity     下单数量,使用closePosition不支持此参数。
                     orderPrice.toString(), // price    委托价格
-                    "false",   // reduceOnly true, false; 非双开模式下默认false；双开模式下不接受此参数； 使用closePosition不支持此参数。
+                    null,   // reduceOnly true, false; 非双开模式下默认false；双开模式下不接受此参数； 使用closePosition不支持此参数。
                     null,   // newClientOrderId 用户自定义的订单号，不可以重复出现在挂单中。如空缺系统会自动赋值。必须满足正则规则 ^[\.A-Z\:/a-z0-9_-]{1,36}$
-                    "0",   // stopPrice 触发价, 仅 STOP, STOP_MARKET, TAKE_PROFIT, TAKE_PROFIT_MARKET 需要此参数
+                    null,   // stopPrice 触发价, 仅 STOP, STOP_MARKET, TAKE_PROFIT, TAKE_PROFIT_MARKET 需要此参数
                     WorkingType.CONTRACT_PRICE,   // workingType stopPrice 触发类型: MARK_PRICE(标记价格), CONTRACT_PRICE(合约最新价). 默认 CONTRACT_PRICE
                     NewOrderRespType.RESULT); //newOrderRespType "ACK", "RESULT", 默认 "ACK"
             reqVo1.setOperateResult(JsonUtil.object2String(orderResp));
