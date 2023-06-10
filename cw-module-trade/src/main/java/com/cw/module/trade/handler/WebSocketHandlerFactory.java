@@ -254,9 +254,13 @@ public class WebSocketHandlerFactory {
                             if(lastestPosition == null || lastestPosition.getQuantity().compareTo(new BigDecimal(0)) == 0) {
                                 BigDecimal positionProp  = order.getPrice()
                                         .multiply(order.getOrigQty()).divide(notifyAccount.formatTypeBalance("USDT"), 2, RoundingMode.HALF_DOWN);
+                                log.info("[跟随下单]：通知账户的比例:{}", positionProp);
                                 BigDecimal accountBalance = account.formatTypeBalance("USDT");
+                                log.info("[跟随下单]：当前账号的余额:{}", accountBalance);
                                 BigDecimal followAmount = positionProp.multiply(accountBalance);
+                                log.info("[跟随下单]：当前账号的跟随金额:{}", followAmount);
                                 followOrderQty = followAmount.divide(followOrderPrice).setScale(scale, RoundingMode.DOWN);
+                                log.info("[跟随下单]：当前账号的跟随数量:{}", followOrderQty);
                             } else {
                                 followOrderQty = order.getOrigQty().
                                         divide(lastestPosition.getQuantity().abs(), 2, RoundingMode.HALF_DOWN)
