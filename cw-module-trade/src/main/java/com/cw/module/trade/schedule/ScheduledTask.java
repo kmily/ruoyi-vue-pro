@@ -50,6 +50,16 @@ public class ScheduledTask {
     }
     
     /**
+     * * 每分钟检测账户的亏损值，是否达到设定值
+     * @date 2023年5月24日
+     * @author wuqiaoxin
+     */
+    @Scheduled(fixedDelay = 60*1000)
+    private void checkStopFollow() {
+        WebSocketHandlerFactory.get().checkStopFollow();
+    }
+    
+    /**
      * * 每50分钟重新刷新长连接监听key的有效期
      * @date 2023年5月24日
      * @author wuqiaoxin

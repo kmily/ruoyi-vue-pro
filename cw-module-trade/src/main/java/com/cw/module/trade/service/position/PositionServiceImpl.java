@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.binance.client.SyncRequestClient;
 import com.binance.client.model.trade.AccountInformation;
+import com.binance.client.model.trade.Asset;
 import com.binance.client.model.trade.Position;
 import com.cw.module.trade.controller.admin.position.vo.PositionCreateReqVO;
 import com.cw.module.trade.controller.admin.position.vo.PositionExportReqVO;
@@ -109,12 +110,17 @@ public class PositionServiceImpl implements PositionService {
         for(AccountDO account : accounts) {
             syncAccountPositionById(account.getId());
         }
+        
     }
 
     @Override
     public void syncAccountPositionById(Long accountId) {
         SyncRequestClient syncRequestClient = WebSocketHandlerFactory.get().getClients().get(accountId);
         AccountInformation accountInformation = syncRequestClient.getAccountInformation();
+        
+        Asset usdtBalance = accountInformation.getAssets().stream().filter(
+                item -> "USDT".equals(item.getAsset())).findFirst().orElse(null);
+        WebSocketHandlerFactory.get().getAccountLastestBalance().put(accountId, usdtBalance.getBalance());
         
         accountInformation.setSymbolLeverage(null);
         // 保存同步记录
@@ -132,6 +138,7 @@ public class PositionServiceImpl implements PositionService {
         accountMapper.updateById(account);
         
         Map<String, Position> positions = accountInformation.getPositions();
+        WebSocketHandlerFactory.get().getAccountPsitions().put(accountId, positions);
         List<String> symbols = positionMapper.selectAccountSymbolPosition(accountId);
         symbols.removeAll(positions.keySet());
         for(Position position : positions.values()) {
