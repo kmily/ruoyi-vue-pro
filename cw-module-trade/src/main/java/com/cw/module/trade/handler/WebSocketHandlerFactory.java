@@ -342,7 +342,8 @@ public class WebSocketHandlerFactory {
             StringBuilder desc, BigDecimal followOrderPrice, BigDecimal followOrderQty, BigDecimal stopPrice) {
         JsonObject params = new JsonObject();
         String stopPriceStr = stopPrice == null || stopPrice.compareTo(BigDecimal.ZERO) == 0 ? null : stopPrice.toString();
-        String reduceOnly = Boolean.TRUE.equals(order.getIsReduceOnly()) ? "true" : null;
+        String reduceOnly = !PositionSide.BOTH.equals(PositionSide.format(order.getPositionSide())) 
+                && Boolean.TRUE.equals(order.getIsReduceOnly()) ? "true" : null;
         params.addProperty("symbol", order.getSymbol());
         params.addProperty("side", order.getSide());
         params.addProperty("positionSide", order.getPositionSide());
@@ -466,7 +467,7 @@ public class WebSocketHandlerFactory {
                 }
                 if(initBalance.subtract(lastestBalance).divide(initBalance, 2, RoundingMode.HALF_DOWN).compareTo(rait) == 1) {
                     stopFollowAccout.add(accountId);
-                } else {
+                } else {x
                     stopFollowAccout.remove(accountId);
                 }
             } catch (Exception e) {
