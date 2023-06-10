@@ -139,7 +139,7 @@ public class WebSocketHandlerFactory {
             }
             Asset usdtBalance = assets.stream().filter(
                     item -> "USDT".equals(item.getAsset())).findFirst().orElse(null);
-            accountDayInitBalance.put(account.getId(), usdtBalance.getBalance());
+//            accountDayInitBalance.put(account.getId(), usdtBalance.getBalance());
         }
         getTradeRuler(monitorAccounts.get(0));
     }
