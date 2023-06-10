@@ -218,11 +218,23 @@ public class WebSocketHandlerFactory {
                             BigDecimal followStopPrice = null;
                             if(order.getStopPrice() != null && order.getStopPrice().compareTo(BigDecimal.ZERO) != 0) {
                                 if(OrderSide.BUY.toString().equals(order.getSide())) {
-                                    followStopPrice = order.getStopPrice().subtract(
-                                            tickSize);
+                                    if(followLastestPosition != null 
+                                            && order.getStopPrice().compareTo(followLastestPosition.getEntryPrice()) == -1) {
+                                        followStopPrice = order.getStopPrice().add(
+                                                tickSize);
+                                    } else {
+                                        followStopPrice = order.getStopPrice().subtract(
+                                                tickSize);
+                                    }
                                 } else if (OrderSide.SELL.toString().equals(order.getSide())) {
-                                    followStopPrice = order.getStopPrice().add(
-                                            tickSize);
+                                    if(followLastestPosition != null 
+                                            && order.getStopPrice().compareTo(followLastestPosition.getEntryPrice()) != -1) {
+                                        followStopPrice = order.getStopPrice().subtract(
+                                                tickSize);
+                                    } else {
+                                        followStopPrice = order.getStopPrice().add(
+                                                tickSize);
+                                    }
                                 }
                             }
                             // 计算金额
