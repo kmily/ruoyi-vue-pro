@@ -74,7 +74,7 @@ public class ScheduledTask {
      * @date 2023年5月24日
      * @author wuqiaoxin
      */
-    @Scheduled(fixedDelay = 60*60*1000, initialDelay = 1*60*1000)
+    @Scheduled(fixedDelay = 60*60*1000, initialDelay = 3*60*1000)
     private void syncSymbolLeverage() {
         List<AccountDO> monitorAccounts = accountService.listMonitorAccount();
         if(CollectionUtil.isEmpty(monitorAccounts)) {

@@ -217,7 +217,7 @@ public class WebSocketHandlerFactory {
                             // 计算触发价格
                             BigDecimal followOrderPrice = new BigDecimal(0);
                             BigDecimal followStopPrice = null;
-                            if(order.getStopPrice() != null) {
+                            if(order.getStopPrice() != null && order.getStopPrice().compareTo(BigDecimal.ZERO) != 0) {
                                 if(OrderSide.BUY.toString().equals(order.getSide())) {
                                     followStopPrice = order.getStopPrice().subtract(
                                             tickSize);
@@ -345,7 +345,7 @@ public class WebSocketHandlerFactory {
         params.addProperty("quantity", followOrderQty.toString());
         params.addProperty("price", followOrderPrice.toString());
         params.addProperty("reduceOnly", order.getIsReduceOnly());
-        params.addProperty("stopPrice", order.getStopPrice().toString());
+        params.addProperty("stopPrice", stopPriceStr);
         params.addProperty("workingType", order.getWorkingType());
         params.addProperty("newOrderRespType", NewOrderRespType.RESULT.toString());
         Order orderResp = clients.get(account.getId()).postOrder(
