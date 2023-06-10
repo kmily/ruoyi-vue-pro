@@ -253,7 +253,7 @@ public class WebSocketHandlerFactory {
                             BigDecimal followOrderQty = new BigDecimal(0);
                             if(lastestPosition == null || lastestPosition.getQuantity().compareTo(new BigDecimal(0)) == 0) {
                                 BigDecimal positionProp  = order.getPrice()
-                                        .multiply(order.getOrigQty()).divide(notifyAccount.formatTypeBalance("USDT"));
+                                        .multiply(order.getOrigQty()).divide(notifyAccount.formatTypeBalance("USDT"), 2, RoundingMode.HALF_DOWN);
                                 BigDecimal accountBalance = account.formatTypeBalance("USDT");
                                 BigDecimal followAmount = positionProp.multiply(accountBalance);
                                 followOrderQty = followAmount.divide(followOrderPrice).setScale(scale, RoundingMode.DOWN);
@@ -453,7 +453,7 @@ public class WebSocketHandlerFactory {
                 if(initBalance.compareTo(BigDecimal.ZERO) == 0) {
                     continue;
                 }
-                if(initBalance.subtract(lastestBalance).divide(initBalance).compareTo(rait) == 1) {
+                if(initBalance.subtract(lastestBalance).divide(initBalance, 2, RoundingMode.HALF_DOWN).compareTo(rait) == 1) {
                     stopFollowAccout.add(accountId);
                 } else {
                     stopFollowAccout.remove(accountId);
@@ -473,7 +473,7 @@ public class WebSocketHandlerFactory {
             }
             
             FollowRecordCreateReqVO reqVo = new FollowRecordCreateReqVO();
-            reqVo.setOperateAccount(accountId);
+            reqVo.setOperateAccount(accountId);L
             reqVo.setOperateTime(new Date());
             reqVo.setOperateDesc("清仓前取消现有所有订单");
             JsonObject params = new JsonObject();
