@@ -545,7 +545,7 @@ public class WebSocketHandlerFactory {
             params1.addProperty("type", OrderType.LIMIT.toString());
             params1.addProperty("positionSide", PositionSide.BOTH.toString());
             params1.addProperty("timeInForce", TimeInForce.GTC.toString());
-            params1.addProperty("quantity", position.getPositionAmt());
+            params1.addProperty("quantity", position.getPositionAmt().abs());
             params1.addProperty("price", orderPrice.toString());
             params1.addProperty("reduceOnly", false);
             params1.addProperty("stopPrice", 0);
@@ -558,7 +558,7 @@ public class WebSocketHandlerFactory {
                         PositionSide.BOTH, //positionSide  持仓方向，单向持仓模式下非必填，默认且仅可填BOTH;在双向持仓模式下必填,且仅可选择 LONG 或 SHORT
                         OrderType.LIMIT,    // orderType 订单类型 LIMIT, MARKET, STOP, TAKE_PROFIT, STOP_MARKET, TAKE_PROFIT_MARKET, TRAILING_STOP_MARKET
                         TimeInForce.GTC ,    // timeInForce  有效方法
-                        position.getPositionAmt().toString(),    // quantity     下单数量,使用closePosition不支持此参数。
+                        position.getPositionAmt().abs().toString(),    // quantity     下单数量,使用closePosition不支持此参数。
                         orderPrice.toString(), // price    委托价格
                         null,   // reduceOnly true, false; 非双开模式下默认false；双开模式下不接受此参数； 使用closePosition不支持此参数。
                         null,   // newClientOrderId 用户自定义的订单号，不可以重复出现在挂单中。如空缺系统会自动赋值。必须满足正则规则 ^[\.A-Z\:/a-z0-9_-]{1,36}$
