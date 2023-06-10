@@ -226,7 +226,8 @@ public class WebSocketHandlerFactory {
                                 }
                             }
                             // 计算金额
-                            if(OrderSide.BUY.toString().equals(order.getSide())) {
+                            if(order.getPrice().compareTo(BigDecimal.ZERO) != 0
+                                    && OrderSide.BUY.toString().equals(order.getSide())) {
                                 if(lastestPosition != null && lastestPosition.hasSubZeroPosition() 
                                         && followLastestPosition.hasSubZeroPosition()
                                         && newPrice.compareTo(followLastestPosition.getEntryPrice()) != 1 ) {
@@ -236,7 +237,8 @@ public class WebSocketHandlerFactory {
                                     followOrderPrice = order.getPrice()
                                             .subtract(tickSize);
                                 }
-                            } else if (OrderSide.SELL.toString().equals(order.getSide())) {
+                            } else if (order.getPrice().compareTo(BigDecimal.ZERO) != 0
+                                    && OrderSide.SELL.toString().equals(order.getSide())) {
                                 if(lastestPosition != null && lastestPosition.hasOverZeroPosition() 
                                         && followLastestPosition.hasOverZeroPosition()
                                         && newPrice.compareTo(followLastestPosition.getEntryPrice()) != -1 ) {
