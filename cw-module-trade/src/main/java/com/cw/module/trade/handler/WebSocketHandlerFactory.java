@@ -577,7 +577,7 @@ public class WebSocketHandlerFactory {
             if(NumberUtils.gtz(account.getFollowAccount())) {
                 Map<String, Position> bPositions = accountPsitions.get(account.getId());
                 Map<String, Position> aPositions = accountPsitions.get(account.getFollowAccount());
-                log.warn("[清仓检测]:a账户持仓:{},b账户持仓:{}", JsonUtil.object2String(aPositions), JsonUtil.object2String(bPositions));
+//                log.warn("[清仓检测]:a账户持仓:{},b账户持仓:{}", JsonUtil.object2String(aPositions), JsonUtil.object2String(bPositions));
                 for(String symbol : bPositions.keySet()) {
                     Position aPosition = aPositions.get(symbol);
                     if(aPosition == null

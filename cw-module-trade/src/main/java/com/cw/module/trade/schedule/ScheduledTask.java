@@ -56,7 +56,16 @@ public class ScheduledTask {
      */
     @Scheduled(fixedDelay = 60*1000)
     private void checkStopFollow() {
-        WebSocketHandlerFactory.get().checkStopFollow();
+        try {
+            WebSocketHandlerFactory.get().checkStopFollow();
+        } catch (Exception e) {
+            log.error("[亏损检测]:出现异常:{}", e);
+        }
+        try {
+            WebSocketHandlerFactory.get().checkABAccountPosition();
+        } catch (Exception e) {
+            log.error("[持仓检测]:出现异常:{}", e);
+        }
     }
     
     /**
