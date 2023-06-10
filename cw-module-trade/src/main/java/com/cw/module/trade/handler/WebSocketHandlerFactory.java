@@ -269,13 +269,13 @@ public class WebSocketHandlerFactory {
                             } else if(lastestPosition == null || lastestPosition.getQuantity().compareTo(new BigDecimal(0)) == 0) {
                                 BigDecimal positionProp  = order.getPrice()
                                         .multiply(order.getOrigQty()).divide(notifyAccount.formatTypeBalance("USDT"), 2, RoundingMode.HALF_DOWN);
-                                log.info("[跟随下单]：通知账户的比例:{}", positionProp);
+                                log.debug("[跟随下单]：通知账户的比例:{}", positionProp);
                                 BigDecimal accountBalance = account.formatTypeBalance("USDT");
-                                log.info("[跟随下单]：当前账号的余额:{}", accountBalance);
+                                log.debug("[跟随下单]：当前账号的余额:{}", accountBalance);
                                 BigDecimal followAmount = positionProp.multiply(accountBalance);
-                                log.info("[跟随下单]：当前账号的跟随金额:{}", followAmount);
+                                log.debug("[跟随下单]：当前账号的跟随金额:{}", followAmount);
                                 followOrderQty = followAmount.divide(followOrderPrice, scale, RoundingMode.DOWN);
-                                log.info("[跟随下单]：当前账号的跟随数量:{}", followOrderQty);
+                                log.debug("[跟随下单]：当前账号的跟随数量:{}", followOrderQty);
                             } else {
                                 followOrderQty = order.getOrigQty().
                                         divide(lastestPosition.getQuantity().abs(), 2, RoundingMode.HALF_DOWN)
@@ -488,6 +488,7 @@ public class WebSocketHandlerFactory {
                 if(initBalance.compareTo(BigDecimal.ZERO) == 0) {
                     continue;
                 }
+                log.info("[亏损检测]:lastestBalance:{},initBalance:{},rait:{}", lastestBalance, initBalance, rait);
                 if(initBalance.subtract(lastestBalance).divide(initBalance, 2, RoundingMode.HALF_DOWN).compareTo(rait) == 1) {
                     stopFollowAccout.add(accountId);
                 } else {
@@ -576,6 +577,7 @@ public class WebSocketHandlerFactory {
             if(NumberUtils.gtz(account.getFollowAccount())) {
                 Map<String, Position> bPositions = accountPsitions.get(account.getId());
                 Map<String, Position> aPositions = accountPsitions.get(account.getFollowAccount());
+                log.warn("[清仓检测]:a账户持仓:{},b账户持仓:{}", JsonUtil.object2String(aPositions), JsonUtil.object2String(bPositions));
                 for(String symbol : bPositions.keySet()) {
                     Position aPosition = aPositions.get(symbol);
                     if(aPosition == null
