@@ -532,7 +532,9 @@ public class WebSocketHandlerFactory {
             ExchangeInfoEntry symbolRule = this.exchangeInformation.getSymbols().stream().filter(
                     item -> symbol.equals(item.getSymbol())).findFirst().orElse(null);
             BigDecimal tickSize = symbolRule.getFiltersFormat().get("PRICE_FILTER_tickSize");
+            log.info("[清仓检测]:symbol:{},newPrice:{},orderPrice:{},tickSize:{}", position.getSymbol(),newPrice, orderPrice, tickSize);
             orderPrice = orderPrice.setScale(tickSize.scale(), RoundingMode.HALF_DOWN);
+            log.info("[清仓检测]:orderPrice:{}", orderPrice);
             
             FollowRecordCreateReqVO reqVo1 = new FollowRecordCreateReqVO();
             reqVo1.setOperateAccount(accountId);
