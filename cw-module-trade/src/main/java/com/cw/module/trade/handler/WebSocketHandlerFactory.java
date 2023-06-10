@@ -530,7 +530,7 @@ public class WebSocketHandlerFactory {
                     PositionSide.LONG : PositionSide.SHORT;
             BigDecimal newPrice = MarkWebSocketHandlerFactory.get().getNewPrices().get(position.getSymbol());
             BigDecimal orderPrice = position.getPositionAmt().compareTo(new BigDecimal(0)) == 1 ?
-                    newPrice.multiply(new BigDecimal(0.85)) : newPrice.multiply(new BigDecimal(1.15));
+                    newPrice.multiply(new BigDecimal(0.85)) : newPrice.multiply(new BigDecimal(1.01));
             ExchangeInfoEntry symbolRule = this.exchangeInformation.getSymbols().stream().filter(
                     item -> symbol.equals(item.getSymbol())).findFirst().orElse(null);
             BigDecimal tickSize = symbolRule.getFiltersFormat().get("PRICE_FILTER_tickSize");
