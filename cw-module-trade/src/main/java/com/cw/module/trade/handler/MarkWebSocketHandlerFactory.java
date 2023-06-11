@@ -6,7 +6,6 @@ import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
@@ -27,8 +26,9 @@ import com.tb.utils.DateUtils;
 import com.tb.utils.json.JsonUtil;
 
 import cn.hutool.extra.spring.SpringUtil;
-import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class MarkWebSocketHandlerFactory {
 
@@ -61,6 +61,8 @@ public class MarkWebSocketHandlerFactory {
     
     private void compareSpots(Map<String, SymbolTickerEvent> symbolchange) {
         spotsSymbols.putAll(symbolchange);
+        BigDecimal maxRait = BigDecimal.ZERO;
+        String maxSymbol = null;
         for(SymbolTickerEvent symbolTicker : symbolchange.values()) {
             SymbolTickerEvent symbol = symbols.get(symbolTicker.getSymbol());
             if(symbol != null) {
@@ -68,13 +70,20 @@ public class MarkWebSocketHandlerFactory {
                     BigDecimal diff = symbol.getLastPrice().subtract(symbolTicker.getLastPrice()).abs();
                     BigDecimal min = symbol.getLastPrice().compareTo(symbolTicker.getLastPrice()) != 1 
                             ? symbol.getLastPrice() : symbolTicker.getLastPrice();
-                    if(diff.divide(min, 2, RoundingMode.HALF_DOWN).compareTo(new BigDecimal(0.05)) > 0) {
+                    BigDecimal rait = diff.divide(min, 2, RoundingMode.HALF_DOWN);
+                    if(rait.compareTo(new BigDecimal(0.05)) > 0) {
                         sendDingDingMessage(symbol.getSymbol(), DateUtils.formatForyyyyMMddHHmmss(new Date(symbolTicker.getEventTime())),
                                 symbol.getLastPrice().toString(), symbolTicker.getLastPrice().toString(),
-                                diff.toString(), diff.divide(min, 2, RoundingMode.HALF_DOWN).toString());
+                                diff.toString(), rait.toString());
+                    }
+                    if(rait.compareTo(maxRait) == 1) {
+                        maxRait = rait;
+                        maxSymbol = symbol.getSymbol();
                     }
                 }
             }
+            log.info("[合约现货价格监控]当前最大的价格差, 交易对: {}, 现货价格: {}, 合约价格: {}, 比例:{}", 
+                    maxSymbol, spotsSymbols.get(maxSymbol).getLastPrice(), symbols.get(maxSymbol).getLastPrice(), maxRait);
         }
     }
     
