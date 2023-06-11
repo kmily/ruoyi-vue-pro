@@ -4,12 +4,10 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentPageReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentReplyVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.ProductCommentUpdateVisibleReqVO;
-import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentAdditionalReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.comment.vo.AppCommentRespVO;
 import cn.iocoder.yudao.module.product.convert.comment.ProductCommentConvert;
@@ -82,7 +80,7 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
             o.setUserNickname("王二狗");
             o.setSpuName("感冒药");
             o.setScores(ProductCommentScoresEnum.FOUR.getScores());
-            o.setReplied(Boolean.TRUE);
+            o.setReplyStatus(Boolean.TRUE);
             o.setVisible(Boolean.TRUE);
             o.setId(generateId());
             o.setUserId(generateId());
@@ -93,12 +91,10 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
             o.setSkuId(generateId());
             o.setDescriptionScores(ProductCommentScoresEnum.FOUR.getScores());
             o.setBenefitScores(ProductCommentScoresEnum.FOUR.getScores());
-            o.setDeliveryScores(ProductCommentScoresEnum.FOUR.getScores());
             o.setContent("真好吃");
             o.setReplyUserId(generateId());
             o.setReplyContent("确实");
             o.setReplyTime(LocalDateTime.now());
-            o.setAdditionalTime(LocalDateTime.now());
             o.setCreateTime(LocalDateTime.now());
             o.setUpdateTime(LocalDateTime.now());
         });
@@ -118,7 +114,7 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
         // 测试 scores 不匹配
         productCommentMapper.insert(cloneIgnoreId(productComment, o -> o.setScores(ProductCommentScoresEnum.ONE.getScores())));
         // 测试 replied 不匹配
-        productCommentMapper.insert(cloneIgnoreId(productComment, o -> o.setReplied(Boolean.FALSE)));
+        productCommentMapper.insert(cloneIgnoreId(productComment, o -> o.setReplyStatus(Boolean.FALSE)));
         // 测试 visible 不匹配
         productCommentMapper.insert(cloneIgnoreId(productComment, o -> o.setVisible(Boolean.FALSE)));
 
@@ -194,29 +190,6 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
 
         ProductCommentDO productCommentDO = productCommentMapper.selectById(productCommentId);
         assertEquals("测试", productCommentDO.getReplyContent());
-    }
-
-    @Test
-    public void testCreateComment_success() {
-        // mock 测试
-        ProductCommentDO productComment = randomPojo(ProductCommentDO.class, o -> {
-            o.setAdditionalContent("");
-        });
-
-        productCommentService.createComment(productComment, Boolean.TRUE);
-
-        MemberUserRespDTO user = new MemberUserRespDTO();
-        user.setId(productComment.getUserId());
-
-        AppCommentAdditionalReqVO createReqVO = new AppCommentAdditionalReqVO();
-        createReqVO.setId(productComment.getId());
-        createReqVO.setAdditionalContent("追加");
-        createReqVO.setAdditionalPicUrls(productComment.getAdditionalPicUrls());
-
-        productCommentService.additionalComment(user, createReqVO);
-        ProductCommentDO exist = productCommentMapper.selectById(productComment.getId());
-
-        assertEquals("追加", exist.getAdditionalContent());
     }
 
 }

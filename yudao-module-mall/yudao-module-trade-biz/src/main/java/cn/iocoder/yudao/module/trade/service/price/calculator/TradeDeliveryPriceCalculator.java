@@ -4,17 +4,16 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
-import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
-import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateChargeDO;
-import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressTemplateFreeDO;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryExpressChargeModeEnum;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressTemplateService;
+import cn.iocoder.yudao.module.trade.service.delivery.bo.DeliveryExpressTemplateChargeBO;
+import cn.iocoder.yudao.module.trade.service.delivery.bo.DeliveryExpressTemplateFreeBO;
 import cn.iocoder.yudao.module.trade.service.delivery.bo.SpuDeliveryExpressTemplateRespBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO.OrderItem;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.DELIVERY_EXPRESS_USER_ADDRESS_IS_EMPTY;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRODUCT_EXPRESS_TEMPLATE_NOT_FOUND;
 
 /**
  * 运费的 {@link TradePriceCalculator} 实现类
@@ -32,12 +34,11 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  */
 @Component
 @Order(TradePriceCalculator.ORDER_DELIVERY)
+@Slf4j
 public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
 
     @Resource
     private AddressApi addressApi;
-    @Resource
-    private ProductSkuApi productSkuApi;
     @Resource
     private DeliveryExpressTemplateService deliveryExpressTemplateService;
 
@@ -47,43 +48,38 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
         if (param.getDeliveryType() == null || DeliveryTypeEnum.PICK_UP.getMode().equals(param.getDeliveryType())) {
             return;
         }
-        // 1.2 得到收件地址区域
         if (param.getAddressId() == null) {
-            return;
+            throw exception(DELIVERY_EXPRESS_USER_ADDRESS_IS_EMPTY);
         }
+        // 1.2 得到收件地址区域
         AddressRespDTO address = addressApi.getAddress(param.getAddressId(), param.getUserId());
         Assert.notNull(address, "收件人({})的地址，不能为空", param.getUserId());
 
-        //1.3 过滤出已选中的商品SKU
+        // 2. 过滤出已选中的商品SKU
         List<OrderItem> selectedItem = filterList(result.getItems(), OrderItem::getSelected);
-
+        Set<Long> spuIds = convertSet(selectedItem, OrderItem::getSpuId);
         Map<Long, SpuDeliveryExpressTemplateRespBO> spuExpressTemplateMap =
-                deliveryExpressTemplateService.getExpressTemplateBySpuIdsAndArea(
-                        convertSet(selectedItem, OrderItem::getSpuId), address.getAreaId());
-
-        // 1.4 计算配送费用
-        if (CollUtil.isNotEmpty(spuExpressTemplateMap)) {
-            calculateDeliveryPrice(selectedItem, spuExpressTemplateMap, result);
+                deliveryExpressTemplateService.getExpressTemplateMapBySpuIdsAndArea(spuIds, address.getAreaId());
+        // 3. 计算配送费用
+        if (CollUtil.isEmpty(spuExpressTemplateMap)) {
+            log.error("找不到商品 SPU ID {}, area Id {} ,对应的运费模板", spuIds, address.getAreaId());
+            throw exception(PRODUCT_EXPRESS_TEMPLATE_NOT_FOUND);
         }
-
+        calculateDeliveryPrice(selectedItem, spuExpressTemplateMap, result);
     }
 
     private void calculateDeliveryPrice(List<OrderItem> selectedSkus,
                                         Map<Long, SpuDeliveryExpressTemplateRespBO> spuExpressTemplateMap,
                                         TradePriceCalculateRespBO result) {
-        Set<Long> skuIds = convertSet(selectedSkus, OrderItem::getSkuId);
-        // 得到SKU 详情。得到 重量体积
-        Map<Long, ProductSkuRespDTO> skuRespMap = convertMap(productSkuApi.getSkuList(skuIds), ProductSkuRespDTO::getId);
-        // 按spu 来计算商品的运费 一个 spuId 可能对应多条订单商品 SKU,
+        // 按 SPU 来计算商品的运费：一个 spuId 可能对应多条订单商品 SKU
         Map<Long, List<OrderItem>> spuIdItemMap = convertMultiMap(selectedSkus, OrderItem::getSpuId);
-
         // 依次计算每个 SPU 的快递运费
         for (Map.Entry<Long, List<OrderItem>> entry : spuIdItemMap.entrySet()) {
             Long spuId  = entry.getKey();
             List<OrderItem> orderItems = entry.getValue();
             SpuDeliveryExpressTemplateRespBO templateBO = spuExpressTemplateMap.get(spuId);
             if (templateBO == null) {
-                // 记录错误日志
+                log.error("不能计算快递运费。不能找到 spuId : {}. 对应的运费模板配置 Resp BO", spuId);
                 continue;
             }
             // 总件数, 总金额, 总重量， 总体积
@@ -92,20 +88,14 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
             double totalWeight = 0;
             double totalVolume = 0;
             for (OrderItem orderItem : orderItems) {
-                totalCount += orderItem.getCount();
-                totalPrice += orderItem.getPayPrice(); // 先按应付总金额来算，后面确认一下
-                ProductSkuRespDTO skuResp = skuRespMap.get(orderItem.getSkuId());
-                if (skuResp != null) {
-                    totalWeight = totalWeight + skuResp.getWeight() * orderItem.getCount();
-                    totalVolume = totalVolume + skuResp.getVolume() * orderItem.getCount();
-                }
+                totalCount  += orderItem.getCount();
+                totalPrice  += orderItem.getPayPrice();
+                totalWeight += totalWeight + orderItem.getWeight() * orderItem.getCount();
+                totalVolume += totalVolume + orderItem.getVolume() * orderItem.getCount();
             }
             // 优先判断是否包邮. 如果包邮不计算快递运费
-            if (checkExpressFree(templateBO.getChargeMode(), totalCount, totalWeight,
+            if (isExpressFree(templateBO.getChargeMode(), totalCount, totalWeight,
                             totalVolume, totalPrice, templateBO.getTemplateFree())) {
-                continue;
-            }
-            if (templateBO.getTemplateCharge() == null) {
                 continue;
             }
             // 计算快递运费
@@ -127,8 +117,12 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
      * @param orderItems SKU 商品项目
      */
     private void calculateExpressFeeByChargeMode(double totalCount, double totalWeight, double totalVolume,
-                                                 int chargeMode, DeliveryExpressTemplateChargeDO templateCharge,
+                                                 int chargeMode, DeliveryExpressTemplateChargeBO templateCharge,
                                                  List<OrderItem> orderItems) {
+        if (templateCharge == null) {
+            log.error("计算快递运费时，不能找到对应的快递运费模板费用配置。无法计算以下商品 SKU 项目运费: {}", orderItems);
+            return;
+        }
         DeliveryExpressChargeModeEnum chargeModeEnum = DeliveryExpressChargeModeEnum.valueOf(chargeMode);
         switch (chargeModeEnum) {
             case PIECE: {
@@ -153,7 +147,7 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
      * @param templateCharge 快递运费配置
      * @param orderItems     SKU 商品项目
      */
-    private void calculateExpressFee(double total, DeliveryExpressTemplateChargeDO templateCharge, List<OrderItem> orderItems) {
+    private void calculateExpressFee(double total, DeliveryExpressTemplateChargeBO templateCharge, List<OrderItem> orderItems) {
         int deliveryPrice;
         if (total <= templateCharge.getStartCount()) {
             deliveryPrice = templateCharge.getStartPrice();
@@ -175,10 +169,14 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
      * @param orderItems    SKU 商品
      */
     private void divideDeliveryPrice(int deliveryPrice, List<OrderItem> orderItems) {
+        // TODO @jason：分摊的话，是不是要按照比例呀？重量、价格、数量等等,
+        //  按比例是不是有点复杂。后面看看是否需要
         int dividePrice = deliveryPrice / orderItems.size();
         for (OrderItem item : orderItems) {
             // 更新快递运费
             item.setDeliveryPrice(dividePrice);
+
+            TradePriceCalculatorHelper.recountPayPrice(item);
         }
     }
 
@@ -192,8 +190,8 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
      * @param totalPrice   总金额
      * @param templateFree 包邮配置
      */
-    private boolean checkExpressFree(Integer chargeMode, int totalCount, double totalWeight,
-                                     double totalVolume, int totalPrice, DeliveryExpressTemplateFreeDO templateFree) {
+    private boolean isExpressFree(Integer chargeMode, int totalCount, double totalWeight,
+                                  double totalVolume, int totalPrice, DeliveryExpressTemplateFreeBO templateFree) {
         if (templateFree == null) {
             return false;
         }
@@ -206,7 +204,9 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
                 }
                 break;
             case WEIGHT:
-                //  freeCount 是不是应该是 double ??
+                // freeCount 是不是应该是 double ??
+                // TODO @jason：要不配置的时候，把它的单位和商品对齐？到底是 kg、还是斤
+                // TODO @芋艿 目前 包邮 件数/重量/体积 都用的是这个字段
                 if (totalWeight >= templateFree.getFreeCount()
                         && totalPrice >= templateFree.getFreePrice()) {
                     return true;

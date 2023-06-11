@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Schema(description = "用户APP - 商品评价 Response VO")
 @Data
@@ -14,7 +13,9 @@ import java.util.List;
 @ToString(callSuper = true)
 public class AppCommentRespVO extends AppCommentBaseVO {
 
-    @Schema(description = "评价人 用户编号", required = true, example = "15721")
+    // TODO puhui999：把 example 也补充下哈
+
+    @Schema(description = "评价人的用户编号", required = true, example = "15721")
     private Long userId;
 
     @Schema(description = "评价人名称", required = true, example = "张三")
@@ -36,7 +37,7 @@ public class AppCommentRespVO extends AppCommentBaseVO {
     private Long orderItemId;
 
     @Schema(description = "商家是否回复", required = true)
-    private Boolean replied;
+    private Boolean replyStatus;
 
     @Schema(description = "回复管理员编号", example = "22212")
     private Long replyUserId;
@@ -47,18 +48,10 @@ public class AppCommentRespVO extends AppCommentBaseVO {
     @Schema(description = "商家回复时间")
     private LocalDateTime replyTime;
 
-    @Schema(description = "追加评价内容")
-    private String additionalContent;
-
-    @Schema(description = "追评评价图片地址数组，以逗号分隔最多上传9张")
-    private List<String> additionalPicUrls;
-
-    @Schema(description = "追加评价时间")
-    private LocalDateTime additionalTime;
-
     @Schema(description = "创建时间", required = true)
     private LocalDateTime createTime;
 
     @Schema(description = "最终评分", required = true)
     private Integer finalScore;
+
 }

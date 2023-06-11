@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.controller.app.comment.vo;
 
+import cn.iocoder.yudao.module.product.controller.app.property.vo.value.AppProductPropertyValueDetailRespVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -7,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
+// TODO @puhui999：C 端可以不要 base 哈。
 @Data
 public class AppCommentBaseVO {
 
@@ -22,6 +24,9 @@ public class AppCommentBaseVO {
     @NotNull(message = "商品SKU编号不能为空")
     private Long skuId;
 
+    @Schema(description = "商品 SKU 属性", required = true)
+    private List<AppProductPropertyValueDetailRespVO> skuProperties; // TODO puhui999：这个需要从数据库查询哈
+
     @Schema(description = "评分星级 1-5分", required = true)
     @NotNull(message = "评分星级 1-5分不能为空")
     private Integer scores;
@@ -33,10 +38,6 @@ public class AppCommentBaseVO {
     @Schema(description = "服务星级 1-5分", required = true)
     @NotNull(message = "服务星级 1-5分不能为空")
     private Integer benefitScores;
-
-    @Schema(description = "配送星级 1-5分", required = true)
-    @NotNull(message = "配送星级 1-5分不能为空")
-    private Integer deliveryScores;
 
     @Schema(description = "评论内容", required = true)
     @NotNull(message = "评论内容不能为空")

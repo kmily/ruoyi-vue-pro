@@ -86,10 +86,10 @@ public interface DeliveryExpressTemplateService {
     /**
      * 基于指定的 SPU 编号数组和收件人地址区域编号. 获取匹配运费模板
      *
-     * @param ids    SPU 编号列表
+     * @param spuIds    SPU 编号列表
      * @param areaId 区域编号
      * @return Map (spuId -> 运费模板设置)
      */
-    Map<Long, SpuDeliveryExpressTemplateRespBO> getExpressTemplateBySpuIdsAndArea(Collection<Long> ids, Integer areaId);
+    Map<Long, SpuDeliveryExpressTemplateRespBO> getExpressTemplateMapBySpuIdsAndArea(Collection<Long> spuIds, Integer areaId);
 
 }
