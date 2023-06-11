@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbAndRedisUnitTest;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
-import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.MemberUser.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
 import cn.iocoder.yudao.module.member.service.auth.MemberAuthServiceImpl;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;

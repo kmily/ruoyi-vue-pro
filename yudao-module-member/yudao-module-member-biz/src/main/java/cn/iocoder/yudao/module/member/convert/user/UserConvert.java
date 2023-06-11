@@ -2,7 +2,8 @@ package cn.iocoder.yudao.module.member.convert.user;
 
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserInfoRespVO;
-import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.MemberUser.MemberUserDO;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserInfoRespVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.convert.user.UserConvert;
-import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.MemberUser.MemberUserDO;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;

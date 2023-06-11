@@ -10,7 +10,7 @@ import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
 import cn.iocoder.yudao.module.member.convert.auth.AuthConvert;
-import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.MemberUser.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import cn.iocoder.yudao.module.system.api.logger.LoginLogApi;

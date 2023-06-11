@@ -1,19 +1,75 @@
 package cn.iocoder.yudao.module.member.service.user;
 
-import cn.iocoder.yudao.framework.common.validation.Mobile;
-import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
-import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
-
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import javax.validation.*;
+
+import cn.iocoder.yudao.framework.common.validation.Mobile;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.*;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
+import cn.iocoder.yudao.module.member.dal.dataobject.MemberUser.MemberUserDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 /**
- * 会员用户 Service 接口
+ * 用户 Service 接口
  *
  * @author 芋道源码
  */
 public interface MemberUserService {
+
+    /**
+     * 创建用户
+     *
+     * @param createReqVO 创建信息
+     * @return 编号
+     */
+    Long createUser(@Valid MemberUserCreateReqVO createReqVO);
+
+    /**
+     * 更新用户
+     *
+     * @param updateReqVO 更新信息
+     */
+    void updateUser(@Valid MemberUserUpdateReqVO updateReqVO);
+
+    /**
+     * 删除用户
+     *
+     * @param id 编号
+     */
+    void deleteUser(Long id);
+
+    /**
+     * 获得用户
+     *
+     * @param id 编号
+     * @return 用户
+     */
+    MemberUserDO getUser(Long id);
+
+    /**
+     * 获得用户列表
+     *
+     * @param ids 编号
+     * @return 用户列表
+     */
+    List<MemberUserDO> getUserList(Collection<Long> ids);
+
+    /**
+     * 获得用户分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 用户分页
+     */
+    PageResult<MemberUserDO> getUserPage(MemberUserPageReqVO pageReqVO);
+
+    /**
+     * 获得用户列表, 用于 Excel 导出
+     *
+     * @param exportReqVO 查询条件
+     * @return 用户列表
+     */
+    List<MemberUserDO> getExportUserList(MemberUserExportReqVO exportReqVO);
 
     /**
      * 通过手机查询用户
@@ -49,21 +105,6 @@ public interface MemberUserService {
      */
     void updateUserLogin(Long id, String loginIp);
 
-    /**
-     * 通过用户 ID 查询用户
-     *
-     * @param id 用户ID
-     * @return 用户对象信息
-     */
-    MemberUserDO getUser(Long id);
-
-    /**
-     * 通过用户 ID 查询用户们
-     *
-     * @param ids 用户 ID
-     * @return 用户对象信息数组
-     */
-    List<MemberUserDO> getUserList(Collection<Long> ids);
 
     /**
      * 修改用户昵称
