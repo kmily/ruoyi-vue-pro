@@ -26,6 +26,7 @@ import com.tb.utils.DateUtils;
 import com.tb.utils.json.JsonUtil;
 
 import cn.hutool.extra.spring.SpringUtil;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -35,9 +36,10 @@ public class MarkWebSocketHandlerFactory {
     private static MarkWebSocketHandlerFactory singleton;
     
     
-    private static Map<String, SymbolTickerEvent> spotsSymbols = Maps.newConcurrentMap();
-    private static Map<String, SymbolTickerEvent> symbols = Maps.newConcurrentMap();
-    private static Map<String, Long> sendInterval = Maps.newConcurrentMap();
+    private Map<String, SymbolTickerEvent> spotsSymbols = Maps.newConcurrentMap();
+    @Getter
+    private Map<String, SymbolTickerEvent> symbols = Maps.newConcurrentMap();
+    private Map<String, Long> sendInterval = Maps.newConcurrentMap();
     
     public static MarkWebSocketHandlerFactory get() {
         if (singleton == null) {

@@ -528,7 +528,7 @@ public class WebSocketHandlerFactory {
                     OrderSide.SELL : OrderSide.BUY;
             PositionSide positionSide = position.getPositionAmt().compareTo(new BigDecimal(0)) == 1 ?
                     PositionSide.LONG : PositionSide.SHORT;
-            BigDecimal newPrice = MarkWebSocketHandlerFactory.get().getNewPrices().get(position.getSymbol());
+            BigDecimal newPrice = MarkWebSocketHandlerFactory.get().getSymbols().get(position.getSymbol()).getLastPrice();
             BigDecimal orderPrice = position.getPositionAmt().compareTo(new BigDecimal(0)) == 1 ?
                     newPrice.multiply(new BigDecimal(0.85)) : newPrice.multiply(new BigDecimal(1.01));
             ExchangeInfoEntry symbolRule = this.exchangeInformation.getSymbols().stream().filter(
