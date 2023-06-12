@@ -62,30 +62,34 @@ public class MarkWebSocketHandlerFactory {
     }
     
     private void compareSpots(Map<String, SymbolTickerEvent> symbolchange) {
-        spotsSymbols.putAll(symbolchange);
-        BigDecimal maxRait = BigDecimal.ZERO;
-        String maxSymbol = null;
-        for(SymbolTickerEvent symbolTicker : symbolchange.values()) {
-            SymbolTickerEvent symbol = symbols.get(symbolTicker.getSymbol());
-            if(symbol != null) {
-                if(symbolTicker.getEventTime() - symbol.getEventTime() < 2000) {
-                    BigDecimal diff = symbol.getLastPrice().subtract(symbolTicker.getLastPrice()).abs();
-                    BigDecimal min = symbol.getLastPrice().compareTo(symbolTicker.getLastPrice()) != 1 
-                            ? symbol.getLastPrice() : symbolTicker.getLastPrice();
-                    BigDecimal rait = diff.divide(min, 2, RoundingMode.HALF_DOWN);
-                    if(rait.compareTo(new BigDecimal(0.05)) > 0) {
-                        sendDingDingMessage(symbol.getSymbol(), DateUtils.formatForyyyyMMddHHmmss(new Date(symbolTicker.getEventTime())),
-                                symbol.getLastPrice().toString(), symbolTicker.getLastPrice().toString(),
-                                diff.toString(), rait.toString());
-                    }
-                    if(rait.compareTo(maxRait) == 1) {
-                        maxRait = rait;
-                        maxSymbol = symbol.getSymbol();
+        try {
+            spotsSymbols.putAll(symbolchange);
+            BigDecimal maxRait = BigDecimal.ZERO;
+            String maxSymbol = null;
+            for(SymbolTickerEvent symbolTicker : symbolchange.values()) {
+                SymbolTickerEvent symbol = symbols.get(symbolTicker.getSymbol());
+                if(symbol != null) {
+                    if(symbolTicker.getEventTime() - symbol.getEventTime() < 2000) {
+                        BigDecimal diff = symbol.getLastPrice().subtract(symbolTicker.getLastPrice()).abs();
+                        BigDecimal min = symbol.getLastPrice().compareTo(symbolTicker.getLastPrice()) != 1 
+                                ? symbol.getLastPrice() : symbolTicker.getLastPrice();
+                        BigDecimal rait = diff.divide(min, 2, RoundingMode.HALF_DOWN);
+                        if(rait.compareTo(new BigDecimal(0.05)) > 0) {
+                            sendDingDingMessage(symbol.getSymbol(), DateUtils.formatForyyyyMMddHHmmss(new Date(symbolTicker.getEventTime())),
+                                    symbol.getLastPrice().toString(), symbolTicker.getLastPrice().toString(),
+                                    diff.toString(), rait.toString());
+                        }
+                        if(rait.compareTo(maxRait) == 1) {
+                            maxRait = rait;
+                            maxSymbol = symbol.getSymbol();
+                        }
                     }
                 }
+                log.info("[合约现货价格监控]当前最大的价格差, 交易对: {}, 现货价格: {}, 合约价格: {}, 比例:{}", 
+                        maxSymbol, spotsSymbols.get(maxSymbol).getLastPrice(), symbols.get(maxSymbol).getLastPrice(), maxRait);
             }
-            log.info("[合约现货价格监控]当前最大的价格差, 交易对: {}, 现货价格: {}, 合约价格: {}, 比例:{}", 
-                    maxSymbol, spotsSymbols.get(maxSymbol).getLastPrice(), symbols.get(maxSymbol).getLastPrice(), maxRait);
+        } catch (Exception e) {
+            log.error("[合约价格监控]出现异常", e);
         }
     }
     
