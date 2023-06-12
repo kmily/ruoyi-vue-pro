@@ -11,7 +11,7 @@ import javax.validation.constraints.*;
 @ToString(callSuper = true)
 public class BorrowUpdateReqVO extends BorrowBaseVO {
 
-    @Schema(description = "id", required = true, example = "23865")
+    @Schema(description = "id", required = true, example = "29419")
     @NotNull(message = "id不能为空")
     private Long id;
 

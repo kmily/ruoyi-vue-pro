@@ -1,20 +1,20 @@
 package cn.iocoder.yudao.module.oa.dal.dataobject.attendance;
 
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.oa.enums.attendance.AttendancePeriodEnum;
-import cn.iocoder.yudao.module.oa.enums.attendance.AttendanceTypeEnum;
-import cn.iocoder.yudao.module.oa.enums.attendance.VisitCustomerTypeEnum;
-import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
-
+import java.util.*;
+import java.math.BigDecimal;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+import com.baomidou.mybatisplus.annotation.*;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
  * 考勤打卡 DO
  *
- * @author 管理员
+ * @author 东海
  */
 @TableName("oa_attendance")
 @KeySequence("oa_attendance_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -33,30 +33,36 @@ public class AttendanceDO extends BaseDO {
     private Long id;
     /**
      * 打卡类型
-     *
-     * 枚举 {@link AttendancePeriodEnum 对应的类}
      */
-    private int attendanceType;
+    private Byte attendanceType;
     /**
      * 打卡时间段
-     *
-     * 枚举 {@link AttendanceTypeEnum 对应的类}
      */
-    private String attendancePeriod;
+    private Byte attendancePeriod;
     /**
      * 工作内容
      */
     private String workContent;
+    /**
+     * 打卡地址
+     */
+    private String address;
+    /**
+     * 经度
+     */
+    private BigDecimal longitude;
+    /**
+     * 纬度
+     */
+    private BigDecimal latitude;
     /**
      * 拜访客户id
      */
     private Long customerId;
     /**
      * 拜访类型
-     *
-     * 枚举 {@link VisitCustomerTypeEnum 对应的类}
      */
-    private String visitType;
+    private Byte visitType;
     /**
      * 拜访事由
      */
@@ -66,7 +72,7 @@ public class AttendanceDO extends BaseDO {
      */
     private LocalDateTime leaveBeginTime;
     /**
-     * 请假结束日期
+     * 请假结束时间
      */
     private LocalDateTime leaveEndTime;
     /**
@@ -77,13 +83,5 @@ public class AttendanceDO extends BaseDO {
      * 请假工作交接
      */
     private String leaveHandover;
-    /**
-     * 创建者
-     */
-    private String creator;
-    /**
-     * 更新者
-     */
-    private String updater;
 
 }

@@ -1,18 +1,21 @@
 package cn.iocoder.yudao.module.oa.controller.admin.attendance.vo;
 
-import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
-import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
-import com.alibaba.excel.annotation.ExcelProperty;
-import lombok.Data;
-
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+import java.util.*;
+import java.math.BigDecimal;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
 
+import com.alibaba.excel.annotation.ExcelProperty;
 
 /**
  * 考勤打卡 Excel VO
  *
- * @author 管理员
+ * @author 东海
  */
 @Data
 public class AttendanceExcelVO {
@@ -20,15 +23,16 @@ public class AttendanceExcelVO {
     @ExcelProperty("id")
     private Long id;
 
-    @ExcelProperty(value = "打卡类型", converter = DictConvert.class)
-    @DictFormat("attendance_type") // TODO 代码优化：建议设置到对应的 XXXDictTypeConstants 枚举类中
-    private int attendanceType;
+    @ExcelProperty("打卡类型")
+    private Byte attendanceType;
 
-    @ExcelProperty(value = "打卡时间段", converter = DictConvert.class)
-    @DictFormat("attendance_period") // TODO 代码优化：建议设置到对应的 XXXDictTypeConstants 枚举类中
-    private String attendancePeriod;
+    @ExcelProperty("打卡时间段")
+    private Byte attendancePeriod;
 
-    @ExcelProperty("打卡地点")
+    @ExcelProperty("工作内容")
+    private String workContent;
+
+    @ExcelProperty("打卡地址")
     private String address;
 
     @ExcelProperty("经度")
@@ -37,15 +41,11 @@ public class AttendanceExcelVO {
     @ExcelProperty("纬度")
     private BigDecimal latitude;
 
-    @ExcelProperty("工作内容")
-    private String workContent;
-
     @ExcelProperty("拜访客户id")
     private Long customerId;
 
-    @ExcelProperty(value = "拜访类型", converter = DictConvert.class)
-    @DictFormat("visit_customer_type") // TODO 代码优化：建议设置到对应的 XXXDictTypeConstants 枚举类中
-    private int visitType;
+    @ExcelProperty("拜访类型")
+    private Byte visitType;
 
     @ExcelProperty("拜访事由")
     private String visitReason;
@@ -53,7 +53,7 @@ public class AttendanceExcelVO {
     @ExcelProperty("请假开始时间")
     private LocalDateTime leaveBeginTime;
 
-    @ExcelProperty("请假结束日期")
+    @ExcelProperty("请假结束时间")
     private LocalDateTime leaveEndTime;
 
     @ExcelProperty("请假事由")
@@ -62,13 +62,7 @@ public class AttendanceExcelVO {
     @ExcelProperty("请假工作交接")
     private String leaveHandover;
 
-    @ExcelProperty("创建者")
-    private String creator;
-
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
-
-    @ExcelProperty("更新者")
-    private String updater;
 
 }

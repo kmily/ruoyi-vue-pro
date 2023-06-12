@@ -18,7 +18,7 @@ import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.*;
 /**
  * 借支申请 Service 实现类
  *
- * @author 管理员
+ * @author 东海
  */
 @Service
 @Validated

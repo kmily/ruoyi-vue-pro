@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class BorrowRespVO extends BorrowBaseVO {
 
-    @Schema(description = "id", required = true, example = "23865")
+    @Schema(description = "id", required = true, example = "29419")
     private Long id;
 
     @Schema(description = "创建时间")

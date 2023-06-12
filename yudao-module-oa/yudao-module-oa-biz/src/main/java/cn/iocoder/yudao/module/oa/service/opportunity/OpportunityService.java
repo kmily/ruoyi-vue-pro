@@ -9,7 +9,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 /**
  * 商机 Service 接口
  *
- * @author 管理员
+ * @author 东海
  */
 public interface OpportunityService {
 

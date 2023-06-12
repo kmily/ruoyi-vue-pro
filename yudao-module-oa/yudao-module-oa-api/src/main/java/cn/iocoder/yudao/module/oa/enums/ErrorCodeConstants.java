@@ -33,5 +33,6 @@ public interface ErrorCodeConstants {
     ErrorCode SIGN_REQ_NOT_EXISTS = new ErrorCode(1005001010, "注册申请不存在");
     ErrorCode PRODUCT_NOT_EXISTS = new ErrorCode(1005001011, "产品不存在");
     ErrorCode PRODUCT_CODE_EXISTS = new ErrorCode(1005001012, "产品编码已存在");
+    ErrorCode OPPORTUNITY_FOLLOW_LOG_NOT_EXISTS = new ErrorCode(1005001013, "商机-跟进日志不存在");
 
 }

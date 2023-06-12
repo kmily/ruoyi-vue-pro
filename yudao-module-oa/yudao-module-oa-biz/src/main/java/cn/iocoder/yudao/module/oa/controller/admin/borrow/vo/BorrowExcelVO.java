@@ -1,15 +1,19 @@
 package cn.iocoder.yudao.module.oa.controller.admin.borrow.vo;
 
-import com.alibaba.excel.annotation.ExcelProperty;
-import lombok.Data;
-
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+import java.util.*;
+import java.math.BigDecimal;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+
+import com.alibaba.excel.annotation.ExcelProperty;
 
 /**
  * 借支申请 Excel VO
  *
- * @author 管理员
+ * @author 东海
  */
 @Data
 public class BorrowExcelVO {
@@ -27,21 +31,15 @@ public class BorrowExcelVO {
     private BigDecimal repaymentFee;
 
     @ExcelProperty("申请单状态")
-    private int status;
+    private Byte status;
 
     @ExcelProperty("审批状态")
-    private int approvalStatus;
+    private Byte approvalStatus;
 
     @ExcelProperty("备注")
     private String remark;
 
-    @ExcelProperty("创建者")
-    private String creator;
-
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
-
-    @ExcelProperty("更新者")
-    private String updater;
 
 }

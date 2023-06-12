@@ -1,26 +1,24 @@
 package cn.iocoder.yudao.module.oa.service.attendance;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.oa.controller.admin.attendance.vo.*;
-import cn.iocoder.yudao.module.oa.convert.attendance.AttendanceConvert;
-import cn.iocoder.yudao.module.oa.dal.dataobject.attendance.AttendanceDO;
-import cn.iocoder.yudao.module.oa.dal.mysql.attendance.AttendanceMapper;
-import cn.iocoder.yudao.module.oa.enums.attendance.AttendanceTypeEnum;
 import org.springframework.stereotype.Service;
+import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import cn.iocoder.yudao.module.oa.controller.admin.attendance.vo.*;
+import cn.iocoder.yudao.module.oa.dal.dataobject.attendance.AttendanceDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+
+import cn.iocoder.yudao.module.oa.convert.attendance.AttendanceConvert;
+import cn.iocoder.yudao.module.oa.dal.mysql.attendance.AttendanceMapper;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.ATTENDANCE_NOT_EXISTS;
-
+import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.*;
 
 /**
  * 考勤打卡 Service 实现类
  *
- * @author 管理员
+ * @author 东海
  */
 @Service
 @Validated
@@ -31,10 +29,6 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public Long createAttendance(AttendanceCreateReqVO createReqVO) {
-        //不同的类型检查插入方式不一样
-        if(createReqVO.getAttendanceType() == AttendanceTypeEnum.WORK.getType()){
-            //
-        }
         // 插入
         AttendanceDO attendance = AttendanceConvert.INSTANCE.convert(createReqVO);
         attendanceMapper.insert(attendance);
@@ -78,11 +72,6 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     public PageResult<AttendanceDO> getAttendancePage(AttendancePageReqVO pageReqVO) {
         return attendanceMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public PageResult<AttendanceDO> getAttendanceByTypeTimeRangePage(AttendanceTypeTimeRangePageReqVO pageReqVO) {
-        return attendanceMapper.selectPageByTypeTimeRange(pageReqVO);
     }
 
     @Override

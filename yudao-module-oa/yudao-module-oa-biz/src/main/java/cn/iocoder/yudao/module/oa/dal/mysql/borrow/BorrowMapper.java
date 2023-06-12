@@ -1,19 +1,18 @@
 package cn.iocoder.yudao.module.oa.dal.mysql.borrow;
 
+import java.util.*;
+
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.oa.controller.admin.borrow.vo.BorrowExportReqVO;
-import cn.iocoder.yudao.module.oa.controller.admin.borrow.vo.BorrowPageReqVO;
+import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.oa.dal.dataobject.borrow.BorrowDO;
 import org.apache.ibatis.annotations.Mapper;
-
-import java.util.List;
+import cn.iocoder.yudao.module.oa.controller.admin.borrow.vo.*;
 
 /**
  * 借支申请 Mapper
  *
- * @author 管理员
+ * @author 东海
  */
 @Mapper
 public interface BorrowMapper extends BaseMapperX<BorrowDO> {
@@ -26,9 +25,7 @@ public interface BorrowMapper extends BaseMapperX<BorrowDO> {
                 .eqIfPresent(BorrowDO::getStatus, reqVO.getStatus())
                 .eqIfPresent(BorrowDO::getApprovalStatus, reqVO.getApprovalStatus())
                 .eqIfPresent(BorrowDO::getRemark, reqVO.getRemark())
-                .eqIfPresent(BorrowDO::getCreator, reqVO.getCreator())
                 .betweenIfPresent(BorrowDO::getCreateTime, reqVO.getCreateTime())
-                .eqIfPresent(BorrowDO::getUpdater, reqVO.getUpdater())
                 .orderByDesc(BorrowDO::getId));
     }
 
@@ -40,9 +37,7 @@ public interface BorrowMapper extends BaseMapperX<BorrowDO> {
                 .eqIfPresent(BorrowDO::getStatus, reqVO.getStatus())
                 .eqIfPresent(BorrowDO::getApprovalStatus, reqVO.getApprovalStatus())
                 .eqIfPresent(BorrowDO::getRemark, reqVO.getRemark())
-                .eqIfPresent(BorrowDO::getCreator, reqVO.getCreator())
                 .betweenIfPresent(BorrowDO::getCreateTime, reqVO.getCreateTime())
-                .eqIfPresent(BorrowDO::getUpdater, reqVO.getUpdater())
                 .orderByDesc(BorrowDO::getId));
     }
 

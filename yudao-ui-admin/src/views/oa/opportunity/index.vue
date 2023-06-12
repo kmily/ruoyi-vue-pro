@@ -4,15 +4,29 @@
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="商机标题" prop="businessTitle">
-        <el-input v-model="queryParams.businessTitle" placeholder="请输入商机标题" clearable @keyup.enter.native="handleQuery" />
+        <el-input v-model="queryParams.businessTitle" placeholder="请输入商机标题" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="商机详情" prop="detail">
+        <el-input v-model="queryParams.detail" placeholder="请输入商机详情" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="上报时间" prop="reportTime">
+        <el-date-picker v-model="queryParams.reportTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
+      </el-form-item>
+      <el-form-item label="跟进用户id" prop="followUserId">
+        <el-input v-model="queryParams.followUserId" placeholder="请输入跟进用户id" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="商机状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择商机状态" clearable size="small">
           <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
-      <el-form-item label="创建者" prop="createBy">
-        <el-input v-model="queryParams.createBy" placeholder="请输入创建者" clearable @keyup.enter.native="handleQuery" />
+      <el-form-item label="备注" prop="remark">
+        <el-input v-model="queryParams.remark" placeholder="请输入备注" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="创建时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -24,11 +38,11 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
-          v-hasPermi="['oa:opportunity:create']">新增</el-button>
+                   v-hasPermi="['oa:opportunity:create']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
-          v-hasPermi="['oa:opportunity:export']">导出</el-button>
+                   v-hasPermi="['oa:opportunity:export']">导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -46,25 +60,23 @@
       <el-table-column label="跟进用户id" align="center" prop="followUserId" />
       <el-table-column label="商机状态" align="center" prop="status" />
       <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="创建者" align="center" prop="createBy" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="更新者" align="center" prop="updateBy" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
-            v-hasPermi="['oa:opportunity:update']">修改</el-button>
+                     v-hasPermi="['oa:opportunity:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
-            v-hasPermi="['oa:opportunity:delete']">删除</el-button>
+                     v-hasPermi="['oa:opportunity:delete']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <!-- 分页组件 -->
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
-      @pagination="getList" />
+                @pagination="getList"/>
 
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" :visible.sync="open" width="500px" v-dialogDrag append-to-body>
@@ -88,12 +100,6 @@
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" placeholder="请输入备注" />
-        </el-form-item>
-        <el-form-item label="创建者" prop="createBy">
-          <el-input v-model="form.createBy" placeholder="请输入创建者" />
-        </el-form-item>
-        <el-form-item label="更新者" prop="updateBy">
-          <el-input v-model="form.updateBy" placeholder="请输入更新者" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -132,8 +138,12 @@ export default {
         pageNo: 1,
         pageSize: 10,
         businessTitle: null,
+        detail: null,
+        reportTime: [],
+        followUserId: null,
         status: null,
-        createBy: null,
+        remark: null,
+        createTime: [],
       },
       // 表单参数
       form: {},
@@ -172,8 +182,6 @@ export default {
         followUserId: undefined,
         status: undefined,
         remark: undefined,
-        createBy: undefined,
-        updateBy: undefined,
       };
       this.resetForm("form");
     },
@@ -229,26 +237,26 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const id = row.id;
-      this.$modal.confirm('是否确认删除商机编号为"' + id + '"的数据项?').then(function () {
-        return deleteOpportunity(id);
-      }).then(() => {
-        this.getList();
-        this.$modal.msgSuccess("删除成功");
-      }).catch(() => { });
+      this.$modal.confirm('是否确认删除商机编号为"' + id + '"的数据项?').then(function() {
+          return deleteOpportunity(id);
+        }).then(() => {
+          this.getList();
+          this.$modal.msgSuccess("删除成功");
+        }).catch(() => {});
     },
     /** 导出按钮操作 */
     handleExport() {
       // 处理查询参数
-      let params = { ...this.queryParams };
+      let params = {...this.queryParams};
       params.pageNo = undefined;
       params.pageSize = undefined;
       this.$modal.confirm('是否确认导出所有商机数据项?').then(() => {
-        this.exportLoading = true;
-        return exportOpportunityExcel(params);
-      }).then(response => {
-        this.$download.excel(response, '商机.xls');
-        this.exportLoading = false;
-      }).catch(() => { });
+          this.exportLoading = true;
+          return exportOpportunityExcel(params);
+        }).then(response => {
+          this.$download.excel(response, '商机.xls');
+          this.exportLoading = false;
+        }).catch(() => {});
     }
   }
 };

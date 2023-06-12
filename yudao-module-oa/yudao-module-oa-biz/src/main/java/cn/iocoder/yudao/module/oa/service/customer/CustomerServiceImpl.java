@@ -1,27 +1,24 @@
 package cn.iocoder.yudao.module.oa.service.customer;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.oa.controller.admin.customer.vo.CustomerCreateReqVO;
-import cn.iocoder.yudao.module.oa.controller.admin.customer.vo.CustomerExportReqVO;
-import cn.iocoder.yudao.module.oa.controller.admin.customer.vo.CustomerPageReqVO;
-import cn.iocoder.yudao.module.oa.controller.admin.customer.vo.CustomerUpdateReqVO;
-import cn.iocoder.yudao.module.oa.convert.customer.CustomerConvert;
-import cn.iocoder.yudao.module.oa.dal.dataobject.customer.CustomerDO;
-import cn.iocoder.yudao.module.oa.dal.mysql.customer.CustomerMapper;
 import org.springframework.stereotype.Service;
+import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import cn.iocoder.yudao.module.oa.controller.admin.customer.vo.*;
+import cn.iocoder.yudao.module.oa.dal.dataobject.customer.CustomerDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+
+import cn.iocoder.yudao.module.oa.convert.customer.CustomerConvert;
+import cn.iocoder.yudao.module.oa.dal.mysql.customer.CustomerMapper;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.CUSTOMER_NOT_EXISTS;
+import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.*;
 
 /**
- * 客户管理 Service 实现类
+ * 客户 Service 实现类
  *
- * @author 管理员
+ * @author 东海
  */
 @Service
 @Validated

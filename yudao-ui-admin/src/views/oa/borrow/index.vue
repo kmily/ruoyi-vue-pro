@@ -3,13 +3,31 @@
 
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="说明" prop="borrowReason">
+        <el-input v-model="queryParams.borrowReason" placeholder="请输入说明" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="借支总费用" prop="borrowFee">
+        <el-input v-model="queryParams.borrowFee" placeholder="请输入借支总费用" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="已还款费用" prop="repaymentFee">
+        <el-input v-model="queryParams.repaymentFee" placeholder="请输入已还款费用" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
       <el-form-item label="申请单状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择申请单状态" clearable size="small">
           <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
-      <el-form-item label="创建者" prop="createBy">
-        <el-input v-model="queryParams.createBy" placeholder="请输入创建者" clearable @keyup.enter.native="handleQuery"/>
+      <el-form-item label="审批状态" prop="approvalStatus">
+        <el-select v-model="queryParams.approvalStatus" placeholder="请选择审批状态" clearable size="small">
+          <el-option label="请选择字典生成" value="" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="备注" prop="remark">
+        <el-input v-model="queryParams.remark" placeholder="请输入备注" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="创建时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -39,13 +57,11 @@
       <el-table-column label="申请单状态" align="center" prop="status" />
       <el-table-column label="审批状态" align="center" prop="approvalStatus" />
       <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="创建者" align="center" prop="createBy" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="更新者" align="center" prop="updateBy" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
@@ -84,12 +100,6 @@
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" placeholder="请输入备注" />
         </el-form-item>
-        <el-form-item label="创建者" prop="createBy">
-          <el-input v-model="form.createBy" placeholder="请输入创建者" />
-        </el-form-item>
-        <el-form-item label="更新者" prop="updateBy">
-          <el-input v-model="form.updateBy" placeholder="请输入更新者" />
-        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -126,8 +136,13 @@ export default {
       queryParams: {
         pageNo: 1,
         pageSize: 10,
+        borrowReason: null,
+        borrowFee: null,
+        repaymentFee: null,
         status: null,
-        createBy: null,
+        approvalStatus: null,
+        remark: null,
+        createTime: [],
       },
       // 表单参数
       form: {},
@@ -167,8 +182,6 @@ export default {
         status: undefined,
         approvalStatus: undefined,
         remark: undefined,
-        createBy: undefined,
-        updateBy: undefined,
       };
       this.resetForm("form");
     },

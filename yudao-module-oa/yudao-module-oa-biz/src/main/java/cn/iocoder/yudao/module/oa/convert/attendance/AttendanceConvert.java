@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.oa.dal.dataobject.attendance.AttendanceDO;
 /**
  * 考勤打卡 Convert
  *
- * @author 管理员
+ * @author 东海
  */
 @Mapper
 public interface AttendanceConvert {

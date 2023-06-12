@@ -12,7 +12,7 @@ import com.alibaba.excel.annotation.ExcelProperty;
 /**
  * 商机 Excel VO
  *
- * @author 管理员
+ * @author 东海
  */
 @Data
 public class OpportunityExcelVO {
@@ -33,18 +33,12 @@ public class OpportunityExcelVO {
     private Long followUserId;
 
     @ExcelProperty("商机状态")
-    private String status;
+    private Byte status;
 
     @ExcelProperty("备注")
     private String remark;
 
-    @ExcelProperty("创建者")
-    private String creator;
-
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
-
-    @ExcelProperty("更新者")
-    private String updater;
 
 }

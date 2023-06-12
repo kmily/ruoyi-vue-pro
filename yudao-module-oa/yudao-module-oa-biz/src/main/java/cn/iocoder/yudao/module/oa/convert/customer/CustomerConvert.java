@@ -1,20 +1,18 @@
 package cn.iocoder.yudao.module.oa.convert.customer;
 
+import java.util.*;
+
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.oa.controller.admin.customer.vo.CustomerCreateReqVO;
-import cn.iocoder.yudao.module.oa.controller.admin.customer.vo.CustomerExcelVO;
-import cn.iocoder.yudao.module.oa.controller.admin.customer.vo.CustomerRespVO;
-import cn.iocoder.yudao.module.oa.controller.admin.customer.vo.CustomerUpdateReqVO;
-import cn.iocoder.yudao.module.oa.dal.dataobject.customer.CustomerDO;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-
-import java.util.List;
+import cn.iocoder.yudao.module.oa.controller.admin.customer.vo.*;
+import cn.iocoder.yudao.module.oa.dal.dataobject.customer.CustomerDO;
 
 /**
- * 客户管理 Convert
+ * 客户 Convert
  *
- * @author 管理员
+ * @author 东海
  */
 @Mapper
 public interface CustomerConvert {

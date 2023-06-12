@@ -9,7 +9,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 /**
  * 借支申请 Service 接口
  *
- * @author 管理员
+ * @author 东海
  */
 public interface BorrowService {
 

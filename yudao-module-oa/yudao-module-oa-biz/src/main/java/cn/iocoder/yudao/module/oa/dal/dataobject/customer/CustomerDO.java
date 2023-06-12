@@ -1,16 +1,16 @@
 package cn.iocoder.yudao.module.oa.dal.dataobject.customer;
 
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.sun.xml.bind.v2.TODO;
 import lombok.*;
+import java.util.*;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+import com.baomidou.mybatisplus.annotation.*;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
- * 客户管理 DO
+ * 客户 DO
  *
- * @author 管理员
+ * @author 东海
  */
 @TableName("oa_customer")
 @KeySequence("oa_customer_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -23,6 +23,19 @@ import lombok.*;
 public class CustomerDO extends BaseDO {
 
     /**
+     * id
+     */
+    @TableId
+    private Long id;
+    /**
+     * 名称
+     */
+    private String customerName;
+    /**
+     * 类型
+     */
+    private Byte customerType;
+    /**
      * 联系人
      */
     private String contactName;
@@ -30,6 +43,18 @@ public class CustomerDO extends BaseDO {
      * 联系电话
      */
     private String contactPhone;
+    /**
+     * 省
+     */
+    private String province;
+    /**
+     * 市
+     */
+    private String city;
+    /**
+     * 区/县
+     */
+    private String district;
     /**
      * 详细地址
      */
@@ -46,33 +71,6 @@ public class CustomerDO extends BaseDO {
      * 税号
      */
     private String taxNumber;
-    /**
-     * id
-     */
-    @TableId
-    private Long id;
-    /**
-     * 名称
-     */
-    private String customerName;
-    /**
-     * 类型
-     *
-     * 枚举 {@link TODO oa_customer_type 对应的类}
-     */
-    private String customerType;
-    /**
-     * 省
-     */
-    private String province;
-    /**
-     * 市
-     */
-    private String city;
-    /**
-     * 区/县
-     */
-    private String district;
     /**
      * 备注
      */

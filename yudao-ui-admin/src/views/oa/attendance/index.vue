@@ -5,12 +5,49 @@
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="打卡类型" prop="attendanceType">
         <el-select v-model="queryParams.attendanceType" placeholder="请选择打卡类型" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.OA_ATTENDANCE_TYPE)" :key="dict.value" :label="dict.label"
-            :value="dict.value" />
+          <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
-      <el-form-item label="创建者" prop="creator">
-        <el-input v-model="queryParams.creator" placeholder="请输入创建者" clearable @keyup.enter.native="handleQuery" />
+      <el-form-item label="打卡时间段" prop="attendancePeriod">
+        <el-input v-model="queryParams.attendancePeriod" placeholder="请输入打卡时间段" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="打卡地址" prop="address">
+        <el-input v-model="queryParams.address" placeholder="请输入打卡地址" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="经度" prop="longitude">
+        <el-input v-model="queryParams.longitude" placeholder="请输入经度" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="纬度" prop="latitude">
+        <el-input v-model="queryParams.latitude" placeholder="请输入纬度" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="拜访客户id" prop="customerId">
+        <el-input v-model="queryParams.customerId" placeholder="请输入拜访客户id" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="拜访类型" prop="visitType">
+        <el-select v-model="queryParams.visitType" placeholder="请选择拜访类型" clearable size="small">
+          <el-option label="请选择字典生成" value="" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="拜访事由" prop="visitReason">
+        <el-input v-model="queryParams.visitReason" placeholder="请输入拜访事由" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="请假开始时间" prop="leaveBeginTime">
+        <el-date-picker v-model="queryParams.leaveBeginTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
+      </el-form-item>
+      <el-form-item label="请假结束时间" prop="leaveEndTime">
+        <el-date-picker v-model="queryParams.leaveEndTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
+      </el-form-item>
+      <el-form-item label="请假事由" prop="leaveReason">
+        <el-input v-model="queryParams.leaveReason" placeholder="请输入请假事由" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="请假工作交接" prop="leaveHandover">
+        <el-input v-model="queryParams.leaveHandover" placeholder="请输入请假工作交接" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="创建时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -22,11 +59,11 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
-          v-hasPermi="['oa:attendance:create']">新增</el-button>
+                   v-hasPermi="['oa:attendance:create']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
-          v-hasPermi="['oa:attendance:export']">导出</el-button>
+                   v-hasPermi="['oa:attendance:export']">导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -34,102 +71,90 @@
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
       <el-table-column label="id" align="center" prop="id" />
-      <el-table-column label="打卡类型" align="center" prop="attendanceType">
-        <template v-slot="scope">
-          <dict-tag :type="DICT_TYPE.ATTENDANCE_TYPE" :value="scope.row.attendanceType" />
-        </template>
-      </el-table-column>
-      <el-table-column label="打卡时间段" align="center" prop="attendancePeriod">
-        <template v-slot="scope">
-          <dict-tag :type="DICT_TYPE.ATTENDANCE_PERIOD" :value="scope.row.attendancePeriod" />
-        </template>
-      </el-table-column>
+      <el-table-column label="打卡类型" align="center" prop="attendanceType" />
+      <el-table-column label="打卡时间段" align="center" prop="attendancePeriod" />
       <el-table-column label="工作内容" align="center" prop="workContent" />
+      <el-table-column label="打卡地址" align="center" prop="address" />
+      <el-table-column label="经度" align="center" prop="longitude" />
+      <el-table-column label="纬度" align="center" prop="latitude" />
       <el-table-column label="拜访客户id" align="center" prop="customerId" />
-      <el-table-column label="拜访类型" align="center" prop="visitType">
-        <template v-slot="scope">
-          <dict-tag :type="DICT_TYPE.VISIT_CUSTOMER_TYPE" :value="scope.row.visitType" />
-        </template>
-      </el-table-column>
+      <el-table-column label="拜访类型" align="center" prop="visitType" />
       <el-table-column label="拜访事由" align="center" prop="visitReason" />
       <el-table-column label="请假开始时间" align="center" prop="leaveBeginTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.leaveBeginTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="请假结束日期" align="center" prop="leaveEndTime" width="180">
+      <el-table-column label="请假结束时间" align="center" prop="leaveEndTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.leaveEndTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="请假事由" align="center" prop="leaveReason" />
       <el-table-column label="请假工作交接" align="center" prop="leaveHandover" />
-      <el-table-column label="创建者" align="center" prop="createBy" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="更新者" align="center" prop="updateBy" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
-            v-hasPermi="['oa:attendance:update']">修改</el-button>
+                     v-hasPermi="['oa:attendance:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
-            v-hasPermi="['oa:attendance:delete']">删除</el-button>
+                     v-hasPermi="['oa:attendance:delete']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <!-- 分页组件 -->
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
-      @pagination="getList" />
+                @pagination="getList"/>
 
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" :visible.sync="open" width="500px" v-dialogDrag append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="打卡类型" prop="attendanceType">
           <el-select v-model="form.attendanceType" placeholder="请选择打卡类型">
-            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.OA_ATTENDANCE_TYPE)" :key="dict.value"
-              :label="dict.label" :value="dict.value" />
+            <el-option label="请选择字典生成" value="" />
           </el-select>
         </el-form-item>
         <el-form-item label="打卡时间段" prop="attendancePeriod">
           <el-input v-model="form.attendancePeriod" placeholder="请输入打卡时间段" />
         </el-form-item>
         <el-form-item label="工作内容">
-          <editor v-model="form.workContent" :min-height="192" />
+          <editor v-model="form.workContent" :min-height="192"/>
+        </el-form-item>
+        <el-form-item label="打卡地址" prop="address">
+          <el-input v-model="form.address" placeholder="请输入打卡地址" />
+        </el-form-item>
+        <el-form-item label="经度" prop="longitude">
+          <el-input v-model="form.longitude" placeholder="请输入经度" />
+        </el-form-item>
+        <el-form-item label="纬度" prop="latitude">
+          <el-input v-model="form.latitude" placeholder="请输入纬度" />
         </el-form-item>
         <el-form-item label="拜访客户id" prop="customerId">
           <el-input v-model="form.customerId" placeholder="请输入拜访客户id" />
         </el-form-item>
         <el-form-item label="拜访类型" prop="visitType">
           <el-select v-model="form.visitType" placeholder="请选择拜访类型">
-            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.OA_VISIT_TYPE)" :key="dict.value" :label="dict.label"
-              :value="dict.value" />
+            <el-option label="请选择字典生成" value="" />
           </el-select>
         </el-form-item>
         <el-form-item label="拜访事由" prop="visitReason">
           <el-input v-model="form.visitReason" placeholder="请输入拜访事由" />
         </el-form-item>
         <el-form-item label="请假开始时间" prop="leaveBeginTime">
-          <el-date-picker clearable v-model="form.leaveBeginTime" type="date" value-format="timestamp"
-            placeholder="选择请假开始时间" />
+          <el-date-picker clearable v-model="form.leaveBeginTime" type="date" value-format="timestamp" placeholder="选择请假开始时间" />
         </el-form-item>
-        <el-form-item label="请假结束日期" prop="leaveEndTime">
-          <el-date-picker clearable v-model="form.leaveEndTime" type="date" value-format="timestamp"
-            placeholder="选择请假结束日期" />
+        <el-form-item label="请假结束时间" prop="leaveEndTime">
+          <el-date-picker clearable v-model="form.leaveEndTime" type="date" value-format="timestamp" placeholder="选择请假结束时间" />
         </el-form-item>
         <el-form-item label="请假事由" prop="leaveReason">
           <el-input v-model="form.leaveReason" placeholder="请输入请假事由" />
         </el-form-item>
         <el-form-item label="请假工作交接" prop="leaveHandover">
           <el-input v-model="form.leaveHandover" placeholder="请输入请假工作交接" />
-        </el-form-item>
-        <el-form-item label="创建者" prop="createBy">
-          <el-input v-model="form.createBy" placeholder="请输入创建者" />
-        </el-form-item>
-        <el-form-item label="更新者" prop="updateBy">
-          <el-input v-model="form.updateBy" placeholder="请输入更新者" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -147,7 +172,7 @@ import Editor from '@/components/Editor';
 export default {
   name: "Attendance",
   components: {
-    Editor
+    Editor,
   },
   data() {
     return {
@@ -170,13 +195,24 @@ export default {
         pageNo: 1,
         pageSize: 10,
         attendanceType: null,
-        createBy: null,
+        attendancePeriod: null,
+        workContent: null,
+        address: null,
+        longitude: null,
+        latitude: null,
+        customerId: null,
+        visitType: null,
+        visitReason: null,
+        leaveBeginTime: [],
+        leaveEndTime: [],
+        leaveReason: null,
+        leaveHandover: null,
+        createTime: [],
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
-        attendanceType: [{ required: true, message: "打卡类型不能为空", trigger: "change" }],
       }
     };
   },
@@ -206,6 +242,9 @@ export default {
         attendanceType: undefined,
         attendancePeriod: undefined,
         workContent: undefined,
+        address: undefined,
+        longitude: undefined,
+        latitude: undefined,
         customerId: undefined,
         visitType: undefined,
         visitReason: undefined,
@@ -213,8 +252,6 @@ export default {
         leaveEndTime: undefined,
         leaveReason: undefined,
         leaveHandover: undefined,
-        createBy: undefined,
-        updateBy: undefined,
       };
       this.resetForm("form");
     },
@@ -270,26 +307,26 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const id = row.id;
-      this.$modal.confirm('是否确认删除考勤打卡编号为"' + id + '"的数据项?').then(function () {
-        return deleteAttendance(id);
-      }).then(() => {
-        this.getList();
-        this.$modal.msgSuccess("删除成功");
-      }).catch(() => { });
+      this.$modal.confirm('是否确认删除考勤打卡编号为"' + id + '"的数据项?').then(function() {
+          return deleteAttendance(id);
+        }).then(() => {
+          this.getList();
+          this.$modal.msgSuccess("删除成功");
+        }).catch(() => {});
     },
     /** 导出按钮操作 */
     handleExport() {
       // 处理查询参数
-      let params = { ...this.queryParams };
+      let params = {...this.queryParams};
       params.pageNo = undefined;
       params.pageSize = undefined;
       this.$modal.confirm('是否确认导出所有考勤打卡数据项?').then(() => {
-        this.exportLoading = true;
-        return exportAttendanceExcel(params);
-      }).then(response => {
-        this.$download.excel(response, '考勤打卡.xls');
-        this.exportLoading = false;
-      }).catch(() => { });
+          this.exportLoading = true;
+          return exportAttendanceExcel(params);
+        }).then(response => {
+          this.$download.excel(response, '考勤打卡.xls');
+          this.exportLoading = false;
+        }).catch(() => {});
     }
   }
 };

@@ -11,7 +11,7 @@ import javax.validation.constraints.*;
 @ToString(callSuper = true)
 public class OpportunityUpdateReqVO extends OpportunityBaseVO {
 
-    @Schema(description = "id", required = true, example = "17670")
+    @Schema(description = "id", required = true, example = "919")
     @NotNull(message = "id不能为空")
     private Long id;
 

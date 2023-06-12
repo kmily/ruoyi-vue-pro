@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class OpportunityRespVO extends OpportunityBaseVO {
 
-    @Schema(description = "id", required = true, example = "17670")
+    @Schema(description = "id", required = true, example = "919")
     private Long id;
 
     @Schema(description = "创建时间")

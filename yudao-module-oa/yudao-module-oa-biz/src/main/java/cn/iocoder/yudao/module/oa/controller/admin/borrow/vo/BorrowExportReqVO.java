@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.oa.controller.admin.borrow.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
+import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import java.time.LocalDateTime;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -13,7 +15,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class BorrowExportReqVO {
 
-    @Schema(description = "说明", example = "不喜欢")
+    @Schema(description = "说明", example = "不对")
     private String borrowReason;
 
     @Schema(description = "借支总费用")
@@ -23,22 +25,16 @@ public class BorrowExportReqVO {
     private BigDecimal repaymentFee;
 
     @Schema(description = "申请单状态", example = "2")
-    private int status;
+    private Byte status;
 
-    @Schema(description = "审批状态", example = "1")
-    private int approvalStatus;
+    @Schema(description = "审批状态", example = "2")
+    private Byte approvalStatus;
 
     @Schema(description = "备注", example = "你猜")
     private String remark;
 
-    @Schema(description = "创建者")
-    private String creator;
-
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
-
-    @Schema(description = "更新者")
-    private String updater;
 
 }

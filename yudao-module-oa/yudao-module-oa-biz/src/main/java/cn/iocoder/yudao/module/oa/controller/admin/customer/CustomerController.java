@@ -1,31 +1,34 @@
 package cn.iocoder.yudao.module.oa.controller.admin.customer;
 
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import org.springframework.web.bind.annotation.*;
+import javax.annotation.Resource;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.security.access.prepost.PreAuthorize;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Operation;
+
+import javax.validation.constraints.*;
+import javax.validation.*;
+import javax.servlet.http.*;
+import java.util.*;
+import java.io.IOException;
+
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
+
 import cn.iocoder.yudao.module.oa.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.oa.dal.dataobject.customer.CustomerDO;
-import cn.iocoder.yudao.module.oa.service.customer.CustomerService;
 import cn.iocoder.yudao.module.oa.convert.customer.CustomerConvert;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import cn.iocoder.yudao.module.oa.service.customer.CustomerService;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
-
-@Tag(name = "管理后台 - 客户管理")
+@Tag(name = "管理后台 - 客户")
 @RestController
 @RequestMapping("/oa/customer")
 @Validated
@@ -35,14 +38,14 @@ public class CustomerController {
     private CustomerService customerService;
 
     @PostMapping("/create")
-    @Operation(summary = "创建客户管理")
+    @Operation(summary = "创建客户")
     @PreAuthorize("@ss.hasPermission('oa:customer:create')")
     public CommonResult<Long> createCustomer(@Valid @RequestBody CustomerCreateReqVO createReqVO) {
         return success(customerService.createCustomer(createReqVO));
     }
 
     @PutMapping("/update")
-    @Operation(summary = "更新客户管理")
+    @Operation(summary = "更新客户")
     @PreAuthorize("@ss.hasPermission('oa:customer:update')")
     public CommonResult<Boolean> updateCustomer(@Valid @RequestBody CustomerUpdateReqVO updateReqVO) {
         customerService.updateCustomer(updateReqVO);
@@ -50,7 +53,7 @@ public class CustomerController {
     }
 
     @DeleteMapping("/delete")
-    @Operation(summary = "删除客户管理")
+    @Operation(summary = "删除客户")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('oa:customer:delete')")
     public CommonResult<Boolean> deleteCustomer(@RequestParam("id") Long id) {
@@ -59,7 +62,7 @@ public class CustomerController {
     }
 
     @GetMapping("/get")
-    @Operation(summary = "获得客户管理")
+    @Operation(summary = "获得客户")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('oa:customer:query')")
     public CommonResult<CustomerRespVO> getCustomer(@RequestParam("id") Long id) {
@@ -68,7 +71,7 @@ public class CustomerController {
     }
 
     @GetMapping("/list")
-    @Operation(summary = "获得客户管理列表")
+    @Operation(summary = "获得客户列表")
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
     @PreAuthorize("@ss.hasPermission('oa:customer:query')")
     public CommonResult<List<CustomerRespVO>> getCustomerList(@RequestParam("ids") Collection<Long> ids) {
@@ -77,7 +80,7 @@ public class CustomerController {
     }
 
     @GetMapping("/page")
-    @Operation(summary = "获得客户管理分页")
+    @Operation(summary = "获得客户分页")
     @PreAuthorize("@ss.hasPermission('oa:customer:query')")
     public CommonResult<PageResult<CustomerRespVO>> getCustomerPage(@Valid CustomerPageReqVO pageVO) {
         PageResult<CustomerDO> pageResult = customerService.getCustomerPage(pageVO);
@@ -85,7 +88,7 @@ public class CustomerController {
     }
 
     @GetMapping("/export-excel")
-    @Operation(summary = "导出客户管理 Excel")
+    @Operation(summary = "导出客户 Excel")
     @PreAuthorize("@ss.hasPermission('oa:customer:export')")
     @OperateLog(type = EXPORT)
     public void exportCustomerExcel(@Valid CustomerExportReqVO exportReqVO,
@@ -93,7 +96,7 @@ public class CustomerController {
         List<CustomerDO> list = customerService.getCustomerList(exportReqVO);
         // 导出 Excel
         List<CustomerExcelVO> datas = CustomerConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "客户管理.xls", "数据", CustomerExcelVO.class, datas);
+        ExcelUtils.write(response, "客户.xls", "数据", CustomerExcelVO.class, datas);
     }
 
 }
