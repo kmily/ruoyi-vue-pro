@@ -17,6 +17,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Component;
 
 import com.binance.client.SubscriptionClient;
@@ -85,8 +86,10 @@ public class MarkWebSocketHandlerFactory {
                         }
                     }
                 }
-                log.info("[合约现货价格监控]当前最大的价格差, 交易对: {}, 现货价格: {}, 合约价格: {}, 比例:{}", 
-                        maxSymbol, spotsSymbols.get(maxSymbol).getLastPrice(), symbols.get(maxSymbol).getLastPrice(), maxRait);
+                if(Strings.isNotBlank(maxSymbol)) {
+                    log.info("[合约现货价格监控]当前最大的价格差, 交易对: {}, 现货价格: {}, 合约价格: {}, 比例:{}", 
+                            maxSymbol, spotsSymbols.get(maxSymbol).getLastPrice(), symbols.get(maxSymbol).getLastPrice(), maxRait);
+                }
             }
         } catch (Exception e) {
             log.error("[合约价格监控]出现异常", e);
