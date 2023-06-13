@@ -2,9 +2,12 @@ package cn.iocoder.yudao.module.oa.service.customer;
 
 import java.util.*;
 import javax.validation.*;
+
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.oa.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.oa.dal.dataobject.customer.CustomerDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * 客户 Service 接口
@@ -51,6 +54,8 @@ public interface CustomerService {
      */
     List<CustomerDO> getCustomerList(Collection<Long> ids);
 
+
+    List<CustomerDO> getCustomerByName(String name);
     /**
      * 获得客户分页
      *
@@ -66,5 +71,6 @@ public interface CustomerService {
      * @return 客户列表
      */
     List<CustomerDO> getCustomerList(CustomerExportReqVO exportReqVO);
+
 
 }

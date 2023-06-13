@@ -70,6 +70,11 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public List<CustomerDO> getCustomerByName(String name) {
+        return customerMapper.selectByName(name);
+    }
+
+    @Override
     public PageResult<CustomerDO> getCustomerPage(CustomerPageReqVO pageReqVO) {
         return customerMapper.selectPage(pageReqVO);
     }
