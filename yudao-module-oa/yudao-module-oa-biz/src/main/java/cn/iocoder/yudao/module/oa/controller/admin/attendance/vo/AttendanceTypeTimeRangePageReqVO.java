@@ -24,4 +24,5 @@ public class AttendanceTypeTimeRangePageReqVO extends PageParam {
 
     @Schema(description = "创建者")
     private String creator;
+
 }

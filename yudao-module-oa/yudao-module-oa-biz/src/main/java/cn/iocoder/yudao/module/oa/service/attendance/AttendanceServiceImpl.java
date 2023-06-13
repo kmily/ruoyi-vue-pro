@@ -1,9 +1,13 @@
 package cn.iocoder.yudao.module.oa.service.attendance;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
+import java.awt.print.Pageable;
+import java.time.LocalDateTime;
 import java.util.*;
 import cn.iocoder.yudao.module.oa.controller.admin.attendance.vo.*;
 import cn.iocoder.yudao.module.oa.dal.dataobject.attendance.AttendanceDO;
@@ -79,4 +83,16 @@ public class AttendanceServiceImpl implements AttendanceService {
         return attendanceMapper.selectList(exportReqVO);
     }
 
+
+    @Override
+    public PageResult<AttendanceDO> getAttendancePage(AttendanceTypeTimeRangePageReqVO typeTimeRangePageReqVO) {
+//        LocalDateTime[] createTime = typeTimeRangePageReqVO.getCreateTime();
+//        LocalDateTime startDate = createTime[0];
+//        LocalDateTime endDate = createTime[1];
+//
+//
+//        Page<AttendanceDO> attendancePage = attendanceMapper.selectPageByTime(startDate, endDate);
+
+        return attendanceMapper.selectPageByTime(typeTimeRangePageReqVO);
+    }
 }

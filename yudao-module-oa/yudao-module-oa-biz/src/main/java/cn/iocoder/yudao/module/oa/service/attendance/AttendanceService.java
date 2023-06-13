@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.oa.service.attendance;
 
+import java.time.LocalDate;
 import java.util.*;
 import javax.validation.*;
 import cn.iocoder.yudao.module.oa.controller.admin.attendance.vo.*;
 import cn.iocoder.yudao.module.oa.dal.dataobject.attendance.AttendanceDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import org.springframework.data.annotation.CreatedDate;
 
 /**
  * 考勤打卡 Service 接口
@@ -67,4 +69,6 @@ public interface AttendanceService {
      */
     List<AttendanceDO> getAttendanceList(AttendanceExportReqVO exportReqVO);
 
+
+    PageResult<AttendanceDO> getAttendancePage(AttendanceTypeTimeRangePageReqVO timeVO);
 }

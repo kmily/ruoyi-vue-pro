@@ -87,6 +87,14 @@ public class AttendanceController {
         return success(AttendanceConvert.INSTANCE.convertPage(pageResult));
     }
 
+    @GetMapping("/time-page")
+    @Operation(summary = "获得考勤条件查询分页")
+    @PreAuthorize("@ss.hasPermission('oa:attendance:query')")
+    public CommonResult<PageResult<AttendanceRespVO>> findByDateBetween(@RequestParam("time") @Valid AttendanceTypeTimeRangePageReqVO timeVO) {
+        PageResult<AttendanceDO> pageResult = attendanceService.getAttendancePage(timeVO);
+        return success(AttendanceConvert.INSTANCE.convertPage(pageResult));
+    }
+
     @GetMapping("/export-excel")
     @Operation(summary = "导出考勤打卡 Excel")
     @PreAuthorize("@ss.hasPermission('oa:attendance:export')")
