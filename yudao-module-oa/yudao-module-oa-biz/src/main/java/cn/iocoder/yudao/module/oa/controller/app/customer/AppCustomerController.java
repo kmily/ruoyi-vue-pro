@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.module.oa.controller.admin.attendance.vo.AttendanceRespVO;
 import cn.iocoder.yudao.module.oa.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.oa.convert.customer.CustomerConvert;
 import cn.iocoder.yudao.module.oa.dal.dataobject.customer.CustomerDO;
@@ -68,6 +69,13 @@ public class AppCustomerController {
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
     public CommonResult<List<CustomerRespVO>> getCustomerList(@RequestParam("ids") Collection<Long> ids) {
         List<CustomerDO> list = customerService.getCustomerList(ids);
+        return success(CustomerConvert.INSTANCE.convertList(list));
+    }
+
+    @GetMapping("/getByName")
+    @Operation(summary = "通过名字获得客户列表")
+    public CommonResult<List<CustomerRespVO>> getCustomerByName(@RequestParam("name")String name){
+        List<CustomerDO> list = customerService.getCustomerByName(name);
         return success(CustomerConvert.INSTANCE.convertList(list));
     }
 

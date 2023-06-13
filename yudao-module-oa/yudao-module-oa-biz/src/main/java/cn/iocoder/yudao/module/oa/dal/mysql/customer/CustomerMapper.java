@@ -53,4 +53,8 @@ public interface CustomerMapper extends BaseMapperX<CustomerDO> {
                 .orderByDesc(CustomerDO::getId));
     }
 
+    default List<CustomerDO> selectByName(String name){
+        return selectList(new LambdaQueryWrapperX<CustomerDO>()
+                .likeIfPresent(CustomerDO::getCustomerName, name));
+    }
 }
