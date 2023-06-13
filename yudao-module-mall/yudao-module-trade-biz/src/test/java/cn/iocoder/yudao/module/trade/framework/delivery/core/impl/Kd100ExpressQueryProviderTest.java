@@ -15,35 +15,36 @@ import org.springframework.test.context.ActiveProfiles;
 
 import javax.annotation.Resource;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-// TODO @芋艿：单测最后 review
 /**
  * @author jason
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = KdNiaoExpressQueryProviderTest.Application.class)
-@ActiveProfiles("trade-delivery-query") // 设置使用 trade-delivery-query 配置文件 TODO @jason：可以直接写到 application-unit-test.yaml 配置文件里
-public class KdNiaoExpressQueryProviderTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = Kd100ExpressQueryProviderTest.Application.class)
+@ActiveProfiles("trade-delivery-query") // 设置使用 trade-delivery-query 配置文件
+public class Kd100ExpressQueryProviderTest {
     @Resource
     private RestTemplateBuilder builder;
     @Resource
     private TradeExpressQueryProperties expressQueryProperties;
 
-    private KdNiaoExpressQueryProvider kdNiaoExpressQueryProvider;
+    private Kd100ExpressQueryProvider kd100ExpressQueryProvider;
 
     @BeforeEach
     public void init(){
-        kdNiaoExpressQueryProvider = new KdNiaoExpressQueryProvider(builder.build(),expressQueryProperties.getKdNiao());
+        kd100ExpressQueryProvider = new Kd100ExpressQueryProvider(builder.build(),expressQueryProperties.getKd100());
     }
     @Test
     @Disabled("需要 授权 key. 暂时忽略")
     void testRealTimeQueryExpressFailed() {
-        assertThrows(ServiceException.class,() ->{
+        ServiceException t =  assertThrows(ServiceException.class, () -> {
             ExpressQueryReqDTO reqDTO = new ExpressQueryReqDTO();
-            reqDTO.setExpressCompanyCode("yy");
+            reqDTO.setExpressCompanyCode("yto");
             reqDTO.setLogisticsNo("YT9383342193097");
-            kdNiaoExpressQueryProvider.realTimeQueryExpress(reqDTO);
+            kd100ExpressQueryProvider.realTimeQueryExpress(reqDTO);
         });
+        assertEquals(1011003007, t.getCode());
     }
 
     @Import({
