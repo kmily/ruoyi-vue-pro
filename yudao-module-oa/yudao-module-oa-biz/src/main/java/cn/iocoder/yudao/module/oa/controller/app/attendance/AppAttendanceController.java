@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
+import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -89,8 +90,9 @@ public class AppAttendanceController {
 @GetMapping("/time-page")
 @Operation(summary = "获得考勤条件查询分页")
 public CommonResult<PageResult<AttendanceRespVO>> findByDateBetween(@Valid AttendanceTypeTimeRangePageReqVO timeVO) {
-    PageResult<AttendanceDO> pageResult = attendanceService.getAttendancePage(timeVO);
-    return success(AttendanceConvert.INSTANCE.convertPage(pageResult));
+        timeVO.setCreator(WebFrameworkUtils.getLoginUserId().toString());
+        PageResult<AttendanceDO> pageResult = attendanceService.getAttendancePage(timeVO);
+        return success(AttendanceConvert.INSTANCE.convertPage(pageResult));
 }
     @GetMapping("/export-excel")
     @Operation(summary = "导出考勤打卡 Excel")
