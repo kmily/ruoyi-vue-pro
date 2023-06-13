@@ -72,5 +72,4 @@ public interface CustomerService {
      */
     List<CustomerDO> getCustomerList(CustomerExportReqVO exportReqVO);
 
-
 }

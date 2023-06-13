@@ -102,5 +102,4 @@ public CommonResult<PageResult<AttendanceRespVO>> findByDateBetween(@Valid Atten
         List<AttendanceExcelVO> datas = AttendanceConvert.INSTANCE.convertList02(list);
         ExcelUtils.write(response, "考勤打卡.xls", "数据", AttendanceExcelVO.class, datas);
     }
-
 }
