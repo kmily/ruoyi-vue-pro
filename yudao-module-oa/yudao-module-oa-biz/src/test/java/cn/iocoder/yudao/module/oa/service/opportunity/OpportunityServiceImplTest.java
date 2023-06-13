@@ -120,7 +120,6 @@ public class OpportunityServiceImplTest extends BaseDbUnitTest {
        OpportunityPageReqVO reqVO = new OpportunityPageReqVO();
        reqVO.setBusinessTitle(null);
        reqVO.setStatus(null);
-       reqVO.setCreator(null);
 
        // 调用
        PageResult<OpportunityDO> pageResult = opportunityService.getOpportunityPage(reqVO);
@@ -150,7 +149,6 @@ public class OpportunityServiceImplTest extends BaseDbUnitTest {
        OpportunityExportReqVO reqVO = new OpportunityExportReqVO();
        reqVO.setBusinessTitle(null);
        reqVO.setStatus(null);
-       reqVO.setCreator(null);
 
        // 调用
        List<OpportunityDO> list = opportunityService.getOpportunityList(reqVO);

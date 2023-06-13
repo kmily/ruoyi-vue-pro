@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.oa.controller.admin.attendance.vo.*;
 import cn.iocoder.yudao.module.oa.convert.attendance.AttendanceConvert;
 import cn.iocoder.yudao.module.oa.dal.dataobject.attendance.AttendanceDO;
@@ -11,20 +12,14 @@ import cn.iocoder.yudao.module.oa.service.attendance.AttendanceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.security.access.prepost.PreAuthorize;
-import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
-
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -43,23 +38,11 @@ public class AppAttendanceController {
     @Operation(summary = "创建考勤打卡")
     public CommonResult<Long> createAttendance(@Valid @RequestBody AttendanceCreateReqVO createReqVO) {
         // 校验是否已经打卡
-        PageResult<AttendanceDO> list = attendanceService.validateAttenanceExists(createReqVO.getAttendanceType(), WebFrameworkUtils.getLoginUserId().toString());
+
+
+        PageResult<AttendanceDO> list = attendanceService.validateAttendanceExists( WebFrameworkUtils.getLoginUserId().toString());
         if (list.getTotal() > 0){
-            AttendanceUpdateReqVO tmp = new AttendanceUpdateReqVO();
-            tmp.setAttendanceType(createReqVO.getAttendanceType());
-            tmp.setId(list.getList().get(0).getId());
-            tmp.setAttendancePeriod(createReqVO.getAttendancePeriod());
-            tmp.setWorkContent(createReqVO.getWorkContent());
-            tmp.setAddress(createReqVO.getAddress());
-            tmp.setLongitude(createReqVO.getLongitude());
-            tmp.setLatitude(createReqVO.getLatitude());
-            tmp.setCustomerId(createReqVO.getCustomerId());
-            tmp.setVisitType(createReqVO.getVisitType());
-            tmp.setVisitReason(createReqVO.getVisitReason());
-            tmp.setLeaveBeginTime(createReqVO.getLeaveBeginTime());
-            tmp.setLeaveEndTime(createReqVO.getLeaveEndTime());
-            tmp.setLeaveReason(createReqVO.getLeaveReason());
-            tmp.setLeaveHandover(createReqVO.getLeaveHandover());
+            AttendanceUpdateReqVO tmp = AttendanceConvert.INSTANCE.convertUpdate(createReqVO, list.getList().get(0).getId());
             return success(Long.valueOf(attendanceService.updateAttendance(tmp)));
         }
         return success(attendanceService.createAttendance(createReqVO));

@@ -1,25 +1,21 @@
 package cn.iocoder.yudao.module.oa.service.attendance;
 
-import cn.hutool.core.date.DateTime;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import cn.iocoder.yudao.module.oa.controller.admin.attendance.vo.*;
+import cn.iocoder.yudao.module.oa.convert.attendance.AttendanceConvert;
+import cn.iocoder.yudao.module.oa.dal.dataobject.attendance.AttendanceDO;
+import cn.iocoder.yudao.module.oa.dal.mysql.attendance.AttendanceMapper;
 import org.springframework.stereotype.Service;
-import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
-import java.awt.print.Pageable;
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.*;
-import cn.iocoder.yudao.module.oa.controller.admin.attendance.vo.*;
-import cn.iocoder.yudao.module.oa.dal.dataobject.attendance.AttendanceDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
-import cn.iocoder.yudao.module.oa.convert.attendance.AttendanceConvert;
-import cn.iocoder.yudao.module.oa.dal.mysql.attendance.AttendanceMapper;
+import java.util.Collection;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.ATTENDANCE_NOT_EXISTS;
 
 /**
  * 考勤打卡 Service 实现类
@@ -65,9 +61,8 @@ public class AttendanceServiceImpl implements AttendanceService {
         }
     }
 
-    public PageResult<AttendanceDO> validateAttenanceExists(int attendancePeriod, String userId ){
+    public PageResult<AttendanceDO> validateAttendanceExists(String userId){
         AttendanceTypeTimeRangePageReqVO tmp = new AttendanceTypeTimeRangePageReqVO();
-        tmp.setAttendanceType(attendancePeriod);
         tmp.setCreateTime(new LocalDateTime[]{LocalDateTimeUtils.getTodayStart(), LocalDateTimeUtils.getTodayEnd()});
         tmp.setCreator(userId);
         return attendanceMapper.selectPageByTime(tmp);

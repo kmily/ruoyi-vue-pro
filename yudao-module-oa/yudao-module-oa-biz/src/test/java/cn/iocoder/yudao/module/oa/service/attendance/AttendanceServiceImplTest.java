@@ -105,18 +105,16 @@ public class AttendanceServiceImplTest extends BaseDbUnitTest {
     public void testGetAttendancePage() {
        // mock 数据
        AttendanceDO dbAttendance = randomPojo(AttendanceDO.class, o -> { // 等会查询到
-           o.setAttendanceType(1);
            o.setCreator(null);
        });
        attendanceMapper.insert(dbAttendance);
        // 测试 attendanceType 不匹配
-       attendanceMapper.insert(cloneIgnoreId(dbAttendance, o -> o.setAttendanceType(100)));
        // 测试 creator 不匹配
        attendanceMapper.insert(cloneIgnoreId(dbAttendance, o -> o.setCreator(null)));
        // 准备参数
        AttendancePageReqVO reqVO = new AttendancePageReqVO();
-       reqVO.setAttendanceType(1);
-       reqVO.setCreator(null);
+
+
 
        // 调用
        PageResult<AttendanceDO> pageResult = attendanceService.getAttendancePage(reqVO);
@@ -131,18 +129,16 @@ public class AttendanceServiceImplTest extends BaseDbUnitTest {
     public void testGetAttendanceList() {
        // mock 数据
        AttendanceDO dbAttendance = randomPojo(AttendanceDO.class, o -> { // 等会查询到
-           o.setAttendanceType(1);
            o.setCreator(null);
        });
        attendanceMapper.insert(dbAttendance);
        // 测试 attendanceType 不匹配
-       attendanceMapper.insert(cloneIgnoreId(dbAttendance, o -> o.setAttendanceType(1000)));
+       attendanceMapper.insert(cloneIgnoreId(dbAttendance, o -> o.setAttendanceType((byte) 1)));
        // 测试 creator 不匹配
        attendanceMapper.insert(cloneIgnoreId(dbAttendance, o -> o.setCreator(null)));
        // 准备参数
        AttendanceExportReqVO reqVO = new AttendanceExportReqVO();
-       reqVO.setAttendanceType(1);
-       reqVO.setCreator(null);
+
 
        // 调用
        List<AttendanceDO> list = attendanceService.getAttendanceList(reqVO);

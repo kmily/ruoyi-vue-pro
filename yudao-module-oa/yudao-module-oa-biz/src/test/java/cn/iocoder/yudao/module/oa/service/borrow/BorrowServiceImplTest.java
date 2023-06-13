@@ -135,9 +135,7 @@ public class BorrowServiceImplTest extends BaseDbUnitTest {
        reqVO.setBorrowFee(null);
        reqVO.setRepaymentFee(null);
        reqVO.setRemark(null);
-       reqVO.setCreator(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
-       reqVO.setUpdater(null);
 
        // 调用
        PageResult<BorrowDO> pageResult = borrowService.getBorrowPage(reqVO);
@@ -181,9 +179,7 @@ public class BorrowServiceImplTest extends BaseDbUnitTest {
        reqVO.setBorrowFee(null);
        reqVO.setRepaymentFee(null);
        reqVO.setRemark(null);
-       reqVO.setCreator(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
-       reqVO.setUpdater(null);
 
        // 调用
        List<BorrowDO> list = borrowService.getBorrowList(reqVO);

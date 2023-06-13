@@ -129,7 +129,6 @@ public class CustomerServiceImplTest extends BaseDbUnitTest {
        CustomerPageReqVO reqVO = new CustomerPageReqVO();
        reqVO.setContactName(null);
        reqVO.setContactPhone(null);
-       reqVO.setCreator(null);
        reqVO.setCustomerName(null);
        reqVO.setCustomerType(null);
        reqVO.setCity(null);
@@ -171,7 +170,6 @@ public class CustomerServiceImplTest extends BaseDbUnitTest {
        CustomerExportReqVO reqVO = new CustomerExportReqVO();
        reqVO.setContactName(null);
        reqVO.setContactPhone(null);
-       reqVO.setCreator(null);
        reqVO.setCustomerName(null);
        reqVO.setCustomerType(null);
        reqVO.setCity(null);
