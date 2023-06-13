@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -41,14 +42,34 @@ public class AppAttendanceController {
     @PostMapping("/create")
     @Operation(summary = "创建考勤打卡")
     public CommonResult<Long> createAttendance(@Valid @RequestBody AttendanceCreateReqVO createReqVO) {
+        // 校验是否已经打卡
+        PageResult<AttendanceDO> list = attendanceService.validateAttenanceExists(createReqVO.getAttendanceType(), WebFrameworkUtils.getLoginUserId().toString());
+        if (list.getTotal() > 0){
+            AttendanceUpdateReqVO tmp = new AttendanceUpdateReqVO();
+            tmp.setAttendanceType(createReqVO.getAttendanceType());
+            tmp.setId(list.getList().get(0).getId());
+            tmp.setAttendancePeriod(createReqVO.getAttendancePeriod());
+            tmp.setWorkContent(createReqVO.getWorkContent());
+            tmp.setAddress(createReqVO.getAddress());
+            tmp.setLongitude(createReqVO.getLongitude());
+            tmp.setLatitude(createReqVO.getLatitude());
+            tmp.setCustomerId(createReqVO.getCustomerId());
+            tmp.setVisitType(createReqVO.getVisitType());
+            tmp.setVisitReason(createReqVO.getVisitReason());
+            tmp.setLeaveBeginTime(createReqVO.getLeaveBeginTime());
+            tmp.setLeaveEndTime(createReqVO.getLeaveEndTime());
+            tmp.setLeaveReason(createReqVO.getLeaveReason());
+            tmp.setLeaveHandover(createReqVO.getLeaveHandover());
+            return success(Long.valueOf(attendanceService.updateAttendance(tmp)));
+        }
         return success(attendanceService.createAttendance(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新考勤打卡")
-    public CommonResult<Boolean> updateAttendance(@Valid @RequestBody AttendanceUpdateReqVO updateReqVO) {
-        attendanceService.updateAttendance(updateReqVO);
-        return success(true);
+    public CommonResult<Integer> updateAttendance(@Valid @RequestBody AttendanceUpdateReqVO updateReqVO) {
+
+        return success( attendanceService.updateAttendance(updateReqVO));
     }
 
     @DeleteMapping("/delete")

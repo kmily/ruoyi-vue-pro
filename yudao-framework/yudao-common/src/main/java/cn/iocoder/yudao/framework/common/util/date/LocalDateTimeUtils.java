@@ -60,4 +60,14 @@ public class LocalDateTimeUtils {
         return LocalDateTimeUtil.isIn(LocalDateTime.now(), startTime, endTime);
     }
 
+    //获取当天0时0分0秒
+    public static LocalDateTime getTodayStart() {
+        return LocalDateTime.of(LocalDateTime.now().toLocalDate(), LocalDateTime.MIN.toLocalTime());
+    }
+
+    //获取当天23时59分59秒
+    public static LocalDateTime getTodayEnd() {
+        return LocalDateTime.of(LocalDateTime.now().toLocalDate(), LocalDateTime.MAX.toLocalTime());
+    }
+
 }

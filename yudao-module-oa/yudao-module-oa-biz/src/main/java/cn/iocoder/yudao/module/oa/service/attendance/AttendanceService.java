@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.oa.service.attendance;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import javax.validation.*;
 import cn.iocoder.yudao.module.oa.controller.admin.attendance.vo.*;
@@ -28,7 +29,7 @@ public interface AttendanceService {
      *
      * @param updateReqVO 更新信息
      */
-    void updateAttendance(@Valid AttendanceUpdateReqVO updateReqVO);
+    int updateAttendance(@Valid AttendanceUpdateReqVO updateReqVO);
 
     /**
      * 删除考勤打卡
@@ -71,4 +72,6 @@ public interface AttendanceService {
 
 
     PageResult<AttendanceDO> getAttendancePage(AttendanceTypeTimeRangePageReqVO timeVO);
+
+    PageResult<AttendanceDO>  validateAttenanceExists(int attendancePeriod, String userId );
 }

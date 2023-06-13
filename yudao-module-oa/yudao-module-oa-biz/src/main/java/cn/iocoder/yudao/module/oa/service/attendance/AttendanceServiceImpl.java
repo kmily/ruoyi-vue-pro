@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.oa.service.attendance;
 
+import cn.hutool.core.date.DateTime;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -41,12 +43,12 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     @Override
-    public void updateAttendance(AttendanceUpdateReqVO updateReqVO) {
+    public int updateAttendance(AttendanceUpdateReqVO updateReqVO) {
         // 校验存在
         validateAttendanceExists(updateReqVO.getId());
         // 更新
         AttendanceDO updateObj = AttendanceConvert.INSTANCE.convert(updateReqVO);
-        attendanceMapper.updateById(updateObj);
+        return attendanceMapper.updateById(updateObj);
     }
 
     @Override
@@ -61,6 +63,14 @@ public class AttendanceServiceImpl implements AttendanceService {
         if (attendanceMapper.selectById(id) == null) {
             throw exception(ATTENDANCE_NOT_EXISTS);
         }
+    }
+
+    public PageResult<AttendanceDO> validateAttenanceExists(int attendancePeriod, String userId ){
+        AttendanceTypeTimeRangePageReqVO tmp = new AttendanceTypeTimeRangePageReqVO();
+        tmp.setAttendanceType(attendancePeriod);
+        tmp.setCreateTime(new LocalDateTime[]{LocalDateTimeUtils.getTodayStart(), LocalDateTimeUtils.getTodayEnd()});
+        tmp.setCreator(userId);
+        return attendanceMapper.selectPageByTime(tmp);
     }
 
     @Override
