@@ -57,11 +57,21 @@ public interface AttendanceMapper extends BaseMapperX<AttendanceDO> {
                 .orderByDesc(AttendanceDO::getId));
     }
     default PageResult<AttendanceDO> selectPageByTime(AttendanceTypeTimeRangePageReqVO typeTimeRangePageReqVO) {
-        return selectPage(typeTimeRangePageReqVO, new LambdaQueryWrapperX<AttendanceDO>()
-                .eqIfPresent(AttendanceDO::getAttendanceType, typeTimeRangePageReqVO.getAttendanceType())
-                .eqIfPresent(AttendanceDO::getCreator,typeTimeRangePageReqVO.getCreator())
-                .betweenIfPresent(AttendanceDO::getCreateTime, typeTimeRangePageReqVO.getCreateTime())
-                .orderByDesc(AttendanceDO::getId));
+
+        if(typeTimeRangePageReqVO.getAttendanceType()== 0){
+            return selectPage(typeTimeRangePageReqVO, new LambdaQueryWrapperX<AttendanceDO>()
+                    .eqIfPresent(AttendanceDO::getCreator,typeTimeRangePageReqVO.getCreator())
+                    .betweenIfPresent(AttendanceDO::getCreateTime, typeTimeRangePageReqVO.getCreateTime())
+                    .orderByDesc(AttendanceDO::getId));
+        }else{
+            return selectPage(typeTimeRangePageReqVO, new LambdaQueryWrapperX<AttendanceDO>()
+                    .eqIfPresent(AttendanceDO::getAttendanceType, typeTimeRangePageReqVO.getAttendanceType())
+                    .eqIfPresent(AttendanceDO::getCreator,typeTimeRangePageReqVO.getCreator())
+                    .betweenIfPresent(AttendanceDO::getCreateTime, typeTimeRangePageReqVO.getCreateTime())
+                    .orderByDesc(AttendanceDO::getId));
+        }
+
+
     }
 
 }
