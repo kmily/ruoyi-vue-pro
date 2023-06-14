@@ -2,7 +2,6 @@ package cn.iocoder.yudao.framework.mybatis.core.query;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -43,6 +42,13 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
 
     public LambdaQueryWrapperX<T> eqIfPresent(SFunction<T, ?> column, Object val) {
         if (ObjectUtil.isNotEmpty(val)) {
+            return (LambdaQueryWrapperX<T>) super.eq(column, val);
+        }
+        return this;
+    }
+
+    public LambdaQueryWrapperX<T> eqIfNotZero(SFunction<T, ?> column, Object val) {
+        if (String.valueOf(val) != "") {
             return (LambdaQueryWrapperX<T>) super.eq(column, val);
         }
         return this;

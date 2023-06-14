@@ -4,7 +4,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
-import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.AuthSmsSendReqVO;
 import cn.iocoder.yudao.module.system.controller.app.auth.vo.*;
@@ -81,7 +80,6 @@ public class AppAuthController {
 
     @PostMapping("/reset-password")
     @Operation(summary = "重置密码", description = "用户忘记密码时使用")
-    @PreAuthenticated
     public CommonResult<Boolean> resetPassword(@RequestBody @Valid AppAuthResetPasswordReqVO reqVO) {
         authService.resetPassword(reqVO);
         return success(true);
@@ -89,7 +87,6 @@ public class AppAuthController {
 
     @PostMapping("/update-password")
     @Operation(summary = "修改用户密码", description = "用户修改密码时使用")
-    @PreAuthenticated
     public CommonResult<Boolean> updatePassword(@RequestBody @Valid AppAuthUpdatePasswordReqVO reqVO) {
         authService.updatePassword(getLoginUserId(), reqVO);
         return success(true);
