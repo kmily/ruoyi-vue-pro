@@ -40,7 +40,7 @@ public class AppAttendanceController {
         // 校验是否已经打卡
 
 
-        PageResult<AttendanceDO> list = attendanceService.validateAttendanceExists( WebFrameworkUtils.getLoginUserId().toString());
+        PageResult<AttendanceDO> list = attendanceService.validateAttendanceExists(createReqVO.getAttendancePeriod(), WebFrameworkUtils.getLoginUserId().toString());
         if (list.getTotal() > 0){
             AttendanceUpdateReqVO tmp = AttendanceConvert.INSTANCE.convertUpdate(createReqVO, list.getList().get(0).getId());
             return success(Long.valueOf(attendanceService.updateAttendance(tmp)));

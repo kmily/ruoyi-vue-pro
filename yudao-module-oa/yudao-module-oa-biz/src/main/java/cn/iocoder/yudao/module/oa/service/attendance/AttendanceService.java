@@ -72,5 +72,5 @@ public interface AttendanceService {
 
     PageResult<AttendanceDO> getAttendancePage(AttendanceTypeTimeRangePageReqVO timeVO);
 
-    PageResult<AttendanceDO>  validateAttendanceExists(String userId );
+    PageResult<AttendanceDO>  validateAttendanceExists(Byte attendancePeriod,String userId );
 }
