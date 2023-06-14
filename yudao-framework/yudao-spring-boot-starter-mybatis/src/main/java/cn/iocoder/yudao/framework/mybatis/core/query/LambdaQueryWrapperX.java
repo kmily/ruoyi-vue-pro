@@ -48,7 +48,7 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
     }
 
     public LambdaQueryWrapperX<T> eqIfNotZero(SFunction<T, ?> column, Object val) {
-        if (String.valueOf(val) != "") {
+        if (!String.valueOf(val).equals("0")) {
             return (LambdaQueryWrapperX<T>) super.eq(column, val);
         }
         return this;
