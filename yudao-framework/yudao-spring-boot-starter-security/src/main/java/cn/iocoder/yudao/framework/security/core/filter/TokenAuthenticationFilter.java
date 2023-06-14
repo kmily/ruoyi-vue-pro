@@ -15,6 +15,7 @@ import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.system.api.oauth2.OAuth2TokenApi;
 import cn.iocoder.yudao.module.system.api.oauth2.dto.OAuth2AccessTokenCheckRespDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -23,6 +24,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.UNAUTHORIZED;
 
@@ -58,12 +61,30 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
                 // 1.3 如果没有登录用户，且当前请求不允许未登录访问，则抛出异常
                 if (loginUser == null) {
-                    String uri = request.getRequestURI();
-                    YudaoWebSecurityConfigurerAdapter.permitAllUrls.values().forEach(urls->{
-                        if(!urls.contains(uri)){
-                            throw ServiceExceptionUtil.exception(UNAUTHORIZED);
-                        }
-                    });
+                    String method = request.getMethod();
+                    Collection<String> urlSet = null;
+                    switch (method){
+                        case "GET":
+                            urlSet = YudaoWebSecurityConfigurerAdapter.permitAllUrls.get(HttpMethod.GET);
+                            break;
+                        case "POST":
+                            urlSet = YudaoWebSecurityConfigurerAdapter.permitAllUrls.get(HttpMethod.POST);
+                            break;
+                        case "PUT":
+                            urlSet = YudaoWebSecurityConfigurerAdapter.permitAllUrls.get(HttpMethod.PUT);
+                            break;
+                        case "DELETE":
+                            urlSet = YudaoWebSecurityConfigurerAdapter.permitAllUrls.get(HttpMethod.DELETE);
+                            break;
+                    }
+                    if(urlSet != null){
+                        String uri = request.getRequestURI();
+                        urlSet.forEach(urls->{
+                            if(!urls.contains(uri)){
+                                throw ServiceExceptionUtil.exception(UNAUTHORIZED);
+                            }
+                        });
+                    }
                 }
 
                 // 2. 设置当前用户
