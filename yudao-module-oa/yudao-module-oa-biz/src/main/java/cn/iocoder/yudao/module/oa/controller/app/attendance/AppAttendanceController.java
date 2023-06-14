@@ -91,13 +91,13 @@ public class AppAttendanceController {
 //        PageResult<AttendanceDO> pageResult = attendanceService.getAttendancePage(pageVO);
 //        return success(AttendanceConvert.INSTANCE.convertPage(pageResult));
 //    }
-@GetMapping("/time-page")
-@Operation(summary = "获得考勤条件查询分页")
-public CommonResult<PageResult<AttendanceRespVO>> findByDateBetween(@Valid AttendanceTypeTimeRangePageReqVO timeVO) {
-        timeVO.setCreator(WebFrameworkUtils.getLoginUserId().toString());
-        PageResult<AttendanceDO> pageResult = attendanceService.getAttendancePage(timeVO);
-        return success(AttendanceConvert.INSTANCE.convertPage(pageResult));
-}
+    @GetMapping("/time-page")
+    @Operation(summary = "获得考勤条件查询分页")
+    public CommonResult<PageResult<AttendanceRespVO>> findByDateBetween(@Valid AttendanceTypeTimeRangePageReqVO timeVO) {
+            timeVO.setCreator(WebFrameworkUtils.getLoginUserId().toString());
+            PageResult<AttendanceDO> pageResult = attendanceService.getAttendancePage(timeVO);
+            return success(AttendanceConvert.INSTANCE.convertPage(pageResult));
+    }
     @GetMapping("/export-excel")
     @Operation(summary = "导出考勤打卡 Excel")
     @OperateLog(type = EXPORT)

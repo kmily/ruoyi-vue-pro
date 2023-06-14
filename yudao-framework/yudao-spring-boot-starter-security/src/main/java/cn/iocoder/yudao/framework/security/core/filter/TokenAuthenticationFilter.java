@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.security.core.filter;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
@@ -21,6 +22,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.UNAUTHORIZED;
 
 /**
  * Token 过滤器，验证 token 的有效性
@@ -50,6 +53,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 // 1.2 模拟 Login 功能，方便日常开发调试
                 if (loginUser == null) {
                     loginUser = mockLoginUser(request, token, userType);
+                }
+
+                boolean login =  request.getRequestURL().toString().contains("login");
+                if (loginUser == null && !login) {
+                    throw ServiceExceptionUtil.exception(UNAUTHORIZED);
                 }
 
                 // 2. 设置当前用户
