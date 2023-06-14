@@ -25,4 +25,7 @@ public class AttendanceTypeTimeRangePageReqVO extends PageParam {
     @Schema(description = "创建者")
     private String creator;
 
+    @Schema(description = "打卡时间段")
+    private byte attendancePeriod;
+
 }

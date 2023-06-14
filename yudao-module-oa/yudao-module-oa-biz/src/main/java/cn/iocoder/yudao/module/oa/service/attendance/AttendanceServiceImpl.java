@@ -61,8 +61,9 @@ public class AttendanceServiceImpl implements AttendanceService {
         }
     }
 
-    public PageResult<AttendanceDO> validateAttendanceExists(String userId){
+    public PageResult<AttendanceDO> validateAttendanceExists(Byte attendancePeriod,String userId){
         AttendanceTypeTimeRangePageReqVO tmp = new AttendanceTypeTimeRangePageReqVO();
+        tmp.setAttendancePeriod(attendancePeriod);
         tmp.setCreateTime(new LocalDateTime[]{LocalDateTimeUtils.getTodayStart(), LocalDateTimeUtils.getTodayEnd()});
         tmp.setCreator(userId);
         return attendanceMapper.selectPageByTime(tmp);
