@@ -11,7 +11,7 @@ import java.lang.annotation.*;
  * @author 陈賝
  * @date 2023/6/8 17:04
  */
-@Target({ElementType.METHOD})
+@Target({ElementType.METHOD,ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface AfterSaleLog {

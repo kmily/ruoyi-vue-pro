@@ -5,7 +5,6 @@ import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.framework.trade.core.annotations.AfterSaleLog;
 import cn.iocoder.yudao.framework.trade.core.dto.TradeAfterSaleLogDTO;
 import cn.iocoder.yudao.framework.trade.core.service.AfterSaleLogService;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
@@ -29,6 +28,7 @@ import cn.iocoder.yudao.module.trade.enums.order.TradeOrderItemAfterSaleStatusEn
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +47,7 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
  *
  * @author 芋道源码
  */
+@Slf4j
 @Service
 @Validated
 public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSaleLogService {
@@ -74,12 +75,11 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
     @Transactional(rollbackFor = Exception.class)
     public Long createAfterSale(Long userId, AppTradeAfterSaleCreateReqVO createReqVO) {
         // 第一步，前置校验
-//        TradeOrderItemDO tradeOrderItem = validateOrderItemApplicable(userId, createReqVO);
-//
-//        // 第二步，存储交易售后
-//        TradeAfterSaleDO afterSale = createAfterSale(createReqVO, tradeOrderItem);
-//        return afterSale.getId();
-        return 1L;
+        TradeOrderItemDO tradeOrderItem = validateOrderItemApplicable(userId, createReqVO);
+
+        // 第二步，存储交易售后
+        TradeAfterSaleDO afterSale = createAfterSale(createReqVO, tradeOrderItem);
+        return afterSale.getId();
     }
 
     /**
@@ -392,7 +392,7 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
                 .setUserId(userId)
                 .setUserType(userType)
                 .setAfterSaleId(afterSale.getId())
-                .setOperateType(afterStatus);
+                .setOperateType(afterStatus.toString());
         // TODO 废弃，待删除
         this.insert(logDTO);
     }
@@ -407,11 +407,16 @@ public class TradeAfterSaleServiceImpl implements TradeAfterSaleService, AfterSa
     @Override
     @Async
     public void insert(TradeAfterSaleLogDTO logDTO) {
-        TradeAfterSaleLogDO afterSaleLog = new TradeAfterSaleLogDO()
-                .setUserId(logDTO.getUserId())
-                .setUserType(logDTO.getUserType())
-                .setAfterSaleId(logDTO.getAfterSaleId())
-                .setContent(logDTO.getContent());
-        tradeAfterSaleLogMapper.insert(afterSaleLog);
+        try {
+            TradeAfterSaleLogDO afterSaleLog = new TradeAfterSaleLogDO()
+                    .setUserId(logDTO.getUserId())
+                    .setUserType(logDTO.getUserType())
+                    .setAfterSaleId(logDTO.getAfterSaleId())
+                    .setOperateType(logDTO.getOperateType())
+                    .setContent(logDTO.getContent());
+            tradeAfterSaleLogMapper.insert(afterSaleLog);
+        }catch (Exception exception){
+            log.error("日志记录错误", exception);
+        }
     }
 }

@@ -33,7 +33,7 @@ public class TradeAfterSaleLogDTO {
     /**
      * 操作类型
      */
-    private Integer operateType;
+    private String operateType;
     /**
      * 操作明细
      */

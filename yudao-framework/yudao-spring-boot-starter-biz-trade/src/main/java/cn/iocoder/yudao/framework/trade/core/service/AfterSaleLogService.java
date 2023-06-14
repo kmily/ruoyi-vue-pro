@@ -12,6 +12,5 @@ public interface AfterSaleLogService {
      * @author 陈賝
      * @date 2023/6/12 14:18
      */
-    @Async
     void insert(TradeAfterSaleLogDTO logDTO);
 }

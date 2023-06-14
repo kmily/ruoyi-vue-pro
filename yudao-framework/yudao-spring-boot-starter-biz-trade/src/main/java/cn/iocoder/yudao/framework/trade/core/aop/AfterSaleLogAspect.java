@@ -11,6 +11,7 @@ import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
@@ -26,7 +27,6 @@ import java.util.Map;
  */
 @Slf4j
 @Aspect
-@Component
 public class AfterSaleLogAspect {
 
     @AfterReturning(pointcut = "@annotation(afterSaleLog)", returning = "info")
@@ -41,9 +41,10 @@ public class AfterSaleLogAspect {
                     .setUserType(userType)
                     .setAfterSaleId(Long.valueOf(formatObj.get("id")))
                     .setContent(formatObj.get("content"))
-                    .setOperateType(Integer.valueOf(formatObj.get("operateType")));
+                    .setOperateType(formatObj.get("operateType"));
             // 异步存入数据库
             SpringUtil.getBean(AfterSaleLogService.class).insert(dto);
+            System.out.println(dto.toString());
         } catch (Exception exception) {
             log.error("日志记录错误", exception);
         }
