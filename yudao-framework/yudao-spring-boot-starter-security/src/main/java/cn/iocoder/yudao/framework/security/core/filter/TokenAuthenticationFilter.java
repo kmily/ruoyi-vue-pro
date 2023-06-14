@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
+import cn.iocoder.yudao.framework.security.config.YudaoWebSecurityConfigurerAdapter;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
@@ -55,9 +56,14 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                     loginUser = mockLoginUser(request, token, userType);
                 }
 
-                boolean login =  request.getRequestURL().toString().contains("login");
-                if (loginUser == null && !login) {
-                    throw ServiceExceptionUtil.exception(UNAUTHORIZED);
+                // 1.3 如果没有登录用户，且当前请求不允许未登录访问，则抛出异常
+                if (loginUser == null) {
+                    String uri = request.getRequestURI();
+                    YudaoWebSecurityConfigurerAdapter.permitAllUrls.values().forEach(urls->{
+                        if(!urls.contains(uri)){
+                            throw ServiceExceptionUtil.exception(UNAUTHORIZED);
+                        }
+                    });
                 }
 
                 // 2. 设置当前用户
