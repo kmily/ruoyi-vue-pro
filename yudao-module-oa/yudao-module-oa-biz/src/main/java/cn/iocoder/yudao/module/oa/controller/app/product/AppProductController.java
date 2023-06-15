@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.oa.controller.admin.product.vo.*;
 import cn.iocoder.yudao.module.oa.convert.product.ProductConvert;
 import cn.iocoder.yudao.module.oa.dal.dataobject.product.ProductDO;
@@ -36,6 +37,7 @@ public class AppProductController {
 
     @GetMapping("/get")
     @Operation(summary = "获得产品")
+    @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     public CommonResult<ProductRespVO> getProduct(@RequestParam("id") Long id) {
         ProductDO product = productService.getProduct(id);
@@ -44,6 +46,7 @@ public class AppProductController {
 
     @GetMapping("/list")
     @Operation(summary = "获得产品列表")
+    @PreAuthenticated
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
     public CommonResult<List<ProductRespVO>> getProductList(@RequestParam("ids") Collection<Long> ids) {
         List<ProductDO> list = productService.getProductList(ids);
@@ -52,6 +55,7 @@ public class AppProductController {
 
     @GetMapping("/page")
     @Operation(summary = "获得产品分页")
+    @PreAuthenticated
     public CommonResult<PageResult<ProductRespVO>> getProductPage(@Valid ProductPageReqVO pageVO) {
         PageResult<ProductDO> pageResult = productService.getProductPage(pageVO);
         return success(ProductConvert.INSTANCE.convertPage(pageResult));
@@ -60,6 +64,7 @@ public class AppProductController {
     @GetMapping("/export-excel")
     @Operation(summary = "导出产品 Excel")
     @OperateLog(type = EXPORT)
+    @PreAuthenticated
     public void exportProductExcel(@Valid ProductExportReqVO exportReqVO,
               HttpServletResponse response) throws IOException {
         List<ProductDO> list = productService.getProductList(exportReqVO);

@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.oa.controller.admin.attendance.vo.*;
 import cn.iocoder.yudao.module.oa.convert.attendance.AttendanceConvert;
@@ -36,6 +37,7 @@ public class AppAttendanceController {
 
     @PostMapping("/create")
     @Operation(summary = "创建考勤打卡")
+    @PreAuthenticated
     public CommonResult<Long> createAttendance(@Valid @RequestBody AttendanceCreateReqVO createReqVO) {
         // 校验是否已经打卡
 
@@ -50,6 +52,7 @@ public class AppAttendanceController {
 
     @PutMapping("/update")
     @Operation(summary = "更新考勤打卡")
+    @PreAuthenticated
     public CommonResult<Integer> updateAttendance(@Valid @RequestBody AttendanceUpdateReqVO updateReqVO) {
 
         return success( attendanceService.updateAttendance(updateReqVO));
@@ -57,6 +60,7 @@ public class AppAttendanceController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除考勤打卡")
+    @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true)
     public CommonResult<Boolean> deleteAttendance(@RequestParam("id") Long id) {
         attendanceService.deleteAttendance(id);
@@ -65,6 +69,7 @@ public class AppAttendanceController {
 
     @GetMapping("/get")
     @Operation(summary = "获得考勤打卡")
+    @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     public CommonResult<AttendanceRespVO> getAttendance(@RequestParam("id") Long id) {
         AttendanceDO attendance = attendanceService.getAttendance(id);
@@ -73,6 +78,7 @@ public class AppAttendanceController {
 
     @GetMapping("/list")
     @Operation(summary = "获得考勤打卡列表")
+    @PreAuthenticated
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
     public CommonResult<List<AttendanceRespVO>> getAttendanceList(@RequestParam("ids") Collection<Long> ids) {
         List<AttendanceDO> list = attendanceService.getAttendanceList(ids);
@@ -81,6 +87,7 @@ public class AppAttendanceController {
 
     @GetMapping("/page")
     @Operation(summary = "获得考勤打卡分页")
+    @PreAuthenticated
     public CommonResult<PageResult<AttendanceRespVO>> getAttendancePage(@Valid AttendancePageReqVO pageVO) {
         PageResult<AttendanceDO> pageResult = attendanceService.getAttendancePage(pageVO);
         return success(AttendanceConvert.INSTANCE.convertPage(pageResult));
@@ -93,6 +100,7 @@ public class AppAttendanceController {
 //    }
     @GetMapping("/time-page")
     @Operation(summary = "获得考勤条件查询分页")
+    @PreAuthenticated
     public CommonResult<PageResult<AttendanceRespVO>> findByDateBetween(@Valid AttendanceTypeTimeRangePageReqVO timeVO) {
             timeVO.setCreator(WebFrameworkUtils.getLoginUserId().toString());
             PageResult<AttendanceDO> pageResult = attendanceService.getAttendancePage(timeVO);
@@ -101,6 +109,7 @@ public class AppAttendanceController {
     @GetMapping("/export-excel")
     @Operation(summary = "导出考勤打卡 Excel")
     @OperateLog(type = EXPORT)
+    @PreAuthenticated
     public void exportAttendanceExcel(@Valid AttendanceExportReqVO exportReqVO,
                                       HttpServletResponse response) throws IOException {
         List<AttendanceDO> list = attendanceService.getAttendanceList(exportReqVO);

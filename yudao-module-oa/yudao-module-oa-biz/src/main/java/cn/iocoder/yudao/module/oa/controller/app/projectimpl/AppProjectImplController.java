@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.oa.controller.admin.projectimpl.vo.*;
 import cn.iocoder.yudao.module.oa.convert.projectimpl.ProjectImplConvert;
 import cn.iocoder.yudao.module.oa.dal.dataobject.projectimpl.ProjectImplDO;
@@ -36,12 +37,14 @@ public class AppProjectImplController {
 
     @PostMapping("/create")
     @Operation(summary = "创建工程实施列")
+    @PreAuthenticated
     public CommonResult<Long> createProjectImpl(@Valid @RequestBody ProjectImplCreateReqVO createReqVO) {
         return success(projectImplService.createProjectImpl(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新工程实施列")
+    @PreAuthenticated
     public CommonResult<Boolean> updateProjectImpl(@Valid @RequestBody ProjectImplUpdateReqVO updateReqVO) {
         projectImplService.updateProjectImpl(updateReqVO);
         return success(true);
@@ -49,6 +52,7 @@ public class AppProjectImplController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除工程实施列")
+    @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true)
     public CommonResult<Boolean> deleteProjectImpl(@RequestParam("id") Long id) {
         projectImplService.deleteProjectImpl(id);
@@ -57,6 +61,7 @@ public class AppProjectImplController {
 
     @GetMapping("/get")
     @Operation(summary = "获得工程实施列")
+    @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     public CommonResult<ProjectImplRespVO> getProjectImpl(@RequestParam("id") Long id) {
         ProjectImplDO projectImpl = projectImplService.getProjectImpl(id);
@@ -65,6 +70,7 @@ public class AppProjectImplController {
 
     @GetMapping("/list")
     @Operation(summary = "获得工程实施列列表")
+    @PreAuthenticated
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
     public CommonResult<List<ProjectImplRespVO>> getProjectImplList(@RequestParam("ids") Collection<Long> ids) {
         List<ProjectImplDO> list = projectImplService.getProjectImplList(ids);
@@ -73,6 +79,7 @@ public class AppProjectImplController {
 
     @GetMapping("/page")
     @Operation(summary = "获得工程实施列分页")
+    @PreAuthenticated
     public CommonResult<PageResult<ProjectImplRespVO>> getProjectImplPage(@Valid ProjectImplPageReqVO pageVO) {
         PageResult<ProjectImplDO> pageResult = projectImplService.getProjectImplPage(pageVO);
         return success(ProjectImplConvert.INSTANCE.convertPage(pageResult));
@@ -80,6 +87,7 @@ public class AppProjectImplController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出工程实施列 Excel")
+    @PreAuthenticated
     @OperateLog(type = EXPORT)
     public void exportProjectImplExcel(@Valid ProjectImplExportReqVO exportReqVO,
               HttpServletResponse response) throws IOException {

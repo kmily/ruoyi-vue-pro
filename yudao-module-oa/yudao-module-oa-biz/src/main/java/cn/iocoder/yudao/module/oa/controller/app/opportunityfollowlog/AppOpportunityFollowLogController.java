@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.oa.controller.admin.opportunityfollowlog.vo.*;
 import cn.iocoder.yudao.module.oa.convert.opportunityfollowlog.OpportunityFollowLogConvert;
 import cn.iocoder.yudao.module.oa.dal.dataobject.opportunityfollowlog.OpportunityFollowLogDO;
@@ -37,12 +38,14 @@ public class AppOpportunityFollowLogController {
 
         @PostMapping("/create")
         @Operation(summary = "创建商机-跟进日志")
+        @PreAuthenticated
         public CommonResult<Long> createOpportunityFollowLog(@Valid @RequestBody OpportunityFollowLogCreateReqVO createReqVO) {
             return success(opportunityFollowLogService.createOpportunityFollowLog(createReqVO));
         }
 
         @PutMapping("/update")
         @Operation(summary = "更新商机-跟进日志")
+        @PreAuthenticated
         public CommonResult<Boolean> updateOpportunityFollowLog(@Valid @RequestBody OpportunityFollowLogUpdateReqVO updateReqVO) {
             opportunityFollowLogService.updateOpportunityFollowLog(updateReqVO);
             return success(true);
@@ -51,6 +54,7 @@ public class AppOpportunityFollowLogController {
         @DeleteMapping("/delete")
         @Operation(summary = "删除商机-跟进日志")
         @Parameter(name = "id", description = "编号", required = true)
+        @PreAuthenticated
         public CommonResult<Boolean> deleteOpportunityFollowLog(@RequestParam("id") Long id) {
             opportunityFollowLogService.deleteOpportunityFollowLog(id);
             return success(true);
@@ -58,6 +62,7 @@ public class AppOpportunityFollowLogController {
 
         @GetMapping("/get")
         @Operation(summary = "获得商机-跟进日志")
+        @PreAuthenticated
         @Parameter(name = "id", description = "编号", required = true, example = "1024")
         public CommonResult<OpportunityFollowLogRespVO> getOpportunityFollowLog(@RequestParam("id") Long id) {
             OpportunityFollowLogDO opportunityFollowLog = opportunityFollowLogService.getOpportunityFollowLog(id);
@@ -66,6 +71,7 @@ public class AppOpportunityFollowLogController {
 
         @GetMapping("/list")
         @Operation(summary = "获得商机-跟进日志列表")
+        @PreAuthenticated
         @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
         public CommonResult<List<OpportunityFollowLogRespVO>> getOpportunityFollowLogList(@RequestParam("ids") Collection<Long> ids) {
             List<OpportunityFollowLogDO> list = opportunityFollowLogService.getOpportunityFollowLogList(ids);
@@ -74,6 +80,7 @@ public class AppOpportunityFollowLogController {
 
         @GetMapping("/page")
         @Operation(summary = "获得商机-跟进日志分页")
+        @PreAuthenticated
         public CommonResult<PageResult<OpportunityFollowLogRespVO>> getOpportunityFollowLogPage(@Valid OpportunityFollowLogPageReqVO pageVO) {
             PageResult<OpportunityFollowLogDO> pageResult = opportunityFollowLogService.getOpportunityFollowLogPage(pageVO);
             return success(OpportunityFollowLogConvert.INSTANCE.convertPage(pageResult));
@@ -82,6 +89,7 @@ public class AppOpportunityFollowLogController {
         @GetMapping("/export-excel")
         @Operation(summary = "导出商机-跟进日志 Excel")
         @OperateLog(type = EXPORT)
+        @PreAuthenticated
         public void exportOpportunityFollowLogExcel(@Valid OpportunityFollowLogExportReqVO exportReqVO,
                                                     HttpServletResponse response) throws IOException {
             List<OpportunityFollowLogDO> list = opportunityFollowLogService.getOpportunityFollowLogList(exportReqVO);
