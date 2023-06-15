@@ -51,6 +51,7 @@ public class AppFeedbackController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除产品反馈")
+    @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthenticated
     public CommonResult<Boolean> deleteFeedback(@RequestParam("id") Long id) {
@@ -60,6 +61,7 @@ public class AppFeedbackController {
 
     @GetMapping("/get")
     @Operation(summary = "获得产品反馈")
+    @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthenticated
     public CommonResult<FeedbackRespVO> getFeedback(@RequestParam("id") Long id) {
@@ -69,6 +71,7 @@ public class AppFeedbackController {
 
     @GetMapping("/list")
     @Operation(summary = "获得产品反馈列表")
+    @PreAuthenticated
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
     @PreAuthenticated
     public CommonResult<List<FeedbackRespVO>> getFeedbackList(@RequestParam("ids") Collection<Long> ids) {

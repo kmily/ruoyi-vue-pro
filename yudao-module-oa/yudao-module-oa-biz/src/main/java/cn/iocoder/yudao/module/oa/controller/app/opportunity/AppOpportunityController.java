@@ -50,6 +50,7 @@ public class AppOpportunityController {
     }
 
     @DeleteMapping("/delete")
+    @PreAuthenticated
     @Operation(summary = "删除商机")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthenticated
@@ -60,6 +61,7 @@ public class AppOpportunityController {
 
     @GetMapping("/get")
     @Operation(summary = "获得商机")
+    @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthenticated
     public CommonResult<OpportunityRespVO> getOpportunity(@RequestParam("id") Long id) {
@@ -69,6 +71,7 @@ public class AppOpportunityController {
 
     @GetMapping("/list")
     @Operation(summary = "获得商机列表")
+    @PreAuthenticated
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
     @PreAuthenticated
     public CommonResult<List<OpportunityRespVO>> getOpportunityList(@RequestParam("ids") Collection<Long> ids) {

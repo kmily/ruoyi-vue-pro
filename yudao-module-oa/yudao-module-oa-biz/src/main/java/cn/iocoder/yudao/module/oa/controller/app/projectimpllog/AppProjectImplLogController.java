@@ -60,6 +60,7 @@ public class AppProjectImplLogController {
 
     @GetMapping("/get")
     @Operation(summary = "获得工程日志列表")
+    @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthenticated
     public CommonResult<ProjectImplLogRespVO> getProjectImplLog(@RequestParam("id") Long id) {
@@ -69,6 +70,7 @@ public class AppProjectImplLogController {
 
     @GetMapping("/list")
     @Operation(summary = "获得工程日志列表列表")
+    @PreAuthenticated
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
     @PreAuthenticated
     public CommonResult<List<ProjectImplLogRespVO>> getProjectImplLogList(@RequestParam("ids") Collection<Long> ids) {
