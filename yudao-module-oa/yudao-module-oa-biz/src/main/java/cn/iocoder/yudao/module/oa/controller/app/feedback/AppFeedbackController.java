@@ -53,7 +53,6 @@ public class AppFeedbackController {
     @Operation(summary = "删除产品反馈")
     @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthenticated
     public CommonResult<Boolean> deleteFeedback(@RequestParam("id") Long id) {
         feedbackService.deleteFeedback(id);
         return success(true);
@@ -63,7 +62,6 @@ public class AppFeedbackController {
     @Operation(summary = "获得产品反馈")
     @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthenticated
     public CommonResult<FeedbackRespVO> getFeedback(@RequestParam("id") Long id) {
         FeedbackDO feedback = feedbackService.getFeedback(id);
         return success(FeedbackConvert.INSTANCE.convert(feedback));
@@ -73,7 +71,6 @@ public class AppFeedbackController {
     @Operation(summary = "获得产品反馈列表")
     @PreAuthenticated
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthenticated
     public CommonResult<List<FeedbackRespVO>> getFeedbackList(@RequestParam("ids") Collection<Long> ids) {
         List<FeedbackDO> list = feedbackService.getFeedbackList(ids);
         return success(FeedbackConvert.INSTANCE.convertList(list));

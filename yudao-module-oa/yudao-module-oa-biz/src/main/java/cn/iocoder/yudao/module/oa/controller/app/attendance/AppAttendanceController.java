@@ -41,9 +41,8 @@ public class AppAttendanceController {
     public CommonResult<Long> createAttendance(@Valid @RequestBody AttendanceCreateReqVO createReqVO) {
         // 校验是否已经打卡
 
-
         PageResult<AttendanceDO> list = attendanceService.validateAttendanceExists(createReqVO.getAttendancePeriod(), WebFrameworkUtils.getLoginUserId().toString());
-        if (list.getTotal() > 0){
+        if (list.getTotal() > 0&&createReqVO.getAttendanceType()!=3){
             AttendanceUpdateReqVO tmp = AttendanceConvert.INSTANCE.convertUpdate(createReqVO, list.getList().get(0).getId());
             return success(Long.valueOf(attendanceService.updateAttendance(tmp)));
         }
@@ -62,7 +61,6 @@ public class AppAttendanceController {
     @Operation(summary = "删除考勤打卡")
     @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthenticated
     public CommonResult<Boolean> deleteAttendance(@RequestParam("id") Long id) {
         attendanceService.deleteAttendance(id);
         return success(true);
@@ -72,7 +70,6 @@ public class AppAttendanceController {
     @Operation(summary = "获得考勤打卡")
     @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthenticated
     public CommonResult<AttendanceRespVO> getAttendance(@RequestParam("id") Long id) {
         AttendanceDO attendance = attendanceService.getAttendance(id);
         return success(AttendanceConvert.INSTANCE.convert(attendance));
@@ -82,7 +79,6 @@ public class AppAttendanceController {
     @Operation(summary = "获得考勤打卡列表")
     @PreAuthenticated
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthenticated
     public CommonResult<List<AttendanceRespVO>> getAttendanceList(@RequestParam("ids") Collection<Long> ids) {
         List<AttendanceDO> list = attendanceService.getAttendanceList(ids);
         return success(AttendanceConvert.INSTANCE.convertList(list));

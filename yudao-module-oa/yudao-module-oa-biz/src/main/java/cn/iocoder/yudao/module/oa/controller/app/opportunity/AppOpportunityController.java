@@ -53,7 +53,6 @@ public class AppOpportunityController {
     @PreAuthenticated
     @Operation(summary = "删除商机")
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthenticated
     public CommonResult<Boolean> deleteOpportunity(@RequestParam("id") Long id) {
         opportunityService.deleteOpportunity(id);
         return success(true);
@@ -63,7 +62,6 @@ public class AppOpportunityController {
     @Operation(summary = "获得商机")
     @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthenticated
     public CommonResult<OpportunityRespVO> getOpportunity(@RequestParam("id") Long id) {
         OpportunityDO opportunity = opportunityService.getOpportunity(id);
         return success(OpportunityConvert.INSTANCE.convert(opportunity));
@@ -73,7 +71,6 @@ public class AppOpportunityController {
     @Operation(summary = "获得商机列表")
     @PreAuthenticated
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthenticated
     public CommonResult<List<OpportunityRespVO>> getOpportunityList(@RequestParam("ids") Collection<Long> ids) {
         List<OpportunityDO> list = opportunityService.getOpportunityList(ids);
         return success(OpportunityConvert.INSTANCE.convertList(list));

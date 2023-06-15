@@ -53,7 +53,6 @@ public class AppExpensesController {
     @Operation(summary = "删除报销申请")
     @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthenticated
     public CommonResult<Boolean> deleteExpenses(@RequestParam("id") Long id) {
         expensesService.deleteExpenses(id);
         return success(true);
@@ -63,7 +62,6 @@ public class AppExpensesController {
     @Operation(summary = "获得报销申请")
     @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthenticated
     public CommonResult<ExpensesRespVO> getExpenses(@RequestParam("id") Long id) {
         ExpensesDO expenses = expensesService.getExpenses(id);
         return success(ExpensesConvert.INSTANCE.convert(expenses));
@@ -73,7 +71,6 @@ public class AppExpensesController {
     @Operation(summary = "获得报销申请列表")
     @PreAuthenticated
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthenticated
     public CommonResult<List<ExpensesRespVO>> getExpensesList(@RequestParam("ids") Collection<Long> ids) {
         List<ExpensesDO> list = expensesService.getExpensesList(ids);
         return success(ExpensesConvert.INSTANCE.convertList(list));
