@@ -51,6 +51,7 @@ public class AppExpensesDetailController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除报销明细")
+    @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthenticated
     public CommonResult<Boolean> deleteExpensesDetail(@RequestParam("id") Long id) {
@@ -60,6 +61,7 @@ public class AppExpensesDetailController {
 
     @GetMapping("/get")
     @Operation(summary = "获得报销明细")
+    @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthenticated
     public CommonResult<ExpensesDetailRespVO> getExpensesDetail(@RequestParam("id") Long id) {
@@ -69,6 +71,7 @@ public class AppExpensesDetailController {
 
     @GetMapping("/list")
     @Operation(summary = "获得报销明细列表")
+    @PreAuthenticated
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
     @PreAuthenticated
     public CommonResult<List<ExpensesDetailRespVO>> getExpensesDetailList(@RequestParam("ids") Collection<Long> ids) {

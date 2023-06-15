@@ -60,6 +60,7 @@ public class AppAttendanceController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除考勤打卡")
+    @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthenticated
     public CommonResult<Boolean> deleteAttendance(@RequestParam("id") Long id) {
@@ -69,6 +70,7 @@ public class AppAttendanceController {
 
     @GetMapping("/get")
     @Operation(summary = "获得考勤打卡")
+    @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthenticated
     public CommonResult<AttendanceRespVO> getAttendance(@RequestParam("id") Long id) {
@@ -78,6 +80,7 @@ public class AppAttendanceController {
 
     @GetMapping("/list")
     @Operation(summary = "获得考勤打卡列表")
+    @PreAuthenticated
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
     @PreAuthenticated
     public CommonResult<List<AttendanceRespVO>> getAttendanceList(@RequestParam("ids") Collection<Long> ids) {

@@ -62,6 +62,7 @@ public class AppOpportunityFollowLogController {
 
         @GetMapping("/get")
         @Operation(summary = "获得商机-跟进日志")
+        @PreAuthenticated
         @Parameter(name = "id", description = "编号", required = true, example = "1024")
         @PreAuthenticated
         public CommonResult<OpportunityFollowLogRespVO> getOpportunityFollowLog(@RequestParam("id") Long id) {
@@ -71,6 +72,7 @@ public class AppOpportunityFollowLogController {
 
         @GetMapping("/list")
         @Operation(summary = "获得商机-跟进日志列表")
+        @PreAuthenticated
         @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
         @PreAuthenticated
         public CommonResult<List<OpportunityFollowLogRespVO>> getOpportunityFollowLogList(@RequestParam("ids") Collection<Long> ids) {

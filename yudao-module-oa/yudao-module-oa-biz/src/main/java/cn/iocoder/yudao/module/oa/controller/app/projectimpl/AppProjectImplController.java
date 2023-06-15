@@ -51,6 +51,7 @@ public class AppProjectImplController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除工程实施列")
+    @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthenticated
     public CommonResult<Boolean> deleteProjectImpl(@RequestParam("id") Long id) {
@@ -60,6 +61,7 @@ public class AppProjectImplController {
 
     @GetMapping("/get")
     @Operation(summary = "获得工程实施列")
+    @PreAuthenticated
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthenticated
     public CommonResult<ProjectImplRespVO> getProjectImpl(@RequestParam("id") Long id) {
@@ -69,6 +71,7 @@ public class AppProjectImplController {
 
     @GetMapping("/list")
     @Operation(summary = "获得工程实施列列表")
+    @PreAuthenticated
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
     @PreAuthenticated
     public CommonResult<List<ProjectImplRespVO>> getProjectImplList(@RequestParam("ids") Collection<Long> ids) {
@@ -86,6 +89,7 @@ public class AppProjectImplController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出工程实施列 Excel")
+    @PreAuthenticated
     @OperateLog(type = EXPORT)
     @PreAuthenticated
     public void exportProjectImplExcel(@Valid ProjectImplExportReqVO exportReqVO,
