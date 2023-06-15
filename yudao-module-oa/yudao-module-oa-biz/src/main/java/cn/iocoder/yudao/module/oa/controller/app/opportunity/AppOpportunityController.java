@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.oa.controller.admin.opportunity.vo.*;
 import cn.iocoder.yudao.module.oa.convert.opportunity.OpportunityConvert;
 import cn.iocoder.yudao.module.oa.dal.dataobject.opportunity.OpportunityDO;
@@ -35,12 +36,14 @@ public class AppOpportunityController {
 
     @PostMapping("/create")
     @Operation(summary = "创建商机")
+    @PreAuthenticated
     public CommonResult<Long> createOpportunity(@Valid @RequestBody OpportunityCreateReqVO createReqVO) {
         return success(opportunityService.createOpportunity(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新商机")
+    @PreAuthenticated
     public CommonResult<Boolean> updateOpportunity(@Valid @RequestBody OpportunityUpdateReqVO updateReqVO) {
         opportunityService.updateOpportunity(updateReqVO);
         return success(true);
@@ -49,6 +52,7 @@ public class AppOpportunityController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除商机")
     @Parameter(name = "id", description = "编号", required = true)
+    @PreAuthenticated
     public CommonResult<Boolean> deleteOpportunity(@RequestParam("id") Long id) {
         opportunityService.deleteOpportunity(id);
         return success(true);
@@ -57,6 +61,7 @@ public class AppOpportunityController {
     @GetMapping("/get")
     @Operation(summary = "获得商机")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthenticated
     public CommonResult<OpportunityRespVO> getOpportunity(@RequestParam("id") Long id) {
         OpportunityDO opportunity = opportunityService.getOpportunity(id);
         return success(OpportunityConvert.INSTANCE.convert(opportunity));
@@ -65,6 +70,7 @@ public class AppOpportunityController {
     @GetMapping("/list")
     @Operation(summary = "获得商机列表")
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
+    @PreAuthenticated
     public CommonResult<List<OpportunityRespVO>> getOpportunityList(@RequestParam("ids") Collection<Long> ids) {
         List<OpportunityDO> list = opportunityService.getOpportunityList(ids);
         return success(OpportunityConvert.INSTANCE.convertList(list));
@@ -72,6 +78,7 @@ public class AppOpportunityController {
 
     @GetMapping("/page")
     @Operation(summary = "获得商机分页")
+    @PreAuthenticated
     public CommonResult<PageResult<OpportunityRespVO>> getOpportunityPage(@Valid OpportunityPageReqVO pageVO) {
         PageResult<OpportunityDO> pageResult = opportunityService.getOpportunityPage(pageVO);
         return success(OpportunityConvert.INSTANCE.convertPage(pageResult));
@@ -80,6 +87,7 @@ public class AppOpportunityController {
     @GetMapping("/export-excel")
     @Operation(summary = "导出商机 Excel")
     @OperateLog(type = EXPORT)
+    @PreAuthenticated
     public void exportOpportunityExcel(@Valid OpportunityExportReqVO exportReqVO,
               HttpServletResponse response) throws IOException {
         List<OpportunityDO> list = opportunityService.getOpportunityList(exportReqVO);

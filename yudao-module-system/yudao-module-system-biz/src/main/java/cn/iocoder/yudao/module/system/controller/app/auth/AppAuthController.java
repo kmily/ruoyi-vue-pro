@@ -55,6 +55,7 @@ public class AppAuthController {
         return success(true);
     }
 
+    @PermitAll
     @PostMapping("/refresh-token")
     @Operation(summary = "刷新令牌")
     @Parameter(name = "refreshToken", description = "刷新令牌", required = true)
@@ -93,6 +94,7 @@ public class AppAuthController {
     }
 
     // ========== 社交登录相关 ==========
+    @PermitAll
     @PostMapping("/social-login")
     @Operation(summary = "社交快捷登录，使用 code 授权码", description = "适合未登录的用户，但是社交账号已绑定用户")
     public CommonResult<AppAuthLoginRespVO> socialLogin(@RequestBody @Valid AppAuthSocialLoginReqVO reqVO) {

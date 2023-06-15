@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.oa.controller.app.borrow;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.oa.controller.admin.borrow.vo.BorrowCreateReqVO;
 import cn.iocoder.yudao.module.oa.controller.admin.borrow.vo.BorrowPageReqVO;
 import cn.iocoder.yudao.module.oa.controller.admin.borrow.vo.BorrowRespVO;
@@ -33,12 +34,14 @@ public class AppBorrowController {
 
     @PostMapping("/create")
     @Operation(summary = "创建借支申请")
+    @PreAuthenticated
     public CommonResult<Long> createBorrow(@Valid @RequestBody BorrowCreateReqVO createReqVO) {
         return success(borrowService.createBorrow(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新借支申请")
+    @PreAuthenticated
     public CommonResult<Boolean> updateBorrow(@Valid @RequestBody BorrowUpdateReqVO updateReqVO) {
         borrowService.updateBorrow(updateReqVO);
         return success(true);
@@ -47,6 +50,7 @@ public class AppBorrowController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除借支申请")
     @Parameter(name = "id", description = "编号", required = true)
+    @PreAuthenticated
     public CommonResult<Boolean> deleteBorrow(@RequestParam("id") Long id) {
         borrowService.deleteBorrow(id);
         return success(true);
@@ -55,6 +59,7 @@ public class AppBorrowController {
     @GetMapping("/get")
     @Operation(summary = "获得借支申请")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthenticated
     public CommonResult<BorrowRespVO> getBorrow(@RequestParam("id") Long id) {
         BorrowDO borrow = borrowService.getBorrow(id);
         return success(BorrowConvert.INSTANCE.convert(borrow));
@@ -63,6 +68,7 @@ public class AppBorrowController {
     @GetMapping("/list")
     @Operation(summary = "获得借支申请列表")
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
+    @PreAuthenticated
     public CommonResult<List<BorrowRespVO>> getBorrowList(@RequestParam("ids") Collection<Long> ids) {
         List<BorrowDO> list = borrowService.getBorrowList(ids);
         return success(BorrowConvert.INSTANCE.convertList(list));
@@ -70,6 +76,7 @@ public class AppBorrowController {
 
     @GetMapping("/page")
     @Operation(summary = "获得借支申请分页")
+    @PreAuthenticated
     public CommonResult<PageResult<BorrowRespVO>> getBorrowPage(@Valid BorrowPageReqVO pageVO) {
         PageResult<BorrowDO> pageResult = borrowService.getBorrowPage(pageVO);
         return success(BorrowConvert.INSTANCE.convertPage(pageResult));

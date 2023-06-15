@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.oa.controller.admin.expenses.vo.*;
 import cn.iocoder.yudao.module.oa.convert.expenses.ExpensesConvert;
 import cn.iocoder.yudao.module.oa.dal.dataobject.expenses.ExpensesDO;
@@ -11,7 +12,6 @@ import cn.iocoder.yudao.module.oa.service.expenses.ExpensesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,12 +36,14 @@ public class AppExpensesController {
 
     @PostMapping("/create")
     @Operation(summary = "创建报销申请")
+    @PreAuthenticated
     public CommonResult<Long> createExpenses(@Valid @RequestBody ExpensesCreateReqVO createReqVO) {
         return success(expensesService.createExpenses(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新报销申请")
+    @PreAuthenticated
     public CommonResult<Boolean> updateExpenses(@Valid @RequestBody ExpensesUpdateReqVO updateReqVO) {
         expensesService.updateExpenses(updateReqVO);
         return success(true);
@@ -50,6 +52,7 @@ public class AppExpensesController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除报销申请")
     @Parameter(name = "id", description = "编号", required = true)
+    @PreAuthenticated
     public CommonResult<Boolean> deleteExpenses(@RequestParam("id") Long id) {
         expensesService.deleteExpenses(id);
         return success(true);
@@ -58,6 +61,7 @@ public class AppExpensesController {
     @GetMapping("/get")
     @Operation(summary = "获得报销申请")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthenticated
     public CommonResult<ExpensesRespVO> getExpenses(@RequestParam("id") Long id) {
         ExpensesDO expenses = expensesService.getExpenses(id);
         return success(ExpensesConvert.INSTANCE.convert(expenses));
@@ -66,6 +70,7 @@ public class AppExpensesController {
     @GetMapping("/list")
     @Operation(summary = "获得报销申请列表")
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
+    @PreAuthenticated
     public CommonResult<List<ExpensesRespVO>> getExpensesList(@RequestParam("ids") Collection<Long> ids) {
         List<ExpensesDO> list = expensesService.getExpensesList(ids);
         return success(ExpensesConvert.INSTANCE.convertList(list));
@@ -73,6 +78,7 @@ public class AppExpensesController {
 
     @GetMapping("/page")
     @Operation(summary = "获得报销申请分页")
+    @PreAuthenticated
     public CommonResult<PageResult<ExpensesRespVO>> getExpensesPage(@Valid ExpensesPageReqVO pageVO) {
         PageResult<ExpensesDO> pageResult = expensesService.getExpensesPage(pageVO);
         return success(ExpensesConvert.INSTANCE.convertPage(pageResult));
@@ -81,6 +87,7 @@ public class AppExpensesController {
     @GetMapping("/export-excel")
     @Operation(summary = "导出报销申请 Excel")
     @OperateLog(type = EXPORT)
+    @PreAuthenticated
     public void exportExpensesExcel(@Valid ExpensesExportReqVO exportReqVO,
               HttpServletResponse response) throws IOException {
         List<ExpensesDO> list = expensesService.getExpensesList(exportReqVO);

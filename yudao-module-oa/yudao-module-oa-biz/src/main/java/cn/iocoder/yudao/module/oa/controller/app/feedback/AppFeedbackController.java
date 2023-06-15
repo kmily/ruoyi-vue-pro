@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.oa.controller.admin.feedback.vo.*;
 import cn.iocoder.yudao.module.oa.convert.feedback.FeedbackConvert;
 import cn.iocoder.yudao.module.oa.dal.dataobject.feedback.FeedbackDO;
@@ -11,7 +12,6 @@ import cn.iocoder.yudao.module.oa.service.feedback.FeedbackService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,12 +36,14 @@ public class AppFeedbackController {
 
     @PostMapping("/create")
     @Operation(summary = "创建产品反馈")
+    @PreAuthenticated
     public CommonResult<Long> createFeedback(@Valid @RequestBody FeedbackCreateReqVO createReqVO) {
         return success(feedbackService.createFeedback(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新产品反馈")
+    @PreAuthenticated
     public CommonResult<Boolean> updateFeedback(@Valid @RequestBody FeedbackUpdateReqVO updateReqVO) {
         feedbackService.updateFeedback(updateReqVO);
         return success(true);
@@ -50,6 +52,7 @@ public class AppFeedbackController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除产品反馈")
     @Parameter(name = "id", description = "编号", required = true)
+    @PreAuthenticated
     public CommonResult<Boolean> deleteFeedback(@RequestParam("id") Long id) {
         feedbackService.deleteFeedback(id);
         return success(true);
@@ -58,6 +61,7 @@ public class AppFeedbackController {
     @GetMapping("/get")
     @Operation(summary = "获得产品反馈")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthenticated
     public CommonResult<FeedbackRespVO> getFeedback(@RequestParam("id") Long id) {
         FeedbackDO feedback = feedbackService.getFeedback(id);
         return success(FeedbackConvert.INSTANCE.convert(feedback));
@@ -66,6 +70,7 @@ public class AppFeedbackController {
     @GetMapping("/list")
     @Operation(summary = "获得产品反馈列表")
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
+    @PreAuthenticated
     public CommonResult<List<FeedbackRespVO>> getFeedbackList(@RequestParam("ids") Collection<Long> ids) {
         List<FeedbackDO> list = feedbackService.getFeedbackList(ids);
         return success(FeedbackConvert.INSTANCE.convertList(list));
@@ -73,6 +78,7 @@ public class AppFeedbackController {
 
     @GetMapping("/page")
     @Operation(summary = "获得产品反馈分页")
+    @PreAuthenticated
     public CommonResult<PageResult<FeedbackRespVO>> getFeedbackPage(@Valid FeedbackPageReqVO pageVO) {
         PageResult<FeedbackDO> pageResult = feedbackService.getFeedbackPage(pageVO);
         return success(FeedbackConvert.INSTANCE.convertPage(pageResult));
@@ -81,6 +87,7 @@ public class AppFeedbackController {
     @GetMapping("/export-excel")
     @Operation(summary = "导出产品反馈 Excel")
     @OperateLog(type = EXPORT)
+    @PreAuthenticated
     public void exportFeedbackExcel(@Valid FeedbackExportReqVO exportReqVO,
               HttpServletResponse response) throws IOException {
         List<FeedbackDO> list = feedbackService.getFeedbackList(exportReqVO);

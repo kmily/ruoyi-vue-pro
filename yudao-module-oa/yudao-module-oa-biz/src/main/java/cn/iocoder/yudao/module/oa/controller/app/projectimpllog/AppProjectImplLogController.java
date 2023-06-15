@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.oa.controller.admin.projectimpllog.vo.*;
 import cn.iocoder.yudao.module.oa.convert.projectimpllog.ProjectImplLogConvert;
 import cn.iocoder.yudao.module.oa.dal.dataobject.projectimpllog.ProjectImplLogDO;
@@ -11,7 +12,6 @@ import cn.iocoder.yudao.module.oa.service.projectimpllog.ProjectImplLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,12 +36,14 @@ public class AppProjectImplLogController {
 
     @PostMapping("/create")
     @Operation(summary = "创建工程日志列表")
+    @PreAuthenticated
     public CommonResult<Long> createProjectImplLog(@Valid @RequestBody ProjectImplLogCreateReqVO createReqVO) {
         return success(projectImplLogService.createProjectImplLog(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新工程日志列表")
+    @PreAuthenticated
     public CommonResult<Boolean> updateProjectImplLog(@Valid @RequestBody ProjectImplLogUpdateReqVO updateReqVO) {
         projectImplLogService.updateProjectImplLog(updateReqVO);
         return success(true);
@@ -50,6 +52,7 @@ public class AppProjectImplLogController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除工程日志列表")
     @Parameter(name = "id", description = "编号", required = true)
+    @PreAuthenticated
     public CommonResult<Boolean> deleteProjectImplLog(@RequestParam("id") Long id) {
         projectImplLogService.deleteProjectImplLog(id);
         return success(true);
@@ -58,6 +61,7 @@ public class AppProjectImplLogController {
     @GetMapping("/get")
     @Operation(summary = "获得工程日志列表")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthenticated
     public CommonResult<ProjectImplLogRespVO> getProjectImplLog(@RequestParam("id") Long id) {
         ProjectImplLogDO projectImplLog = projectImplLogService.getProjectImplLog(id);
         return success(ProjectImplLogConvert.INSTANCE.convert(projectImplLog));
@@ -66,6 +70,7 @@ public class AppProjectImplLogController {
     @GetMapping("/list")
     @Operation(summary = "获得工程日志列表列表")
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
+    @PreAuthenticated
     public CommonResult<List<ProjectImplLogRespVO>> getProjectImplLogList(@RequestParam("ids") Collection<Long> ids) {
         List<ProjectImplLogDO> list = projectImplLogService.getProjectImplLogList(ids);
         return success(ProjectImplLogConvert.INSTANCE.convertList(list));
@@ -73,6 +78,7 @@ public class AppProjectImplLogController {
 
     @GetMapping("/page")
     @Operation(summary = "获得工程日志列表分页")
+    @PreAuthenticated
     public CommonResult<PageResult<ProjectImplLogRespVO>> getProjectImplLogPage(@Valid ProjectImplLogPageReqVO pageVO) {
         PageResult<ProjectImplLogDO> pageResult = projectImplLogService.getProjectImplLogPage(pageVO);
         return success(ProjectImplLogConvert.INSTANCE.convertPage(pageResult));
@@ -81,6 +87,7 @@ public class AppProjectImplLogController {
     @GetMapping("/export-excel")
     @Operation(summary = "导出工程日志列表 Excel")
     @OperateLog(type = EXPORT)
+    @PreAuthenticated
     public void exportProjectImplLogExcel(@Valid ProjectImplLogExportReqVO exportReqVO,
               HttpServletResponse response) throws IOException {
         List<ProjectImplLogDO> list = projectImplLogService.getProjectImplLogList(exportReqVO);

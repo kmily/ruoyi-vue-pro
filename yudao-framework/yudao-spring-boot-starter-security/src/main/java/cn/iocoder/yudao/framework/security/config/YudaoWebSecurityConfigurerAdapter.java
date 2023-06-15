@@ -68,8 +68,6 @@ public class YudaoWebSecurityConfigurerAdapter {
     @Resource
     private ApplicationContext applicationContext;
 
-
-    public static  Multimap<HttpMethod, String> permitAllUrls;
     /**
      * 由于 Spring Security 创建 AuthenticationManager 对象时，没声明 @Bean 注解，导致无法被注入
      * 通过覆写父类的该方法，添加 @Bean 注解，解决该问题
@@ -113,7 +111,7 @@ public class YudaoWebSecurityConfigurerAdapter {
         // 登录、登录暂时不使用 Spring Security 的拓展点，主要考虑一方面拓展多用户、多种登录方式相对复杂，一方面用户的学习成本较高
 
         // 获得 @PermitAll 带来的 URL 列表，免登录
-         permitAllUrls = getPermitAllUrlsFromAnnotations();
+        Multimap<HttpMethod, String> permitAllUrls = getPermitAllUrlsFromAnnotations();
         // 设置每个请求的权限
         httpSecurity
                 // ①：全局共享规则
