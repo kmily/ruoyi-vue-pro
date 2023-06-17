@@ -619,6 +619,9 @@ public class WebSocketHandlerFactory {
                 Map<String, Position> bPositions = accountPsitions.get(account.getId());
                 Map<String, Position> aPositions = accountPsitions.get(account.getFollowAccount());
 //                log.warn("[清仓检测]:a账户持仓:{},b账户持仓:{}", JsonUtil.object2String(aPositions), JsonUtil.object2String(bPositions));
+                if(CollectionUtil.isEmpty(bPositions.keySet())) {
+                    continue ;
+                }
                 for(String symbol : bPositions.keySet()) {
                     Position aPosition = aPositions.get(symbol);
                     if(aPosition == null
