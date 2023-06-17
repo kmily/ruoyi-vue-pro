@@ -297,8 +297,13 @@ public class WebSocketHandlerFactory {
                 followOrderPrice = order.getPrice()
                         .add(tickSize);
             } else {
-                followOrderPrice = order.getPrice()
-                        .subtract(tickSize);
+                if(OrderType.LIMIT.toString().equals(order.getType())) {
+                    followOrderPrice = order.getPrice()
+                            .add(tickSize);
+                } else {
+                    followOrderPrice = order.getPrice()
+                            .subtract(tickSize);
+                }
             }
         } else if (order.getPrice().compareTo(BigDecimal.ZERO) != 0
                 && OrderSide.SELL.toString().equals(order.getSide())) {
@@ -308,8 +313,13 @@ public class WebSocketHandlerFactory {
                 followOrderPrice = order.getPrice()
                         .subtract(tickSize);
             } else {
-                followOrderPrice = order.getPrice()
-                        .add(tickSize);
+                if(OrderType.LIMIT.toString().equals(order.getType())) {
+                    followOrderPrice = order.getPrice()
+                            .subtract(tickSize);
+                } else {
+                    followOrderPrice = order.getPrice()
+                            .add(tickSize);
+                }
             }
         }
         return followOrderPrice;
