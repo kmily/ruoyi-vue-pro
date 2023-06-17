@@ -45,13 +45,13 @@ import com.cw.module.trade.service.followrecord.FollowRecordService;
 import com.cw.module.trade.service.notifymsg.NotifyMsgService;
 import com.cw.module.trade.service.position.PositionService;
 import com.google.common.collect.Maps;
-import com.google.gson.JsonObject;
 import com.tb.utils.DateUtils;
 import com.tb.utils.NumberUtils;
 import com.tb.utils.json.JsonUtil;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -216,72 +216,15 @@ public class WebSocketHandlerFactory {
                             // 计算触发价格
                             BigDecimal followOrderPrice = new BigDecimal(0);
                             BigDecimal followStopPrice = null;
-                            if(order.getStopPrice() != null && order.getStopPrice().compareTo(BigDecimal.ZERO) != 0) {
-                                if(OrderSide.BUY.toString().equals(order.getSide())) {
-                                    if(followLastestPosition != null && followLastestPosition.hasPosition()
-                                            && order.getStopPrice().compareTo(followLastestPosition.getEntryPrice()) == -1) {
-                                        followStopPrice = order.getStopPrice().add(
-                                                tickSize);
-                                    } else {
-                                        followStopPrice = order.getStopPrice().subtract(
-                                                tickSize);
-                                    }
-                                } else if (OrderSide.SELL.toString().equals(order.getSide())) {
-                                    if(followLastestPosition != null && followLastestPosition.hasPosition()
-                                            && order.getStopPrice().compareTo(followLastestPosition.getEntryPrice()) != -1) {
-                                        followStopPrice = order.getStopPrice().subtract(
-                                                tickSize);
-                                    } else {
-                                        followStopPrice = order.getStopPrice().add(
-                                                tickSize);
-                                    }
-                                }
-                            }
-                            // 计算金额
-                            if(order.getPrice().compareTo(BigDecimal.ZERO) != 0
-                                    && OrderSide.BUY.toString().equals(order.getSide())) {
-                                if(lastestPosition != null && lastestPosition.hasSubZeroPosition() 
-                                        && followLastestPosition.hasSubZeroPosition()
-                                        && newPrice.compareTo(followLastestPosition.getEntryPrice()) != 1 ) {
-                                    followOrderPrice = order.getPrice()
-                                            .add(tickSize);
-                                } else {
-                                    followOrderPrice = order.getPrice()
-                                            .subtract(tickSize);
-                                }
-                            } else if (order.getPrice().compareTo(BigDecimal.ZERO) != 0
-                                    && OrderSide.SELL.toString().equals(order.getSide())) {
-                                if(lastestPosition != null && lastestPosition.hasOverZeroPosition() 
-                                        && followLastestPosition.hasOverZeroPosition()
-                                        && newPrice.compareTo(followLastestPosition.getEntryPrice()) != -1 ) {
-                                    followOrderPrice = order.getPrice()
-                                            .subtract(tickSize);
-                                } else {
-                                    followOrderPrice = order.getPrice()
-                                            .add(tickSize);
-                                }
-                            }
+                            followStopPrice = calcFollowStopPrice(order, tickSize, followLastestPosition);
+                            followOrderPrice = calcFollowPrice(order, tickSize, newPrice, lastestPosition,
+                                    followLastestPosition, followOrderPrice);
                             
                             // 计算数量
                             BigDecimal followOrderQty = new BigDecimal(0);
-                            if(order.getOrigQty() != null && order.getOrigQty().compareTo(BigDecimal.ZERO) == 0) {
-                                followOrderQty = followLastestPosition.getQuantity();
-                            } else if(lastestPosition == null || lastestPosition.getQuantity().compareTo(new BigDecimal(0)) == 0) {
-                                BigDecimal positionProp  = order.getPrice()
-                                        .multiply(order.getOrigQty()).divide(notifyAccount.formatTypeBalance("USDT"), 2, RoundingMode.HALF_DOWN);
-                                log.debug("[跟随下单]：通知账户的比例:{}", positionProp);
-                                BigDecimal accountBalance = account.formatTypeBalance("USDT");
-                                log.debug("[跟随下单]：当前账号的余额:{}", accountBalance);
-                                BigDecimal followAmount = positionProp.multiply(accountBalance);
-                                log.debug("[跟随下单]：当前账号的跟随金额:{}", followAmount);
-                                followOrderQty = followAmount.divide(followOrderPrice, scale, RoundingMode.DOWN);
-                                log.debug("[跟随下单]：当前账号的跟随数量:{}", followOrderQty);
-                            } else {
-                                followOrderQty = order.getOrigQty().
-                                        divide(lastestPosition.getQuantity().abs(), 2, RoundingMode.HALF_DOWN)
-                                        .multiply(followLastestPosition.getQuantity().abs())
-                                        .setScale(scale, RoundingMode.DOWN);
-                            }
+                            followOrderQty = calcFollowQty(order, notifyAccount, scale, account, lastestPosition,
+                                    followLastestPosition, followOrderPrice);
+                            
                             postOrder(order, account, reqVo, desc, followOrderPrice,
                                     followOrderQty, followStopPrice);
                         }
@@ -319,6 +262,85 @@ public class WebSocketHandlerFactory {
         log.info(sw.prettyPrint(TimeUnit.MILLISECONDS));
     }
 
+    private BigDecimal calcFollowQty(OrderUpdate order, AccountDO notifyAccount, int scale, AccountDO account,
+            PositionDO lastestPosition, PositionDO followLastestPosition, BigDecimal followOrderPrice) {
+        BigDecimal followOrderQty;
+        if(order.getOrigQty() != null && order.getOrigQty().compareTo(BigDecimal.ZERO) == 0) {
+            followOrderQty = followLastestPosition.getQuantity();
+        } else if(lastestPosition == null || lastestPosition.getQuantity().compareTo(new BigDecimal(0)) == 0) {
+            BigDecimal positionProp  = order.getPrice()
+                    .multiply(order.getOrigQty()).divide(notifyAccount.formatTypeBalance("USDT"), 2, RoundingMode.HALF_DOWN);
+            log.debug("[跟随下单]：通知账户的比例:{}", positionProp);
+            BigDecimal accountBalance = account.formatTypeBalance("USDT");
+            log.debug("[跟随下单]：当前账号的余额:{}", accountBalance);
+            BigDecimal followAmount = positionProp.multiply(accountBalance);
+            log.debug("[跟随下单]：当前账号的跟随金额:{}", followAmount);
+            followOrderQty = followAmount.divide(followOrderPrice, scale, RoundingMode.DOWN);
+            log.debug("[跟随下单]：当前账号的跟随数量:{}", followOrderQty);
+        } else {
+            followOrderQty = order.getOrigQty().
+                    divide(lastestPosition.getQuantity().abs(), 2, RoundingMode.HALF_DOWN)
+                    .multiply(followLastestPosition.getQuantity().abs())
+                    .setScale(scale, RoundingMode.DOWN);
+        }
+        return followOrderQty;
+    }
+
+    private BigDecimal calcFollowPrice(OrderUpdate order, BigDecimal tickSize, BigDecimal newPrice,
+            PositionDO lastestPosition, PositionDO followLastestPosition, BigDecimal followOrderPrice) {
+        // 计算金额
+        if(order.getPrice().compareTo(BigDecimal.ZERO) != 0
+                && OrderSide.BUY.toString().equals(order.getSide())) {
+            if(lastestPosition != null && lastestPosition.hasSubZeroPosition() 
+                    && followLastestPosition.hasSubZeroPosition()
+                    && newPrice.compareTo(followLastestPosition.getEntryPrice()) != 1 ) {
+                followOrderPrice = order.getPrice()
+                        .add(tickSize);
+            } else {
+                followOrderPrice = order.getPrice()
+                        .subtract(tickSize);
+            }
+        } else if (order.getPrice().compareTo(BigDecimal.ZERO) != 0
+                && OrderSide.SELL.toString().equals(order.getSide())) {
+            if(lastestPosition != null && lastestPosition.hasOverZeroPosition() 
+                    && followLastestPosition.hasOverZeroPosition()
+                    && newPrice.compareTo(followLastestPosition.getEntryPrice()) != -1 ) {
+                followOrderPrice = order.getPrice()
+                        .subtract(tickSize);
+            } else {
+                followOrderPrice = order.getPrice()
+                        .add(tickSize);
+            }
+        }
+        return followOrderPrice;
+    }
+
+    private BigDecimal calcFollowStopPrice(OrderUpdate order, BigDecimal tickSize, PositionDO followLastestPosition) {
+        BigDecimal followStopPrice = new BigDecimal(0);
+        if(order.getStopPrice() != null && order.getStopPrice().compareTo(BigDecimal.ZERO) != 0) {
+            if(OrderSide.BUY.toString().equals(order.getSide())) {
+                if(followLastestPosition != null && followLastestPosition.hasPosition()
+                        && order.getStopPrice().compareTo(followLastestPosition.getEntryPrice()) == -1) {
+                    followStopPrice = order.getStopPrice().add(
+                            tickSize);
+                } else {
+                    followStopPrice = order.getStopPrice().subtract(
+                            tickSize);
+                }
+            } else if (OrderSide.SELL.toString().equals(order.getSide())) {
+                if(followLastestPosition != null && followLastestPosition.hasPosition()
+                        && order.getStopPrice().compareTo(followLastestPosition.getEntryPrice()) != -1) {
+                    followStopPrice = order.getStopPrice().subtract(
+                            tickSize);
+                } else {
+                    followStopPrice = order.getStopPrice().add(
+                            tickSize);
+                }
+            }
+        }
+        return followStopPrice;
+    }
+
     private void orderCancel(Long notifyAccountId, Long notifyId, OrderUpdate order) {
         // 根据订单id查询出来跟随的记录
         List<FollowRecordDO> listFollowRecord = followRecordServiceImpl.listFollowRecord(order.getOrderId());
@@ -337,9 +359,9 @@ public class WebSocketHandlerFactory {
             StringBuilder desc = new StringBuilder();
             
             // 调用第三方
-            JsonObject params = new JsonObject();
-            params.addProperty("symbol", order.getSymbol());
-            params.addProperty("orderId", record.getThirdOrderId());
+            JSONObject params = new JSONObject();
+            params.set("symbol", order.getSymbol());
+            params.set("orderId", record.getThirdOrderId());
             reqVo.setOperateInfo(JsonUtil.object2String(params));
             
             Order cancelOrder = clients.get(record.getOperateAccount()).cancelOrder(
@@ -357,7 +379,7 @@ public class WebSocketHandlerFactory {
 
     private Boolean postOrder(OrderUpdate order, AccountDO account, FollowRecordCreateReqVO reqVo,
             StringBuilder desc, BigDecimal followOrderPrice, BigDecimal followOrderQty, BigDecimal stopPrice) {
-        JsonObject params = new JsonObject();
+        JSONObject params = new JSONObject();
         String stopPriceStr = stopPrice == null || stopPrice.compareTo(BigDecimal.ZERO) == 0 ? null : stopPrice.toString();
         String followOrderPriceStr = followOrderPrice == null || 
                 followOrderPrice.compareTo(BigDecimal.ZERO) == 0 ? null : followOrderPrice.toString();
@@ -367,17 +389,17 @@ public class WebSocketHandlerFactory {
         OrderType orderType = OrderType.lookup(order.getType());
         TimeInForce timeInForce = OrderType.MARKET.equals(orderType) ? null : TimeInForce.valueOf(order.getTimeInForce());
         
-        params.addProperty("symbol", order.getSymbol());
-        params.addProperty("side", order.getSide());
-        params.addProperty("positionSide", order.getPositionSide());
-        params.addProperty("type", order.getType());
-        params.addProperty("timeInForce", order.getTimeInForce());
-        params.addProperty("quantity", followOrderQtyStr);
-        params.addProperty("price", followOrderPriceStr);
-        params.addProperty("reduceOnly", reduceOnly);
-        params.addProperty("stopPrice", stopPriceStr);
-        params.addProperty("workingType", order.getWorkingType());
-        params.addProperty("newOrderRespType", NewOrderRespType.RESULT.toString());
+        params.set("symbol", order.getSymbol());
+        params.set("side", order.getSide());
+        params.set("positionSide", order.getPositionSide());
+        params.set("type", order.getType());
+        params.set("timeInForce", order.getTimeInForce());
+        params.set("quantity", followOrderQtyStr);
+        params.set("price", followOrderPriceStr);
+        params.set("reduceOnly", reduceOnly);
+        params.set("stopPrice", stopPriceStr);
+        params.set("workingType", order.getWorkingType());
+        params.set("newOrderRespType", NewOrderRespType.RESULT.toString());
         try {
             Order orderResp = clients.get(account.getId()).postOrder(
                     order.getSymbol(),  //symbol    交易对
@@ -512,8 +534,8 @@ public class WebSocketHandlerFactory {
             reqVo.setOperateAccount(accountId);
             reqVo.setOperateTime(new Date());
             reqVo.setOperateDesc("清仓前取消现有所有订单");
-            JsonObject params = new JsonObject();
-            params.addProperty("symbol", position.getSymbol());
+            JSONObject params = new JSONObject();
+            params.set("symbol", position.getSymbol());
             reqVo.setOperateInfo(JsonUtil.object2String(params));
             
             // 调用第三方
@@ -543,18 +565,18 @@ public class WebSocketHandlerFactory {
             reqVo1.setOperateTime(new Date());
             reqVo1.setOperateDesc("触发保护机制，市价卖出");
             
-            JsonObject params1 = new JsonObject();
-            params1.addProperty("symbol", position.getSymbol());
-            params1.addProperty("side", side.toString());
-            params1.addProperty("type", OrderType.LIMIT.toString());
-            params1.addProperty("positionSide", positionSide.toString());
-            params1.addProperty("timeInForce", TimeInForce.GTC.toString());
-            params1.addProperty("quantity", position.getPositionAmt().abs());
-            params1.addProperty("price", orderPrice.toString());
-            params1.addProperty("reduceOnly", false);
-            params1.addProperty("stopPrice", 0);
-            params1.addProperty("workingType", WorkingType.CONTRACT_PRICE.toString());
-            params1.addProperty("newOrderRespType", NewOrderRespType.RESULT.toString());
+            JSONObject params1 = new JSONObject();
+            params1.set("symbol", position.getSymbol());
+            params1.set("side", side.toString());
+            params1.set("type", OrderType.LIMIT.toString());
+            params1.set("positionSide", positionSide.toString());
+            params1.set("timeInForce", TimeInForce.GTC.toString());
+            params1.set("quantity", position.getPositionAmt().abs());
+            params1.set("price", orderPrice.toString());
+            params1.set("reduceOnly", false);
+            params1.set("stopPrice", 0);
+            params1.set("workingType", WorkingType.CONTRACT_PRICE.toString());
+            params1.set("newOrderRespType", NewOrderRespType.RESULT.toString());
             try {
                 Order orderResp = clients.get(accountId).postOrder(
                         position.getSymbol(),  //symbol    交易对

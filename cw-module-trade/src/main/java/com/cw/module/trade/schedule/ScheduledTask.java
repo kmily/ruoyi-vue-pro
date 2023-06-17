@@ -30,7 +30,7 @@ public class ScheduledTask {
     private PositionService positionServiceImpl;
 
     /**
-     * * 每5分钟同步一下账户余额
+     * * 每天凌晨同步账户余额
      * @date 2023年5月24日
      * @author wuqiaoxin
      */
@@ -44,7 +44,7 @@ public class ScheduledTask {
      * @date 2023年5月24日
      * @author wuqiaoxin
      */
-    @Scheduled(fixedDelay = 60*1000)
+    @Scheduled(fixedDelay = 60*1000, initialDelay = 60*1000)
     private void syncPosition() {
         positionServiceImpl.syncPosition();
     }
@@ -54,7 +54,7 @@ public class ScheduledTask {
      * @date 2023年5月24日
      * @author wuqiaoxin
      */
-    @Scheduled(fixedDelay = 60*1000)
+    @Scheduled(fixedDelay = 60*1000, initialDelay = 60*1000)
     private void checkStopFollow() {
         try {
             WebSocketHandlerFactory.get().checkStopFollow();
@@ -73,7 +73,7 @@ public class ScheduledTask {
      * @date 2023年5月24日
      * @author wuqiaoxin
      */
-    @Scheduled(fixedDelay = 50*60*1000)
+    @Scheduled(fixedDelay = 50*60*1000, initialDelay = 60*1000)
     private void keepListenKey() {
         WebSocketHandlerFactory.get().keepListenKey();
     }
@@ -83,7 +83,7 @@ public class ScheduledTask {
      * @date 2023年5月24日
      * @author wuqiaoxin
      */
-    @Scheduled(fixedDelay = 60*60*1000, initialDelay = 3*60*1000)
+    @Scheduled(fixedDelay = 60*60*1000, initialDelay = 60*1000)
     private void syncSymbolLeverage() {
         List<AccountDO> monitorAccounts = accountService.listMonitorAccount();
         if(CollectionUtil.isEmpty(monitorAccounts)) {
