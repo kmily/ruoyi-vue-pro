@@ -53,7 +53,7 @@ public class AuthController {
     private RoleService roleService;
     @Resource
     private PermissionService permissionService;
-    @Resource
+//    @Resource
     private SocialUserService socialUserService;
     @Resource
     private SecurityProperties securityProperties;

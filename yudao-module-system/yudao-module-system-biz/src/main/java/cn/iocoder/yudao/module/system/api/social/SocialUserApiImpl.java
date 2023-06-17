@@ -17,7 +17,7 @@ import javax.annotation.Resource;
 @Validated
 public class SocialUserApiImpl implements SocialUserApi {
 
-    @Resource
+//    @Resource
     private SocialUserService socialUserService;
 
     @Override

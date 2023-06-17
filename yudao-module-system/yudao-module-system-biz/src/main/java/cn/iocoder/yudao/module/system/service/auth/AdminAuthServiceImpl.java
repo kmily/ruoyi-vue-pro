@@ -53,7 +53,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     private LoginLogService loginLogService;
     @Resource
     private OAuth2TokenService oauth2TokenService;
-    @Resource
+//    @Resource
     private SocialUserService socialUserService;
     @Resource
     private MemberService memberService;
