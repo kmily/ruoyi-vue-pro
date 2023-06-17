@@ -17,7 +17,7 @@ import javax.annotation.Resource;
 @Slf4j
 public class SmsChannelRefreshConsumer extends AbstractChannelMessageListener<SmsChannelRefreshMessage> {
 
-    @Resource
+//    @Resource
     private SmsChannelService smsChannelService;
 
     @Override
