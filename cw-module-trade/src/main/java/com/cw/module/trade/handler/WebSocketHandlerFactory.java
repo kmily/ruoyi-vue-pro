@@ -187,7 +187,7 @@ public class WebSocketHandlerFactory {
                 }
 //                BigDecimal newPrice = MarkWebSocketHandlerFactory.get().getNewPrices().get(symbol);
                 BigDecimal newPrice = order.getPrice();
-                log.info("当前需要跟单的账号有:{}", JsonUtil.object2String(accounts));
+                log.info("当前需要跟单的账号有:{}", JsonUtil.object2String(listFollowAccount));
                 // 新订单
                 for(AccountDO account : listFollowAccount) {
                     sw.start("账号"+account.getId()+"跟随耗时");
