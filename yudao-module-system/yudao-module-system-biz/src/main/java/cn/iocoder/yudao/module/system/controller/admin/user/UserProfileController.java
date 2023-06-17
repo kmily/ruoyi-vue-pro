@@ -52,7 +52,7 @@ public class UserProfileController {
     private PermissionService permissionService;
     @Resource
     private RoleService roleService;
-    @Resource
+//    @Resource
     private SocialUserService socialService;
 
     @GetMapping("/get")
