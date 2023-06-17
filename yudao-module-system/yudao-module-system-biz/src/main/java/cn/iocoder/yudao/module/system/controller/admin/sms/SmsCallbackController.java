@@ -22,7 +22,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RequestMapping("/system/sms/callback")
 public class SmsCallbackController {
 
-    @Resource
+//    @Resource
     private SmsSendService smsSendService;
 
     @PostMapping("/aliyun")
