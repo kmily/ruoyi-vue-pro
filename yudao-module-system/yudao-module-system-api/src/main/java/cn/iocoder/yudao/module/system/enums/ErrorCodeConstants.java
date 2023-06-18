@@ -163,4 +163,6 @@ public interface ErrorCodeConstants {
     // ========== 站内信发送 1002028000 ==========
     ErrorCode NOTIFY_SEND_TEMPLATE_PARAM_MISS = new ErrorCode(1002025000, "模板参数({})缺失");
 
+    // ========== 用户组 1002029000 ==========
+    ErrorCode GROUP_NOT_EXISTS = new ErrorCode(1002029000, "用户组不存在");
 }

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <parent>
+        <artifactId>yudao</artifactId>
+        <groupId>cn.iocoder.boot</groupId>
+        <version>${revision}</version><!-- 1.修改version为${revision} -->
+    </parent>
+
+    <modules>
+        <module>yudao-module-ycxt_course-api</module>
+        <module>yudao-module-ycxt_course-biz</module>
+    </modules>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>yudao-module-ycxt_course</artifactId>
+    <packaging>pom</packaging><!-- 2.新增packaging为pom -->
+
+    <name>${project.artifactId}</name><!-- 3.新增name为${project.artifactId} -->
+    <description>
+        羊村学堂课程模块。
+    </description>
+</project>
