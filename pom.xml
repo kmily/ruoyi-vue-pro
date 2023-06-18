@@ -24,6 +24,13 @@
         <!-- 示例项目 -->
         <module>yudao-example</module>
         <module>yudao-module-demo</module>
+        <module>yudao-module-ycxt_column</module>
+        <module>yudao-module-ycxt_course</module>
+        <module>yudao-module-ycxt_user</module>
+        <module>yudao-module-ycxt_order</module>
+        <module>yudao-module-ycxt_column/yudao-module-ycxt_column-api</module>
+        <module>yudao-module-ycxt_column/yudao-module-ycxt_column-biz</module>
+        <module>yudao-module-ycxt_order</module>
     </modules>
 
     <name>${project.artifactId}</name>
