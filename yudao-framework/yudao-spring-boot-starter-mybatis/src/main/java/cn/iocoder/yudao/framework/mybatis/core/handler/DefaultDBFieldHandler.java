@@ -48,14 +48,14 @@ public class DefaultDBFieldHandler implements MetaObjectHandler {
     public void updateFill(MetaObject metaObject) {
         // 更新时间为空，则以当前时间为更新时间
         Object modifyTime = getFieldValByName("updateTime", metaObject);
-        if (Objects.nonNull(modifyTime)) {
+        if (Objects.isNull(modifyTime)) {
             setFieldValByName("updateTime", LocalDateTime.now(), metaObject);
         }
 
         // 当前登录用户不为空，更新人为空，则当前登录用户为更新人
         Object modifier = getFieldValByName("updater", metaObject);
         Long userId = WebFrameworkUtils.getLoginUserId();
-        if (Objects.nonNull(userId) && Objects.nonNull(modifier)) {
+        if (Objects.nonNull(userId) && Objects.isNull(modifier)) {
             setFieldValByName("updater", userId.toString(), metaObject);
         }
     }

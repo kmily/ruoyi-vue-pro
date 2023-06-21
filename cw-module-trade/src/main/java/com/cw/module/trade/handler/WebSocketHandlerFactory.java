@@ -348,6 +348,12 @@ public class WebSocketHandlerFactory {
                 }
             }
         }
+        // 限价单不需要stopPrice参数
+        if(OrderType.LIMIT.toString().equals(order.getType())
+                || OrderType.MARKET.toString().equals(order.getType())
+                || OrderType.TRAILING_STOP_MARKET.toString().equals(order.getType()) ) {
+            return null;
+        }
         return followStopPrice;
     }
 
@@ -562,7 +568,7 @@ public class WebSocketHandlerFactory {
                     PositionSide.LONG : PositionSide.SHORT;
             BigDecimal newPrice = MarkWebSocketHandlerFactory.get().getSymbols().get(position.getSymbol()).getLastPrice();
             BigDecimal orderPrice = position.getPositionAmt().compareTo(new BigDecimal(0)) == 1 ?
-                    newPrice.multiply(new BigDecimal(0.85)) : newPrice.multiply(new BigDecimal(1.01));
+                    newPrice.multiply(new BigDecimal(0.99)) : newPrice.multiply(new BigDecimal(1.01));
             ExchangeInfoEntry symbolRule = this.exchangeInformation.getSymbols().stream().filter(
                     item -> symbol.equals(item.getSymbol())).findFirst().orElse(null);
             BigDecimal tickSize = symbolRule.getFiltersFormat().get("PRICE_FILTER_tickSize");
