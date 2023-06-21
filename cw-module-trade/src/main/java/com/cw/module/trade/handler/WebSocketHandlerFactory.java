@@ -230,6 +230,7 @@ public class WebSocketHandlerFactory {
                         }
                     } catch (Exception e) {
                         log.error("跟随下单出现错误:{}", e);
+                        reqVo.setOperateResult(e.getMessage());
                         desc.append("程序发生错误,请联系开发人员");
                     }
                     reqVo.setOperateSuccess(success);
@@ -434,6 +435,7 @@ public class WebSocketHandlerFactory {
             reqVo.setThirdOrderId(orderResp.getOrderId());
         } catch (Exception e) {
             log.error("请求第三方下单出现异常:{}", e);
+            reqVo.setOperateResult(e.getMessage());
         }
         reqVo.setOperateInfo(JsonUtil.object2String(params));
         desc.append("成功请求第三方。");
