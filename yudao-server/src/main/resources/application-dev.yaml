@@ -170,7 +170,8 @@ yudao:
     callback-url: http://yunai.natapp1.cc/admin-api/pay/notify/callback
     return-url: http://yunai.natapp1.cc/admin-api/pay/notify/return
   demo: true # 开启演示模式
-
+  security:
+    multiple-device-login: [ 1,2 ] #允许多设备登录的用户类型数组 对应UserTypeEnum
 justauth:
   enabled: true
   type:

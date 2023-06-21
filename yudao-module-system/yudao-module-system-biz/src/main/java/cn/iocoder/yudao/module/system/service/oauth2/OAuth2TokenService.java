@@ -77,4 +77,10 @@ public interface OAuth2TokenService {
      */
     PageResult<OAuth2AccessTokenDO> getAccessTokenPage(OAuth2AccessTokenPageReqVO reqVO);
 
+    /**
+     * 删除用户所有返回令牌
+     * @param id
+     */
+    void removeByUser(Long id);
+
 }

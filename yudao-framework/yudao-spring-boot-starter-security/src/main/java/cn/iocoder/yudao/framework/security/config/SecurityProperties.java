@@ -33,6 +33,11 @@ public class SecurityProperties {
     private String mockSecret = "test";
 
     /**
+     * 允许多设备登录的用户类型配置
+     */
+    private List<Integer> multipleDeviceLogin = Collections.emptyList();
+
+    /**
      * 免登录的 URL 列表
      */
     private List<String> permitAllUrls = Collections.emptyList();

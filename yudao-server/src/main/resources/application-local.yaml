@@ -188,6 +188,7 @@ yudao:
     enable: false # 本地环境，暂时关闭图片验证码，方便登录等接口的测试；
   security:
     mock-enable: true
+    multiple-device-login: [ 1,2 ] #允许多设备登录的用户类型数组 对应UserTypeEnum
   xss:
     enable: false
     exclude-urls: # 如下两个 url，仅仅是为了演示，去掉配置也没关系
