@@ -17,7 +17,7 @@ import javax.annotation.Resource;
 @Slf4j
 public class SmsSendConsumer extends AbstractStreamMessageListener<SmsSendMessage> {
 
-    @Resource
+//    @Resource
     private SmsSendService smsSendService;
 
     @Override

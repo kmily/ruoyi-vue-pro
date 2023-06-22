@@ -36,7 +36,7 @@ public class SmsCodeServiceImpl implements SmsCodeService {
     @Resource
     private SmsCodeMapper smsCodeMapper;
 
-    @Resource
+//    @Resource
     private SmsSendService smsSendService;
 
     @Override

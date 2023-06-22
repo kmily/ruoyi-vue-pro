@@ -22,7 +22,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 @Validated
 public class SocialUserController {
 
-    @Resource
+//    @Resource
     private SocialUserService socialUserService;
 
     @PostMapping("/bind")

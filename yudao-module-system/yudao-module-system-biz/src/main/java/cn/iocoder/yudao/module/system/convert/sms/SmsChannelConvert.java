@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannel
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.sms.core.property.SmsChannelProperties;
+//import cn.iocoder.yudao.framework.sms.core.property.SmsChannelProperties;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -32,7 +32,7 @@ public interface SmsChannelConvert {
 
     PageResult<SmsChannelRespVO> convertPage(PageResult<SmsChannelDO> page);
 
-    List<SmsChannelProperties> convertList02(List<SmsChannelDO> list);
+//    List<SmsChannelProperties> convertList02(List<SmsChannelDO> list);
 
     List<SmsChannelSimpleRespVO> convertList03(List<SmsChannelDO> list);
 

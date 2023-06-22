@@ -16,7 +16,7 @@ import javax.annotation.Resource;
 @Validated
 public class SmsSendApiImpl implements SmsSendApi {
 
-    @Resource
+//    @Resource
     private SmsSendService smsSendService;
 
     @Override

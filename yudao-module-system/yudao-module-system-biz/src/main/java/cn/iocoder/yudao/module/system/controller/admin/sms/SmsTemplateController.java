@@ -29,9 +29,9 @@ import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.E
 @RequestMapping("/system/sms-template")
 public class SmsTemplateController {
 
-    @Resource
+//    @Resource
     private SmsTemplateService smsTemplateService;
-    @Resource
+//    @Resource
     private SmsSendService smsSendService;
 
     @PostMapping("/create")

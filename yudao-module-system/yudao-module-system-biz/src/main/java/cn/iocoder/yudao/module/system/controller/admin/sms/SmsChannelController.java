@@ -24,7 +24,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RequestMapping("system/sms-channel")
 public class SmsChannelController {
 
-    @Resource
+//    @Resource
     private SmsChannelService smsChannelService;
 
     @PostMapping("/create")
