@@ -86,4 +86,13 @@ public class FollowRecordServiceImpl implements FollowRecordService {
         return followRecordMapper.selectList(Wrappers.lambdaQuery(
                 new FollowRecordDO().setFollowThridOrderId(thirdOrderId)));
     }
+
+    @Override
+    public List<FollowRecordDO> listFollowRecord(Long thirdOrderId, Long accountId) {
+        return followRecordMapper.selectList(Wrappers.lambdaQuery(
+                new FollowRecordDO().setFollowThridOrderId(thirdOrderId)
+                .setFollowAccount(accountId)));
+    }
+    
+    
 }

@@ -73,5 +73,12 @@ public interface FollowRecordService {
      * @author wuqiaoxin
      */
     List<FollowRecordDO> listFollowRecord(Long thirdOrderId);
+    
+    /**
+     * * 根据第三方订单号和跟随账户查找跟随订单
+     * @date 2023年6月22日
+     * @author wuqiaoxin
+     */
+    List<FollowRecordDO> listFollowRecord(Long thirdOrderId, Long accountId);
 
 }

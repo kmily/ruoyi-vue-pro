@@ -36,6 +36,7 @@ import com.binance.client.model.user.OrderUpdate;
 import com.binance.client.model.user.UserDataUpdateEvent;
 import com.cw.module.trade.controller.admin.account.vo.AccountUpdateReqVO;
 import com.cw.module.trade.controller.admin.followrecord.vo.FollowRecordCreateReqVO;
+import com.cw.module.trade.controller.admin.followrecord.vo.FollowRecordExportReqVO;
 import com.cw.module.trade.controller.admin.notifymsg.vo.NotifyMsgCreateReqVO;
 import com.cw.module.trade.dal.dataobject.account.AccountDO;
 import com.cw.module.trade.dal.dataobject.followrecord.FollowRecordDO;
@@ -190,6 +191,12 @@ public class WebSocketHandlerFactory {
                 log.info("当前需要跟单的账号有:{}", JsonUtil.object2String(listFollowAccount));
                 // 新订单
                 for(AccountDO account : listFollowAccount) {
+                    List<FollowRecordDO> listFollowRecord = followRecordServiceImpl.listFollowRecord(order.getOrderId(), account.getId());
+                    if(CollectionUtil.isNotEmpty(listFollowRecord)) {
+                        log.warn("账号{}已经跟随过订单，无需再次跟随, {}", account.getId(), order);
+                        continue ;
+                    }
+                    
                     sw.start("账号"+account.getId()+"跟随耗时");
                     // 下单则需要保存跟随记录
                     FollowRecordCreateReqVO reqVo = new FollowRecordCreateReqVO();
