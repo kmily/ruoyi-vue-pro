@@ -2,12 +2,14 @@ package cn.iocoder.yudao.module.trade.controller.app.order;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
+import cn.iocoder.yudao.module.product.api.comment.ProductCommentApi;
+import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.property.ProductPropertyValueApi;
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.*;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemRespVO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
@@ -15,6 +17,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderService;
+import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,14 +27,16 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_ITEM_NOT_FOUND;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_NOT_FOUND;
 
 @Tag(name = "用户 App - 交易订单")
 @RestController
@@ -45,6 +50,8 @@ public class AppTradeOrderController {
 
     @Resource
     private ProductPropertyValueApi productPropertyValueApi;
+    @Resource
+    private ProductCommentApi productCommentApi;
 
     @Resource
     private TradeOrderProperties tradeOrderProperties;
@@ -106,7 +113,7 @@ public class AppTradeOrderController {
     @GetMapping("/get-count")
     @Operation(summary = "获得交易订单数量")
     public CommonResult<Map<String, Long>> getOrderCount() {
-        Map<String, Long> orderCount = new HashMap<>();
+        Map<String, Long> orderCount = Maps.newLinkedHashMapWithExpectedSize(5);
         // 全部
         orderCount.put("allCount", tradeOrderService.getOrderCount(getLoginUserId(), null, null));
         // 待付款（未支付）
@@ -130,11 +137,25 @@ public class AppTradeOrderController {
         return success(TradeOrderConvert.INSTANCE.convert03(item));
     }
 
-    // TODO 芋艿：待实现
     @PostMapping("/item/create-comment")
     @Operation(summary = "创建交易订单项的评价")
-    public CommonResult<Long> createOrderItemComment() {
-        return success(0L);
+    public CommonResult<Long> createOrderItemComment(@RequestBody AppTradeOrderItemCommentCreateReqVO createReqVO) {
+        // TODO @puhui999：这个逻辑，最好写到 service 哈；
+        Long loginUserId = getLoginUserId();
+        // 先通过订单项 ID 查询订单项是否存在
+        TradeOrderItemDO orderItemDO = tradeOrderService.getOrderItemByIdAndUserId(createReqVO.getOrderItemId(), loginUserId);
+        if (orderItemDO == null) {
+            throw exception(ORDER_ITEM_NOT_FOUND);
+        }
+        // 校验订单
+        TradeOrderDO orderDO = tradeOrderService.getOrderByIdAndUserId(orderItemDO.getOrderId(), loginUserId);
+        if (orderDO == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+        // TODO @puhui999：要校验订单已完成，但是未评价；
+
+        ProductCommentCreateReqDTO productCommentCreateReqDTO = TradeOrderConvert.INSTANCE.convert04(createReqVO, orderItemDO);
+        return success(productCommentApi.createComment(productCommentCreateReqDTO));
     }
 
 }
