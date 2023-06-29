@@ -168,7 +168,7 @@ public class DeptServiceImpl implements DeptService {
         }
         // 针对多租户，过滤掉非当前租户的部门
         Long tenantId = TenantContextHolder.getTenantId();
-        if (tenantId != null) {
+        if (tenantId != null && !TenantContextHolder.isIgnore() ) {
             depts = CollUtil.filterNew(depts, dept -> tenantId.equals(dept.getTenantId()));
         }
         result.addAll(depts);
