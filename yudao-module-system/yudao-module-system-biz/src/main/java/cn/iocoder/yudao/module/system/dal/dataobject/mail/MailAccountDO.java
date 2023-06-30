@@ -49,5 +49,10 @@ public class MailAccountDO extends BaseDO {
      * 是否开启 SSL
      */
     private Boolean sslEnable;
+    /**
+     * 是否开启STARTTLS安全连接
+     * 使用 STARTTLS安全连接，STARTTLS是对纯文本通信协议的扩展。它将纯文本连接升级为加密连接（TLS或SSL）， 而不是使用一个单独的加密通信端口。
+     */
+    private Boolean starttlsEnable;
 
 }

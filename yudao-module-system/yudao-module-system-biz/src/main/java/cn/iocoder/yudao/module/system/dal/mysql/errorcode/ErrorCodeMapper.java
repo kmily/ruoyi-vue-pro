@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.dal.mysql.errorcode;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.LangUtils;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodeExportReqVO;
@@ -11,6 +12,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 @Mapper
 public interface ErrorCodeMapper extends BaseMapperX<ErrorCodeDO> {
@@ -36,11 +38,11 @@ public interface ErrorCodeMapper extends BaseMapperX<ErrorCodeDO> {
     }
 
     default List<ErrorCodeDO> selectListByCodes(Collection<Integer> codes) {
-        return selectList(ErrorCodeDO::getCode, codes);
+        return selectList(new LambdaQueryWrapperX<ErrorCodeDO>().in(ErrorCodeDO::getCode, codes).eq(ErrorCodeDO::getLangType, LangUtils.getDefaultLang()));
     }
 
-    default ErrorCodeDO selectByCode(Integer code) {
-        return selectOne(ErrorCodeDO::getCode, code);
+    default ErrorCodeDO selectByCode(Integer code, String langType) {
+        return selectOne(new LambdaQueryWrapperX<ErrorCodeDO>().eq(ErrorCodeDO::getCode, code).eq(ErrorCodeDO::getLangType, langType));
     }
 
     default List<ErrorCodeDO> selectListByApplicationNameAndUpdateTimeGt(String applicationName, LocalDateTime minUpdateTime) {

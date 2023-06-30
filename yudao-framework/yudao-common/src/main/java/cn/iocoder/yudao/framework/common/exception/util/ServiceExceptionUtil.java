@@ -1,10 +1,15 @@
 package cn.iocoder.yudao.framework.common.exception.util;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.util.LangUtils;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.i18n.LocaleContextHolder;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -28,14 +33,14 @@ public class ServiceExceptionUtil {
     /**
      * 错误码提示模板
      */
-    private static final ConcurrentMap<Integer, String> MESSAGES = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, String> MESSAGES = new ConcurrentHashMap<>();
 
-    public static void putAll(Map<Integer, String> messages) {
+    public static void putAll(Map<String, String> messages) {
         ServiceExceptionUtil.MESSAGES.putAll(messages);
     }
 
-    public static void put(Integer code, String message) {
-        ServiceExceptionUtil.MESSAGES.put(code, message);
+    public static void put(String codeLang, String message) {
+        ServiceExceptionUtil.MESSAGES.put(codeLang, message);
     }
 
     public static void delete(Integer code, String message) {
@@ -45,12 +50,12 @@ public class ServiceExceptionUtil {
     // ========== 和 ServiceException 的集成 ==========
 
     public static ServiceException exception(ErrorCode errorCode) {
-        String messagePattern = MESSAGES.getOrDefault(errorCode.getCode(), errorCode.getMsg());
+        String messagePattern = MESSAGES.getOrDefault(LangUtils.addSuffix(errorCode.getCode()), errorCode.getMsg());
         return exception0(errorCode.getCode(), messagePattern);
     }
 
     public static ServiceException exception(ErrorCode errorCode, Object... params) {
-        String messagePattern = MESSAGES.getOrDefault(errorCode.getCode(), errorCode.getMsg());
+        String messagePattern = MESSAGES.getOrDefault(LangUtils.addSuffix(errorCode.getCode()), errorCode.getMsg());
         return exception0(errorCode.getCode(), messagePattern, params);
     }
 
@@ -61,7 +66,7 @@ public class ServiceExceptionUtil {
      * @return 异常
      */
     public static ServiceException exception(Integer code) {
-        return exception0(code, MESSAGES.get(code));
+        return exception0(code, MESSAGES.get(LangUtils.addSuffix(code)));
     }
 
     /**
@@ -72,7 +77,7 @@ public class ServiceExceptionUtil {
      * @return 异常
      */
     public static ServiceException exception(Integer code, Object... params) {
-        return exception0(code, MESSAGES.get(code), params);
+        return exception0(code, MESSAGES.get(LangUtils.addSuffix(code)), params);
     }
 
     public static ServiceException exception0(Integer code, String messagePattern, Object... params) {

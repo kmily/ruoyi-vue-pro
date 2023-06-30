@@ -11,7 +11,10 @@ import java.time.LocalDateTime;
  */
 @Data
 public class ErrorCodeRespDTO {
-
+    /**
+     * 多语言
+     */
+    private String langType;
     /**
      * 错误码编码
      */
