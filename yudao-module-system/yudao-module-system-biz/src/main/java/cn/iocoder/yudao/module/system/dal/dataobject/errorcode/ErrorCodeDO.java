@@ -48,5 +48,9 @@ public class ErrorCodeDO extends BaseDO {
      * 错误码备注
      */
     private String memo;
+    /**
+     * 多语言
+     */
+    private String langType;
 
 }

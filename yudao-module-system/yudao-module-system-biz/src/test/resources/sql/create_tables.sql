@@ -344,6 +344,7 @@ CREATE TABLE IF NOT EXISTS "system_error_code" (
   "type" tinyint NOT NULL DEFAULT '0',
   "application_name" varchar(50) NOT NULL,
   "code" int NOT NULL DEFAULT '0',
+  "lang_type" varchar(10) NOT NULL DEFAULT 'zh',
   "message" varchar(512) NOT NULL DEFAULT '',
   "memo" varchar(512) DEFAULT '',
   "creator" varchar(64) DEFAULT '',

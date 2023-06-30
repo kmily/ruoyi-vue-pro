@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Import;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
@@ -156,11 +157,12 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
     public void testValidateCodeDuplicate_codeDuplicateForCreate() {
         // 准备参数
         Integer code = randomInteger();
+        String langType = Locale.SIMPLIFIED_CHINESE.getLanguage();
         // mock 数据
-        errorCodeMapper.insert(randomErrorCodeDO(o -> o.setCode(code)));
+        errorCodeMapper.insert(randomErrorCodeDO(o -> o.setCode(code).setLangType(langType)));
 
         // 调用，校验异常
-        assertServiceException(() -> errorCodeService.validateCodeDuplicate(code, null),
+        assertServiceException(() -> errorCodeService.validateCodeDuplicate(code, langType,null),
                 ERROR_CODE_DUPLICATE);
     }
 
@@ -169,11 +171,12 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
         // 准备参数
         Long id = randomLongId();
         Integer code = randomInteger();
+        String langType = Locale.SIMPLIFIED_CHINESE.getLanguage();
         // mock 数据
-        errorCodeMapper.insert(randomErrorCodeDO(o -> o.setCode(code)));
+        errorCodeMapper.insert(randomErrorCodeDO(o -> o.setCode(code).setLangType(langType)));
 
         // 调用，校验异常
-        assertServiceException(() -> errorCodeService.validateCodeDuplicate(code, id),
+        assertServiceException(() -> errorCodeService.validateCodeDuplicate(code, langType, id),
                 ERROR_CODE_DUPLICATE);
     }
 

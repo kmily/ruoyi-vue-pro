@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.errorcode.core.loader;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.module.system.api.errorcode.ErrorCodeApi;
 import cn.iocoder.yudao.module.system.api.errorcode.dto.ErrorCodeRespDTO;
@@ -12,6 +13,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * ErrorCodeLoader 的实现类，从 infra 的数据库中，加载错误码。
@@ -60,11 +62,13 @@ public class ErrorCodeLoaderImpl implements ErrorCodeLoader {
             return;
         }
         log.info("[loadErrorCodes0][加载到 ({}) 个错误码]", errorCodeRespDTOs.size());
+        //默认中文
+        String defaultLang = Locale.SIMPLIFIED_CHINESE.getLanguage();
 
         // 刷新错误码的缓存
         errorCodeRespDTOs.forEach(errorCodeRespDTO -> {
             // 写入到错误码的缓存
-            putErrorCode(errorCodeRespDTO.getCode(), errorCodeRespDTO.getMessage());
+            putErrorCode(errorCodeRespDTO.getCode() + StrUtil.UNDERLINE + (StrUtil.isNotBlank(errorCodeRespDTO.getLangType()) ? errorCodeRespDTO.getLangType() : defaultLang), errorCodeRespDTO.getMessage());
             // 记录下更新时间，方便增量更新
             maxUpdateTime = DateUtils.max(maxUpdateTime, errorCodeRespDTO.getUpdateTime());
         });
