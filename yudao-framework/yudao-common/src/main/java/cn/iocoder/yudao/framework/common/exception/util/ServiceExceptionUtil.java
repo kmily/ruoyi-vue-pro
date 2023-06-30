@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.util.LangUtils;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -49,14 +50,12 @@ public class ServiceExceptionUtil {
     // ========== 和 ServiceException 的集成 ==========
 
     public static ServiceException exception(ErrorCode errorCode) {
-        String currentLocaleLang = ObjectUtil.isNotNull(LocaleContextHolder.getLocale()) ? LocaleContextHolder.getLocale().getLanguage() : Locale.SIMPLIFIED_CHINESE.getLanguage();
-        String messagePattern = MESSAGES.getOrDefault(errorCode.getCode() + StrUtil.UNDERLINE + currentLocaleLang, errorCode.getMsg());
+        String messagePattern = MESSAGES.getOrDefault(LangUtils.addSuffix(errorCode.getCode()), errorCode.getMsg());
         return exception0(errorCode.getCode(), messagePattern);
     }
 
     public static ServiceException exception(ErrorCode errorCode, Object... params) {
-        String currentLocaleLang = ObjectUtil.isNotNull(LocaleContextHolder.getLocale()) ? LocaleContextHolder.getLocale().getLanguage() : Locale.SIMPLIFIED_CHINESE.getLanguage();
-        String messagePattern = MESSAGES.getOrDefault(errorCode.getCode() + StrUtil.UNDERLINE + currentLocaleLang, errorCode.getMsg());
+        String messagePattern = MESSAGES.getOrDefault(LangUtils.addSuffix(errorCode.getCode()), errorCode.getMsg());
         return exception0(errorCode.getCode(), messagePattern, params);
     }
 
@@ -67,8 +66,7 @@ public class ServiceExceptionUtil {
      * @return 异常
      */
     public static ServiceException exception(Integer code) {
-        String currentLocaleLang = ObjectUtil.isNotNull(LocaleContextHolder.getLocale()) ? LocaleContextHolder.getLocale().getLanguage() : Locale.SIMPLIFIED_CHINESE.getLanguage();
-        return exception0(code, MESSAGES.get(code + StrUtil.UNDERLINE + currentLocaleLang));
+        return exception0(code, MESSAGES.get(LangUtils.addSuffix(code)));
     }
 
     /**
@@ -79,8 +77,7 @@ public class ServiceExceptionUtil {
      * @return 异常
      */
     public static ServiceException exception(Integer code, Object... params) {
-        String currentLocaleLang = ObjectUtil.isNotNull(LocaleContextHolder.getLocale()) ? LocaleContextHolder.getLocale().getLanguage() : Locale.SIMPLIFIED_CHINESE.getLanguage();
-        return exception0(code, MESSAGES.get(code + StrUtil.UNDERLINE + currentLocaleLang), params);
+        return exception0(code, MESSAGES.get(LangUtils.addSuffix(code)), params);
     }
 
     public static ServiceException exception0(Integer code, String messagePattern, Object... params) {

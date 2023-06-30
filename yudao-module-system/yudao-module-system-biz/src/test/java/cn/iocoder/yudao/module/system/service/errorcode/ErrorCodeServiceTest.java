@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.service.errorcode;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.LangUtils;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.api.errorcode.dto.ErrorCodeAutoGenerateReqDTO;
@@ -157,7 +158,7 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
     public void testValidateCodeDuplicate_codeDuplicateForCreate() {
         // 准备参数
         Integer code = randomInteger();
-        String langType = Locale.SIMPLIFIED_CHINESE.getLanguage();
+        String langType = LangUtils.getDefaultLang();
         // mock 数据
         errorCodeMapper.insert(randomErrorCodeDO(o -> o.setCode(code).setLangType(langType)));
 
@@ -171,7 +172,7 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
         // 准备参数
         Long id = randomLongId();
         Integer code = randomInteger();
-        String langType = Locale.SIMPLIFIED_CHINESE.getLanguage();
+        String langType = LangUtils.getDefaultLang();
         // mock 数据
         errorCodeMapper.insert(randomErrorCodeDO(o -> o.setCode(code).setLangType(langType)));
 

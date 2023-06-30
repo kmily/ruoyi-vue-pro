@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.errorcode.core.loader;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.LangUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.module.system.api.errorcode.ErrorCodeApi;
 import cn.iocoder.yudao.module.system.api.errorcode.dto.ErrorCodeRespDTO;
@@ -62,8 +63,8 @@ public class ErrorCodeLoaderImpl implements ErrorCodeLoader {
             return;
         }
         log.info("[loadErrorCodes0][加载到 ({}) 个错误码]", errorCodeRespDTOs.size());
-        //默认中文
-        String defaultLang = Locale.SIMPLIFIED_CHINESE.getLanguage();
+        //默认语言
+        String defaultLang = LangUtils.getDefaultLang();
 
         // 刷新错误码的缓存
         errorCodeRespDTOs.forEach(errorCodeRespDTO -> {

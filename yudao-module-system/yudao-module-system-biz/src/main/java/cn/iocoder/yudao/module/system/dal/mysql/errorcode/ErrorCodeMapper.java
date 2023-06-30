@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.dal.mysql.errorcode;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.LangUtils;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodeExportReqVO;
@@ -37,7 +38,7 @@ public interface ErrorCodeMapper extends BaseMapperX<ErrorCodeDO> {
     }
 
     default List<ErrorCodeDO> selectListByCodes(Collection<Integer> codes) {
-        return selectList(new LambdaQueryWrapperX<ErrorCodeDO>().in(ErrorCodeDO::getCode, codes).eq(ErrorCodeDO::getLangType, Locale.SIMPLIFIED_CHINESE.getLanguage()));
+        return selectList(new LambdaQueryWrapperX<ErrorCodeDO>().in(ErrorCodeDO::getCode, codes).eq(ErrorCodeDO::getLangType, LangUtils.getDefaultLang()));
     }
 
     default ErrorCodeDO selectByCode(Integer code, String langType) {
