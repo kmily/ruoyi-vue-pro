@@ -11,6 +11,7 @@ public interface ErrorCodeConstants {
 
     // ========== 用户相关  1004001000============
     ErrorCode USER_NOT_EXISTS = new ErrorCode(1004001000, "用户不存在");
+
     ErrorCode USER_PASSWORD_FAILED = new ErrorCode(1004001001, "密码校验失败");
 
     // ========== AUTH 模块 1004003000 ==========
@@ -22,5 +23,6 @@ public interface ErrorCodeConstants {
 
     // ========== 用户收件地址 1004004000 ==========
     ErrorCode ADDRESS_NOT_EXISTS = new ErrorCode(1004004000, "用户收件地址不存在");
+
 
 }

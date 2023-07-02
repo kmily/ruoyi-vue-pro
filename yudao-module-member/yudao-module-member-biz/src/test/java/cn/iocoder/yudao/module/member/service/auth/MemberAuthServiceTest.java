@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbAndRedisUnitTest;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.AppAuthResetPasswordReqVO;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.AppAuthUpdatePasswordReqVO;
-import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.MemberUser.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import cn.iocoder.yudao.module.system.api.oauth2.OAuth2TokenApi;

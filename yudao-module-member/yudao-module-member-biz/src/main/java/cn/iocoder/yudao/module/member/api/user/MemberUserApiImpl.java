@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.member.api.user;
 
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.convert.user.UserConvert;
-import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.MemberUser.MemberUserDO;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
