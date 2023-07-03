@@ -44,7 +44,7 @@ public class AppTradeOrderDetailRespVO {
     // ========== 价格 + 支付基本信息 ==========
 
     @Schema(description = "是否已支付", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-    private Boolean payed;
+    private Boolean payStatus;
 
     @Schema(description = "支付订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long payOrderId;
@@ -101,6 +101,9 @@ public class AppTradeOrderDetailRespVO {
 
     @Schema(description = "收件人详细地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "中关村大街 1 号")
     private String receiverDetailAddress;
+
+    @Schema(description = "自提门店编号", example = "1088")
+    private Long pickUpStoreId;
 
     // ========== 售后基本信息 ==========
 

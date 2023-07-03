@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.dal.dataobject.order;
 
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.*;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -116,7 +117,7 @@ public class TradeOrderDO extends BaseDO {
      * true - 已经支付过
      * false - 没有支付过
      */
-    private Boolean payed;
+    private Boolean payStatus;
     /**
      * 付款时间
      */
@@ -172,12 +173,6 @@ public class TradeOrderDO extends BaseDO {
      */
     private Integer deliveryType;
     /**
-     * 配置模板的编号
-     *
-     * 关联 DeliveryTemplateDO 的 id 编号
-     */
-    private Long deliveryTemplateId;
-    /**
      * 发货物流公司编号
      */
     private Long logisticsId;
@@ -217,6 +212,13 @@ public class TradeOrderDO extends BaseDO {
      */
     private String receiverDetailAddress;
 
+    /**
+     * 自提门店编号
+     *
+     * 关联 {@link DeliveryPickUpStoreDO#getId()}
+     */
+    private Long pickUpStoreId;
+
     // ========== 售后基本信息 ==========
     /**
      * 售后状态
@@ -243,6 +245,7 @@ public class TradeOrderDO extends BaseDO {
      * 对应 taobao 的 trade.coupon_fee 字段
      */
     private Integer couponPrice;
+    // TODO 芋艿：需要记录使用的积分；
     /**
      * 积分抵扣的金额，单位：分
      *

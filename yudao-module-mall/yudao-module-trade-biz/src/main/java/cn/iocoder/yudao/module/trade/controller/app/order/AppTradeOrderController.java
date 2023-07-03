@@ -66,9 +66,9 @@ public class AppTradeOrderController {
     @PostMapping("/create")
     @Operation(summary = "创建订单")
     @PreAuthenticated
-    public CommonResult<Long> createOrder(@RequestBody AppTradeOrderCreateReqVO createReqVO) {
-        Long orderId = tradeOrderService.createOrder(getLoginUserId(), getClientIP(), createReqVO);
-        return success(orderId);
+    public CommonResult<AppTradeOrderCreateRespVO> createOrder(@RequestBody AppTradeOrderCreateReqVO createReqVO) {
+        TradeOrderDO order = tradeOrderService.createOrder(getLoginUserId(), getClientIP(), createReqVO);
+        return success(new AppTradeOrderCreateRespVO().setId(order.getId()).setPayOrderId(order.getPayOrderId()));
     }
 
     @PostMapping("/update-paid")
@@ -125,6 +125,30 @@ public class AppTradeOrderController {
         // 待评价
         orderCount.put("uncommentedCount", tradeOrderService.getOrderCount(getLoginUserId(), TradeOrderStatusEnum.COMPLETED.getStatus(), false));
         return success(orderCount);
+    }
+
+    @PutMapping("/take")
+    @Operation(summary = "确认交易订单收货")
+    @Parameter(name = "id", description = "交易订单编号")
+    public CommonResult<Boolean> takeOrder(@RequestParam("id") Long id) {
+        // TODO @芋艿：未实现，mock 用
+        return success(true);
+    }
+
+    @DeleteMapping("/cancel")
+    @Operation(summary = "取消交易订单")
+    @Parameter(name = "id", description = "交易订单编号")
+    public CommonResult<Boolean> cancelOrder(@RequestParam("id") Long id) {
+        // TODO @芋艿：未实现，mock 用
+        return success(true);
+    }
+
+    @DeleteMapping("/delete")
+    @Operation(summary = "删除交易订单")
+    @Parameter(name = "id", description = "交易订单编号")
+    public CommonResult<Boolean> deleteOrder(@RequestParam("id") Long id) {
+        // TODO @芋艿：未实现，mock 用
+        return success(true);
     }
 
     // ========== 订单项 ==========
