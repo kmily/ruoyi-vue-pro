@@ -6,7 +6,7 @@
     <parent>
         <groupId>cn.iocoder.boot</groupId>
         <artifactId>yudao-module-mall</artifactId>
-        <version>${revision}</version>
+        <version>1.7.3-snapshot</version>
     </parent>
 
     <artifactId>yudao-module-product-api</artifactId>

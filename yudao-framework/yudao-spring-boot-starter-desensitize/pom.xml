@@ -6,7 +6,7 @@
     <parent>
         <artifactId>yudao-framework</artifactId>
         <groupId>cn.iocoder.boot</groupId>
-        <version>${revision}</version>
+        <version>1.7.3-snapshot</version>
     </parent>
 
     <artifactId>yudao-spring-boot-starter-desensitize</artifactId>

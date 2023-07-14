@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>cn.iocoder.boot</groupId>
     <artifactId>yudao</artifactId>
-    <version>${revision}</version>
+    <version>1.7.3-snapshot</version>
     <packaging>pom</packaging>
     <modules>
         <module>yudao-dependencies</module>
@@ -16,11 +16,11 @@
         <module>yudao-module-member</module>
         <module>yudao-module-system</module>
         <module>yudao-module-infra</module>
-<!--        <module>yudao-module-pay</module>-->
-<!--        <module>yudao-module-bpm</module>-->
-<!--        <module>yudao-module-report</module>-->
-<!--        <module>yudao-module-mp</module>-->
-<!--        <module>yudao-module-mall</module>-->
+        <module>yudao-module-pay</module>
+        <module>yudao-module-bpm</module>
+        <module>yudao-module-report</module>
+        <module>yudao-module-mp</module>
+        <module>yudao-module-mall</module>
         <!-- 示例项目 -->
         <module>yudao-example</module>
     </modules>
@@ -49,7 +49,7 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-dependencies</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

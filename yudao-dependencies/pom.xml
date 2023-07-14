@@ -6,7 +6,7 @@
 
     <groupId>cn.iocoder.boot</groupId>
     <artifactId>yudao-dependencies</artifactId>
-    <version>${revision}</version>
+    <version>1.7.3-snapshot</version>
     <packaging>pom</packaging>
 
     <name>${project.artifactId}</name>
@@ -89,67 +89,67 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-banner</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-operatelog</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-dict</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-sms</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-pay</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-weixin</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-tenant</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-data-permission</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-social</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-error-code</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-ip</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-captcha</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-desensitize</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
 
             <!-- Spring 核心 -->
@@ -164,13 +164,13 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-web</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
 
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-security</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
 
             <dependency>
@@ -188,7 +188,7 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-mybatis</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
 
             <dependency>
@@ -221,7 +221,7 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-redis</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
 
             <dependency>
@@ -240,21 +240,21 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-job</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
 
             <!-- 消息队列相关 -->
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-mq</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
 
             <!-- 服务保障相关 -->
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-protection</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
 
             <dependency>
@@ -284,7 +284,7 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-monitor</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
 
             <dependency>
@@ -343,7 +343,7 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-test</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
                 <scope>test</scope>
             </dependency>
 
@@ -385,7 +385,7 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-flowable</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
             <dependency>
                 <groupId>org.flowable</groupId>
@@ -403,13 +403,13 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-common</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
 
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-excel</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
 
             <dependency>
@@ -552,7 +552,7 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-file</artifactId>
-                <version>${revision}</version>
+                <version>1.7.3-snapshot</version>
             </dependency>
             <dependency>
                 <groupId>io.minio</groupId>

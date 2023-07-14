@@ -5,7 +5,7 @@
     <parent>
         <groupId>cn.iocoder.boot</groupId>
         <artifactId>yudao-module-member</artifactId>
-        <version>${revision}</version>
+        <version>1.7.3-snapshot</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>yudao-module-member-api</artifactId>
@@ -13,7 +13,7 @@
 
     <name>${project.artifactId}</name>
     <description>
-        member 模块 API，暴露给其它模块调用
+<!--        member 模块 API，暴露给其它模块调用-->
     </description>
 
     <dependencies>
