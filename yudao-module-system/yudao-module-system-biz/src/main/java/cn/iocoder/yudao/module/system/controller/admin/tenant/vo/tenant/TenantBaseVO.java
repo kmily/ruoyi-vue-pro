@@ -28,8 +28,11 @@ public class TenantBaseVO {
     @NotNull(message = "租户状态")
     private Integer status;
 
+    /**
+     * 租户表 domain 达梦数据库关键字，命名修改为 domdomainUrl by cao.yong 20230715
+     */
     @Schema(description = "绑定域名", example = "https://www.iocoder.cn")
-    private String domain;
+    private String domainUrl;
 
     @Schema(description = "租户套餐编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "租户套餐编号不能为空")
