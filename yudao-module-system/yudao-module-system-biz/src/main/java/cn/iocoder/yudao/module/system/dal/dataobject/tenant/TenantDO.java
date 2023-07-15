@@ -61,8 +61,9 @@ public class TenantDO extends BaseDO {
      * 绑定域名
      *
      * TODO 芋艿：目前是预留字段，未来会支持根据域名，自动查询到对应的租户。等等
+     * TODO 租户表 domain 达梦数据库关键字，命名修改为 domainUrl by cao.yong 20230715
      */
-    private String domain;
+    private String domainUrl;
     /**
      * 租户套餐编号
      *
