@@ -1,9 +1,9 @@
-package cn.iocoder.yudao.module.biz.service.calcinterestratedata;
+package cn.iocoder.yudao.module.biz.service.calc;
 
 import java.util.*;
 import javax.validation.*;
-import cn.iocoder.yudao.module.biz.controller.admin.calcinterestratedata.vo.*;
-import cn.iocoder.yudao.module.biz.dal.dataobject.calcinterestratedata.CalcInterestRateDataDO;
+import cn.iocoder.yudao.module.biz.controller.admin.calc.vo.*;
+import cn.iocoder.yudao.module.biz.dal.dataobject.calc.CalcInterestRateDataDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 /**
  * 利率数据 Service 接口

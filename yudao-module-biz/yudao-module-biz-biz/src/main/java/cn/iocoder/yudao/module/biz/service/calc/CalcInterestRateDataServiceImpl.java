@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.biz.service.calcinterestratedata;
+package cn.iocoder.yudao.module.biz.service.calc;
 
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
@@ -6,10 +6,10 @@ import org.springframework.validation.annotation.Validated;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 import java.util.*;
-import cn.iocoder.yudao.module.biz.controller.admin.calcinterestratedata.vo.*;
-import cn.iocoder.yudao.module.biz.dal.dataobject.calcinterestratedata.CalcInterestRateDataDO;
-import cn.iocoder.yudao.module.biz.convert.calcinterestratedata.CalcInterestRateDataConvert;
-import cn.iocoder.yudao.module.biz.dal.mysql.calcinterestratedata.CalcInterestRateDataMapper;
+import cn.iocoder.yudao.module.biz.controller.admin.calc.vo.*;
+import cn.iocoder.yudao.module.biz.dal.dataobject.calc.CalcInterestRateDataDO;
+import cn.iocoder.yudao.module.biz.convert.calc.CalcInterestRateDataConvert;
+import cn.iocoder.yudao.module.biz.dal.mysql.calc.CalcInterestRateDataMapper;
 
 
 /**

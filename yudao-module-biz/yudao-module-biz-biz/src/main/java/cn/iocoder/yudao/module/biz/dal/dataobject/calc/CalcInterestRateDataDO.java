@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.biz.dal.dataobject.calcinterestratedata;
+package cn.iocoder.yudao.module.biz.dal.dataobject.calc;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;

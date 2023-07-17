@@ -3,4 +3,4 @@
  * @author sz
  * @date 2023-07-17
  */
-package cn.iocoder.yudao.module.biz.controller;
+package cn.iocoder.yudao.module.biz.dal.dataobject;

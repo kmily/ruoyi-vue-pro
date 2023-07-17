@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.biz.controller.admin.calcinterestratedata.vo;
+package cn.iocoder.yudao.module.biz.controller.admin.calc.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;

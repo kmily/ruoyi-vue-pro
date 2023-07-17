@@ -1,13 +1,13 @@
-package cn.iocoder.yudao.module.biz.controller.admin.calcinterestratedata;
+package cn.iocoder.yudao.module.biz.controller.admin.calc;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.biz.controller.admin.calcinterestratedata.vo.*;
-import cn.iocoder.yudao.module.biz.convert.calcinterestratedata.CalcInterestRateDataConvert;
-import cn.iocoder.yudao.module.biz.dal.dataobject.calcinterestratedata.CalcInterestRateDataDO;
-import cn.iocoder.yudao.module.biz.service.calcinterestratedata.CalcInterestRateDataService;
+import cn.iocoder.yudao.module.biz.controller.admin.calc.vo.*;
+import cn.iocoder.yudao.module.biz.convert.calc.CalcInterestRateDataConvert;
+import cn.iocoder.yudao.module.biz.dal.dataobject.calc.CalcInterestRateDataDO;
+import cn.iocoder.yudao.module.biz.service.calc.CalcInterestRateDataService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

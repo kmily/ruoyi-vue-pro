@@ -1,12 +1,12 @@
-package cn.iocoder.yudao.module.biz.dal.mysql.calcinterestratedata;
+package cn.iocoder.yudao.module.biz.dal.mysql.calc;
 
 import java.util.*;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.biz.dal.dataobject.calcinterestratedata.CalcInterestRateDataDO;
+import cn.iocoder.yudao.module.biz.dal.dataobject.calc.CalcInterestRateDataDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.biz.controller.admin.calcinterestratedata.vo.*;
+import cn.iocoder.yudao.module.biz.controller.admin.calc.vo.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 /**
