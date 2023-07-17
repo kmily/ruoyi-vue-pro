@@ -2,9 +2,11 @@ package cn.iocoder.yudao.module.biz.service.calc;
 
 import java.util.*;
 import javax.validation.*;
+
 import cn.iocoder.yudao.module.biz.controller.admin.calc.vo.*;
 import cn.iocoder.yudao.module.biz.dal.dataobject.calc.CalcInterestRateDataDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+
 /**
  * 利率数据 Service 接口
  *
@@ -19,6 +21,9 @@ public interface CalcInterestRateDataService {
      * @return 编号
      */
     Integer createCalcInterestRateData(@Valid CalcInterestRateDataCreateReqVO createReqVO);
+
+    CalcInterestRateExecResVO execCalcInterestData(@Valid CalcInterestRateExecParamVO execVO);
+
 
     /**
      * 更新利率数据

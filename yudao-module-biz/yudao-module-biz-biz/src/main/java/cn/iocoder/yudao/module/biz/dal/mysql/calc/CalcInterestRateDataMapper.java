@@ -26,7 +26,7 @@ public interface CalcInterestRateDataMapper extends BaseMapperX<CalcInterestRate
                 .eqIfPresent(CalcInterestRateDataDO::getRateFiveYear, reqVO.getRateFiveYear())
                 .eqIfPresent(CalcInterestRateDataDO::getRateOverFiveYear, reqVO.getRateOverFiveYear())
                 .betweenIfPresent(CalcInterestRateDataDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(CalcInterestRateDataDO::getId));
+                .orderByAsc(CalcInterestRateDataDO::getStartDate));
     }
 
     default List<CalcInterestRateDataDO> selectList(CalcInterestRateDataExportReqVO reqVO) {

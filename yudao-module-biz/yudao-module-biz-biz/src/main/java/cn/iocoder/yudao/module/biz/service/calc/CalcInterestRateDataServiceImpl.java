@@ -34,6 +34,13 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
     }
 
     @Override
+    public CalcInterestRateExecResVO execCalcInterestData(CalcInterestRateExecParamVO execVO) {
+        CalcInterestRateExecResVO vo = new CalcInterestRateExecResVO();
+
+        return vo;
+    }
+
+    @Override
     public void updateCalcInterestRateData(CalcInterestRateDataUpdateReqVO updateReqVO) {
         // 校验存在
         validateCalcInterestRateDataExists(updateReqVO.getId());

@@ -33,6 +33,13 @@ public class CalcInterestRateDataController {
     @Resource
     private CalcInterestRateDataService calcInterestRateDataService;
 
+    @PostMapping("/exec")
+    @Operation(summary = "计算利息")
+    @PreAuthorize("@ss.hasPermission('biz:calc-interest-rate-data:query')")
+    public CommonResult<CalcInterestRateExecResVO> execCalcInterestData(@Valid @RequestBody CalcInterestRateExecParamVO execVO) {
+        return success(calcInterestRateDataService.execCalcInterestData(execVO));
+    }
+
     @PostMapping("/create")
     @Operation(summary = "创建利率数据")
     @PreAuthorize("@ss.hasPermission('biz:calc-interest-rate-data:create')")
@@ -87,7 +94,7 @@ public class CalcInterestRateDataController {
     @Operation(summary = "导出利率数据 Excel")
     @PreAuthorize("@ss.hasPermission('biz:calc-interest-rate-data:export')")
     public void exportCalcInterestRateDataExcel(@Valid CalcInterestRateDataExportReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
+                                                HttpServletResponse response) throws IOException {
         List<CalcInterestRateDataDO> list = calcInterestRateDataService.getCalcInterestRateDataList(exportReqVO);
         // 导出 Excel
         List<CalcInterestRateDataExcelVO> datas = CalcInterestRateDataConvert.INSTANCE.convertList02(list);
