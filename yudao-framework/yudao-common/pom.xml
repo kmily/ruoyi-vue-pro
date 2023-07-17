@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>yudao-common</artifactId>
     <packaging>jar</packaging>
-
+    <version>1.7.3-snapshot</version>
     <name>${project.artifactId}</name>
     <description>定义基础 pojo 类、枚举、工具类等等</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>

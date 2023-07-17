@@ -41,4 +41,6 @@ public class DefaultController {
                 "[报表模块 yudao-module-report - 已禁用][参考 https://doc.iocoder.cn/report/ 开启]");
     }
 
+
+
 }

@@ -40,7 +40,11 @@
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-biz-error-code</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-biz-biz</artifactId>
+            <version>1.7.3-snapshot</version>
+        </dependency>
 <!--         数据报表-->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>

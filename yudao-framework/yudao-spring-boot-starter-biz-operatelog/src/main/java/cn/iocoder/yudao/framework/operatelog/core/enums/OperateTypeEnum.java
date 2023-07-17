@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.operatelog.core.enums;
 
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
