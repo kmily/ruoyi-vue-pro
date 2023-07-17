@@ -5,10 +5,9 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
@@ -57,10 +56,10 @@ public class WxBarPayClient extends AbstractWxPayClient {
         }
         // 构建 WxPayMicropayRequest 对象
         WxPayMicropayRequest request = WxPayMicropayRequest.newBuilder()
-                .outTradeNo(reqDTO.getMerchantOrderId())
+                .outTradeNo(reqDTO.getOutTradeNo())
                 .body(reqDTO.getSubject())
                 .detail(reqDTO.getBody())
-                .totalFee(reqDTO.getAmount()) // 单位分
+                .totalFee(reqDTO.getPrice()) // 单位分
                 .timeExpire(formatDateV2(expireTime))
                 .spbillCreateIp(reqDTO.getUserIp())
                 .authCode(getAuthCode(reqDTO))
@@ -70,9 +69,17 @@ public class WxBarPayClient extends AbstractWxPayClient {
             try {
                 WxPayMicropayResult response = client.micropay(request);
                 // 支付成功（例如说，用户输入了密码）
+                PayOrderRespDTO order = PayOrderRespDTO.builder()
+                        .status(PayOrderStatusRespEnum.SUCCESS.getStatus())
+                        .outTradeNo(response.getOutTradeNo())
+                        .channelOrderNo(response.getTransactionId())
+                        .channelUserId(response.getOpenid())
+                        .successTime(parseDateV2(response.getTimeEnd()))
+                        .rawData(response)
+                        .build();
                 return new PayOrderUnifiedRespDTO(PayOrderDisplayModeEnum.BAR_CODE.getMode(),
-                        JsonUtils.toJsonString(response),
-                        PayOrderStatusRespEnum.SUCCESS.getStatus());
+                        JsonUtils.toJsonString(response))
+                        .setOrder(order);
             } catch (WxPayException ex) {
                 // 如果不满足这 3 种任一的，则直接抛出 WxPayException 异常，不仅需处理
                 // 1. SYSTEMERROR：接口返回错误：请立即调用被扫订单结果查询API，查询当前订单状态，并根据订单的状态决定下一步的操作。
@@ -93,11 +100,6 @@ public class WxBarPayClient extends AbstractWxPayClient {
     @Override
     protected PayOrderUnifiedRespDTO doUnifiedOrderV3(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
         return doUnifiedOrderV2(reqDTO);
-    }
-
-    @Override
-    protected PayRefundUnifiedRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) {
-        return null;
     }
 
     // ========== 各种工具方法 ==========

@@ -53,10 +53,10 @@ public class PayRefundExcelVO {
     private Integer type;
 
     @ExcelProperty("支付金额，单位：元")
-    private String payAmount;
+    private String payPrice;
 
     @ExcelProperty("退款金额，单位：元")
-    private String refundAmount;
+    private String refundPrice;
 
     @ExcelProperty("退款原因")
     private String reason;
@@ -75,9 +75,6 @@ public class PayRefundExcelVO {
 
     @ExcelProperty("退款成功时间")
     private LocalDateTime successTime;
-
-    @ExcelProperty("退款通知时间")
-    private LocalDateTime notifyTime;
 
     @ExcelProperty("退款失效时间")
     private LocalDateTime expireTime;

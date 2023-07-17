@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.framework.pay.core.client;
 
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayNotifyReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayOrderNotifyRespDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.notify.PayRefundNotifyRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedRespDTO;
+
+import java.util.Map;
 
 /**
  * 支付客户端，用于对接各支付渠道的 SDK，实现发起支付、退款等功能
@@ -22,6 +22,8 @@ public interface PayClient {
      */
     Long getId();
 
+    // ============ 支付相关 ==========
+
     /**
      * 调用支付渠道，统一下单
      *
@@ -31,22 +33,31 @@ public interface PayClient {
     PayOrderUnifiedRespDTO unifiedOrder(PayOrderUnifiedReqDTO reqDTO);
 
     /**
-     * 调用支付渠道，进行退款
-     * @param reqDTO  统一退款请求信息
-     * @return 各支付渠道的统一返回结果
+     * 解析 order 回调数据
+     *
+     * @param params HTTP 回调接口 content type 为 application/x-www-form-urlencoded 的所有参数
+     * @param body HTTP 回调接口的 request body
+     * @return 支付订单信息
      */
-    PayRefundUnifiedRespDTO unifiedRefund(PayRefundUnifiedReqDTO reqDTO);
+    PayOrderRespDTO parseOrderNotify(Map<String, String> params, String body);
+
+    // ============ 退款相关 ==========
 
     /**
-     * 解析回调数据
+     * 调用支付渠道，进行退款
      *
-     * @param rawNotify 通知内容
-     * @return 回调对象
-     *         1. {@link PayRefundNotifyRespDTO} 退款通知
-     *         2. {@link PayOrderNotifyRespDTO} 支付通知
+     * @param reqDTO  统一退款请求信息
+     * @return 退款信息
      */
-    default Object parseNotify(PayNotifyReqDTO rawNotify) {
-        throw new UnsupportedOperationException("未实现 parseNotify 方法！");
-    }
+    PayRefundRespDTO unifiedRefund(PayRefundUnifiedReqDTO reqDTO);
+
+    /**
+     * 解析 refund 回调数据
+     *
+     * @param params HTTP 回调接口 content type 为 application/x-www-form-urlencoded 的所有参数
+     * @param body HTTP 回调接口的 request body
+     * @return 支付订单信息
+     */
+    PayRefundRespDTO parseRefundNotify(Map<String, String> params, String body);
 
 }

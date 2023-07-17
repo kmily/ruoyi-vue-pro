@@ -27,24 +27,15 @@ export function deleteChannel(id) {
   })
 }
 
-// 获得支付渠道分页
-export function getChannelPage(query) {
-  return request({
-    url: '/pay/channel/page',
-    method: 'get',
-    params: query
-  })
-}
-
 // 获得支付渠道
-export function getChannel(appId,code) {
+export function getChannel(appId, code) {
   return request({
-    url: '/pay/channel/get-channel',
+    url: '/pay/channel/get',
+    method: 'get',
     params:{
-      appId:appId,
-      code:code
+      appId,
+      code
     },
-    method: 'get'
   })
 }
 
