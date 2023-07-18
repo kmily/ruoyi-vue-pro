@@ -4,19 +4,19 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 售后操作类型的枚举
+ * 订单操作类型的枚举
  *
  * @author 陈賝
- * @since 2023/6/13 13:53
+ * @since 2023/7/6 15:31
  */
 @RequiredArgsConstructor
 @Getter
-public enum AfterSaleOperateTypeEnum {
+public enum OrderOperateTypeEnum {
 
     /**
-     * 用户申请
+     * 用户下单
      */
-    APPLY(0, "用户申请"),
+    ORDER(0, "用户下单"),
     ;
 
     // 类型
@@ -27,5 +27,4 @@ public enum AfterSaleOperateTypeEnum {
     public String description() {
         return description;
     }
-
 }
