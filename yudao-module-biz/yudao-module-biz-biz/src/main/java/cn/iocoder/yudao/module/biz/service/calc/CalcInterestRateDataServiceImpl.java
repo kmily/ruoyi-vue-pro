@@ -32,6 +32,11 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
      * LPR开始时间
      */
     private final static Date LPR_START_DATE = DateUtil.paseDate(DateUtil.DATE_FORMAT_NORMAL, "2019-10-08");
+    /**
+     * 罚息利率规定变更时间
+     */
+    private final static Date FX_DATE = DateUtil.paseDate(DateUtil.DATE_FORMAT_NORMAL, "2014-08-01");
+    private final static BigDecimal FX_RATE =new BigDecimal("0.000175");
 
     @Resource
     private CalcInterestRateDataMapper calcInterestRateDataMapper;
