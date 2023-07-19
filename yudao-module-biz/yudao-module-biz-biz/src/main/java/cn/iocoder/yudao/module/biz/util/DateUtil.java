@@ -42,6 +42,8 @@ public class DateUtil {
      * yyyy-MM
      */
     public static final String MONTH_FORMAT_NORMAL = "yyyy-MM";
+
+    public static final String YEAR_FORMAT_NORMAL = "yyyy";
     /**
      * MM-dd
      */
