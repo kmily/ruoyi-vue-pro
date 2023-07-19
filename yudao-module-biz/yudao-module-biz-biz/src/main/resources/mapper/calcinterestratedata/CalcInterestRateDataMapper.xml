@@ -8,5 +8,24 @@
         代码生成器暂时只生成 Mapper XML 文件本身，更多推荐 MybatisX 快速开发插件来生成查询。
         文档可见：https://www.iocoder.cn/MyBatis/x-plugins/
      -->
+    <select id="selectAll" resultType="cn.iocoder.yudao.module.biz.dal.dataobject.calc.CalcInterestRateDataDO">
+        SELECT
+            t.id id,
+            t.start_date startDate,
+            t.rate_half_year rateHalfYear,
+            t.rate_one_year rateOneYear,
+            t.rate_three_year rateThreeYear,
+            t.rate_five_year rateFiveYear,
+            t.rate_over_five_year rateOverFiveYear,
+            t.create_time createTime,
+            t.update_time updateTime,
+            t.creator creator,
+            t.updater updater,
+            t.deleted deleted,
+            t.tenant_id tenantId
+        FROM  biz_calc_interest_rate_data t
+        ORDER BY t.start_date
+
+    </select>
 
 </mapper>

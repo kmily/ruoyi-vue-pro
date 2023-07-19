@@ -17,6 +17,9 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 @Mapper
 public interface CalcInterestRateDataMapper extends BaseMapperX<CalcInterestRateDataDO> {
 
+
+    List<CalcInterestRateDataDO> selectAll();
+
     default PageResult<CalcInterestRateDataDO> selectPage(CalcInterestRateDataPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<CalcInterestRateDataDO>()
                 .betweenIfPresent(CalcInterestRateDataDO::getStartDate, reqVO.getStartDate())

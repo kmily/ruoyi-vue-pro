@@ -8,6 +8,8 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * 利率数据 DO
@@ -53,5 +55,18 @@ public class CalcInterestRateDataDO extends BaseDO {
      * 五年以上利率
      */
     private BigDecimal rateOverFiveYear;
+
+    private LocalDateTime createTime;
+
+    private LocalDateTime updateTime;
+
+    private String creator;
+
+    private String updater;
+
+    private Boolean deleted;
+
+    private Integer tenantId;
+
 
 }

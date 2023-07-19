@@ -1,15 +1,21 @@
 package cn.iocoder.yudao.module.biz.service.calc;
 
-import org.springframework.stereotype.Service;
-import javax.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
-import java.util.*;
 import cn.iocoder.yudao.module.biz.controller.admin.calc.vo.*;
-import cn.iocoder.yudao.module.biz.dal.dataobject.calc.CalcInterestRateDataDO;
 import cn.iocoder.yudao.module.biz.convert.calc.CalcInterestRateDataConvert;
+import cn.iocoder.yudao.module.biz.dal.dataobject.calc.CalcInterestRateDataDO;
 import cn.iocoder.yudao.module.biz.dal.mysql.calc.CalcInterestRateDataMapper;
+import cn.iocoder.yudao.module.biz.util.DateUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -17,12 +23,69 @@ import cn.iocoder.yudao.module.biz.dal.mysql.calc.CalcInterestRateDataMapper;
  *
  * @author 芋道源码
  */
+@Slf4j
 @Service
 @Validated
 public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataService {
 
+    /**
+     * LPR开始时间
+     */
+    private final static Date LPR_START_DATE = DateUtil.paseDate(DateUtil.DATE_FORMAT_NORMAL, "2019-10-08");
+
     @Resource
     private CalcInterestRateDataMapper calcInterestRateDataMapper;
+
+    @Override
+    public CalcInterestRateExecResVO execCalcInterestData(CalcInterestRateExecParamVO execVO) {
+        CalcInterestRateExecResVO vo = new CalcInterestRateExecResVO();
+
+        if (execVO.getCalcType() == 1) {
+            execLx(execVO);
+        } else if (execVO.getCalcType() == 2) {
+            execFx(execVO);
+        } else if (execVO.getCalcType() == 3) {
+            execZxf(execVO);
+        }
+
+        return vo;
+    }
+
+    //获取所在年度天数
+    private Integer getDaysThisYear() {
+
+        return 0;
+    }
+
+    private CalcInterestRateExecResVO execLx(CalcInterestRateExecParamVO execVO) {
+        List<CalcInterestRateDataDO> allRate = calcInterestRateDataMapper.selectAll();
+        //计算开始结束时间差
+        if (execVO.getLxRateType() == 1) {//1约定利率
+            //计算日期差
+            int days = DateUtil.dateIntervalDay(execVO.getLxStartDate(), execVO.getLxEndDate());
+            BigDecimal lxAmount = execVO.getLxFixRate()
+                    .divide(new BigDecimal(100)).multiply(new BigDecimal(days))
+                    .multiply(execVO.getLxAmount())
+                    .setScale(2, RoundingMode.HALF_DOWN);
+            log.info(lxAmount.toString());
+        } else if (execVO.getLxRateType() == 2) {//2中国人民银行同期贷款基准利率与LPR自动分段
+
+        } else if (execVO.getLxRateType() == 3) {//3全国银行间同业拆借中心公布的贷款市场报价利率(LPR)
+
+        }
+        return null;
+    }
+
+    private CalcInterestRateExecResVO execFx(CalcInterestRateExecParamVO execVO) {
+
+        return null;
+    }
+
+    private CalcInterestRateExecResVO execZxf(CalcInterestRateExecParamVO execVO) {
+
+        return null;
+    }
+
 
     @Override
     public Integer createCalcInterestRateData(CalcInterestRateDataCreateReqVO createReqVO) {
@@ -33,12 +96,6 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
         return calcInterestRateData.getId();
     }
 
-    @Override
-    public CalcInterestRateExecResVO execCalcInterestData(CalcInterestRateExecParamVO execVO) {
-        CalcInterestRateExecResVO vo = new CalcInterestRateExecResVO();
-
-        return vo;
-    }
 
     @Override
     public void updateCalcInterestRateData(CalcInterestRateDataUpdateReqVO updateReqVO) {
