@@ -36,7 +36,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
      * 罚息利率规定变更时间
      */
     private final static Date FX_DATE = DateUtil.paseDate(DateUtil.DATE_FORMAT_NORMAL, "2014-08-01");
-    private final static BigDecimal FX_RATE =new BigDecimal("0.000175");
+    private final static BigDecimal FX_RATE = new BigDecimal("0.000175");
 
     @Resource
     private CalcInterestRateDataMapper calcInterestRateDataMapper;
@@ -67,11 +67,14 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
         //计算开始结束时间差
         if (execVO.getLxRateType() == 1) {//1约定利率
             //计算日期差
-            int days = DateUtil.dateIntervalDay(execVO.getLxStartDate(), execVO.getLxEndDate());
-            BigDecimal lxAmount = execVO.getLxFixRate()
-                    .divide(new BigDecimal(100)).multiply(new BigDecimal(days))
-                    .multiply(execVO.getLxAmount())
-                    .setScale(2, RoundingMode.HALF_DOWN);
+            int days = DateUtil.dateIntervalDay(execVO.getLxStartDate(), execVO.getLxEndDate()) + 1;
+            BigDecimal lxAmount =
+                    execVO.getLxFixRate()
+                            .divide(new BigDecimal(365))
+                            .divide(new BigDecimal(100))
+                            .multiply(new BigDecimal(days))
+                            .multiply(execVO.getLxAmount())
+                            .setScale(2, RoundingMode.HALF_DOWN);
             log.info(lxAmount.toString());
         } else if (execVO.getLxRateType() == 2) {//2中国人民银行同期贷款基准利率与LPR自动分段
 
