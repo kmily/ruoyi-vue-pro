@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -35,7 +36,7 @@ public class CalcInterestRateDataController {
 
     @PostMapping("/exec")
     @Operation(summary = "计算利息")
-    @PreAuthorize("@ss.hasPermission('biz:calc-interest-rate-data:query')")
+    @PermitAll
     public CommonResult<CalcInterestRateExecResVO> execCalcInterestData(@Valid @RequestBody CalcInterestRateExecParamVO execVO) {
         return success(calcInterestRateDataService.execCalcInterestData(execVO));
     }

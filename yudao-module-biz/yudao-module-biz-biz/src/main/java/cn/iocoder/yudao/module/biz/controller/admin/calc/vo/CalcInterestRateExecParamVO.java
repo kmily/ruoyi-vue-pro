@@ -28,6 +28,8 @@ public class CalcInterestRateExecParamVO {
     private Integer lxRateType;
 
     /***************************************************************罚息***************************************************************/
+    @Schema(description = "利息金额")
+    private BigDecimal fxAmount;
     @Schema(description = "罚息开始日期")
     private Date fxStartDate;
     @Schema(description = "罚息结束日期")

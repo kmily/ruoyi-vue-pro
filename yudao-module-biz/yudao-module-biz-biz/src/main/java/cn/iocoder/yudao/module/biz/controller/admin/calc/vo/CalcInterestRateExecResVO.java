@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.module.biz.controller.admin.calc.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.util.List;
 
 /**
  * 利率计算-返回值
@@ -12,22 +11,11 @@ import java.time.LocalDate;
 @Data
 public class CalcInterestRateExecResVO {
 
-    @Schema(description = "开始日期")
-    private LocalDate startDate;
 
-    @Schema(description = "半年期利率")
-    private BigDecimal rateHalfYear;
+    private BigDecimal totalAmount;
 
-    @Schema(description = "一年期利率")
-    private BigDecimal rateOneYear;
+    private String processId;
 
-    @Schema(description = "三年期利率")
-    private BigDecimal rateThreeYear;
-
-    @Schema(description = "五年期利率")
-    private BigDecimal rateFiveYear;
-
-    @Schema(description = "五年以上利率")
-    private BigDecimal rateOverFiveYear;
+    private List<SectionIndexVO> sectionList;
 
 }

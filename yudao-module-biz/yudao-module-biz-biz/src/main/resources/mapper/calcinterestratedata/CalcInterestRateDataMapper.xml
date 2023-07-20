@@ -52,4 +52,34 @@
         VALUES ( #{id},#{processId},#{rateId},#{dateIndex},#{dayRate},#{dayAmount} )
     </insert>
 
+    <select id="selectSectionListByProcessAndYearType" resultType="cn.iocoder.yudao.module.biz.controller.admin.calc.vo.SectionIndexVO">
+        SELECT
+            case
+                when b.start_date is not null then b.start_date
+                when b.start_date is null then '2014-08-01' end  AS  startDate,
+            b.end_date AS  endDate,
+            case
+                when #{yearType} = 1 and a.rate_id != 0 then b.rate_half_year
+                when #{yearType} = 2 and a.rate_id != 0 then b.rate_one_year
+                when #{yearType} = 3 and a.rate_id != 0 then b.rate_three_year
+                when #{yearType} = 4 and a.rate_id != 0 then b.rate_five_year
+                when #{yearType} = 5 and a.rate_id != 0 then b.rate_over_five_year
+                when a.rate_id  = 0 then 0.0175
+                end AS  suiteRate,
+            c.days AS  days,
+            ROUND(SUM(day_amount),2)  AS sectionAmount
+        FROM biz_calc_exec_data a
+        LEFT JOIN biz_calc_interest_rate_data b ON a.rate_id = b.id
+        LEFT JOIN (
+            SELECT process_id ,COUNT(1) days,rate_id FROM biz_calc_exec_data WHERE process_id = #{processId} GROUP BY  rate_id
+        ) c ON a.process_id = c.process_id AND a.rate_id = c.rate_id
+        WHERE a.process_id = #{processId}
+        GROUP BY a.rate_id
+        ORDER BY b.start_date
+    </select>
+
+    <select id="selectTotalAmountByProcessId" parameterType="java.lang.String" resultType="java.math.BigDecimal">
+        SELECT ROUND(SUM(day_amount),2) FROM biz_calc_exec_data WHERE process_id = #{processId}
+    </select>
+
 </mapper>

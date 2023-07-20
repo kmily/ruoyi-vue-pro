@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.biz.dal.mysql.calc;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
@@ -9,6 +10,7 @@ import cn.iocoder.yudao.module.biz.dal.dataobject.calc.CalcInterestRateDataDO;
 import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.biz.controller.admin.calc.vo.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 利率数据 Mapper
@@ -33,6 +35,10 @@ public interface CalcInterestRateDataMapper extends BaseMapperX<CalcInterestRate
      * 保存执行数据
      */
     Integer insertExecProcessData(ExecProcessDataDTO execProcessDataDTO);
+
+    List<SectionIndexVO> selectSectionListByProcessAndYearType(@Param("processId") String processId, @Param("yearType") Integer yearType);
+
+    BigDecimal selectTotalAmountByProcessId(String processId);
 
     default PageResult<CalcInterestRateDataDO> selectPage(CalcInterestRateDataPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<CalcInterestRateDataDO>()
