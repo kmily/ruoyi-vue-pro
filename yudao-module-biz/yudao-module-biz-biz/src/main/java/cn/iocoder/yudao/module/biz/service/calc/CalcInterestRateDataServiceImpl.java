@@ -33,10 +33,6 @@ import java.util.List;
 public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataService {
 
     /**
-     * LPR开始时间
-     */
-    private final static Date LPR_START_DATE = DateUtil.paseDate("2019-10-08", DateUtil.DATE_FORMAT_NORMAL);
-    /**
      * 罚息利率规定变更时间
      */
     private final static Date FX_DATE = DateUtil.paseDate("2014-08-01", DateUtil.DATE_FORMAT_NORMAL);
@@ -103,7 +99,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
         CalcInterestRateExecResVO vo = new CalcInterestRateExecResVO();
         BigDecimal totalAmount = BigDecimal.ZERO;
         List<CalcInterestRateDataDO> allRate = calcInterestRateDataMapper.selectAll();
-
+        String processId = execVO.getProcessId();
         //计算开始结束时间差
         if (execVO.getLxRateType() == 1) {//1约定利率
             //计算日期差
@@ -119,7 +115,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
         } else if (execVO.getLxRateType() == 2) {//2中国人民银行同期贷款基准利率与LPR自动分段
             List<YearInfo> yearList = getYearsList(execVO.getLxStartDate(), execVO.getLxEndDate());
             //计算日期区间,选择适用区间
-            String processId = CodeUtil.getUUID();
+
             Integer yearType = getYearType(execVO.getLxStartDate(), execVO.getLxEndDate());
             Date startDate = execVO.getLxStartDate();
             Date endDate = execVO.getLxEndDate();
@@ -180,7 +176,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
     private CalcInterestRateExecResVO execFx(CalcInterestRateExecParamVO execVO) {
         CalcInterestRateExecResVO vo = new CalcInterestRateExecResVO();
         //计算日期区间,选择适用区间
-        String processId = CodeUtil.getUUID();
+        String processId = execVO.getProcessId();
         Integer yearType = getYearType(execVO.getFxStartDate(), execVO.getFxEndDate());
         Date startDate = execVO.getFxStartDate();
         Date endDate = execVO.getFxEndDate();
