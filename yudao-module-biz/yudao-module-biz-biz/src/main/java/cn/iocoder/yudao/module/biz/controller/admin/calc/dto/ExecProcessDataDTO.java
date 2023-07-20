@@ -27,6 +27,8 @@ public class ExecProcessDataDTO {
 
     private String id;
     private String processId;
+    //1利息 2罚息
+    private String calcType;
     private Integer rateId;
     private Date dateIndex;
     private BigDecimal dayRate;

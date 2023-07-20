@@ -34,12 +34,20 @@ public class CalcInterestRateDataController {
     @Resource
     private CalcInterestRateDataService calcInterestRateDataService;
 
-    @PostMapping("/exec")
+    @PostMapping("/exec/lx")
     @Operation(summary = "计算利息")
     @PermitAll
     public CommonResult<CalcInterestRateExecResVO> execCalcInterestData(@Valid @RequestBody CalcInterestRateExecParamVO execVO) {
         return success(calcInterestRateDataService.execCalcInterestData(execVO));
     }
+
+    @PostMapping("/exec/zxf")
+    @Operation(summary = "执行费")
+    @PermitAll
+    public CommonResult<CalcInterestRateExecResVO> execCalcFeeData(@Valid @RequestBody CalcInterestRateExecParamVO execVO) {
+        return success(calcInterestRateDataService.execCalcFeeData(execVO));
+    }
+
 
     @PostMapping("/create")
     @Operation(summary = "创建利率数据")

@@ -24,6 +24,8 @@ public interface CalcInterestRateDataService {
 
     CalcInterestRateExecResVO execCalcInterestData(@Valid CalcInterestRateExecParamVO execVO);
 
+    CalcInterestRateExecResVO execCalcFeeData(@Valid CalcInterestRateExecParamVO execVO);
+
 
     /**
      * 更新利率数据
