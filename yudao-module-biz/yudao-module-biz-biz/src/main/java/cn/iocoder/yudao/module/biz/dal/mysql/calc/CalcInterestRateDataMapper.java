@@ -38,6 +38,10 @@ public interface CalcInterestRateDataMapper extends BaseMapperX<CalcInterestRate
 
     List<SectionIndexVO> selectSectionListByProcessAndYearType(@Param("processId") String processId, @Param("yearType") Integer yearType);
 
+    List<SectionIndexVO> selectSectionListByFixRate(@Param("processId") String processId);
+
+    List<SectionIndexVO> selectSectionListByFixMonthRate(@Param("processId") String processId);
+
     BigDecimal selectTotalAmountByProcessId(String processId);
 
     default PageResult<CalcInterestRateDataDO> selectPage(CalcInterestRateDataPageReqVO reqVO) {

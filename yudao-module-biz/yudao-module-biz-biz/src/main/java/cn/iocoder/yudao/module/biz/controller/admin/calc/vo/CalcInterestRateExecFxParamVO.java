@@ -27,7 +27,7 @@ public class CalcInterestRateExecFxParamVO {
     @Schema(description = "罚息利息类型  1约定利率 2中国人民银行同期贷款基准利率与LPR自动分段 3全国银行间同业拆借中心公布的贷款市场报价利率(LPR) 备注：2014-08-01后为固定万分之1.75")
     private Integer rateType;
     @Schema(description = "罚息-约定利率-约定周期 1年2月3日")
-    private BigDecimal fixSectionType;
+    private Integer fixSectionType;
     @Schema(description = "罚息约定利率-利率")
     private BigDecimal fixRate;
 

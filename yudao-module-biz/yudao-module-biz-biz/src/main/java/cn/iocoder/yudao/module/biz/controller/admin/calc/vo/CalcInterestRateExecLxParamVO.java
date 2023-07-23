@@ -26,9 +26,14 @@ public class CalcInterestRateExecLxParamVO {
     private Date endDate;
     @Schema(description = "利息类型 1约定利率 2中国人民银行同期贷款基准利率与LPR自动分段 3全国银行间同业拆借中心公布的贷款市场报价利率(LPR)")
     private Integer rateType;
+    /*************************************************************约定利息*************************************************************/
     @Schema(description = "约定利率-约定周期 1年2月3日")
-    private BigDecimal fixSectionType;
-    @Schema(description = "约定利率-利率")
-    private BigDecimal lxFixRate;
+    private Integer fixSectionType;
+    @Schema(description = "约定类型 1指定利率值 2LPR倍数 默认1")
+    private Integer fixType;
+    @Schema(description = "约定利率-利率值")
+    private BigDecimal fixRate;
+    @Schema(description = "约定利率-LPR倍数")
+    private BigDecimal fixLPRs;
 
 }

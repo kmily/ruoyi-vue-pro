@@ -78,6 +78,39 @@
         ORDER BY b.start_date
     </select>
 
+    <select id="selectSectionListByFixRate" parameterType="java.lang.String"   resultType="cn.iocoder.yudao.module.biz.controller.admin.calc.vo.SectionIndexVO">
+        SELECT
+            ''  startDate,
+            ''  endDate,
+            a.day_rate  suiteRate,
+            c.days AS  days,
+            ROUND(SUM(day_amount),2)  AS sectionAmount
+        FROM biz_calc_exec_data a
+                 LEFT JOIN biz_calc_interest_rate_data b ON a.rate_id = b.id
+                 LEFT JOIN (
+            SELECT process_id ,COUNT(1) days,rate_id FROM biz_calc_exec_data WHERE process_id = #{processId} GROUP BY rate_id
+        ) c ON a.process_id = c.process_id AND a.rate_id = c.rate_id
+        WHERE a.process_id = #{processId}
+        GROUP BY a.rate_id
+        ORDER BY b.start_date
+    </select>
+
+    <select id="selectSectionListByFixMonthRate" parameterType="java.lang.String"   resultType="cn.iocoder.yudao.module.biz.controller.admin.calc.vo.SectionIndexVO">
+        SELECT
+            DATE_FORMAT(a.date_index,'%Y-%m')  startDate,
+            ''  endDate,
+            a.day_rate  suiteRate,
+            c.days AS  days,
+            ROUND(SUM(day_amount),2)  AS sectionAmount
+        FROM biz_calc_exec_data a
+                 LEFT JOIN biz_calc_interest_rate_data b ON a.rate_id = b.id
+                 LEFT JOIN (
+            SELECT process_id ,COUNT(1) days,DATE_FORMAT( date_index,'%Y-%m') monthIndex FROM biz_calc_exec_data WHERE process_id = #{processId} GROUP BY DATE_FORMAT(date_index,'%Y-%m')
+        ) c ON a.process_id = c.process_id AND DATE_FORMAT(a.date_index,'%Y-%m') = c.monthIndex
+        WHERE a.process_id = #{processId}
+        GROUP BY DATE_FORMAT(a.date_index,'%Y-%m')
+    </select>
+
     <select id="selectTotalAmountByProcessId" parameterType="java.lang.String" resultType="java.math.BigDecimal">
         SELECT ROUND(SUM(day_amount),2) FROM biz_calc_exec_data WHERE process_id = #{processId}
     </select>

@@ -8,12 +8,12 @@ import lombok.Data;
  * @date 2023-07-19
  */
 @Data
-public class YearInfo {
+public class YearInfoDTO {
 
-    public YearInfo() {
+    public YearInfoDTO() {
     }
 
-    public YearInfo(int year, boolean isLeapYear) {
+    public YearInfoDTO(int year, boolean isLeapYear) {
         this.year = year;
         this.isLeapYear = isLeapYear;
     }
