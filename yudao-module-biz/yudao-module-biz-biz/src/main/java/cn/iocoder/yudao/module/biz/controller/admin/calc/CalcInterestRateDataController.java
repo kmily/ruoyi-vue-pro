@@ -50,7 +50,7 @@ public class CalcInterestRateDataController {
     @PostMapping("/exec/zxf")
     @Operation(summary = "执行费")
     @PermitAll
-    public CommonResult<CalcInterestRateExecResVO> execCalcZxfData(@Valid @RequestBody CalcInterestRateExecFxParamVO execVO) {
+    public CommonResult<CalcInterestRateExecZxfResVO> execCalcZxfData(@Valid @RequestBody CalcInterestRateExecZxfParamVO execVO) {
         return success(calcInterestRateDataService.execCalcFeeData(execVO));
     }
 

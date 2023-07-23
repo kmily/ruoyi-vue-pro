@@ -56,9 +56,36 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
         return execFx(paramVO);
     }
 
+    /**
+     * 执行金额或者价额不超过1万元的，每件交纳50元；超过1万元至50万元的部分，按照1.5％交纳；超过50万元至500万元的部分，按照1％交纳；超过500万元至1000万元的部分，按照0.5％交纳；超过1000万元的部分，按照0.1％交纳
+     *
+     * @param execVO
+     * @return
+     */
     @Override
-    public CalcInterestRateExecResVO execCalcFeeData(CalcInterestRateExecFxParamVO execVO) {
-        return null;
+    public CalcInterestRateExecZxfResVO execCalcFeeData(CalcInterestRateExecZxfParamVO execVO) {
+        CalcInterestRateExecZxfResVO vo = new CalcInterestRateExecZxfResVO();
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        //一万
+        BigDecimal ten_thousand = new BigDecimal("10000");
+        //五十万
+        BigDecimal five_hundred_thousand = new BigDecimal("500000");
+        //五百万
+        BigDecimal five_million = new BigDecimal("5000000");
+        //一千万
+        BigDecimal ten_million = new BigDecimal("10000000");
+        if (execVO.getZxfType() == 1) {
+            //计算总执行费
+//            if (execVO.getLeftAmount() == null || ten_thousand.compareTo(execVO.getLeftAmount()) >= 0) {
+//                totalAmount = new BigDecimal("50");
+//            } else if (execVO.getLeftAmount() == null || ten_thousand.compareTo(execVO.getLeftAmount()) >= 0) {
+//
+//            } else if () {
+//
+//            }
+        }
+
+        return vo;
     }
 
 

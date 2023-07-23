@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 利率计算-入参
+ * 罚息-入参
  */
 @Data
 public class CalcInterestRateExecFxParamVO {
