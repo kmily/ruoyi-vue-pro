@@ -27,26 +27,6 @@
         ORDER BY t.start_date
     </select>
 
-    <select id="selectSuitableRate" parameterType="java.util.Date" resultType="cn.iocoder.yudao.module.biz.dal.dataobject.calc.CalcInterestRateDataDO">
-        SELECT
-            t.id id,
-            t.start_date startDate,
-            t.rate_half_year rateHalfYear,
-            t.rate_one_year rateOneYear,
-            t.rate_three_year rateThreeYear,
-            t.rate_five_year rateFiveYear,
-            t.rate_over_five_year rateOverFiveYear,
-            t.create_time createTime,
-            t.update_time updateTime,
-            t.creator creator,
-            t.updater updater,
-            t.deleted deleted,
-            t.tenant_id tenantId
-        FROM  biz_calc_interest_rate_data t
-        WHERE t.start_date <![CDATA[ <= ]]> #{date}
-        ORDER BY t.start_date desc limit 1
-    </select>
-
     <insert id="insertExecProcessData" parameterType="cn.iocoder.yudao.module.biz.controller.admin.calc.dto.ExecProcessDataDTO">
         INSERT INTO biz_calc_exec_data ( id,  process_id, rate_id, date_index, day_rate, day_amount )
         VALUES ( #{id},#{processId},#{rateId},#{dateIndex},#{dayRate},#{dayAmount} )

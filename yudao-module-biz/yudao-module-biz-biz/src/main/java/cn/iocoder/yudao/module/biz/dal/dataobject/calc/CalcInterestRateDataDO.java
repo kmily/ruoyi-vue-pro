@@ -34,7 +34,7 @@ public class CalcInterestRateDataDO extends BaseDO {
     /**
      * 开始日期
      */
-    private LocalDate startDate;
+    private Date startDate;
     /**
      * 半年期利率
      */

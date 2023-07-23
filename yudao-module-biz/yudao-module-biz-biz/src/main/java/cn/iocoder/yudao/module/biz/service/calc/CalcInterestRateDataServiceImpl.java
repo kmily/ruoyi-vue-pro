@@ -174,6 +174,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
             }
 
         } else if (execVO.getFixType() == 2) {
+            List<CalcInterestRateDataDO> allRateList = calcInterestRateDataMapper.selectAll();
             //LPR倍数
             Date startDate = execVO.getStartDate();
             Date endDate = execVO.getEndDate();
@@ -182,7 +183,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
                 throw new IllegalArgumentException("起始时间是2019年以前的计算，不可以选择4倍LPR！");
             }
             while (startDate.compareTo(endDate) <= 0) {
-                CalcInterestRateDataDO suiteRate = calcInterestRateDataMapper.selectSuitableRate(startDate);
+                CalcInterestRateDataDO suiteRate = getSuiteRate(allRateList, startDate);
                 Integer yearDays = 365;
                 BigDecimal suiteRateValue = null;
                 BigDecimal suiteOneYearRateValue = null;
@@ -216,6 +217,17 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
         return vo;
     }
 
+    private CalcInterestRateDataDO getSuiteRate(List<CalcInterestRateDataDO> allRateList, Date startDate) {
+        CalcInterestRateDataDO suiteRate = null;
+        for (CalcInterestRateDataDO index : allRateList) {
+            if (index.getStartDate().compareTo(startDate) > 0) {
+                break;
+            }
+            suiteRate = index;
+        }
+        return suiteRate;
+    }
+
     private List<MonthInfoDTO> getMonthList(Date startDate, Date endDate) {
         List<MonthInfoDTO> monthList = new ArrayList<>();
         while (startDate.compareTo(endDate) <= 0) {
@@ -241,10 +253,11 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
     private CalcInterestRateExecResVO getLxType2(CalcInterestRateExecLxParamVO execVO) {
         CalcInterestRateExecResVO vo = new CalcInterestRateExecResVO();
         Integer yearType = getYearType(execVO.getStartDate(), execVO.getEndDate());
+        List<CalcInterestRateDataDO> allRateList = calcInterestRateDataMapper.selectAll();
         Date startDate = execVO.getStartDate();
         Date endDate = execVO.getEndDate();
         while (startDate.compareTo(endDate) <= 0) {
-            CalcInterestRateDataDO suiteRate = calcInterestRateDataMapper.selectSuitableRate(startDate);
+            CalcInterestRateDataDO suiteRate = getSuiteRate(allRateList, startDate);
             BigDecimal suiteRateValue = null;
             Integer yearDays = 365;
             if (yearType == 1) {
@@ -300,10 +313,11 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
         Integer yearType = getYearType(execVO.getStartDate(), execVO.getEndDate());
         Date startDate = execVO.getStartDate();
         Date endDate = execVO.getEndDate();
+        List<CalcInterestRateDataDO> allRateList = calcInterestRateDataMapper.selectAll();
         while (startDate.compareTo(endDate) <= 0) {
             BigDecimal suiteRateValue = null;
             if (startDate.compareTo(FX_DATE) < 0) {//2014-08-01之后
-                CalcInterestRateDataDO suiteRate = calcInterestRateDataMapper.selectSuitableRate(startDate);
+                CalcInterestRateDataDO suiteRate = getSuiteRate(allRateList, startDate);
                 Integer yearDays = 365;
                 if (yearType == 1) {
                     suiteRateValue = suiteRate.getRateHalfYear();

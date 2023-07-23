@@ -27,11 +27,6 @@ public interface CalcInterestRateDataMapper extends BaseMapperX<CalcInterestRate
     List<CalcInterestRateDataDO> selectAll();
 
     /**
-     * 查询适用当前日期的利息配置
-     */
-    CalcInterestRateDataDO selectSuitableRate(Date date);
-
-    /**
      * 保存执行数据
      */
     Integer insertExecProcessData(ExecProcessDataDTO execProcessDataDTO);
