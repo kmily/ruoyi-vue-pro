@@ -42,21 +42,21 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
     private CalcInterestRateDataMapper calcInterestRateDataMapper;
 
     @Override
-    public CalcInterestRateExecResVO execCalcInterestData(CalcInterestRateExecParamVO paramVO) {
+    public CalcInterestRateExecResVO execCalcInterestLxData(CalcInterestRateExecLxParamVO paramVO) {
         String processId = CodeUtil.getUUID();
         paramVO.setProcessId(processId);
-        execLx(paramVO);
-        if (paramVO.getFx() != null || paramVO.getFx() == 1) {
-            execFx(paramVO);
-        }
-        /**
-         * 取结果数据
-         */
-        return getResult(processId);
+        return execLx(paramVO);
     }
 
     @Override
-    public CalcInterestRateExecResVO execCalcFeeData(CalcInterestRateExecParamVO execVO) {
+    public CalcInterestRateExecResVO execCalcInterestFxData(CalcInterestRateExecFxParamVO paramVO) {
+        String processId = CodeUtil.getUUID();
+        paramVO.setProcessId(processId);
+        return execFx(paramVO);
+    }
+
+    @Override
+    public CalcInterestRateExecResVO execCalcFeeData(CalcInterestRateExecFxParamVO execVO) {
         return null;
     }
 
@@ -95,15 +95,15 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
     /**
      * 处理利息+罚息
      */
-    private CalcInterestRateExecResVO execLx(CalcInterestRateExecParamVO execVO) {
+    private CalcInterestRateExecResVO execLx(CalcInterestRateExecLxParamVO execVO) {
         CalcInterestRateExecResVO vo = new CalcInterestRateExecResVO();
         BigDecimal totalAmount = BigDecimal.ZERO;
         List<CalcInterestRateDataDO> allRate = calcInterestRateDataMapper.selectAll();
         String processId = execVO.getProcessId();
         //计算开始结束时间差
-        if (execVO.getLxRateType() == 1) {//1约定利率
+        if (execVO.getRateType() == 1) {//1约定利率
             //计算日期差
-            int days = DateUtil.dateIntervalDay(execVO.getLxStartDate(), execVO.getLxEndDate()) + 1;
+            int days = DateUtil.dateIntervalDay(execVO.getStartDate(), execVO.getEndDate()) + 1;
             BigDecimal lxAmount =
                     execVO.getLxFixRate()
                             .divide(new BigDecimal(365), 8, RoundingMode.HALF_UP)
@@ -112,13 +112,13 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
                             .multiply(execVO.getLeftAmount())
                             .setScale(2, RoundingMode.HALF_UP);
             log.info(lxAmount.toString());
-        } else if (execVO.getLxRateType() == 2) {//2中国人民银行同期贷款基准利率与LPR自动分段
-            List<YearInfo> yearList = getYearsList(execVO.getLxStartDate(), execVO.getLxEndDate());
+        } else if (execVO.getRateType() == 2) {//2中国人民银行同期贷款基准利率与LPR自动分段
+            List<YearInfo> yearList = getYearsList(execVO.getStartDate(), execVO.getEndDate());
             //计算日期区间,选择适用区间
 
-            Integer yearType = getYearType(execVO.getLxStartDate(), execVO.getLxEndDate());
-            Date startDate = execVO.getLxStartDate();
-            Date endDate = execVO.getLxEndDate();
+            Integer yearType = getYearType(execVO.getStartDate(), execVO.getEndDate());
+            Date startDate = execVO.getStartDate();
+            Date endDate = execVO.getEndDate();
             while (startDate.compareTo(endDate) <= 0) {
                 CalcInterestRateDataDO suiteRate = calcInterestRateDataMapper.selectSuitableRate(startDate);
                 BigDecimal suiteRateValue = null;
@@ -143,7 +143,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
             vo.setSectionList(calcInterestRateDataMapper.selectSectionListByProcessAndYearType(processId, yearType));
             vo.setTotalAmount(calcInterestRateDataMapper.selectTotalAmountByProcessId(processId));
             vo.setProcessId(processId);
-        } else if (execVO.getLxRateType() == 3) {//3全国银行间同业拆借中心公布的贷款市场报价利率(LPR)
+        } else if (execVO.getRateType() == 3) {//3全国银行间同业拆借中心公布的贷款市场报价利率(LPR)
 
         }
         return vo;
@@ -173,13 +173,13 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
         return yearType;
     }
 
-    private CalcInterestRateExecResVO execFx(CalcInterestRateExecParamVO execVO) {
+    private CalcInterestRateExecResVO execFx(CalcInterestRateExecFxParamVO execVO) {
         CalcInterestRateExecResVO vo = new CalcInterestRateExecResVO();
         //计算日期区间,选择适用区间
         String processId = execVO.getProcessId();
-        Integer yearType = getYearType(execVO.getFxStartDate(), execVO.getFxEndDate());
-        Date startDate = execVO.getFxStartDate();
-        Date endDate = execVO.getFxEndDate();
+        Integer yearType = getYearType(execVO.getStartDate(), execVO.getEndDate());
+        Date startDate = execVO.getStartDate();
+        Date endDate = execVO.getEndDate();
         while (startDate.compareTo(endDate) <= 0) {
             BigDecimal suiteRateValue = null;
             if (startDate.compareTo(FX_DATE) < 0) {//2014-08-01之后
@@ -212,7 +212,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
         return vo;
     }
 
-    private CalcInterestRateExecResVO execZxf(CalcInterestRateExecParamVO execVO) {
+    private CalcInterestRateExecResVO execZxf(CalcInterestRateExecFxParamVO execVO) {
 
         return null;
     }

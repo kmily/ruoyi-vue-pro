@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.biz.controller.admin.calc;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.biz.controller.admin.calc.vo.*;
 import cn.iocoder.yudao.module.biz.convert.calc.CalcInterestRateDataConvert;
 import cn.iocoder.yudao.module.biz.dal.dataobject.calc.CalcInterestRateDataDO;
@@ -37,14 +36,21 @@ public class CalcInterestRateDataController {
     @PostMapping("/exec/lx")
     @Operation(summary = "计算利息")
     @PermitAll
-    public CommonResult<CalcInterestRateExecResVO> execCalcInterestData(@Valid @RequestBody CalcInterestRateExecParamVO execVO) {
-        return success(calcInterestRateDataService.execCalcInterestData(execVO));
+    public CommonResult<CalcInterestRateExecResVO> execCalcInterestLxData(@Valid @RequestBody CalcInterestRateExecLxParamVO execVO) {
+        return success(calcInterestRateDataService.execCalcInterestLxData(execVO));
+    }
+
+    @PostMapping("/exec/fx")
+    @Operation(summary = "计算利息")
+    @PermitAll
+    public CommonResult<CalcInterestRateExecResVO> execCalcInterestFxData(@Valid @RequestBody CalcInterestRateExecFxParamVO execVO) {
+        return success(calcInterestRateDataService.execCalcInterestFxData(execVO));
     }
 
     @PostMapping("/exec/zxf")
     @Operation(summary = "执行费")
     @PermitAll
-    public CommonResult<CalcInterestRateExecResVO> execCalcFeeData(@Valid @RequestBody CalcInterestRateExecParamVO execVO) {
+    public CommonResult<CalcInterestRateExecResVO> execCalcZxfData(@Valid @RequestBody CalcInterestRateExecFxParamVO execVO) {
         return success(calcInterestRateDataService.execCalcFeeData(execVO));
     }
 

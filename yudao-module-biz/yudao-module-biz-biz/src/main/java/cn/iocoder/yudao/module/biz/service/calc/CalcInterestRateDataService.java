@@ -22,9 +22,12 @@ public interface CalcInterestRateDataService {
      */
     Integer createCalcInterestRateData(@Valid CalcInterestRateDataCreateReqVO createReqVO);
 
-    CalcInterestRateExecResVO execCalcInterestData(@Valid CalcInterestRateExecParamVO execVO);
+    CalcInterestRateExecResVO execCalcInterestLxData(@Valid CalcInterestRateExecLxParamVO execVO);
 
-    CalcInterestRateExecResVO execCalcFeeData(@Valid CalcInterestRateExecParamVO execVO);
+    CalcInterestRateExecResVO execCalcInterestFxData(@Valid CalcInterestRateExecFxParamVO execVO);
+
+
+    CalcInterestRateExecResVO execCalcFeeData(@Valid CalcInterestRateExecFxParamVO execVO);
 
 
     /**
