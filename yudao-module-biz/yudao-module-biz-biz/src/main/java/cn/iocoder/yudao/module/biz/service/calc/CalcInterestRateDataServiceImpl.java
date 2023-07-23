@@ -94,7 +94,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
             vo = getLxType1(execVO);
         } else if (execVO.getRateType() == 2) {//2中国人民银行同期贷款基准利率与LPR自动分段
             //计算日期区间,选择适用区间
-            getLxType2(execVO);
+            vo = getLxType2(execVO);
         } else if (execVO.getRateType() == 3) {//3全国银行间同业拆借中心公布的贷款市场报价利率(LPR)
 
         }
@@ -108,7 +108,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
             vo = getFxType1(execVO);
         } else if (execVO.getRateType() == 2) {//2中国人民银行同期贷款基准利率与LPR自动分段
             //计算日期区间,选择适用区间
-            getFxType2(execVO);
+            vo = getFxType2(execVO);
         } else if (execVO.getRateType() == 3) {//3全国银行间同业拆借中心公布的贷款市场报价利率(LPR)
 
         }
