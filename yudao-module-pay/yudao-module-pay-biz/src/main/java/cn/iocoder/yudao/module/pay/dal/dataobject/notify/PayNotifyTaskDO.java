@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,7 +16,7 @@ import lombok.experimental.Accessors;
 import java.time.LocalDateTime;
 
 /**
- * 商户支付、退款等的通知
+ * 支付通知
  * 在支付系统收到支付渠道的支付、退款的结果后，需要不断的通知到业务系统，直到成功。
  *
  * @author 芋道源码
@@ -40,6 +41,7 @@ public class PayNotifyTaskDO extends TenantBaseDO {
     /**
      * 编号，自增
      */
+    @TableId
     private Long id;
     /**
      * 应用编号

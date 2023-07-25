@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import com.alipay.api.AlipayApiException;
@@ -27,15 +27,16 @@ public class AlipayAppPayClient extends AbstractAlipayPayClient {
     }
 
     @Override
-    public PayOrderUnifiedRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) throws AlipayApiException {
+    public PayOrderRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) throws AlipayApiException {
         // 1.1 构建 AlipayTradeAppPayModel 请求
         AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
         // ① 通用的参数
         model.setOutTradeNo(reqDTO.getOutTradeNo());
         model.setSubject(reqDTO.getSubject());
-        model.setBody(reqDTO.getBody());
+        model.setBody(reqDTO.getBody() + "test");
         model.setTotalAmount(formatAmount(reqDTO.getPrice()));
-        model.setProductCode(" QUICK_MSECURITY_PAY"); // 销售产品码：无线快捷支付产品
+        model.setTimeExpire(formatTime(reqDTO.getExpireTime()));
+        model.setProductCode("QUICK_MSECURITY_PAY"); // 销售产品码：无线快捷支付产品
         // ② 个性化的参数【无】
         // ③ 支付宝扫码支付只有一种展示
         String displayMode = PayOrderDisplayModeEnum.APP.getMode();
@@ -47,10 +48,13 @@ public class AlipayAppPayClient extends AbstractAlipayPayClient {
         request.setReturnUrl(reqDTO.getReturnUrl());
 
         // 2.1 执行请求
-        AlipayTradeAppPayResponse response = client.execute(request);
+        AlipayTradeAppPayResponse response = client.sdkExecute(request);
         // 2.2 处理结果
-        validateUnifiedOrderResponse(request, response);
-        return new PayOrderUnifiedRespDTO(displayMode, "");
+        if (!response.isSuccess()) {
+            return buildClosedPayOrderRespDTO(reqDTO, response);
+        }
+        return PayOrderRespDTO.waitingOf(displayMode, response.getBody(),
+                reqDTO.getOutTradeNo(), response);
     }
 
 }

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.weixin;
 
+import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import com.github.binarywang.wxpay.bean.order.WxPayNativeOrderResult;
@@ -32,42 +32,27 @@ public class WxNativePayClient extends AbstractWxPayClient {
     }
 
     @Override
-    protected PayOrderUnifiedRespDTO doUnifiedOrderV2(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
+    protected PayOrderRespDTO doUnifiedOrderV2(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
         // 构建 WxPayUnifiedOrderRequest 对象
-        WxPayUnifiedOrderRequest request = WxPayUnifiedOrderRequest.newBuilder()
-                .outTradeNo(reqDTO.getOutTradeNo())
-                .body(reqDTO.getSubject())
-                .detail(reqDTO.getBody())
-                .totalFee(reqDTO.getPrice()) // 单位分
-                .productId(reqDTO.getOutTradeNo())
-                .timeExpire(formatDateV2(reqDTO.getExpireTime()))
-                .spbillCreateIp(reqDTO.getUserIp())
-                .notifyUrl(reqDTO.getNotifyUrl())
-                .build();
+        WxPayUnifiedOrderRequest request = buildPayUnifiedOrderRequestV2(reqDTO);
         // 执行请求
         WxPayNativeOrderResult response = client.createOrder(request);
 
         // 转换结果
-        return new PayOrderUnifiedRespDTO(PayOrderDisplayModeEnum.QR_CODE.getMode(),
-                response.getCodeUrl());
+        return PayOrderRespDTO.waitingOf(PayOrderDisplayModeEnum.QR_CODE.getMode(), response.getCodeUrl(),
+                reqDTO.getOutTradeNo(), response);
     }
 
     @Override
-    protected PayOrderUnifiedRespDTO doUnifiedOrderV3(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
-        // 构建 WxPayUnifiedOrderRequest 对象
-        WxPayUnifiedOrderV3Request request = new WxPayUnifiedOrderV3Request();
-        request.setOutTradeNo(reqDTO.getOutTradeNo());
-        request.setDescription(reqDTO.getBody());
-        request.setAmount(new WxPayUnifiedOrderV3Request.Amount().setTotal(reqDTO.getPrice())); // 单位分
-        request.setTimeExpire(formatDateV3(reqDTO.getExpireTime()));
-        request.setSceneInfo(new WxPayUnifiedOrderV3Request.SceneInfo().setPayerClientIp(reqDTO.getUserIp()));
-        request.setNotifyUrl(reqDTO.getNotifyUrl());
+    protected PayOrderRespDTO doUnifiedOrderV3(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
+        // 构建 WxPayUnifiedOrderV3Request 对象
+        WxPayUnifiedOrderV3Request request = buildPayUnifiedOrderRequestV3(reqDTO);
         // 执行请求
         String response = client.createOrderV3(TradeTypeEnum.NATIVE, request);
 
         // 转换结果
-        return new PayOrderUnifiedRespDTO(PayOrderDisplayModeEnum.QR_CODE.getMode(),
-                response);
+        return PayOrderRespDTO.waitingOf(PayOrderDisplayModeEnum.QR_CODE.getMode(), response,
+                reqDTO.getOutTradeNo(), response);
     }
 
 }

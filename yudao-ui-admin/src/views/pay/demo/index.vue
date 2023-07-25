@@ -1,5 +1,10 @@
 <template>
   <div class="app-container">
+    <doc-alert title="支付宝支付接入" url="https://doc.iocoder.cn/pay/alipay-pay-demo/" />
+    <doc-alert title="支付宝、微信退款接入" url="https://doc.iocoder.cn/pay/refund-demo/" />
+    <doc-alert title="微信公众号支付接入" url="https://doc.iocoder.cn/pay/wx-pub-pay-demo/" />
+    <doc-alert title="微信小程序支付接入" url="https://doc.iocoder.cn/pay/wx-lite-pay-demo/" />
+
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
@@ -41,7 +46,8 @@
       </el-table-column>
       <el-table-column label="退款时间" align="center" prop="refundTime" width="180">
         <template v-slot="scope">
-          <span>{{ parseTime(scope.row.refundTime) }}</span>
+          <span v-if="scope.row.refundTime">{{ parseTime(scope.row.refundTime) }}</span>
+          <span v-else-if="scope.row.payRefundId">退款中，等待退款结果</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">

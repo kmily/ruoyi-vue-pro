@@ -2,7 +2,6 @@ package cn.iocoder.yudao.framework.pay.core.client;
 
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 
@@ -28,9 +27,9 @@ public interface PayClient {
      * 调用支付渠道，统一下单
      *
      * @param reqDTO 下单信息
-     * @return 各支付渠道的返回结果
+     * @return 支付订单信息
      */
-    PayOrderUnifiedRespDTO unifiedOrder(PayOrderUnifiedReqDTO reqDTO);
+    PayOrderRespDTO unifiedOrder(PayOrderUnifiedReqDTO reqDTO);
 
     /**
      * 解析 order 回调数据
@@ -40,6 +39,14 @@ public interface PayClient {
      * @return 支付订单信息
      */
     PayOrderRespDTO parseOrderNotify(Map<String, String> params, String body);
+
+    /**
+     * 获得支付订单信息
+     *
+     * @param outTradeNo 外部订单号
+     * @return 支付订单信息
+     */
+    PayOrderRespDTO getOrder(String outTradeNo);
 
     // ============ 退款相关 ==========
 
@@ -59,5 +66,14 @@ public interface PayClient {
      * @return 支付订单信息
      */
     PayRefundRespDTO parseRefundNotify(Map<String, String> params, String body);
+
+    /**
+     * 获得退款订单信息
+     *
+     * @param outTradeNo 外部订单号
+     * @param outRefundNo 外部退款号
+     * @return 退款订单信息
+     */
+    PayRefundRespDTO getRefund(String outTradeNo, String outRefundNo);
 
 }

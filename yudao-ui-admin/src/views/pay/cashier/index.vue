@@ -78,7 +78,6 @@
 </template>
 <script>
 import QrcodeVue from 'qrcode.vue'
-import { DICT_TYPE, getDictDatas } from "@/utils/dict";
 import { getOrder, submitOrder } from '@/api/pay/order';
 import { PayChannelEnum, PayDisplayModeEnum, PayOrderStatusEnum } from "@/utils/constants";
 
@@ -107,7 +106,7 @@ export default {
         code: "alipay_app"
       }, {
         name: '支付宝扫码支付',
-        icon: require("@/assets/images/pay/icon/alipay_app.svg"),
+        icon: require("@/assets/images/pay/icon/alipay_qr.svg"),
         code: "alipay_qr"
       }, {
         name: '支付宝条码支付',
@@ -213,6 +212,16 @@ export default {
         return;
       }
 
+      // 微信公众号、小程序支付，无法在 PC 网页中进行
+      if (channelCode === PayChannelEnum.WX_PUB.code) {
+        this.$message.error('微信公众号支付：不支持 PC 网站');
+        return;
+      }
+      if (channelCode === PayChannelEnum.WX_LITE.code) {
+        this.$message.error('微信小程序：不支持 PC 网站');
+        return;
+      }
+
       // 默认的提交处理
       this.submit0(channelCode)
     },
@@ -238,6 +247,8 @@ export default {
           this.displayUrl(channelCode, data)
         } else if (data.displayMode === PayDisplayModeEnum.QR_CODE.mode) {
           this.displayQrCode(channelCode, data)
+        } else if (data.displayMode === PayDisplayModeEnum.APP.mode) {
+          this.displayApp(channelCode, data)
         }
 
         // 打开轮询任务
@@ -271,7 +282,7 @@ export default {
       location.href = data.displayContent
       this.submitLoading = false
     },
-    /** 提交支付后（支付宝扫码支付） */
+    /** 提交支付后（扫码支付） */
     displayQrCode(channelCode, data) {
       let title = '请使用手机浏览器“扫一扫”';
       if (channelCode === PayChannelEnum.ALIPAY_WAP.code) {
@@ -288,6 +299,17 @@ export default {
       }
       this.submitLoading = false
     },
+    /** 提交支付后（App） */
+    displayApp(channelCode, data) {
+      if (channelCode === PayChannelEnum.ALIPAY_APP.code) {
+        this.$message.error('支付宝 App 支付：无法在网页支付！');
+      }
+      if (channelCode === PayChannelEnum.WX_APP.code) {
+        this.$message.error('微信 App 支付：无法在网页支付！');
+      }
+      this.submitLoading = false
+    },
+
     /** 轮询查询任务 */
     createQueryInterval() {
       if (this.interval) {

@@ -16,7 +16,8 @@ public enum PayOrderStatusRespEnum {
 
     WAITING(0, "未支付"),
     SUCCESS(10, "支付成功"),
-    CLOSED(20, "支付关闭"), // 未付款交易超时关闭，或支付完成后全额退款
+    REFUND(20, "已退款"),
+    CLOSED(30, "支付关闭"),
     ;
 
     private final Integer status;
@@ -30,6 +31,26 @@ public enum PayOrderStatusRespEnum {
      */
     public static boolean isSuccess(Integer status) {
         return Objects.equals(status, SUCCESS.getStatus());
+    }
+
+    /**
+     * 判断是否已退款
+     *
+     * @param status 状态
+     * @return 是否支付成功
+     */
+    public static boolean isRefund(Integer status) {
+        return Objects.equals(status, REFUND.getStatus());
+    }
+
+    /**
+     * 判断是否支付关闭
+     *
+     * @param status 状态
+     * @return 是否支付关闭
+     */
+    public static boolean isClosed(Integer status) {
+        return Objects.equals(status, CLOSED.getStatus());
     }
 
 }
