@@ -90,6 +90,10 @@
         </el-row>        
       </el-form>
       <div>
+        <div style="padding: 5px 0; border-bottom: 1px solid #b0b0b0; margin-bottom: 10px;color: #666;padding-right: 101px;display: flex;justify-content: space-between;">
+          <span style="font-size: 20px; font-weight: bold;">利息总和</span>
+          <span style="margin-left:20px;">{{totalAmount}}</span>
+        </div>
         <el-table v-loading="loading" :data="list" :height="500">
           <el-table-column label="时间段" align="center"  >
             <template v-slot="scope">
@@ -142,6 +146,7 @@ export default {
         {value: 1,label: '分段'},
         {value: 2,label: '约定'}        
       ],
+      totalAmount:null,
       // 表单参数
       form: {},
       // 表单校验
@@ -157,6 +162,7 @@ export default {
     execCalcInterestFxData(){
       execCalcInterestFxData(this.data).then((res)=>{
         this.list=res.data.sectionList;
+        this.totalAmount=res.data.totalAmount;
       })
     },
   }
