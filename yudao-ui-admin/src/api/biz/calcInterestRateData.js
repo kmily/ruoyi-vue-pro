@@ -52,3 +52,32 @@ export function exportCalcInterestRateDataExcel(query) {
     responseType: 'blob'
   })
 }
+
+// 计算利息
+export function execCalcInterestLxData(data) {
+  return request({
+    url: '/biz/calc-interest-rate-data/exec/lx',
+    method: 'post',
+    data: data
+  })
+}
+
+// 计算罚息
+export function execCalcInterestFxData(data) {
+  return request({
+    url: '/biz/calc-interest-rate-data/exec/fx',
+    method: 'post',
+    data: data
+  })
+}
+
+// 计算执行费
+export function execCalcZxfData(data) {
+  return request({
+    url: '/biz/calc-interest-rate-data/exec/zxf',
+    method: 'post',
+    data: data
+  })
+}
+
+
