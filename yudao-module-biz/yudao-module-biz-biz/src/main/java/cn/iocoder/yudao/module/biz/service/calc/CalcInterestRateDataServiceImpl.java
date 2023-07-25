@@ -122,7 +122,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
             }
             zxfAmount.setScale(2, RoundingMode.HALF_UP);
             vo.setZxfAmount(zxfAmount);
-        } else if (execVO.getZxfType() == 1) {
+        } else if (execVO.getZxfType() == 2) {
             BigDecimal leve1 = new BigDecimal("10050");
             //五十万
             BigDecimal leve2 = new BigDecimal("507400");
