@@ -64,6 +64,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
      */
     @Override
     public CalcInterestRateExecZxfResVO execCalcFeeData(CalcInterestRateExecZxfParamVO execVO) {
+        execVO.setTotalAmount(execVO.getTotalAmount().multiply(new BigDecimal("10000")));
         CalcInterestRateExecZxfResVO vo = new CalcInterestRateExecZxfResVO();
         BigDecimal zxfAmount = BigDecimal.ZERO;
         BigDecimal leftAmount = BigDecimal.ZERO;
@@ -122,7 +123,37 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
             zxfAmount.setScale(2, RoundingMode.HALF_UP);
             vo.setZxfAmount(zxfAmount);
         } else if (execVO.getZxfType() == 1) {
+            BigDecimal leve1 = new BigDecimal("10050");
+            //五十万
+            BigDecimal leve2 = new BigDecimal("507400");
+            //五百万
+            BigDecimal leve3 = new BigDecimal("5056400");
+            //一千万
+            BigDecimal leve4 = new BigDecimal("10081400");
             //计算总执行费，即计算zxfAmount和leftAmount
+            //第一梯队的
+            if (execVO.getTotalAmount() == null || execVO.getTotalAmount().compareTo(leve1) <= 0) {
+                zxfAmount = new BigDecimal("50");
+                leftAmount = execVO.getTotalAmount().subtract(zxfAmount);
+            }
+            if (execVO.getTotalAmount().compareTo(leve1) > 0 && execVO.getTotalAmount().compareTo(leve2) <= 0) {
+                leftAmount = execVO.getTotalAmount()
+                        .subtract(execVO.getTotalAmount().multiply(new BigDecimal("0.015")))
+                        .add(new BigDecimal("100.750"))
+                        ;
+                zxfAmount = execVO.getTotalAmount().subtract(leftAmount);
+            }
+            if (execVO.getTotalAmount().compareTo(leve2) > 0 && execVO.getTotalAmount().compareTo(leve3) <= 0) {
+
+            }
+            if (execVO.getTotalAmount().compareTo(leve3) > 0 && execVO.getTotalAmount().compareTo(leve4) <= 0) {
+
+            }
+            if (execVO.getTotalAmount().compareTo(leve4) > 0) {
+
+            }
+            vo.setZxfAmount(zxfAmount);
+            vo.setLeftAmount(leftAmount);
 
         }
 
