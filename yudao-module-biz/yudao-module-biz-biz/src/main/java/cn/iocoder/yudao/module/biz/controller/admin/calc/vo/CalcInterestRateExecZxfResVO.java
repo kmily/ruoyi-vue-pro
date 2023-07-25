@@ -12,7 +12,10 @@ import java.util.List;
 public class CalcInterestRateExecZxfResVO {
 
 
-    private BigDecimal totalAmount;
+
+    private BigDecimal zxfAmount;
+
+    private BigDecimal leftAmount;
 
 
 }

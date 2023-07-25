@@ -65,6 +65,8 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
     @Override
     public CalcInterestRateExecZxfResVO execCalcFeeData(CalcInterestRateExecZxfParamVO execVO) {
         CalcInterestRateExecZxfResVO vo = new CalcInterestRateExecZxfResVO();
+        BigDecimal zxfAmount = BigDecimal.ZERO;
+        BigDecimal leftAmount = BigDecimal.ZERO;
         BigDecimal totalAmount = BigDecimal.ZERO;
         //一万
         BigDecimal ten_thousand = new BigDecimal("10000");
@@ -75,14 +77,53 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
         //一千万
         BigDecimal ten_million = new BigDecimal("10000000");
         if (execVO.getZxfType() == 1) {
-            //计算总执行费
-//            if (execVO.getLeftAmount() == null || ten_thousand.compareTo(execVO.getLeftAmount()) >= 0) {
-//                totalAmount = new BigDecimal("50");
-//            } else if (execVO.getLeftAmount() == null || ten_thousand.compareTo(execVO.getLeftAmount()) >= 0) {
-//
-//            } else if () {
-//
-//            }
+            //计算总执行费，即计算zxfAmount
+            //计算梯度
+            Integer level = 0;
+            if (execVO.getTotalAmount() == null || execVO.getTotalAmount().compareTo(ten_thousand) <= 0) {
+                //执行金额或者价额不超过1万元的
+                level = 1;
+            } else if (ten_thousand.compareTo(execVO.getTotalAmount()) > 0 && execVO.getTotalAmount().compareTo(five_hundred_thousand) <= 0) {
+                //超过1万元至50万元的部分
+                level = 2;
+            } else if (five_hundred_thousand.compareTo(execVO.getTotalAmount()) > 0 && execVO.getTotalAmount().compareTo(five_million) <= 0) {
+                //超过50万元至500万元的部分
+                level = 3;
+            } else if (execVO.getTotalAmount().compareTo(five_million) > 0 && execVO.getTotalAmount().compareTo(ten_million) <= 0) {
+                //超过500万元至1000万元的部分
+                level = 4;
+            } else if (execVO.getTotalAmount().compareTo(ten_million) > 0) {
+                //超过1000万元的部分
+                level = 5;
+            }
+            if (level >= 1) {
+                //执行金额或者价额不超过1万元的，每件交纳50元；
+                zxfAmount = zxfAmount.add(new BigDecimal("50"));
+            }
+            if (level >= 2) {
+                //执行金额或者价额不超过1万元的，每件交纳50元；超过1万元至50万元的部分，按照1.5％交纳
+                BigDecimal calcAmount = five_hundred_thousand.compareTo(execVO.getTotalAmount()) >= 0 ? execVO.getTotalAmount() : five_hundred_thousand;
+                zxfAmount = zxfAmount.add(calcAmount.subtract(ten_thousand).multiply(new BigDecimal("0.015")));
+            }
+            if (level >= 3) {
+                BigDecimal calcAmount = five_million.compareTo(execVO.getTotalAmount()) >= 0 ? execVO.getTotalAmount() : five_million;
+                //执行金额或者价额不超过1万元的，每件交纳50元；超过1万元至50万元的部分，按照1.5％交纳；超过50万元至500万元的部分，按照1％交纳
+                zxfAmount = zxfAmount.add(calcAmount.subtract(five_hundred_thousand).multiply(new BigDecimal("0.01")));
+            }
+            if (level >= 4) {
+                BigDecimal calcAmount = ten_million.compareTo(execVO.getTotalAmount()) >= 0 ? execVO.getTotalAmount() : ten_million;
+                //执行金额或者价额不超过1万元的，每件交纳50元；超过1万元至50万元的部分，按照1.5％交纳；超过50万元至500万元的部分，按照1％交纳；超过500万元至1000万元的部分，按照0.5％交纳
+                zxfAmount = zxfAmount.add(calcAmount.subtract(five_million).multiply(new BigDecimal("0.005")));
+            }
+            if (level >= 5) {
+                //执行金额或者价额不超过1万元的，每件交纳50元；超过1万元至50万元的部分，按照1.5％交纳；超过50万元至500万元的部分，按照1％交纳；超过500万元至1000万元的部分，按照0.5％交纳；超过1000万元的部分，按照0.1％交纳
+                zxfAmount = zxfAmount.add(execVO.getTotalAmount().subtract(ten_million).multiply(new BigDecimal("0.001")));
+            }
+            zxfAmount.setScale(2, RoundingMode.HALF_UP);
+            vo.setZxfAmount(zxfAmount);
+        } else if (execVO.getZxfType() == 1) {
+            //计算总执行费，即计算zxfAmount和leftAmount
+
         }
 
         return vo;
