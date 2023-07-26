@@ -127,30 +127,39 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
             //五十万
             BigDecimal leve2 = new BigDecimal("507400");
             //五百万
-            BigDecimal leve3 = new BigDecimal("5056400");
+            BigDecimal leve3 = new BigDecimal("5052400");
             //一千万
-            BigDecimal leve4 = new BigDecimal("10081400");
+            BigDecimal leve4 = new BigDecimal("10077400");
             //计算总执行费，即计算zxfAmount和leftAmount
             //第一梯队的
             if (execVO.getTotalAmount() == null || execVO.getTotalAmount().compareTo(leve1) <= 0) {
+                //执行金额或者价额不超过1万元的，每件交纳50元
                 zxfAmount = new BigDecimal("50");
                 leftAmount = execVO.getTotalAmount().subtract(zxfAmount);
             }
             if (execVO.getTotalAmount().compareTo(leve1) > 0 && execVO.getTotalAmount().compareTo(leve2) <= 0) {
-                leftAmount = execVO.getTotalAmount()
-                        .subtract(execVO.getTotalAmount().multiply(new BigDecimal("0.015")))
-                        .add(new BigDecimal("100.750"))
-                        ;
+                //超过1万元至50万元的部分，按照1.5％交纳；
+                //执行金额或者价额不超过1万元的，每件交纳50元；超过1万元至50万元的部分，按照1.5％交纳
+                leftAmount = (execVO.getTotalAmount().add(new BigDecimal("100"))).divide(new BigDecimal("1.015"), 2, RoundingMode.HALF_UP);
                 zxfAmount = execVO.getTotalAmount().subtract(leftAmount);
             }
             if (execVO.getTotalAmount().compareTo(leve2) > 0 && execVO.getTotalAmount().compareTo(leve3) <= 0) {
-
+                //超过50万元至500万元的部分，按照1％交纳
+                //执行金额或者价额不超过1万元的，每件交纳50元；超过1万元至50万元的部分，按照1.5％交纳；超过50万元至500万元的部分，按照1％交纳
+                leftAmount = (execVO.getTotalAmount().subtract(new BigDecimal("2400"))).divide(new BigDecimal("1.01"), 2, RoundingMode.HALF_UP);
+                zxfAmount = execVO.getTotalAmount().subtract(leftAmount);
             }
             if (execVO.getTotalAmount().compareTo(leve3) > 0 && execVO.getTotalAmount().compareTo(leve4) <= 0) {
-
+                //执行金额或者价额不超过1万元的，每件交纳50元；超过1万元至50万元的部分，按照1.5％交纳；超过50万元至500万元的部分，按照1％交纳；超过500万元至1000万元的部分，按照0.5％交纳
+                //超过500万元至1000万元的部分，按照0.5％交纳
+                leftAmount = (execVO.getTotalAmount().subtract(new BigDecimal("27400"))).divide(new BigDecimal("1.005"), 2, RoundingMode.HALF_UP);
+                zxfAmount = execVO.getTotalAmount().subtract(leftAmount);
             }
             if (execVO.getTotalAmount().compareTo(leve4) > 0) {
-
+                //超过1000万元的部分，按照0.1％交纳
+                //执行金额或者价额不超过1万元的，每件交纳50元；超过1万元至50万元的部分，按照1.5％交纳；超过50万元至500万元的部分，按照1％交纳；超过500万元至1000万元的部分，按照0.5％交纳；超过1000万元的部分，按照0.1％交纳
+                leftAmount = (execVO.getTotalAmount().subtract(new BigDecimal("67400"))).divide(new BigDecimal("1.001"), 2, RoundingMode.HALF_UP);
+                zxfAmount = execVO.getTotalAmount().subtract(leftAmount);
             }
             vo.setZxfAmount(zxfAmount);
             vo.setLeftAmount(leftAmount);
