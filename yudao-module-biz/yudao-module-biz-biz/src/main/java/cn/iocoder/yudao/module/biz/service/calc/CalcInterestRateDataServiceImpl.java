@@ -84,10 +84,10 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
             if (execVO.getTotalAmount() == null || execVO.getTotalAmount().compareTo(ten_thousand) <= 0) {
                 //执行金额或者价额不超过1万元的
                 level = 1;
-            } else if (ten_thousand.compareTo(execVO.getTotalAmount()) > 0 && execVO.getTotalAmount().compareTo(five_hundred_thousand) <= 0) {
+            } else if (execVO.getTotalAmount().compareTo(ten_thousand) > 0 && execVO.getTotalAmount().compareTo(five_hundred_thousand) <= 0) {
                 //超过1万元至50万元的部分
                 level = 2;
-            } else if (five_hundred_thousand.compareTo(execVO.getTotalAmount()) > 0 && execVO.getTotalAmount().compareTo(five_million) <= 0) {
+            } else if (execVO.getTotalAmount().compareTo(five_hundred_thousand) > 0 && execVO.getTotalAmount().compareTo(five_million) <= 0) {
                 //超过50万元至500万元的部分
                 level = 3;
             } else if (execVO.getTotalAmount().compareTo(five_million) > 0 && execVO.getTotalAmount().compareTo(ten_million) <= 0) {
