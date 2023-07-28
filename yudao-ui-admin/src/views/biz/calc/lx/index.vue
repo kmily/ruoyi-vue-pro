@@ -44,7 +44,7 @@
         <el-row v-if="data.rateType==1">
           <el-col :span="14">
             <el-form-item label="利息周期" >
-              <el-radio-group v-model="data.fixSectionType">
+              <el-radio-group v-model="data.fixSectionType" :disabled="data.fixType==2?true:false">
                 <el-radio :label="1">年</el-radio>
 <!--                <el-radio :label="2">月</el-radio>-->
                 <el-radio :label="3">日</el-radio>
