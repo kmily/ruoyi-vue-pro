@@ -36,7 +36,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
     /**
      * 罚息利率规定变更时间
      */
-    private final static Date FX_DATE = DateUtil.paseDate("2014-08-01", DateUtil.DATE_FORMAT_NORMAL);
+    private final static Date FX_DATE = DateUtil.paseDate("2014-08-01 00:00:00");
     private final static BigDecimal FX_RATE = new BigDecimal("0.000175");
 
     @Resource
@@ -239,8 +239,8 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
                     if (startDate.compareTo(FX_DATE) < 0) {
                         //2014-08-01之前
                         dayRateValue = execVO.getFixRate()
-                                .divide(new BigDecimal(100), 8, RoundingMode.HALF_UP)
-                                .divide(new BigDecimal(365), 8, RoundingMode.HALF_UP);
+                                .divide(new BigDecimal(100), 16, RoundingMode.HALF_UP)
+                                .divide(new BigDecimal(365), 16, RoundingMode.HALF_UP);
                     } else {
                         //2014-08-01之后
                         dayRateValue = FX_RATE;
@@ -249,7 +249,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
                     calcInterestRateDataMapper.insertExecProcessData(execDataIndex);
                     startDate = DateUtil.addDays(startDate, 1);
                 }
-                vo.setSectionList(calcInterestRateDataMapper.selectSectionListByFixRate(execVO.getProcessId()));
+                vo.setSectionList(calcInterestRateDataMapper.selectSectionList4FxByFixRate(execVO.getProcessId()));
                 vo.setTotalAmount(calcInterestRateDataMapper.selectTotalAmountByProcessId(execVO.getProcessId()));
                 vo.setProcessId(execVO.getProcessId());
             } else if (execVO.getFixSectionType() == 2) {
@@ -265,13 +265,13 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
                      */
                     for (MonthInfoDTO monthIndex : monthList) {
                         if (startDate.compareTo(monthIndex.getMonthStartDate()) >= 0 && startDate.compareTo(monthIndex.getMonthEndDate()) <= 0) {
-                            dayRateValue = execVO.getFixRate().divide(new BigDecimal(100)).divide(new BigDecimal(monthIndex.getDays()), 8, RoundingMode.HALF_UP);
+                            dayRateValue = execVO.getFixRate().divide(new BigDecimal(100)).divide(new BigDecimal(monthIndex.getDays()), 16, RoundingMode.HALF_UP);
                             break;
                         }
                     }
                     ExecProcessDataDTO execDataIndex = null;
                     if (startDate.compareTo(FX_DATE) >= 0) {
-                        //2014-08-01之后
+                        //2014-016-01之后
                         dayRateValue = FX_RATE;
                     }
                     execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), execVO.getProcessId(), 0, startDate, dayRateValue, dayRateValue.multiply(execVO.getLeftAmount()));
@@ -290,7 +290,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
                     ExecProcessDataDTO execDataIndex = null;
                     if (startDate.compareTo(FX_DATE) < 0) {
                         //2014-08-01之前
-                        dayRateValue = execVO.getFixRate().divide(new BigDecimal(100), 8, RoundingMode.HALF_UP);
+                        dayRateValue = execVO.getFixRate().divide(new BigDecimal(100), 16, RoundingMode.HALF_UP);
                     } else {
                         //2014-08-01之后
                         dayRateValue = FX_RATE;
@@ -333,7 +333,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
                 } else if (yearType == 5) {
                     suiteRateValue = suiteRate.getRateOverFiveYear();
                 }
-                suiteRateValue = suiteRateValue.divide(new BigDecimal(100), 8, RoundingMode.HALF_UP).divide(new BigDecimal(yearDays), 8, RoundingMode.HALF_UP);
+                suiteRateValue = suiteRateValue.divide(new BigDecimal(100), 16, RoundingMode.HALF_UP).divide(new BigDecimal(yearDays), 16, RoundingMode.HALF_UP);
                 ExecProcessDataDTO execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), processId, suiteRate.getId(), startDate, suiteRateValue, suiteRateValue.multiply(execVO.getLeftAmount()));
                 calcInterestRateDataMapper.insertExecProcessData(execDataIndex);
             } else {
@@ -343,7 +343,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
             }
             startDate = DateUtil.addDays(startDate, 1);
         }
-        vo.setSectionList(calcInterestRateDataMapper.selectSectionListByProcessAndYearType(processId, yearType));
+        vo.setSectionList(calcInterestRateDataMapper.selectSectionListByProcessAndYearType(processId));
         vo.setTotalAmount(calcInterestRateDataMapper.selectTotalAmountByProcessId(processId));
         vo.setProcessId(processId);
         return vo;
@@ -360,8 +360,8 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
                 Date startDate = execVO.getStartDate();
                 Date endDate = execVO.getEndDate();
                 BigDecimal dayRateValue = execVO.getFixRate()
-                        .divide(new BigDecimal(100), 8, RoundingMode.HALF_UP)
-                        .divide(new BigDecimal(365), 8, RoundingMode.HALF_UP);
+                        .divide(new BigDecimal(100), 16, RoundingMode.HALF_UP)
+                        .divide(new BigDecimal(365), 16, RoundingMode.HALF_UP);
                 while (startDate.compareTo(endDate) <= 0) {
                     ExecProcessDataDTO execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), execVO.getProcessId(), 0, startDate, dayRateValue, dayRateValue.multiply(execVO.getLeftAmount()));
                     calcInterestRateDataMapper.insertExecProcessData(execDataIndex);
@@ -383,7 +383,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
                      */
                     for (MonthInfoDTO monthIndex : monthList) {
                         if (startDate.compareTo(monthIndex.getMonthStartDate()) >= 0 && startDate.compareTo(monthIndex.getMonthEndDate()) <= 0) {
-                            dayRateValue = execVO.getFixRate().divide(new BigDecimal(100)).divide(new BigDecimal(monthIndex.getDays()), 8, RoundingMode.HALF_UP);
+                            dayRateValue = execVO.getFixRate().divide(new BigDecimal(100)).divide(new BigDecimal(monthIndex.getDays()), 16, RoundingMode.HALF_UP);
                             break;
                         }
                     }
@@ -398,7 +398,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
                 //3-日
                 Date startDate = execVO.getStartDate();
                 Date endDate = execVO.getEndDate();
-                BigDecimal dayRateValue = execVO.getFixRate().divide(new BigDecimal(100), 8, RoundingMode.HALF_UP);
+                BigDecimal dayRateValue = execVO.getFixRate().divide(new BigDecimal(100), 16, RoundingMode.HALF_UP);
                 while (startDate.compareTo(endDate) <= 0) {
                     ExecProcessDataDTO execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), execVO.getProcessId(), 0, startDate, dayRateValue, dayRateValue.multiply(execVO.getLeftAmount()));
                     calcInterestRateDataMapper.insertExecProcessData(execDataIndex);
@@ -414,32 +414,37 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
             //LPR倍数
             Date startDate = execVO.getStartDate();
             Date endDate = execVO.getEndDate();
-            if (execVO.getFixLPRs().compareTo(new BigDecimal("4")) == 0 && DateUtil.format(startDate, DateUtil.DATE_FORMAT_NORMAL).compareTo(DateUtil.format(new Date("2019-01-01"), DateUtil.DATE_FORMAT_NORMAL)) > 0) {
+            if (startDate.compareTo(DateUtil.paseDate("2019-08-20", DateUtil.DATE_FORMAT_NORMAL)) < 0) {
                 //2019年以前不可以选择LPR4倍数据
-                throw new IllegalArgumentException("起始时间是2019年以前的计算，不可以选择4倍LPR！");
+                throw new IllegalArgumentException("起始时间是2019年8月20号以前，不允许使用LPR倍数！");
             }
+//            if (execVO.getFixLPRs().compareTo(new BigDecimal("4")) == 0 && DateUtil.format(startDate, DateUtil.DATE_FORMAT_NORMAL).compareTo(DateUtil.format(new Date("2019-01-01"), DateUtil.DATE_FORMAT_NORMAL)) > 0) {
+//                //2019年以前不可以选择LPR4倍数据
+//                throw new IllegalArgumentException("起始时间是2019年以前的计算，不可以选择4倍LPR！");
+//            }
             while (startDate.compareTo(endDate) <= 0) {
                 CalcInterestRateDataDO suiteRate = getSuiteRate(allRateList, startDate);
                 Integer yearDays = 365;
                 BigDecimal suiteRateValue = null;
                 BigDecimal suiteOneYearRateValue = null;
-                Integer yearType = getYearType(execVO.getStartDate(), execVO.getEndDate());
-                if (yearType == 1) {
-                    suiteRateValue = suiteRate.getRateHalfYear();
-                } else if (yearType == 2) {
-                    suiteOneYearRateValue = suiteRate.getRateOneYear();
-                    suiteRateValue = suiteRate.getRateOneYear();
-                } else if (yearType == 3) {
-                    suiteRateValue = suiteRate.getRateThreeYear();
-                } else if (yearType == 4) {
-                    suiteRateValue = suiteRate.getRateFiveYear();
-                } else if (yearType == 5) {
-                    suiteRateValue = suiteRate.getRateOverFiveYear();
-                }
+//                Integer yearType = getYearType(execVO.getStartDate(), execVO.getEndDate());
+//                if (yearType == 1) {
+//                    suiteRateValue = suiteRate.getRateHalfYear();
+//                } else if (yearType == 2) {
+//                    suiteOneYearRateValue = suiteRate.getRateOneYear();
+//                    suiteRateValue = suiteRate.getRateOneYear();
+//                } else if (yearType == 3) {
+//                    suiteRateValue = suiteRate.getRateThreeYear();
+//                } else if (yearType == 4) {
+//                    suiteRateValue = suiteRate.getRateFiveYear();
+//                } else if (yearType == 5) {
+//                    suiteRateValue = suiteRate.getRateOverFiveYear();
+//                }
+                suiteRateValue = suiteRate.getRateOneYear();
                 if (execVO.getFixLPRs().compareTo(new BigDecimal("4")) == 0) {
-                    suiteRateValue = suiteOneYearRateValue.multiply(execVO.getFixLPRs()).divide(new BigDecimal(100), 8, RoundingMode.HALF_UP).divide(new BigDecimal(yearDays), 8, RoundingMode.HALF_UP);
+                    suiteRateValue = suiteOneYearRateValue.multiply(execVO.getFixLPRs()).divide(new BigDecimal(100), 16, RoundingMode.HALF_UP).divide(new BigDecimal(yearDays), 16, RoundingMode.HALF_UP);
                 } else {
-                    suiteRateValue = suiteRateValue.multiply(execVO.getFixLPRs()).divide(new BigDecimal(100), 8, RoundingMode.HALF_UP).divide(new BigDecimal(yearDays), 8, RoundingMode.HALF_UP);
+                    suiteRateValue = suiteRateValue.multiply(execVO.getFixLPRs()).divide(new BigDecimal(100), 16, RoundingMode.HALF_UP).divide(new BigDecimal(yearDays), 16, RoundingMode.HALF_UP);
                 }
                 ExecProcessDataDTO execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), execVO.getProcessId(), suiteRate.getId(), startDate, suiteRateValue, suiteRateValue.multiply(execVO.getLeftAmount()));
                 calcInterestRateDataMapper.insertExecProcessData(execDataIndex);
@@ -507,12 +512,12 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
             } else if (yearType == 5) {
                 suiteRateValue = suiteRate.getRateOverFiveYear();
             }
-            suiteRateValue = suiteRateValue.divide(new BigDecimal(100), 8, RoundingMode.HALF_UP).divide(new BigDecimal(yearDays), 8, RoundingMode.HALF_UP);
+            suiteRateValue = suiteRateValue.divide(new BigDecimal(100), 16, RoundingMode.HALF_UP).divide(new BigDecimal(yearDays), 16, RoundingMode.HALF_UP);
             ExecProcessDataDTO execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), execVO.getProcessId(), suiteRate.getId(), startDate, suiteRateValue, suiteRateValue.multiply(execVO.getLeftAmount()));
             calcInterestRateDataMapper.insertExecProcessData(execDataIndex);
             startDate = DateUtil.addDays(startDate, 1);
         }
-        vo.setSectionList(calcInterestRateDataMapper.selectSectionListByProcessAndYearType(execVO.getProcessId(), yearType));
+        vo.setSectionList(calcInterestRateDataMapper.selectSectionListByProcessAndYearType(execVO.getProcessId()));
         vo.setTotalAmount(calcInterestRateDataMapper.selectTotalAmountByProcessId(execVO.getProcessId()));
         vo.setProcessId(execVO.getProcessId());
         return vo;

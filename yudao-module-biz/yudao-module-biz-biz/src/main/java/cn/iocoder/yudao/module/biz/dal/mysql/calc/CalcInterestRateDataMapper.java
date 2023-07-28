@@ -31,9 +31,11 @@ public interface CalcInterestRateDataMapper extends BaseMapperX<CalcInterestRate
      */
     Integer insertExecProcessData(ExecProcessDataDTO execProcessDataDTO);
 
-    List<SectionIndexVO> selectSectionListByProcessAndYearType(@Param("processId") String processId, @Param("yearType") Integer yearType);
+    List<SectionIndexVO> selectSectionListByProcessAndYearType(@Param("processId") String processId);
 
     List<SectionIndexVO> selectSectionListByFixRate(@Param("processId") String processId);
+
+    List<SectionIndexVO> selectSectionList4FxByFixRate(@Param("processId") String processId);
 
     List<SectionIndexVO> selectSectionListByFixMonthRate(@Param("processId") String processId);
 

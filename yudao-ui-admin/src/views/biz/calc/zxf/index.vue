@@ -17,7 +17,7 @@
         </el-col>
         <el-col :span="12" style="padding-left: 52px;">
           <el-form :model="data2" ref="dataForm2" size="small"  label-position="left" label-width="120px">
-            <el-form-item label="未履行债务总额" >
+            <el-form-item label="本次执行总额" >
               <el-input v-model="data2.totalAmount" style="width:250px" placeholder="请输入内容" clearable /> 万元
             </el-form-item>
             <el-form-item label="执行费用" >
@@ -58,12 +58,12 @@ export default {
       open: false,
       // 查询参数
       data: {
-        totalAmount:null,  
+        totalAmount:null,
         zxfType:1,
         zxfAmount:null,
       },
       data2: {
-        totalAmount:null,    
+        totalAmount:null,
         zxfType:2,
         zxfAmount:null,
         leftAmount:null,
@@ -74,7 +74,7 @@ export default {
     };
   },
   created() {
-    
+
   },
   methods: {
     execCalcZxfData1(){

@@ -5,7 +5,8 @@
         <el-row>
           <el-col :span="14">
             <el-form-item label="未履行债务总额" >
-              <el-input v-model="data.leftAmount" style="width:250px" placeholder="请输入内容" clearable /> 万元
+              <el-input v-model="data.leftAmount" style="width:250px" placeholder="请输入内容" clearable />元
+<!--              万元-->
             </el-form-item>
           </el-col>
           <el-col :span="10">
@@ -30,22 +31,22 @@
               </el-radio-group>
             </el-form-item>
           </el-col>
-          <el-col :span="10">
-            <el-form-item label="考虑闰年" >
-              <el-switch
-                v-model="data.leapYear"
-                :active-value="1"
-                :inactive-value="0">
-              </el-switch>
-            </el-form-item>
-          </el-col>
-        </el-row> 
+<!--          <el-col :span="10">-->
+<!--            <el-form-item label="考虑闰年" >-->
+<!--              <el-switch-->
+<!--                v-model="data.leapYear"-->
+<!--                :active-value="1"-->
+<!--                :inactive-value="0">-->
+<!--              </el-switch>-->
+<!--            </el-form-item>-->
+<!--          </el-col>-->
+        </el-row>
         <el-row v-if="data.rateType==1">
           <el-col :span="14">
             <el-form-item label="利息周期" >
               <el-radio-group v-model="data.fixSectionType">
                 <el-radio :label="1">年</el-radio>
-                <el-radio :label="2">月</el-radio>
+<!--                <el-radio :label="2">月</el-radio>-->
                 <el-radio :label="3">日</el-radio>
               </el-radio-group>
             </el-form-item>
@@ -58,7 +59,7 @@
               <el-input v-model="data.fixLPRs" style="width:220px" placeholder="请输入内容" clearable />
             </el-form-item>
           </el-col>
-        </el-row> 
+        </el-row>
         <el-row>
           <el-col :span="14">
             <el-form-item label="开始时间" >
@@ -67,27 +68,27 @@
           </el-col>
           <el-col :span="10">
             <el-form-item label="结束时间" >
-              <el-date-picker v-model="data.endDate" type="date" placeholder="选择日期"  value-format="timestamp"></el-date-picker>              
+              <el-date-picker v-model="data.endDate" type="date" placeholder="选择日期"  value-format="timestamp"></el-date-picker>
             </el-form-item>
           </el-col>
-        </el-row> 
+        </el-row>
         <el-row>
-          <el-col :span="14">            
-            <el-form-item label="考虑闰年" v-if="data.rateType==2" >
-              <el-switch
-                v-model="data.leapYear"
-                :active-value="1"
-                :inactive-value="0">
-              </el-switch>
-            </el-form-item>
-            <span v-if="data.rateType==1"> &nbsp;</span>
+          <el-col :span="14">
+<!--            <el-form-item label="考虑闰年" v-if="data.rateType==2" >-->
+<!--              <el-switch-->
+<!--                v-model="data.leapYear"-->
+<!--                :active-value="1"-->
+<!--                :inactive-value="0">-->
+<!--              </el-switch>-->
+<!--            </el-form-item>-->
+<!--            <span v-if="data.rateType==1"> &nbsp;</span>-->
           </el-col>
           <el-col :span="10">
             <el-form-item>
               <el-button type="primary" icon="el-icon-search" @click="count">计算</el-button>
             </el-form-item>
           </el-col>
-        </el-row>        
+        </el-row>
       </el-form>
       <div>
         <div style="padding: 5px 0; border-bottom: 1px solid #b0b0b0; margin-bottom: 10px;color: #666;padding-right: 101px;display: flex;justify-content: space-between;">
@@ -143,8 +144,8 @@ export default {
         fixLPRs:null,
       },
       lvList:[
-        {value: 1,label: '分段'},
-        {value: 2,label: '约定'}        
+        {value: 1,label: '约定利率'},
+        {value: 2,label: '中国人民银行同期贷款基准利率与LPR自动分段'}
       ],
       totalAmount:null,
       // 表单参数
@@ -153,7 +154,7 @@ export default {
     };
   },
   created() {
-    
+
   },
   methods: {
     count(){

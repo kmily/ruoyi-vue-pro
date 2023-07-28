@@ -41,7 +41,7 @@ public class CalcInterestRateDataController {
     }
 
     @PostMapping("/exec/fx")
-    @Operation(summary = "计算利息")
+    @Operation(summary = "计算罚息")
     @PermitAll
     public CommonResult<CalcInterestRateExecResVO> execCalcInterestFxData(@Valid @RequestBody CalcInterestRateExecFxParamVO execVO) {
         return success(calcInterestRateDataService.execCalcInterestFxData(execVO));
