@@ -29,7 +29,7 @@ public interface CalcInterestRateDataMapper extends BaseMapperX<CalcInterestRate
     /**
      * 保存执行数据
      */
-    Integer insertExecProcessData(ExecProcessDataDTO execProcessDataDTO);
+    Integer insertExecProcessDataBatch(@Param("list") List<ExecProcessDataDTO> dataList);
 
     List<SectionIndexVO> selectSectionListByProcessAndYearType(@Param("processId") String processId);
 

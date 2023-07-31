@@ -27,10 +27,16 @@
         ORDER BY t.start_date
     </select>
 
-    <insert id="insertExecProcessData" parameterType="cn.iocoder.yudao.module.biz.controller.admin.calc.dto.ExecProcessDataDTO">
+
+    <insert id="insertExecProcessDataBatch">
         INSERT INTO biz_calc_exec_data ( id,  process_id, rate_id, date_index, day_rate, day_amount )
-        VALUES ( #{id},#{processId},#{rateId},#{dateIndex},#{dayRate},#{dayAmount} )
+        VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (  #{item.id},  #{item.processId},  #{item.rateId},  #{item.dateIndex}, #{item.dayRate}, #{item.dayAmount}   )
+        </foreach>
     </insert>
+
+
 
     <select id="selectSectionListByProcessAndYearType" resultType="cn.iocoder.yudao.module.biz.controller.admin.calc.vo.SectionIndexVO">
         SELECT
