@@ -1,9 +1,9 @@
 <template>
-  <el-alert v-if="enable()" type="success" show-icon>
+<!--  <el-alert v-if="enable()" type="success" show-icon>
     <template slot="title">
       <div @click="goToUrl">{{ '【' + title + '】文档地址：' + url }}</div>
     </template>
-  </el-alert>
+  </el-alert>-->
 </template>
 
 <script>

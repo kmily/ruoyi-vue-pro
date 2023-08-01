@@ -53,13 +53,9 @@
                 <el-form-item prop="mobileCode">
                   <el-input v-model="loginForm.mobileCode" type="text" auto-complete="off" placeholder="短信验证码"
                             @keyup.enter.native="handleLogin">
-                    <template v-slot="icon">
                       <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon"/>
-                    </template>
-                    <template v-slot="append">
-                      <span v-if="mobileCodeTimer <= 0" class="getMobileCode" @click="getSmsCode" style="cursor: pointer;">获取验证码</span>
-                      <span v-if="mobileCodeTimer > 0" class="getMobileCode">{{ mobileCodeTimer }}秒后可重新获取</span>
-                    </template>
+                      <span slot="append" v-if="mobileCodeTimer <= 0" class="getMobileCode" @click="getSmsCode" style="cursor: pointer;">获取验证码</span>
+                      <span slot="append" v-if="mobileCodeTimer > 0" class="getMobileCode">{{ mobileCodeTimer }}秒后可重新获取</span>
                   </el-input>
                 </el-form-item>
               </div>
@@ -73,7 +69,7 @@
                 </el-button>
               </el-form-item>
 
-              <!--  社交登录 -->
+              <!--  社交登录
              <el-form-item style="width:100%;">
                   <div class="oauth-login" style="display:flex">
                     <div class="oauth-login-item" v-for="item in SysUserSocialTypeEnum" :key="item.type" @click="doSocialLogin(item)">
@@ -81,7 +77,7 @@
                       <span>{{item.title}}</span>
                     </div>
                 </div>
-              </el-form-item>
+              </el-form-item>-->
             </el-form>
           </div>
         </div>
@@ -136,7 +132,7 @@ export default {
         mobile: "",
         mobileCode: "",
         rememberMe: false,
-        tenantName: "芋道源码",
+        tenantName: "测试租户",
       },
       scene: 21,
 
@@ -247,6 +243,7 @@ export default {
           // 发起登陆
           // console.log("发起登录", this.loginForm);
           this.$store.dispatch(this.loginForm.loginType === "sms" ? "SmsLogin" : "Login", this.loginForm).then(() => {
+            debugger
             this.$router.push({path: this.redirect || "/"}).catch(() => {
             });
           }).catch(() => {

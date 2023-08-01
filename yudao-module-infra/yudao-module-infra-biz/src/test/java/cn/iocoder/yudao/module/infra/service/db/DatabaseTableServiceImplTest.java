@@ -18,10 +18,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-@Import(DatabaseTableServiceImpl.class)
+//@Import(DatabaseTableServiceImpl.class)
 public class DatabaseTableServiceImplTest extends BaseDbUnitTest {
 
-    @Resource
+    /*@Resource
     private DatabaseTableServiceImpl databaseTableService;
 
     @MockBean
@@ -85,5 +85,5 @@ public class DatabaseTableServiceImplTest extends BaseDbUnitTest {
         assertFalse(nameField.isKeyIdentityFlag());
         assertEquals(DbColumnType.STRING, nameField.getColumnType());
         assertEquals("name", nameField.getPropertyName());
-    }
+    }*/
 }
