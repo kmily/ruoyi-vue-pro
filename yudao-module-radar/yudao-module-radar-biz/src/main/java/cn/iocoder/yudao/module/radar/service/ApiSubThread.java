@@ -1,13 +1,19 @@
 package cn.iocoder.yudao.module.radar.service;
 
+import cn.iocoder.yudao.module.radar.api.device.DeviceApi;
+import cn.iocoder.yudao.module.radar.api.device.dto.DeviceDTO;
+import cn.iocoder.yudao.module.radar.bean.entity.Device;
 import cn.iocoder.yudao.module.radar.bean.enums.WebSocketApiEnum;
 import cn.iocoder.yudao.module.radar.bean.request.SubscribeRadarCondition;
 import cn.iocoder.yudao.module.radar.bean.request.SubscribeVehicleCondition;
 import cn.iocoder.yudao.module.radar.bean.request.SubscriptionRequest;
+import cn.iocoder.yudao.module.radar.job.DeviceCache;
+import cn.iocoder.yudao.module.radar.utils.BitUtil;
 import cn.iocoder.yudao.module.radar.utils.WebSocketUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,6 +53,9 @@ public class ApiSubThread implements Runnable {
 
     private static String currIp;
 
+    private static DeviceCache deviceCache;
+
+
     @Override
     public void run() {
         /**
@@ -60,7 +69,7 @@ public class ApiSubThread implements Runnable {
             long lastSubTimeStamp = entry.getValue();
             if (0 == lastSubTimeStamp) {
                 //如果最近发送订阅时间为0，代表没有发过，立即发送订阅数据请求
-                SubscriptionRequest subscriptionRequest = initSubscriptionRequest(channelId);
+                SubscriptionRequest subscriptionRequest = initSubscriptionRequest(channelId, 0);
                 JSONObject data = JSON.parseObject(JSON.toJSONString(subscriptionRequest));
 
                 //发送订阅请求
@@ -146,7 +155,7 @@ public class ApiSubThread implements Runnable {
      * @description: TODO 初始化订阅请求消息体
      * @author l09655 2022年08月05日
      */
-    public static SubscriptionRequest initSubscriptionRequest(ChannelId channelId) {
+    public static SubscriptionRequest initSubscriptionRequest(ChannelId channelId, long subType) {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest();
         subscriptionRequest.setDeviceID(ChannelSupervise.channelDeviceMap.get(channelId).getDeviceCode());
         subscriptionRequest.setIpAddress(currIp);
@@ -182,6 +191,7 @@ public class ApiSubThread implements Runnable {
         if (0 != (subType & 0b0000000000000100000000000000000) || 0 != (subType & 0b0000000000000000000000000100000)){
             SubscribeRadarCondition subscribeRadarCondition = new SubscribeRadarCondition();
             subscribeRadarCondition.setType(0b0000000000000000000000000000111);
+            subscribeRadarCondition.setRealTimeDataDuration(2L);
             subscriptionRequest.setSubscribeRadarCondition(subscribeRadarCondition);
         }
 
@@ -195,9 +205,42 @@ public class ApiSubThread implements Runnable {
     }
 
 
-    public ApiSubThread( int currPort, String currIp) {
+    public static void subscription(ChannelHandlerContext ctx, Device device){
+
+        DeviceDTO deviceDTO = deviceCache.getBySn(device.getDeviceCode());
+        if(deviceDTO == null || deviceDTO.getId() == null){
+            log.info("设备[{}]在系统中不存在", JSON.toJSONString(device));
+        }else{
+            String requestStr = "";
+            //如果最近发送订阅时间为0，代表没有发过，立即发送订阅数据请求
+            SubscriptionRequest subscriptionRequest = ApiSubThread.initSubscriptionRequest(ctx.channel().id(), getSubType(deviceDTO.getType()));
+            JSONObject data = JSON.parseObject(JSON.toJSONString(subscriptionRequest));
+            ChannelSupervise.channelDeviceMap.get(ctx.channel().id()).setSubDuration(subscriptionRequest.getDuration());
+            //发送订阅请求
+            requestStr = WebSocketUtil.sendWebSocketRequest(WebSocketApiEnum.SUBSCRIPTION.url, "POST", data, ctx.channel().id());
+            log.info(ctx.channel().id() + "发送订阅请求" + requestStr + "\n");
+            ChannelSupervise.channelSubTimeMap.put(ctx.channel().id(), System.currentTimeMillis());
+        }
+    }
+
+    public static long getSubType(int type){
+        long subType = 0b0000000000000000000000000000000;
+        if(type == 1){
+            // 人体特征
+            subType = BitUtil.setIndexBitToOne(subType, 17);
+        }else if(type == 2){
+            // 人体检查
+            subType = BitUtil.setIndexBitToOne(subType, 14);
+        }
+        return subType;
+
+    }
+
+
+    public ApiSubThread( int currPort, String currIp, DeviceCache deviceCache) {
         ApiSubThread.currPort = currPort;
         ApiSubThread.currIp = currIp;
+        ApiSubThread.deviceCache = deviceCache;
     }
 
 }

@@ -200,6 +200,10 @@ yudao:
   error-code: # 错误码相关配置项
     enable: false
   demo: false # 关闭演示模式
+  radar:
+    socket:
+      port: 80
+
 
 justauth:
   enabled: true

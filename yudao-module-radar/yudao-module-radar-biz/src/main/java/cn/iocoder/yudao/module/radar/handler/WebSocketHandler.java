@@ -2,12 +2,14 @@ package cn.iocoder.yudao.module.radar.handler;
 
 
 import cn.iocoder.yudao.module.radar.bean.entity.Device;
+import cn.iocoder.yudao.module.radar.bean.entity.RequestData;
 import cn.iocoder.yudao.module.radar.bean.enums.ResponseCodeEnum;
 import cn.iocoder.yudao.module.radar.bean.enums.WebSocketApiEnum;
-import cn.iocoder.yudao.module.radar.bean.request.SubscriptionRequest;
 import cn.iocoder.yudao.module.radar.bean.request.WebsocketRequest;
 import cn.iocoder.yudao.module.radar.bean.response.SubscriptionResponse;
 import cn.iocoder.yudao.module.radar.bean.response.WebsocketResponse;
+import cn.iocoder.yudao.module.radar.cache.RadarDataCache;
+import cn.iocoder.yudao.module.radar.enums.DeviceTypeEnum;
 import cn.iocoder.yudao.module.radar.service.ApiSubThread;
 import cn.iocoder.yudao.module.radar.service.ChannelSupervise;
 import cn.iocoder.yudao.module.radar.utils.CustomWebSocketServerHandshaker;
@@ -28,7 +30,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import sun.misc.BASE64Encoder;
 
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.text.DateFormat;
@@ -182,12 +183,18 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
 
             if (WebSocketApiEnum.KEEPALIVE.url.equals(request.getRequestURL())) {
                 log.info(channelId + "-" + df.format(new Date()) + "收到保活请求" + request + "\n");
+
+                Device device = ChannelSupervise.channelDeviceMap.get(channelId);
+                if(device != null){
+                    log.info("设备 {} 发了保活请求", device.getDeviceCode());
+                }
+
                 //返回消息体
                 JSONObject data = new JSONObject();
                 //协议要求，精确到秒
                 data.put("Timestamp", System.currentTimeMillis()/1000);
                 data.put("Timeout", 60);
-                response = initResponse(request, response, ResponseCodeEnum.SUCCEED, data);
+                initResponse(request, response, ResponseCodeEnum.SUCCEED, data);
             } else if (WebSocketApiEnum.REAL_TIME_INFO.url.equals(request.getRequestURL())) {
 
                 LOGGER.info("RealTimeInfo 获取数据为：{}", requestStr);
@@ -199,7 +206,9 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
                 LOGGER.info("Alarm 获取数据为：{}", requestStr);
             }else {
                 if (null != webSocketApiEnum) {
-                    String text = channelId + "-" + df.format(new Date()) + webSocketApiEnum.apiName + "收到数据" + requestStr;
+                    Object requestData = request.getData();
+                    String string = JSON.toJSONString(requestData);
+                    RequestData requestData1 = JSON.parseObject(string, RequestData.class);
 
                     //如果是雷达上报事件或结构化数据，界面日志打印替换BASE64流
                     //实际使用时应将json字符串转换为实体类或JSONObject后替换字段属性
@@ -222,16 +231,6 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
                             indexTemp = StringUtils.ordinalIndexOf(requestStr, "\"Data\":", dataNum);
                         }
                     }
-                    String textNoBase64 = channelId + "-" + df.format(new Date()) + webSocketApiEnum.apiName + "收到数据" + requestStr;
-
-                    //String getMethodName = webSocketApiEnum.textAreaGetMethodName;
-                    //获取要执行的get方法名
-                   // Method method = textAreasLog.getClass().getMethod(getMethodName);
-                    //过车替换为中文
-                   // textNoBase64 = replaceENG2CHN(textNoBase64, getMethodName);
-                    //反射执行get方法，界面日志不打印base64流
-                    //TextAreaLogUtil.printLog(textNoBase64, (JTextArea) method.invoke(textAreasLog));
-
                     //结构化数据接口，需要response
                     if(WebSocketApiEnum.STRUCTURE_DATA.url.equals(request.getRequestURL())) {
                         JSONObject data = new JSONObject();
@@ -241,20 +240,24 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
 
                         data.put("NotificationType", requestDataJsonObject.get("NotificationType"));
                         data.put("RelatedID", requestDataJsonObject.get("RelatedID"));
-                        response = initResponse(request, response, ResponseCodeEnum.SUCCEED, data);
-                    }
-
-                    //人体康养数据业务接口，需要response
-                    if(WebSocketApiEnum.HEALTH_DATA.url.equals(request.getRequestURL())) {
-                        Object requestData = request.getData();
-
-
+                        initResponse(request, response, ResponseCodeEnum.SUCCEED, data);
+                    }else if(WebSocketApiEnum.HEALTH_DATA.url.equals(request.getRequestURL())) {
+                        //人体康养数据业务接口，需要response
+                        requestData1.setType(DeviceTypeEnum.HEALTH);
                         JSONObject data = new JSONObject();
-                        response = initResponse(request, response, ResponseCodeEnum.SUCCEED, data);
+                        initResponse(request, response, ResponseCodeEnum.SUCCEED, data);
+                    }else if(WebSocketApiEnum.AREA_RULE_DATA.url.equals(request.getRequestURL())){
+                        // 区域统计
+                        requestData1.setType(DeviceTypeEnum.AREA_RULE);
+                        JSONObject data = new JSONObject();
+                        initResponse(request, response, ResponseCodeEnum.SUCCEED, data);
+                    }else if(WebSocketApiEnum.LINE_RULE_DATA.url.equals(request.getRequestURL())){
+                        // 绊线统计
+                        requestData1.setType(DeviceTypeEnum.LINE_RULE);
+                        JSONObject data = new JSONObject();
+                        initResponse(request, response, ResponseCodeEnum.SUCCEED, data);
                     }
-                    //response = initResponse(request, response, ResponseCodeEnum.SUCCEED, ResponseCodeEnum.SUCCEED_MSG);
-                    //log4j日志打印base64流
-                    LOGGER.log(webSocketApiEnum.logLevel, text);
+                    RadarDataCache.put(requestData1);
                 } else {
                     //response = initResponse(request, response, ResponseCodeEnum.NOT_SUPPORTED, ResponseCodeEnum.NOT_SUPPORTED_MSG);
                     log.info(channelId + "请求未做处理:" + request + "\n");
@@ -312,7 +315,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
              * 判断注册类型，1有鉴权方式，2无鉴权方式
              */
             Device device = null;
-            Map<String, String> params = cn.iocoder.yudao.module.radar.utils.HttpUtil.getRequestParams(req);
+            Map<String, String> params = HttpUtil.getRequestParams(req);
             if(log.isDebugEnabled()){
                 log.debug("注册参数：{}", params);
             }
@@ -362,16 +365,17 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
              * 如果订阅状态为开启，直接发起订阅，否则只存储
              */
             if (1 == ApiSubThread.apiSubStatus) {
-                String requestStr = "";
+               /* String requestStr = "";
                 //如果最近发送订阅时间为0，代表没有发过，立即发送订阅数据请求
                 SubscriptionRequest subscriptionRequest = ApiSubThread.initSubscriptionRequest(ctx.channel().id());
                 JSONObject data = JSON.parseObject(JSON.toJSONString(subscriptionRequest));
                 ChannelSupervise.channelDeviceMap.get(ctx.channel().id()).setSubDuration(subscriptionRequest.getDuration());
                 //发送订阅请求
-                requestStr = cn.iocoder.yudao.module.radar.utils.WebSocketUtil.sendWebSocketRequest(WebSocketApiEnum.SUBSCRIPTION.url, "POST", data, ctx.channel().id());
+                requestStr = WebSocketUtil.sendWebSocketRequest(WebSocketApiEnum.SUBSCRIPTION.url, "POST", data, ctx.channel().id());
                 log.info(ctx.channel().id() + "发送订阅请求" + requestStr + "\n");
                 ChannelSupervise.channelSubTimeMap.put(ctx.channel().id(), System.currentTimeMillis());
-                log.info("---------------------------\n");
+                log.info("---------------------------\n");*/
+                ApiSubThread.subscription(ctx, device);
             } else {
                 ChannelSupervise.channelSubTimeMap.put(ctx.channel().id(), 0L);
             }
@@ -546,18 +550,16 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
      * @param response 响应对象
      * @param responseCodeEnum 状态吗
      * @param data 响应数据
-     * @return bean.response.WebsocketResponse
      * @description: TODO 初始化成功响应消息体（带data参数）
      * @author l09655 2022年08月08日
      */
-    private WebsocketResponse initResponse(WebsocketRequest request, WebsocketResponse response, ResponseCodeEnum responseCodeEnum,  JSONObject data) {
+    private void initResponse(WebsocketRequest request, WebsocketResponse response, ResponseCodeEnum responseCodeEnum, JSONObject data) {
         response.setResponseURL(request.getRequestURL());
         //响应的cseq与请求保持一致
         response.setCseq(request.getCseq());
         response.setResponseCode(responseCodeEnum.code);
         response.setResponseString(responseCodeEnum.msg);
         response.setData(data);
-        return response;
     }
 
 }

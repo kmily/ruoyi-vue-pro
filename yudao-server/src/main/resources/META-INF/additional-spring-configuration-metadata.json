@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "yudao.radar.socket.port",
+      "type": "java.lang.String",
+      "description": "Description for yudao.radar.socket.port."
+  }
+] }

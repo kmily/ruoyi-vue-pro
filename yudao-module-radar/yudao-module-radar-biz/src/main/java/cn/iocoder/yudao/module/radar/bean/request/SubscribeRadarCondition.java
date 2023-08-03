@@ -31,4 +31,13 @@ public class SubscribeRadarCondition {
     @JSONField(name = "Type")
     private long type;
 
+    /**
+     * 实时数据上报周期，Bit1 使能
+     * 时有效，单位秒，范围
+     * [0,3600]，默认上报周期和实
+     * 时帧率保持一致，设置为 0 时
+     * 按设备默认实时帧率上报。
+     */
+    @JSONField(name = "RealTimeDataDuration")
+    private long realTimeDataDuration;
 }

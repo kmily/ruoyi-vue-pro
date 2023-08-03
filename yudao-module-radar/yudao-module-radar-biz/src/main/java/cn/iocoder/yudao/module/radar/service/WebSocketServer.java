@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.radar.service;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.radar.utils.WebSocketUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -47,10 +48,13 @@ public class WebSocketServer implements Runnable {
             log.info("端口设置为" + currPort + "\n");
             Channel channel = null;
             try {
-                channel = bootstrap.bind(currIp, currPort).sync().channel();
+                if(StrUtil.isNotBlank(currIp)){
+                    channel = bootstrap.bind(currIp, currPort).sync().channel();
+                }else{
+                    channel = bootstrap.bind(currPort).sync().channel();
+                }
                 log.info("webSocket服务器启动成功：" + channel + "\n");
             } catch (Exception e) {
-                e.printStackTrace();
                 log.info("webSocket服务器启动失败，端口被占用或该端口已有服务运行，请检查ip端口设置\n");
             }
             assert channel != null;
