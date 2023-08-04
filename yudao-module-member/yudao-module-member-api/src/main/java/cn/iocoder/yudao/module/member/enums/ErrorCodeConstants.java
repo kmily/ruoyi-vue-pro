@@ -23,4 +23,10 @@ public interface ErrorCodeConstants {
     // ========== 用户收件地址 1004004000 ==========
     ErrorCode ADDRESS_NOT_EXISTS = new ErrorCode(1004004000, "用户收件地址不存在");
 
+    // ========== 用户家庭 1004005000 ==========
+    ErrorCode FAMILY_NOT_EXISTS = new ErrorCode(1004005000, "家庭不存在");
+
+
+    // ========== 用户房间 1004006000 ==========
+    ErrorCode ROOM_NOT_EXISTS = new ErrorCode(1004006000, "房间不存在");
 }

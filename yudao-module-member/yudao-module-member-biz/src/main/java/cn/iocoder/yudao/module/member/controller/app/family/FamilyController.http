@@ -1,0 +1,32 @@
+### 请求 member/family/create 接口 成功
+POST {{appApi}}/member/family/create
+Content-Type: application/json
+Authorization: Bearer test1
+tenant-id: {{appTenentId}}
+
+{
+  "name": "李四家"
+}
+
+### 请求 member/family/list 接口 成功
+GET {{appApi}}/member/family/list
+Authorization: Bearer test1
+tenant-id: {{appTenentId}}
+
+
+### 请求 member/family/update 接口 成功
+PUT {{appApi}}/member/family/update
+Content-Type: application/json
+Authorization: Bearer test1
+tenant-id: {{appTenentId}}
+
+{
+   "id": 1,
+   "name": "本家"
+}
+
+
+### 请求 member/family/list 接口 成功
+DELETE {{appApi}}/member/family/delete?id=1
+Authorization: Bearer test1
+tenant-id: {{appTenentId}}

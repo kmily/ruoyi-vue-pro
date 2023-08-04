@@ -24,7 +24,7 @@ Content-Type: application/json
 tenant-id: {{appTenentId}}
 
 {
-  "mobile": "15601691301",
+  "mobile": "18618131639",
   "code": 9999
 }
 
