@@ -24,6 +24,7 @@ public class MonthInfoDTO {
     private Date monthEndDate;
     private Integer isFull;
     private Integer days;
+    private Integer fullDays;
 
 
 }

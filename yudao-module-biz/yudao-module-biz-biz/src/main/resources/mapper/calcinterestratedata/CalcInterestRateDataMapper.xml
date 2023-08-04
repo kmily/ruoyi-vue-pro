@@ -36,6 +36,14 @@
         </foreach>
     </insert>
 
+    <insert id="insertExecProcessDataMonthBatch">
+        INSERT INTO biz_calc_exec_data ( id,  process_id, rate_id, date_index, day_rate, day_amount,days )
+        VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (  #{item.id},  #{item.processId},  #{item.rateId},  #{item.dateIndex}, #{item.dayRate}, #{item.dayAmount} , #{item.days}  )
+        </foreach>
+    </insert>
+
 
 
     <select id="selectSectionListByProcessAndYearType" resultType="cn.iocoder.yudao.module.biz.controller.admin.calc.vo.SectionIndexVO">
@@ -94,11 +102,12 @@
         SELECT
             DATE_FORMAT(a.date_index,'%Y-%m')  startDate,
             ''  endDate,
-            a.day_rate  suiteRate,
+            round(a.day_rate*100,5)  suiteRate,
             c.days AS  days,
-            ROUND(SUM(day_amount),2)  AS sectionAmount
+            ROUND(SUM(day_amount),2)  AS sectionAmount,
+            a.days days
         FROM biz_calc_exec_data a
-                 LEFT JOIN biz_calc_interest_rate_data b ON a.rate_id = b.id
+        LEFT JOIN biz_calc_interest_rate_data b ON a.rate_id = b.id
                  LEFT JOIN (
             SELECT process_id ,COUNT(1) days,DATE_FORMAT( date_index,'%Y-%m') monthIndex FROM biz_calc_exec_data WHERE process_id = #{processId} GROUP BY DATE_FORMAT(date_index,'%Y-%m')
         ) c ON a.process_id = c.process_id AND DATE_FORMAT(a.date_index,'%Y-%m') = c.monthIndex

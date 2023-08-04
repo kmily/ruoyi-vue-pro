@@ -282,7 +282,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
                     dataList.add(execDataIndex);
                     startDate = DateUtil.addDays(startDate, 1);
                 }
-                insertDataList(dataList);
+                insertDataListMonth(dataList);
                 vo.setSectionList(calcInterestRateDataMapper.selectSectionListByFixMonthRate(execVO.getProcessId()));
                 vo.setTotalAmount(calcInterestRateDataMapper.selectTotalAmountByProcessId(execVO.getProcessId()));
                 vo.setProcessId(execVO.getProcessId());
@@ -388,22 +388,27 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
                 Date endDate = execVO.getEndDate();
                 List<MonthInfoDTO> monthList = getMonthList(startDate, endDate);
                 List<ExecProcessDataDTO> dataList = new ArrayList<>();
-                while (startDate.compareTo(endDate) <= 0) {
-                    BigDecimal dayRateValue = null;
-                    /**
-                     * 处理日利率
-                     */
-                    for (MonthInfoDTO monthIndex : monthList) {
-                        if (startDate.compareTo(monthIndex.getMonthStartDate()) >= 0 && startDate.compareTo(monthIndex.getMonthEndDate()) <= 0) {
-                            dayRateValue = execVO.getFixRate().divide(new BigDecimal(100)).divide(new BigDecimal(monthIndex.getDays()), 16, RoundingMode.HALF_UP);
-                            break;
-                        }
+                for (MonthInfoDTO monthIndex : monthList) {
+                    ExecProcessDataDTO execDataIndex = null;
+                    if (monthIndex.getIsFull() == 1) {
+                        execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), execVO.getProcessId(), 0, monthIndex.getMonthStartDate()
+                                , execVO.getFixRate().divide(new BigDecimal(100))
+                                , execVO.getFixRate().divide(new BigDecimal(100)).multiply(execVO.getLeftAmount())
+                                , monthIndex.getDays()
+                        );
+                    } else {
+                        //计算月利率
+                        BigDecimal dayRateValue = execVO.getFixRate().divide(new BigDecimal(100)).divide(new BigDecimal(monthIndex.getFullDays()), 16, RoundingMode.HALF_UP);
+                        //处理非正月金额
+                        execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), execVO.getProcessId(), 0, monthIndex.getMonthStartDate()
+                                , execVO.getFixRate().divide(new BigDecimal(100))
+                                , dayRateValue.multiply(execVO.getLeftAmount()).multiply(new BigDecimal(monthIndex.getDays()))
+                                , monthIndex.getDays()
+                        );
                     }
-                    ExecProcessDataDTO execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), execVO.getProcessId(), 0, startDate, dayRateValue, dayRateValue.multiply(execVO.getLeftAmount()));
                     dataList.add(execDataIndex);
-                    startDate = DateUtil.addDays(startDate, 1);
                 }
-                insertDataList(dataList);
+                insertDataListMonth(dataList);
                 vo.setSectionList(calcInterestRateDataMapper.selectSectionListByFixMonthRate(execVO.getProcessId()));
                 vo.setTotalAmount(calcInterestRateDataMapper.selectTotalAmountByProcessId(execVO.getProcessId()));
                 vo.setProcessId(execVO.getProcessId());
@@ -472,6 +477,8 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
     private List<MonthInfoDTO> getMonthList(Date startDate, Date endDate) {
         List<MonthInfoDTO> monthList = new ArrayList<>();
         while (startDate.compareTo(endDate) <= 0) {
+            Date preStartDate = startDate;
+            Date preEndDate = null;
             Date end = DateUtil.addDays(cn.hutool.core.date.DateUtil.offsetMonth(startDate, 1), -1);
             Integer isFull = 1;
             Integer days = 0;
@@ -487,6 +494,8 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
                 monthList.add(monthInfoDTO);
             }
             startDate = cn.hutool.core.date.DateUtil.offsetMonth(startDate, 1);//加一个月
+            preEndDate = DateUtil.addDays(startDate, -1);
+            monthInfoDTO.setFullDays(DateUtil.dateIntervalDay(preStartDate, preEndDate));
         }
         return monthList;
     }
@@ -528,6 +537,12 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
     private void insertDataList(List<ExecProcessDataDTO> dataList) {
         if (!CollectionUtils.isEmpty(dataList)) {
             calcInterestRateDataMapper.insertExecProcessDataBatch(dataList);
+        }
+    }
+
+    private void insertDataListMonth(List<ExecProcessDataDTO> dataList) {
+        if (!CollectionUtils.isEmpty(dataList)) {
+            calcInterestRateDataMapper.insertExecProcessDataMonthBatch(dataList);
         }
     }
 

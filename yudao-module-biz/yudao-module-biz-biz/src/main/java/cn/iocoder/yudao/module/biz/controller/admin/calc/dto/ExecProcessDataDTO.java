@@ -25,6 +25,26 @@ public class ExecProcessDataDTO {
         this.dayAmount = dayAmount;
     }
 
+    public ExecProcessDataDTO(String id, String processId, Integer rateId, Date dateIndex, BigDecimal dayRate, BigDecimal dayAmount, Integer days) {
+        this.id = id;
+        this.processId = processId;
+        this.rateId = rateId;
+        this.dateIndex = dateIndex;
+        this.dayRate = dayRate;
+        this.dayAmount = dayAmount;
+        this.days = days;
+    }
+
+    public ExecProcessDataDTO(String id, String processId, Integer rateId, Date dateIndex, BigDecimal dayRate, BigDecimal dayAmount, BigDecimal yearRate) {
+        this.id = id;
+        this.processId = processId;
+        this.rateId = rateId;
+        this.dateIndex = dateIndex;
+        this.dayRate = dayRate;
+        this.dayAmount = dayAmount;
+        this.yearRate = yearRate;
+    }
+
     private String id;
     private String processId;
     //1利息 2罚息
@@ -32,6 +52,9 @@ public class ExecProcessDataDTO {
     private Integer rateId;
     private Date dateIndex;
     private BigDecimal dayRate;
+    private BigDecimal yearRate;
     private BigDecimal dayAmount;
+    private Integer days;
+
 
 }
