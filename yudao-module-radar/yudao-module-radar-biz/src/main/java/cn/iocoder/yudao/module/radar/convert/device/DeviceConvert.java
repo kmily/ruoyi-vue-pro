@@ -34,4 +34,6 @@ public interface DeviceConvert {
 
     DeviceDTO convertDTO(DeviceDO bean);
 
+    List<DeviceDTO> convertList03(List<DeviceDO> list);
+
 }

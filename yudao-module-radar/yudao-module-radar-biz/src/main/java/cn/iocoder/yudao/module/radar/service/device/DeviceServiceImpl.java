@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.radar.convert.device.DeviceConvert;
 import cn.iocoder.yudao.module.radar.dal.mysql.device.DeviceMapper;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.radar.enums.DeviceErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.radar.enums.ErrorCodeConstants.*;
 
 /**
  * 设备信息 Service 实现类

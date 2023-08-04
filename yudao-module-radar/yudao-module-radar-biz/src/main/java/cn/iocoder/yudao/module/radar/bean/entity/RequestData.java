@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.radar.bean.entity;
 
-import cn.iocoder.yudao.module.radar.enums.DeviceTypeEnum;
+import cn.iocoder.yudao.module.radar.enums.DeviceDataTypeEnum;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 import lombok.ToString;
@@ -22,7 +22,7 @@ public class RequestData {
     /**
      * 数据类型
      */
-    private DeviceTypeEnum type;
+    private DeviceDataTypeEnum type;
 
     /**
      * 上报时间。

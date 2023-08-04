@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.radar.service.device.DeviceService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -30,5 +31,11 @@ public class DeviceApiImpl implements DeviceApi{
     public DeviceDTO queryBySn(String sn) {
         List<DeviceDO> deviceList = deviceService.getDeviceList(new DeviceExportReqVO().setSn(sn));
         return CollUtil.isEmpty(deviceList)? new DeviceDTO(): DeviceConvert.INSTANCE.convertDTO(deviceList.get(0));
+    }
+
+    @Override
+    public List<DeviceDTO> getByIds(Collection<Long> ids) {
+        List<DeviceDO> deviceList = deviceService.getDeviceList(ids);
+        return DeviceConvert.INSTANCE.convertList03(deviceList);
     }
 }

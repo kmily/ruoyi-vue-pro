@@ -1,10 +1,6 @@
 package cn.iocoder.yudao.module.radar.job;
 
-import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.util.cache.CacheUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
-import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
-import cn.iocoder.yudao.module.radar.api.device.DeviceApi;
 import cn.iocoder.yudao.module.radar.api.device.dto.DeviceDTO;
 import cn.iocoder.yudao.module.radar.bean.entity.HealthData;
 import cn.iocoder.yudao.module.radar.bean.entity.RequestData;
@@ -13,23 +9,16 @@ import cn.iocoder.yudao.module.radar.controller.admin.arearuledata.vo.AreaRuleDa
 import cn.iocoder.yudao.module.radar.controller.admin.healthdata.vo.HealthDataCreateReqVO;
 import cn.iocoder.yudao.module.radar.controller.admin.lineruledata.vo.LineRuleDataCreateReqVO;
 import cn.iocoder.yudao.module.radar.convert.healthdata.HealthDataConvert;
-import cn.iocoder.yudao.module.radar.dal.dataobject.healthdata.HealthDataDO;
-import cn.iocoder.yudao.module.radar.enums.DeviceTypeEnum;
+import cn.iocoder.yudao.module.radar.enums.DeviceDataTypeEnum;
 import cn.iocoder.yudao.module.radar.service.arearuledata.AreaRuleDataService;
 import cn.iocoder.yudao.module.radar.service.healthdata.HealthDataService;
 import cn.iocoder.yudao.module.radar.service.lineruledata.LineRuleDataService;
 import com.alibaba.fastjson.JSON;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.time.Duration;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @author whycode
@@ -147,7 +136,7 @@ public class RadarDataJob implements InitializingBean, Runnable {
         while (true){
             try {
                 RequestData requestData = RadarDataCache.take();
-                DeviceTypeEnum type = requestData.getType();
+                DeviceDataTypeEnum type = requestData.getType();
                 switch (type){
                     case HEALTH:
                         saveHealthData(requestData);

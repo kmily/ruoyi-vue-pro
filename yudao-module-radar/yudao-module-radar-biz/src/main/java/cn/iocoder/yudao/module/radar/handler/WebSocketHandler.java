@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.radar.bean.request.WebsocketRequest;
 import cn.iocoder.yudao.module.radar.bean.response.SubscriptionResponse;
 import cn.iocoder.yudao.module.radar.bean.response.WebsocketResponse;
 import cn.iocoder.yudao.module.radar.cache.RadarDataCache;
-import cn.iocoder.yudao.module.radar.enums.DeviceTypeEnum;
+import cn.iocoder.yudao.module.radar.enums.DeviceDataTypeEnum;
 import cn.iocoder.yudao.module.radar.service.ApiSubThread;
 import cn.iocoder.yudao.module.radar.service.ChannelSupervise;
 import cn.iocoder.yudao.module.radar.utils.CustomWebSocketServerHandshaker;
@@ -243,17 +243,17 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
                         initResponse(request, response, ResponseCodeEnum.SUCCEED, data);
                     }else if(WebSocketApiEnum.HEALTH_DATA.url.equals(request.getRequestURL())) {
                         //人体康养数据业务接口，需要response
-                        requestData1.setType(DeviceTypeEnum.HEALTH);
+                        requestData1.setType(DeviceDataTypeEnum.HEALTH);
                         JSONObject data = new JSONObject();
                         initResponse(request, response, ResponseCodeEnum.SUCCEED, data);
                     }else if(WebSocketApiEnum.AREA_RULE_DATA.url.equals(request.getRequestURL())){
                         // 区域统计
-                        requestData1.setType(DeviceTypeEnum.AREA_RULE);
+                        requestData1.setType(DeviceDataTypeEnum.AREA_RULE);
                         JSONObject data = new JSONObject();
                         initResponse(request, response, ResponseCodeEnum.SUCCEED, data);
                     }else if(WebSocketApiEnum.LINE_RULE_DATA.url.equals(request.getRequestURL())){
                         // 绊线统计
-                        requestData1.setType(DeviceTypeEnum.LINE_RULE);
+                        requestData1.setType(DeviceDataTypeEnum.LINE_RULE);
                         JSONObject data = new JSONObject();
                         initResponse(request, response, ResponseCodeEnum.SUCCEED, data);
                     }

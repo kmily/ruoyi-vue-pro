@@ -2,6 +2,9 @@ package cn.iocoder.yudao.module.radar.api.device;
 
 import cn.iocoder.yudao.module.radar.api.device.dto.DeviceDTO;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * @author whycode
  * @title: DeviceApi
@@ -17,5 +20,12 @@ public interface DeviceApi {
      * @return
      */
     DeviceDTO queryBySn(String sn);
+
+    /**
+     * 根据设备ID查询设备信息
+     * @param ids 设备ID
+     * @return
+     */
+    List<DeviceDTO> getByIds(Collection<Long> ids);
 
 }

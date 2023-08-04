@@ -35,4 +35,9 @@ public class DeviceDTO {
      */
     private Long tenantId;
 
+    /**
+     * 设备名称
+     */
+    private String name;
+
 }

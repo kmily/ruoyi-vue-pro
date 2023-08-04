@@ -29,4 +29,14 @@ public interface ErrorCodeConstants {
 
     // ========== 用户房间 1004006000 ==========
     ErrorCode ROOM_NOT_EXISTS = new ErrorCode(1004006000, "房间不存在");
+
+    // ========== 用户房间 1004007000 ==========
+    ErrorCode DEVICE_USER_NOT_EXISTS = new ErrorCode(1004007000, "设备绑定信息不存在");
+    ErrorCode DEVICE_NOT_EXISTS = new ErrorCode(1004007001, "设备信息不存在");
+
+    // ========== 人员存在感知雷达设置 1004008000 ==========
+    ErrorCode EXIST_ALARM_SETTINGS_NOT_EXISTS = new ErrorCode(1004008000, "人员存在感知雷达设置不存在");
+
+
+
 }
