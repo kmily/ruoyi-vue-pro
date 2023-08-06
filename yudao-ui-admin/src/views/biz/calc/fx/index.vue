@@ -68,14 +68,15 @@
         </el-row>
         <el-row>
           <el-col :span="14">
-            <el-form-item label="考虑闰年" v-if="data.rateType==2" >
-              <el-switch
-                v-model="data.leapYear"
-                :active-value="1"
-                :inactive-value="0">
-              </el-switch>
-            </el-form-item>
-            <span v-if="data.rateType==1"> &nbsp;</span>
+<!--            <el-form-item label="考虑闰年" v-if="data.rateType==2" >-->
+<!--              <el-switch-->
+<!--                v-model="data.leapYear"-->
+<!--                :active-value="1"-->
+<!--                :inactive-value="0">-->
+<!--              </el-switch>-->
+<!--            </el-form-item>-->
+<!--            <span v-if="data.rateType==1"> &nbsp;</span>-->
+            <span > &nbsp;</span>
           </el-col>
           <el-col :span="10">
             <el-form-item>
@@ -131,14 +132,14 @@ export default {
         processId: 10,
         startDate:null,
         endDate:null,
-        rateType:1,
+        rateType:2,
         fixSectionType:null, //约定周期 1年2月3日
         fixType:1,  //利息类型 1指定利率值 2LPR倍数 默认1
         fixRate:null,
         fixLPRs:null,
       },
       lvList:[
-        {value: 1,label: '约定(2014年8月1号后法定)'},
+        // {value: 1,label: '约定(2014年8月1号后法定)'},
         {value: 2,label: '法定迟延履行利息'}
       ],
       totalAmount:null,

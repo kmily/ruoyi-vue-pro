@@ -18,6 +18,9 @@ public class SectionIndexVO {
     private String endDate;
     //匹配的税率
     private String suiteRate;
+
+    private String suiteDayRate;
+
     //天数
     private Integer days;
     //区间金额

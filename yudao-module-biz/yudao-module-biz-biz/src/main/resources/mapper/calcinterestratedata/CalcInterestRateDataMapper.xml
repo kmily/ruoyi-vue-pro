@@ -29,18 +29,18 @@
 
 
     <insert id="insertExecProcessDataBatch">
-        INSERT INTO biz_calc_exec_data ( id,  process_id, rate_id, date_index, day_rate, day_amount )
+        INSERT INTO biz_calc_exec_data ( id,  process_id, rate_id, date_index, day_rate, day_amount,year_rate )
         VALUES
         <foreach collection="list" index="index" item="item" separator=",">
-            (  #{item.id},  #{item.processId},  #{item.rateId},  #{item.dateIndex}, #{item.dayRate}, #{item.dayAmount}   )
+            (  #{item.id},  #{item.processId},  #{item.rateId},  #{item.dateIndex}, #{item.dayRate}, #{item.dayAmount} , #{item.yearRate}  )
         </foreach>
     </insert>
 
     <insert id="insertExecProcessDataMonthBatch">
-        INSERT INTO biz_calc_exec_data ( id,  process_id, rate_id, date_index, day_rate, day_amount,days )
+        INSERT INTO biz_calc_exec_data ( id,  process_id, rate_id, date_index, day_rate, day_amount,days,year_rate )
         VALUES
         <foreach collection="list" index="index" item="item" separator=",">
-            (  #{item.id},  #{item.processId},  #{item.rateId},  #{item.dateIndex}, #{item.dayRate}, #{item.dayAmount} , #{item.days}  )
+            (  #{item.id},  #{item.processId},  #{item.rateId},  #{item.dateIndex}, #{item.dayRate}, #{item.dayAmount} , #{item.days} , #{item.yearRate} )
         </foreach>
     </insert>
 
@@ -50,7 +50,7 @@
         SELECT
             min(a.date_index) AS  startDate,
             max(a.date_index) AS  endDate,
-            round(a.day_rate * 100,5) suiteRate,
+            round(a.year_rate ,5) suiteRate,
             c.days AS  days,
             ROUND(SUM(day_amount),2)  AS sectionAmount
         FROM biz_calc_exec_data a
@@ -67,7 +67,7 @@
         SELECT
             min(a.date_index)  startDate,
             max(a.date_index)  endDate,
-            round(a.day_rate*100,5)  suiteRate,
+            round(a.year_rate,5)  suiteRate,
             c.days AS  days,
             ROUND(SUM(day_amount),2)  AS sectionAmount
         FROM biz_calc_exec_data a
@@ -102,13 +102,13 @@
         SELECT
             DATE_FORMAT(a.date_index,'%Y-%m')  startDate,
             ''  endDate,
-            round(a.day_rate*100,5)  suiteRate,
+            round(a.year_rate,5)  suiteRate,
             c.days AS  days,
             ROUND(SUM(day_amount),2)  AS sectionAmount,
             a.days days
         FROM biz_calc_exec_data a
         LEFT JOIN biz_calc_interest_rate_data b ON a.rate_id = b.id
-                 LEFT JOIN (
+        LEFT JOIN (
             SELECT process_id ,COUNT(1) days,DATE_FORMAT( date_index,'%Y-%m') monthIndex FROM biz_calc_exec_data WHERE process_id = #{processId} GROUP BY DATE_FORMAT(date_index,'%Y-%m')
         ) c ON a.process_id = c.process_id AND DATE_FORMAT(a.date_index,'%Y-%m') = c.monthIndex
         WHERE a.process_id = #{processId}
