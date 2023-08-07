@@ -18,10 +18,15 @@ public class AppDeviceRespVO {
     @Schema(description = "自增编号", required = true, example = "32074")
     private Long id;
 
-    @Schema(description = "设备名称", required = true, example = "32074")
+    @Schema(description = "设备名称", required = true, example = "跌倒雷达")
     private String name;
+
+    @Schema(description = "自定义名称", required = true, example = "主卧跌倒雷达")
+    private String customName;
 
     @Schema(description = "设备类型", required = true, example = "32074")
     private Integer type;
 
+    @Schema(description = "设备编号", required = true, example = "1000000")
+    private String sn;
 }

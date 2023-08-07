@@ -36,13 +36,13 @@ public class AppExistAlarmSettingsController {
 
     @Resource
     private ExistAlarmSettingsService existAlarmSettingsService;
-
+/*
     @PostMapping("/create")
     @Operation(summary = "创建人员存在感知雷达设置")
     @PreAuthenticated
     public CommonResult<Long> createExistAlarmSettings(@Valid @RequestBody AppExistAlarmSettingsCreateReqVO createReqVO) {
         return success(existAlarmSettingsService.createExistAlarmSettings(createReqVO));
-    }
+    }*/
 
     @PutMapping("/update")
     @Operation(summary = "更新人员存在感知雷达设置")
@@ -54,22 +54,22 @@ public class AppExistAlarmSettingsController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除人员存在感知雷达设置")
-    @Parameter(name = "id", description = "编号", required = true)
+    @Parameter(name = "deviceId", description = "设备ID", required = true)
     @PreAuthenticated
-    public CommonResult<Boolean> deleteExistAlarmSettings(@RequestParam("id") Long id) {
-        existAlarmSettingsService.deleteExistAlarmSettings(id);
+    public CommonResult<Boolean> deleteExistAlarmSettings(@RequestParam("deviceId") Long deviceId) {
+        existAlarmSettingsService.deleteExistAlarmSettings(deviceId);
         return success(true);
     }
 
     @GetMapping("/get")
     @Operation(summary = "获得人员存在感知雷达设置")
-    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @Parameter(name = "deviceId", description = "设备ID", required = true, example = "1024")
     @PreAuthenticated
-    public CommonResult<AppExistAlarmSettingsRespVO> getExistAlarmSettings(@RequestParam("id") Long id) {
-        ExistAlarmSettingsDO existAlarmSettings = existAlarmSettingsService.getExistAlarmSettings(id);
+    public CommonResult<AppExistAlarmSettingsRespVO> getExistAlarmSettings(@RequestParam("deviceId") Long deviceId) {
+        ExistAlarmSettingsDO existAlarmSettings = existAlarmSettingsService.getExistAlarmSettings(deviceId);
         return success(ExistAlarmSettingsConvert.INSTANCE.convert(existAlarmSettings));
     }
-
+/*
     @GetMapping("/list")
     @Operation(summary = "获得人员存在感知雷达设置列表")
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
@@ -85,7 +85,7 @@ public class AppExistAlarmSettingsController {
     public CommonResult<PageResult<AppExistAlarmSettingsRespVO>> getExistAlarmSettingsPage(@Valid AppExistAlarmSettingsPageReqVO pageVO) {
         PageResult<ExistAlarmSettingsDO> pageResult = existAlarmSettingsService.getExistAlarmSettingsPage(pageVO);
         return success(ExistAlarmSettingsConvert.INSTANCE.convertPage(pageResult));
-    }
+    }*/
 
 
 }

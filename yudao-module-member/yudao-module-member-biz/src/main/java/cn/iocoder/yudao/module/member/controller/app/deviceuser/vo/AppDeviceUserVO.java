@@ -17,6 +17,9 @@ import lombok.ToString;
 @Data
 public class AppDeviceUserVO {
 
+    @Schema(description = "编号", required = true, example = "1")
+    private Long id;
+
     @Schema(description = "房间ID", required = true, example = "7201")
     private Long roomId;
 
@@ -29,7 +32,14 @@ public class AppDeviceUserVO {
     @Schema(description = "设备名称", required = true, example = "跌倒雷达")
     private String deviceName;
 
+    @Schema(description = "自定义名称", required = true, example = "主卧跌倒雷达")
+    private String customName;
+
     @Schema(description = "设备类型", required = true, example = "1")
     private Integer type;
+
+    @Schema(description = "设备编号", required = true, example = "1000000")
+    private String sn;
+
 
 }

@@ -11,8 +11,8 @@ import javax.validation.constraints.*;
 @ToString(callSuper = true)
 public class AppExistAlarmSettingsUpdateReqVO extends AppExistAlarmSettingsBaseVO {
 
-    @Schema(description = "自增编号", required = true, example = "32485")
-    @NotNull(message = "自增编号不能为空")
+//    @Schema(description = "自增编号", required = true, example = "32485")
+//    @NotNull(message = "自增编号不能为空")
     private Long id;
 
 }

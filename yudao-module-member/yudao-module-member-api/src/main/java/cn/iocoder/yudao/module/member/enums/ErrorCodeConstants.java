@@ -29,13 +29,24 @@ public interface ErrorCodeConstants {
 
     // ========== 用户房间 1004006000 ==========
     ErrorCode ROOM_NOT_EXISTS = new ErrorCode(1004006000, "房间不存在");
+    ErrorCode ROOM_NOT_MATE_FAMILY = new ErrorCode(1004006001, "房间所属家庭与家庭不匹配");
 
     // ========== 用户房间 1004007000 ==========
     ErrorCode DEVICE_USER_NOT_EXISTS = new ErrorCode(1004007000, "设备绑定信息不存在");
     ErrorCode DEVICE_NOT_EXISTS = new ErrorCode(1004007001, "设备信息不存在");
+    ErrorCode FAMILY_DEVICE_NOT_EXISTS = new ErrorCode(1004007002, "家庭不存在雷达");
 
     // ========== 人员存在感知雷达设置 1004008000 ==========
     ErrorCode EXIST_ALARM_SETTINGS_NOT_EXISTS = new ErrorCode(1004008000, "人员存在感知雷达设置不存在");
+
+    // ========== 跌倒雷达设置 1004009000 ==========
+    ErrorCode FALL_ALARM_SETTINGS_NOT_EXISTS = new ErrorCode(1004009000, "跌倒雷达设置不存在");
+
+    // ========== 体征检测雷达设置 1004001000 ==========
+    ErrorCode HEALTH_ALARM_SETTINGS_NOT_EXISTS = new ErrorCode(1004001000, "体征检测雷达设置不存在");
+
+   // ========== 人体检测雷达设置 1004001100 ==========
+    ErrorCode DETECTION_ALARM_SETTINGS_NOT_EXISTS = new ErrorCode(1004001100, "人体检测雷达设置");
 
 
 

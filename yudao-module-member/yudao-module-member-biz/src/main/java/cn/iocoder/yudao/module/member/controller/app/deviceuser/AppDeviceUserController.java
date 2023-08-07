@@ -26,12 +26,15 @@ import java.util.stream.Collectors;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+
 
 import cn.iocoder.yudao.module.member.controller.app.deviceuser.vo.*;
 import cn.iocoder.yudao.module.member.dal.dataobject.deviceuser.DeviceUserDO;
@@ -56,7 +59,7 @@ public class AppDeviceUserController {
 
     @PostMapping("/create")
     @Operation(summary = "创建设备和用户绑定")
-
+    @PreAuthenticated
     public CommonResult<Long> createDeviceUser(@Valid @RequestBody AppDeviceUserCreateReqVO createReqVO) {
         createReqVO.setUserId(getLoginUserId());
         return success(deviceUserService.createDeviceUser(createReqVO));
@@ -65,7 +68,7 @@ public class AppDeviceUserController {
 
     @PutMapping("/update")
     @Operation(summary = "更新设备和用户绑定")
-
+    @PreAuthenticated
     public CommonResult<Boolean> updateDeviceUser(@Valid @RequestBody AppDeviceUserUpdateReqVO updateReqVO) {
         deviceUserService.updateDeviceUser(updateReqVO);
         return success(true);
@@ -74,7 +77,7 @@ public class AppDeviceUserController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除设备和用户绑定")
     @Parameter(name = "id", description = "编号", required = true)
-
+    @PreAuthenticated
     public CommonResult<Boolean> deleteDeviceUser(@RequestParam("id") Long id) {
         deviceUserService.deleteDeviceUser(id);
         return success(true);
@@ -83,20 +86,20 @@ public class AppDeviceUserController {
     @GetMapping("/get")
     @Operation(summary = "获得设备和用户绑定")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-
+    @PreAuthenticated
     public CommonResult<AppDeviceUserRespVO> getDeviceUser(@RequestParam("id") Long id) {
         DeviceUserDO deviceUser = deviceUserService.getDeviceUser(id);
         return success(DeviceUserConvert.INSTANCE.convert(deviceUser));
     }
 
-    @GetMapping("/list")
+   /* @GetMapping("/list")
     @Operation(summary = "获得设备和用户绑定列表")
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
 
     public CommonResult<List<AppDeviceUserRespVO>> getDeviceUserList(@RequestParam("ids") Collection<Long> ids) {
         List<DeviceUserDO> list = deviceUserService.getDeviceUserList(ids);
         return success(DeviceUserConvert.INSTANCE.convertList(list));
-    }
+    }*/
 
     @GetMapping("/room-devices")
     @Operation(summary = "获得用户房间和设备列表")
@@ -104,6 +107,10 @@ public class AppDeviceUserController {
     @PreAuthenticated
     public CommonResult<List<AppDeviceUserRespVO>> getRoomAndDeviceList(@RequestParam(value = "familyId") Long familyId) {
         List<DeviceUserDO> list = deviceUserService.getDeviceUserList(new AppDeviceUserExportReqVO().setUserId(getLoginUserId()).setFamilyId(familyId));
+        if(list.isEmpty()){
+            return success(new ArrayList<>());
+        }
+
         List<RoomDO> roomList = roomService.getRoomList(new RoomExportReqVO().setFamilyId(familyId));
 
         Map<Long, String> roomMap = roomList.stream().collect(Collectors.toMap(RoomDO::getId, RoomDO::getName));
@@ -118,8 +125,10 @@ public class AppDeviceUserController {
                     .setId(room).setName(roomMap.get(room));
             List<AppDeviceRespVO> deviceRespVOS = devices.stream().map(item -> {
                 DeviceDTO deviceDTO = deviceDTOMap.get(item.getDeviceId());
-                deviceDTO.setName(item.getCustomName());
-                return DeviceUserConvert.INSTANCE.convert(deviceDTO);
+                return DeviceUserConvert.INSTANCE.convert(deviceDTO)
+                        .setCustomName(item.getCustomName())
+                        .setSn(deviceDTO.getSn())
+                        .setId(item.getId());
             }).collect(Collectors.toList());
             vo.setDeviceRespVOList(deviceRespVOS);
             respVOS.add(vo);
@@ -140,21 +149,24 @@ public class AppDeviceUserController {
         Map<Long, DeviceDTO> deviceDTOMap = deviceDTOS.stream().collect(Collectors.toMap(DeviceDTO::getId, Function.identity()));
         List<AppDeviceUserVO> userVOS = list.stream().map(item -> new AppDeviceUserVO()
                 .setRoomId(item.getRoomId())
+                .setId(item.getId())
                 .setRoomName(roomMap.get(item.getRoomId()))
-                .setDeviceName(item.getCustomName())
+                .setDeviceName(deviceDTOMap.get(item.getDeviceId()).getName())
+                .setCustomName(item.getCustomName())
                 .setDeviceId(item.getDeviceId())
+                .setSn(deviceDTOMap.get(item.getDeviceId()).getSn())
                 .setType(deviceDTOMap.get(item.getDeviceId()).getType())).collect(Collectors.toList());
         return success(userVOS);
     }
 
 
 
-    @GetMapping("/page")
+   /* @GetMapping("/page")
     @Operation(summary = "获得设备和用户绑定分页")
 
     public CommonResult<PageResult<AppDeviceUserRespVO>> getDeviceUserPage(@Valid AppDeviceUserPageReqVO pageVO) {
         PageResult<DeviceUserDO> pageResult = deviceUserService.getDeviceUserPage(pageVO);
         return success(DeviceUserConvert.INSTANCE.convertPage(pageResult));
-    }
+    }*/
 
 }

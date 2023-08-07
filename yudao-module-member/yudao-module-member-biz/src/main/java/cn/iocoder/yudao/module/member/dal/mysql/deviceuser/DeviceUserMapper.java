@@ -37,8 +37,8 @@ public interface DeviceUserMapper extends BaseMapperX<DeviceUserDO> {
                 .eqIfPresent(DeviceUserDO::getRoomId, reqVO.getRoomId())
                 .likeIfPresent(DeviceUserDO::getCustomName, reqVO.getCustomName())
 
-                .betweenIfPresent(DeviceUserDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(DeviceUserDO::getId));
+                .betweenIfPresent(DeviceUserDO::getCreateTime, reqVO.getCreateTime()));
+                //.orderByDesc(DeviceUserDO::getId));
     }
 
 }

@@ -29,9 +29,20 @@ public class ExistAlarmSettingsServiceImpl implements ExistAlarmSettingsService 
 
     @Override
     public Long createExistAlarmSettings(AppExistAlarmSettingsCreateReqVO createReqVO) {
+        Long id = null;
+        try {
+            id = validateExistAlarmSettingsExists(createReqVO.getDeviceId());
+        } catch (Exception e) {
+        }
+
         // 插入
         ExistAlarmSettingsDO existAlarmSettings = ExistAlarmSettingsConvert.INSTANCE.convert(createReqVO);
-        existAlarmSettingsMapper.insert(existAlarmSettings);
+        if(id == null){
+            existAlarmSettingsMapper.insert(existAlarmSettings);
+        }else{
+            existAlarmSettings.setDeleted(false);
+            existAlarmSettingsMapper.updateById(existAlarmSettings.setId(id));
+        }
         // 返回
         return existAlarmSettings.getId();
     }
@@ -39,29 +50,32 @@ public class ExistAlarmSettingsServiceImpl implements ExistAlarmSettingsService 
     @Override
     public void updateExistAlarmSettings(AppExistAlarmSettingsUpdateReqVO updateReqVO) {
         // 校验存在
-        validateExistAlarmSettingsExists(updateReqVO.getId());
+        Long id = validateExistAlarmSettingsExists(updateReqVO.getDeviceId());
         // 更新
         ExistAlarmSettingsDO updateObj = ExistAlarmSettingsConvert.INSTANCE.convert(updateReqVO);
+        updateObj.setId(id);
         existAlarmSettingsMapper.updateById(updateObj);
     }
 
     @Override
-    public void deleteExistAlarmSettings(Long id) {
+    public void deleteExistAlarmSettings(Long deviceId) {
         // 校验存在
-        validateExistAlarmSettingsExists(id);
+        Long id = validateExistAlarmSettingsExists(deviceId);
         // 删除
         existAlarmSettingsMapper.deleteById(id);
     }
 
-    private void validateExistAlarmSettingsExists(Long id) {
-        if (existAlarmSettingsMapper.selectById(id) == null) {
+    private Long validateExistAlarmSettingsExists(Long id) {
+        ExistAlarmSettingsDO settingsDO = existAlarmSettingsMapper.selectOne(ExistAlarmSettingsDO::getDeviceId, id);
+        if (settingsDO == null) {
             throw exception(EXIST_ALARM_SETTINGS_NOT_EXISTS);
         }
+        return  settingsDO.getId();
     }
 
     @Override
-    public ExistAlarmSettingsDO getExistAlarmSettings(Long id) {
-        return existAlarmSettingsMapper.selectById(id);
+    public ExistAlarmSettingsDO getExistAlarmSettings(Long deviceId) {
+        return existAlarmSettingsMapper.selectOne(ExistAlarmSettingsDO::getDeviceId, deviceId);
     }
 
     @Override

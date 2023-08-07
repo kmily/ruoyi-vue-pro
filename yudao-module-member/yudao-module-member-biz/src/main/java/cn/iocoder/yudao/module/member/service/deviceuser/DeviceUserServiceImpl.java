@@ -69,6 +69,10 @@ public class DeviceUserServiceImpl implements DeviceUserService {
             throw exception(ROOM_NOT_EXISTS);
         }
 
+        if(!Objects.equals(family.getId(),  room.getFamilyId())){
+            throw exception(ROOM_NOT_MATE_FAMILY);
+        }
+
         // 插入
         DeviceUserDO deviceUser = DeviceUserConvert.INSTANCE.convert(createReqVO);
         deviceUser.setDeviceId(deviceDTO.getId());
@@ -76,6 +80,7 @@ public class DeviceUserServiceImpl implements DeviceUserService {
             createReqVO.setCustomName(deviceDTO.getName());
         }
         deviceUserMapper.insert(deviceUser);
+        // 初始化雷达告警设置
         alarmSettingsService.createAlarmSettings(deviceDTO.getId(),  deviceDTO.getType());
         // 返回
         return deviceUser.getId();
@@ -85,6 +90,14 @@ public class DeviceUserServiceImpl implements DeviceUserService {
     public void updateDeviceUser(AppDeviceUserUpdateReqVO updateReqVO) {
         // 校验存在
         validateDeviceUserExists(updateReqVO.getId());
+
+        // 校验房间是否存在
+        if(Objects.nonNull(updateReqVO.getRoomId())){
+            RoomDO room = roomService.getRoom(updateReqVO.getRoomId());
+            if(room == null){
+                throw exception(ROOM_NOT_EXISTS);
+            }
+        }
         // 更新
         DeviceUserDO updateObj = DeviceUserConvert.INSTANCE.convert(updateReqVO);
         deviceUserMapper.updateById(updateObj);
