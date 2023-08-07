@@ -48,6 +48,10 @@ public interface ErrorCodeConstants {
    // ========== 人体检测雷达设置 1004001100 ==========
     ErrorCode DETECTION_ALARM_SETTINGS_NOT_EXISTS = new ErrorCode(1004001100, "人体检测雷达设置");
 
+    // ========== 人体检测雷达设置 1004001200 ==========
+    ErrorCode HOME_PAGE_NOT_EXISTS = new ErrorCode(1004001200, "首页配置不存在");
+    ErrorCode HOME_PAGE_SYSTEM_CANOT_DELETED = new ErrorCode(1004001200, "系统配置不能删除");
+
 
 
 }

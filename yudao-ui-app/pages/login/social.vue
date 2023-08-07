@@ -53,6 +53,7 @@ export default {
         uni.login({
           provider: 'weixin',
           success: res => {
+            console.log('获取数据', res)
             this.$store.dispatch('Login', { type: 2, data: { phoneCode: phoneCode, loginCode: res.code } }).then(res => {
               uni.$u.toast('登录成功')
               setTimeout(() => {

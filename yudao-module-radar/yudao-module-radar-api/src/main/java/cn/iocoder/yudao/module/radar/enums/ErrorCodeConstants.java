@@ -5,6 +5,9 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 
 public interface ErrorCodeConstants {
     ErrorCode DEVICE_NOT_EXISTS = new ErrorCode(1, "设备信息不存在");
+
+
+    ErrorCode BANNER_NOT_EXISTS = new ErrorCode(2, "");
 }
 
 
