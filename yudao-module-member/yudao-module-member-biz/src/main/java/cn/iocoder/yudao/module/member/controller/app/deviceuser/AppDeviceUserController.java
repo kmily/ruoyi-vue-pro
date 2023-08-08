@@ -140,8 +140,10 @@ public class AppDeviceUserController {
     @GetMapping("/devices")
     @Operation(summary = "获得用户设备信息")
     @Parameter(name = "familyId", description = "家庭ID", required = true, example = "123")
+    @Parameter(name = "type", description = "设备类型 1-体征雷达，2-存在感知雷达，3-跌倒雷达，4-人体检测雷达", example = "1")
     @PreAuthenticated
-    public CommonResult<List<AppDeviceUserVO>> getDeviceList(@RequestParam(value = "familyId") Long familyId) {
+    public CommonResult<List<AppDeviceUserVO>> getDeviceList(@RequestParam(value = "familyId") Long familyId,
+                                                             @RequestParam(value = "type",required = false) Integer type) {
         List<DeviceUserDO> list = deviceUserService.getDeviceUserList(new AppDeviceUserExportReqVO().setUserId(getLoginUserId()).setFamilyId(familyId));
         List<RoomDO> roomList = roomService.getRoomList(new RoomExportReqVO().setFamilyId(familyId));
         Map<Long, String> roomMap = roomList.stream().collect(Collectors.toMap(RoomDO::getId, RoomDO::getName));
@@ -156,9 +158,20 @@ public class AppDeviceUserController {
                 .setDeviceId(item.getDeviceId())
                 .setSn(deviceDTOMap.get(item.getDeviceId()).getSn())
                 .setType(deviceDTOMap.get(item.getDeviceId()).getType())).collect(Collectors.toList());
+        if(Objects.nonNull(type)){
+            userVOS = userVOS.stream().filter(item -> Objects.equals(type, item.getType())).collect(Collectors.toList());
+        }
         return success(userVOS);
     }
 
+
+    @GetMapping("/device-count")
+    @Operation(summary = "获得用户设备数量")
+    @PreAuthenticated
+    public CommonResult<Long> queryDeviceCount(){
+        Long count = deviceUserService.getDeviceCount(getLoginUserId());
+        return success(count);
+    }
 
 
    /* @GetMapping("/page")

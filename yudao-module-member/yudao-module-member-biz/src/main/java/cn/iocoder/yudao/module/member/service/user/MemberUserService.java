@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.member.service.user;
 
 import cn.iocoder.yudao.framework.common.validation.Mobile;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateInfoReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 
@@ -96,4 +97,10 @@ public interface MemberUserService {
      */
     boolean isPasswordMatch(String rawPassword, String encodedPassword);
 
+    /**
+     * 修改用户信息
+     * @param loginUserId
+     * @param reqVO
+     */
+    void updateInfo(Long loginUserId, AppUserUpdateInfoReqVO reqVO);
 }

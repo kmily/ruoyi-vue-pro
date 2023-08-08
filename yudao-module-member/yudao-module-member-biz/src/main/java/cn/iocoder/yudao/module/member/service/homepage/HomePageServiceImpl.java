@@ -1,7 +1,12 @@
 package cn.iocoder.yudao.module.member.service.homepage;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.member.enums.HomePageType;
+import cn.iocoder.yudao.module.radar.api.device.DeviceApi;
+import cn.iocoder.yudao.module.radar.api.device.dto.DeviceDTO;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
@@ -34,7 +39,7 @@ public class HomePageServiceImpl implements HomePageService {
     private HomePageMapper homePageMapper;
 
     @Resource
-    private DictDataApi dictDataApi;
+    private DeviceApi deviceApi;
 
     @Override
     public Long createHomePage(AppHomePageCreateReqVO createReqVO) {
@@ -117,6 +122,38 @@ public class HomePageServiceImpl implements HomePageService {
             homePageDOList =  initialization(familyId);
         }
         return homePageDOList;
+    }
+
+    @Override
+    public void bindDevice(Long id, Set<Long> devices) {
+        if(devices.isEmpty()){
+            throw exception(HOME_PAGE_DEVICE_EMPTY);
+        }
+        validateHomePageExists(id);
+        //List<DeviceDTO> deviceDTOS = deviceApi.getByIds(devices);
+        String join = CollUtil.join(devices, ",");
+        HomePageDO pageDO = new HomePageDO();
+        pageDO.setDevices(join);
+        pageDO.setId(id);
+        homePageMapper.updateById(pageDO);
+    }
+
+    @Override
+    public void saveOrUpdate(List<AppHomePageUpdateReqVO> updateReqVOS) {
+        List<AppHomePageUpdateReqVO> saveList = updateReqVOS.stream().filter(item -> item.getId() == 0).collect(Collectors.toList());
+        List<AppHomePageUpdateReqVO> updateList = updateReqVOS.stream().filter(item -> item.getId() != 0).collect(Collectors.toList());
+
+        if(CollUtil.isNotEmpty(saveList)){
+            List<HomePageDO> saveHpList = saveList.stream().map(item -> HomePageConvert.INSTANCE.convert(item).setId(null)).collect(Collectors.toList());
+            homePageMapper.insertBatch(saveHpList);
+        }
+
+        if(CollUtil.isNotEmpty(updateList)){
+            updateList.forEach(item -> {
+                homePageMapper.updateById(HomePageConvert.INSTANCE.convert(item));
+            });
+        }
+
     }
 
 }

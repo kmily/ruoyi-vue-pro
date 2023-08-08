@@ -45,4 +45,13 @@ public class StrUtils {
         return Arrays.stream(longs).boxed().collect(Collectors.toList());
     }
 
+    /**
+     * 手机号脱敏
+     * @param mobile 脱敏
+     * @return
+     */
+    public static String phoneDesensitize(String mobile){
+        return mobile.replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2");
+    }
+
 }

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.member.controller.app.user;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserInfoRespVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateInfoReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.convert.user.UserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
@@ -16,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+
+import java.io.IOException;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -66,6 +69,22 @@ public class AppUserController {
         userService.updateUserMobile(getLoginUserId(), reqVO);
         return success(true);
     }
+
+
+    @PostMapping("/update")
+    @Operation(summary = "修改用户信息")
+    @PreAuthenticated
+    public CommonResult<Boolean> updateInfo(@RequestBody @Valid AppUserUpdateInfoReqVO reqVO,
+                                            @RequestParam("avatarFile") MultipartFile file) throws Exception {
+
+
+        if(file != null && !file.isEmpty()){
+            String avatar = userService.updateUserAvatar(getLoginUserId(), file.getInputStream());
+        }
+        userService.updateInfo(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
 
 }
 

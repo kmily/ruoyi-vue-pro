@@ -4,14 +4,18 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateInfoReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
+import cn.iocoder.yudao.module.member.convert.user.UserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
+import cn.iocoder.yudao.module.member.service.family.FamilyService;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +53,10 @@ public class MemberUserServiceImpl implements MemberUserService {
     @Resource
     private PasswordEncoder passwordEncoder;
 
+    @Resource
+    @Lazy
+    private FamilyService familyService;
+
     @Override
     public MemberUserDO getUserByMobile(String mobile) {
         return memberUserMapper.selectByMobile(mobile);
@@ -80,6 +88,9 @@ public class MemberUserServiceImpl implements MemberUserService {
         user.setPassword(encodePassword(password)); // 加密密码
         user.setRegisterIp(registerIp);
         memberUserMapper.insert(user);
+
+        familyService.createFamily(user.getId(), user.getNickname(), user.getMobile());
+
         return user;
     }
 
@@ -143,6 +154,13 @@ public class MemberUserServiceImpl implements MemberUserService {
     @Override
     public boolean isPasswordMatch(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
+    @Override
+    public void updateInfo(Long id, AppUserUpdateInfoReqVO reqVO) {
+        MemberUserDO userDO = UserConvert.INSTANCE.convert(reqVO);
+        userDO.setId(id);
+        memberUserMapper.updateById(userDO);
     }
 
     /**

@@ -81,4 +81,18 @@ public interface HomePageService {
      * @return
      */
     List<HomePageDO> getHomePageList(Long familyId);
+
+    /**
+     * 首页数据卡片，绑定设备
+     * @param id  卡片ID
+     * @param devices 绑定的设备
+     */
+    void bindDevice(Long id, Set<Long> devices);
+
+    /**
+     * 修改或保存数据
+     * @param updateReqVOS
+     */
+    void saveOrUpdate(List<AppHomePageUpdateReqVO> updateReqVOS);
+
 }

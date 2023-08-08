@@ -69,6 +69,16 @@ public class MemberUserDO extends TenantBaseDO {
      */
     private LocalDateTime loginDate;
 
+    /**
+     * 性别
+     */
+    private Byte sex;
+
+    /**
+     * 出生日期
+     */
+    private String birthday;
+
     // TODO 芋艿：name 真实名字；
     // TODO 芋艿：email 邮箱；
     // TODO 芋艿：gender 性别；

@@ -137,4 +137,10 @@ public class DeviceUserServiceImpl implements DeviceUserService {
         return deviceUserMapper.selectList(exportReqVO);
     }
 
+    @Override
+    public Long getDeviceCount(Long userId) {
+        return deviceUserMapper.selectCount(DeviceUserDO::getUserId, userId);
+
+    }
+
 }

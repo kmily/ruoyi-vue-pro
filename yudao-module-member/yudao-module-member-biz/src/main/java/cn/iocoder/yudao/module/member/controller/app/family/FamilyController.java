@@ -49,6 +49,34 @@ public class FamilyController {
         return success(true);
     }
 
+
+    @PostMapping("/add-mobile")
+    @Operation(summary = "新增手机号")
+    @PreAuthenticated
+    public CommonResult<Collection<String>> addMobile(@RequestBody @Valid FamilyAddMobileVO mobileVO){
+        Collection<String> mobiles = familyService.addMobile(mobileVO);
+        return success(mobiles);
+    }
+
+    @PutMapping("/update-mobile")
+    @Operation(summary = "修改手机号")
+    @PreAuthenticated
+    public CommonResult<Collection<String>> updateMobile(@RequestBody @Valid FamilyUpdateMobileVO mobileVO){
+        Collection<String> mobiles = familyService.updateMobile(mobileVO);
+        return success(mobiles);
+    }
+
+
+    @DeleteMapping("/delete-mobile")
+    @Operation(summary = "删除手机号")
+    @PreAuthenticated
+    public CommonResult<Collection<String>> deleteMobile(@RequestBody @Valid FamilyAddMobileVO mobileVO){
+        Collection<String> mobiles = familyService.deleteMobile(mobileVO);
+        return success(mobiles);
+    }
+
+
+
     @DeleteMapping("/delete")
     @Operation(summary = "删除用户家庭")
     @Parameter(name = "id", description = "编号", required = true)
@@ -57,6 +85,7 @@ public class FamilyController {
         familyService.deleteFamily(id);
         return success(true);
     }
+
 
     @GetMapping("/get")
     @Operation(summary = "获得用户家庭")

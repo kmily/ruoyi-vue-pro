@@ -67,4 +67,29 @@ public interface FamilyService {
      */
     List<FamilyDO> getFamilyList(FamilyExportReqVO exportReqVO);
 
+    /**
+     * 新增预警手机号
+     * @return
+     */
+    Collection<String> addMobile(FamilyAddMobileVO mobileVO);
+
+    /**
+     * 修改手机号
+     * @return
+     */
+    Collection<String> updateMobile(FamilyUpdateMobileVO mobileVO);
+
+    /**
+     * 删除手机号
+     * @param mobileVO
+     * @return
+     */
+    Collection<String> deleteMobile(FamilyAddMobileVO mobileVO);
+
+    /**
+     * 创建家庭
+     * @param userId 会员ID
+     * @param mobile 手机号
+     */
+    Long createFamily(Long userId, String nickName, String mobile);
 }

@@ -19,4 +19,11 @@ public class AppUserInfoRespVO {
 
     @Schema(description = "用户手机号", required = true, example = "15601691300")
     private String mobile;
+
+    @Schema(description = "用户性别", required = true, example = "0")
+    private Byte sex;
+
+    @Schema(description = "用户出生日期", required = true, example = "1900-01-01")
+    private String birthday;
+
 }

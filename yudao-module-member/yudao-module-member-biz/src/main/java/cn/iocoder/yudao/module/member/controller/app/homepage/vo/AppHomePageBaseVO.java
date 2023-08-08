@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.member.controller.app.homepage.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import org.hibernate.validator.constraints.Range;
+
 import java.util.*;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
@@ -14,8 +16,8 @@ import javax.validation.constraints.*;
 @Data
 public class AppHomePageBaseVO {
 
-    @Schema(description = "用户ID", required = true, example = "10081")
-    @NotNull(message = "用户ID不能为空")
+//    @Schema(description = "用户ID", required = true, example = "10081")
+//    @NotNull(message = "用户ID不能为空")
     private Long userId;
 
     @Schema(description = "家庭ID", required = true, example = "23700")
@@ -27,10 +29,11 @@ public class AppHomePageBaseVO {
     private String name;
 
     @Schema(description = "数据类型 0-睡眠,1-如厕,2-跌倒,3-离/回家", example = "1")
+    @NotNull(message = "数据类型不能为空")
+    @Range(min = 0, max = 3, message = "数据类型必须为 0, 1, 2, 3")
     private Byte type;
 
-    @Schema(description = "状态（0正常 1停用）", required = true, example = "2")
-    @NotNull(message = "状态（0正常 1停用）不能为空")
+    @Schema(description = "状态（0正常 1停用）",  example = "0")
     private Byte status;
 
     @Schema(description = "排序")

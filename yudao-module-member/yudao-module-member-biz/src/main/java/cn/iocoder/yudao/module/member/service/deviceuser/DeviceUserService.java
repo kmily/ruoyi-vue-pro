@@ -67,4 +67,10 @@ public interface DeviceUserService {
      */
     List<DeviceUserDO> getDeviceUserList(AppDeviceUserExportReqVO exportReqVO);
 
+    /**
+     * 查询用户下所有的绑定设备
+     * @param userId 用户ID
+     * @return
+     */
+    Long getDeviceCount(Long userId);
 }

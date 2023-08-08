@@ -50,7 +50,8 @@ public interface ErrorCodeConstants {
 
     // ========== 人体检测雷达设置 1004001200 ==========
     ErrorCode HOME_PAGE_NOT_EXISTS = new ErrorCode(1004001200, "首页配置不存在");
-    ErrorCode HOME_PAGE_SYSTEM_CANOT_DELETED = new ErrorCode(1004001200, "系统配置不能删除");
+    ErrorCode HOME_PAGE_SYSTEM_CANOT_DELETED = new ErrorCode(1004001201, "系统配置不能删除");
+    ErrorCode HOME_PAGE_DEVICE_EMPTY = new ErrorCode(1004001202, "设备不能为空");
 
 
 
