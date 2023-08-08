@@ -10,15 +10,25 @@ import cn.iocoder.yudao.module.biz.service.calc.CalcInterestRateDataService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.ResourceUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.List;
 
@@ -32,6 +42,25 @@ public class CalcInterestRateDataController {
 
     @Resource
     private CalcInterestRateDataService calcInterestRateDataService;
+
+    @GetMapping("/desc/file")
+    @Operation(summary = "计算利息")
+    @PermitAll
+    public ResponseEntity getDescFile() throws IOException {
+        FileSystemResource file = new FileSystemResource(ResourceUtils.getFile("测试阶段说明.docx"));
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", file.getFilename()));
+        headers.add("Pragma", "no-cache");
+        headers.add("Expires", "0");
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .contentLength(file.contentLength())
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .body(new InputStreamResource(file.getInputStream()));
+    }
 
     @PostMapping("/exec/lx")
     @Operation(summary = "计算利息")
