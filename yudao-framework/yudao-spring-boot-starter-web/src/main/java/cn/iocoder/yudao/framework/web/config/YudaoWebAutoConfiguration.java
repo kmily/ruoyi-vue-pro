@@ -86,7 +86,8 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
         config.addAllowedMethod("*"); // 设置访问源请求方法
         // 创建 UrlBasedCorsConfigurationSource 对象
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config); // 对接口配置跨域设置
+        source.registerCorsConfiguration("/**", config);
+        // 对接口配置跨域设置
         return createFilterBean(new CorsFilter(source), WebFilterOrderEnum.CORS_FILTER);
     }
 
