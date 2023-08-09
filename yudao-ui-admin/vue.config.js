@@ -35,7 +35,7 @@ module.exports = {
     open: true,
     proxy: {
       ['/proxy-api']: {
-        target: `http://api.calc.xiaodouwangluo.cn:48080`,
+        target: `https://api.calc.xiaodouwangluo.cn`,
         changeOrigin: true,
         pathRewrite: {
           ['^' + process.env.VUE_APP_BASE_API]: ''
