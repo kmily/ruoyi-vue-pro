@@ -44,6 +44,13 @@
         </foreach>
     </insert>
 
+    <insert id="insertExecProcessDataYearBatch">
+        INSERT INTO biz_calc_exec_data ( id,  process_id, rate_id, date_index, date_index_end, day_rate, day_amount,days,year_rate )
+        VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (  #{item.id},  #{item.processId},  #{item.rateId},  #{item.dateIndex},  #{item.dateIndexEnd}, #{item.dayRate}, #{item.dayAmount} , #{item.days} , #{item.yearRate} )
+        </foreach>
+    </insert>
 
 
     <select id="selectSectionListByProcessAndYearType" resultType="cn.iocoder.yudao.module.biz.controller.admin.calc.vo.SectionIndexVO">
@@ -113,6 +120,20 @@
         ) c ON a.process_id = c.process_id AND DATE_FORMAT(a.date_index,'%Y-%m') = c.monthIndex
         WHERE a.process_id = #{processId}
         GROUP BY DATE_FORMAT(a.date_index,'%Y-%m')
+    </select>
+
+    <select id="selectSectionListByFixYearRate" parameterType="java.lang.String"   resultType="cn.iocoder.yudao.module.biz.controller.admin.calc.vo.SectionIndexVO">
+        SELECT
+            concat(a.date_index,'至',a.date_index_end)  startDate,
+            ''  endDate,
+            round(a.year_rate,5)  suiteRate,
+            a.days AS  days,
+            ROUND(SUM(day_amount),2)  AS sectionAmount,
+            a.days days
+        FROM biz_calc_exec_data a
+        LEFT JOIN biz_calc_interest_rate_data b ON a.rate_id = b.id
+        WHERE a.process_id = #{processId}
+        GROUP BY DATE_FORMAT(a.date_index,'%Y')
     </select>
 
     <select id="selectTotalAmountByProcessId" parameterType="java.lang.String" resultType="java.math.BigDecimal">

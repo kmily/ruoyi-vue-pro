@@ -254,23 +254,65 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
         if (execVO.getFixType() == 1) {
             //固定数值
             //计算日期差
+//            if (execVO.getFixSectionType() == 1) {
+//                //1-年
+//                Date startDate = execVO.getStartDate();
+//                Date endDate = execVO.getEndDate();
+//
+//                List<ExecProcessDataDTO> dataList = new ArrayList<>();
+//                while (startDate.compareTo(endDate) <= 0) {
+//                    BigDecimal dayRateValue = execVO.getFixRate()
+//                            .divide(new BigDecimal(100), 16, RoundingMode.HALF_UP)
+//                            .divide(new BigDecimal(getDaysThisYear(startDate)), 16, RoundingMode.HALF_UP);
+//                    ExecProcessDataDTO execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), execVO.getProcessId()
+//                            , 0, startDate, dayRateValue, dayRateValue.multiply(execVO.getLeftAmount())
+//                            , execVO.getFixRate());
+//                    dataList.add(execDataIndex);
+//                    startDate = DateUtil.addDays(startDate, 1);
+//                }
+//                List<YearInfoDTO> yearList = getYearList(startDate, endDate);
+//
+//
+//                insertDataList(dataList);
+//                vo.setSectionList(calcInterestRateDataMapper.selectSectionListByFixRate(execVO.getProcessId()));
+//                vo.setTotalAmount(calcInterestRateDataMapper.selectTotalAmountByProcessId(execVO.getProcessId()));
+//                vo.setProcessId(execVO.getProcessId());
+//            }
             if (execVO.getFixSectionType() == 1) {
                 //1-年
                 Date startDate = execVO.getStartDate();
                 Date endDate = execVO.getEndDate();
-                BigDecimal dayRateValue = execVO.getFixRate()
-                        .divide(new BigDecimal(100), 16, RoundingMode.HALF_UP)
-                        .divide(new BigDecimal(getDaysThisYear(startDate)), 16, RoundingMode.HALF_UP);
+                List<YearInfoDTO> yearList = getYearList(startDate, endDate);
                 List<ExecProcessDataDTO> dataList = new ArrayList<>();
-                while (startDate.compareTo(endDate) <= 0) {
-                    ExecProcessDataDTO execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), execVO.getProcessId()
-                            , 0, startDate, dayRateValue, dayRateValue.multiply(execVO.getLeftAmount())
-                            , execVO.getFixRate());
+                for (YearInfoDTO yearIndex : yearList) {
+                    ExecProcessDataDTO execDataIndex = null;
+                    if (yearIndex.getIsFull() == 1) {
+                        execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), execVO.getProcessId(), 0
+                                , yearIndex.getYearStartDate()
+                                , yearIndex.getYearEndDate()
+                                , execVO.getFixRate().divide(new BigDecimal(100))
+                                , execVO.getFixRate().divide(new BigDecimal(100)).multiply(execVO.getLeftAmount())
+                                , yearIndex.getDays()
+                                , execVO.getFixRate()
+                        );
+                    } else {
+                        //计算日利率
+                        BigDecimal dayRateValue = execVO.getFixRate().divide(new BigDecimal(100)).divide(new BigDecimal(yearIndex.getFullDays()), 16, RoundingMode.HALF_UP);
+                        //处理非整年金额
+                        execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), execVO.getProcessId(),
+                                0
+                                , yearIndex.getYearStartDate()
+                                , yearIndex.getYearEndDate()
+                                , execVO.getFixRate().divide(new BigDecimal(100))
+                                , dayRateValue.multiply(execVO.getLeftAmount()).multiply(new BigDecimal(yearIndex.getDays()))
+                                , yearIndex.getDays()
+                                , execVO.getFixRate()
+                        );
+                    }
                     dataList.add(execDataIndex);
-                    startDate = DateUtil.addDays(startDate, 1);
                 }
-                insertDataList(dataList);
-                vo.setSectionList(calcInterestRateDataMapper.selectSectionListByFixRate(execVO.getProcessId()));
+                insertDataListYear(dataList);
+                vo.setSectionList(calcInterestRateDataMapper.selectSectionListByFixYearRate(execVO.getProcessId()));
                 vo.setTotalAmount(calcInterestRateDataMapper.selectTotalAmountByProcessId(execVO.getProcessId()));
                 vo.setProcessId(execVO.getProcessId());
             } else if (execVO.getFixSectionType() == 2) {
@@ -397,6 +439,34 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
         return monthList;
     }
 
+    private List<YearInfoDTO> getYearList(Date startDate, Date endDate) {
+        List<YearInfoDTO> yearList = new ArrayList<>();
+        while (startDate.compareTo(endDate) <= 0) {
+            Date preStartDate = startDate;
+            Date preEndDate = null;
+            Date end = DateUtil.addDays(cn.hutool.core.date.DateUtil.offsetMonth(startDate, 12), -1);
+            Integer isFull = 1;
+            Integer days = 0;
+            if (end.compareTo(endDate) > 0) {
+                isFull = 0;
+                days = DateUtil.dateIntervalDay(startDate, end);
+                end = endDate;
+            } else {
+                days = DateUtil.dateIntervalDay(startDate, end);
+                days = days + 1;
+            }
+            YearInfoDTO yearInfoDTO = new YearInfoDTO(startDate, end, isFull, days);
+            if (!yearList.contains(yearInfoDTO)) {
+                yearInfoDTO.setDays(DateUtil.dateIntervalDay(yearInfoDTO.getYearStartDate(), yearInfoDTO.getYearEndDate())+1);
+                yearList.add(yearInfoDTO);
+            }
+            startDate = cn.hutool.core.date.DateUtil.offsetMonth(startDate, 12);//加12个月
+            preEndDate = DateUtil.addDays(startDate, -1);
+            yearInfoDTO.setFullDays(DateUtil.dateIntervalDay(preStartDate, preEndDate) + 1);
+        }
+        return yearList;
+    }
+
     private CalcInterestRateExecResVO getLxType2(CalcInterestRateExecLxParamVO execVO) {
         CalcInterestRateExecResVO vo = new CalcInterestRateExecResVO();
         Integer yearType = getYearType(execVO.getStartDate(), execVO.getEndDate());
@@ -444,6 +514,13 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
         }
     }
 
+    private void insertDataListYear(List<ExecProcessDataDTO> dataList) {
+        if (!CollectionUtils.isEmpty(dataList)) {
+            calcInterestRateDataMapper.insertExecProcessDataYearBatch(dataList);
+        }
+    }
+
+
     private Integer getYearType(Date startDate, Date endDate) {
         Integer yearType = 1;
         int diffDays = DateUtil.dateIntervalDay(startDate, endDate);
@@ -467,13 +544,6 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
         }
         return yearType;
     }
-
-
-    private CalcInterestRateExecResVO execZxf(CalcInterestRateExecFxParamVO execVO) {
-
-        return null;
-    }
-
 
     @Override
     public Integer createCalcInterestRateData(CalcInterestRateDataCreateReqVO createReqVO) {

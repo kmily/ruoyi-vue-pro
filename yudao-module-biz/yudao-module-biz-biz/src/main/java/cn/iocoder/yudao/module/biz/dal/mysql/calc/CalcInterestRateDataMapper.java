@@ -33,6 +33,8 @@ public interface CalcInterestRateDataMapper extends BaseMapperX<CalcInterestRate
 
     Integer insertExecProcessDataMonthBatch(@Param("list") List<ExecProcessDataDTO> dataList);
 
+    Integer insertExecProcessDataYearBatch(@Param("list") List<ExecProcessDataDTO> dataList);
+
     List<SectionIndexVO> selectSectionListByProcessAndYearType(@Param("processId") String processId);
 
     List<SectionIndexVO> selectSectionListByFixRate(@Param("processId") String processId);
@@ -40,6 +42,8 @@ public interface CalcInterestRateDataMapper extends BaseMapperX<CalcInterestRate
     List<SectionIndexVO> selectSectionList4FxByFixRate(@Param("processId") String processId);
 
     List<SectionIndexVO> selectSectionListByFixMonthRate(@Param("processId") String processId);
+
+    List<SectionIndexVO> selectSectionListByFixYearRate(@Param("processId") String processId);
 
     BigDecimal selectTotalAmountByProcessId(String processId);
 

@@ -36,6 +36,18 @@ public class ExecProcessDataDTO {
         this.yearRate = yearRate;
     }
 
+    public ExecProcessDataDTO(String id, String processId, Integer rateId, Date dateIndex, Date dateIndexEnd, BigDecimal dayRate, BigDecimal dayAmount, Integer days, BigDecimal yearRate) {
+        this.id = id;
+        this.processId = processId;
+        this.rateId = rateId;
+        this.dateIndex = dateIndex;
+        this.dateIndexEnd = dateIndexEnd;
+        this.dayRate = dayRate;
+        this.dayAmount = dayAmount;
+        this.days = days;
+        this.yearRate = yearRate;
+    }
+
     public ExecProcessDataDTO(String id, String processId, Integer rateId, Date dateIndex, BigDecimal dayRate, BigDecimal dayAmount, BigDecimal yearRate) {
         this.id = id;
         this.processId = processId;
@@ -52,6 +64,7 @@ public class ExecProcessDataDTO {
     private String calcType;
     private Integer rateId;
     private Date dateIndex;
+    private Date dateIndexEnd;
     private BigDecimal dayRate;
     private BigDecimal yearRate;
     private BigDecimal dayAmount;
