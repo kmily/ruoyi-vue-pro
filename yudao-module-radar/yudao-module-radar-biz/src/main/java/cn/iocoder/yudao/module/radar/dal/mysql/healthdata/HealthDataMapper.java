@@ -5,6 +5,7 @@ import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.module.radar.controller.app.healthdata.vo.AppHealthDataReqVO;
 import cn.iocoder.yudao.module.radar.dal.dataobject.healthdata.HealthDataDO;
 import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.radar.controller.admin.healthdata.vo.*;
@@ -65,4 +66,9 @@ public interface HealthDataMapper extends BaseMapperX<HealthDataDO> {
                 .orderByDesc(HealthDataDO::getId));
     }
 
+    default List<HealthDataDO> selectList(AppHealthDataReqVO reqVO){
+        return selectList(new LambdaQueryWrapperX<HealthDataDO>()
+                .inIfPresent(HealthDataDO::getDeviceId, reqVO.getDeviceIds())
+                .betweenIfPresent(HealthDataDO::getCreateTime, reqVO.getCreateTime()));
+    }
 }

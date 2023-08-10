@@ -73,4 +73,12 @@ public interface DeviceUserService {
      * @return
      */
     Long getDeviceCount(Long userId);
+
+    /**
+     * 查询某个房间下的所有设备
+     * @param familyId 房间号
+     * @param type 设备类型
+     * @return
+     */
+    List<AppDeviceUserVO> getDevicesOfFamily(Long familyId, Integer type);
 }

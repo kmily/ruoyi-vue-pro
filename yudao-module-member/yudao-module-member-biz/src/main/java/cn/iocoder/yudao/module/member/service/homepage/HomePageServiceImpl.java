@@ -1,13 +1,21 @@
 package cn.iocoder.yudao.module.member.service.homepage;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapBuilder;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.member.controller.app.deviceuser.vo.AppDeviceUserVO;
+import cn.iocoder.yudao.module.member.controller.app.room.vo.RoomExportReqVO;
+import cn.iocoder.yudao.module.member.dal.dataobject.room.RoomDO;
 import cn.iocoder.yudao.module.member.enums.HomePageType;
+import cn.iocoder.yudao.module.member.service.deviceuser.DeviceUserService;
+import cn.iocoder.yudao.module.member.service.room.RoomService;
 import cn.iocoder.yudao.module.radar.api.device.DeviceApi;
 import cn.iocoder.yudao.module.radar.api.device.dto.DeviceDTO;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -37,6 +45,13 @@ public class HomePageServiceImpl implements HomePageService {
 
     @Resource
     private HomePageMapper homePageMapper;
+
+    @Resource
+    private DeviceUserService deviceUserService;
+
+    @Resource
+    @Lazy
+    private RoomService roomService;
 
     @Resource
     private DeviceApi deviceApi;
@@ -121,6 +136,18 @@ public class HomePageServiceImpl implements HomePageService {
         if(homePageDOList.isEmpty()){
             homePageDOList =  initialization(familyId);
         }
+        List<RoomDO> roomList = roomService.getRoomList(new RoomExportReqVO().setFamilyId(familyId));
+        Map<Long, String> roomMap = roomList.stream().collect(Collectors.toMap(RoomDO::getId, RoomDO::getName));
+        homePageDOList.forEach(homePageDO -> {
+            List<Map<String, Object>> devices = homePageDO.getDevices();
+            if(CollUtil.isNotEmpty(devices)){
+                devices.forEach(map -> {
+                    Object room = map.get("room");
+                    map.put("roomName", MapUtil.getStr(roomMap, Long.parseLong(room.toString())));
+                });
+            }
+        });
+
         return homePageDOList;
     }
 
@@ -129,11 +156,25 @@ public class HomePageServiceImpl implements HomePageService {
         if(devices.isEmpty()){
             throw exception(HOME_PAGE_DEVICE_EMPTY);
         }
-        validateHomePageExists(id);
+        HomePageDO homePage = getHomePage(id);
+        if(homePage == null){
+            throw exception(HOME_PAGE_NOT_EXISTS);
+        }
+
+        if (!Objects.equals(homePage.getType(), HomePageType.FALL.type) && devices.size() >  1){
+            throw exception(HOME_PAGE_BIND_TOO_MORE);
+        }
+
+        List<AppDeviceUserVO> devicesOfFamily = deviceUserService.getDevicesOfFamily(homePage.getFamilyId(), null);
+        Map<Long, Long> deviceRoomMap = devicesOfFamily.stream().collect(Collectors.toMap(AppDeviceUserVO::getDeviceId, AppDeviceUserVO::getRoomId));
         //List<DeviceDTO> deviceDTOS = deviceApi.getByIds(devices);
-        String join = CollUtil.join(devices, ",");
+        List<Map<String, Object>> mapList = devices.stream().map(device -> {
+            MapBuilder<String, Object> builder = MapUtil.builder();
+            return builder.put("device", device)
+                    .put("room", deviceRoomMap.get(device)).build();
+        }).collect(Collectors.toList());
         HomePageDO pageDO = new HomePageDO();
-        pageDO.setDevices(join);
+        pageDO.setDevices(mapList);
         pageDO.setId(id);
         homePageMapper.updateById(pageDO);
     }

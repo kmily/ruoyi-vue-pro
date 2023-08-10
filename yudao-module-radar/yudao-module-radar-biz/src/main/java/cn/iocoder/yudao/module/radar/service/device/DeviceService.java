@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.radar.service.device;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import javax.validation.*;
 import cn.iocoder.yudao.module.radar.controller.admin.device.vo.*;
@@ -67,4 +68,10 @@ public interface DeviceService {
      */
     List<DeviceDO> getDeviceList(DeviceExportReqVO exportReqVO);
 
+    /**
+     * 更新保活时间
+     * @param id
+     * @param now
+     */
+    void updateKeepalive(Long id, LocalDateTime now);
 }

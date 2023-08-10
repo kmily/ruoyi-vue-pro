@@ -38,5 +38,5 @@ public class AppHomePageExportReqVO {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
     @Schema(description = "绑定设备, 多个','隔开", example = "11,22")
-    private String devices;
+    private List<Map<String, Object>> devices;
 }

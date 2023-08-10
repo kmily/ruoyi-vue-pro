@@ -45,4 +45,9 @@ public class DeviceDO extends TenantBaseDO {
      */
     private Byte status;
 
+    /**
+     * 保活时间
+     */
+    private LocalDateTime keepalive;
+
 }

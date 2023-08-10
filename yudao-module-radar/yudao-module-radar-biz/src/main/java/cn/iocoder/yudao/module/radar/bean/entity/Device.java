@@ -40,5 +40,7 @@ public class Device {
      * 当前设备订阅ID
      */
     private long id = 0;
+
+    private int type;
     
 }

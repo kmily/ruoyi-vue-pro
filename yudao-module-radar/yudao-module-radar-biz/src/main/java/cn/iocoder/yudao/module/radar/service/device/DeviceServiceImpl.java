@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import cn.iocoder.yudao.module.radar.controller.admin.device.vo.*;
 import cn.iocoder.yudao.module.radar.dal.dataobject.device.DeviceDO;
@@ -77,6 +78,11 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public List<DeviceDO> getDeviceList(DeviceExportReqVO exportReqVO) {
         return deviceMapper.selectList(exportReqVO);
+    }
+
+    @Override
+    public void updateKeepalive(Long id, LocalDateTime now) {
+        deviceMapper.updateById(new DeviceDO().setKeepalive(now).setId(id));
     }
 
 }

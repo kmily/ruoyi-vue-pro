@@ -187,6 +187,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
                 Device device = ChannelSupervise.channelDeviceMap.get(channelId);
                 if(device != null){
                     log.info("设备 {} 发了保活请求", device.getDeviceCode());
+                    ApiSubThread.updateKeepalive(device.getDeviceCode());
                 }
 
                 //返回消息体

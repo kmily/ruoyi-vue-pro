@@ -8,6 +8,7 @@ public interface ErrorCodeConstants {
 
 
     ErrorCode BANNER_NOT_EXISTS = new ErrorCode(2, "");
+    ErrorCode HEALTH_STATISTICS_NOT_EXISTS = new ErrorCode(3, "数据不存在");
 }
 
 

@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.module.radar.service;
 
+import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.extra.spring.SpringUtil;
+import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.radar.api.device.DeviceApi;
 import cn.iocoder.yudao.module.radar.api.device.dto.DeviceDTO;
 import cn.iocoder.yudao.module.radar.bean.entity.Device;
@@ -8,6 +11,7 @@ import cn.iocoder.yudao.module.radar.bean.request.SubscribeRadarCondition;
 import cn.iocoder.yudao.module.radar.bean.request.SubscribeVehicleCondition;
 import cn.iocoder.yudao.module.radar.bean.request.SubscriptionRequest;
 import cn.iocoder.yudao.module.radar.job.DeviceCache;
+import cn.iocoder.yudao.module.radar.service.device.DeviceService;
 import cn.iocoder.yudao.module.radar.utils.BitUtil;
 import cn.iocoder.yudao.module.radar.utils.WebSocketUtil;
 import com.alibaba.fastjson.JSON;
@@ -17,6 +21,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -102,6 +107,10 @@ public class ApiSubThread implements Runnable {
                 //最近订阅时间点
                 long lastSubTimeStamp = entry.getValue();
                 if (System.currentTimeMillis() - lastSubTimeStamp >= freshSubLimit) {
+                    Device device = ChannelSupervise.channelDeviceMap.get(channelId);
+                   // SubscriptionRequest subscriptionRequest = ApiSubThread.initSubscriptionRequest(channelId, getSubType(device.getType()));
+                   // JSONObject data = JSON.parseObject(JSON.toJSONString(subscriptionRequest));
+
                     //如果最近订阅时间与当前时间的间隔，超过订阅周期时长的85%，刷新订阅
                     JSONObject data = new JSONObject();
                     /**
@@ -216,6 +225,7 @@ public class ApiSubThread implements Runnable {
             SubscriptionRequest subscriptionRequest = ApiSubThread.initSubscriptionRequest(ctx.channel().id(), getSubType(deviceDTO.getType()));
             JSONObject data = JSON.parseObject(JSON.toJSONString(subscriptionRequest));
             ChannelSupervise.channelDeviceMap.get(ctx.channel().id()).setSubDuration(subscriptionRequest.getDuration());
+            ChannelSupervise.channelDeviceMap.get(ctx.channel().id()).setType(deviceDTO.getType());
             //发送订阅请求
             requestStr = WebSocketUtil.sendWebSocketRequest(WebSocketApiEnum.SUBSCRIPTION.url, "POST", data, ctx.channel().id());
             log.info(ctx.channel().id() + "发送订阅请求" + requestStr + "\n");
@@ -234,6 +244,24 @@ public class ApiSubThread implements Runnable {
         }
         return subType;
 
+    }
+
+
+    public static void updateKeepalive(String deviceCode){
+        ThreadUtil.execAsync(() -> {
+            DeviceService deviceService = SpringUtil.getBean(DeviceService.class);
+            try {
+                DeviceDTO deviceDTO = deviceCache.getBySn(deviceCode);
+                if(deviceDTO.getId() != null){
+                    TenantContextHolder.setTenantId(deviceDTO.getTenantId());
+                }else{
+                    TenantContextHolder.setIgnore(true);
+                }
+                deviceService.updateKeepalive(deviceDTO.getId(), LocalDateTime.now());
+            } finally {
+                TenantContextHolder.clear();
+            }
+        });
     }
 
 

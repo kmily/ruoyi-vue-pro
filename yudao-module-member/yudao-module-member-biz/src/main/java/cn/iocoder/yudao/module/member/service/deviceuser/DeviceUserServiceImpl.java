@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.member.service.deviceuser;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
+import cn.iocoder.yudao.module.member.controller.app.room.vo.RoomExportReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.family.FamilyDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.room.RoomDO;
 import cn.iocoder.yudao.module.member.service.alarmsettings.AlarmSettingsService;
@@ -17,6 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import cn.iocoder.yudao.module.member.controller.app.deviceuser.vo.*;
 import cn.iocoder.yudao.module.member.dal.dataobject.deviceuser.DeviceUserDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -25,6 +29,7 @@ import cn.iocoder.yudao.module.member.convert.deviceuser.DeviceUserConvert;
 import cn.iocoder.yudao.module.member.dal.mysql.deviceuser.DeviceUserMapper;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
 
 /**
@@ -141,6 +146,28 @@ public class DeviceUserServiceImpl implements DeviceUserService {
     public Long getDeviceCount(Long userId) {
         return deviceUserMapper.selectCount(DeviceUserDO::getUserId, userId);
 
+    }
+
+    @Override
+    public List<AppDeviceUserVO> getDevicesOfFamily(Long familyId, Integer type) {
+        List<DeviceUserDO> list = this.getDeviceUserList(new AppDeviceUserExportReqVO().setUserId(getLoginUserId()).setFamilyId(familyId));
+        List<RoomDO> roomList = roomService.getRoomList(new RoomExportReqVO().setFamilyId(familyId));
+        Map<Long, String> roomMap = roomList.stream().collect(Collectors.toMap(RoomDO::getId, RoomDO::getName));
+        List<DeviceDTO> deviceDTOS = deviceApi.getByIds(list.stream().map(DeviceUserDO::getDeviceId).collect(Collectors.toSet()));
+        Map<Long, DeviceDTO> deviceDTOMap = deviceDTOS.stream().collect(Collectors.toMap(DeviceDTO::getId, Function.identity()));
+        List<AppDeviceUserVO> userVOS = list.stream().map(item -> new AppDeviceUserVO()
+                .setRoomId(item.getRoomId())
+                .setId(item.getId())
+                .setRoomName(roomMap.get(item.getRoomId()))
+                .setDeviceName(deviceDTOMap.get(item.getDeviceId()).getName())
+                .setCustomName(item.getCustomName())
+                .setDeviceId(item.getDeviceId())
+                .setSn(deviceDTOMap.get(item.getDeviceId()).getSn())
+                .setType(deviceDTOMap.get(item.getDeviceId()).getType())).collect(Collectors.toList());
+        if(Objects.nonNull(type)){
+            userVOS = userVOS.stream().filter(item -> Objects.equals(type, item.getType())).collect(Collectors.toList());
+        }
+        return userVOS;
     }
 
 }

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.radar.controller.app;
+package cn.iocoder.yudao.module.radar.controller.app.banner;
 
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;

@@ -144,23 +144,8 @@ public class AppDeviceUserController {
     @PreAuthenticated
     public CommonResult<List<AppDeviceUserVO>> getDeviceList(@RequestParam(value = "familyId") Long familyId,
                                                              @RequestParam(value = "type",required = false) Integer type) {
-        List<DeviceUserDO> list = deviceUserService.getDeviceUserList(new AppDeviceUserExportReqVO().setUserId(getLoginUserId()).setFamilyId(familyId));
-        List<RoomDO> roomList = roomService.getRoomList(new RoomExportReqVO().setFamilyId(familyId));
-        Map<Long, String> roomMap = roomList.stream().collect(Collectors.toMap(RoomDO::getId, RoomDO::getName));
-        List<DeviceDTO> deviceDTOS = deviceApi.getByIds(list.stream().map(DeviceUserDO::getDeviceId).collect(Collectors.toSet()));
-        Map<Long, DeviceDTO> deviceDTOMap = deviceDTOS.stream().collect(Collectors.toMap(DeviceDTO::getId, Function.identity()));
-        List<AppDeviceUserVO> userVOS = list.stream().map(item -> new AppDeviceUserVO()
-                .setRoomId(item.getRoomId())
-                .setId(item.getId())
-                .setRoomName(roomMap.get(item.getRoomId()))
-                .setDeviceName(deviceDTOMap.get(item.getDeviceId()).getName())
-                .setCustomName(item.getCustomName())
-                .setDeviceId(item.getDeviceId())
-                .setSn(deviceDTOMap.get(item.getDeviceId()).getSn())
-                .setType(deviceDTOMap.get(item.getDeviceId()).getType())).collect(Collectors.toList());
-        if(Objects.nonNull(type)){
-            userVOS = userVOS.stream().filter(item -> Objects.equals(type, item.getType())).collect(Collectors.toList());
-        }
+
+        List<AppDeviceUserVO> userVOS = deviceUserService.getDevicesOfFamily(familyId, type);
         return success(userVOS);
     }
 

@@ -43,6 +43,6 @@ public class AppHomePageBaseVO {
     private Byte mold;
 
     @Schema(description = "绑定设备, 多个','隔开", example = "11,22")
-    private String devices;
+    private List<Map<String, Object>> devices;
 
 }

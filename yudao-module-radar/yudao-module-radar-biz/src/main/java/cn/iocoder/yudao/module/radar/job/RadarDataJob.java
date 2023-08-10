@@ -14,11 +14,17 @@ import cn.iocoder.yudao.module.radar.service.arearuledata.AreaRuleDataService;
 import cn.iocoder.yudao.module.radar.service.healthdata.HealthDataService;
 import cn.iocoder.yudao.module.radar.service.lineruledata.LineRuleDataService;
 import com.alibaba.fastjson.JSON;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author whycode
@@ -43,10 +49,15 @@ public class RadarDataJob implements InitializingBean, Runnable {
     @Resource
     private DeviceCache deviceCache;
 
+    private final Double SLEEP = 70.0;
 
+    private final Cache<Long, LocalDateTime> cache = CacheBuilder.newBuilder().expireAfterWrite(12L, TimeUnit.MINUTES).build();
+    private final Cache<Long, LocalDateTime> HAS_SLEEP_CACHE = CacheBuilder.newBuilder().expireAfterWrite(1L, TimeUnit.HOURS).build();
 
     @Override
     public void afterPropertiesSet() throws Exception {
+
+
 
 //        ExecutorService service1 = Executors.newSingleThreadExecutor();
 //        service1.submit(this);
