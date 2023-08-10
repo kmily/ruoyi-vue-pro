@@ -44,22 +44,25 @@ public class CalcInterestRateDataController {
     private CalcInterestRateDataService calcInterestRateDataService;
 
     @GetMapping("/desc/file")
-    @Operation(summary = "计算利息")
+    @Operation(summary = "测试阶段说明下载")
     @PermitAll
     public ResponseEntity getDescFile() throws IOException {
-        FileSystemResource file = new FileSystemResource(ResourceUtils.getFile("测试阶段说明.docx"));
+        File file=ResourceUtils.getFile("classpath:测试阶段说明.docx");
+        FileSystemResource fileResource = new FileSystemResource(file);
+        String fileName="测试阶段说明.docx";
+
         HttpHeaders headers = new HttpHeaders();
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-        headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", file.getFilename()));
+        headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", URLEncoder.encode(fileName, "UTF-8")));
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
 
         return ResponseEntity
                 .ok()
                 .headers(headers)
-                .contentLength(file.contentLength())
+                .contentLength(fileResource.contentLength())
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
-                .body(new InputStreamResource(file.getInputStream()));
+                .body(new InputStreamResource(fileResource.getInputStream()));
     }
 
     @PostMapping("/exec/lx")
