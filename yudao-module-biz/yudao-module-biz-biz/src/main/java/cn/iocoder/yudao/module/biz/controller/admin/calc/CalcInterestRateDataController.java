@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -46,23 +47,45 @@ public class CalcInterestRateDataController {
     @GetMapping("/desc/file")
     @Operation(summary = "测试阶段说明下载")
     @PermitAll
-    public ResponseEntity getDescFile() throws IOException {
-        File file=ResourceUtils.getFile("classpath:测试阶段说明.docx");
-        FileSystemResource fileResource = new FileSystemResource(file);
-        String fileName="测试阶段说明.docx";
+    public void getDescFile(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        //设置文件路径
+        org.springframework.core.io.Resource resource = new ClassPathResource("测试阶段说明.docx");
+        if (resource.exists()) {
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("application/msword");
+            String fileName = resource.getURI().toString().substring(resource.getURI().toString().lastIndexOf("/") + 1);
+            response.setHeader("content-disposition", "attachment;filename=" + fileName);
+            response.flushBuffer();
+            //放弃使用直接获取文件的方式, 改成使用流的方式
+            BufferedInputStream bis = new BufferedInputStream(resource.getInputStream());
+            OutputStream os = response.getOutputStream();
+            byte[] buffer = new byte[1024];
+            int i = bis.read(buffer);
+            while (i != -1) {
+                os.write(buffer, 0, i);
+                i = bis.read(buffer);
+            }
+            if (bis != null) {
+                bis.close();
+            }
+        }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-        headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", URLEncoder.encode(fileName, "UTF-8")));
-        headers.add("Pragma", "no-cache");
-        headers.add("Expires", "0");
-
-        return ResponseEntity
-                .ok()
-                .headers(headers)
-                .contentLength(fileResource.contentLength())
-                .contentType(MediaType.parseMediaType("application/octet-stream"))
-                .body(new InputStreamResource(fileResource.getInputStream()));
+//        File file=ResourceUtils.getFile("classpath:测试阶段说明.docx");
+//        FileSystemResource fileResource = new FileSystemResource(file);
+//        String fileName="测试阶段说明.docx";
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+//        headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", URLEncoder.encode(fileName, "UTF-8")));
+//        headers.add("Pragma", "no-cache");
+//        headers.add("Expires", "0");
+//
+//        return ResponseEntity
+//                .ok()
+//                .headers(headers)
+//                .contentLength(fileResource.contentLength())
+//                .contentType(MediaType.parseMediaType("application/octet-stream"))
+//                .body(new InputStreamResource(fileResource.getInputStream()));
     }
 
     @PostMapping("/exec/lx")
