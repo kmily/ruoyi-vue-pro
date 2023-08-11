@@ -170,4 +170,9 @@ public class DeviceUserServiceImpl implements DeviceUserService {
         return userVOS;
     }
 
+    @Override
+    public DeviceUserDO getDeviceUserByDevice(Long device) {
+        return deviceUserMapper.selectOne(DeviceUserDO::getDeviceId, device);
+    }
+
 }

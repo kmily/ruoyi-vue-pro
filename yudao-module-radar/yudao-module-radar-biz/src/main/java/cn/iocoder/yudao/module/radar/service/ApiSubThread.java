@@ -108,11 +108,11 @@ public class ApiSubThread implements Runnable {
                 long lastSubTimeStamp = entry.getValue();
                 if (System.currentTimeMillis() - lastSubTimeStamp >= freshSubLimit) {
                     Device device = ChannelSupervise.channelDeviceMap.get(channelId);
-                   // SubscriptionRequest subscriptionRequest = ApiSubThread.initSubscriptionRequest(channelId, getSubType(device.getType()));
-                   // JSONObject data = JSON.parseObject(JSON.toJSONString(subscriptionRequest));
+                    SubscriptionRequest subscriptionRequest = ApiSubThread.initSubscriptionRequest(channelId, getSubType(device.getType()));
+                    JSONObject data = JSON.parseObject(JSON.toJSONString(subscriptionRequest));
 
                     //如果最近订阅时间与当前时间的间隔，超过订阅周期时长的85%，刷新订阅
-                    JSONObject data = new JSONObject();
+                    //JSONObject data = new JSONObject();
                     /**
                      * 订阅周期，后续可能需要做可配，目前写死3600s
                      */

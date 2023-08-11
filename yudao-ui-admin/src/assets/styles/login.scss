@@ -12,7 +12,7 @@ $buttonH: 50;
 $containerBgColor: #e6ebf2;
 $containerBgImage: '../assets/images/bg.png';
 // container-logo
-$logoWidth: 417px;
+$logoWidth: 457px;
 $logoHeight: 64px;
 $logoImage: '../assets/logo/login-logo.png';
 // container-content
@@ -38,12 +38,16 @@ $buttonHeight: $buttonH * 1px;
     width: 33%;
     height: 38px;
     float: right;
+
     img {
       cursor: pointer;
-      width:100%;max-width:100px; height:auto;
+      width: 100%;
+      max-width: 100px;
+      height: auto;
       vertical-align: middle;
     }
   }
+
   // 元素
   width: inherit;
   height: inherit;
@@ -61,6 +65,7 @@ $buttonHeight: $buttonH * 1px;
   font-size: 14px;
   font-family: Microsoft YaHei;
   font-weight: 400;
+
   .logo {
     // 元素
     width: $logoWidth;
@@ -73,6 +78,7 @@ $buttonHeight: $buttonH * 1px;
     left: 50%;
     margin-left: -$logoWidth/2;
   }
+
   .content {
     // 元素
     width: $contentWidth;
@@ -82,6 +88,7 @@ $buttonHeight: $buttonH * 1px;
     border-radius: 20px;
     // 定位
     position: relative;
+
     .pic {
       // 元素
       width: $picWidth;
@@ -89,12 +96,14 @@ $buttonHeight: $buttonH * 1px;
       background-image: url($picImage);
       background-repeat: no-repeat;
       background-size: cover;
+      background-position: center;
       border-radius: 20px 0 0 20px;
       // 定位
       position: absolute;
       top: 0;
       left: 0;
     }
+
     .field {
       width: $fieldWidth;
       height: $fieldHeight;
@@ -102,21 +111,29 @@ $buttonHeight: $buttonH * 1px;
       position: absolute;
       top: 0;
       left: $picWidth;
-      display:flex;
+      display: flex;
       justify-content: center;
       align-items: center;
-      .pc-title{ width: 100%; clear: both;}
+
+      .pc-title {
+        width: 100%;
+        clear: both;
+      }
+
       .mobile-title,
       .mobile-switch {
         display: none;
       }
+
       .form {
         box-sizing: border-box;
         width: $formWidth;
+
         // - - - tab
         :deep(.el-tabs__content) {
           padding: 20px 0 0;
         }
+
         :deep(.el-tabs__item) {
           // 元素
           width: $tabWidth;
@@ -126,14 +143,17 @@ $buttonHeight: $buttonH * 1px;
           line-height: $rowHeight;
           color: #666666;
         }
+
         :deep(.el-tabs__item.is-active) {
           font-weight: bold;
           color: #2F53EB;
         }
+
         :deep(.el-tabs__active-bar) {
           height: 3px;
           border-radius: 2px;
         }
+
         // - - - input
         :deep(.el-input__inner) {
           // 元素
@@ -147,30 +167,41 @@ $buttonHeight: $buttonH * 1px;
           line-height: 19px;
           color: #262626;
         }
+
         .code:deep(.el-input__inner) {
           padding: 0 24px;
           // 文字
           text-align: left;
         }
-        :deep(.el-input__inner::-webkit-input-placeholder) { /* WebKit browsers */
+
+        :deep(.el-input__inner::-webkit-input-placeholder) {
+          /* WebKit browsers */
           font-weight: 400;
           color: #8C8C8C;
         }
-        :deep(.el-input__inner:-moz-placeholder) { /* Mozilla Firefox 4 to 18 */
+
+        :deep(.el-input__inner:-moz-placeholder) {
+          /* Mozilla Firefox 4 to 18 */
           font-weight: 400;
           color: #8C8C8C;
         }
-        :deep(.el-input__inner::-moz-placeholder) { /* Mozilla Firefox 19+ */
+
+        :deep(.el-input__inner::-moz-placeholder) {
+          /* Mozilla Firefox 19+ */
           font-weight: 400;
           color: #8C8C8C;
-          opacity:1;
+          opacity: 1;
         }
-        :deep(.el-input__inner:-ms-input-placeholder) { /* Internet Explorer 10+ */
+
+        :deep(.el-input__inner:-ms-input-placeholder) {
+          /* Internet Explorer 10+ */
           font-weight: 400;
           color: #8C8C8C !important;
         }
+
         :deep(.el-form-item) {
           position: relative;
+
           .button-code {
             // 元素
             height: $rowHeight;
@@ -186,15 +217,18 @@ $buttonHeight: $buttonH * 1px;
             font-family: PingFang SC;
             font-weight: 400;
             color: #2F53EB;
+
             span {
               padding-left: 15px;
               border-left: 2px solid #D9D9D9;
             }
           }
         }
+
         :deep(.el-form-item__error) {
           padding-left: 24px;
         }
+
         .button {
           width: 100%;
           height: $buttonHeight;
@@ -207,6 +241,7 @@ $buttonHeight: $buttonH * 1px;
           font-size: 20px;
           color: #FFFFFF;
         }
+
         .button-active {
           background: #2F53EB;
           box-shadow: 0px 2px 8px rgba(0, 80, 184, 0.2);
@@ -214,6 +249,7 @@ $buttonHeight: $buttonH * 1px;
       }
     }
   }
+
   .footer {
     // 元素
     height: 16px;
@@ -223,6 +259,7 @@ $buttonHeight: $buttonH * 1px;
     // 定位
     position: absolute;
     bottom: 30px;
+
     a,
     a:hover,
     a:active {
@@ -238,18 +275,23 @@ $buttonHeight: $buttonH * 1px;
     .content {
       width: 710px;
       height: 397px;
+
       .pic {
         width: 314px;
       }
+
       .field {
         width: calc(710px - 314px);
         left: 314px;
+
         .form {
           width: 320px;
+
           :deep(.el-input__inner) {
             width: 320px;
             height: 56px;
           }
+
           .button {
             height: 50px;
           }
@@ -291,6 +333,7 @@ $iconBgImage: '../assets/images/icon.png';
     font-size: 17px;
     font-family: PingFang SC;
     font-weight: bold;
+
     .logo {
       display: none;
     }
@@ -305,9 +348,11 @@ $iconBgImage: '../assets/images/icon.png';
       display: flex;
       justify-content: center;
       align-items: center;
+
       .pic {
         display: none;
       }
+
       .field {
         // 元素
         width: inherit;
@@ -316,20 +361,25 @@ $iconBgImage: '../assets/images/icon.png';
         left: 0;
         display: flex;
         flex-direction: column;
+
         .mobile-title {
           // 元素
           margin: 0 0 20px;
           display: block;
         }
+
         .form {
           width: $mobileFormWidth;
+
           // - - - tab
           :deep(.el-tabs__header) {
             display: none;
           }
+
           :deep(.el-tabs__content) {
             padding: 0;
           }
+
           // - - - input
           :deep(.el-input__inner) {
             height: $mobileRowHeight;
@@ -338,18 +388,21 @@ $iconBgImage: '../assets/images/icon.png';
             text-align: center;
             color: #262626;
           }
+
           :deep(.el-form-item) {
             .button-code {
               // 元素
               height: $mobileRowHeight;
             }
           }
+
           .button {
             height: $mobileButtonHeight;
             line-height: 24px;
             color: #FFFFFF;
           }
         }
+
         .mobile-switch {
           display: block;
           line-height: 20px;
@@ -357,6 +410,7 @@ $iconBgImage: '../assets/images/icon.png';
           font-weight: 400;
           color: #595959;
           margin: 0;
+
           .icon {
             width: 14px;
             height: 14px;
@@ -365,11 +419,13 @@ $iconBgImage: '../assets/images/icon.png';
             background-size: cover;
           }
         }
+
         .mobile-switch:hover {
           cursor: pointer;
         }
       }
     }
+
     .footer {
       // 元素
       font-size: 12px;

@@ -81,4 +81,11 @@ public interface DeviceUserService {
      * @return
      */
     List<AppDeviceUserVO> getDevicesOfFamily(Long familyId, Integer type);
+
+    /**
+     * 根据 设备查询关联
+     * @param device 设备ID
+     * @return
+     */
+    DeviceUserDO getDeviceUserByDevice(Long device);
 }

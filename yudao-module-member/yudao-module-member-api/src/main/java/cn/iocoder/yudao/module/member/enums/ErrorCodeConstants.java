@@ -54,6 +54,9 @@ public interface ErrorCodeConstants {
     ErrorCode HOME_PAGE_DEVICE_EMPTY = new ErrorCode(1004001202, "设备不能为空");
     ErrorCode HOME_PAGE_BIND_TOO_MORE = new ErrorCode(1004001203, "设备绑定太多");
 
+    // ========== 设备通知 1004001300 ==========
+    ErrorCode DEVICE_NOTICE_NOT_EXISTS = new ErrorCode(1004001300, "通知不存在");
+
 
 
 }

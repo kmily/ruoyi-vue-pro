@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.radar.controller.admin.healthdata.vo.HealthDataCr
 import cn.iocoder.yudao.module.radar.controller.admin.lineruledata.vo.LineRuleDataCreateReqVO;
 import cn.iocoder.yudao.module.radar.convert.healthdata.HealthDataConvert;
 import cn.iocoder.yudao.module.radar.enums.DeviceDataTypeEnum;
+import cn.iocoder.yudao.module.radar.mq.producer.notify.DeviceNotificationProducer;
 import cn.iocoder.yudao.module.radar.service.arearuledata.AreaRuleDataService;
 import cn.iocoder.yudao.module.radar.service.healthdata.HealthDataService;
 import cn.iocoder.yudao.module.radar.service.lineruledata.LineRuleDataService;
@@ -24,6 +25,8 @@ import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -49,10 +52,8 @@ public class RadarDataJob implements InitializingBean, Runnable {
     @Resource
     private DeviceCache deviceCache;
 
-    private final Double SLEEP = 70.0;
-
-    private final Cache<Long, LocalDateTime> cache = CacheBuilder.newBuilder().expireAfterWrite(12L, TimeUnit.MINUTES).build();
-    private final Cache<Long, LocalDateTime> HAS_SLEEP_CACHE = CacheBuilder.newBuilder().expireAfterWrite(1L, TimeUnit.HOURS).build();
+    @Resource
+    private DeviceNotificationProducer producer;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -85,6 +86,14 @@ public class RadarDataJob implements InitializingBean, Runnable {
             healthDataService.createHealthData(healthDataDO);
         } finally {
             TenantContextHolder.clear();
+        }
+        if(healthData.getHasPeople() == 1){
+            Map<String, Object> content = new HashMap<>();
+            content.put("breath", healthData.getBreathFreqAverage());
+            content.put("heart", healthData.getHeartFreqAverage());
+            content.put("time", requestData.getTimeStamp());
+            content.put("device", healthDataDO.getDeviceId());
+            producer.sendNotifyMessage(DeviceDataTypeEnum.HEALTH, JSON.toJSONString(content));
         }
     }
 
@@ -148,6 +157,7 @@ public class RadarDataJob implements InitializingBean, Runnable {
             try {
                 RequestData requestData = RadarDataCache.take();
                 DeviceDataTypeEnum type = requestData.getType();
+
                 switch (type){
                     case HEALTH:
                         saveHealthData(requestData);
