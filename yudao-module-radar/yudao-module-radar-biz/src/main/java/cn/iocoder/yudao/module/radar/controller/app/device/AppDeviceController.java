@@ -47,7 +47,7 @@ public class AppDeviceController {
 
     @GetMapping("/device-status")
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @Operation(summary = "获得banner列表")
+    @Operation(summary = "获得设备状态列表")
     @PreAuthenticated
     public CommonResult<List<DeviceStatusVO>> getDeviceStatusList(@RequestParam("ids") Collection<Long> ids) {
         List<DeviceDO> deviceList = deviceService.getDeviceList(ids);

@@ -26,7 +26,9 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
+import java.util.OptionalDouble;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
@@ -50,14 +52,38 @@ public class HealthStatisticsController {
     @Parameter(name = "startDate", description = "开始日期", required = true, example = "2023-08-07")
     @Parameter(name = "endDate", description = "结束日期", required = true, example = "2023-08-11")
     @PreAuthenticated
-    public CommonResult<List<HealthStatisticsRespVO>> getHealthStatisticsList(@RequestParam("deviceId") Long deviceId,
+    public CommonResult<AppHealthStatisticsResVO> getHealthStatisticsList(@RequestParam("deviceId") Long deviceId,
                                                                               @RequestParam("startDate") String startDate,
                                                                               @RequestParam("endDate") String endDate) {
 
 
         healthDataService.healthStatistics(LocalDate.now());
         List<HealthStatisticsDO> list = healthStatisticsService.getHealthStatisticsList(deviceId, startDate, endDate);
-        return success(HealthStatisticsConvert.INSTANCE.convertList(list));
+
+        List<HealthStatisticsRespVO> respVOS = HealthStatisticsConvert.INSTANCE.convertList(list);
+
+        AppHealthStatisticsResVO resVO = new AppHealthStatisticsResVO();
+        DoubleSummaryStatistics heartStatistics = respVOS.stream().mapToDouble(HealthStatisticsBaseVO::getHeartAverage).summaryStatistics();
+        double heartAverage = heartStatistics.getAverage();
+        double maxHearth = heartStatistics.getMax();
+        double minHearth = heartStatistics.getMin();
+        double heartSilent = respVOS.stream().mapToDouble(HealthStatisticsBaseVO::getHeartSilent).summaryStatistics().getAverage();
+
+        DoubleSummaryStatistics breathStatistics = respVOS.stream().mapToDouble(HealthStatisticsBaseVO::getBreathAverage).summaryStatistics();
+        double breathAverage = breathStatistics.getAverage();
+        double maxBreath = breathStatistics.getMax();
+        double minBreath = breathStatistics.getMin();
+
+        resVO.setRespVOList(respVOS)
+                .setBreathMaxValue(maxBreath)
+                .setBreathMinValue(minBreath)
+                .setBreathAverage(breathAverage)
+                .setHeartAverage(heartAverage)
+                .setHeartSilent(heartSilent)
+                .setHeartMaxValue(maxHearth)
+                .setHeartMinValue(minHearth);
+
+        return success(resVO);
     }
 
 
