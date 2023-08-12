@@ -47,7 +47,7 @@ public class RandomUtils {
             }
             // 如果是 type、status 结尾的字段，返回 tinyint 范围
             if (StrUtil.endWithAnyIgnoreCase(attributeMetadata.getAttributeName(),
-                    "type", "status", "category", "scope")) {
+                    "type", "status", "category", "scope", "result")) {
                 return RandomUtil.randomInt(0, TINYINT_MAX + 1);
             }
             return RandomUtil.randomInt();
@@ -122,7 +122,7 @@ public class RandomUtils {
     @SafeVarargs
     public static <T> List<T> randomPojoList(Class<T> clazz, Consumer<T>... consumers) {
         int size = RandomUtil.randomInt(1, RANDOM_COLLECTION_LENGTH);
-        return Stream.iterate(0, i -> i).limit(size).map(o -> randomPojo(clazz, consumers)).toList();
+        return Stream.iterate(0, i -> i).limit(size).map(o -> randomPojo(clazz, consumers)).collect(Collectors.toList());
     }
 
 }
