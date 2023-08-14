@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.dal.redis.sku;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuStockLogDO;
@@ -36,10 +37,12 @@ public class ProductSkuStockRedisDAO {
     }
 
     public void incrementStock(Long skuId, long delta) {
+        Assert.isTrue(delta > 0);
         stringRedisTemplate.opsForValue().increment(formatKey(skuId), delta);
     }
 
     public Long decrementStock(Long skuId, long delta) {
+        Assert.isTrue(delta > 0);
         return stringRedisTemplate.opsForValue().decrement(formatKey(skuId), delta);
     }
 
@@ -50,7 +53,7 @@ public class ProductSkuStockRedisDAO {
     }
 
     public void setStock(Long skuId, Long stock) {
-        stringRedisTemplate.opsForValue().setIfAbsent(formatKey(skuId), stock.toString(), SKU_STOCK_EXPIRE_TIME, TimeUnit.MILLISECONDS);
+        stringRedisTemplate.opsForValue().set(formatKey(skuId), stock.toString(), SKU_STOCK_EXPIRE_TIME, TimeUnit.MILLISECONDS);
     }
 
 

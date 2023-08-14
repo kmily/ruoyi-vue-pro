@@ -3,8 +3,7 @@ package cn.iocoder.yudao.module.product.service.sku;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.extra.spring.SpringUtil;
-import cn.iocoder.yudao.framework.common.exception.ServiceException;
-import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
+import cn.iocoder.yudao.framework.common.util.cache.CacheUtils;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 import cn.iocoder.yudao.module.product.convert.sku.ProductSkuStockLogConvert;
@@ -14,6 +13,8 @@ import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuMapper;
 import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuStockLogMapper;
 import cn.iocoder.yudao.module.product.dal.redis.sku.ProductSkuStockRedisDAO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -24,12 +25,16 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_STOCK_NOT_ENOUGH;
+import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SPU_NOT_EXISTS;
 
 /**
  * 商品 库存并发扣减 Service 实现类
@@ -49,6 +54,12 @@ public class ProductSkuStockServiceImpl implements ProductSkuStockService {
     @Resource
     private ProductSkuMapper productSkuMapper;
 
+    private final LoadingCache<Long, FutureTask<Long>> SKU_STOCK_LOCAL_LOCK = CacheUtils.buildAsyncReloadingCache(Duration.ofSeconds(10), new CacheLoader<Long, FutureTask<Long>>() {
+        @Override
+        public FutureTask<Long> load(Long skuId) {
+            return new FutureTask<>(() -> initRedisStock(skuId));
+        }
+    });
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -134,7 +145,19 @@ public class ProductSkuStockServiceImpl implements ProductSkuStockService {
     }
 
     private Long obtainRedisStock(Long skuId) {
-        return ObjectUtil.defaultIfNull(stockRedisDAO.getStock(skuId), initRedisStock(skuId));
+        return ObjectUtil.defaultIfNull(stockRedisDAO.getStock(skuId), syncObtainRedisStock(skuId));
+    }
+
+    private Long syncObtainRedisStock(Long skuId) {
+        try {
+            // 针对单个服务的 并发限制
+            FutureTask<Long> futureTask = SKU_STOCK_LOCAL_LOCK.get(skuId);
+            futureTask.run();
+            return futureTask.get(1000, TimeUnit.MILLISECONDS);
+        } catch (Throwable e) {
+            //抛错，防超卖
+            throw exception(SKU_STOCK_NOT_ENOUGH);
+        }
     }
 
     /**
@@ -147,6 +170,7 @@ public class ProductSkuStockServiceImpl implements ProductSkuStockService {
     private Long initRedisStock(Long skuId) {
         AtomicReference<Long> redisStock = new AtomicReference<>(0L);
         stockRedisDAO.lock(skuId, 1000L, () -> {
+            // 针对微服务的 并发限制
             Long stock = stockRedisDAO.getStock(skuId);
             if (stock != null) {
                 redisStock.set(stock);
@@ -169,8 +193,7 @@ public class ProductSkuStockServiceImpl implements ProductSkuStockService {
     public Long doSyncStock(Long skuId) {
         ProductSkuDO productSkuDO = productSkuMapper.selectById(skuId);
         if (productSkuDO == null) {
-            log.warn("[doSyncStock][进行库存同步时，根据商品skuId({})找不到商品信息]", skuId);
-            return 0L;
+            throw exception(SPU_NOT_EXISTS);
         }
 
         List<ProductSkuStockLogDO> stockLogList = stockLogMapper.selectList(skuId);
@@ -184,7 +207,7 @@ public class ProductSkuStockServiceImpl implements ProductSkuStockService {
             }
 
             LambdaUpdateWrapper<ProductSkuDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<ProductSkuDO>()
-                    .setSql(" stock = stock + " + (-sumValue))
+                    .setSql(" stock = stock - " + sumValue)
                     .eq(ProductSkuDO::getId, skuId);
             productSkuMapper.update(null, lambdaUpdateWrapper);
         }
