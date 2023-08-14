@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.product.dal.redis.ProductRedisKeyConstants.PRODUCT_SKU_STOCK;
@@ -61,23 +62,25 @@ public class ProductSkuStockRedisDAO {
         return String.format(PRODUCT_SKU_STOCK_LOCK, skuId.toString());
     }
 
-    public void lock(Long id, Long timeoutMillis, Runnable runnable) {
-        String lockKey = formatLockKey(id);
+    public Long syncInitRedisStock(Long skuId, long timeoutMillis, Supplier<Long> supplier) throws Exception {
+        String lockKey = formatLockKey(skuId);
         RLock lock = redissonClient.getLock(lockKey);
         boolean agree = false;
         try {
             agree = lock.tryLock(timeoutMillis, TimeUnit.MILLISECONDS);
-            if (agree) {
-                runnable.run(); // 执行逻辑
+            if (agree) { // 执行逻辑
+                Long stock = getStock(skuId);
+                if (stock != null) return stock; //存在立即返回
+
+                stock = supplier.get(); //获取同步后的库存
+                setStock(skuId, stock); //设置缓存
+                return stock;
             } else {
                 throw exception(GlobalErrorCodeConstants.LOCKED);
             }
-        } catch (InterruptedException ignored) {
-            throw exception(GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR);
         } finally {
             if (agree) lock.unlock();
         }
-
     }
 
 
