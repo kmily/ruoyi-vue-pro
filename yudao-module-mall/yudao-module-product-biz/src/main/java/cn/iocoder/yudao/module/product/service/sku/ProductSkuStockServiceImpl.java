@@ -145,7 +145,7 @@ public class ProductSkuStockServiceImpl implements ProductSkuStockService {
     }
 
     private Long obtainRedisStock(Long skuId) {
-        return ObjectUtil.defaultIfNull(stockRedisDAO.getStock(skuId), syncObtainRedisStock(skuId));
+        return ObjectUtil.defaultIfNull(stockRedisDAO.getStock(skuId),()->syncObtainRedisStock(skuId));
     }
 
     private Long syncObtainRedisStock(Long skuId) {
