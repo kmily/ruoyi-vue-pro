@@ -133,6 +133,17 @@
             <artifactId>transmittable-thread-local</artifactId>
         </dependency>
 
+        <!-- macos 需要的依赖，win可注释-->
+        <!-- 
+        <dependency>
+            <groupId>io.netty</groupId>	
+            <artifactId>netty-resolver-dns-native-macos</artifactId>	
+            <version>4.1.85.Final</version>	
+            <scope>runtime</scope>	
+            <classifier>osx-aarch_64</classifier>	
+        </dependency>
+        -->
+
     </dependencies>
 
 </project>
