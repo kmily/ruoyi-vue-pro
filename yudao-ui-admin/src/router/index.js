@@ -77,6 +77,11 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/calc',
+    component: (resolve) => require(['@/views/index2'], resolve),
+    hidden: true
+  },
+  {
     path: '/user',
     component: Layout,
     hidden: true,
