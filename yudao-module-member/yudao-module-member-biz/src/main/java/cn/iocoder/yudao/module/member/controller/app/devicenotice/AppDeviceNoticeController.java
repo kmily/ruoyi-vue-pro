@@ -1,5 +1,10 @@
 package cn.iocoder.yudao.module.member.controller.app.devicenotice;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.member.service.deviceuser.DeviceUserService;
+import cn.iocoder.yudao.module.member.service.deviceuser.dto.FamilyAndRoomDeviceDTO;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -13,6 +18,8 @@ import javax.validation.*;
 import javax.servlet.http.*;
 import java.util.*;
 import java.io.IOException;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -35,6 +42,9 @@ public class AppDeviceNoticeController {
 
     @Resource
     private DeviceNoticeService deviceNoticeService;
+
+    @Resource
+    private DeviceUserService deviceUserService;
 
     @PostMapping("/create")
     @Operation(summary = "创建设备通知")
@@ -83,9 +93,31 @@ public class AppDeviceNoticeController {
 
     public CommonResult<PageResult<AppDeviceNoticeRespVO>> getDeviceNoticePage(@Valid AppDeviceNoticePageReqVO pageVO) {
         PageResult<DeviceNoticeDO> pageResult = deviceNoticeService.getDeviceNoticePage(pageVO);
-        return success(DeviceNoticeConvert.INSTANCE.convertPage(pageResult));
+        PageResult<AppDeviceNoticeRespVO> convertPage = DeviceNoticeConvert.INSTANCE.convertPage(pageResult);
+        List<AppDeviceNoticeRespVO> pageResultList = convertPage.getList();
+        Set<Long> deviceIds = pageResultList.stream().filter(item -> Objects.equals((byte) 0, item.getCategory()))
+                .map(AppDeviceNoticeRespVO::getDeviceId).collect(Collectors.toSet());
+        if(CollUtil.isNotEmpty(deviceIds)){
+            List<FamilyAndRoomDeviceDTO> deviceUserDTOS = deviceUserService.selectFamilyAndRoom(deviceIds);
+            Map<Long, FamilyAndRoomDeviceDTO> deviceDTOMap = deviceUserDTOS.stream().collect(Collectors.toMap(FamilyAndRoomDeviceDTO::getDeviceId, Function.identity()));
+            pageResultList.forEach(item -> {
+                Long deviceId = item.getDeviceId();
+                FamilyAndRoomDeviceDTO roomDeviceDTO = deviceDTOMap.getOrDefault(deviceId, new FamilyAndRoomDeviceDTO());
+                item.setFamilyName(roomDeviceDTO.getFamily())
+                        .setRoomName(roomDeviceDTO.getRoom());
+            });
+        }
+        return success(convertPage);
     }
 
 
+    @GetMapping("/unRead")
+    @Operation(summary = "查询未读消息数量")
+    @Parameter(name = "familyId", description = "家庭ID")
+    @PreAuthenticated
+    public CommonResult<Long> getUnRead(@RequestParam(value = "familyId", required = false) Long familyId) {
+        Long count = deviceNoticeService.getUnRead(SecurityFrameworkUtils.getLoginUserId(), familyId);
+        return success(count);
+    }
 
 }

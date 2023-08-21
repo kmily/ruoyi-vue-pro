@@ -23,6 +23,7 @@ public interface DeviceMapper extends BaseMapperX<DeviceDO> {
                 .likeIfPresent(DeviceDO::getName, reqVO.getName())
                 .eqIfPresent(DeviceDO::getType, reqVO.getType())
                 .eqIfPresent(DeviceDO::getStatus, reqVO.getStatus())
+                .eqIfPresent(DeviceDO::getBind, reqVO.getBind())
                 .betweenIfPresent(DeviceDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(DeviceDO::getId));
     }

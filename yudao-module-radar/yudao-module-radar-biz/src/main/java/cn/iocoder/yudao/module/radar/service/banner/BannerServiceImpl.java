@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.radar.service.banner;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -81,7 +82,7 @@ public class BannerServiceImpl implements BannerService {
 
     @Override
     public List<BannerDO> getBannerList() {
-        return bannerMapper.selectList();
+        return bannerMapper.selectList(new BannerExportReqVO().setStatus(CommonStatusEnum.ENABLE.getStatus().byteValue()));
     }
 
 }

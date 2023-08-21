@@ -28,4 +28,12 @@ public interface DeviceApi {
      */
     List<DeviceDTO> getByIds(Collection<Long> ids);
 
+
+    /**
+     * 绑定或解绑
+     * @param id 设备ID
+     * @param bind 绑定状态0-未绑定，1-绑定
+     */
+    void bindOrUnBind(Long id, byte bind);
+
 }

@@ -56,6 +56,7 @@ public interface ErrorCodeConstants {
 
     // ========== 设备通知 1004001300 ==========
     ErrorCode DEVICE_NOTICE_NOT_EXISTS = new ErrorCode(1004001300, "通知不存在");
+    ErrorCode NOTICE_USER_NOT_EXISTS = new ErrorCode(1004001400, "通知不存在");
 
 
 

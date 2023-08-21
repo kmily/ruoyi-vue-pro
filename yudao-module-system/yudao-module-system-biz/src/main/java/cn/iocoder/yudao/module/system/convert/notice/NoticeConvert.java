@@ -1,12 +1,15 @@
 package cn.iocoder.yudao.module.system.convert.notice;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.system.api.notice.dto.NoticeDTO;
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notice.NoticeDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper
 public interface NoticeConvert {
@@ -21,4 +24,5 @@ public interface NoticeConvert {
 
     NoticeDO convert(NoticeCreateReqVO bean);
 
+    List<NoticeDTO> convertList(List<NoticeDO> noticeDOS);
 }

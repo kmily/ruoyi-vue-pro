@@ -21,7 +21,7 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
-                   v-hasPermi="['system:menu:create']">新增</el-button>
+                  v-hasPermi="['system:menu:create']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button type="info" plain icon="el-icon-sort" size="mini" @click="toggleExpandAll">展开/折叠</el-button>
@@ -49,11 +49,11 @@
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
-                     v-hasPermi="['system:menu:update']">修改</el-button>
+                    v-hasPermi="['system:menu:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-plus" @click="handleAdd(scope.row)"
-                     v-hasPermi="['system:menu:create']">新增</el-button>
+                    v-hasPermi="['system:menu:create']">新增</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
-                     v-hasPermi="['system:menu:delete']">删除</el-button>
+                    v-hasPermi="['system:menu:delete']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -164,7 +164,7 @@
                 <el-tooltip content="选择不是时，当该菜单只有一个子菜单时，不展示自己，直接展示子菜单" placement="top">
                   <i class="el-icon-question" />
                 </el-tooltip>
-                 总是显示
+                总是显示
               </span>
               <el-radio-group v-model="form.alwaysShow">
                 <el-radio :key="true" :label="true">总是</el-radio>
@@ -178,7 +178,7 @@
                 <el-tooltip content="选择缓存时，则会被 `keep-alive` 缓存，必须填写「组件名称」字段" placement="top">
                   <i class="el-icon-question" />
                 </el-tooltip>
-                 是否缓存
+                是否缓存
               </span>
 							<el-radio-group v-model="form.keepAlive">
 								<el-radio :key="true" :label="true">缓存</el-radio>

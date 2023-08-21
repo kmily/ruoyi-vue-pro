@@ -2,9 +2,12 @@ package cn.iocoder.yudao.module.member.service.deviceuser;
 
 import java.util.*;
 import javax.validation.*;
+
+import cn.iocoder.yudao.module.member.api.deviceuser.dto.DeviceUserDTO;
 import cn.iocoder.yudao.module.member.controller.app.deviceuser.vo.*;
 import cn.iocoder.yudao.module.member.dal.dataobject.deviceuser.DeviceUserDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.member.service.deviceuser.dto.FamilyAndRoomDeviceDTO;
 
 /**
  * 设备和用户绑定 Service 接口
@@ -88,4 +91,14 @@ public interface DeviceUserService {
      * @return
      */
     DeviceUserDO getDeviceUserByDevice(Long device);
+
+    /**
+     * 批量查询
+     * @param deviceIds
+     * @return
+     */
+    List<DeviceUserDTO> getDeviceUserListByDevices(Collection<Long> deviceIds);
+
+    List<FamilyAndRoomDeviceDTO> selectFamilyAndRoom(Collection<Long> deviceIds);
+
 }

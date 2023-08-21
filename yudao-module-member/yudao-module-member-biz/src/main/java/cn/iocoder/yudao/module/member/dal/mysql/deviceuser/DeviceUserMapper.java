@@ -5,9 +5,12 @@ import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.module.member.api.deviceuser.dto.DeviceUserDTO;
 import cn.iocoder.yudao.module.member.dal.dataobject.deviceuser.DeviceUserDO;
+import cn.iocoder.yudao.module.member.service.deviceuser.dto.FamilyAndRoomDeviceDTO;
 import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.member.controller.app.deviceuser.vo.*;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 设备和用户绑定 Mapper
@@ -41,4 +44,7 @@ public interface DeviceUserMapper extends BaseMapperX<DeviceUserDO> {
                 //.orderByDesc(DeviceUserDO::getId));
     }
 
+    List<DeviceUserDTO> selectDeviceUser(@Param("deviceIds") Collection<Long> deviceIds);
+
+    List<FamilyAndRoomDeviceDTO> selectFamilyAndRoom(@Param("deviceIds") Collection<Long> deviceIds);
 }

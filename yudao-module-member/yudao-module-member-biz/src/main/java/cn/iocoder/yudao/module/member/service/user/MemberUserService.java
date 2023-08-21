@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.member.service.user;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.UserPageReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateInfoReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
@@ -103,4 +105,12 @@ public interface MemberUserService {
      * @param reqVO
      */
     void updateInfo(Long loginUserId, AppUserUpdateInfoReqVO reqVO);
+
+    /**
+     * 获得会员分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 会员分页
+     */
+    PageResult<MemberUserDO> getUserPage(UserPageReqVO pageReqVO);
 }

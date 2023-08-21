@@ -16,4 +16,13 @@ public class DeviceRespVO extends DeviceBaseVO {
     @Schema(description = "创建时间", required = true)
     private LocalDateTime createTime;
 
+    @Schema(description = "用户昵称", required = true)
+    private String nickname;
+    @Schema(description = "用户手机号", required = true)
+    private String mobile;
+    @Schema(description = "用户ID", required = true)
+    private Long userId;
+
+
+
 }

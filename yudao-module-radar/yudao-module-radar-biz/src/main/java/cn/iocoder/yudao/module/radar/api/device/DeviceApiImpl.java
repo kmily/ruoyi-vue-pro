@@ -1,15 +1,20 @@
 package cn.iocoder.yudao.module.radar.api.device;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.radar.api.device.dto.DeviceDTO;
+import cn.iocoder.yudao.module.radar.controller.admin.device.vo.DeviceBaseVO;
 import cn.iocoder.yudao.module.radar.controller.admin.device.vo.DeviceExportReqVO;
 import cn.iocoder.yudao.module.radar.controller.admin.device.vo.DeviceRespVO;
+import cn.iocoder.yudao.module.radar.controller.admin.device.vo.DeviceUpdateReqVO;
 import cn.iocoder.yudao.module.radar.convert.device.DeviceConvert;
 import cn.iocoder.yudao.module.radar.dal.dataobject.device.DeviceDO;
 import cn.iocoder.yudao.module.radar.service.device.DeviceService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -35,7 +40,21 @@ public class DeviceApiImpl implements DeviceApi{
 
     @Override
     public List<DeviceDTO> getByIds(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)){
+            return new ArrayList<>();
+        }
         List<DeviceDO> deviceList = deviceService.getDeviceList(ids);
         return DeviceConvert.INSTANCE.convertList03(deviceList);
+    }
+
+    @Override
+    public void bindOrUnBind(Long id, byte bind) {
+        TenantUtils.executeIgnore(()->{
+            DeviceUpdateReqVO updateReqVO = new DeviceUpdateReqVO();
+            updateReqVO.setId(id)
+                    .setBind(bind)
+                    .setBindTime(LocalDateTime.now());
+            deviceService.updateDevice(updateReqVO);
+        });
     }
 }

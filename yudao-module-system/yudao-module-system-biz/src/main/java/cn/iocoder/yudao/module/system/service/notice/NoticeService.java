@@ -6,6 +6,9 @@ import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticePageReqVO
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notice.NoticeDO;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 /**
  * 通知公告 Service 接口
  */
@@ -49,4 +52,10 @@ public interface NoticeService {
      */
     NoticeDO getNotice(Long id);
 
+    /**
+     * 根据时间查询消息
+     * @param startTime
+     * @return
+     */
+    List<NoticeDO> getNoticeList(LocalDateTime startTime);
 }

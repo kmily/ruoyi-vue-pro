@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.dal.mysql.devicenotice;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -8,6 +9,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.member.dal.dataobject.devicenotice.DeviceNoticeDO;
 import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.member.controller.app.devicenotice.vo.*;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 设备通知 Mapper
@@ -26,7 +28,7 @@ public interface DeviceNoticeMapper extends BaseMapperX<DeviceNoticeDO> {
                 .eqIfPresent(DeviceNoticeDO::getType, reqVO.getType())
                 .eqIfPresent(DeviceNoticeDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(DeviceNoticeDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(DeviceNoticeDO::getId));
+                .orderByDesc(DeviceNoticeDO::getHappenTime));
     }
 
     default List<DeviceNoticeDO> selectList(AppDeviceNoticeExportReqVO reqVO) {
@@ -40,5 +42,22 @@ public interface DeviceNoticeMapper extends BaseMapperX<DeviceNoticeDO> {
                 .betweenIfPresent(DeviceNoticeDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(DeviceNoticeDO::getId));
     }
+
+    /**
+     * 查询最大阅读时间
+     * @param userId
+     * @return
+     */
+    LocalDateTime selectMaxDate(@Param("userId") Long userId);
+
+    /**
+     * 查询微阅读条数
+     * @param userId 用户ID
+     * @param familyId 家庭ID
+     * @return 未阅读条数
+     */
+    Long selectUnReadCount(@Param("userId") Long userId, @Param("familyId") Long familyId);
+
+    void updateByNoticeId(@Param("noticeId") Long noticeId, @Param("content") String content);
 
 }

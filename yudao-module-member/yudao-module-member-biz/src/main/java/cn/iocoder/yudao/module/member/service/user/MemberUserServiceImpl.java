@@ -3,7 +3,9 @@ package cn.iocoder.yudao.module.member.service.user;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.UserPageReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateInfoReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.convert.user.UserConvert;
@@ -161,6 +163,11 @@ public class MemberUserServiceImpl implements MemberUserService {
         MemberUserDO userDO = UserConvert.INSTANCE.convert(reqVO);
         userDO.setId(id);
         memberUserMapper.updateById(userDO);
+    }
+
+    @Override
+    public PageResult<MemberUserDO> getUserPage(UserPageReqVO pageReqVO) {
+        return memberUserMapper.selectPage(pageReqVO);
     }
 
     /**

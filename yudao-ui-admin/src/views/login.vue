@@ -4,153 +4,132 @@
     <!-- 登录区域 -->
     <div class="content">
       <!-- 配图 -->
-      <div class="pic"></div>
+      <div class="pic">
+        <h3 class="title">守望家  连接家的温度</h3>
+      </div>
       <!-- 表单 -->
       <div class="field">
         <!-- [移动端]标题 -->
         <h2 class="mobile-title">
-          <h3 class="title">芋道后台管理系统</h3>
+          <h3 class="title">守望家后台管理系统</h3>
         </h2>
-
+        <div class="title-warp">
+          <img src="../assets/images/logo_1.png" height="35px"/>
+          <div class="title-div">守望家</div>
+          <el-divider class=" line" direction="vertical"></el-divider>
+          <div class="title-div">后台管理</div>
+        </div>
         <!-- 表单 -->
         <div class="form-cont">
-          <el-tabs
-            class="form"
-            v-model="loginForm.loginType"
-            style="float: none"
-          >
-            <el-tab-pane label="账号密码登录" name="uname"> </el-tab-pane>
-            <el-tab-pane label="短信验证码登录" name="sms"> </el-tab-pane>
+          <el-tabs class="form" v-model="loginForm.loginType" style="float: none" >
+            <!-- <el-tab-pane label="账号密码登录" name="uname"> </el-tab-pane>
+            <el-tab-pane label="短信验证码登录" name="sms"> </el-tab-pane> -->
           </el-tabs>
+          
           <div>
-            <el-form
-              ref="loginForm"
-              :model="loginForm"
-              :rules="LoginRules"
-              class="login-form"
-            >
-              <el-form-item
-                prop="tenantName"
-                v-if="tenantEnable"
-                v-show="false"
-              >
-                <el-input
-                  v-model="loginForm.tenantName"
-                  type="text"
-                  auto-complete="off"
-                  placeholder="租户"
-                >
-                  <svg-icon
-                    slot="prefix"
-                    icon-class="tree"
-                    class="el-input__icon input-icon"
-                  />
+            <el-form  ref="loginForm" :model="loginForm" :rules="LoginRules" class="login-form">
+              <el-form-item  prop="tenantName"  v-if="tenantEnable" v-show="false">
+                <el-input v-model="loginForm.tenantName"  type="text" auto-complete="off" placeholder="租户">
+                  <svg-icon  slot="prefix"  icon-class="tree"  class="el-input__icon input-icon"/>
                 </el-input>
               </el-form-item>
               <!-- 账号密码登录 -->
               <div v-if="loginForm.loginType === 'uname'">
                 <el-form-item prop="username">
-                  <el-input
-                    v-model="loginForm.username"
-                    type="text"
-                    auto-complete="off"
-                    placeholder="账号"
-                  >
-                    <svg-icon
-                      slot="prefix"
-                      icon-class="user"
-                      class="el-input__icon input-icon"
-                    />
+                  <el-input  v-model="loginForm.username"  type="text"  auto-complete="off"  placeholder="账号">
+                    <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
                   </el-input>
                 </el-form-item>
-                <el-form-item prop="password">
-                  <el-input
-                    v-model="loginForm.password"
-                    type="password"
-                    auto-complete="off"
-                    placeholder="密码"
-                    @keyup.enter.native="getCode"
-                  >
-                    <svg-icon
-                      slot="prefix"
-                      icon-class="password"
-                      class="el-input__icon input-icon"
-                    />
+                <el-form-item prop="password" style="margin-bottom:2px">
+                  <el-input v-model="loginForm.password" type="password" auto-complete="off" placeholder="密码"
+                    @keyup.enter.native="getCode" >
+                    <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon"/>
                   </el-input>
                 </el-form-item>
-                <el-checkbox
-                  v-model="loginForm.rememberMe"
-                  style="margin: 0 0 25px 0"
-                  >记住密码</el-checkbox
-                >
+                <!-- <el-checkbox  v-model="loginForm.rememberMe" style="margin: 0 0 25px 0">记住密码</el-checkbox> -->
+                <el-button size="mini"  type="text"  @click="loginForm.loginType = 'sms'">验证码登录</el-button>
+                <!-- <el-button size="mini"  type="text" style="float:right;"  @click="loginForm.loginType = 'pwd'">忘记密码</el-button> -->
               </div>
 
               <!-- 短信验证码登录 -->
               <div v-if="loginForm.loginType === 'sms'">
                 <el-form-item prop="mobile">
-                  <el-input
-                    v-model="loginForm.mobile"
-                    type="text"
-                    auto-complete="off"
-                    placeholder="请输入手机号"
-                  >
-                    <svg-icon
-                      slot="prefix"
-                      icon-class="phone"
-                      class="el-input__icon input-icon"
-                    />
+                  <el-input v-model="loginForm.mobile" type="text" auto-complete="off" placeholder="请输入手机号">
+                    <svg-icon slot="prefix" icon-class="phone" class="el-input__icon input-icon"/>
                   </el-input>
                 </el-form-item>
-                <el-form-item prop="mobileCode">
-                  <el-input
-                    v-model="loginForm.mobileCode"
-                    type="text"
-                    auto-complete="off"
-                    placeholder="短信验证码"
-                    @keyup.enter.native="handleLogin"
-                  >
-                    <svg-icon
-                      slot="prefix"
-                      icon-class="password"
-                      class="el-input__icon input-icon"
-                    />
-                    <span
-                      slot="append"
-                      v-if="mobileCodeTimer <= 0"
-                      class="getMobileCode"
-                      @click="getSmsCode"
-                      style="cursor: pointer"
-                      >获取验证码
-                    </span>
-                    <span
-                      slot="append"
-                      v-if="mobileCodeTimer > 0"
-                      class="getMobileCode"
-                      >{{ mobileCodeTimer }}秒后可重新获取</span
-                    >
+                <el-form-item prop="mobileCode" class="mobile-code" style="margin-bottom:2px;display:flex;">
+                  <el-input v-model="loginForm.mobileCode" type="text" auto-complete="off" placeholder="短信验证码"
+                    @keyup.enter.native="handleLogin" >
+                    <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon"/>
+                    <!-- <span slot="append" v-if="mobileCodeTimer <= 0" class="getMobileCode"
+                      @click="getSmsCode" style="cursor: pointer" >获取验证码</span>
+                    <span slot="append" v-if="mobileCodeTimer > 0" class="getMobileCode" >{{ mobileCodeTimer }}秒后可重新获取</span> -->
                   </el-input>
+                  <el-button  size="mini" v-if="mobileCodeTimer <= 0" class="getMobileCode"
+                      @click="getSmsCode" type="primary">获取验证码</el-button>
+                  <el-button  size="mini" v-if="mobileCodeTimer > 0" class="getMobileCode"
+                      type="primary">{{ mobileCodeTimer }}秒后可重新获取</el-button>
                 </el-form-item>
-                <el-checkbox style="margin: 0 0 25px 0; visibility: hidden"
-                  >记住密码</el-checkbox
-                >
+                <!-- <el-checkbox style="margin: 0 0 25px 0; visibility: hidden" >记住密码</el-checkbox> -->
+                <el-button size="mini"  type="text"  @click="loginForm.loginType = 'uname'">密码登录</el-button>
               </div>
 
+              <!-- 忘记密码 -->
+              <div v-if="loginForm.loginType === 'pwd'">
+                <el-form-item prop="mobile">
+                  <el-input v-model="loginForm.mobile" type="text" auto-complete="off" placeholder="请输入手机号">
+                    <svg-icon slot="prefix" icon-class="phone" class="el-input__icon input-icon"/>
+                  </el-input>
+                </el-form-item>
+                <el-form-item prop="mobileCode" >
+                  <el-input v-model="loginForm.mobileCode" type="text" auto-complete="off" placeholder="短信验证码"
+                    @keyup.enter.native="handleLogin" >
+                    <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon"/>
+                    <span slot="append" v-if="mobileCodeTimer <= 0" class="getMobileCode"
+                      @click="getSmsCode" style="cursor: pointer" >获取验证码</span>
+                    <span slot="append" v-if="mobileCodeTimer > 0" class="getMobileCode" >{{ mobileCodeTimer }}秒后可重新获取</span>
+                  </el-input>
+                  <!-- <el-button  size="mini" type="text"  @click="loginForm.loginType = 'uname'">返回登录</el-button> -->
+                </el-form-item>
+                <el-form-item prop="password" >
+                  <el-input v-model="loginForm.password" type="password" auto-complete="off" placeholder="输入新密码"
+                    @keyup.enter.native="handleLogin" >
+                    <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon"/>
+                  </el-input>
+                </el-form-item>
+                <el-form-item prop="repassword" style="margin-bottom:2px">
+                  <el-input v-model="loginForm.repassword" type="password" auto-complete="off" placeholder="再次输入密码"
+                    @keyup.enter.native="handleLogin" >
+                    <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon"/>
+                  </el-input>
+                </el-form-item>
+                <!-- <el-checkbox style="margin: 0 0 25px 0; visibility: hidden" >记住密码</el-checkbox> -->
+                <el-button  size="mini" type="text"  @click="loginForm.loginType = 'uname'">返回登录</el-button>
+              </div>
+
+
               <!-- 下方的登录按钮 -->
-              <el-form-item style="width: 100%">
+              <el-form-item style="width: 100%;margin-top:22px">
                 <el-button
                   :loading="loading"
                   size="medium"
                   type="primary"
-                  style="width: 100%"
+                  style="width:100%; "
                   @click.native.prevent="getCode"
                 >
                   <span v-if="!loading">登 录</span>
                   <span v-else>登 录 中...</span>
                 </el-button>
+                <div style="float: right;">
+                  <el-checkbox label=""></el-checkbox>
+                  <span>&nbsp;&nbsp;阅读并同意</span>
+                  <el-button  size="mini" type="text">《用户服务协议》</el-button>
+                </div>
               </el-form-item>
 
               <!--  社交登录
-             <el-form-item style="width:100%;">
+            <el-form-item style="width:100%;">
                   <div class="oauth-login" style="display:flex">
                     <div class="oauth-login-item" v-for="item in SysUserSocialTypeEnum" :key="item.type" @click="doSocialLogin(item)">
                       <img :src="item.img" height="25px" width="25px" alt="登录" >
@@ -174,7 +153,7 @@
 
     <!-- footer -->
     <div class="footer">
-      Copyright © 2020-2022 iocoder.cn All Rights Reserved.
+      Copyright © 2022-2024 blinktech.cn All Rights Reserved.
     </div>
   </div>
 </template>
@@ -349,7 +328,6 @@ export default {
               this.loginForm
             )
             .then(() => {
-              debugger;
               this.$router.push({ path: this.redirect || "/" }).catch(() => {});
             })
             .catch(() => {
@@ -427,7 +405,16 @@ export default {
         });
       });
     },
+
+    /**
+     * 跳转注册页面
+     */
+    registerHandl(){
+      window.location.href = 'register';
+    }
   },
+
+
 };
 </script>
 <style lang="scss" scoped>

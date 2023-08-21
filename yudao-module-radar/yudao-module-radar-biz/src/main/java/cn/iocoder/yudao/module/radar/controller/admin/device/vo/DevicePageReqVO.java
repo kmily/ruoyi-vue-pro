@@ -31,4 +31,12 @@ public class DevicePageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
+    @Schema(description = "绑定状态（0未 1已）", required = true, example = "1")
+    private Byte bind;
+
+    @Schema(description = "保活时间", required = true)
+    private LocalDateTime keepalive;
+    @Schema(description = "绑定时间", required = true)
+    private LocalDateTime bindTime;
+
 }

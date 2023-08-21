@@ -50,18 +50,8 @@ public class AppDeviceController {
     @Operation(summary = "获得设备状态列表")
     @PreAuthenticated
     public CommonResult<List<DeviceStatusVO>> getDeviceStatusList(@RequestParam("ids") Collection<Long> ids) {
-        List<DeviceDO> deviceList = deviceService.getDeviceList(ids);
-        Map<Long, LocalDateTime> deviceTimeMap = deviceList.stream().collect(HashMap::new, (map, item) -> map.put(item.getId(), item.getKeepalive()),
-                HashMap::putAll);
-        LocalDateTime now = LocalDateTime.now();
-        List<DeviceStatusVO> deviceStatusVOS = ids.stream().map(id -> {
-            LocalDateTime dateTime = deviceTimeMap.get(id);
-            int status = 0;
-            if (dateTime != null && Duration.between(dateTime, now).toMinutes() <= 5L) {
-                status = 1;
-            }
-            return new DeviceStatusVO().setDeviceId(id).setStatus(status);
-        }).collect(Collectors.toList());
+
+        List<DeviceStatusVO> deviceStatusVOS = deviceService.getDeviceStatusList(ids);
 
         return success(deviceStatusVOS);
     }

@@ -26,8 +26,17 @@ public class DeviceBaseVO {
     @NotNull(message = "设备类别不能为空")
     private Integer type;
 
-    @Schema(description = "部门状态（0正常 1停用）", required = true, example = "2")
+    @Schema(description = "状态（0正常 1停用）", required = true, example = "2")
     @NotNull(message = "部门状态（0正常 1停用）不能为空")
     private Byte status;
 
+    @Schema(description = "绑定状态（0未 1已）", required = true, example = "1")
+    private Byte bind;
+
+    @Schema(description = "保活时间", required = true)
+    private LocalDateTime keepalive;
+
+
+    @Schema(description = "绑定时间", required = true)
+    private LocalDateTime bindTime;
 }

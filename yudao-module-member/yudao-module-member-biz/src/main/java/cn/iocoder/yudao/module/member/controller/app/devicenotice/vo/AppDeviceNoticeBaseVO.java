@@ -38,4 +38,15 @@ public class AppDeviceNoticeBaseVO {
     @Schema(description = "发生时间")
     private LocalDateTime happenTime;
 
+    /**
+     * 阅读时间
+     */
+    @Schema(description = "阅读时间")
+    private LocalDateTime readTime;
+
+    /**
+     * 消息类别 0-设备警告，1-系统消息
+     */
+    @Schema(description = "消息类别 0-设备警告，1-系统消息")
+    private Byte category;
 }

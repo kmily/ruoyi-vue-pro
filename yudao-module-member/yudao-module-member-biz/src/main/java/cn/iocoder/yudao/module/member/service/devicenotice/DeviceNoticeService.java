@@ -74,4 +74,32 @@ public interface DeviceNoticeService {
      * @param number
      */
     void createDeviceNotice(int type, String content, String number);
+
+    /**
+     * 查询未读数据
+     * @param loginUserId
+     * @return
+     */
+    Long getUnReadCount(Long loginUserId, Long familyId);
+
+    /**
+     * 获取未读消息条数
+     * @param userId  用户ID
+     * @param familyId 家庭ID
+     * @return 返回未读消息条数
+     */
+    Long getUnRead(Long userId, Long familyId);
+
+    /**
+     * 根据消息ID删除
+     * @param noticeId
+     */
+    void deleteByNoticeId(Long noticeId);
+
+    /**
+     * 更新消息
+     * @param noticeId 消息ID
+     * @param content 消息内容
+     */
+    void updateByNoticeId(Long noticeId, String content);
 }

@@ -1,16 +1,17 @@
 package cn.iocoder.yudao.module.member.service.deviceuser;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.util.string.StrUtils;
+import cn.iocoder.yudao.module.member.api.deviceuser.dto.DeviceUserDTO;
 import cn.iocoder.yudao.module.member.controller.app.room.vo.RoomExportReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.family.FamilyDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.room.RoomDO;
 import cn.iocoder.yudao.module.member.service.alarmsettings.AlarmSettingsService;
+import cn.iocoder.yudao.module.member.service.deviceuser.dto.FamilyAndRoomDeviceDTO;
 import cn.iocoder.yudao.module.member.service.family.FamilyService;
 import cn.iocoder.yudao.module.member.service.room.RoomService;
 import cn.iocoder.yudao.module.radar.api.device.DeviceApi;
 import cn.iocoder.yudao.module.radar.api.device.dto.DeviceDTO;
-import cn.iocoder.yudao.module.radar.enums.RadarType;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
@@ -29,7 +30,6 @@ import cn.iocoder.yudao.module.member.convert.deviceuser.DeviceUserConvert;
 import cn.iocoder.yudao.module.member.dal.mysql.deviceuser.DeviceUserMapper;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
 
 /**
@@ -87,6 +87,9 @@ public class DeviceUserServiceImpl implements DeviceUserService {
         deviceUserMapper.insert(deviceUser);
         // 初始化雷达告警设置
         alarmSettingsService.createAlarmSettings(deviceDTO.getId(),  deviceDTO.getType());
+
+        deviceApi.bindOrUnBind(deviceDTO.getId(), (byte)1);
+
         // 返回
         return deviceUser.getId();
     }
@@ -150,7 +153,10 @@ public class DeviceUserServiceImpl implements DeviceUserService {
 
     @Override
     public List<AppDeviceUserVO> getDevicesOfFamily(Long familyId, Integer type) {
-        List<DeviceUserDO> list = this.getDeviceUserList(new AppDeviceUserExportReqVO().setUserId(getLoginUserId()).setFamilyId(familyId));
+        List<DeviceUserDO> list = this.getDeviceUserList(new AppDeviceUserExportReqVO().setFamilyId(familyId));
+        if(CollUtil.isEmpty(list)){
+            return new ArrayList<>();
+        }
         List<RoomDO> roomList = roomService.getRoomList(new RoomExportReqVO().setFamilyId(familyId));
         Map<Long, String> roomMap = roomList.stream().collect(Collectors.toMap(RoomDO::getId, RoomDO::getName));
         List<DeviceDTO> deviceDTOS = deviceApi.getByIds(list.stream().map(DeviceUserDO::getDeviceId).collect(Collectors.toSet()));
@@ -173,6 +179,17 @@ public class DeviceUserServiceImpl implements DeviceUserService {
     @Override
     public DeviceUserDO getDeviceUserByDevice(Long device) {
         return deviceUserMapper.selectOne(DeviceUserDO::getDeviceId, device);
+    }
+
+    @Override
+    public List<DeviceUserDTO> getDeviceUserListByDevices(Collection<Long> deviceIds) {
+        return deviceUserMapper.selectDeviceUser(deviceIds);
+    }
+
+    @Override
+    public List<FamilyAndRoomDeviceDTO> selectFamilyAndRoom(Collection<Long> deviceIds) {
+
+        return deviceUserMapper.selectFamilyAndRoom(deviceIds);
     }
 
 }

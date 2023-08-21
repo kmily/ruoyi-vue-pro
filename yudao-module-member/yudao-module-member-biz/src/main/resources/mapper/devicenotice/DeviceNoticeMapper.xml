@@ -9,4 +9,29 @@
         文档可见：https://www.iocoder.cn/MyBatis/x-plugins/
      -->
 
+
+    <select id="selectMaxDate" resultType="java.time.LocalDateTime">
+
+        select max(`happen_time`) from member_device_notice where `user_id` = #{userId}
+        and category = 1
+
+    </select>
+
+
+    <select id="selectUnReadCount" resultType="java.lang.Long">
+
+        select count(*) from member_device_notice where `user_id` = #{userId}
+                                                      and `status` = 0
+        <if test="familyId != null">
+            AND ((family_id = #{familyId} AND category = 0) OR category = 1 )
+        </if>
+
+    </select>
+
+    <update id="updateByNoticeId">
+        update member_device_notice set `content` = #{content},
+                                        `deleted` = 0
+        where `device_id` = #{noticeId} and `category` = 1
+    </update>
+
 </mapper>

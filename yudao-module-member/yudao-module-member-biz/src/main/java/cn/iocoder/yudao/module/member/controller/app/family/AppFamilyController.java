@@ -28,7 +28,7 @@ import cn.iocoder.yudao.module.member.service.family.FamilyService;
 @RestController
 @RequestMapping("/member/family")
 @Validated
-public class FamilyController {
+public class AppFamilyController {
 
     @Resource
     private FamilyService familyService;

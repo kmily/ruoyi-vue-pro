@@ -46,9 +46,7 @@
         />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" @click="handleQuery"
-          >搜索</el-button
-        >
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
@@ -62,9 +60,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['radar:banner:create']"
-          >新增</el-button
-        >
+          v-hasPermi="['radar:banner:create']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -74,9 +70,7 @@
           size="mini"
           @click="handleExport"
           :loading="exportLoading"
-          v-hasPermi="['radar:banner:export']"
-          >导出</el-button
-        >
+          v-hasPermi="['radar:banner:export']">导出</el-button>
       </el-col>
       <right-toolbar
         :showSearch.sync="showSearch"
@@ -86,16 +80,11 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
+      <el-table-column label="编号" align="center" prop="id" />
       <el-table-column label="标题" align="center" prop="title" />
-
       <el-table-column label="缩略图" align="center" prop="picUrl">
         <template v-slot="scope">
-          <img
-            v-if="scope.row.picUrl"
-            :src="scope.row.picUrl"
-            alt="缩略图片"
-            class="img-height"
-          />
+          <img  v-if="scope.row.picUrl"  :src="scope.row.picUrl" alt="缩略图片"  class="img-height"/>
         </template>
       </el-table-column>
       <el-table-column label="跳转连接" align="center" prop="url" />
@@ -106,39 +95,17 @@
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
-
-      <el-table-column
-        label="创建时间"
-        align="center"
-        prop="createTime"
-        width="180"
-      >
+      <el-table-column  label="创建时间"  align="center"  prop="createTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column
-        label="操作"
-        align="center"
-        class-name="small-padding fixed-width"
-      >
+      <el-table-column  label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['radar:banner:update']"
-            >修改</el-button
-          >
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['radar:banner:delete']"
-            >删除</el-button
-          >
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
+                    v-hasPermi="['radar:banner:update']">修改</el-button>
+          <el-button  size="mini"  type="text"  icon="el-icon-delete" @click="handleDelete(scope.row)"
+                    v-hasPermi="['radar:banner:delete']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -148,17 +115,10 @@
       :total="total"
       :page.sync="queryParams.pageNo"
       :limit.sync="queryParams.pageSize"
-      @pagination="getList"
-    />
+      @pagination="getList"/>
 
     <!-- 对话框(添加 / 修改) -->
-    <el-dialog
-      :title="title"
-      :visible.sync="open"
-      width="500px"
-      v-dialogDrag
-      append-to-body
-    >
+    <el-dialog  :title="title"  :visible.sync="open"  width="500px"  v-dialogDrag append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="标题" prop="title">
           <el-input v-model="form.title" placeholder="请输入标题" />
@@ -244,7 +204,6 @@ export default {
         picUrl: [
           { required: true, message: "图片地址不能为空", trigger: "blur" },
         ],
-        url: [{ required: true, message: "跳转地址不能为空", trigger: "blur" }],
         sort: [{ required: true, message: "排序不能为空", trigger: "blur" }],
         status: [
           { required: true, message: "状态不能为空", trigger: "change" },
@@ -372,6 +331,6 @@ export default {
 <style scoped lang="scss">
 //
 .img-height {
-  height: 150px;
+  height: 100px;
 }
 </style>

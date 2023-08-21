@@ -55,9 +55,9 @@
             <el-tab-pane label="修改密码" name="resetPwd">
               <resetPwd :user="user" />
             </el-tab-pane>
-            <el-tab-pane label="社交信息" name="userSocial">
+            <!-- <el-tab-pane label="社交信息" name="userSocial">
               <userSocial :user="user" :getUser="getUser" :setActiveTab="setActiveTab" />
-            </el-tab-pane>
+            </el-tab-pane> -->
           </el-tabs>
         </el-card>
       </el-col>

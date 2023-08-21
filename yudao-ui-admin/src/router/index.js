@@ -45,6 +45,11 @@ export const constantRoutes = [
     hidden: true
   },
   {
+    path: '/register',
+    component: (resolve) => require(['@/views/register'], resolve),
+    hidden: true
+  },
+  {
     path: '/sso',
     component: (resolve) => require(['@/views/sso'], resolve),
     hidden: true
@@ -221,7 +226,19 @@ export const constantRoutes = [
         component: (resolve) => require(['@/views/mall/trade/order/detail'], resolve)
       }
     ]
-  }
+  },
+  {
+    path: '/member',
+    component: Layout,
+    hidden: true,
+    children: [{
+        path: 'user/detail/:userId(\\d+)',
+        component: (resolve) => require(['@/views/member/user/detail'], resolve),
+        name: 'Detail',
+        meta: {title: '会员详情', icon: '', activeMenu: '/member/user'}
+      }
+    ]
+  },
 ]
 
 // 防止连续点击多次路由报错

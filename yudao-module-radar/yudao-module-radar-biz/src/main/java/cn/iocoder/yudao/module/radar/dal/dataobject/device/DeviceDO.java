@@ -50,4 +50,16 @@ public class DeviceDO extends TenantBaseDO {
      */
     private LocalDateTime keepalive;
 
+
+    /**
+     * 是否绑定 0-未，1-已
+     */
+    private Byte bind;
+
+    /**
+     * 绑定时间
+     */
+    private LocalDateTime bindTime;
+
+
 }

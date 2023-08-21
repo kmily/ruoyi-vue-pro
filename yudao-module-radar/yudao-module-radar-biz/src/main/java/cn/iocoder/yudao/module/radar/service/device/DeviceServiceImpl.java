@@ -1,11 +1,15 @@
 package cn.iocoder.yudao.module.radar.service.device;
 
+import cn.iocoder.yudao.module.radar.controller.app.device.DeviceStatusVO;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import cn.iocoder.yudao.module.radar.controller.admin.device.vo.*;
 import cn.iocoder.yudao.module.radar.dal.dataobject.device.DeviceDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -83,6 +87,23 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public void updateKeepalive(Long id, LocalDateTime now) {
         deviceMapper.updateById(new DeviceDO().setKeepalive(now).setId(id));
+    }
+
+    @Override
+    public List<DeviceStatusVO> getDeviceStatusList(Collection<Long> ids) {
+        List<DeviceDO> deviceList = this.getDeviceList(ids);
+        Map<Long, LocalDateTime> deviceTimeMap = deviceList.stream().collect(HashMap::new, (map, item) -> map.put(item.getId(), item.getKeepalive()),
+                HashMap::putAll);
+        LocalDateTime now = LocalDateTime.now();
+
+        return ids.stream().map(id -> {
+            LocalDateTime dateTime = deviceTimeMap.get(id);
+            int status = 0;
+            if (dateTime != null && Duration.between(dateTime, now).toMinutes() <= 5L) {
+                status = 1;
+            }
+            return new DeviceStatusVO().setDeviceId(id).setStatus(status);
+        }).collect(Collectors.toList());
     }
 
 }

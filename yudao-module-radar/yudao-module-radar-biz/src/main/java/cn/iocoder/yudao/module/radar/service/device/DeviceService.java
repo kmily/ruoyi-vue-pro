@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import javax.validation.*;
 import cn.iocoder.yudao.module.radar.controller.admin.device.vo.*;
+import cn.iocoder.yudao.module.radar.controller.app.device.DeviceStatusVO;
 import cn.iocoder.yudao.module.radar.dal.dataobject.device.DeviceDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
@@ -74,4 +75,13 @@ public interface DeviceService {
      * @param now
      */
     void updateKeepalive(Long id, LocalDateTime now);
+
+    /**
+     * 查询设备状态
+     * @param ids
+     * @return
+     */
+    List<DeviceStatusVO> getDeviceStatusList(Collection<Long> ids);
+
+
 }

@@ -16,4 +16,15 @@ public class AppDeviceNoticeRespVO extends AppDeviceNoticeBaseVO {
     @Schema(description = "创建时间", required = true)
     private LocalDateTime createTime;
 
+
+    /**
+     * 家庭名称
+     */
+    private String familyName;
+
+    /**
+     * 房间名称
+     */
+    private String roomName;
+
 }

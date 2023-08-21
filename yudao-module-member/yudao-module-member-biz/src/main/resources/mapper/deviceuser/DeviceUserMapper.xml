@@ -9,4 +9,37 @@
         文档可见：https://www.iocoder.cn/MyBatis/x-plugins/
      -->
 
+
+    <select id="selectDeviceUser" resultType="cn.iocoder.yudao.module.member.api.deviceuser.dto.DeviceUserDTO">
+        SELECT nickname,
+               mobile,
+               user_id AS userId,
+               device_id AS deviceId
+
+        FROM `member_device_user` AS d
+        JOIN `member_user` AS u
+        ON d.user_id = u.id
+        WHERE device_id IN
+        <foreach collection="deviceIds" open="(" separator="," close=")" item="id">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectFamilyAndRoom" resultType="cn.iocoder.yudao.module.member.service.deviceuser.dto.FamilyAndRoomDeviceDTO">
+        SELECT
+            u.device_id AS deviceId,
+            f.name AS family,
+            r.name AS room
+        FROM `member_family` AS f
+                 JOIN `member_device_user` AS u
+                      ON f.id = u.family_id
+                 JOIN `member_room` AS r
+                      ON r.id = u.room_id
+        WHERE u.device_id IN
+        <foreach collection="deviceIds" open="(" separator="," close=")" item="id">
+            #{id}
+        </foreach>
+    </select>
+
+
 </mapper>

@@ -57,4 +57,16 @@ public class DeviceNoticeDO extends BaseDO {
      */
     private LocalDateTime happenTime;
 
+
+    /**
+     * 阅读时间
+     */
+    private LocalDateTime readTime;
+
+    /**
+     * 消息类别 0-设备警告，1-系统消息
+     */
+    private Byte category;
+
+
 }

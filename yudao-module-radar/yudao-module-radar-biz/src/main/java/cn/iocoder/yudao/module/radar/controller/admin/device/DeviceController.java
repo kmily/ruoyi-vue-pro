@@ -1,5 +1,10 @@
 package cn.iocoder.yudao.module.radar.controller.admin.device;
 
+
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
+import cn.iocoder.yudao.module.member.api.deviceuser.DeviceUserApi;
+import cn.iocoder.yudao.module.member.api.deviceuser.dto.DeviceUserDTO;
+import cn.iocoder.yudao.module.radar.controller.app.device.DeviceStatusVO;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -13,6 +18,8 @@ import javax.validation.*;
 import javax.servlet.http.*;
 import java.util.*;
 import java.io.IOException;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -36,6 +43,9 @@ public class DeviceController {
 
     @Resource
     private DeviceService deviceService;
+
+    @Resource
+    private DeviceUserApi userApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建设备信息")
@@ -84,7 +94,21 @@ public class DeviceController {
     @PreAuthorize("@ss.hasPermission('radar:device:query')")
     public CommonResult<PageResult<DeviceRespVO>> getDevicePage(@Valid DevicePageReqVO pageVO) {
         PageResult<DeviceDO> pageResult = deviceService.getDevicePage(pageVO);
-        return success(DeviceConvert.INSTANCE.convertPage(pageResult));
+        PageResult<DeviceRespVO> pageResult1 = DeviceConvert.INSTANCE.convertPage(pageResult);
+
+        List<Long> collect = pageResult1.getList().stream().filter(item -> item.getBind() == (byte)1).map(DeviceRespVO::getId).collect(Collectors.toList());
+        if(collect.size() > 0){
+            List<DeviceUserDTO> userDTOS = userApi.queryUser(collect);
+            Map<Long, DeviceUserDTO> userDTOMap = userDTOS.stream().collect(Collectors.toMap(DeviceUserDTO::getDeviceId, Function.identity(), (newKey, oldKey) -> newKey));
+            pageResult1.getList().forEach(item -> {
+                DeviceUserDTO userDTO = userDTOMap.getOrDefault(item.getId(), new DeviceUserDTO());
+                item.setNickname(userDTO.getNickname())
+                        .setMobile(userDTO.getMobile())
+                        .setUserId(userDTO.getUserId());
+            });
+        }
+
+        return success(pageResult1);
     }
 
     @GetMapping("/export-excel")
@@ -97,6 +121,16 @@ public class DeviceController {
         // 导出 Excel
         List<DeviceExcelVO> datas = DeviceConvert.INSTANCE.convertList02(list);
         ExcelUtils.write(response, "设备信息.xls", "数据", DeviceExcelVO.class, datas);
+    }
+
+
+    @GetMapping("/device-status")
+    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
+    @Operation(summary = "获得设备状态列表")
+    @PreAuthorize("@ss.hasPermission('radar:device:query')")
+    public CommonResult<List<DeviceStatusVO>> getDeviceStatusList(@RequestParam("ids") Collection<Long> ids) {
+        List<DeviceStatusVO> deviceStatusVOS = deviceService.getDeviceStatusList(ids);
+        return success(deviceStatusVOS);
     }
 
 }
