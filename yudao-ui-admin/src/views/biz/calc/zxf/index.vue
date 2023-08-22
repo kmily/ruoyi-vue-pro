@@ -5,7 +5,7 @@
         <el-col :span="12" style="border-right: 1px solid #e6e1e1;">
           <el-form :model="data" ref="dataForm" size="small"  label-position="left" label-width="120px">
             <el-form-item label="未履行债务总额" >
-              <el-input v-model="data.totalAmount" style="width:250px" placeholder="请输入内容" clearable /> 万元
+              <el-input v-model="data.totalAmount" style="width:250px" placeholder="请输入内容" clearable /> 元
             </el-form-item>
             <el-form-item label="执行费用" >
               <el-input v-model="data.zxfAmount" style="width:250px" disabled /> 元
@@ -18,7 +18,7 @@
         <el-col :span="12" style="padding-left: 52px;">
           <el-form :model="data2" ref="dataForm2" size="small"  label-position="left" label-width="120px">
             <el-form-item label="本次执行总额" >
-              <el-input v-model="data2.totalAmount" style="width:250px" placeholder="请输入内容" clearable /> 万元
+              <el-input v-model="data2.totalAmount" style="width:250px" placeholder="请输入内容" clearable /> 元
             </el-form-item>
             <el-form-item label="执行费用" >
               <el-input v-model="data2.zxfAmount" style="width:250px" disabled /> 元
