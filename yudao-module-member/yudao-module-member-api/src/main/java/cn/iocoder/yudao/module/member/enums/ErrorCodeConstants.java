@@ -29,6 +29,10 @@ public interface ErrorCodeConstants {
     ErrorCode TAG_NAME_EXISTS = new ErrorCode(1004006001, "用户标签已经存在");
     ErrorCode TAG_HAS_USER = new ErrorCode(1004006002, "用户标签下存在用户，无法删除");
 
+    //========== 会员分组 1005001000 ==========
+    ErrorCode GROUP_NOT_EXISTS = new ErrorCode(1005001000, "会员分组不存在");
+    ErrorCode GROUP_NAME_EXISTS = new ErrorCode(1005001001, "会员分组已经存在");
+
     //========== 积分配置 1004007000 ==========
 
     //========== 积分记录 1004008000 ==========
@@ -53,7 +57,7 @@ public interface ErrorCodeConstants {
     ErrorCode LEVEL_REASON_NOT_EXISTS = new ErrorCode(1004011300, "用户等级调整原因不能为空");
 
     //========== 用户分组 1004012000 ==========
-    ErrorCode GROUP_NOT_EXISTS = new ErrorCode(1004012000, "用户分组不存在");
+//    ErrorCode GROUP_NOT_EXISTS = new ErrorCode(1004012000, "用户分组不存在");
     ErrorCode GROUP_HAS_USER = new ErrorCode(1004012001, "用户分组下存在用户，无法删除");
 
 }
