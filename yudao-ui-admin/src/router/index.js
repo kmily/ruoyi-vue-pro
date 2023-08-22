@@ -67,7 +67,7 @@ export const constantRoutes = [
   {
     path: '',
     component: Layout,
-    redirect: 'index',
+    redirect: 'calc',
     children: [{
         path: 'index',
         component: (resolve) => require(['@/views/index'], resolve),
