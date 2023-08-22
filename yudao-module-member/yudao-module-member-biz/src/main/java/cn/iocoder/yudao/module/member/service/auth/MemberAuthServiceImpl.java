@@ -234,6 +234,12 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     }
 
     @Override
+    public void setPassword(Long loginUserId, AppAuthAddPasswordReqVO reqVO) {
+        userMapper.updateById(MemberUserDO.builder().id(loginUserId)
+                .password(passwordEncoder.encode(reqVO.getPassword())).build());
+    }
+
+    @Override
     public void sendSmsCode(Long userId, AppAuthSmsSendReqVO reqVO) {
         // TODO 要根据不同的场景，校验是否有用户
         smsCodeApi.sendSmsCode(AuthConvert.INSTANCE.convert(reqVO).setCreateIp(getClientIP()));
@@ -244,6 +250,8 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         OAuth2AccessTokenRespDTO accessTokenDO = oauth2TokenApi.refreshAccessToken(refreshToken, OAuth2ClientConstants.CLIENT_ID_DEFAULT);
         return AuthConvert.INSTANCE.convert(accessTokenDO);
     }
+
+
 
     /**
      * 校验旧密码

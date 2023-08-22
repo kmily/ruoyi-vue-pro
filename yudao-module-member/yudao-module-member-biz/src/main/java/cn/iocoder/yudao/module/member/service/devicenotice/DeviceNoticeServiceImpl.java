@@ -101,7 +101,6 @@ public class DeviceNoticeServiceImpl implements DeviceNoticeService {
 
     @Override
     public PageResult<DeviceNoticeDO> getDeviceNoticePage(AppDeviceNoticePageReqVO pageReqVO) {
-
         return deviceNoticeMapper.selectPage(pageReqVO);
     }
 

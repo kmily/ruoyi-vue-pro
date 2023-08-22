@@ -93,6 +93,16 @@ public class AppAuthController {
         return success(true);
     }
 
+    @PostMapping("/set-password")
+    @Operation(summary = "设置用户密码",description = "首次注册设置密码使用")
+    @PreAuthenticated
+    public CommonResult<Boolean> setPassword(@RequestBody @Valid AppAuthAddPasswordReqVO reqVO) {
+        authService.setPassword(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
+
+
     // ========== 社交登录相关 ==========
 
     @GetMapping("/social-auth-redirect")

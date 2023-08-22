@@ -90,4 +90,10 @@ public interface MemberAuthService {
      */
     AppAuthLoginRespVO refreshToken(String refreshToken);
 
+    /**
+     * 设置密码
+     * @param loginUserId
+     * @param reqVO
+     */
+    void setPassword(Long loginUserId, AppAuthAddPasswordReqVO reqVO);
 }

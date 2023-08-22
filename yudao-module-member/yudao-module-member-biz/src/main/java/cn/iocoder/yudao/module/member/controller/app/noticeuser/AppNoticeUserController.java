@@ -29,7 +29,7 @@ import cn.iocoder.yudao.module.member.dal.dataobject.noticeuser.NoticeUserDO;
 import cn.iocoder.yudao.module.member.convert.noticeuser.NoticeUserConvert;
 import cn.iocoder.yudao.module.member.service.noticeuser.NoticeUserService;
 
-@Tag(name = "用户 APP - 用户消息关联")
+@Tag(name = "用户 APP - 用户消息关联 --- 暂时废除", description = "暂时废除")
 @RestController
 @RequestMapping("/member/notice-user")
 @Validated
