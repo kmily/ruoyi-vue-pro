@@ -31,7 +31,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
  * @date 2023/8/1710:58
  */
 
-@Tag(name = "用户 APP - 设备和用户绑定")
+@Tag(name = "管理后台 - 设备和用户绑定")
 @RestController
 @RequestMapping("/member/device-user")
 @Validated

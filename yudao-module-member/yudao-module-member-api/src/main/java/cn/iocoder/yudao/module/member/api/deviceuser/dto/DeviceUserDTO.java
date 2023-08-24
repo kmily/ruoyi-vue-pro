@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.member.api.deviceuser.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 /**
  * @author whycode
  * @title: DeviceUserDTO
@@ -32,5 +34,10 @@ public class DeviceUserDTO {
      * 用户ID
      */
     private Long userId;
+
+    /**
+     * 保活时间
+     */
+    private LocalDateTime keepalive;
 
 }

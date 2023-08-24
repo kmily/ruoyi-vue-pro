@@ -91,9 +91,9 @@ public class OperateLogAspect {
                            Operation operation) throws Throwable {
         // 目前，只有管理员，才记录操作日志！所以非管理员，直接调用，不进行记录
         Integer userType = WebFrameworkUtils.getLoginUserType();
-        if (!Objects.equals(userType, UserTypeEnum.ADMIN.getValue())) {
+       /* if (!Objects.equals(userType, UserTypeEnum.ADMIN.getValue())) {
             return joinPoint.proceed();
-        }
+        }*/
 
         // 记录开始时间
         LocalDateTime startTime = LocalDateTime.now();

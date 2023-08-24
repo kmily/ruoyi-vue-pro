@@ -75,7 +75,7 @@ public class AppUserController {
     @Operation(summary = "修改用户信息")
     @PreAuthenticated
     public CommonResult<Boolean> updateInfo(@RequestBody @Valid AppUserUpdateInfoReqVO reqVO,
-                                            @RequestParam("avatarFile") MultipartFile file) throws Exception {
+                                            @RequestParam(value = "avatarFile", required = false) MultipartFile file) throws Exception {
 
 
         if(file != null && !file.isEmpty()){

@@ -19,6 +19,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import javax.validation.constraints.*;
 import javax.validation.*;
 import javax.servlet.http.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.io.IOException;
 import java.util.function.Function;
@@ -120,14 +122,17 @@ public class AppDeviceUserController {
         Map<Long, DeviceDTO> deviceDTOMap = deviceDTOS.stream().collect(Collectors.toMap(DeviceDTO::getId, Function.identity()));
         Map<Long, List<DeviceUserDO>> roomDevice = list.stream().collect(Collectors.groupingBy(DeviceUserDO::getRoomId));
         List<AppDeviceUserRespVO> respVOS = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
         roomDevice.forEach((room, devices) -> {
             AppDeviceUserRespVO vo = new AppDeviceUserRespVO()
                     .setId(room).setName(roomMap.get(room));
             List<AppDeviceRespVO> deviceRespVOS = devices.stream().map(item -> {
                 DeviceDTO deviceDTO = deviceDTOMap.get(item.getDeviceId());
+                LocalDateTime keepalive = item.getKeepalive();
                 return DeviceUserConvert.INSTANCE.convert(deviceDTO)
                         .setCustomName(item.getCustomName())
                         .setSn(deviceDTO.getSn())
+                        .setOnLine(keepalive != null && Duration.between(keepalive, now).toMinutes() < 5)
                         .setId(item.getId());
             }).collect(Collectors.toList());
             vo.setDeviceRespVOList(deviceRespVOS);

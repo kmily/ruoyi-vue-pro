@@ -1,31 +1,31 @@
-package cn.iocoder.yudao.module.radar.mq.message;
+package cn.iocoder.yudao.module.radar.mq.message.radar;
 
 import cn.iocoder.yudao.framework.mq.core.pubsub.AbstractChannelMessage;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
 /**
  * @author whycode
- * @title: DeviceNotificationMessage
+ * @title: RadarStatusMessage
  * @projectName ruoyi-vue-pro
  * @description: TODO
- * @date 2023/8/1114:18
+ * @date 2023/8/2411:06
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class DeviceNotificationMessage extends AbstractChannelMessage {
+public class RadarStatusMessage extends AbstractChannelMessage {
 
-    private String number;
+    private Long deviceId;
 
-    private int type;
+    private LocalDateTime time;
 
-
-    private String content;
 
     @Override
     public String getChannel() {
-        return "radar.device-event.notice";
+        return "radar.device-status.notice";
     }
 }

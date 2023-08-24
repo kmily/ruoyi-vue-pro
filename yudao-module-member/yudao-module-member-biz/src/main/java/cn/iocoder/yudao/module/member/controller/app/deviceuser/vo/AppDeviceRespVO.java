@@ -29,4 +29,7 @@ public class AppDeviceRespVO {
 
     @Schema(description = "设备编号", required = true, example = "1000000")
     private String sn;
+
+    @Schema(description = "在线状态", required = true, example = "true")
+    private Boolean onLine;
 }

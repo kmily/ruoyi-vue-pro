@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.radar.service;
 
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.iocoder.yudao.framework.common.util.spring.SpringAopUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.radar.api.device.DeviceApi;
 import cn.iocoder.yudao.module.radar.api.device.dto.DeviceDTO;
@@ -11,6 +12,7 @@ import cn.iocoder.yudao.module.radar.bean.request.SubscribeRadarCondition;
 import cn.iocoder.yudao.module.radar.bean.request.SubscribeVehicleCondition;
 import cn.iocoder.yudao.module.radar.bean.request.SubscriptionRequest;
 import cn.iocoder.yudao.module.radar.job.DeviceCache;
+import cn.iocoder.yudao.module.radar.mq.producer.radar.RadarStatusProducer;
 import cn.iocoder.yudao.module.radar.service.device.DeviceService;
 import cn.iocoder.yudao.module.radar.utils.BitUtil;
 import cn.iocoder.yudao.module.radar.utils.WebSocketUtil;
@@ -258,6 +260,8 @@ public class ApiSubThread implements Runnable {
                     TenantContextHolder.setIgnore(true);
                 }
                 deviceService.updateKeepalive(deviceDTO.getId(), LocalDateTime.now());
+                RadarStatusProducer producer = SpringUtil.getBean(RadarStatusProducer.class);
+                producer.sendRadarStatusMessage(deviceDTO.getId(), LocalDateTime.now());
             } finally {
                 TenantContextHolder.clear();
             }

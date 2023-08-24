@@ -27,4 +27,7 @@ public class AppAuthLoginRespVO {
     @Schema(description = "过期时间", required = true)
     private LocalDateTime expiresTime;
 
+    @Schema(description = "是否第一次登录")
+    private Boolean first;
+
 }

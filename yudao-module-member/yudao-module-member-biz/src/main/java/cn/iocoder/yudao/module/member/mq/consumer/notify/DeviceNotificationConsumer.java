@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.member.mq.consumer.notify;
 
 import cn.iocoder.yudao.framework.mq.core.pubsub.AbstractChannelMessageListener;
 import cn.iocoder.yudao.module.member.service.devicenotice.DeviceNoticeService;
-import cn.iocoder.yudao.module.radar.mq.message.DeviceNotificationMessage;
+import cn.iocoder.yudao.module.radar.mq.message.notiy.DeviceNotificationMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

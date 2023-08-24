@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.service.deviceuser;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import javax.validation.*;
 
@@ -101,4 +102,10 @@ public interface DeviceUserService {
 
     List<FamilyAndRoomDeviceDTO> selectFamilyAndRoom(Collection<Long> deviceIds);
 
+    /**
+     * 更新保活时间
+     * @param deviceId 设备ID
+     * @param time 保活时间
+     */
+    void updateKeepalive(Long deviceId, LocalDateTime time);
 }

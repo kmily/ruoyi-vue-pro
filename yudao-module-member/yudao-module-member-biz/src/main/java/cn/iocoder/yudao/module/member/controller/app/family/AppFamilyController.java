@@ -101,6 +101,7 @@ public class AppFamilyController {
     @PreAuthenticated
     public CommonResult<List<FamilyRespVO>> getFamilyList() {
         List<FamilyDO> list = familyService.getFamilyList(new FamilyExportReqVO().setUserId(getLoginUserId()));
+        Collections.reverse(list);
         return success(FamilyConvert.INSTANCE.convertList(list));
     }
 

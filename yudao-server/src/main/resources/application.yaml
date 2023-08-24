@@ -193,7 +193,7 @@ yudao:
   sms-code: # 短信验证码相关的配置项
     expire-times: 10m
     send-frequency: 1m
-    send-maximum-quantity-per-day: 10
+    send-maximum-quantity-per-day: 100
     begin-code: 1111 # 这里配置 9999 的原因是，测试方便。
     end-code: 9999 # 这里配置 9999 的原因是，测试方便。
   trade:

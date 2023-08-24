@@ -29,4 +29,7 @@ public class OperateLogPageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] startTime;
 
+    @Schema(description = "用户类型, 参加 UserTypeEnum 枚举类", example = "1")
+    private Integer userType;
+
 }

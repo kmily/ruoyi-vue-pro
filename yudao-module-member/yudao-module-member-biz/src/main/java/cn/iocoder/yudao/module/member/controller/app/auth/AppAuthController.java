@@ -79,7 +79,6 @@ public class AppAuthController {
 
     @PostMapping("/reset-password")
     @Operation(summary = "重置密码", description = "用户忘记密码时使用")
-    @PreAuthenticated
     public CommonResult<Boolean> resetPassword(@RequestBody @Valid AppAuthResetPasswordReqVO reqVO) {
         authService.resetPassword(reqVO);
         return success(true);

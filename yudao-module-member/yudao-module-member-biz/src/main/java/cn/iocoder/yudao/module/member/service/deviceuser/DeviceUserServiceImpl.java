@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.member.service.deviceuser;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.member.api.deviceuser.dto.DeviceUserDTO;
 import cn.iocoder.yudao.module.member.controller.app.room.vo.RoomExportReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.family.FamilyDO;
@@ -18,6 +19,8 @@ import javax.annotation.Resource;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -157,6 +160,7 @@ public class DeviceUserServiceImpl implements DeviceUserService {
         if(CollUtil.isEmpty(list)){
             return new ArrayList<>();
         }
+        LocalDateTime now = LocalDateTime.now();
         List<RoomDO> roomList = roomService.getRoomList(new RoomExportReqVO().setFamilyId(familyId));
         Map<Long, String> roomMap = roomList.stream().collect(Collectors.toMap(RoomDO::getId, RoomDO::getName));
         List<DeviceDTO> deviceDTOS = deviceApi.getByIds(list.stream().map(DeviceUserDO::getDeviceId).collect(Collectors.toSet()));
@@ -169,6 +173,7 @@ public class DeviceUserServiceImpl implements DeviceUserService {
                 .setCustomName(item.getCustomName())
                 .setDeviceId(item.getDeviceId())
                 .setSn(deviceDTOMap.get(item.getDeviceId()).getSn())
+                .setOnLine(item.getKeepalive() != null && Duration.between(item.getKeepalive(), now).toMinutes() < 5)
                 .setType(deviceDTOMap.get(item.getDeviceId()).getType())).collect(Collectors.toList());
         if(Objects.nonNull(type)){
             userVOS = userVOS.stream().filter(item -> Objects.equals(type, item.getType())).collect(Collectors.toList());
@@ -190,6 +195,15 @@ public class DeviceUserServiceImpl implements DeviceUserService {
     public List<FamilyAndRoomDeviceDTO> selectFamilyAndRoom(Collection<Long> deviceIds) {
 
         return deviceUserMapper.selectFamilyAndRoom(deviceIds);
+    }
+
+    @Override
+    public void updateKeepalive(Long deviceId, LocalDateTime time) {
+
+        TenantUtils.executeIgnore(() -> {
+            deviceUserMapper.updateById(new DeviceUserDO().setKeepalive(time).setDeviceId(deviceId));
+        });
+
     }
 
 }

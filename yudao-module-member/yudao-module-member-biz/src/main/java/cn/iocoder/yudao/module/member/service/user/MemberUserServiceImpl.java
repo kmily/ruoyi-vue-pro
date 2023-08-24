@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.member.service.user;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
@@ -84,11 +85,15 @@ public class MemberUserServiceImpl implements MemberUserService {
         // 生成密码
         String password = IdUtil.fastSimpleUUID();
         // 插入用户
+
+        String suf = StrUtil.subSuf(mobile, 7);
+
         MemberUserDO user = new MemberUserDO();
         user.setMobile(mobile);
         user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
         user.setPassword(encodePassword(password)); // 加密密码
         user.setRegisterIp(registerIp);
+        user.setNickname("用户" + suf); // 取手机号后四位为昵称
         memberUserMapper.insert(user);
 
         familyService.createFamily(user.getId(), user.getNickname(), user.getMobile());

@@ -20,6 +20,7 @@ public interface OperateLogMapper extends BaseMapperX<OperateLogDO> {
                 .likeIfPresent(OperateLogDO::getModule, reqVO.getModule())
                 .inIfPresent(OperateLogDO::getUserId, userIds)
                 .eqIfPresent(OperateLogDO::getType, reqVO.getType())
+                .eqIfPresent(OperateLogDO::getUserType, reqVO.getUserType())
                 .betweenIfPresent(OperateLogDO::getStartTime, reqVO.getStartTime());
         if (Boolean.TRUE.equals(reqVO.getSuccess())) {
             query.eq(OperateLogDO::getResultCode, GlobalErrorCodeConstants.SUCCESS.getCode());

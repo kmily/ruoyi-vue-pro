@@ -48,5 +48,8 @@ public class DeviceUserDO extends BaseDO {
      */
     private String customName;
 
-
+    /**
+     * 保活时间
+     */
+    private LocalDateTime keepalive;
 }

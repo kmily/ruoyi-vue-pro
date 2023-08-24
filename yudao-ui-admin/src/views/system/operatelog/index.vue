@@ -11,10 +11,16 @@
         <el-input v-model="queryParams.operName" placeholder="请输入操作人员" clearable style="width: 240px;"
                   @keyup.enter.native="handleQuery"/>
       </el-form-item>
+      <el-form-item label="用户类型" prop="userType">
+        <el-select v-model="queryParams.success" placeholder="操作状态" clearable style="width: 240px">
+          <el-option :key="1" label="会员" :value="1"/>
+          <el-option :key="2" label="管理员" :value="2"/>
+        </el-select>
+      </el-form-item>
       <el-form-item label="类型" prop="type">
         <el-select v-model="queryParams.type" placeholder="操作类型" clearable style="width: 240px">
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_OPERATE_TYPE)" :key="parseInt(dict.value)"
-                     :label="dict.label" :value="parseInt(dict.value)"/>
+                    :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
       <el-form-item label="状态" prop="status">
@@ -36,7 +42,7 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="warning" icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
-                   v-hasPermi="['system:operate-log:export']">导出</el-button>
+                  v-hasPermi="['system:operate-log:export']">导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -158,7 +164,8 @@ export default {
         operName: undefined,
         businessType: undefined,
         status: undefined,
-        startTime: []
+        startTime: [],
+        userType: undefined
       },
     };
   },
