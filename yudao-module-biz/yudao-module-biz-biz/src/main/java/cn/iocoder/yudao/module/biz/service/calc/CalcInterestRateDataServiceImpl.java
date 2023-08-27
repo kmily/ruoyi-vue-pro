@@ -230,7 +230,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
                 }
                 suiteDayRateValue = suiteYearRateValue.divide(new BigDecimal(100), 16, RoundingMode.HALF_UP).divide(new BigDecimal(yearDays), 16, RoundingMode.HALF_UP);
                 ExecProcessDataDTO execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), processId, suiteRate.getId(), startDate
-                        , suiteDayRateValue, suiteDayRateValue.multiply(execVO.getLeftAmount()), suiteYearRateValue.multiply(new BigDecimal("2")));
+                        , suiteDayRateValue, suiteDayRateValue.multiply(execVO.getLeftAmount()).multiply(new BigDecimal("2")), suiteYearRateValue.multiply(new BigDecimal("2")));
                 dataList.add(execDataIndex);
             } else {
                 suiteDayRateValue = FX_RATE;
@@ -456,7 +456,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
             }
             YearInfoDTO yearInfoDTO = new YearInfoDTO(startDate, end, isFull, days);
             if (!yearList.contains(yearInfoDTO)) {
-                yearInfoDTO.setDays(DateUtil.dateIntervalDay(yearInfoDTO.getYearStartDate(), yearInfoDTO.getYearEndDate())+1);
+                yearInfoDTO.setDays(DateUtil.dateIntervalDay(yearInfoDTO.getYearStartDate(), yearInfoDTO.getYearEndDate()) + 1);
                 yearList.add(yearInfoDTO);
             }
             startDate = cn.hutool.core.date.DateUtil.offsetMonth(startDate, 12);//加12个月
