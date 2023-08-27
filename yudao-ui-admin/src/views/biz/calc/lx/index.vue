@@ -101,7 +101,12 @@
               <span>{{ scope.row.startDate }}<template v-if="scope.row.endDate"> 至 {{ scope.row.endDate }}</template></span>
             </template>
           </el-table-column>
-          <el-table-column label="天数" align="center" prop="days" />
+
+<!--          <el-table-column label="天数" align="center" prop="days" />-->
+          <el-table-column v-if="data.fixSectionType==1" label="天数" align="center" prop="days" />
+          <el-table-column v-if="data.fixSectionType==2" label="月数" align="center" prop="days" />
+          <el-table-column v-if="data.fixSectionType==3" label="天数" align="center" prop="days" />
+
           <el-table-column label="基准利率%" align="center" prop="suiteRate" />
           <el-table-column label="金额" align="center" prop="sectionAmount" />
         </el-table>
