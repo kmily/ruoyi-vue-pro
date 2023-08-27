@@ -295,6 +295,41 @@ public class DateUtil {
         return currentMonth;
     }
 
+    public static Date getMonthLastDay(Date date , String format) {
+        java.text.SimpleDateFormat df = new java.text.SimpleDateFormat(format);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.DATE, 1);// 将下2个月1号作为日期初始值
+        cal.add(Calendar.MONTH, 1);// 当前月＋2，即下2个月
+        cal.add(Calendar.DATE, -1);// 下2个月1号减去一天，即得到下1一个月最后一天
+        return cal.getTime();
+    }
+
+    /**
+     * 获取本月第一天
+     */
+    public static Date getMonthFirstDay(Date date , String format) {
+        Calendar cale = Calendar.getInstance();
+        cale.setTime(date);
+        cale.add(Calendar.MONTH, 0);
+        cale.set(Calendar.DAY_OF_MONTH, 1);
+        // 将小时至0
+        cale.set(Calendar.HOUR_OF_DAY, 0);
+        // 将分钟至0
+        cale.set(Calendar.MINUTE, 0);
+        // 将秒至0
+        cale.set(Calendar.SECOND, 0);
+        // 将毫秒至0
+        cale.set(Calendar.MILLISECOND, 0);
+        return cale.getTime();
+    }
+
+    public static void main(String [] args)
+    {
+        Date d = getMonthFirstDay(new Date(),DateUtil.DATE_FORMAT_NORMAL);
+        System.out.println(DateUtil.format(d,DateUtil.DATE_FORMAT_NORMAL));
+    }
+
     public static String format(Date date) {
         if (null == date) {
             return null;

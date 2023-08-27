@@ -22,7 +22,7 @@ public class SectionIndexVO {
     private String suiteDayRate;
 
     //天数
-    private Integer days;
+    private String days;
     //区间金额
     private BigDecimal sectionAmount;
 

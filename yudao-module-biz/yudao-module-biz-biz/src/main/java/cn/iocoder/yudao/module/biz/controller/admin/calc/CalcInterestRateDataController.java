@@ -70,22 +70,6 @@ public class CalcInterestRateDataController {
             }
         }
 
-//        File file=ResourceUtils.getFile("classpath:测试阶段说明.docx");
-//        FileSystemResource fileResource = new FileSystemResource(file);
-//        String fileName="测试阶段说明.docx";
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-//        headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", URLEncoder.encode(fileName, "UTF-8")));
-//        headers.add("Pragma", "no-cache");
-//        headers.add("Expires", "0");
-//
-//        return ResponseEntity
-//                .ok()
-//                .headers(headers)
-//                .contentLength(fileResource.contentLength())
-//                .contentType(MediaType.parseMediaType("application/octet-stream"))
-//                .body(new InputStreamResource(fileResource.getInputStream()));
     }
 
     @PostMapping("/exec/lx")

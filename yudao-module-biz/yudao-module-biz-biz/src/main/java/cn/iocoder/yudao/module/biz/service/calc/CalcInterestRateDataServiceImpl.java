@@ -252,31 +252,6 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
         CalcInterestRateExecResVO vo = new CalcInterestRateExecResVO();
         if (execVO.getFixType() == 1) {
             //固定数值
-            //计算日期差
-//            if (execVO.getFixSectionType() == 1) {
-//                //1-年
-//                Date startDate = execVO.getStartDate();
-//                Date endDate = execVO.getEndDate();
-//
-//                List<ExecProcessDataDTO> dataList = new ArrayList<>();
-//                while (startDate.compareTo(endDate) <= 0) {
-//                    BigDecimal dayRateValue = execVO.getFixRate()
-//                            .divide(new BigDecimal(100), 16, RoundingMode.HALF_UP)
-//                            .divide(new BigDecimal(getDaysThisYear(startDate)), 16, RoundingMode.HALF_UP);
-//                    ExecProcessDataDTO execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), execVO.getProcessId()
-//                            , 0, startDate, dayRateValue, dayRateValue.multiply(execVO.getLeftAmount())
-//                            , execVO.getFixRate());
-//                    dataList.add(execDataIndex);
-//                    startDate = DateUtil.addDays(startDate, 1);
-//                }
-//                List<YearInfoDTO> yearList = getYearList(startDate, endDate);
-//
-//
-//                insertDataList(dataList);
-//                vo.setSectionList(calcInterestRateDataMapper.selectSectionListByFixRate(execVO.getProcessId()));
-//                vo.setTotalAmount(calcInterestRateDataMapper.selectTotalAmountByProcessId(execVO.getProcessId()));
-//                vo.setProcessId(execVO.getProcessId());
-//            }
             if (execVO.getFixSectionType() == 1) {
                 //1-年
                 Date startDate = execVO.getStartDate();
@@ -324,21 +299,30 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
                 for (MonthInfoDTO monthIndex : monthList) {
                     ExecProcessDataDTO execDataIndex = null;
                     if (monthIndex.getIsFull() == 1) {
-                        execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), execVO.getProcessId(), 0, monthIndex.getMonthStartDate()
+                        execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), execVO.getProcessId(), 0
+                                , monthIndex.getMonthStartDate()
+                                , monthIndex.getMonthEndDate()
                                 , execVO.getFixRate().divide(new BigDecimal(100))
                                 , execVO.getFixRate().divide(new BigDecimal(100)).multiply(execVO.getLeftAmount())
                                 , monthIndex.getDays()
                                 , execVO.getFixRate().multiply(new BigDecimal("12"))
+                                , monthIndex.getFullDays()
+                                , monthIndex.getIsFull()
                         );
                     } else {
                         //计算月利率
                         BigDecimal dayRateValue = execVO.getFixRate().divide(new BigDecimal(100)).divide(new BigDecimal(monthIndex.getFullDays()), 16, RoundingMode.HALF_UP);
                         //处理非整月金额
-                        execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), execVO.getProcessId(), 0, monthIndex.getMonthStartDate()
+                        execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), execVO.getProcessId(), 0
+                                , monthIndex.getMonthStartDate()
+                                , monthIndex.getMonthEndDate()
                                 , execVO.getFixRate().divide(new BigDecimal(100))
                                 , dayRateValue.multiply(execVO.getLeftAmount()).multiply(new BigDecimal(monthIndex.getDays()))
                                 , monthIndex.getDays()
                                 , execVO.getFixRate().multiply(new BigDecimal("12"))
+                                , monthIndex.getFullDays()
+                                , monthIndex.getIsFull()
+
                         );
                     }
                     dataList.add(execDataIndex);
@@ -413,27 +397,32 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
     }
 
     private List<MonthInfoDTO> getMonthList(Date startDate, Date endDate) {
+        //获取startDate 所在的次月1号
         List<MonthInfoDTO> monthList = new ArrayList<>();
         while (startDate.compareTo(endDate) <= 0) {
             Date preStartDate = startDate;
-            Date preEndDate = null;
-            Date end = DateUtil.addDays(cn.hutool.core.date.DateUtil.offsetMonth(startDate, 1), -1);
+            Date preMonthLastDay = DateUtil.getMonthLastDay(startDate, DateUtil.DATE_FORMAT_NORMAL);
+            Date preMonthFirstDay = DateUtil.getMonthFirstDay(preMonthLastDay, DateUtil.DATE_FORMAT_NORMAL);
+            Integer fullDays = DateUtil.dateIntervalDay(preMonthFirstDay, preMonthLastDay) + 1;
+            Date preEndDate = preMonthLastDay.compareTo(endDate) <= 0 ? preMonthLastDay : endDate;
+
             Integer isFull = 1;
             Integer days = 0;
-            if (end.compareTo(endDate) > 0) {
-                isFull = 0;
-                days = DateUtil.dateIntervalDay(startDate, end);
-                end = endDate;
+            if (startDate.compareTo(preMonthFirstDay) == 0 && preEndDate.compareTo(preMonthLastDay) == 0) {
+                days = DateUtil.dateIntervalDay(startDate, preEndDate) + 1;
             } else {
-                days = DateUtil.dateIntervalDay(startDate, end);
+                isFull = 0;
+                days = DateUtil.dateIntervalDay(preStartDate, preEndDate) + 1;
             }
-            MonthInfoDTO monthInfoDTO = new MonthInfoDTO(startDate, end, isFull, days);
+            MonthInfoDTO monthInfoDTO = new MonthInfoDTO(startDate, preEndDate, isFull, days, fullDays);
             if (!monthList.contains(monthInfoDTO)) {
                 monthList.add(monthInfoDTO);
             }
-            startDate = cn.hutool.core.date.DateUtil.offsetMonth(startDate, 1);//加一个月
-            preEndDate = DateUtil.addDays(startDate, -1);
-            monthInfoDTO.setFullDays(DateUtil.dateIntervalDay(preStartDate, preEndDate));
+            //加一个月
+            startDate = DateUtil.getMonthFirstDay(
+                    cn.hutool.core.date.DateUtil.offsetMonth(preMonthLastDay, 1)
+                    , DateUtil.DATE_FORMAT_NORMAL);
+
         }
         return monthList;
     }

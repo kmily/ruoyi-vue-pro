@@ -2,11 +2,12 @@
   <div style="width: 880px; margin: 0 auto;">
     <el-tabs v-model="activeName" @tab-click="handleClick">
       <el-tab-pane label="执行利息" name="first">
-        <fx/>
-      </el-tab-pane>
-      <el-tab-pane label="延迟履行利息" name="second">
         <lx/>
       </el-tab-pane>
+      <el-tab-pane label="迟延履行利息" name="second">
+        <fx/>
+      </el-tab-pane>
+
       <el-tab-pane label="执行费" name="third">
         <zxf/>
       </el-tab-pane>

@@ -37,10 +37,12 @@
     </insert>
 
     <insert id="insertExecProcessDataMonthBatch">
-        INSERT INTO biz_calc_exec_data ( id,  process_id, rate_id, date_index, day_rate, day_amount,days,year_rate )
+        INSERT INTO biz_calc_exec_data ( id,  process_id, rate_id, date_index, date_index_end, day_rate, day_amount,days,year_rate
+        ,full_days,is_full )
         VALUES
         <foreach collection="list" index="index" item="item" separator=",">
-            (  #{item.id},  #{item.processId},  #{item.rateId},  #{item.dateIndex}, #{item.dayRate}, #{item.dayAmount} , #{item.days} , #{item.yearRate} )
+            (  #{item.id},  #{item.processId},  #{item.rateId},  #{item.dateIndex},  #{item.dateIndexEnd}, #{item.dayRate}, #{item.dayAmount}
+            , #{item.days} , #{item.yearRate}, #{item.fullDays}, #{item.isFull} )
         </foreach>
     </insert>
 
@@ -105,12 +107,13 @@
     </select>
 
 
-    <select id="selectSectionListByFixMonthRate" parameterType="java.lang.String"   resultType="cn.iocoder.yudao.module.biz.controller.admin.calc.vo.SectionIndexVO">
+    <select id="selectSectionListByFixMonthRate" parameterType="java.lang.String"
+            resultType="cn.iocoder.yudao.module.biz.controller.admin.calc.vo.SectionIndexVO">
         SELECT
             DATE_FORMAT(a.date_index,'%Y-%m')  startDate,
             ''  endDate,
             round(a.year_rate,5)  suiteRate,
-            c.days AS  days,
+           case a.is_full when 1 then 1 else concat(a.days,'/',a.full_days) end  AS  days,
             ROUND(SUM(day_amount),2)  AS sectionAmount,
             a.days days
         FROM biz_calc_exec_data a

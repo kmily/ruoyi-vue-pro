@@ -25,18 +25,10 @@ public class ExecProcessDataDTO {
         this.dayAmount = dayAmount;
     }
 
-    public ExecProcessDataDTO(String id, String processId, Integer rateId, Date dateIndex, BigDecimal dayRate, BigDecimal dayAmount, Integer days, BigDecimal yearRate) {
-        this.id = id;
-        this.processId = processId;
-        this.rateId = rateId;
-        this.dateIndex = dateIndex;
-        this.dayRate = dayRate;
-        this.dayAmount = dayAmount;
-        this.days = days;
-        this.yearRate = yearRate;
-    }
 
-    public ExecProcessDataDTO(String id, String processId, Integer rateId, Date dateIndex, Date dateIndexEnd, BigDecimal dayRate, BigDecimal dayAmount, Integer days, BigDecimal yearRate) {
+    public ExecProcessDataDTO(String id, String processId, Integer rateId, Date dateIndex, Date dateIndexEnd
+            , BigDecimal dayRate, BigDecimal dayAmount, Integer days, BigDecimal yearRate
+    ) {
         this.id = id;
         this.processId = processId;
         this.rateId = rateId;
@@ -46,6 +38,22 @@ public class ExecProcessDataDTO {
         this.dayAmount = dayAmount;
         this.days = days;
         this.yearRate = yearRate;
+    }
+
+    public ExecProcessDataDTO(String id, String processId, Integer rateId, Date dateIndex, Date dateIndexEnd
+            , BigDecimal dayRate, BigDecimal dayAmount, Integer days, BigDecimal yearRate, Integer fullDays, Integer isFull
+    ) {
+        this.id = id;
+        this.processId = processId;
+        this.rateId = rateId;
+        this.dateIndex = dateIndex;
+        this.dateIndexEnd = dateIndexEnd;
+        this.dayRate = dayRate;
+        this.dayAmount = dayAmount;
+        this.days = days;
+        this.yearRate = yearRate;
+        this.fullDays = fullDays;
+        this.isFull = isFull;
     }
 
     public ExecProcessDataDTO(String id, String processId, Integer rateId, Date dateIndex, BigDecimal dayRate, BigDecimal dayAmount, BigDecimal yearRate) {
@@ -69,6 +77,7 @@ public class ExecProcessDataDTO {
     private BigDecimal yearRate;
     private BigDecimal dayAmount;
     private Integer days;
-
+    private Integer fullDays;
+    private Integer isFull;
 
 }
