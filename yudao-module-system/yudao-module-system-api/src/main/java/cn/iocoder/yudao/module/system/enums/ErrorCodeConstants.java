@@ -163,4 +163,6 @@ public interface ErrorCodeConstants {
     // ========== 站内信发送 1002028000 ==========
     ErrorCode NOTIFY_SEND_TEMPLATE_PARAM_MISS = new ErrorCode(1002025000, "模板参数({})缺失");
 
+    ErrorCode LPRS = new ErrorCode(1004005000, "起始时间是2019年8月20号以前，不允许使用LPR倍数！");
+
 }

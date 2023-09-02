@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.biz.dal.dataobject.calc.CalcInterestRateDataDO;
 import cn.iocoder.yudao.module.biz.dal.mysql.calc.CalcInterestRateDataMapper;
 import cn.iocoder.yudao.module.biz.util.CodeUtil;
 import cn.iocoder.yudao.module.biz.util.DateUtil;
+import cn.iocoder.yudao.module.system.enums.ErrorCodeConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -22,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 
 /**
@@ -271,7 +274,9 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
                         );
                     } else {
                         //计算日利率
-                        BigDecimal dayRateValue = execVO.getFixRate().divide(new BigDecimal(100)).divide(new BigDecimal(yearIndex.getFullDays()), 16, RoundingMode.HALF_UP);
+                        BigDecimal dayRateValue = execVO.getFixRate()
+                                .divide(new BigDecimal(100))
+                                .divide(new BigDecimal(yearIndex.getFullDays()), 16, RoundingMode.HALF_UP);
                         //处理非整年金额
                         execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), execVO.getProcessId(),
                                 0
@@ -358,30 +363,37 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
             Date endDate = execVO.getEndDate();
             if (startDate.compareTo(DateUtil.paseDate("2019-08-20", DateUtil.DATE_FORMAT_NORMAL)) < 0) {
                 //2019年以前不可以选择LPR4倍数据
-                throw new UnsupportedOperationException("起始时间是2019年8月20号以前，不允许使用LPR倍数！");
+//                throw new RuntimeException("起始时间是2019年8月20号以前，不允许使用LPR倍数！");
+                throw exception(ErrorCodeConstants.LPRS);
             }
             List<ExecProcessDataDTO> dataList = new ArrayList<>();
             while (startDate.compareTo(endDate) <= 0) {
                 CalcInterestRateDataDO suiteRate = getSuiteRate(allRateList, startDate);
                 Integer yearDays = getDaysThisYear(startDate);
-                BigDecimal suiteRateValue = null;
-//                BigDecimal suiteOneYearRateValue = null;
-                suiteRateValue = suiteRate.getRateOneYear();
+                BigDecimal suiteYearRateValue = suiteRate.getRateOneYear();
+                BigDecimal suiteRateValue = suiteRate.getRateOneYear();
                 if (execVO.getFixLPRs().compareTo(new BigDecimal("4")) >= 0) {
+                    suiteYearRateValue = suiteRateValue.multiply(new BigDecimal("4"));
                     suiteRateValue = suiteRateValue.multiply(new BigDecimal("4"))
                             .divide(new BigDecimal(100), 16, RoundingMode.HALF_UP)
                             .divide(new BigDecimal(yearDays), 16, RoundingMode.HALF_UP);
                 } else {
+                    suiteYearRateValue = suiteRateValue.multiply(execVO.getFixLPRs());
                     suiteRateValue = suiteRateValue.multiply(execVO.getFixLPRs())
                             .divide(new BigDecimal(100), 16, RoundingMode.HALF_UP)
                             .divide(new BigDecimal(yearDays), 16, RoundingMode.HALF_UP);
                 }
-                ExecProcessDataDTO execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), execVO.getProcessId(), suiteRate.getId(), startDate, suiteRateValue, suiteRateValue.multiply(execVO.getLeftAmount()));
+                suiteRate.getEndDate();
+
+                Date currentEndDate = endDate.compareTo(suiteRate.getEndDate() == null ? DateUtil.getToday() : suiteRate.getEndDate()) > 0 ? suiteRate.getEndDate() : endDate;
+//                ExecProcessDataDTO execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), execVO.getProcessId(), suiteRate.getId(), startDate, suiteRateValue, suiteRateValue.multiply(execVO.getLeftAmount()));
+                ExecProcessDataDTO execDataIndex = new ExecProcessDataDTO(CodeUtil.getUUID(), execVO.getProcessId(), suiteRate.getId(), startDate, currentEndDate,
+                        suiteRateValue, suiteRateValue.multiply(execVO.getLeftAmount()), DateUtil.dateIntervalDay(startDate, currentEndDate) + 1, suiteYearRateValue);
                 dataList.add(execDataIndex);
                 startDate = DateUtil.addDays(startDate, 1);
             }
             insertDataList(dataList);
-            vo.setSectionList(calcInterestRateDataMapper.selectSectionListByFixMonthRate(execVO.getProcessId()));
+            vo.setSectionList(calcInterestRateDataMapper.selectSectionListByFixLPRs(execVO.getProcessId()));
             vo.setTotalAmount(calcInterestRateDataMapper.selectTotalAmountByProcessId(execVO.getProcessId()));
             vo.setProcessId(execVO.getProcessId());
 
@@ -434,6 +446,42 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
     private List<YearInfoDTO> getYearList(Date startDate, Date endDate) {
         List<YearInfoDTO> yearList = new ArrayList<>();
         while (startDate.compareTo(endDate) <= 0) {
+            Integer isFull = 0;
+            Integer days = 0;
+            Integer fullDays = 0;
+            Date currentEnd = null;
+            if (startDate.compareTo(DateUtil.getYearFirstDay(startDate)) != 0
+                    && endDate.compareTo(DateUtil.getYearLastDay(startDate)) >= 0) {
+                //非整年，但是年尾在结束日期之前
+                isFull = 0;
+                days = DateUtil.dateIntervalDay(startDate, DateUtil.getYearLastDay(startDate)) + 1;
+                fullDays = getDaysThisYear(endDate);
+                currentEnd = DateUtil.getYearLastDay(startDate);
+            } else if (startDate.compareTo(DateUtil.getYearFirstDay(startDate)) == 0
+                    && endDate.compareTo(DateUtil.getYearLastDay(startDate)) >= 0) {
+                //一整年
+                isFull = 1;
+                days = getDaysThisYear(startDate);
+                fullDays = getDaysThisYear(startDate);
+                currentEnd = DateUtil.getYearLastDay(startDate);
+            } else if (startDate.compareTo(DateUtil.getYearFirstDay(startDate)) == 0
+                    && endDate.compareTo(DateUtil.getYearLastDay(startDate)) < 0) {
+                //最后一个非整年
+                isFull = 0;
+                days = DateUtil.dateIntervalDay(startDate, endDate) + 1;
+                fullDays = getDaysThisYear(startDate);
+                currentEnd = endDate;
+            }
+            YearInfoDTO yearInfoDTO = new YearInfoDTO(startDate, currentEnd, isFull, days, fullDays);
+            yearList.add(yearInfoDTO);
+            startDate = DateUtil.getYearFirstDay(cn.hutool.core.date.DateUtil.offsetMonth(startDate, 12));
+        }
+        return yearList;
+    }
+
+    private List<YearInfoDTO> getYearListBak(Date startDate, Date endDate) {
+        List<YearInfoDTO> yearList = new ArrayList<>();
+        while (startDate.compareTo(endDate) <= 0) {
             Date preStartDate = startDate;
             Date preEndDate = null;
             Date end = DateUtil.addDays(cn.hutool.core.date.DateUtil.offsetMonth(startDate, 12), -1);
@@ -452,7 +500,8 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
                 yearInfoDTO.setDays(DateUtil.dateIntervalDay(yearInfoDTO.getYearStartDate(), yearInfoDTO.getYearEndDate()) + 1);
                 yearList.add(yearInfoDTO);
             }
-            startDate = cn.hutool.core.date.DateUtil.offsetMonth(startDate, 12);//加12个月
+            //加12个月
+            startDate = cn.hutool.core.date.DateUtil.offsetMonth(startDate, 12);
             preEndDate = DateUtil.addDays(startDate, -1);
             yearInfoDTO.setFullDays(DateUtil.dateIntervalDay(preStartDate, preEndDate) + 1);
         }
