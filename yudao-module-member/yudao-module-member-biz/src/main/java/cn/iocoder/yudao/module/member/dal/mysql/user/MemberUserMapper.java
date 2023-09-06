@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.UserPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.UserStatisticsDetailVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -42,4 +43,5 @@ public interface MemberUserMapper extends BaseMapperX<MemberUserDO> {
                 .orderByDesc(MemberUserDO::getId));
     }
 
+    List<UserStatisticsDetailVO> selectCountEveryMonth();
 }

@@ -29,7 +29,11 @@ public class LineRuleDataPageReqVO extends PageParam {
 
     @Schema(description = "绊线规则数量")
     private Integer lineNum;
+    @Schema(description = "回家")
+    private Integer enter;
 
+    @Schema(description = "离家")
+    private Integer goOut;
     @Schema(description = "绊线统计数据")
     private String lineData;
 

@@ -18,6 +18,9 @@ public class AppDeviceRespVO {
     @Schema(description = "自增编号", required = true, example = "32074")
     private Long id;
 
+    @Schema(description = "设备ID", required = true)
+    private Long deviceId;
+
     @Schema(description = "设备名称", required = true, example = "跌倒雷达")
     private String name;
 
@@ -32,4 +35,5 @@ public class AppDeviceRespVO {
 
     @Schema(description = "在线状态", required = true, example = "true")
     private Boolean onLine;
+
 }

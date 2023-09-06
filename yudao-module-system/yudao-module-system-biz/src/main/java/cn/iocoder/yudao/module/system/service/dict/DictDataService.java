@@ -105,4 +105,11 @@ public interface DictDataService {
      * @return 字典数据
      */
     DictDataDO parseDictData(String dictType, String label);
+
+    /**
+     * 根据字典类型查询字典值
+     * @param type 字典类型
+     * @return
+     */
+    List<DictDataDO> getDictDataList(String type);
 }

@@ -74,16 +74,17 @@ public class AppUserController {
     @PostMapping("/update")
     @Operation(summary = "修改用户信息")
     @PreAuthenticated
-    public CommonResult<Boolean> updateInfo(@RequestBody @Valid AppUserUpdateInfoReqVO reqVO,
-                                            @RequestParam(value = "avatarFile", required = false) MultipartFile file) throws Exception {
+    public CommonResult<Boolean> updateInfo(@RequestBody @Valid AppUserUpdateInfoReqVO reqVO) {
 
 
-        if(file != null && !file.isEmpty()){
-            String avatar = userService.updateUserAvatar(getLoginUserId(), file.getInputStream());
-        }
+//        if(file != null && !file.isEmpty()){
+//            String avatar = userService.updateUserAvatar(getLoginUserId(), file.getInputStream());
+//        }
         userService.updateInfo(getLoginUserId(), reqVO);
         return success(true);
     }
+
+
 
 
 }

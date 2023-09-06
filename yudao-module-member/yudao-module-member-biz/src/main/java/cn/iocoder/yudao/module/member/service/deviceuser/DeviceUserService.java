@@ -108,4 +108,17 @@ public interface DeviceUserService {
      * @param time 保活时间
      */
     void updateKeepalive(Long deviceId, LocalDateTime time);
+
+    /**
+     * 校验设备
+     * @param deviceSn 设备编号
+     * @return
+     */
+    AppDeviceRespVO checkDevice(String deviceSn);
+
+    /**
+     * 查询数量
+     * @return
+     */
+    Long selectCount();
 }

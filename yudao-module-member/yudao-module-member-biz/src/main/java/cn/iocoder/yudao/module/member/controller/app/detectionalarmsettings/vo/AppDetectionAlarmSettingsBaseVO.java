@@ -25,6 +25,6 @@ public class AppDetectionAlarmSettingsBaseVO {
     private Boolean enter;
 
     @Schema(description = "离开告警")
-    private Boolean leave;
+    private Boolean goOut;
 
 }

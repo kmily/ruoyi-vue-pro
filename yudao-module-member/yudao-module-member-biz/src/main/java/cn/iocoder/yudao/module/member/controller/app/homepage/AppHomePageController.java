@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.member.controller.app.homepage;
 
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.member.enums.HomePageType;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -41,6 +43,9 @@ public class AppHomePageController {
     @Resource
     private HomePageService homePageService;
 
+    @Resource
+    private RedisTemplate<String, Integer> redisTemplate;
+
     @PostMapping("/create")
     @Operation(summary = "创建首页数据卡片")
     @PreAuthenticated
@@ -48,6 +53,25 @@ public class AppHomePageController {
         createReqVO.setMold((byte) 1);
         createReqVO.setUserId(SecurityFrameworkUtils.getLoginUserId());
         return success(homePageService.createHomePage(createReqVO));
+    }
+
+    @PostMapping("/copy")
+    @Operation(summary = "复制首页数据卡片")
+    @PreAuthenticated
+    public CommonResult<AppHomePageRespVO> copyHomePage(@Valid @RequestBody AppHomePageCopyReqVO copyReqVO) {
+        AppHomePageCreateReqVO createReqVO = new AppHomePageCreateReqVO();
+        createReqVO.setFamilyId(copyReqVO.getFamilyId());
+        createReqVO.setType(copyReqVO.getType());
+        createReqVO.setMold((byte) 1);
+        createReqVO.setUserId(SecurityFrameworkUtils.getLoginUserId());
+        HomePageDO homePageDO = new HomePageDO();
+        // 如果是自定义卡片则设置副标题
+        if(createReqVO.getMold() == (byte)1){
+            Long increment = redisTemplate.opsForValue().increment(createReqVO.key());
+            homePageDO.setSubtitle("场景" + increment);
+            homePageDO.setName(HomePageType.valueOf(createReqVO.getType()).name);
+        }
+        return success(HomePageConvert.INSTANCE.convert(homePageDO));
     }
 
     @PutMapping("/update")
@@ -61,9 +85,9 @@ public class AppHomePageController {
     @PutMapping("/saveOrUpdate")
     @Operation(summary = "保存或更新首页数据卡片")
     @PreAuthenticated
-    public CommonResult<Boolean> saveOrUpdate(@Valid @RequestBody List<AppHomePageUpdateReqVO> updateReqVOS){
+    public CommonResult<Boolean> saveOrUpdate(@Valid @RequestBody SaveUpdateDeleteVO saveUpdateDeleteVO){
 
-        homePageService.saveOrUpdate(updateReqVOS);
+        homePageService.saveOrUpdate(saveUpdateDeleteVO);
 
         return success(true);
     }
@@ -80,13 +104,9 @@ public class AppHomePageController {
 
     @PutMapping("/bind-device")
     @Operation(summary = "首页数据卡片绑定设备")
-    @Parameter(name = "id", description = "编号", required = true)
-    @Parameter(name = "devices", description = "要绑定的设备ID", required = true, example = "1,2")
     @PreAuthenticated
-    public CommonResult<Boolean> bindDevice(@RequestParam("id") Long id,
-                                            @RequestParam("devices") Set<Long> devices) {
-
-        homePageService.bindDevice(id, devices);
+    public CommonResult<Boolean> bindDevice(@RequestBody AppHomePageBindReqVO bindReqVO) {
+        homePageService.bindDevice(bindReqVO.getId(), bindReqVO.getDevices());
         return success(true);
     }
 

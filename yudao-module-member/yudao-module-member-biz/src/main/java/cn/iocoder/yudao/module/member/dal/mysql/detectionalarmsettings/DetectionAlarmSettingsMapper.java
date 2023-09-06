@@ -22,7 +22,7 @@ public interface DetectionAlarmSettingsMapper extends BaseMapperX<DetectionAlarm
                 .eqIfPresent(DetectionAlarmSettingsDO::getDeviceId, reqVO.getDeviceId())
                 .eqIfPresent(DetectionAlarmSettingsDO::getNotice, reqVO.getNotice())
                 .eqIfPresent(DetectionAlarmSettingsDO::getEnter, reqVO.getEnter())
-                .eqIfPresent(DetectionAlarmSettingsDO::getLeave, reqVO.getLeave())
+                .eqIfPresent(DetectionAlarmSettingsDO::getGoOut, reqVO.getGoOut())
                 .betweenIfPresent(DetectionAlarmSettingsDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(DetectionAlarmSettingsDO::getId));
     }
@@ -32,7 +32,7 @@ public interface DetectionAlarmSettingsMapper extends BaseMapperX<DetectionAlarm
                 .eqIfPresent(DetectionAlarmSettingsDO::getDeviceId, reqVO.getDeviceId())
                 .eqIfPresent(DetectionAlarmSettingsDO::getNotice, reqVO.getNotice())
                 .eqIfPresent(DetectionAlarmSettingsDO::getEnter, reqVO.getEnter())
-                .eqIfPresent(DetectionAlarmSettingsDO::getLeave, reqVO.getLeave())
+                .eqIfPresent(DetectionAlarmSettingsDO::getGoOut, reqVO.getGoOut())
                 .betweenIfPresent(DetectionAlarmSettingsDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(DetectionAlarmSettingsDO::getId));
     }

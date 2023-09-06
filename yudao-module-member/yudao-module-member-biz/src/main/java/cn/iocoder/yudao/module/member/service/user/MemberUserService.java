@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.member.service.user;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.UserPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.UserStatisticsDetailVO;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.UserStatisticsVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateInfoReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
@@ -113,4 +115,22 @@ public interface MemberUserService {
      * @return 会员分页
      */
     PageResult<MemberUserDO> getUserPage(UserPageReqVO pageReqVO);
+
+    /**
+     * 用户信息统计
+     * @return
+     */
+    UserStatisticsVO statistics();
+
+    /**
+     * 查询每个月的明细
+     * @return
+     */
+    List<UserStatisticsDetailVO> selectCountEveryMonth();
+
+    /**
+     * 查询用户总量
+     * @return
+     */
+    Long selectCount();
 }

@@ -25,4 +25,16 @@ public enum HomePageType {
         this.name = name;
     }
 
+
+    public static HomePageType valueOf(byte type){
+        if(SEEP.type == type){
+            return SEEP;
+        }else if(TOILET.type == type){
+            return TOILET;
+        }else if(FALL.type == type){
+            return FALL;
+        }else{
+            return LEAVE_BACK;
+        }
+    }
 }

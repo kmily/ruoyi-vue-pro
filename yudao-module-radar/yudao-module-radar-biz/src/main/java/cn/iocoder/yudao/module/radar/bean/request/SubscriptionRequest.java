@@ -78,5 +78,7 @@ public class SubscriptionRequest {
     @JSONField(name = "SubscribeRadarCondition")
     private SubscribeRadarCondition subscribeRadarCondition;
 
+    @JSONField(name = "SubscribeEvent")
+    private SubscribeEvent subscribeEvent;
 
 }

@@ -23,7 +23,7 @@ public class AppDetectionAlarmSettingsExportReqVO {
     private Boolean enter;
 
     @Schema(description = "离开告警")
-    private Boolean leave;
+    private Boolean goOut;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

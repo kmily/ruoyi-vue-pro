@@ -35,6 +35,7 @@ public interface ErrorCodeConstants {
     ErrorCode DEVICE_USER_NOT_EXISTS = new ErrorCode(1004007000, "设备绑定信息不存在");
     ErrorCode DEVICE_NOT_EXISTS = new ErrorCode(1004007001, "设备信息不存在");
     ErrorCode FAMILY_DEVICE_NOT_EXISTS = new ErrorCode(1004007002, "家庭不存在雷达");
+    ErrorCode DEVICE_IS_BOUND = new ErrorCode(1004007002, "此雷达已被绑定");
 
     // ========== 人员存在感知雷达设置 1004008000 ==========
     ErrorCode EXIST_ALARM_SETTINGS_NOT_EXISTS = new ErrorCode(1004008000, "人员存在感知雷达设置不存在");

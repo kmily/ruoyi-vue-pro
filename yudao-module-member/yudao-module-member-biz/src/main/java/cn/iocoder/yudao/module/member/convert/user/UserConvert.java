@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.member.convert.user;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.UserRespVO;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.UserStatisticsDetailVO;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.UserStatisticsExcelVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserInfoRespVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateInfoReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
@@ -26,4 +28,6 @@ public interface UserConvert {
 
     MemberUserDO convert(AppUserUpdateInfoReqVO reqVO);
     PageResult<UserRespVO> convertPage(PageResult<MemberUserDO> page);
+
+    List<UserStatisticsExcelVO> convertList02(List<UserStatisticsDetailVO> voList);
 }

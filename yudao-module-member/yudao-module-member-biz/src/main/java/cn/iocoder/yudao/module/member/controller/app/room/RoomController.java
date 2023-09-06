@@ -1,7 +1,11 @@
 package cn.iocoder.yudao.module.member.controller.app.room;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.*;
+
+import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
+import cn.iocoder.yudao.module.system.api.dict.dto.DictDataRespDTO;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -14,6 +18,7 @@ import javax.validation.*;
 import javax.servlet.http.*;
 import java.util.*;
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -36,6 +41,9 @@ public class RoomController {
 
     @Resource
     private RoomService roomService;
+
+    @Resource
+    private DictDataApi dictDataApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建用户房间")
@@ -89,6 +97,18 @@ public class RoomController {
         PageResult<RoomDO> pageResult = roomService.getRoomPage(pageVO);
         return success(RoomConvert.INSTANCE.convertPage(pageResult));
     }
+
+
+    @GetMapping("/presets-room")
+    @Operation(summary = "查询预设房间")
+    @PreAuthenticated
+    public CommonResult<List<String>> getPresetsRoom(){
+        List<DictDataRespDTO> dataRespDTOS = dictDataApi.getDictData("radar_room_type");
+        List<String> rooms = dataRespDTOS.stream().filter(item -> Objects.equals(CommonStatusEnum.ENABLE.getStatus(), item.getStatus()))
+                .map(DictDataRespDTO::getLabel).collect(Collectors.toList());
+        return CommonResult.success(rooms);
+    }
+
 
 
 }

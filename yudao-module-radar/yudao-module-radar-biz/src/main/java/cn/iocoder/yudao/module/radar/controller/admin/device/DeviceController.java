@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.member.api.deviceuser.DeviceUserApi;
 import cn.iocoder.yudao.module.member.api.deviceuser.dto.DeviceUserDTO;
 import cn.iocoder.yudao.module.radar.controller.app.device.DeviceStatusVO;
+import cn.iocoder.yudao.module.radar.service.ApiSubThread;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -133,4 +134,12 @@ public class DeviceController {
         return success(deviceStatusVOS);
     }
 
+
+    @GetMapping("/device-rule")
+    @Parameter(name = "code", description = "设备编号", required = true, example = "219801C1F76227200128")
+    @Operation(summary = "获得设备状态列表")
+    public CommonResult<Boolean> getDeviceRule(@RequestParam("code") String code) {
+        ApiSubThread.getLinesRule(code);
+        return success(true);
+    }
 }

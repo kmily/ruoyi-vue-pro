@@ -28,6 +28,9 @@ public class AppHomePageBaseVO {
 //    @NotNull(message = "房间名称不能为空")
     private String name;
 
+    @Schema(description = "附加名称", example = "1")
+    private String subtitle;
+
     @Schema(description = "数据类型 0-睡眠,1-如厕,2-跌倒,3-离/回家", example = "1")
     @NotNull(message = "数据类型不能为空")
     @Range(min = 0, max = 3, message = "数据类型必须为 0, 1, 2, 3")

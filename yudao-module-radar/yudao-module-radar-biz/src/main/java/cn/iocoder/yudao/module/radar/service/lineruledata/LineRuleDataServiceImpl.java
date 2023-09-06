@@ -1,10 +1,22 @@
 package cn.iocoder.yudao.module.radar.service.lineruledata;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.iocoder.yudao.module.radar.controller.app.lineruledata.vo.AppLineRuleDataInfoVO;
+import cn.iocoder.yudao.module.radar.controller.app.lineruledata.vo.AppLineRuleDataReqVO;
+import cn.iocoder.yudao.module.radar.controller.app.lineruledata.vo.AppLineRuleDataResVO;
+import cn.iocoder.yudao.module.radar.controller.app.lineruledata.vo.AppLineRuleDataVO;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import cn.iocoder.yudao.module.radar.controller.admin.lineruledata.vo.*;
 import cn.iocoder.yudao.module.radar.dal.dataobject.lineruledata.LineRuleDataDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -77,6 +89,35 @@ public class LineRuleDataServiceImpl implements LineRuleDataService {
     @Override
     public List<LineRuleDataDO> getLineRuleDataList(LineRuleDataExportReqVO exportReqVO) {
         return lineRuleDataMapper.selectList(exportReqVO);
+    }
+
+    @Override
+    public List<AppLineRuleDataResVO> getLineRuleDataList(Long deviceId, String  startDate, String endDate) {
+
+        String start = startDate + " 00:00:00";
+        String end = endDate + " 23:59:59";
+        List<LineRuleDataDO> list = lineRuleDataMapper.selectList(deviceId, start, end);
+        if(CollUtil.isEmpty(list)){
+            return new ArrayList<>();
+        }
+        Map<String, List<LineRuleDataDO>> dateToDataMap = list.stream().collect(Collectors.groupingBy(item -> LocalDateTimeUtil.format(item.getCreateTime(), "yyyy-MM-dd")));
+        List<AppLineRuleDataResVO> resVOS = new ArrayList<>();
+        dateToDataMap.forEach((date, ruleDataList) -> {
+            AppLineRuleDataResVO resVO = new AppLineRuleDataResVO();
+            resVO.setDate(date);
+            List<AppLineRuleDataInfoVO> infoVOS = ruleDataList.stream().map(AppLineRuleDataInfoVO::new).collect(Collectors.toList());
+            Long dateTime = null;
+            List<AppLineRuleDataInfoVO> collect = infoVOS.stream().filter(AppLineRuleDataInfoVO::getGoOut).collect(Collectors.toList());
+            if(CollUtil.isNotEmpty(collect)){
+                 dateTime = collect.stream().map(item -> item.getCreateTime().toInstant(ZoneOffset.of("+8")).toEpochMilli())
+                        .max((o1, o2) -> (int)(o2 - o1)).orElse(null);
+            }
+
+            resVO.setRuleDataVO(new AppLineRuleDataVO().setDetails(infoVOS).setLastGoOut(dateTime));
+
+            resVOS.add(resVO);
+        });
+        return resVOS;
     }
 
 }

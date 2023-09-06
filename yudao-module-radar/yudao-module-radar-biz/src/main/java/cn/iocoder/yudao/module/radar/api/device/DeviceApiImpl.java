@@ -50,11 +50,12 @@ public class DeviceApiImpl implements DeviceApi{
     @Override
     public void bindOrUnBind(Long id, byte bind) {
         TenantUtils.executeIgnore(()->{
-            DeviceUpdateReqVO updateReqVO = new DeviceUpdateReqVO();
-            updateReqVO.setId(id)
-                    .setBind(bind)
-                    .setBindTime(LocalDateTime.now());
-            deviceService.updateDevice(updateReqVO);
+            deviceService.updateBind(bind, id);
         });
+    }
+
+    @Override
+    public DeviceDTO getById(Long id) {
+        return DeviceConvert.INSTANCE.convertDTO(deviceService.getDevice(id));
     }
 }

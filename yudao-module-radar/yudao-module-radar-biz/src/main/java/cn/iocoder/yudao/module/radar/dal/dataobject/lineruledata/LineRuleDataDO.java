@@ -47,6 +47,17 @@ public class LineRuleDataDO extends BaseDO {
      * 绊线规则数量
      */
     private Integer lineNum;
+
+    /**
+     * 进入
+     */
+    private Integer enter;
+
+    /**
+     * 离开
+     */
+    private Integer goOut;
+
     /**
      * 绊线统计数据
      */

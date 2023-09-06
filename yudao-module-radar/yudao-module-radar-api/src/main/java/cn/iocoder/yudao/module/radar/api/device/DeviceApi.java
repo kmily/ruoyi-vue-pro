@@ -36,4 +36,6 @@ public interface DeviceApi {
      */
     void bindOrUnBind(Long id, byte bind);
 
+    DeviceDTO getById(Long id);
+
 }

@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.radar.dal.mysql.lineruledata;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.radar.dal.dataobject.lineruledata.LineRuleDataDO;
@@ -38,6 +40,14 @@ public interface LineRuleDataMapper extends BaseMapperX<LineRuleDataDO> {
                 .eqIfPresent(LineRuleDataDO::getLineNum, reqVO.getLineNum())
                 .eqIfPresent(LineRuleDataDO::getLineData, reqVO.getLineData())
                 .betweenIfPresent(LineRuleDataDO::getCreateTime, reqVO.getCreateTime())
+                .orderByDesc(LineRuleDataDO::getId));
+    }
+
+
+    default List<LineRuleDataDO> selectList(Long deviceId, String start, String end){
+        return selectList(new LambdaQueryWrapperX<LineRuleDataDO>()
+                .eq(LineRuleDataDO::getDeviceId, deviceId)
+                .between(BaseDO::getCreateTime, start, end)
                 .orderByDesc(LineRuleDataDO::getId));
     }
 

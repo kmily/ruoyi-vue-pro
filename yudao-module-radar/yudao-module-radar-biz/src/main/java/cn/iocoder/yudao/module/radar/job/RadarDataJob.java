@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.radar.job;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.radar.api.device.dto.DeviceDTO;
 import cn.iocoder.yudao.module.radar.bean.entity.HealthData;
+import cn.iocoder.yudao.module.radar.bean.entity.LineRuleData;
 import cn.iocoder.yudao.module.radar.bean.entity.RequestData;
 import cn.iocoder.yudao.module.radar.cache.RadarDataCache;
 import cn.iocoder.yudao.module.radar.controller.admin.arearuledata.vo.AreaRuleDataCreateReqVO;
@@ -26,6 +28,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -77,6 +80,7 @@ public class RadarDataJob implements InitializingBean, Runnable {
         healthDataDO.setDeviceCode(requestData.getDeviceCode());
         DeviceDTO deviceDTO = deviceCache.getBySn(requestData.getDeviceCode());
         try {
+            log.info("开始保存体征数据 \n{}", healthDataDO);
             if(deviceDTO.getId() != null){
                 healthDataDO.setDeviceId(deviceDTO.getId());
                 TenantContextHolder.setTenantId(deviceDTO.getTenantId());
@@ -132,10 +136,24 @@ public class RadarDataJob implements InitializingBean, Runnable {
     private void saveLineRuleData(RequestData requestData){
         LineRuleDataCreateReqVO createReqVO = new LineRuleDataCreateReqVO();
         createReqVO.setLineData(JSON.toJSONString(requestData.getLineRuleDataList()))
-                .setLineNum(requestData.getAreaNum())
+                .setLineNum(requestData.getLineNum())
                 .setDeviceCode(requestData.getDeviceCode())
                 .setSeq(requestData.getSeq())
                 .setTimeStamp(requestData.getTimeStamp());
+        int enter = 0;
+        int goOut = 0;
+        List<LineRuleData> lineRuleDataList = requestData.getLineRuleDataList();
+        if(CollUtil.isNotEmpty(lineRuleDataList)){
+            for (LineRuleData ruleData: lineRuleDataList){
+                long objectIn = ruleData.getObjectIn();
+                long objectOut = ruleData.getObjectOut();
+                enter += objectIn;
+                goOut += objectOut;
+            }
+            createReqVO.setEnter(enter).setGoOut(goOut);
+        }
+
+        createReqVO.setEnter(enter).setGoOut(goOut);
         DeviceDTO deviceDTO = deviceCache.getBySn(requestData.getDeviceCode());
         try {
             if(deviceDTO.getId() != null){
@@ -147,6 +165,17 @@ public class RadarDataJob implements InitializingBean, Runnable {
             lineRuleDataService.createLineRuleData(createReqVO);
         } finally {
             TenantContextHolder.clear();
+        }
+
+        if(createReqVO.getEnter() > 0 || createReqVO.getGoOut() > 0){
+
+            Map<String, Object> content = new HashMap<>();
+            content.put("enter", createReqVO.getEnter());
+            content.put("goOut", createReqVO.getGoOut());
+            content.put("time", requestData.getTimeStamp());
+            content.put("device", createReqVO.getDeviceId());
+            producer.sendNotifyMessage(DeviceDataTypeEnum.LINE_RULE, JSON.toJSONString(content));
+
         }
     }
 

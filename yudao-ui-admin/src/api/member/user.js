@@ -60,3 +60,22 @@ export function getUserByMobile(mobile){
     method: 'get',
   })
 }
+
+
+// 查询用户分析
+export function getUserStatistics(){
+  return request({
+    url: '/member/user/statistics',
+    method: 'get',
+  })
+}
+
+
+// 导出设备信息 Excel
+export function exportStatisticsExcel() {
+  return request({
+    url: '/member/user/export-excel',
+    method: 'get',
+    responseType: 'blob'
+  })
+}

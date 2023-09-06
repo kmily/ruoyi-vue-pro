@@ -181,4 +181,9 @@ public class DictDataServiceImpl implements DictDataService {
         return dictDataMapper.selectByDictTypeAndLabel(dictType, label);
     }
 
+    @Override
+    public List<DictDataDO> getDictDataList(String type) {
+        return dictDataMapper.selectList(DictDataDO::getDictType, type);
+    }
+
 }

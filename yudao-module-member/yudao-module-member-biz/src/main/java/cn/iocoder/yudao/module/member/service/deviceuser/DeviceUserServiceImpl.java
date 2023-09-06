@@ -62,8 +62,17 @@ public class DeviceUserServiceImpl implements DeviceUserService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Long createDeviceUser(AppDeviceUserCreateReqVO createReqVO) {
-        DeviceDTO deviceDTO = deviceApi.queryBySn(createReqVO.getDeviceCode());
+        /*DeviceDTO deviceDTO = deviceApi.queryBySn(createReqVO.getDeviceCode());
         if(deviceDTO == null){
+            throw exception(DEVICE_NOT_EXISTS);
+        }*/
+        DeviceDTO deviceDTO = new DeviceDTO();
+        if(StrUtil.isNotBlank(createReqVO.getDeviceCode())){
+            AppDeviceRespVO vo = this.checkDevice(createReqVO.getDeviceCode());
+            deviceDTO.setId(vo.getId()).setName(vo.getName()).setType(vo.getType());
+        }else if(createReqVO.getDeviceId() != null){
+             deviceDTO = deviceApi.getById(createReqVO.getDeviceId());
+        }else{
             throw exception(DEVICE_NOT_EXISTS);
         }
 
@@ -80,13 +89,13 @@ public class DeviceUserServiceImpl implements DeviceUserService {
         if(!Objects.equals(family.getId(),  room.getFamilyId())){
             throw exception(ROOM_NOT_MATE_FAMILY);
         }
-
         // 插入
         DeviceUserDO deviceUser = DeviceUserConvert.INSTANCE.convert(createReqVO);
         deviceUser.setDeviceId(deviceDTO.getId());
         if(StrUtil.isEmpty(createReqVO.getCustomName())){
             createReqVO.setCustomName(deviceDTO.getName());
         }
+
         deviceUserMapper.insert(deviceUser);
         // 初始化雷达告警设置
         alarmSettingsService.createAlarmSettings(deviceDTO.getId(),  deviceDTO.getType());
@@ -116,10 +125,17 @@ public class DeviceUserServiceImpl implements DeviceUserService {
 
     @Override
     public void deleteDeviceUser(Long id) {
-        // 校验存在
-        validateDeviceUserExists(id);
+
+        List<DeviceUserDO> deviceUserDOS = deviceUserMapper.selectList(DeviceUserDO::getDeviceId, id);
+
+        if(deviceUserDOS.isEmpty()){
+            throw exception(DEVICE_USER_NOT_EXISTS);
+        }
+
+        Set<Long> longs = deviceUserDOS.stream().map(DeviceUserDO::getId).collect(Collectors.toSet());
+
         // 删除
-        deviceUserMapper.deleteById(id);
+        deviceUserMapper.deleteBatchIds(longs);
     }
 
     private void validateDeviceUserExists(Long id) {
@@ -204,6 +220,28 @@ public class DeviceUserServiceImpl implements DeviceUserService {
             deviceUserMapper.updateById(new DeviceUserDO().setKeepalive(time).setDeviceId(deviceId));
         });
 
+    }
+
+    @Override
+    public AppDeviceRespVO checkDevice(String deviceSn) {
+
+        DeviceDTO deviceDTO = deviceApi.queryBySn(deviceSn);
+        if(deviceDTO == null){
+            throw exception(DEVICE_NOT_EXISTS);
+        }
+        List<DeviceUserDO> deviceUserDOS = this.deviceUserMapper.selectList(DeviceUserDO::getDeviceId, deviceDTO.getId());
+        if(!deviceUserDOS.isEmpty()){
+            throw exception(DEVICE_IS_BOUND);
+        }
+        return new AppDeviceRespVO().setId(deviceDTO.getId())
+                .setType(deviceDTO.getType())
+                .setSn(deviceDTO.getSn())
+                .setName(deviceDTO.getName());
+    }
+
+    @Override
+    public Long selectCount() {
+        return deviceUserMapper.selectCount();
     }
 
 }

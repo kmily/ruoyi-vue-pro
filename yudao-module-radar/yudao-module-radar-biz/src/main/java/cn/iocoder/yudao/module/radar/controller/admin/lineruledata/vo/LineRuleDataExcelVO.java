@@ -36,7 +36,11 @@ public class LineRuleDataExcelVO {
 
     @ExcelProperty("绊线统计数据")
     private String lineData;
+    @Schema(description = "回家")
+    private Integer enter;
 
+    @Schema(description = "离家")
+    private Integer goOut;
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 

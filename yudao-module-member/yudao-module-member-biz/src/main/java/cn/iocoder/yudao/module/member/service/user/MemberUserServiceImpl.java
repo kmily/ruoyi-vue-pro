@@ -1,12 +1,17 @@
 package cn.iocoder.yudao.module.member.service.user;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.UserPageReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.UserStatisticsDetailVO;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.UserStatisticsVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateInfoReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.convert.user.UserConvert;
@@ -16,6 +21,7 @@ import cn.iocoder.yudao.module.member.service.family.FamilyService;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -26,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -173,6 +180,33 @@ public class MemberUserServiceImpl implements MemberUserService {
     @Override
     public PageResult<MemberUserDO> getUserPage(UserPageReqVO pageReqVO) {
         return memberUserMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public UserStatisticsVO statistics() {
+        List<UserStatisticsDetailVO> voList = memberUserMapper.selectCountEveryMonth();
+
+        String now = DateUtil.format(new Date(), "yyyy-MM");
+
+        String sevenDays = LocalDateTimeUtil.format(LocalDate.now().plusDays(-7), "yyyy-MM-dd");
+
+        Long month = memberUserMapper.selectCount(new LambdaQueryWrapper<MemberUserDO>().ge(BaseDO::getCreateTime, now + "-01 00:00:00"));
+        Long sevenDayCount = memberUserMapper.selectCount(new LambdaQueryWrapper<MemberUserDO>().ge(BaseDO::getCreateTime, sevenDays + " 00:00:00"));
+
+        long sum = voList.stream().mapToLong(UserStatisticsDetailVO::getQuantity).sum();
+
+        return new UserStatisticsVO().setDetail(voList).setMonth(month).setSevenDays(sevenDayCount)
+                .setTotal(sum);
+    }
+
+    @Override
+    public List<UserStatisticsDetailVO> selectCountEveryMonth() {
+        return  memberUserMapper.selectCountEveryMonth();
+    }
+
+    @Override
+    public Long selectCount() {
+        return memberUserMapper.selectCount();
     }
 
     /**

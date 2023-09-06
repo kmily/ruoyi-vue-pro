@@ -91,8 +91,8 @@ public interface HomePageService {
 
     /**
      * 修改或保存数据
-     * @param updateReqVOS
+     * @param saveUpdateDeleteVO
      */
-    void saveOrUpdate(List<AppHomePageUpdateReqVO> updateReqVOS);
+    void saveOrUpdate(SaveUpdateDeleteVO saveUpdateDeleteVO);
 
 }

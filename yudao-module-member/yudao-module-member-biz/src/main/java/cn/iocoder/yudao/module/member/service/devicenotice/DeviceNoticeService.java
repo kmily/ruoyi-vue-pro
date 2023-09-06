@@ -102,4 +102,10 @@ public interface DeviceNoticeService {
      * @param content 消息内容
      */
     void updateByNoticeId(Long noticeId, String content);
+
+    /**
+     * 查询所有
+     * @return
+     */
+    Long selectCount();
 }

@@ -12,6 +12,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Date;
 import java.util.Set;
 
 @Slf4j
@@ -55,7 +56,7 @@ public class WebSocketServer implements Runnable {
                 }
                 log.info("webSocket服务器启动成功：" + channel + "\n");
             } catch (Exception e) {
-                log.info("webSocket服务器启动失败，端口被占用或该端口已有服务运行，请检查ip端口设置\n");
+                log.error("webSocket服务器启动失败，端口被占用或该端口已有服务运行，请检查ip端口设置\n", e);
             }
             assert channel != null;
             channel.closeFuture().sync();
@@ -83,5 +84,11 @@ public class WebSocketServer implements Runnable {
         if (!CollectionUtils.isEmpty(channelIds)) {
             channelIds.forEach(WebSocketUtil::closeSession);
         }
+    }
+
+    public static void main(String[] args) {
+        Date h = new Date();
+        h.setTime(19700101085100L);
+        System.out.println(h.toLocaleString());
     }
 }

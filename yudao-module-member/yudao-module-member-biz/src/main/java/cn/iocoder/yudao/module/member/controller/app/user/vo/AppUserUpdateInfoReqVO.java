@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 public class AppUserUpdateInfoReqVO {
 
     @Schema(description = "用户昵称", required = true, example = "张三")
-    private String nickName;
+    private String nickname;
 
     @Schema(description = "用户出生日期", required = true, example = "1900-01-01")
     private String birthday;

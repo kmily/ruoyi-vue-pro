@@ -7,9 +7,9 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            访客
+            用户
           </div>
-          <count-to :start-val="0" :end-val="102400" :duration="2600" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="peoples" :duration="2600" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -20,22 +20,22 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            消息
+            告警
           </div>
-          <count-to :start-val="0" :end-val="81212" :duration="3000" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="messages" :duration="3000" class="card-panel-num" />
         </div>
       </div>
     </el-col>
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('purchases')">
         <div class="card-panel-icon-wrapper icon-money">
-          <svg-icon icon-class="money" class-name="card-panel-icon" />
+          <svg-icon icon-class="devices" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            金额
+            设备
           </div>
-          <count-to :start-val="0" :end-val="9280" :duration="3200" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="devices" :duration="3200" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -48,7 +48,7 @@
           <div class="card-panel-text">
             订单
           </div>
-          <count-to :start-val="0" :end-val="13600" :duration="3600" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="devices" :duration="3600" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -58,13 +58,34 @@
 <script>
 import CountTo from 'vue-count-to'
 
+import {selectCount} from "@/api/member/index"; 
+
 export default {
   components: {
     CountTo
   },
+  data(){
+    return {
+      peoples: 0,
+      devices: 0,
+      messages: 0
+    }
+  },
+  created(){
+    this.selectCount();
+  },
   methods: {
     handleSetLineChartData(type) {
       this.$emit('handleSetLineChartData', type)
+    },
+    selectCount(){
+      selectCount().then(response => {
+        console.log('返回数据', response.data);
+        this.peoples = response.data.peoples * 100;
+        this.devices = response.data.devices * 100;
+        this.messages = response.data.messages * 100;
+        this.loading = false;
+      });
     }
   }
 }

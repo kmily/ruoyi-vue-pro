@@ -4,6 +4,7 @@ import java.util.*;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
+import cn.iocoder.yudao.module.radar.controller.app.lineruledata.vo.AppLineRuleDataInfoVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import cn.iocoder.yudao.module.radar.controller.admin.lineruledata.vo.*;
@@ -31,4 +32,5 @@ public interface LineRuleDataConvert {
 
     List<LineRuleDataExcelVO> convertList02(List<LineRuleDataDO> list);
 
+   // List<AppLineRuleDataInfoVO> convertList03(List<LineRuleDataDO> ruleDataList);
 }

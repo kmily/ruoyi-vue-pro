@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.radar.service.device;
 
 import cn.iocoder.yudao.module.radar.controller.app.device.DeviceStatusVO;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -104,6 +105,13 @@ public class DeviceServiceImpl implements DeviceService {
             }
             return new DeviceStatusVO().setDeviceId(id).setStatus(status);
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateBind(byte bind, Long id) {
+        this.deviceMapper.update(new DeviceDO(), new LambdaUpdateWrapper<DeviceDO>().set(DeviceDO::getBind, bind)
+                .set(DeviceDO::getBindTime, LocalDateTime.now()).eq(DeviceDO::getId, id));
+
     }
 
 }

@@ -42,7 +42,7 @@ public class FallAlarmSettingsDO extends BaseDO {
     /**
      * 离开告警
      */
-    private Boolean leave;
+    private Boolean goOut;
     /**
      * 跌倒告警
      */

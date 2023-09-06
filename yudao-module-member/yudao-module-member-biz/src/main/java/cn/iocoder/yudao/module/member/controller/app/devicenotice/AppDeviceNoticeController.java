@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.member.controller.app.devicenotice;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.member.service.deviceuser.DeviceUserService;
@@ -91,7 +92,7 @@ public class AppDeviceNoticeController {
     @GetMapping("/page")
     @Operation(summary = "获得设备通知分页")
 
-    public CommonResult<PageResult<AppDeviceNoticeRespVO>> getDeviceNoticePage(@Valid AppDeviceNoticePageReqVO pageVO) {
+    public CommonResult<PageResult<AppNoticeTimeGroupVO>> getDeviceNoticePage(@Valid AppDeviceNoticePageReqVO pageVO) {
         PageResult<DeviceNoticeDO> pageResult = deviceNoticeService.getDeviceNoticePage(pageVO);
         PageResult<AppDeviceNoticeRespVO> convertPage = DeviceNoticeConvert.INSTANCE.convertPage(pageResult);
         List<AppDeviceNoticeRespVO> pageResultList = convertPage.getList();
@@ -107,7 +108,21 @@ public class AppDeviceNoticeController {
                         .setRoomName(roomDeviceDTO.getRoom());
             });
         }
-        return success(convertPage);
+
+        List<AppDeviceNoticeRespVO> list = convertPage.getList();
+
+        Map<String, List<AppDeviceNoticeRespVO>> collect = list.stream().collect(Collectors.groupingBy(item -> DateUtil.format(item.getHappenTime(), "yyyy-MM-dd HH:mm")));
+
+        PageResult<AppNoticeTimeGroupVO> page = new PageResult<>();
+        page.setTotal(convertPage.getTotal());
+
+        List<AppNoticeTimeGroupVO> groupVOS = new ArrayList<>();
+        collect.forEach((key, list1) -> {
+            groupVOS.add(new AppNoticeTimeGroupVO().setTime(key).setRespVOS(list1));
+        });
+        groupVOS.sort((o1, o2) -> o2.getTime().compareTo(o1.getTime()));
+        page.setList(groupVOS);
+        return success(page);
     }
 
 

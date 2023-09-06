@@ -11,4 +11,10 @@ import javax.validation.constraints.*;
 @ToString(callSuper = true)
 public class AppHomePageCreateReqVO extends AppHomePageBaseVO {
 
+
+
+    public String key(){
+       return  "home-page:" + this.getUserId() + ":" + this.getFamilyId() + ":" + this.getType();
+    }
+
 }

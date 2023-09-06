@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.member.controller.app.existalarmsettings;
 
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
+import cn.iocoder.yudao.module.radar.api.device.DeviceApi;
+import cn.iocoder.yudao.module.radar.api.device.dto.DeviceDTO;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -36,6 +38,9 @@ public class AppExistAlarmSettingsController {
 
     @Resource
     private ExistAlarmSettingsService existAlarmSettingsService;
+
+    @Resource
+    private DeviceApi deviceApi;
 /*
     @PostMapping("/create")
     @Operation(summary = "创建人员存在感知雷达设置")
@@ -67,7 +72,12 @@ public class AppExistAlarmSettingsController {
     @PreAuthenticated
     public CommonResult<AppExistAlarmSettingsRespVO> getExistAlarmSettings(@RequestParam("deviceId") Long deviceId) {
         ExistAlarmSettingsDO existAlarmSettings = existAlarmSettingsService.getExistAlarmSettings(deviceId);
-        return success(ExistAlarmSettingsConvert.INSTANCE.convert(existAlarmSettings));
+        AppExistAlarmSettingsRespVO convert = ExistAlarmSettingsConvert.INSTANCE.convert(existAlarmSettings);
+        List<DeviceDTO> deviceDTOS = deviceApi.getByIds(Collections.singleton(existAlarmSettings.getDeviceId()));
+        if(!deviceDTOS.isEmpty()){
+            convert.setSn(deviceDTOS.get(0).getSn());
+        }
+        return success(convert);
     }
 /*
     @GetMapping("/list")

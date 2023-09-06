@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.radar.api.device.DeviceApi;
 import cn.iocoder.yudao.module.radar.api.device.dto.DeviceDTO;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -56,14 +57,18 @@ public class HomePageServiceImpl implements HomePageService {
     @Resource
     private DeviceApi deviceApi;
 
+
+
     @Override
     public Long createHomePage(AppHomePageCreateReqVO createReqVO) {
         // 插入
         HomePageDO homePage = HomePageConvert.INSTANCE.convert(createReqVO);
+
         homePageMapper.insert(homePage);
         // 返回
         return homePage.getId();
     }
+
 
     @Override
     public void updateHomePage(AppHomePageUpdateReqVO updateReqVO) {
@@ -180,7 +185,10 @@ public class HomePageServiceImpl implements HomePageService {
     }
 
     @Override
-    public void saveOrUpdate(List<AppHomePageUpdateReqVO> updateReqVOS) {
+    public void saveOrUpdate(SaveUpdateDeleteVO saveUpdateDeleteVO) {
+
+        List<AppHomePageUpdateReqVO> updateReqVOS = saveUpdateDeleteVO.getUpdateReqVOS();
+
         List<AppHomePageUpdateReqVO> saveList = updateReqVOS.stream().filter(item -> item.getId() == 0).collect(Collectors.toList());
         List<AppHomePageUpdateReqVO> updateList = updateReqVOS.stream().filter(item -> item.getId() != 0).collect(Collectors.toList());
 
@@ -194,7 +202,12 @@ public class HomePageServiceImpl implements HomePageService {
                 homePageMapper.updateById(HomePageConvert.INSTANCE.convert(item));
             });
         }
+        Set<Long> delIds = saveUpdateDeleteVO.getDelIds();
+        if(CollUtil.isNotEmpty(delIds)){
+            homePageMapper.deleteBatchIds(delIds);
+        }
 
     }
+
 
 }

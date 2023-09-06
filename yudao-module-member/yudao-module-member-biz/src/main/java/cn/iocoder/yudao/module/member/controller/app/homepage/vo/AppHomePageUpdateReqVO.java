@@ -15,4 +15,6 @@ public class AppHomePageUpdateReqVO extends AppHomePageBaseVO {
     @NotNull(message = "自增编号不能为空")
     private Long id;
 
+
+
 }

@@ -68,6 +68,15 @@ public class AppDeviceUserController {
     }
 
 
+    @GetMapping("/check-device")
+    @Operation(summary = "校验设备是否存在")
+    @Parameter(description = "设备编号", name = "deviceSn")
+    @PreAuthenticated
+    public CommonResult<AppDeviceRespVO> checkDevice(@RequestParam("deviceSn") String deviceSn){
+        AppDeviceRespVO deviceRespVO = deviceUserService.checkDevice(deviceSn);
+        return CommonResult.success(deviceRespVO);
+    }
+
     @PutMapping("/update")
     @Operation(summary = "更新设备和用户绑定")
     @PreAuthenticated
@@ -78,10 +87,10 @@ public class AppDeviceUserController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除设备和用户绑定")
-    @Parameter(name = "id", description = "编号", required = true)
+    @Parameter(name = "deviceId", description = "设备ID", required = true)
     @PreAuthenticated
-    public CommonResult<Boolean> deleteDeviceUser(@RequestParam("id") Long id) {
-        deviceUserService.deleteDeviceUser(id);
+    public CommonResult<Boolean> deleteDeviceUser(@RequestParam("deviceId") Long deviceId) {
+        deviceUserService.deleteDeviceUser(deviceId);
         return success(true);
     }
 
@@ -125,7 +134,8 @@ public class AppDeviceUserController {
         LocalDateTime now = LocalDateTime.now();
         roomDevice.forEach((room, devices) -> {
             AppDeviceUserRespVO vo = new AppDeviceUserRespVO()
-                    .setId(room).setName(roomMap.get(room));
+                    .setName(roomMap.get(room));
+                    vo.setRoomId(room);
             List<AppDeviceRespVO> deviceRespVOS = devices.stream().map(item -> {
                 DeviceDTO deviceDTO = deviceDTOMap.get(item.getDeviceId());
                 LocalDateTime keepalive = item.getKeepalive();
@@ -133,7 +143,8 @@ public class AppDeviceUserController {
                         .setCustomName(item.getCustomName())
                         .setSn(deviceDTO.getSn())
                         .setOnLine(keepalive != null && Duration.between(keepalive, now).toMinutes() < 5)
-                        .setId(item.getId());
+                        .setId(item.getId())
+                        .setDeviceId(item.getDeviceId());
             }).collect(Collectors.toList());
             vo.setDeviceRespVOList(deviceRespVOS);
             respVOS.add(vo);
@@ -162,6 +173,9 @@ public class AppDeviceUserController {
         Long count = deviceUserService.getDeviceCount(getLoginUserId());
         return success(count);
     }
+
+
+
 
 
    /* @GetMapping("/page")

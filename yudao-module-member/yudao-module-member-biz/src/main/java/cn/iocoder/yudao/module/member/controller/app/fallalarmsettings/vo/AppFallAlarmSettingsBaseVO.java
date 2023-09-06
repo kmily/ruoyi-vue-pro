@@ -25,7 +25,7 @@ public class AppFallAlarmSettingsBaseVO {
     private Boolean enter;
 
     @Schema(description = "离开告警")
-    private Boolean leave;
+    private Boolean goOut;
 
     @Schema(description = "跌倒告警")
     private Boolean fall;

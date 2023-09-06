@@ -30,7 +30,11 @@ public class LineRuleDataExportReqVO {
 
     @Schema(description = "绊线统计数据")
     private String lineData;
+    @Schema(description = "回家")
+    private Integer enter;
 
+    @Schema(description = "离家")
+    private Integer goOut;
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;

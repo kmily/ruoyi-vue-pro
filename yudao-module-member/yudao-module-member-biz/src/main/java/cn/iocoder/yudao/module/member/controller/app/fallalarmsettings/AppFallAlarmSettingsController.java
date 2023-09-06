@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.member.controller.app.fallalarmsettings;
 
+import cn.iocoder.yudao.module.radar.api.device.DeviceApi;
+import cn.iocoder.yudao.module.radar.api.device.dto.DeviceDTO;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -36,6 +38,9 @@ public class AppFallAlarmSettingsController {
     @Resource
     private FallAlarmSettingsService fallAlarmSettingsService;
 
+    @Resource
+    private DeviceApi deviceApi;
+
    /* @PostMapping("/create")
     @Operation(summary = "创建跌倒雷达设置")
 
@@ -62,11 +67,18 @@ public class AppFallAlarmSettingsController {
 
     @GetMapping("/get")
     @Operation(summary = "获得跌倒雷达设置")
+    @OperateLog
     @Parameter(name = "deviceId", description = "设备Id", required = true, example = "1024")
 
     public CommonResult<AppFallAlarmSettingsRespVO> getFallAlarmSettings(@RequestParam("deviceId") Long deviceId) {
         FallAlarmSettingsDO fallAlarmSettings = fallAlarmSettingsService.getFallAlarmSettings(deviceId);
-        return success(FallAlarmSettingsConvert.INSTANCE.convert(fallAlarmSettings));
+        AppFallAlarmSettingsRespVO convert = FallAlarmSettingsConvert.INSTANCE.convert(fallAlarmSettings);
+        List<DeviceDTO> deviceDTOS = deviceApi.getByIds(Collections.singleton(fallAlarmSettings.getDeviceId()));
+        if(!deviceDTOS.isEmpty()){
+            convert.setSn(deviceDTOS.get(0).getSn());
+        }
+        return success(convert);
+
     }
 /*
     @GetMapping("/list")

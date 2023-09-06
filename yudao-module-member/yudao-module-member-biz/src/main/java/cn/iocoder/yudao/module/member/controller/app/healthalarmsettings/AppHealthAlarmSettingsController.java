@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.member.controller.app.healthalarmsettings;
 
+import cn.iocoder.yudao.module.radar.api.device.DeviceApi;
+import cn.iocoder.yudao.module.radar.api.device.dto.DeviceDTO;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -36,6 +38,9 @@ public class AppHealthAlarmSettingsController {
     @Resource
     private HealthAlarmSettingsService healthAlarmSettingsService;
 
+    @Resource
+    private DeviceApi deviceApi;
+
    /* @PostMapping("/create")
     @Operation(summary = "创建体征检测雷达设置")
 
@@ -66,7 +71,12 @@ public class AppHealthAlarmSettingsController {
 
     public CommonResult<AppHealthAlarmSettingsRespVO> getHealthAlarmSettings(@RequestParam("deviceId") Long deviceId) {
         HealthAlarmSettingsDO healthAlarmSettings = healthAlarmSettingsService.getHealthAlarmSettings(deviceId);
-        return success(HealthAlarmSettingsConvert.INSTANCE.convert(healthAlarmSettings));
+        List<DeviceDTO> deviceDTOS = deviceApi.getByIds(Collections.singleton(healthAlarmSettings.getDeviceId()));
+        AppHealthAlarmSettingsRespVO convert = HealthAlarmSettingsConvert.INSTANCE.convert(healthAlarmSettings);
+        if(!deviceDTOS.isEmpty()){
+            convert.setSn(deviceDTOS.get(0).getSn());
+        }
+        return success(convert);
     }
 
  /*   @GetMapping("/list")

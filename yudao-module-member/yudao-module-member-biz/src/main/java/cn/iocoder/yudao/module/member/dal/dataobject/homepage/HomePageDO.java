@@ -40,6 +40,12 @@ public class HomePageDO extends BaseDO {
      * 房间名称
      */
     private String name;
+
+    /**
+     * 副标题
+     */
+    private String subtitle;
+
     /**
      * 数据类型 0-睡眠,1-如厕,2-跌倒,3-离/回家
      */

@@ -28,7 +28,7 @@ public class AppDetectionAlarmSettingsExcelVO {
     private Boolean enter;
 
     //@ExcelProperty("离开告警")
-    private Boolean leave;
+    private Boolean goOut;
 
     //@ExcelProperty("创建时间")
     private LocalDateTime createTime;

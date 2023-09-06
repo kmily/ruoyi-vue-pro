@@ -84,4 +84,10 @@ public interface DeviceService {
     List<DeviceStatusVO> getDeviceStatusList(Collection<Long> ids);
 
 
+    /**
+     * 更改绑定
+     * @param bind
+     * @param id
+     */
+    void updateBind(byte bind, Long id);
 }

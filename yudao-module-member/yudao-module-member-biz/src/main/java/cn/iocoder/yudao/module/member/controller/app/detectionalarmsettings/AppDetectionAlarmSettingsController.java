@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.member.controller.app.detectionalarmsettings;
 
+import cn.iocoder.yudao.module.radar.api.device.DeviceApi;
+import cn.iocoder.yudao.module.radar.api.device.dto.DeviceDTO;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -35,6 +37,8 @@ public class AppDetectionAlarmSettingsController {
 
     @Resource
     private DetectionAlarmSettingsService detectionAlarmSettingsService;
+    @Resource
+    private DeviceApi deviceApi;
 
     /*@PostMapping("/create")
     @Operation(summary = "创建人体检测雷达设置")
@@ -66,7 +70,13 @@ public class AppDetectionAlarmSettingsController {
 
     public CommonResult<AppDetectionAlarmSettingsRespVO> getDetectionAlarmSettings(@RequestParam("deviceId") Long deviceId) {
         DetectionAlarmSettingsDO detectionAlarmSettings = detectionAlarmSettingsService.getDetectionAlarmSettings(deviceId);
-        return success(DetectionAlarmSettingsConvert.INSTANCE.convert(detectionAlarmSettings));
+        AppDetectionAlarmSettingsRespVO convert = DetectionAlarmSettingsConvert.INSTANCE.convert(detectionAlarmSettings);
+
+        List<DeviceDTO> deviceDTOS = deviceApi.getByIds(Collections.singleton(detectionAlarmSettings.getDeviceId()));
+        if(!deviceDTOS.isEmpty()){
+            convert.setSn(deviceDTOS.get(0).getSn());
+        }
+        return success(convert);
     }
 /*
 

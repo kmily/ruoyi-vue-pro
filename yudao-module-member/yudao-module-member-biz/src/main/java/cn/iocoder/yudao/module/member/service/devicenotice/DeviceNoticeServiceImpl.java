@@ -4,8 +4,11 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
+import cn.iocoder.yudao.module.member.dal.dataobject.detectionalarmsettings.DetectionAlarmSettingsDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.deviceuser.DeviceUserDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.healthalarmsettings.HealthAlarmSettingsDO;
+import cn.iocoder.yudao.module.member.service.detectionalarmsettings.DetectionAlarmSettingsService;
 import cn.iocoder.yudao.module.member.service.deviceuser.dto.FamilyAndRoomDeviceDTO;
 import cn.iocoder.yudao.module.member.service.deviceuser.DeviceUserService;
 import cn.iocoder.yudao.module.member.service.healthalarmsettings.HealthAlarmSettingsService;
@@ -32,6 +35,7 @@ import cn.iocoder.yudao.module.member.convert.devicenotice.DeviceNoticeConvert;
 import cn.iocoder.yudao.module.member.dal.mysql.devicenotice.DeviceNoticeMapper;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
 
 /**
@@ -48,6 +52,9 @@ public class DeviceNoticeServiceImpl implements DeviceNoticeService {
 
     @Resource
     private HealthAlarmSettingsService healthAlarmSettingsService;
+
+    @Resource
+    private DetectionAlarmSettingsService detectionAlarmSettingsService;
 
     @Resource
     private DeviceUserService deviceUserService;
@@ -114,38 +121,92 @@ public class DeviceNoticeServiceImpl implements DeviceNoticeService {
     public void createDeviceNotice(int type, String content, String number) {
 
         if(type == DeviceDataTypeEnum.HEALTH.type){
-
             JSONObject entry = JSONUtil.parseObj(content);
             Double heart = entry.getDouble("heart");
             Long time = entry.getLong("time");
             Long device = entry.getLong("device");
-            //TenantUtils.executeIgnore(() -> {
-            HealthAlarmSettingsDO settings = healthAlarmSettingsService.getHealthAlarmSettings(device);
-            if(Boolean.TRUE.equals(settings.getHeart())){
-                DeviceUserDO userDO = deviceUserService.getDeviceUserByDevice(device);
-                String range = settings.getHeartRange();
-                String[] split = range.split("-");
-                double min = Double.parseDouble(split[0]);
-                double max = Double.parseDouble(split[1]);
-                String format = DateUtil.format(new Date(time * 1000), "HH点mm分ss秒");
-                String msg = format + "设别到";
+            TenantUtils.executeIgnore(() -> {
+                HealthAlarmSettingsDO settings = healthAlarmSettingsService.getHealthAlarmSettings(device);
+                if(Boolean.TRUE.equals(settings.getHeart())){
+                    DeviceUserDO userDO = deviceUserService.getDeviceUserByDevice(device);
+                    String range = settings.getHeartRange();
+                    String[] split = range.split("-");
+                    double min = Double.parseDouble(split[0]);
+                    double max = Double.parseDouble(split[1]);
+                    String format = DateUtil.format(new Date(time * 1000), "HH点mm分ss秒");
+                    String msg = format + "设别到";
 
-                LocalDateTime dateTime = LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.ofHours(8));
+                    LocalDateTime dateTime = LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.ofHours(8));
 
-                if(min > heart || max < heart){
-                    msg += "体征监测雷达检测到心率异常。心率["+ heart.intValue() + "次/分]，正常范围为" + range + "次/分";
-                    deviceNoticeMapper.insert(new DeviceNoticeDO()
-                            .setDeviceId(device)
-                            .setFamilyId(userDO.getFamilyId())
-                            .setContent(msg)
-                            .setUserId(userDO.getUserId())
-                            .setType((byte)type)
-                            .setHappenTime(dateTime));
+                    if(min > heart || max < heart){
+                        msg += "体征监测雷达检测到心率异常。心率["+ heart.intValue() + "次/分]，正常范围为" + range + "次/分";
+                        deviceNoticeMapper.insert(new DeviceNoticeDO()
+                                .setDeviceId(device)
+                                .setFamilyId(userDO.getFamilyId())
+                                .setContent(msg)
+                                .setUserId(userDO.getUserId())
+                                .setType((byte)type)
+                                .setHappenTime(dateTime));
+                    }
                 }
-            }
-            //});
+            });
+        }else if(type == DeviceDataTypeEnum.LINE_RULE.type){
+            JSONObject entry = JSONUtil.parseObj(content);
+            dealWithLineRuleData(entry);
+
+
         }
 
+    }
+
+    // 处理绊线数据通知
+    private void dealWithLineRuleData(JSONObject entry) {
+
+        Long device = entry.getLong("device");
+        Long time = entry.getLong("time");
+        Integer enter = entry.getInt("enter", 0);
+        Integer goOut = entry.getInt("goOut", 0);
+        TenantUtils.executeIgnore(() -> {
+            DetectionAlarmSettingsDO alarmSettings = detectionAlarmSettingsService.getDetectionAlarmSettings(device);
+            List<FamilyAndRoomDeviceDTO> familyAndRoomDeviceDTOS = deviceUserService.selectFamilyAndRoom(Collections.singleton(device));
+            if(familyAndRoomDeviceDTOS.isEmpty()){
+                return;
+            }
+            FamilyAndRoomDeviceDTO roomDeviceDTO = familyAndRoomDeviceDTOS.get(0);
+
+            String temp = "人体检测雷达检测到有人回家！\n" +
+                          "时间：%s\n" +
+                          "地点：%s";
+
+            String leave = "人体检测雷达检测到有人离家！\n" +
+                    "时间：%s\n" +
+                    "地点：%s";
+
+            String format = DateUtil.format(new Date(time * 1000), FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND);
+            LocalDateTime dateTime = LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.ofHours(8));
+            String address = roomDeviceDTO.getFamily() + "," + roomDeviceDTO.getRoom();
+            DeviceUserDO userDO = deviceUserService.getDeviceUserByDevice(device);
+            if(enter > 0 && alarmSettings.getEnter()){
+                String content = String.format(temp, format, address);
+                deviceNoticeMapper.insert(new DeviceNoticeDO()
+                        .setDeviceId(device)
+                        .setFamilyId(userDO.getFamilyId())
+                        .setContent(content)
+                        .setUserId(userDO.getUserId())
+                        .setType((byte)DeviceDataTypeEnum.HEALTH.type)
+                        .setHappenTime(dateTime));
+            }
+            if(goOut > 0 && alarmSettings.getGoOut()){
+                String content = String.format(leave, format, address);
+                deviceNoticeMapper.insert(new DeviceNoticeDO()
+                        .setDeviceId(device)
+                        .setFamilyId(userDO.getFamilyId())
+                        .setContent(content)
+                        .setUserId(userDO.getUserId())
+                        .setType((byte)DeviceDataTypeEnum.HEALTH.type)
+                        .setHappenTime(dateTime));
+            }
+        });
     }
 
     @Override
@@ -180,6 +241,11 @@ public class DeviceNoticeServiceImpl implements DeviceNoticeService {
     @Override
     public void updateByNoticeId(Long noticeId, String content) {
         deviceNoticeMapper.updateByNoticeId(noticeId, content);
+    }
+
+    @Override
+    public Long selectCount() {
+        return deviceNoticeMapper.selectCount();
     }
 
 }

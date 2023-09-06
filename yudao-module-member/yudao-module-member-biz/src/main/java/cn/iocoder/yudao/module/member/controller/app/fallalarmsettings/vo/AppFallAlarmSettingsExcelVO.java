@@ -28,7 +28,7 @@ public class AppFallAlarmSettingsExcelVO {
     private Boolean enter;
 
     //@ExcelProperty("离开告警")
-    private Boolean leave;
+    private Boolean goOut;
 
     //@ExcelProperty("跌倒告警")
     private Boolean fall;

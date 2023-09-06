@@ -8,9 +8,9 @@ import cn.iocoder.yudao.module.radar.api.device.DeviceApi;
 import cn.iocoder.yudao.module.radar.api.device.dto.DeviceDTO;
 import cn.iocoder.yudao.module.radar.bean.entity.Device;
 import cn.iocoder.yudao.module.radar.bean.enums.WebSocketApiEnum;
-import cn.iocoder.yudao.module.radar.bean.request.SubscribeRadarCondition;
-import cn.iocoder.yudao.module.radar.bean.request.SubscribeVehicleCondition;
-import cn.iocoder.yudao.module.radar.bean.request.SubscriptionRequest;
+import cn.iocoder.yudao.module.radar.bean.request.*;
+import cn.iocoder.yudao.module.radar.enums.DeviceDataTypeEnum;
+import cn.iocoder.yudao.module.radar.enums.RadarType;
 import cn.iocoder.yudao.module.radar.job.DeviceCache;
 import cn.iocoder.yudao.module.radar.mq.producer.radar.RadarStatusProducer;
 import cn.iocoder.yudao.module.radar.service.device.DeviceService;
@@ -24,7 +24,11 @@ import io.netty.channel.ChannelId;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -140,6 +144,26 @@ public class ApiSubThread implements Runnable {
         }
     }
 
+
+    public static void getLinesRule(String deviceCode){
+
+        ConcurrentHashMap<ChannelId, Device> deviceMap = ChannelSupervise.channelDeviceMap;
+
+        deviceMap.forEach((channelId, device) -> {
+            String code = device.getDeviceCode();
+            if(Objects.equals(deviceCode, code)){
+
+                String url = String.format(WebSocketApiEnum.LINES_RULE.url, device.getId());
+                JSONObject data = new JSONObject();
+               String requestStr = WebSocketUtil.sendWebSocketRequest(url, "GET", data, channelId);
+               log.info(WebSocketApiEnum.LINES_RULE.apiName + ", {}", requestStr);
+
+            }
+        });
+
+    }
+
+
     /**
      * @description: TODO 停止订阅
      * @author l09655 2022年08月02日
@@ -204,6 +228,29 @@ public class ApiSubThread implements Runnable {
             subscribeRadarCondition.setType(0b0000000000000000000000000000111);
             subscribeRadarCondition.setRealTimeDataDuration(2L);
             subscriptionRequest.setSubscribeRadarCondition(subscribeRadarCondition);
+
+            if(0 != (subType & 0b0000000000000100000000000000000)){
+
+                SubscribeEvent subscribeEvent = new SubscribeEvent();
+                subscribeEvent.setNum(1L);
+
+                List<SubScribeObj> subScribeObjs = new ArrayList<>();
+
+                subscribeEvent.setSubScribeObjList(subScribeObjs);
+
+                SubScribeObj subScribeObj = new SubScribeObj();
+                subScribeObjs.add(subScribeObj);
+
+                subScribeObj.setEventType("All");
+                Source source = new Source();
+                source.setSourceType("Device").setIDType(0L).setId("0");
+
+                List<Source> sources = new ArrayList<>();
+                sources.add(source);
+                subScribeObj.setSourceList(sources);
+                subscriptionRequest.setSubscribeEvent(subscribeEvent);
+            }
+
         }
 
 
@@ -237,10 +284,10 @@ public class ApiSubThread implements Runnable {
 
     public static long getSubType(int type){
         long subType = 0b0000000000000000000000000000000;
-        if(type == 1){
+        if(type == RadarType.HEALTH_AREA.type){
             // 人体特征
             subType = BitUtil.setIndexBitToOne(subType, 17);
-        }else if(type == 2){
+        }else if(type == RadarType.DETECTION_AREA.type){
             // 人体检查
             subType = BitUtil.setIndexBitToOne(subType, 14);
         }

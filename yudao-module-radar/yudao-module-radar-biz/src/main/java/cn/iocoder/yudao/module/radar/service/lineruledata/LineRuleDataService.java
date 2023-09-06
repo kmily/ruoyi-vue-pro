@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.radar.service.lineruledata;
 import java.util.*;
 import javax.validation.*;
 import cn.iocoder.yudao.module.radar.controller.admin.lineruledata.vo.*;
+import cn.iocoder.yudao.module.radar.controller.app.lineruledata.vo.AppLineRuleDataReqVO;
+import cn.iocoder.yudao.module.radar.controller.app.lineruledata.vo.AppLineRuleDataResVO;
 import cn.iocoder.yudao.module.radar.dal.dataobject.lineruledata.LineRuleDataDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
@@ -67,4 +69,10 @@ public interface LineRuleDataService {
      */
     List<LineRuleDataDO> getLineRuleDataList(LineRuleDataExportReqVO exportReqVO);
 
+    /**
+     * 查询离回家数据
+     * @param ruleDataReqVO
+     * @return
+     */
+    List<AppLineRuleDataResVO> getLineRuleDataList(Long deviceId, String  startDate, String endDate);
 }

@@ -21,7 +21,10 @@ public enum WebSocketApiEnum {
     LINE_RULE_DATA("/LAPI/V1.0/System/Event/Notification/PeopleCount/LineRuleData", "人数拌线统计接口", LogEnum.DATA_LINE_RULE),
     AREA_RULE_DATA("/LAPI/V1.0/System/Event/Notification/PeopleCount/AreaRuleData", "人数区域统计接口", LogEnum.DATA_AREA_RULE),
     HEALTH_DATA("/LAPI/V1.0/System/Event/Notification/HealthData", "人体康养接口", LogEnum.DATA_HEALTH),
-    STRUCTURE_DATA("/LAPI/V1.0/System/Event/Notification/Structure", "结构化数据接口", LogEnum.DATA_STRUCTURE);
+    STRUCTURE_DATA("/LAPI/V1.0/System/Event/Notification/Structure", "结构化数据接口", LogEnum.DATA_STRUCTURE),
+
+    LINES_RULE("/LAPI/V1.0/Channels/%s/Smart/PeopleCounting/Lines/Rule", "绊线人数统计规则配置信息", LogEnum.DATA_LINE_RULE);
+
 
     public final String url;
 

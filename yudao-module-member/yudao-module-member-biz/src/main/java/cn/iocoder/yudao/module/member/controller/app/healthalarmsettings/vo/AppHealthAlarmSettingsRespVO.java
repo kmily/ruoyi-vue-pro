@@ -16,4 +16,7 @@ public class AppHealthAlarmSettingsRespVO extends AppHealthAlarmSettingsBaseVO {
     @Schema(description = "创建时间", required = true)
     private LocalDateTime createTime;
 
+    @Schema(description = "设备编号", required = true)
+    private String sn;
+
 }
