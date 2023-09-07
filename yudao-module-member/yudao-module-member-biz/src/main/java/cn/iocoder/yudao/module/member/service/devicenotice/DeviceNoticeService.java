@@ -108,4 +108,11 @@ public interface DeviceNoticeService {
      * @return
      */
     Long selectCount();
+
+    /**
+     * 设置消息为已读
+     * @param id 消息ID
+     */
+    void updateToRead(Long id);
+
 }

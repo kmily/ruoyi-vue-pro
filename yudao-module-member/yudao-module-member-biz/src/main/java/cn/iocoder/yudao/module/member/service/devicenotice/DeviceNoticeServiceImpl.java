@@ -248,4 +248,11 @@ public class DeviceNoticeServiceImpl implements DeviceNoticeService {
         return deviceNoticeMapper.selectCount();
     }
 
+    @Override
+    public void updateToRead(Long id) {
+
+        deviceNoticeMapper.updateById(new DeviceNoticeDO().setId(id).setStatus((byte)0));
+
+    }
+
 }

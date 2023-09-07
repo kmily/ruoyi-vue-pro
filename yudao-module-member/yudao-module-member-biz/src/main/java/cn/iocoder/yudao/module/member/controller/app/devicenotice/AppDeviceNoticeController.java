@@ -100,7 +100,7 @@ public class AppDeviceNoticeController {
                 .map(AppDeviceNoticeRespVO::getDeviceId).collect(Collectors.toSet());
         if(CollUtil.isNotEmpty(deviceIds)){
             List<FamilyAndRoomDeviceDTO> deviceUserDTOS = deviceUserService.selectFamilyAndRoom(deviceIds);
-            Map<Long, FamilyAndRoomDeviceDTO> deviceDTOMap = deviceUserDTOS.stream().collect(Collectors.toMap(FamilyAndRoomDeviceDTO::getDeviceId, Function.identity()));
+            Map<Long, FamilyAndRoomDeviceDTO> deviceDTOMap = deviceUserDTOS.stream().collect(Collectors.toMap(FamilyAndRoomDeviceDTO::getDeviceId, Function.identity(), (key1, key2) -> key2));
             pageResultList.forEach(item -> {
                 Long deviceId = item.getDeviceId();
                 FamilyAndRoomDeviceDTO roomDeviceDTO = deviceDTOMap.getOrDefault(deviceId, new FamilyAndRoomDeviceDTO());
@@ -133,6 +133,16 @@ public class AppDeviceNoticeController {
     public CommonResult<Long> getUnRead(@RequestParam(value = "familyId", required = false) Long familyId) {
         Long count = deviceNoticeService.getUnRead(SecurityFrameworkUtils.getLoginUserId(), familyId);
         return success(count);
+    }
+
+
+    @PutMapping("/read")
+    @Operation(summary = "更新为已读")
+    @Parameter(name = "id", description = "消息ID", required = true, example = "1024")
+    @PreAuthenticated
+    public CommonResult<Boolean> setRead(@RequestParam("id") Long id){
+        deviceNoticeService.updateToRead(id);
+        return success(true);
     }
 
 }
