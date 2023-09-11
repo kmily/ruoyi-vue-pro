@@ -37,8 +37,8 @@ module.exports = vm => {
           // 2. 进行刷新访问令牌
           try {
             let param = {}
-            let refreshToken =  uni.getStorageSync('REFRESH_TOKEN');
-            param.refreshToken = refreshToken;
+            let refreshTokenSaved =  uni.getStorageSync('REFRESH_TOKEN');
+            param.refreshToken = refreshTokenSaved;
             const refreshTokenRes = await refreshToken(param)
             // 2.1 刷新成功，则回放队列的请求 + 当前请求
             vm.$store.commit('SET_TOKEN', refreshTokenRes.data)
