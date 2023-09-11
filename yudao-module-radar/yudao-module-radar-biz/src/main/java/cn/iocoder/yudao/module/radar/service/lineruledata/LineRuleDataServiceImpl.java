@@ -2,10 +2,7 @@ package cn.iocoder.yudao.module.radar.service.lineruledata;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
-import cn.iocoder.yudao.module.radar.controller.app.lineruledata.vo.AppLineRuleDataInfoVO;
-import cn.iocoder.yudao.module.radar.controller.app.lineruledata.vo.AppLineRuleDataReqVO;
-import cn.iocoder.yudao.module.radar.controller.app.lineruledata.vo.AppLineRuleDataResVO;
-import cn.iocoder.yudao.module.radar.controller.app.lineruledata.vo.AppLineRuleDataVO;
+import cn.iocoder.yudao.module.radar.controller.app.lineruledata.vo.*;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -118,6 +115,41 @@ public class LineRuleDataServiceImpl implements LineRuleDataService {
             resVOS.add(resVO);
         });
         return resVOS;
+    }
+
+    @Override
+    public PageResult<AppLineRuleDataInfoVO> queryEnterAndLeaveDetail(AppEntryLeaveDetailPageReqVO reqVO) {
+        String queryDate = reqVO.getQueryDate();
+        String start = queryDate + " 00:00:00";
+        String end = queryDate + " 23:59:59";
+
+       List<LineRuleDataDO> list =  lineRuleDataMapper.selectList(reqVO.getDeviceId(), start, end);
+
+       List<AppLineRuleDataInfoVO> splitList = new ArrayList<>();
+
+       list.forEach(item -> {
+           Integer enter = item.getEnter();
+           Integer goOut = item.getGoOut();
+           if(enter > 0){
+                splitList.add(new AppLineRuleDataInfoVO().setCreateTime(item.getCreateTime()).setEnter(true));
+           }
+           if(goOut > 0){
+               splitList.add(new AppLineRuleDataInfoVO().setCreateTime(item.getCreateTime()).setGoOut(true));
+           }
+       });
+
+        Integer pageNo = reqVO.getPageNo();
+        Integer pageSize = reqVO.getPageSize();
+
+        int startIndex = (pageNo - 1) * pageSize;
+        int endIndex = startIndex + pageSize;
+        List<AppLineRuleDataInfoVO> infoVOS = null;
+        if(startIndex >= splitList.size()){
+            infoVOS = new ArrayList<>();
+        }else{
+            infoVOS = splitList.subList(startIndex, Math.min(endIndex, splitList.size()));
+        }
+        return new PageResult<>(infoVOS, (long) splitList.size());
     }
 
 }

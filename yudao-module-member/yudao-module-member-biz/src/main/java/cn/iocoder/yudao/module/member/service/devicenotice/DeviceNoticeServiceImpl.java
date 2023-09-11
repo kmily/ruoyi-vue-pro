@@ -251,7 +251,7 @@ public class DeviceNoticeServiceImpl implements DeviceNoticeService {
     @Override
     public void updateToRead(Long id) {
 
-        deviceNoticeMapper.updateById(new DeviceNoticeDO().setId(id).setStatus((byte)0));
+        deviceNoticeMapper.updateById(new DeviceNoticeDO().setId(id).setStatus((byte)1).setReadTime(LocalDateTime.now()));
 
     }
 

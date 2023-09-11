@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.module.radar.controller.app.lineruledata.vo.AppEntryLeaveDetailPageReqVO;
 import cn.iocoder.yudao.module.radar.dal.dataobject.lineruledata.LineRuleDataDO;
 import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.radar.controller.admin.lineruledata.vo.*;
@@ -45,7 +46,7 @@ public interface LineRuleDataMapper extends BaseMapperX<LineRuleDataDO> {
 
 
     default List<LineRuleDataDO> selectList(Long deviceId, String start, String end){
-        return selectList(new LambdaQueryWrapperX<LineRuleDataDO>()
+        return selectList(new LambdaQueryWrapperX<LineRuleDataDO>().select(LineRuleDataDO::getId, LineRuleDataDO::getEnter, LineRuleDataDO::getGoOut, BaseDO::getCreateTime)
                 .eq(LineRuleDataDO::getDeviceId, deviceId)
                 .between(BaseDO::getCreateTime, start, end)
                 .orderByDesc(LineRuleDataDO::getId));

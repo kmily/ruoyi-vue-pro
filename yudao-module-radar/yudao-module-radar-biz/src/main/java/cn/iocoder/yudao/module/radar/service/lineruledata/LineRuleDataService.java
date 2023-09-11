@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.radar.service.lineruledata;
 import java.util.*;
 import javax.validation.*;
 import cn.iocoder.yudao.module.radar.controller.admin.lineruledata.vo.*;
+import cn.iocoder.yudao.module.radar.controller.app.lineruledata.vo.AppEntryLeaveDetailPageReqVO;
+import cn.iocoder.yudao.module.radar.controller.app.lineruledata.vo.AppLineRuleDataInfoVO;
 import cn.iocoder.yudao.module.radar.controller.app.lineruledata.vo.AppLineRuleDataReqVO;
 import cn.iocoder.yudao.module.radar.controller.app.lineruledata.vo.AppLineRuleDataResVO;
 import cn.iocoder.yudao.module.radar.dal.dataobject.lineruledata.LineRuleDataDO;
@@ -75,4 +77,11 @@ public interface LineRuleDataService {
      * @return
      */
     List<AppLineRuleDataResVO> getLineRuleDataList(Long deviceId, String  startDate, String endDate);
+
+    /**
+     * 分页查询 离回家详情
+     * @param reqVO
+     * @return
+     */
+    PageResult<AppLineRuleDataInfoVO> queryEnterAndLeaveDetail(AppEntryLeaveDetailPageReqVO reqVO);
 }

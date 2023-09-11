@@ -172,4 +172,64 @@ public class DateUtils {
         return LocalDateTimeUtil.isSameDay(date, LocalDateTime.now());
     }
 
+
+    /**
+     * 毫秒数转换为 时分秒
+     * @param time 毫秒
+     * @return
+     */
+    public static String secToTime(long time){
+
+        String timeStr = "";
+
+        long hour = 0;
+        long minute = 0;
+        long second = 0;
+        long millisecond = 0;
+
+        if(time <= 0){
+            return "00:00:00";
+        }
+
+        second = time / 1000;
+
+        minute = second / 60;
+
+        if (second < 60) {
+            timeStr = "00:00:" + unitFormat(second);
+        }else if (minute < 60) {
+            second = second % 60;
+            timeStr = "00:" + unitFormat(minute) + ":" + unitFormat(second);
+        }else{//数字>=3600 000的时候
+            hour = minute /60;
+            minute = minute % 60;
+            second = second - hour * 3600 - minute * 60;
+            timeStr = unitFormat(hour) + ":" + unitFormat(minute) + ":" + unitFormat(second);
+        }
+        return timeStr;
+
+    }
+
+    public static String unitFormat(long i) {//时分秒的格式转换
+        String retStr = null;
+        if (i >= 0 && i < 10)
+            retStr = "0" + i;
+        else
+            retStr = "" + i;
+        return retStr;
+    }
+
+    public static String unitFormat2(long i) {//毫秒的格式转换
+        String retStr = null;
+        if (i >= 0 && i < 10)
+            retStr = "00" + i;
+        else if (i >=10 && i < 100) {
+            retStr = "0" + i;
+        }
+        else
+            retStr = "" + i;
+        return retStr;
+    }
+
+
 }

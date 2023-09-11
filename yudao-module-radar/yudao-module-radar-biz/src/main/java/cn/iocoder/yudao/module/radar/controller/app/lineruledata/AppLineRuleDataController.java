@@ -6,9 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.radar.controller.admin.lineruledata.vo.LineRuleDataPageReqVO;
 import cn.iocoder.yudao.module.radar.controller.admin.lineruledata.vo.LineRuleDataRespVO;
-import cn.iocoder.yudao.module.radar.controller.app.lineruledata.vo.AppLineRuleDataPageReqVO;
-import cn.iocoder.yudao.module.radar.controller.app.lineruledata.vo.AppLineRuleDataReqVO;
-import cn.iocoder.yudao.module.radar.controller.app.lineruledata.vo.AppLineRuleDataResVO;
+import cn.iocoder.yudao.module.radar.controller.app.lineruledata.vo.*;
 import cn.iocoder.yudao.module.radar.convert.lineruledata.LineRuleDataConvert;
 import cn.iocoder.yudao.module.radar.dal.dataobject.lineruledata.LineRuleDataDO;
 import cn.iocoder.yudao.module.radar.service.lineruledata.LineRuleDataService;
@@ -65,6 +63,20 @@ public class AppLineRuleDataController {
     }
 
 
+
+    @GetMapping("/enter-leave-detail")
+    @Operation(summary = "查询离回家数据详情数据")
+    @PreAuthenticated
+    public CommonResult<PageResult<AppLineRuleDataInfoVO>> queryEnterAndLeaveDetail(@Valid AppEntryLeaveDetailPageReqVO reqVO){
+
+        PageResult<AppLineRuleDataInfoVO> lineRuleDataResVOS = lineRuleDataService.queryEnterAndLeaveDetail(reqVO);
+
+        return CommonResult.success(lineRuleDataResVOS);
+
+    }
+
+
+
     @GetMapping("/page")
     @Operation(summary = "获得绊线数据分页")
     @PreAuthenticated
@@ -101,5 +113,9 @@ public class AppLineRuleDataController {
 
         return success(LineRuleDataConvert.INSTANCE.convertPage(pageResult));
     }
+
+
+
+
 
 }

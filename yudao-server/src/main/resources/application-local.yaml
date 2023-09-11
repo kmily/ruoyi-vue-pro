@@ -206,7 +206,7 @@ yudao:
   radar:
     socket:
       port: 80
-      host: 192.168.1.162 #192.168.43.227 #
+      host: 192.168.43.227 #192.168.43.227 #
   member:
     alarm:
       breathe-range: 16-24
