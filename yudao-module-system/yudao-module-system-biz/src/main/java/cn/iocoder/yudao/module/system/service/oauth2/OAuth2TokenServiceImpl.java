@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -174,11 +175,11 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void removeByUser(Long id) {
-        List<String> tokenList = oauth2AccessTokenMapper.selectByUserId(id);
-        if (!CollectionUtils.isAnyEmpty(tokenList)) {
-            oauth2AccessTokenRedisDAO.deleteList(tokenList);
+        List<OAuth2AccessTokenDO> oAuth2AccessTokenDOList = oauth2AccessTokenMapper.selectListByUserId(id);
+        if (!CollectionUtils.isAnyEmpty(oAuth2AccessTokenDOList)) {
+            oauth2AccessTokenRedisDAO.deleteList(oAuth2AccessTokenDOList.stream().map(OAuth2AccessTokenDO::getAccessToken).collect(Collectors.toList()));
         }
-        oauth2AccessTokenMapper.removeByUser(id);
-        oauth2RefreshTokenMapper.removeByUser(id);
+        oauth2AccessTokenMapper.deleteByUserId(id);
+        oauth2RefreshTokenMapper.deleteByUserId(id);
     }
 }

@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.token.OAuth2AccessTokenPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -32,9 +33,11 @@ public interface OAuth2AccessTokenMapper extends BaseMapperX<OAuth2AccessTokenDO
                 .orderByDesc(OAuth2AccessTokenDO::getId));
     }
 
-    @Select("SELECT access_token FROM system_oauth2_access_token WHERE user_id=#{userId} AND deleted=0")
-    List<String> selectByUserId(Long id);
+    default void deleteByUserId(Long userId) {
+        delete(Wrappers.lambdaUpdate(OAuth2AccessTokenDO.class).eq(OAuth2AccessTokenDO::getUserId, userId));
+    }
 
-    @Update("UPDATE system_oauth2_access_token SET deleted=1 WHERE user_id=#{userId}")
-    int removeByUser(Long id);
+    default List<OAuth2AccessTokenDO> selectListByUserId(Long userId) {
+        return selectList(OAuth2AccessTokenDO::getAccessToken, userId);
+    }
 }
