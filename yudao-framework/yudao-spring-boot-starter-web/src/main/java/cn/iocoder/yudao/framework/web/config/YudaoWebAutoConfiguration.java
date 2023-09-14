@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.web.config;
 
 import cn.iocoder.yudao.framework.apilog.core.service.ApiErrorLogFrameworkService;
 import cn.iocoder.yudao.framework.common.enums.WebFilterOrderEnum;
+import cn.iocoder.yudao.framework.web.core.error.YudaoErrorAttributes;
 import cn.iocoder.yudao.framework.web.core.filter.CacheRequestBodyFilter;
 import cn.iocoder.yudao.framework.web.core.filter.DemoFilter;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
@@ -11,50 +12,39 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.util.AntPathMatcher;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.Resource;
 import javax.servlet.Filter;
 
-@AutoConfiguration
+@AutoConfiguration(before = ErrorMvcAutoConfiguration.class)
 @EnableConfigurationProperties(WebProperties.class)
-public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
-
+public class YudaoWebAutoConfiguration  {
     @Resource
     private WebProperties webProperties;
+
     /**
      * 应用名
      */
     @Value("${spring.application.name}")
     private String applicationName;
 
-    @Override
-    public void configurePathMatch(PathMatchConfigurer configurer) {
-        configurePathMatch(configurer, webProperties.getAdminApi());
-        configurePathMatch(configurer, webProperties.getAppApi());
+    @Bean
+    public YudaoErrorAttributes supplyErrorAttributes(GlobalExceptionHandler globalExceptionHandler) {
+        return new YudaoErrorAttributes(globalExceptionHandler);
     }
 
-    /**
-     * 设置 API 前缀，仅仅匹配 controller 包下的
-     *
-     * @param configurer 配置
-     * @param api        API 配置
-     */
-    private void configurePathMatch(PathMatchConfigurer configurer, WebProperties.Api api) {
-        AntPathMatcher antPathMatcher = new AntPathMatcher(".");
-        configurer.addPathPrefix(api.getPrefix(), clazz -> clazz.isAnnotationPresent(RestController.class)
-                && antPathMatcher.match(api.getController(), clazz.getPackage().getName())); // 仅仅匹配 controller 包
+    @Bean
+    public YudaoWebMvcConfigurer yudaoWebMvcConfigurer() {
+        return new YudaoWebMvcConfigurer(webProperties);
     }
 
     @Bean

@@ -11,7 +11,6 @@ import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.tenant.core.service.TenantFrameworkService;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import cn.iocoder.yudao.framework.web.core.filter.ApiRequestFilter;
-import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.AntPathMatcher;
 
@@ -37,17 +36,14 @@ public class TenantSecurityWebFilter extends ApiRequestFilter {
 
     private final AntPathMatcher pathMatcher;
 
-    private final GlobalExceptionHandler globalExceptionHandler;
     private final TenantFrameworkService tenantFrameworkService;
 
     public TenantSecurityWebFilter(TenantProperties tenantProperties,
                                    WebProperties webProperties,
-                                   GlobalExceptionHandler globalExceptionHandler,
                                    TenantFrameworkService tenantFrameworkService) {
         super(webProperties);
         this.tenantProperties = tenantProperties;
         this.pathMatcher = new AntPathMatcher();
-        this.globalExceptionHandler = globalExceptionHandler;
         this.tenantFrameworkService = tenantFrameworkService;
     }
 
@@ -83,13 +79,7 @@ public class TenantSecurityWebFilter extends ApiRequestFilter {
                 return;
             }
             // 3. 校验租户是合法，例如说被禁用、到期
-            try {
-                tenantFrameworkService.validTenant(tenantId);
-            } catch (Throwable ex) {
-                CommonResult<?> result = globalExceptionHandler.allExceptionHandler(request, ex);
-                ServletUtils.writeJSON(response, result);
-                return;
-            }
+            tenantFrameworkService.validTenant(tenantId);
         } else { // 如果是允许忽略租户的 URL，若未传递租户编号，则默认忽略租户编号，避免报错
             if (tenantId == null) {
                 TenantContextHolder.setIgnore(true);

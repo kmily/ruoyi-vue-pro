@@ -218,7 +218,6 @@ public class GlobalExceptionHandler {
     /**
      * 处理系统异常，兜底处理所有的一切
      */
-    @ExceptionHandler(value = Exception.class)
     public CommonResult<?> defaultExceptionHandler(HttpServletRequest req, Throwable ex) {
         // 情况一：处理表不存在的异常
         CommonResult<?> tableNotExistsResult = handleTableNotExists(ex);

@@ -3,11 +3,13 @@ package cn.iocoder.yudao.framework.common.util.json;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * JSON 工具类
@@ -130,6 +133,20 @@ public class JsonUtils {
             return objectMapper.readValue(text, objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
         } catch (IOException e) {
             log.error("json parse err,json:{}", text, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <K, V> Map<K, V> parseMap(String json, Class<K> kClazz, Class<V> vClass) {
+        return parseMap(json, kClazz, vClass, objectMapper);
+    }
+
+    public static <K, V> Map<K, V> parseMap(String json, Class<K> kClazz, Class<V> vClass, ObjectMapper mapper) {
+        try {
+            MapType mapType = mapper.getTypeFactory().constructMapType(Map.class, kClazz, vClass);
+            return mapper.readValue(json, mapType);
+        } catch (JsonProcessingException e) {
+            log.error("deserializeMap object failed. json string: " + json, e);
             throw new RuntimeException(e);
         }
     }
