@@ -29,7 +29,10 @@
         SELECT
             u.device_id AS deviceId,
             f.name AS family,
-            r.name AS room
+            r.name AS room,
+            f.phones AS phones,
+            f.user_id AS userId
+
         FROM `member_family` AS f
                  JOIN `member_device_user` AS u
                       ON f.id = u.family_id

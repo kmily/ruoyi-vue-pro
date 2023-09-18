@@ -19,4 +19,7 @@ public class FamilyAndRoomDeviceDTO {
 
     private String room;
 
+    private String phones;
+
+    private Long userId;
 }

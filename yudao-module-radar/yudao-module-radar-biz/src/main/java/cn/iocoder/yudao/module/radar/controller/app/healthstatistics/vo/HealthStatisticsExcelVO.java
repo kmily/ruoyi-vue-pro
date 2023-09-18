@@ -1,14 +1,19 @@
 package cn.iocoder.yudao.module.radar.controller.app.healthstatistics.vo;
 
-import com.alibaba.excel.annotation.ExcelProperty;
-import lombok.Data;
-
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+import java.util.*;
 import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+
+import com.alibaba.excel.annotation.ExcelProperty;
 
 /**
  * 睡眠统计记录 Excel VO
  *
- * @author 芋道源码
+ * @author 和尘同光
  */
 @Data
 public class HealthStatisticsExcelVO {
@@ -45,6 +50,21 @@ public class HealthStatisticsExcelVO {
 
     @ExcelProperty("心率平均")
     private Double heartAverage;
+
+    @ExcelProperty("开始睡眠时间")
+    private LocalDateTime sleepStart;
+
+    @ExcelProperty("睡眠结束时间")
+    private LocalDateTime sleepEnd;
+
+    @ExcelProperty("总睡眠时间")
+    private Long sleepTotalTime;
+
+    @ExcelProperty("白天睡眠时间")
+    private Long sleepDayTime;
+
+    @ExcelProperty("睡眠数据 [睡眠时间, 清醒时间, 无人时间]")
+    private String sleepData;
 
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;

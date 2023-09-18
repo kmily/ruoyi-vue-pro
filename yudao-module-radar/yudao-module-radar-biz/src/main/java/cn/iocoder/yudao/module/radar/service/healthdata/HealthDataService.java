@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.util.*;
 import javax.validation.*;
 import cn.iocoder.yudao.module.radar.controller.admin.healthdata.vo.*;
+import cn.iocoder.yudao.module.radar.controller.app.healthdata.vo.AppHealthDataLogReqVO;
 import cn.iocoder.yudao.module.radar.controller.app.healthdata.vo.AppHealthDataReqVO;
+import cn.iocoder.yudao.module.radar.controller.app.healthdata.vo.AppHealthDataResVO;
 import cn.iocoder.yudao.module.radar.dal.dataobject.healthdata.HealthDataDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
@@ -80,4 +82,13 @@ public interface HealthDataService {
     void healthStatistics(LocalDate date);
 
 
+    /**
+     * 提供当天睡眠
+     * @param reqVO
+     * @return
+     */
+    AppHealthDataResVO queryTodaySleep(AppHealthDataReqVO reqVO);
+
+
+    HealthDataDO selectAvg(HealthDataPageReqVO reqVO);
 }

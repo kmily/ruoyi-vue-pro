@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.radar.controller.app.healthstatistics.vo;
 
+import lombok.*;
+import java.util.*;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
-
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import java.time.LocalDateTime;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -12,7 +13,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class HealthStatisticsExportReqVO {
 
-    @Schema(description = "设备ID", example = "5957")
+    @Schema(description = "设备ID", example = "9583")
     private Long deviceId;
 
     @Schema(description = "日期")
@@ -42,6 +43,23 @@ public class HealthStatisticsExportReqVO {
 
     @Schema(description = "心率平均")
     private Double heartAverage;
+
+    @Schema(description = "开始睡眠时间")
+    private LocalDateTime sleepStart;
+
+    @Schema(description = "睡眠结束时间")
+    private LocalDateTime sleepEnd;
+
+    @Schema(description = "总睡眠时间")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private Long[] sleepTotalTime;
+
+    @Schema(description = "白天睡眠时间")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private Long[] sleepDayTime;
+
+    @Schema(description = "睡眠数据 [睡眠时间, 清醒时间, 无人时间]")
+    private String sleepData;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

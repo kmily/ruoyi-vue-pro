@@ -34,8 +34,10 @@ public class AppLineRuleDataInfoVO {
 
     public AppLineRuleDataInfoVO(LineRuleDataDO dataDO){
         this.createTime = dataDO.getCreateTime();
-        this.enter = dataDO.getEnter() > 0;
-        this.goOut = dataDO.getGoOut() > 0;
+        Integer enter = dataDO.getEnter();
+        Integer goOut = dataDO.getGoOut();
+        this.enter = enter - goOut > 0;
+        this.goOut = goOut - enter > 0;
     }
 
 }

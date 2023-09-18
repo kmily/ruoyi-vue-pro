@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.radar.controller.app.healthstatistics;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -25,10 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.DoubleSummaryStatistics;
-import java.util.List;
-import java.util.OptionalDouble;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
@@ -60,6 +58,10 @@ public class HealthStatisticsController {
         healthDataService.healthStatistics(LocalDate.now());
         List<HealthStatisticsDO> list = healthStatisticsService.getHealthStatisticsList(deviceId, startDate, endDate);
 
+        if(CollUtil.isEmpty(list)){
+            return success(new AppHealthStatisticsResVO());
+        }
+
         List<HealthStatisticsRespVO> respVOS = HealthStatisticsConvert.INSTANCE.convertList(list);
 
         AppHealthStatisticsResVO resVO = new AppHealthStatisticsResVO();
@@ -73,6 +75,8 @@ public class HealthStatisticsController {
         double breathAverage = breathStatistics.getAverage();
         double maxBreath = breathStatistics.getMax();
         double minBreath = breathStatistics.getMin();
+
+        Collections.sort(respVOS);
 
         resVO.setRespVOList(respVOS)
                 .setBreathMaxValue(maxBreath)

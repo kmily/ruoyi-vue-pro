@@ -23,6 +23,12 @@ public class AppHealthDataResVO {
     @Schema(description = "心跳数据", required = true)
     private BreathAndHeartVO heart;
 
+
+    @Schema(description = "睡眠数据", required = true)
+    private AppNightSleepVO sleepVO;
+
+
+
     @Schema(description = "睡眠时间")
     private Long sleep;
 

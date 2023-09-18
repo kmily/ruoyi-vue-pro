@@ -30,8 +30,7 @@ public class AppHealthDataReqVO {
 
     @Schema(description = "查询设备ID", required = true, example = "[1,2]")
     @NotNull(message = "查询设备不能为空")
-    @Size(min = 1, message = "查询设备不能为空")
-    private Set<Long> deviceIds;
+    private Long deviceId;
 
     @Schema(description = "查询日期", example = "2023-08-01")
     @DateTimeFormat(pattern = "yyyy-MM-dd")

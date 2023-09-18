@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +21,7 @@ import java.util.Map;
 @ToString(callSuper = true)
 public class BreathAndHeartDataVO {
 
-    private String time;
+    private LocalDateTime time;
 
     private Double value;
 

@@ -68,7 +68,7 @@ public interface HealthDataMapper extends BaseMapperX<HealthDataDO> {
 
     default List<HealthDataDO> selectList(AppHealthDataReqVO reqVO){
         return selectList(new LambdaQueryWrapperX<HealthDataDO>()
-                .inIfPresent(HealthDataDO::getDeviceId, reqVO.getDeviceIds())
+                .eqIfPresent(HealthDataDO::getDeviceId, reqVO.getDeviceId())
                 .betweenIfPresent(HealthDataDO::getCreateTime, reqVO.getCreateTime()));
     }
 }
