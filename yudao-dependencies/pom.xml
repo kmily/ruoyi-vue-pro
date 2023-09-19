@@ -44,7 +44,7 @@
         <!-- Bpm 工作流相关 -->
         <flowable.version>7.0.0.M2</flowable.version>
         <!-- 工具类相关 -->
-        <captcha-plus.version>1.0.7</captcha-plus.version>
+        <captcha-plus.version>2.0.1</captcha-plus.version>
         <jsoup.version>1.15.4</jsoup.version>
         <lombok.version>1.18.28</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
@@ -68,7 +68,7 @@
         <aliyun-java-sdk-core.version>4.6.3</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.2.1</aliyun-java-sdk-dysmsapi.version>
         <tencentcloud-sdk-java.version>3.1.758</tencentcloud-sdk-java.version>
-        <justauth.version>1.0.4</justauth.version>
+        <justauth.version>2.0.0</justauth.version>
         <jimureport.version>1.6.1</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
         <weixin-java.version>4.5.5.B</weixin-java.version>
