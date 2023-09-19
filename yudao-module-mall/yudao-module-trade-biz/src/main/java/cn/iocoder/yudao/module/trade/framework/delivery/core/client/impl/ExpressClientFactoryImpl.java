@@ -3,10 +3,10 @@ package cn.iocoder.yudao.module.trade.framework.delivery.core.client.impl;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.module.trade.framework.delivery.config.TradeExpressProperties;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.ExpressClient;
+import cn.iocoder.yudao.module.trade.framework.delivery.core.client.ExpressClientFactory;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.impl.kd100.Kd100ExpressClient;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.client.impl.kdniao.KdNiaoExpressClient;
 import cn.iocoder.yudao.module.trade.framework.delivery.core.enums.ExpressClientEnum;
-import cn.iocoder.yudao.module.trade.framework.delivery.core.client.ExpressClientFactory;
 import lombok.AllArgsConstructor;
 import org.springframework.web.client.RestTemplate;
 
@@ -41,14 +41,10 @@ public class ExpressClientFactoryImpl implements ExpressClientFactory {
 
     private ExpressClient createExpressClient(ExpressClientEnum queryProviderEnum,
                                                 TradeExpressProperties tradeExpressProperties) {
-        switch (queryProviderEnum) {
-            case NOT_PROVIDE:
-                return new NoProvideExpressClient();
-            case KD_NIAO:
-                return new KdNiaoExpressClient(restTemplate, tradeExpressProperties.getKdNiao());
-            case KD_100:
-                return new Kd100ExpressClient(restTemplate, tradeExpressProperties.getKd100());
-        }
-        return null;
+        return switch (queryProviderEnum) {
+            case NOT_PROVIDE -> new NoProvideExpressClient();
+            case KD_NIAO -> new KdNiaoExpressClient(restTemplate, tradeExpressProperties.getKdNiao());
+            case KD_100 -> new Kd100ExpressClient(restTemplate, tradeExpressProperties.getKd100());
+        };
     }
 }

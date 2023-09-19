@@ -52,26 +52,20 @@ public interface MpMessageConvert {
         MpMessageDO message = new MpMessageDO();
         message.setType(sendReqBO.getType());
         switch (sendReqBO.getType()) {
-            case WxConsts.XmlMsgType.TEXT: // 1. 文本
-                message.setContent(sendReqBO.getContent());
-                break;
-            case WxConsts.XmlMsgType.IMAGE: // 2. 图片
-            case WxConsts.XmlMsgType.VOICE: // 3. 语音
-                message.setMediaId(sendReqBO.getMediaId());
-                break;
-            case WxConsts.XmlMsgType.VIDEO: // 4. 视频
-                message.setMediaId(sendReqBO.getMediaId())
+            // 1. 文本
+            case WxConsts.XmlMsgType.TEXT -> message.setContent(sendReqBO.getContent());
+            // 2. 图片 3. 语音
+            case WxConsts.XmlMsgType.IMAGE,WxConsts.XmlMsgType.VOICE -> message.setMediaId(sendReqBO.getMediaId());
+            // 4. 视频
+            case WxConsts.XmlMsgType.VIDEO -> message.setMediaId(sendReqBO.getMediaId())
                         .setTitle(sendReqBO.getTitle()).setDescription(sendReqBO.getDescription());
-                break;
-            case WxConsts.XmlMsgType.NEWS: // 5. 图文
-                message.setArticles(sendReqBO.getArticles());
-            case WxConsts.XmlMsgType.MUSIC: // 6. 音乐
-                message.setTitle(sendReqBO.getTitle()).setDescription(sendReqBO.getDescription())
-                        .setMusicUrl(sendReqBO.getMusicUrl()).setHqMusicUrl(sendReqBO.getHqMusicUrl())
-                        .setThumbMediaId(sendReqBO.getThumbMediaId());
-                break;
-            default:
-                throw new IllegalArgumentException("不支持的消息类型：" + message.getType());
+            // 5. 图文
+            case WxConsts.XmlMsgType.NEWS -> message.setArticles(sendReqBO.getArticles());
+            // 6. 音乐
+            case WxConsts.XmlMsgType.MUSIC -> message.setTitle(sendReqBO.getTitle()).setDescription(sendReqBO.getDescription())
+                    .setMusicUrl(sendReqBO.getMusicUrl()).setHqMusicUrl(sendReqBO.getHqMusicUrl())
+                    .setThumbMediaId(sendReqBO.getThumbMediaId());
+            default -> throw new IllegalArgumentException("不支持的消息类型：" + message.getType());
         }
 
         // 其它字段
@@ -85,33 +79,20 @@ public interface MpMessageConvert {
     }
 
     default WxMpXmlOutMessage convert02(MpMessageDO message, MpAccountDO account) {
-        BaseBuilder<?, ? extends WxMpXmlOutMessage> builder;
         // 个性化字段
-        switch (message.getType()) {
-            case WxConsts.XmlMsgType.TEXT:
-                builder = WxMpXmlOutMessage.TEXT().content(message.getContent());
-                break;
-            case WxConsts.XmlMsgType.IMAGE:
-                builder = WxMpXmlOutMessage.IMAGE().mediaId(message.getMediaId());
-                break;
-            case WxConsts.XmlMsgType.VOICE:
-                builder = WxMpXmlOutMessage.VOICE().mediaId(message.getMediaId());
-                break;
-            case WxConsts.XmlMsgType.VIDEO:
-                builder = WxMpXmlOutMessage.VIDEO().mediaId(message.getMediaId())
-                        .title(message.getTitle()).description(message.getDescription());
-                break;
-            case WxConsts.XmlMsgType.NEWS:
-                builder = WxMpXmlOutMessage.NEWS().articles(convertList02(message.getArticles()));
-                break;
-            case WxConsts.XmlMsgType.MUSIC:
-                builder = WxMpXmlOutMessage.MUSIC().title(message.getTitle()).description(message.getDescription())
-                        .musicUrl(message.getMusicUrl()).hqMusicUrl(message.getHqMusicUrl())
-                        .thumbMediaId(message.getThumbMediaId());
-                break;
-            default:
-                throw new IllegalArgumentException("不支持的消息类型：" + message.getType());
-        }
+        BaseBuilder<?, ? extends WxMpXmlOutMessage> builder = switch (message.getType()) {
+            case WxConsts.XmlMsgType.TEXT -> WxMpXmlOutMessage.TEXT().content(message.getContent());
+            case WxConsts.XmlMsgType.IMAGE -> WxMpXmlOutMessage.IMAGE().mediaId(message.getMediaId());
+            case WxConsts.XmlMsgType.VOICE -> WxMpXmlOutMessage.VOICE().mediaId(message.getMediaId());
+            case WxConsts.XmlMsgType.VIDEO -> WxMpXmlOutMessage.VIDEO().mediaId(message.getMediaId())
+                    .title(message.getTitle()).description(message.getDescription());
+            case WxConsts.XmlMsgType.NEWS -> WxMpXmlOutMessage.NEWS().articles(convertList02(message.getArticles()));
+            case WxConsts.XmlMsgType.MUSIC ->
+                    WxMpXmlOutMessage.MUSIC().title(message.getTitle()).description(message.getDescription())
+                            .musicUrl(message.getMusicUrl()).hqMusicUrl(message.getHqMusicUrl())
+                            .thumbMediaId(message.getThumbMediaId());
+            default -> throw new IllegalArgumentException("不支持的消息类型：" + message.getType());
+        };
         // 通用字段
         builder.fromUser(account.getAccount());
         builder.toUser(message.getOpenid());
@@ -120,33 +101,20 @@ public interface MpMessageConvert {
     List<WxMpXmlOutNewsMessage.Item> convertList02(List<MpMessageDO.Article> list);
 
     default WxMpKefuMessage convert(MpMessageSendReqVO sendReqVO, MpUserDO user) {
-        me.chanjar.weixin.mp.builder.kefu.BaseBuilder<?> builder;
         // 个性化字段
-        switch (sendReqVO.getType()) {
-            case WxConsts.KefuMsgType.TEXT:
-                builder = WxMpKefuMessage.TEXT().content(sendReqVO.getContent());
-                break;
-            case WxConsts.KefuMsgType.IMAGE:
-                builder = WxMpKefuMessage.IMAGE().mediaId(sendReqVO.getMediaId());
-                break;
-            case WxConsts.KefuMsgType.VOICE:
-                builder = WxMpKefuMessage.VOICE().mediaId(sendReqVO.getMediaId());
-                break;
-            case WxConsts.KefuMsgType.VIDEO:
-                builder = WxMpKefuMessage.VIDEO().mediaId(sendReqVO.getMediaId())
-                        .title(sendReqVO.getTitle()).description(sendReqVO.getDescription());
-                break;
-            case WxConsts.KefuMsgType.NEWS:
-                builder = WxMpKefuMessage.NEWS().articles(convertList03(sendReqVO.getArticles()));
-                break;
-            case WxConsts.KefuMsgType.MUSIC:
-                builder = WxMpKefuMessage.MUSIC().title(sendReqVO.getTitle()).description(sendReqVO.getDescription())
-                        .thumbMediaId(sendReqVO.getThumbMediaId())
-                        .musicUrl(sendReqVO.getMusicUrl()).hqMusicUrl(sendReqVO.getHqMusicUrl());
-                break;
-            default:
-                throw new IllegalArgumentException("不支持的消息类型：" + sendReqVO.getType());
-        }
+        me.chanjar.weixin.mp.builder.kefu.BaseBuilder<?> builder = switch (sendReqVO.getType()) {
+            case WxConsts.KefuMsgType.TEXT -> WxMpKefuMessage.TEXT().content(sendReqVO.getContent());
+            case WxConsts.KefuMsgType.IMAGE -> WxMpKefuMessage.IMAGE().mediaId(sendReqVO.getMediaId());
+            case WxConsts.KefuMsgType.VOICE -> WxMpKefuMessage.VOICE().mediaId(sendReqVO.getMediaId());
+            case WxConsts.KefuMsgType.VIDEO -> WxMpKefuMessage.VIDEO().mediaId(sendReqVO.getMediaId())
+                    .title(sendReqVO.getTitle()).description(sendReqVO.getDescription());
+            case WxConsts.KefuMsgType.NEWS -> WxMpKefuMessage.NEWS().articles(convertList03(sendReqVO.getArticles()));
+            case WxConsts.KefuMsgType.MUSIC ->
+                    WxMpKefuMessage.MUSIC().title(sendReqVO.getTitle()).description(sendReqVO.getDescription())
+                            .thumbMediaId(sendReqVO.getThumbMediaId())
+                            .musicUrl(sendReqVO.getMusicUrl()).hqMusicUrl(sendReqVO.getHqMusicUrl());
+            default -> throw new IllegalArgumentException("不支持的消息类型：" + sendReqVO.getType());
+        };
         // 通用字段
         builder.toUser(user.getOpenid());
         return builder.build();

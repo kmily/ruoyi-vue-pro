@@ -45,9 +45,10 @@ public class MpUtils {
         // 获得对应的校验 group
         Class<?> group;
         switch (type) {
+            // 需要额外校验回复的消息格式
             case WxConsts.MenuButtonType.CLICK:
                 group = ClickButtonGroup.class;
-                validateMessage(validator, messageType, button); // 需要额外校验回复的消息格式
+                validateMessage(validator, messageType, button);
                 break;
             case WxConsts.MenuButtonType.VIEW:
                 group = ViewButtonGroup.class;
@@ -55,14 +56,16 @@ public class MpUtils {
             case WxConsts.MenuButtonType.MINIPROGRAM:
                 group = MiniProgramButtonGroup.class;
                 break;
+            // 需要额外校验回复的消息格式
             case WxConsts.MenuButtonType.SCANCODE_WAITMSG:
                 group = ScanCodeWaitMsgButtonGroup.class;
-                validateMessage(validator, messageType, button); // 需要额外校验回复的消息格式
+                validateMessage(validator, messageType, button);
                 break;
             case "article_" + WxConsts.MenuButtonType.VIEW_LIMITED:
                 group = ViewLimitedButtonGroup.class;
                 break;
-            case WxConsts.MenuButtonType.SCANCODE_PUSH: // 不用校验，直接 return 即可
+            // 不用校验，直接 return 即可
+            case WxConsts.MenuButtonType.SCANCODE_PUSH:
             case WxConsts.MenuButtonType.PIC_SYSPHOTO:
             case WxConsts.MenuButtonType.PIC_PHOTO_OR_ALBUM:
             case WxConsts.MenuButtonType.PIC_WEIXIN:
@@ -85,16 +88,12 @@ public class MpUtils {
      * @return 媒体文件类型 {@link WxConsts.MediaFileType}
      */
     public static String getMediaFileType(String messageType) {
-        switch (messageType) {
-            case WxConsts.XmlMsgType.IMAGE:
-                return WxConsts.MediaFileType.IMAGE;
-            case WxConsts.XmlMsgType.VOICE:
-                return WxConsts.MediaFileType.VOICE;
-            case WxConsts.XmlMsgType.VIDEO:
-                return WxConsts.MediaFileType.VIDEO;
-            default:
-                return WxConsts.MediaFileType.FILE;
-        }
+        return switch (messageType) {
+            case WxConsts.XmlMsgType.IMAGE -> WxConsts.MediaFileType.IMAGE;
+            case WxConsts.XmlMsgType.VOICE -> WxConsts.MediaFileType.VOICE;
+            case WxConsts.XmlMsgType.VIDEO -> WxConsts.MediaFileType.VIDEO;
+            default -> WxConsts.MediaFileType.FILE;
+        };
     }
 
     /**

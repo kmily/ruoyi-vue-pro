@@ -83,12 +83,10 @@ public class YudaoAuthRequestFactory extends AuthRequestFactory {
 
         // 获得拓展的 Request
         // noinspection SwitchStatementWithTooFewBranches
-        switch (authExtendSource) {
-            case WECHAT_MINI_APP:
-                return new AuthWeChatMiniAppRequest(config, authStateCache);
-            default:
-                return null;
-        }
+        return switch (authExtendSource) {
+            case WECHAT_MINI_APP -> new AuthWeChatMiniAppRequest(config, authStateCache);
+            default -> null;
+        };
     }
 
 }
