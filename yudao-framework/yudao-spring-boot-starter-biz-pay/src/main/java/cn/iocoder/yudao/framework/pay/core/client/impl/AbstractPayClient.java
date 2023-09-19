@@ -184,8 +184,8 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     // ========== 各种工具方法 ==========
 
     private PayException buildPayException(Throwable ex) {
-        if (ex instanceof PayException) {
-            return (PayException) ex;
+        if (ex instanceof PayException payException) {
+            return payException;
         }
         throw new PayException(ex);
     }

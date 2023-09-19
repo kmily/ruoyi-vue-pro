@@ -38,8 +38,7 @@ public class YudaoWebSocketHandlerDecorator extends WebSocketHandlerDecorator {
 
         Object obj = webSocketSession.getAttributes().get(WebSocketKeyDefine.LOGIN_USER);
 
-        if (obj instanceof LoginUser) {
-            LoginUser loginUser = (LoginUser) obj;
+        if (obj instanceof LoginUser loginUser) {
             // userId 作为唯一区分
             return String.valueOf(loginUser.getId());
         }

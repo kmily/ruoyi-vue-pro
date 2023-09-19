@@ -75,8 +75,7 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
             log.error("[doUnifiedOrder] 失败", ex);
             Integer errorCode = INTERNAL_SERVER_ERROR.getCode();
             String errorMsg = INTERNAL_SERVER_ERROR.getMsg();
-            if (ex instanceof ServiceException) {
-                ServiceException serviceException = (ServiceException) ex;
+            if (ex instanceof ServiceException serviceException) {
                 errorCode = serviceException.getCode();
                 errorMsg = serviceException.getMessage();
             }
@@ -130,8 +129,7 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
             log.error("[doUnifiedRefund] 失败", ex);
             Integer errorCode = INTERNAL_SERVER_ERROR.getCode();
             String errorMsg = INTERNAL_SERVER_ERROR.getMsg();
-            if (ex instanceof ServiceException) {
-                ServiceException serviceException = (ServiceException) ex;
+            if (ex instanceof ServiceException serviceException) {
                 errorCode =  serviceException.getCode();
                 errorMsg = serviceException.getMessage();
             }

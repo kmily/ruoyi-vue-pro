@@ -25,8 +25,8 @@ public class TencentSmsChannelProperties extends SmsChannelProperties {
      * 因此在使用时，需要将 secretId 和 sdkAppId 解析出来，分别存储到对应字段中。
      */
     public static TencentSmsChannelProperties build(SmsChannelProperties properties) {
-        if (properties instanceof TencentSmsChannelProperties) {
-            return (TencentSmsChannelProperties) properties;
+        if (properties instanceof TencentSmsChannelProperties tencentSmsChannelProperties) {
+            return tencentSmsChannelProperties;
         }
         TencentSmsChannelProperties result = BeanUtil.toBean(properties, TencentSmsChannelProperties.class);
         String combineKey = properties.getApiKey();

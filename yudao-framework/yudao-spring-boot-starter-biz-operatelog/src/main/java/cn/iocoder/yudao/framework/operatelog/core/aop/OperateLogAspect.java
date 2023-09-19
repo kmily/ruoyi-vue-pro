@@ -238,8 +238,7 @@ public class OperateLogAspect {
         }
         operateLogObj.setDuration((int) (LocalDateTimeUtil.between(startTime, LocalDateTime.now()).toMillis()));
         // （正常）处理 resultCode 和 resultMsg 字段
-        if (result instanceof CommonResult) {
-            CommonResult<?> commonResult = (CommonResult<?>) result;
+        if (result instanceof CommonResult<?> commonResult) {
             operateLogObj.setResultCode(commonResult.getCode());
             operateLogObj.setResultMsg(commonResult.getMsg());
         } else {
@@ -339,8 +338,8 @@ public class OperateLogAspect {
 
     private static String obtainResultData(Object result) {
         // TODO 提升：结果脱敏和忽略
-        if (result instanceof CommonResult) {
-            result = ((CommonResult<?>) result).getData();
+        if (result instanceof CommonResult commonResult) {
+            result = commonResult.getData();
         }
         return JsonUtils.toJsonString(result);
     }
