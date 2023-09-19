@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.mp.dal.mysql.account.MpAccountMapper;
 import cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.mp.framework.mp.core.MpServiceFactory;
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
