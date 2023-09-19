@@ -78,9 +78,9 @@ public class SmsClientFactoryImpl implements SmsClientFactory {
         Assert.notNull(channelEnum, String.format("渠道类型(%s) 为空", channelEnum));
         // 创建客户端
         switch (channelEnum) {
-            case ALIYUN -> new AliyunSmsClient(properties);
-            case DEBUG_DING_TALK -> new DebugDingTalkSmsClient(properties);
-            case TENCENT -> new TencentSmsClient(properties);
+            case ALIYUN: return new AliyunSmsClient(properties);
+            case DEBUG_DING_TALK: return new DebugDingTalkSmsClient(properties);
+            case TENCENT: return new TencentSmsClient(properties);
         }
         // 创建失败，错误日志 + 抛出异常
         log.error("[createSmsClient][配置({}) 找不到合适的客户端实现]", properties);
