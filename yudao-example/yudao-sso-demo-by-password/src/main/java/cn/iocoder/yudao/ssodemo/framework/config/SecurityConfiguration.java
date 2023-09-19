@@ -2,6 +2,7 @@ package cn.iocoder.yudao.ssodemo.framework.config;
 
 import cn.iocoder.yudao.ssodemo.framework.core.filter.TokenAuthenticationFilter;
 import cn.iocoder.yudao.ssodemo.framework.core.handler.AccessDeniedHandlerImpl;
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,8 +11,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import javax.annotation.Resource;
 
 @Configuration(proxyBeanMethods = false)
 @EnableWebSecurity

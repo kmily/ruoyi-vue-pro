@@ -3,10 +3,9 @@ package cn.iocoder.yudao.module.trade.api.brokerage;
 import cn.iocoder.yudao.module.trade.api.brokerage.dto.BrokerageUserDTO;
 import cn.iocoder.yudao.module.trade.convert.brokerage.user.BrokerageUserConvert;
 import cn.iocoder.yudao.module.trade.service.brokerage.user.BrokerageUserService;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-
-import javax.annotation.Resource;
 
 /**
  * 分销 API 接口实现类

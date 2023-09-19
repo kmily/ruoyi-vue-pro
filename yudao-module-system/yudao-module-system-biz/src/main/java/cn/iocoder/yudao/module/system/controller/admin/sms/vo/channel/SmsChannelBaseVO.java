@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
-
-import javax.validation.constraints.NotNull;
 
 /**
 * 短信渠道 Base VO，提供给添加、修改、详细的子 VO 使用

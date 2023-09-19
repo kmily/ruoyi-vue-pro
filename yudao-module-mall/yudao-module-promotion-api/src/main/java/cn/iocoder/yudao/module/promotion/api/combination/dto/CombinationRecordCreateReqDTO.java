@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.promotion.api.combination.dto;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 // TODO @芋艿：这块要在看看
 /**

@@ -6,9 +6,9 @@ import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobExportReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobPageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobUpdateReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.job.JobDO;
+import jakarta.validation.Valid;
 import org.quartz.SchedulerException;
 
-import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 

@@ -5,8 +5,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActi
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.BargainActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
-
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * 砍价活动 Service 接口

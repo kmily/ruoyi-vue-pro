@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-
-import javax.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - 短信渠道创建 Request VO")
 @Data

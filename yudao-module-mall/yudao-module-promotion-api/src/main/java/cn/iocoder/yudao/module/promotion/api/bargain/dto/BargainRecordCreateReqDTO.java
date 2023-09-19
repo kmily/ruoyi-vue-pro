@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.module.promotion.api.bargain.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
 
 // TODO @芋艿：这块要在看看
 

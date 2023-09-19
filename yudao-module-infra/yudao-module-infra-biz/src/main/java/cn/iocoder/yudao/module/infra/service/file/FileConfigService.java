@@ -6,8 +6,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigC
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigPageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigUpdateReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileConfigDO;
-
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * 文件配置 Service 接口

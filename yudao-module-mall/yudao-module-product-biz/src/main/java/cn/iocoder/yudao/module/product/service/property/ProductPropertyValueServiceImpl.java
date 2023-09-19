@@ -11,11 +11,11 @@ import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyVa
 import cn.iocoder.yudao.module.product.dal.mysql.property.ProductPropertyValueMapper;
 import cn.iocoder.yudao.module.product.service.property.bo.ProductPropertyValueDetailRespBO;
 import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;

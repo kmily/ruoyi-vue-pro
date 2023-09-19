@@ -11,10 +11,10 @@ import cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.template.AppCo
 import cn.iocoder.yudao.module.promotion.service.coupon.CouponService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

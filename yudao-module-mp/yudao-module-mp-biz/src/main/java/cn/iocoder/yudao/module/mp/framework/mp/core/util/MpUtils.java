@@ -2,10 +2,9 @@ package cn.iocoder.yudao.module.mp.framework.mp.core.util;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
+import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.api.WxConsts;
-
-import javax.validation.Validator;
 
 /**
  * 公众号工具类

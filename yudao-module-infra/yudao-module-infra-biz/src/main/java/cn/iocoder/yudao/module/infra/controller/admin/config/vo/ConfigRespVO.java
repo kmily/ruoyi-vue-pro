@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.infra.controller.admin.config.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - 参数配置信息 Response VO")

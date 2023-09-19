@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.module.system.controller.admin.mail.vo.account;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
 
 /**
  * 邮箱账号 Base VO，提供给添加、修改、详细的子 VO 使用

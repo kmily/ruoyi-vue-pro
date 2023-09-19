@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.oa.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.time.LocalDateTime;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 

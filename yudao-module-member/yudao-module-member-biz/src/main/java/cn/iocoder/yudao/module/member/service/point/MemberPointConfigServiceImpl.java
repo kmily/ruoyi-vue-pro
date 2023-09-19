@@ -5,10 +5,10 @@ import cn.iocoder.yudao.module.member.controller.admin.point.vo.config.MemberPoi
 import cn.iocoder.yudao.module.member.convert.point.MemberPointConfigConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.point.MemberPointConfigDO;
 import cn.iocoder.yudao.module.member.dal.mysql.point.MemberPointConfigMapper;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**

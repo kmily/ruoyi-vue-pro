@@ -3,9 +3,8 @@ package cn.iocoder.yudao.module.member.controller.admin.signin.vo.config;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * 签到规则 Base VO，提供给添加、修改、详细的子 VO 使用

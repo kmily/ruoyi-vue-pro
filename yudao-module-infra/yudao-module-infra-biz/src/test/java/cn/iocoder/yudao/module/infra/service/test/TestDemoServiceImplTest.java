@@ -9,10 +9,10 @@ import cn.iocoder.yudao.module.infra.controller.admin.test.vo.TestDemoPageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.test.vo.TestDemoUpdateReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.test.TestDemoDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.test.TestDemoMapper;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 

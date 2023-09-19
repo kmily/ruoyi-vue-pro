@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.member.controller.admin.point.vo.config;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * 会员积分配置 Base VO，提供给添加、修改、详细的子 VO 使用

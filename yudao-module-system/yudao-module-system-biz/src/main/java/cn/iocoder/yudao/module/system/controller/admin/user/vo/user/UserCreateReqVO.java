@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.system.controller.admin.user.vo.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Length;
-
-import javax.validation.constraints.NotEmpty;
 
 @Schema(description = "管理后台 - 用户创建 Request VO")
 @Data

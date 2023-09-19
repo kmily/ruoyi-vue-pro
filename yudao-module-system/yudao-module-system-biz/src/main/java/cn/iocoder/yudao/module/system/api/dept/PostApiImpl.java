@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.system.api.dept;
 
 import cn.iocoder.yudao.module.system.service.dept.PostService;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.Collection;
 
 /**

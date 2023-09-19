@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.module.promotion.api.coupon.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * 优惠劵使用 Request DTO

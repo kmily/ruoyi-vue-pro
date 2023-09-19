@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.module.promotion.api.bargain;
 
 import cn.iocoder.yudao.module.promotion.api.bargain.dto.BargainRecordCreateReqDTO;
-
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 // TODO @芋艿：后面也再撸撸这几个接口
 

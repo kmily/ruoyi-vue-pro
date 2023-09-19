@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.trade.framework.aftersalelog.core.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 // TODO @puhui999：这个是不是应该搞成 vo 啊？

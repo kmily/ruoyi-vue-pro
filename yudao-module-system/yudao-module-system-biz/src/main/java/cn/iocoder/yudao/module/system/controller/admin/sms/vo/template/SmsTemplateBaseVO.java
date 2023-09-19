@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.system.controller.admin.sms.vo.template;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
 * 短信模板 Base VO，提供给添加、修改、详细的子 VO 使用

@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.report.controller.admin.goview.vo.data;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
-
-import javax.validation.constraints.NotEmpty;
 
 @Schema(description = "管理后台 - GoView 使用 SQL 查询数据 Request VO")
 @Data

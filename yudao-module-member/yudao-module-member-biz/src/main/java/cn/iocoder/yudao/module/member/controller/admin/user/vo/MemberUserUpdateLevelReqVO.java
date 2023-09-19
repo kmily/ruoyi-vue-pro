@@ -1,12 +1,11 @@
 package cn.iocoder.yudao.module.member.controller.admin.user.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - 会员用户 修改等级 Request VO")
 @Data

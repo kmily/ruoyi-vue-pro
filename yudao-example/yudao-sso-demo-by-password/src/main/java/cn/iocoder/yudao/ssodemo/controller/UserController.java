@@ -4,9 +4,8 @@ import cn.iocoder.yudao.ssodemo.client.UserClient;
 import cn.iocoder.yudao.ssodemo.client.dto.CommonResult;
 import cn.iocoder.yudao.ssodemo.client.dto.user.UserInfoRespDTO;
 import cn.iocoder.yudao.ssodemo.client.dto.user.UserUpdateReqDTO;
+import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/user")

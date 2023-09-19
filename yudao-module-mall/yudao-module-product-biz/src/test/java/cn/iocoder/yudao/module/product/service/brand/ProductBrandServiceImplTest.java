@@ -8,10 +8,9 @@ import cn.iocoder.yudao.module.product.controller.admin.brand.vo.ProductBrandPag
 import cn.iocoder.yudao.module.product.controller.admin.brand.vo.ProductBrandUpdateReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.brand.ProductBrandDO;
 import cn.iocoder.yudao.module.product.dal.mysql.brand.ProductBrandMapper;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-
-import javax.annotation.Resource;
 
 import java.time.LocalDateTime;
 

@@ -5,9 +5,9 @@ import cn.iocoder.yudao.module.promotion.api.seckill.dto.SeckillActivityUpdateSt
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.seckillactivity.SeckillProductDO;
 import cn.iocoder.yudao.module.promotion.service.seckill.SeckillActivityService;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

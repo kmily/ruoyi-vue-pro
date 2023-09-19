@@ -2,10 +2,10 @@ package cn.iocoder.yudao.module.infra.websocket;
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.Strings;
 
-import javax.validation.constraints.NotNull;
 import javax.websocket.Session;
 import java.io.IOException;
 import java.util.List;

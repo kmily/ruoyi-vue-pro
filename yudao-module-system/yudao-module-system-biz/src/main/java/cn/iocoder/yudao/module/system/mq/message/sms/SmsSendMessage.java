@@ -2,10 +2,10 @@ package cn.iocoder.yudao.module.system.mq.message.sms;
 
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.mq.core.stream.AbstractStreamMessage;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**

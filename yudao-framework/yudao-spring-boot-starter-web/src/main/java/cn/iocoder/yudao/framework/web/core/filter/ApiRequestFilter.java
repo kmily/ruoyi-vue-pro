@@ -2,10 +2,9 @@ package cn.iocoder.yudao.framework.web.core.filter;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * 过滤 /admin-api、/app-api 等 API 请求的过滤器

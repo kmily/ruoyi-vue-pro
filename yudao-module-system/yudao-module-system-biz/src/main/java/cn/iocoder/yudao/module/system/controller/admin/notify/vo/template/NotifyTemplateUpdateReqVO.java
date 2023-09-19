@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.system.controller.admin.notify.vo.template;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Schema(description = "管理后台 - 站内信模版更新 Request VO")
 @Data

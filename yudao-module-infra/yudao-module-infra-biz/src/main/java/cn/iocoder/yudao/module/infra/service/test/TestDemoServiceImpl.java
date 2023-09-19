@@ -8,12 +8,12 @@ import cn.iocoder.yudao.module.infra.controller.admin.test.vo.TestDemoUpdateReqV
 import cn.iocoder.yudao.module.infra.convert.test.TestDemoConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.test.TestDemoDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.test.TestDemoMapper;
+import jakarta.annotation.Resource;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 

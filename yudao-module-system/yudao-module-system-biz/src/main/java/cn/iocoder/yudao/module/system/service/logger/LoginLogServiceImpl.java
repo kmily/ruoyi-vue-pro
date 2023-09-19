@@ -7,10 +7,10 @@ import cn.iocoder.yudao.module.system.controller.admin.logger.vo.loginlog.LoginL
 import cn.iocoder.yudao.module.system.convert.logger.LoginLogConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.logger.LoginLogDO;
 import cn.iocoder.yudao.module.system.dal.mysql.logger.LoginLogMapper;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**

@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.module.system.controller.admin.permission.vo.role;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import javax.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - 角色更新 Request VO")
 @Data

@@ -3,13 +3,12 @@ package cn.iocoder.yudao.module.mp.controller.admin.material.vo;
 import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import me.chanjar.weixin.common.api.WxConsts;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - 公众号素材上传永久 Request VO")
 @Data

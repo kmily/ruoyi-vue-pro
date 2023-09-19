@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.infra.controller.admin.db.vo;
+
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
 * 数据源配置 Base VO，提供给添加、修改、详细的子 VO 使用

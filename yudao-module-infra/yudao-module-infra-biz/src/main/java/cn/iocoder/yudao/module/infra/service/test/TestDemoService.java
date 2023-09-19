@@ -6,8 +6,8 @@ import cn.iocoder.yudao.module.infra.controller.admin.test.vo.TestDemoExportReqV
 import cn.iocoder.yudao.module.infra.controller.admin.test.vo.TestDemoPageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.test.vo.TestDemoUpdateReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.test.TestDemoDO;
+import jakarta.validation.Valid;
 
-import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 

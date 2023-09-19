@@ -3,10 +3,10 @@ package cn.iocoder.yudao.module.product.api.property;
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.product.convert.propertyvalue.ProductPropertyValueConvert;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 

@@ -8,12 +8,12 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.record.BrokerageRe
 import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.record.BrokerageRecordMapper;
 import cn.iocoder.yudao.module.trade.service.brokerage.user.BrokerageUserService;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
 import java.math.RoundingMode;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;

@@ -1,12 +1,11 @@
 package cn.iocoder.yudao.module.bpm.service.task;
 
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
+import jakarta.validation.Valid;
 import org.flowable.task.api.Task;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
