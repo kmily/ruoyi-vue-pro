@@ -22,30 +22,18 @@ public class MpUtils {
      */
     public static void validateMessage(Validator validator, String type, Object message) {
         // 获得对应的校验 group
-        Class<?> group;
-        switch (type) {
-            case WxConsts.XmlMsgType.TEXT:
-                group = TextMessageGroup.class;
-                break;
-            case WxConsts.XmlMsgType.IMAGE:
-                group = ImageMessageGroup.class;
-                break;
-            case WxConsts.XmlMsgType.VOICE:
-                group = VoiceMessageGroup.class;
-                break;
-            case WxConsts.XmlMsgType.VIDEO:
-                group = VideoMessageGroup.class;
-                break;
-            case WxConsts.XmlMsgType.NEWS:
-                group = NewsMessageGroup.class;
-                break;
-            case WxConsts.XmlMsgType.MUSIC:
-                group = MusicMessageGroup.class;
-                break;
-            default:
+        Class<?> group = switch (type) {
+            case WxConsts.XmlMsgType.TEXT -> TextMessageGroup.class;
+            case WxConsts.XmlMsgType.IMAGE -> ImageMessageGroup.class;
+            case WxConsts.XmlMsgType.VOICE -> VoiceMessageGroup.class;
+            case WxConsts.XmlMsgType.VIDEO -> VideoMessageGroup.class;
+            case WxConsts.XmlMsgType.NEWS -> NewsMessageGroup.class;
+            case WxConsts.XmlMsgType.MUSIC -> MusicMessageGroup.class;
+            default -> {
                 log.error("[validateMessage][未知的消息类型({})]", message);
                 throw new IllegalArgumentException("不支持的消息类型：" + type);
-        }
+            }
+        };
         // 执行校验
         ValidationUtils.validate(validator, message, group);
     }

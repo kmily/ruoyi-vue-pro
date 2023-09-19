@@ -19,7 +19,7 @@
         <!-- 统一依赖管理 -->
         <spring.boot.version>3.1.3</spring.boot.version>
         <!-- Web 相关 -->
-        <springdoc.version>1.7.0</springdoc.version>
+        <springdoc.version>2.2.0</springdoc.version>
         <knife4j.version>4.3.0</knife4j.version>
         <servlet.versoin>2.5</servlet.versoin>
         <!-- DB 相关 -->
@@ -35,7 +35,7 @@
         <resilience4j.version>2.1.0</resilience4j.version>
         <!-- 监控相关 -->
         <skywalking.version>8.12.0</skywalking.version>
-        <spring-boot-admin.version>2.7.10</spring-boot-admin.version>
+        <spring-boot-admin.version>3.1.6</spring-boot-admin.version>
         <opentracing.version>0.33.0</opentracing.version>
         <!-- Test 测试相关 -->
         <podam.version>7.2.11.RELEASE</podam.version>
@@ -71,7 +71,7 @@
         <justauth.version>1.0.4</justauth.version>
         <jimureport.version>1.6.1</jimureport.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
-        <weixin-java.version>4.5.0</weixin-java.version>
+        <weixin-java.version>4.5.5.B</weixin-java.version>
     </properties>
 
     <dependencyManagement>
@@ -180,12 +180,12 @@
 
             <dependency>
                 <groupId>com.github.xiaoymin</groupId>
-                <artifactId>knife4j-openapi3-spring-boot-starter</artifactId>
+                <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
                 <version>${knife4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-ui</artifactId>
+                <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
                 <version>${springdoc.version}</version>
             </dependency>
 
