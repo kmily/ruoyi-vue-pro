@@ -32,6 +32,9 @@ public class BreathAndHeartVO {
     @Schema(description = "最低值")
     private Double lowest;
 
+    @Schema(description = "静息平均心率")
+    private Double heartSilent;
+
     @Schema(description = "数据")
     private List<BreathAndHeartDataVO> timeList;
 

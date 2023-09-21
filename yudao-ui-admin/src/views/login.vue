@@ -122,7 +122,7 @@
                   <span v-else>登 录 中...</span>
                 </el-button>
                 <div style="float: right;">
-                  <el-checkbox label=""></el-checkbox>
+                  <el-checkbox  v-model="checked" label=""></el-checkbox>
                   <span>&nbsp;&nbsp;阅读并同意</span>
                   <el-button  size="mini" type="text">《用户服务协议》</el-button>
                 </div>
@@ -193,10 +193,11 @@ export default {
       captchaEnable: true,
       tenantEnable: true,
       mobileCodeTimer: 0,
+      checked: false,
       loginForm: {
         loginType: "uname",
-        username: "admin",
-        password: "admin123",
+        username: "",
+        password: "",
         captchaVerification: "",
         mobile: "",
         mobileCode: "",
@@ -279,6 +280,12 @@ export default {
   },
   methods: {
     getCode() {
+
+      if(!this.checked){
+        this.$modal.msgWarning("请勾选用户协议");  
+        return false;
+      }
+
       // 情况一，未开启：则直接登录
       if (!this.captchaEnable) {
         this.handleLogin({});

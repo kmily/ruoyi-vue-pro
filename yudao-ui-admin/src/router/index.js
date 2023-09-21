@@ -232,7 +232,7 @@ export const constantRoutes = [
     component: Layout,
     hidden: true,
     children: [{
-        path: 'user/detail/:userId(\\d+)',
+        path: 'user/detail/:userId(\\d+)/:name',
         component: (resolve) => require(['@/views/member/user/detail'], resolve),
         name: 'Detail',
         meta: {title: '会员详情', icon: '', activeMenu: '/member/user'}

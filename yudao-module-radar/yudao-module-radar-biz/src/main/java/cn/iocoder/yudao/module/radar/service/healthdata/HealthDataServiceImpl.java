@@ -134,6 +134,9 @@ public class HealthDataServiceImpl implements HealthDataService {
             double minBreath = Double.MAX_VALUE;
 
             for(HealthDataDO healthData: lowSleep) {
+                if(healthData.getHasPeople() == 0){
+                    break;
+                }
                 Double breathFreqAverage = healthData.getBreathFreqAverage();
                 Double heartFreqAverage = healthData.getHeartFreqAverage();
                 maxHeart = Math.max(maxHeart,  heartFreqAverage);
@@ -248,6 +251,9 @@ public class HealthDataServiceImpl implements HealthDataService {
             return new AppHealthDataResVO();
         }
 
+        double silent = 0.0;
+        double silentSize = 0;
+
         AppHealthDataResVO resVO = new AppHealthDataResVO();
         BreathAndHeartVO heartVO = new BreathAndHeartVO();
         BreathAndHeartVO breathVO = new BreathAndHeartVO();
@@ -282,12 +288,18 @@ public class HealthDataServiceImpl implements HealthDataService {
             maxBreath = Math.max(maxBreath, breathFreqAverage);
             minBreath = Math.min(minBreath, breathFreqAverage);
 
+            if(healthData.getHasPeople() == 1 && healthData.getHasMove() == 0){
+                silent += heartFreqAverage;
+                silentSize += 1;
+            }
         }
+
         if(lowSleep.size() > 0){
             HealthDataDO healthDataDO = lowSleep.get(lowSleep.size() - 1);
             heartVO.setAverage(heart.get() / lowSleep.size());
             heartVO.setCurrent(healthDataDO.getHeartFreqAverage());
             heartVO.setHighest(maxHeart).setLowest(minHeart);
+            heartVO.setHeartSilent(silentSize > 0? silent / silentSize: null);
             breathVO.setAverage(breath.get() / lowSleep.size());
             breathVO.setCurrent(healthDataDO.getBreathFreqAverage());
             breathVO.setHighest(maxBreath).setLowest(maxBreath);

@@ -58,7 +58,7 @@
     
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
-          <router-link :to="'/member/user/detail/' + scope.row.id" class="link-type">
+          <router-link :to="'/member/user/detail/' + scope.row.id + '/' + scope.row.nickname" class="link-type">
             <span>更多</span>
           </router-link>
           <!-- <el-button size="mini" type="text" icon="el-icon-more" @click="handleUpdate(scope.row)"

@@ -1,5 +1,11 @@
 <template>
   <div class="app-container">
+    <el-card>
+      <span style=" font-weight: 600; font-size: 18px;">{{userName}}</span> 的家庭信息
+    </el-card>
+    <el-card v-if="familyData.length == 0">
+      用户还未创建家庭
+    </el-card>
     <el-card v-for="item in familyData" class="family-devices" :key="item.id">
       <div slot="header" class="clearfix">
         <span class="family">{{item.name}}</span>
@@ -10,7 +16,7 @@
               <div class="pic">
                 <img :src="radarImg[item.type]"/>
               </div>
-              <div v-if="radarStatus[item.deviceId] == 1" class="online">
+              <div v-if="item.onLine" class="online">
                 在线
               </div>
               <div v-else class="offline">
@@ -42,12 +48,14 @@ export default {
     return {
       familyData: [],
       radarImg: [1, Radar1, Radar2, Radar3, Radar4],
-      radarStatus: {}
+      radarStatus: {},
+      userName: ""
     };
   },
   created() {
     const userId = this.$route.params && this.$route.params.userId;
-    console.log('查询用户', userId);
+    this.userName = this.$route.params && this.$route.params.name;
+    console.log('查询用户', userId, this.userName);
     this.familyList(userId);
   },
 
@@ -77,7 +85,9 @@ export default {
             deviceIds.push(dev.deviceId);
           });
         });
-        this.getDeviceStatus(deviceIds, familyData);
+        this.familyData = familyData;
+        this.loading = false;
+        //this.getDeviceStatus(deviceIds, familyData);
       });
     },
     
