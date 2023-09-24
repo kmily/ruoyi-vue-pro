@@ -471,6 +471,13 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
                 days = DateUtil.dateIntervalDay(startDate, endDate) + 1;
                 fullDays = getDaysThisYear(startDate);
                 currentEnd = endDate;
+            } else if (startDate.compareTo(DateUtil.getYearFirstDay(startDate)) != 0
+                    && endDate.compareTo(DateUtil.getYearLastDay(startDate)) <= 0) {
+                //非整年，但是年尾在结束日期之前
+                isFull = 0;
+                days = DateUtil.dateIntervalDay(startDate, endDate) + 1;
+                fullDays = getDaysThisYear(endDate);
+                currentEnd = DateUtil.getYearLastDay(startDate);
             }
             YearInfoDTO yearInfoDTO = new YearInfoDTO(startDate, currentEnd, isFull, days, fullDays);
             yearList.add(yearInfoDTO);
