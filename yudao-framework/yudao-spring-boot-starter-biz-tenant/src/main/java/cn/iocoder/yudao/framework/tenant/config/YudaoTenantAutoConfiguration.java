@@ -15,6 +15,8 @@ import cn.iocoder.yudao.framework.tenant.core.web.TenantContextWebFilter;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import cn.iocoder.yudao.module.system.api.tenant.TenantApi;
+import com.baomidou.mybatisplus.autoconfigure.MybatisPlusProperties;
+import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -53,8 +55,10 @@ public class YudaoTenantAutoConfiguration {
 
     @Bean
     public TenantLineInnerInterceptor tenantLineInnerInterceptor(TenantProperties properties,
-                                                                 MybatisPlusInterceptor interceptor) {
-        TenantLineInnerInterceptor inner = new TenantLineInnerInterceptor(new TenantDatabaseInterceptor(properties));
+                                                                 MybatisPlusInterceptor interceptor,
+                                                                 MybatisPlusProperties mybatisPlusProperties) {
+        GlobalConfig.DbConfig dbConfig = mybatisPlusProperties.getGlobalConfig().getDbConfig();
+        TenantLineInnerInterceptor inner = new TenantLineInnerInterceptor(new TenantDatabaseInterceptor(properties, dbConfig));
         // 添加到 interceptor 中
         // 需要加在首个，主要是为了在分页插件前面。这个是 MyBatis Plus 的规定
         MyBatisUtils.addInterceptor(interceptor, inner, 0);
