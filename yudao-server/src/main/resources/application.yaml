@@ -80,6 +80,8 @@ mybatis-plus:
 
 mybatis-plus-join:
   banner: false # 关闭控制台的 Banner 打印
+  #副表逻辑删除条件的位置 支持 where / on  默认 where
+  logic-del-type: on
 
 # Spring Data Redis 配置
 spring:
