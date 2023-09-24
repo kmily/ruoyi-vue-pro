@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.bpm.dal.dataobject.definition;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -16,6 +17,7 @@ import java.util.List;
  * @author 芋道源码
  */
 @TableName(value = "bpm_form", autoResultMap = true)
+@KeySequence("bpm_form_seq")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
