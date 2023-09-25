@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.flowable.core.util.BpmnModelUtils;
+import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
@@ -31,6 +32,7 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -39,6 +41,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -186,27 +189,58 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void approveTask(Long userId, @Valid BpmTaskApproveReqVO reqVO) {
-        // 校验任务存在
-        Task task = checkTask(userId, reqVO.getId());
-        // 校验流程实例存在
+        // 1.1 校验任务存在
+        Task task = validateTask(userId, reqVO.getId());
+        // 1.2 校验流程实例存在
         ProcessInstance instance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
         if (instance == null) {
             throw exception(PROCESS_INSTANCE_NOT_EXISTS);
         }
 
+        // 情况一：被委派的任务，不调用 complete 去完成任务
+        if (DelegationState.PENDING.equals(task.getDelegationState())) {
+            approveDelegateTask(reqVO, task);
+            return;
+        }
+
+        // 情况二：自己审批的任务，调用 complete 去完成任务
         // 完成任务，审批通过
         taskService.complete(task.getId(), instance.getProcessVariables());
-
         // 更新任务拓展表为通过
         taskExtMapper.updateByTaskId(
                 new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.APPROVE.getResult())
                         .setReason(reqVO.getReason()));
     }
 
+    /**
+     * 审批被委派的任务
+     *
+     * @param reqVO 前端请求参数，包含当前任务ID，审批意见等
+     * @param task  当前被审批的任务
+     */
+    private void approveDelegateTask(BpmTaskApproveReqVO reqVO, Task task) {
+        // 1. 添加审批意见
+        AdminUserRespDTO currentUser = adminUserApi.getUser(WebFrameworkUtils.getLoginUserId());
+        AdminUserRespDTO sourceApproveUser = adminUserApi.getUser(NumberUtils.parseLong(task.getOwner()));
+        Assert.notNull(sourceApproveUser, "委派任务找不到原审批人，需要检查数据");
+        String comment = StrUtil.format("[{}]完成委派任务，任务重新回到[{}]手中，审批意见为:{}", currentUser.getNickname(),
+                sourceApproveUser.getNickname(), reqVO.getReason());
+        taskService.addComment(reqVO.getId(), task.getProcessInstanceId(),
+                BpmProcessInstanceResultEnum.DELEGATE.getResult().toString(), comment);
+
+        // 2.1 调用 resolveTask 完成任务。
+        // 底层调用 TaskHelper.changeTaskAssignee(task, task.getOwner())：将 owner 设置为 assignee
+        taskService.resolveTask(task.getId());
+        // 2.2 更新任务拓展表为【处理中】
+        taskExtMapper.updateByTaskId(
+                new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.PROCESS.getResult())
+                        .setReason(reqVO.getReason()));
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void rejectTask(Long userId, @Valid BpmTaskRejectReqVO reqVO) {
-        Task task = checkTask(userId, reqVO.getId());
+        Task task = validateTask(userId, reqVO.getId());
         // 校验流程实例存在
         ProcessInstance instance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
         if (instance == null) {
@@ -225,7 +259,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Override
     public void updateTaskAssignee(Long userId, BpmTaskUpdateAssigneeReqVO reqVO) {
         // 校验任务存在
-        Task task = checkTask(userId, reqVO.getId());
+        Task task = validateTask(userId, reqVO.getId());
         // 更新负责人
         updateTaskAssignee(task.getId(), reqVO.getAssigneeUserId());
     }
@@ -241,13 +275,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      * @param userId 用户 id
      * @param taskId task id
      */
-    private Task checkTask(Long userId, String taskId) {
+    private Task validateTask(Long userId, String taskId) {
         Task task = getTask(taskId);
         if (task == null) {
-            throw exception(TASK_COMPLETE_FAIL_NOT_EXISTS);
+            throw exception(TASK_NOT_EXISTS);
         }
         if (!Objects.equals(userId, NumberUtils.parseLong(task.getAssignee()))) {
-            throw exception(TASK_COMPLETE_FAIL_ASSIGN_NOT_SELF);
+            throw exception(TASK_OPERATE_FAIL_ASSIGN_NOT_SELF);
         }
         return task;
     }
@@ -319,23 +353,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     private Task getTask(String id) {
-        return taskService.createTaskQuery().taskId(id).singleResult();
-    }
-
-    /**
-     * 校验任务是否合法
-     *
-     * @param taskId 任务编号
-     * @return 任务
-     */
-    private Task validateTask(String taskId) {
-        // 当前任务 task
-        Task task = getTask(taskId);
-        if (task == null) {
+        Task task = taskService.createTaskQuery().taskId(id).singleResult();
+        if (null == task) {
             throw exception(TASK_NOT_EXISTS);
-        }
-        if (task.isSuspended()) {
-            throw exception(TASK_IS_PENDING);
         }
         return task;
     }
@@ -351,6 +371,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (task == null) {
             throw exception(TASK_NOT_EXISTS);
         }
+        // 根据流程定义获取流程模型信息
         BpmnModel bpmnModel = bpmModelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
         FlowElement source = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
         if (source == null) {
@@ -369,9 +390,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void returnTask(BpmTaskReturnReqVO reqVO) {
+    public void returnTask(Long userId, BpmTaskReturnReqVO reqVO) {
         // 1.1 当前任务 task
-        Task task = validateTask(reqVO.getId());
+        Task task = validateTask(userId, reqVO.getId());
+        if (task.isSuspended()) {
+            throw exception(TASK_IS_PENDING);
+        }
         // 1.2 校验源头和目标节点的关系，并返回目标元素
         FlowElement targetElement = validateTargetTaskCanReturn(task.getTaskDefinitionKey(), reqVO.getTargetDefinitionKey(), task.getProcessDefinitionId());
 
@@ -443,6 +467,53 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 .moveActivityIdsToSingleActivityId(returnTaskKeyList, // 当前要跳转的节点列表( 1 或多)
                         reqVO.getTargetDefinitionKey()) // targetKey 跳转到的节点(1)
                 .changeState();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void delegateTask(BpmTaskDelegateReqVO reqVO, Long userId) {
+        // 1.1 校验任务
+        Task task = validateTaskCanDelegate(userId, reqVO);
+        // 1.2 校验目标用户存在
+        AdminUserRespDTO delegateUser = adminUserApi.getUser(reqVO.getDelegateUserId());
+        if (delegateUser == null) {
+            throw exception(TASK_DELEGATE_FAIL_USER_NOT_EXISTS);
+        }
+
+        // 2. 添加审批意见
+        AdminUserRespDTO currentUser = adminUserApi.getUser(userId);
+        String comment = StrUtil.format("[{}]将任务委派给[{}]，委派理由为:{}", currentUser.getNickname(),
+                delegateUser.getNickname(), reqVO.getReason());
+        String taskId = reqVO.getId();
+        // TODO 海：后面改；感觉 comment 应该 type 做个枚举；不和 result 耦合在一起；
+        taskService.addComment(taskId, task.getProcessInstanceId(),
+                BpmProcessInstanceResultEnum.DELEGATE.getResult().toString(), comment);
+
+        // 3.1 设置任务所有人 (owner) 为原任务的处理人 (assignee)
+        taskService.setOwner(taskId, task.getAssignee());
+        // 3.2 执行委派，将任务委派给 receiveId
+        taskService.delegateTask(taskId, reqVO.getDelegateUserId().toString());
+        // 3.3 更新任务拓展表为【委派】
+        taskExtMapper.updateByTaskId(
+                new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.DELEGATE.getResult())
+                        .setReason(reqVO.getReason()));
+    }
+
+    /**
+     * 校验任务委派参数
+     *
+     * @param userId 用户编号
+     * @param reqVO 任务编号，接收人ID
+     * @return 当前任务信息
+     */
+    private Task validateTaskCanDelegate(Long userId, BpmTaskDelegateReqVO reqVO) {
+        // 校验任务
+        Task task = validateTask(userId, reqVO.getId());
+        // 校验当前审批人和被委派人不是同一人
+        if (task.getAssignee().equals(reqVO.getDelegateUserId().toString())) {
+            throw exception(TASK_DELEGATE_FAIL_USER_REPEAT);
+        }
+        return task;
     }
 
 }
