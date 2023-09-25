@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigUpda
 import cn.iocoder.yudao.module.infra.convert.db.DataSourceConfigConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.db.DataSourceConfigDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.db.DataSourceConfigMapper;
-import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourceProperty;
+import com.baomidou.dynamic.datasource.creator.DataSourceProperty;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceProperties;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
