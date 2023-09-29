@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.biz.controller.admin.calc;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -32,6 +35,13 @@ import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.List;
+
+
+import jxl.Cell;
+import jxl.Workbook;
+import jxl.write.Label;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -70,6 +80,84 @@ public class CalcInterestRateDataController {
             }
         }
 
+    }
+
+    @PostMapping("/excel")
+    @PermitAll
+    public void downloadExcelFile(HttpServletResponse response, @RequestBody List<SectionIndexVO> sectionList) throws IOException {
+        //设置文件路径
+        try {
+            String filePath = parseExcel(sectionList);
+            InputStream inputStream = new FileInputStream(new File(filePath));
+            try (ServletOutputStream outputStream = response.getOutputStream()) {
+                //设置响应头信息，包括下载后的文件名和编码等
+                response.addHeader("content-disposition", String.format("attachment;filename= %s", URLEncoder.encode("数据.xlsx", "utf-8")));
+                response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                response.setCharacterEncoding("UTF-8");
+                //在文件夹里获取到文件并转为流
+                byte[] b = IoUtil.readBytes(inputStream);
+                response.getOutputStream().write(b);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (inputStream != null) {
+                    try {
+                        inputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+
+    public String parseExcel(List<SectionIndexVO> sectionList) throws Exception {
+        //读取excel
+        org.springframework.core.io.Resource resource = new ClassPathResource("利息数据.xls");
+        String filePath = resource.getFile().getParentFile().getPath() + "/" + System.currentTimeMillis() + ".xls";
+        File resultfile = FileUtil.copy(resource.getFile().getAbsolutePath(), filePath, true);
+        //ping
+        {
+            //创建Excel工作薄
+            Workbook workbookIn = Workbook.getWorkbook(resultfile);
+            WritableWorkbook workbook = Workbook.createWorkbook(resultfile, workbookIn);
+            if (null == workbook) {
+                throw new Exception("创建Excel工作薄为空！");
+            }
+            WritableSheet sheet = workbook.getSheet(0);
+            //遍历Excel中所有的sheet
+            for (int i = 0; i < sectionList.size(); i++) {
+                SectionIndexVO index = sectionList.get(i);
+                //获取第一列
+                String column1 = index.getStartDate() + "至" + index.getEndDate();
+                Label label1 = new Label(0, i + 1, column1);
+                sheet.addCell(label1);
+                //获取第二列
+                String column2 = index.getDays();
+                Label label2 = new Label(1, i + 1, column2);
+                sheet.addCell(label2);
+                //获取第三列
+                String column3 = index.getSuiteRate();
+                Label label3 = new Label(2, i + 1, column3);
+                sheet.addCell(label3);
+                //获取第四列
+                String column4 = index.getSectionAmount().toString();
+                Label label4 = new Label(3, i + 1, column4);
+                sheet.addCell(label4);
+            }
+            {
+                //写入数据
+                workbook.write();
+                //一定要关闭，不然不会写入文件内。
+                workbook.close();
+            }
+        }
+        return filePath;
     }
 
     @PostMapping("/exec/lx")

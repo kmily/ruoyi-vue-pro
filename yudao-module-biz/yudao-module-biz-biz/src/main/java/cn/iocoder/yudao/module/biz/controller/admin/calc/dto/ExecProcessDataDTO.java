@@ -41,6 +41,22 @@ public class ExecProcessDataDTO {
     }
 
     public ExecProcessDataDTO(String id, String processId, Integer rateId, Date dateIndex, Date dateIndexEnd
+            , BigDecimal dayRate, BigDecimal dayAmount, Integer days, BigDecimal yearRate, Integer calcProcType
+    ) {
+        this.id = id;
+        this.processId = processId;
+        this.rateId = rateId;
+        this.dateIndex = dateIndex;
+        this.dateIndexEnd = dateIndexEnd;
+        this.dayRate = dayRate;
+        this.dayAmount = dayAmount;
+        this.days = days;
+        this.yearRate = yearRate;
+        this.calcProcType = calcProcType;
+    }
+
+
+    public ExecProcessDataDTO(String id, String processId, Integer rateId, Date dateIndex, Date dateIndexEnd
             , BigDecimal dayRate, BigDecimal dayAmount, Integer days, BigDecimal yearRate, Integer fullDays, Integer isFull
     ) {
         this.id = id;
@@ -66,6 +82,18 @@ public class ExecProcessDataDTO {
         this.yearRate = yearRate;
     }
 
+    public ExecProcessDataDTO(String id, String processId, Integer rateId, Date dateIndex, BigDecimal dayRate, BigDecimal dayAmount, BigDecimal yearRate, Integer calcProcType) {
+        this.id = id;
+        this.processId = processId;
+        this.rateId = rateId;
+        this.dateIndex = dateIndex;
+        this.dayRate = dayRate;
+        this.dayAmount = dayAmount;
+        this.yearRate = yearRate;
+        this.calcProcType = calcProcType;
+    }
+
+
     private String id;
     private String processId;
     //1利息 2罚息
@@ -79,5 +107,9 @@ public class ExecProcessDataDTO {
     private Integer days;
     private Integer fullDays;
     private Integer isFull;
+    /**
+     * 1约定利息-lprs,2lpr分段
+     */
+    private Integer calcProcType;
 
 }

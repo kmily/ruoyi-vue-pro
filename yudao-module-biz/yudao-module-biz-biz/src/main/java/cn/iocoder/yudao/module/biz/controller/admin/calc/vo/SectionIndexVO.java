@@ -12,6 +12,8 @@ import java.math.BigDecimal;
 @Data
 public class SectionIndexVO {
 
+    private Integer sort;
+
     //区间开始时间
     private String startDate;
     //区间结束时间
@@ -26,5 +28,6 @@ public class SectionIndexVO {
     //区间金额
     private BigDecimal sectionAmount;
 
+    private Integer abort;
 
 }
