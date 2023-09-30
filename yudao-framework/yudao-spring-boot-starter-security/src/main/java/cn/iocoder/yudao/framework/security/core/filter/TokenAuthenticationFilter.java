@@ -3,12 +3,9 @@ package cn.iocoder.yudao.framework.security.core.filter;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
-import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.system.api.oauth2.OAuth2TokenApi;
 import cn.iocoder.yudao.module.system.api.oauth2.dto.OAuth2AccessTokenCheckRespDTO;
@@ -33,8 +30,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final SecurityProperties securityProperties;
 
-    private final GlobalExceptionHandler globalExceptionHandler;
-
     private final OAuth2TokenApi oauth2TokenApi;
 
     @Override
@@ -44,22 +39,16 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getTokenHeader());
         if (StrUtil.isNotEmpty(token)) {
             Integer userType = WebFrameworkUtils.getLoginUserType(request);
-            try {
-                // 1.1 基于 token 构建登录用户
-                LoginUser loginUser = buildLoginUserByToken(token, userType);
-                // 1.2 模拟 Login 功能，方便日常开发调试
-                if (loginUser == null) {
-                    loginUser = mockLoginUser(request, token, userType);
-                }
+            // 1.1 基于 token 构建登录用户
+            LoginUser loginUser = buildLoginUserByToken(token, userType);
+            // 1.2 模拟 Login 功能，方便日常开发调试
+            if (loginUser == null) {
+                loginUser = mockLoginUser(request, token, userType);
+            }
 
-                // 2. 设置当前用户
-                if (loginUser != null) {
-                    SecurityFrameworkUtils.setLoginUser(loginUser, request);
-                }
-            } catch (Throwable ex) {
-                CommonResult<?> result = globalExceptionHandler.allExceptionHandler(request, ex);
-                ServletUtils.writeJSON(response, result);
-                return;
+            // 2. 设置当前用户
+            if (loginUser != null) {
+                SecurityFrameworkUtils.setLoginUser(loginUser, request);
             }
         }
 
