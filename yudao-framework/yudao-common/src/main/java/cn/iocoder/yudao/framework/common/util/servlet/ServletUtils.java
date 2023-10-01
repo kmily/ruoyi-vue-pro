@@ -3,8 +3,12 @@ package cn.iocoder.yudao.framework.common.util.servlet;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
+import cn.hutool.http.HttpStatus;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRange;
 import org.springframework.http.MediaType;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -14,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,6 +51,39 @@ public class ServletUtils {
         // 设置 header 和 contentType
         response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.setContentLengthLong(content.length);
+        // 输出附件
+        IoUtil.write(response.getOutputStream(), false, content);
+    }
+
+    /**
+     * 返回附件
+     *
+     * @param response 响应
+     * @param filename 文件名
+     * @param content  附件内容
+     * @param headers  请求头，判断是否分片下载
+     * @throws IOException
+     */
+    public static void writeAttachment(HttpServletResponse response, HttpHeaders headers, String filename, byte[] content) throws IOException {
+        // Range：告知服务端，客户端下载该文件想要从指定的位置开始下载
+        List<HttpRange> httpRanges = headers.getRange();
+        if (!CollectionUtils.isEmpty(httpRanges)) {
+            HttpRange httpRange = httpRanges.get(0);
+            int firstBytePos = (int) httpRange.getRangeStart(content.length);
+            int lastBytePos = (int) httpRange.getRangeEnd(content.length);
+            int rangeLength = lastBytePos - firstBytePos + 1;
+            byte[] bs = new byte[rangeLength];
+            System.arraycopy(content, firstBytePos, bs, 0, rangeLength);
+            response.setStatus(HttpStatus.HTTP_PARTIAL);
+            response.setHeader(HttpHeaders.CONTENT_RANGE, "bytes " + firstBytePos + "-" + lastBytePos + "/" + content.length);
+            content = bs;
+        }
+
+        // 设置 header 和 contentType
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.setContentLengthLong(content.length);
         // 输出附件
         IoUtil.write(response.getOutputStream(), false, content);
     }
