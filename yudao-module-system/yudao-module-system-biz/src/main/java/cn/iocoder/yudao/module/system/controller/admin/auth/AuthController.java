@@ -101,7 +101,7 @@ public class AuthController {
 
         // 1.2 获得角色列表
         Set<Long> roleIds = permissionService.getUserRoleIdListByUserId(getLoginUserId());
-        if(CollectionUtils.isEmpty(roleIds)){
+        if (CollectionUtils.isEmpty(roleIds)) {
             return success(AuthConvert.INSTANCE.convert(user, List.of(), List.of()));
         }
         List<RoleDO> roles = roleService.getRoleList(roleIds);

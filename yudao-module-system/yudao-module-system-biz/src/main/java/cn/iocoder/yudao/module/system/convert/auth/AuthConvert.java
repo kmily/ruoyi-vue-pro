@@ -47,8 +47,9 @@ public interface AuthConvert {
      * @return 菜单树
      */
     default List<AuthPermissionInfoRespVO.MenuVO> buildMenuTree(List<MenuDO> menuList) {
-        if(CollectionUtils.isEmpty(menuList))
+        if (CollectionUtils.isEmpty(menuList)) {
             return List.of();
+        }
         // 移除按钮
         menuList.removeIf(menu -> menu.getType().equals(MenuTypeEnum.BUTTON.getType()));
         // 排序，保证菜单的有序性
