@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.system.enums.permission.MenuTypeEnum;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
@@ -46,6 +47,8 @@ public interface AuthConvert {
      * @return 菜单树
      */
     default List<AuthPermissionInfoRespVO.MenuVO> buildMenuTree(List<MenuDO> menuList) {
+        if(CollectionUtils.isEmpty(menuList))
+            return List.of();
         // 移除按钮
         menuList.removeIf(menu -> menu.getType().equals(MenuTypeEnum.BUTTON.getType()));
         // 排序，保证菜单的有序性
