@@ -39,6 +39,11 @@ public class OAuth2RefreshTokenDO extends BaseDO {
      */
     private Long userId;
     /**
+     * 用户昵称
+     *
+     */
+    private String nickname;
+    /**
      * 用户类型
      *
      * 枚举 {@link UserTypeEnum}

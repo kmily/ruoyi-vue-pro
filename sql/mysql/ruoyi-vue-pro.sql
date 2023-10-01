@@ -2112,6 +2112,7 @@ DROP TABLE IF EXISTS `system_oauth2_access_token`;
 CREATE TABLE `system_oauth2_access_token`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
   `user_id` bigint NOT NULL COMMENT '用户编号',
+  `nickname` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户昵称',
   `user_type` tinyint NOT NULL COMMENT '用户类型',
   `access_token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '访问令牌',
   `refresh_token` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '刷新令牌',
@@ -2235,6 +2236,7 @@ DROP TABLE IF EXISTS `system_oauth2_refresh_token`;
 CREATE TABLE `system_oauth2_refresh_token`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
   `user_id` bigint NOT NULL COMMENT '用户编号',
+  `nickname` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户昵称',
   `refresh_token` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '刷新令牌',
   `user_type` tinyint NOT NULL COMMENT '用户类型',
   `client_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '客户端编号',
