@@ -4,6 +4,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
 import javax.validation.constraints.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.LocalDate;
+
 ## 处理 Date 字段的引入
 #foreach ($column in $columns)
 #if (${column.updateOperation} && (!${column.createOperation} || !${column.listOperationResult})

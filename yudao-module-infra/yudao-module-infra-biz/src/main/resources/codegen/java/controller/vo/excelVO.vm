@@ -3,6 +3,9 @@ package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePac
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.LocalDate;
 #foreach ($column in $columns)
 #if (${column.javaType} == "BigDecimal")
 import java.math.BigDecimal;
@@ -27,7 +30,12 @@ import ${DictConvertClassName};
  *
  * @author ${table.author}
  */
+
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = false) // 设置 chain = false，避免用户导入有问题
 public class ${sceneEnum.prefixClass}${table.className}ExcelVO {
 
 #foreach ($column in $columns)

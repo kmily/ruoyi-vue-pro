@@ -19,21 +19,21 @@ public interface ${table.className}Service {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    ${primaryColumn.javaType} create${simpleClassName}(@Valid ${sceneEnum.prefixClass}${table.className}CreateReqVO createReqVO);
+    ${primaryColumn.javaType} create(@Valid ${sceneEnum.prefixClass}${table.className}CreateReqVO createReqVO);
 
     /**
      * 更新${table.classComment}
      *
      * @param updateReqVO 更新信息
      */
-    void update${simpleClassName}(@Valid ${sceneEnum.prefixClass}${table.className}UpdateReqVO updateReqVO);
+    void update(@Valid ${sceneEnum.prefixClass}${table.className}UpdateReqVO updateReqVO);
 
     /**
      * 删除${table.classComment}
      *
      * @param id 编号
      */
-    void delete${simpleClassName}(${primaryColumn.javaType} id);
+    void delete(${primaryColumn.javaType} id);
 
     /**
      * 获得${table.classComment}
@@ -41,7 +41,7 @@ public interface ${table.className}Service {
      * @param id 编号
      * @return ${table.classComment}
      */
-    ${table.className}DO get${simpleClassName}(${primaryColumn.javaType} id);
+    ${table.className}DO get(${primaryColumn.javaType} id);
 
     /**
      * 获得${table.classComment}列表
@@ -49,7 +49,7 @@ public interface ${table.className}Service {
      * @param ids 编号
      * @return ${table.classComment}列表
      */
-    List<${table.className}DO> get${simpleClassName}List(Collection<${primaryColumn.javaType}> ids);
+    List<${table.className}DO> getList(Collection<${primaryColumn.javaType}> ids);
 
     /**
      * 获得${table.classComment}分页
@@ -57,7 +57,7 @@ public interface ${table.className}Service {
      * @param pageReqVO 分页查询
      * @return ${table.classComment}分页
      */
-    PageResult<${table.className}DO> get${simpleClassName}Page(${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO);
+    PageResult<${table.className}DO> getPage(${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO);
 
     /**
      * 获得${table.classComment}列表, 用于 Excel 导出
@@ -65,6 +65,6 @@ public interface ${table.className}Service {
      * @param exportReqVO 查询条件
      * @return ${table.classComment}列表
      */
-    List<${table.className}DO> get${simpleClassName}List(${sceneEnum.prefixClass}${table.className}ExportReqVO exportReqVO);
+    List<${table.className}DO> getList(${sceneEnum.prefixClass}${table.className}ExportReqVO exportReqVO);
 
 }

@@ -2,6 +2,10 @@ package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePac
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.LocalDate;
+
 #foreach ($column in $columns)
 #if (${column.javaType} == "LocalDateTime")
 import java.time.LocalDateTime;

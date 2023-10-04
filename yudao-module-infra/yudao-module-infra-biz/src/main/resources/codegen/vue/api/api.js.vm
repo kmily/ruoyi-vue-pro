@@ -2,7 +2,7 @@ import request from '@/utils/request'
 #set ($baseURL = "/${table.moduleName}/${simpleClassName_strikeCase}")
 
 // 创建${table.classComment}
-export function create${simpleClassName}(data) {
+export function create(data) {
   return request({
     url: '${baseURL}/create',
     method: 'post',
@@ -11,7 +11,7 @@ export function create${simpleClassName}(data) {
 }
 
 // 更新${table.classComment}
-export function update${simpleClassName}(data) {
+export function update(data) {
   return request({
     url: '${baseURL}/update',
     method: 'put',
@@ -20,7 +20,7 @@ export function update${simpleClassName}(data) {
 }
 
 // 删除${table.classComment}
-export function delete${simpleClassName}(id) {
+export function del(id) {
   return request({
     url: '${baseURL}/delete?id=' + id,
     method: 'delete'
@@ -28,7 +28,7 @@ export function delete${simpleClassName}(id) {
 }
 
 // 获得${table.classComment}
-export function get${simpleClassName}(id) {
+export function get(id) {
   return request({
     url: '${baseURL}/get?id=' + id,
     method: 'get'
@@ -36,7 +36,7 @@ export function get${simpleClassName}(id) {
 }
 
 // 获得${table.classComment}分页
-export function get${simpleClassName}Page(query) {
+export function page(query) {
   return request({
     url: '${baseURL}/page',
     method: 'get',
@@ -45,7 +45,7 @@ export function get${simpleClassName}Page(query) {
 }
 
 // 导出${table.classComment} Excel
-export function export${simpleClassName}Excel(query) {
+export function exportExcel(query) {
   return request({
     url: '${baseURL}/export-excel',
     method: 'get',

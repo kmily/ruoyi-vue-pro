@@ -10,9 +10,11 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenColumnHtmlTypeEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenColumnListConditionEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
+import cn.iocoder.yudao.module.infra.service.codegen.CodegenServiceImpl;
 import com.baomidou.mybatisplus.generator.config.po.TableField;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.google.common.collect.Sets;
+import com.testlk.util.GenerateSqlUtil;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -49,6 +51,13 @@ public class CodegenBuilder {
                     .put("status", CodegenColumnHtmlTypeEnum.RADIO)
                     .put("sex", CodegenColumnHtmlTypeEnum.RADIO)
                     .put("type", CodegenColumnHtmlTypeEnum.SELECT)
+                    .put("result", CodegenColumnHtmlTypeEnum.RADIO)
+                    .put("state", CodegenColumnHtmlTypeEnum.SELECT)
+                    .put("level", CodegenColumnHtmlTypeEnum.SELECT)
+                    .put("condition", CodegenColumnHtmlTypeEnum.SELECT)
+                    .put("situation", CodegenColumnHtmlTypeEnum.SELECT)
+                    .put("dataSource", CodegenColumnHtmlTypeEnum.SELECT)
+                    .put("manId", CodegenColumnHtmlTypeEnum.EDITOR)
                     .put("image", CodegenColumnHtmlTypeEnum.UPLOAD_IMAGE)
                     .put("file", CodegenColumnHtmlTypeEnum.UPLOAD_FILE)
                     .put("content", CodegenColumnHtmlTypeEnum.EDITOR)
@@ -137,23 +146,64 @@ public class CodegenBuilder {
 
     private void processColumnOperation(CodegenColumnDO column) {
         // 处理 createOperation 字段
-        column.setCreateOperation(!CREATE_OPERATION_EXCLUDE_COLUMN.contains(column.getJavaField())
+        column.setCreateOperation(!CREATE_OPERATION_EXCLUDE_COLUMN.contains(column.getJavaField()) && !column.getJavaField().endsWith("Id")
                 && !column.getPrimaryKey()); // 对于主键，创建时无需传递
         // 处理 updateOperation 字段
-        column.setUpdateOperation(!UPDATE_OPERATION_EXCLUDE_COLUMN.contains(column.getJavaField())
+        column.setUpdateOperation(
+                ( !UPDATE_OPERATION_EXCLUDE_COLUMN.contains(column.getJavaField())
+                        && !column.getJavaField().endsWith("Id") )
                 || column.getPrimaryKey()); // 对于主键，更新时需要传递
         // 处理 listOperation 字段
         column.setListOperation(!LIST_OPERATION_EXCLUDE_COLUMN.contains(column.getJavaField())
+                && !column.getJavaField().endsWith("Id")
+                && listIncludeFields.contains(column.getJavaField())    // 限制查询条件， 不然字段太多了， 不好看啊！ fixed
                 && !column.getPrimaryKey()); // 对于主键，列表过滤不需要传递
+
+        column.setImportExcelOperation(!LIST_OPERATION_EXCLUDE_COLUMN.contains(column.getJavaField())
+                && !column.getJavaField().endsWith("Id")
+//                && listIncludeFields.contains(column.getJavaField())
+                && !column.getPrimaryKey()); // 对于主键，列表过滤不需要传递
+
+        column.setExportExcelOperation(!LIST_OPERATION_EXCLUDE_COLUMN.contains(column.getJavaField())
+                && !column.getJavaField().endsWith("Id")
+//                && listIncludeFields.contains(column.getJavaField())
+                && !column.getPrimaryKey()); // 对于主键，列表过滤不需要传递
+
         // 处理 listOperationCondition 字段
         COLUMN_LIST_OPERATION_CONDITION_MAPPINGS.entrySet().stream()
                 .filter(entry -> StrUtil.endWithIgnoreCase(column.getJavaField(), entry.getKey()))
+//                .filter(entry -> !column.getJavaField().endsWith("Id"))
+//                .filter(entry -> listIncludeFields.contains(column.getJavaField()) )
                 .findFirst().ifPresent(entry -> column.setListOperationCondition(entry.getValue().getCondition()));
         if (column.getListOperationCondition() == null) {
             column.setListOperationCondition(CodegenColumnListConditionEnum.EQ.getCondition());
         }
         // 处理 listOperationResult 字段
-        column.setListOperationResult(!LIST_OPERATION_RESULT_EXCLUDE_COLUMN.contains(column.getJavaField()));
+        column.setListOperationResult(!LIST_OPERATION_RESULT_EXCLUDE_COLUMN.contains(column.getJavaField())
+                && !column.getJavaField().endsWith("Id")
+//                && listOperationResult.contains(column.getJavaField())
+        );
+    }
+
+    public static Set<String> listIncludeFields = new HashSet<>();
+    public static Set<String> listOperationResult = new HashSet<>();
+    static {
+        listIncludeFields.add("name");
+        listIncludeFields.add("code");
+        listIncludeFields.add("status");
+        listIncludeFields.add("qacRet");
+        listIncludeFields.add("auditRet");
+
+        listOperationResult.add("name");
+        listOperationResult.add("unit");
+        listOperationResult.add("code");
+        listOperationResult.add("creator");
+        listOperationResult.add("createTime");
+//        listOperationResult.add("updater");
+        listOperationResult.add("updateTime");
+        listOperationResult.add("status");
+        listOperationResult.add("qacRet");
+        listOperationResult.add("auditRet");
     }
 
     private void processColumnUI(CodegenColumnDO column) {
@@ -166,10 +216,18 @@ public class CodegenBuilder {
         if (Boolean.class.getSimpleName().equals(column.getJavaType())) {
             column.setHtmlType(CodegenColumnHtmlTypeEnum.RADIO.getType());
         }
+
+        CodegenServiceImpl.test();
+        // 如果之前已经设置， 那么..
+        if (GenerateSqlUtil.knownDictTypes.containsKey(column.getColumnName())) {
+            column.setHtmlType(CodegenColumnHtmlTypeEnum.SELECT.getType());
+        }
+
         // 兜底，设置默认为 input 类型
         if (column.getHtmlType() == null) {
             column.setHtmlType(CodegenColumnHtmlTypeEnum.INPUT.getType());
         }
+
     }
 
     /**
@@ -185,7 +243,7 @@ public class CodegenBuilder {
         }
         // name
         if (StrUtil.endWithIgnoreCase(column.getJavaField(), "name")) {
-            column.setExample(randomEle(new String[]{"张三", "李四", "王五", "赵六", "芋艿"}));
+            column.setExample(randomEle(new String[]{"张三", "李四", "王五", "赵六", "罗哥"}));
             return;
         }
         // status
@@ -195,7 +253,7 @@ public class CodegenBuilder {
         }
         // url
         if (StrUtil.endWithIgnoreCase(column.getColumnName(), "url")) {
-            column.setExample("https://www.iocoder.cn");
+            column.setExample("https://www.qq.com");
             return;
         }
         // reason

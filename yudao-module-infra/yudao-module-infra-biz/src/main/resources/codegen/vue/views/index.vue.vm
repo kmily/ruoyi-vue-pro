@@ -179,7 +179,7 @@
 </template>
 
 <script>
-import { create${simpleClassName}, update${simpleClassName}, delete${simpleClassName}, get${simpleClassName}, get${simpleClassName}Page, export${simpleClassName}Excel } from "@/api/${table.moduleName}/${classNameVar}";
+import { create, update, del, get, page, exportExcel } from "@/api/${table.moduleName}/${classNameVar}";
 #if ($hasImageUploadColumn)
 import ImageUpload from '@/components/ImageUpload';
 #end
@@ -255,7 +255,7 @@ export default {
     getList() {
       this.loading = true;
       // 执行查询
-      get${simpleClassName}Page(this.queryParams).then(response => {
+      page(this.queryParams).then(response => {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;
@@ -301,7 +301,7 @@ export default {
     handleUpdate(row) {
       this.reset();
       const ${primaryColumn.javaField} = row.${primaryColumn.javaField};
-      get${simpleClassName}(${primaryColumn.javaField}).then(response => {
+      get(${primaryColumn.javaField}).then(response => {
         this.form = response.data;
         #foreach ($column in $columns)
         #if($column.htmlType == "checkbox")## checkbox 特殊处理
@@ -325,7 +325,7 @@ export default {
         #end
         // 修改的提交
         if (this.form.${primaryColumn.javaField} != null) {
-          update${simpleClassName}(this.form).then(response => {
+          update(this.form).then(response => {
             this.#[[$modal]]#.msgSuccess("修改成功");
             this.open = false;
             this.getList();
@@ -333,7 +333,7 @@ export default {
           return;
         }
         // 添加的提交
-        create${simpleClassName}(this.form).then(response => {
+        create(this.form).then(response => {
           this.#[[$modal]]#.msgSuccess("新增成功");
           this.open = false;
           this.getList();
@@ -344,7 +344,7 @@ export default {
     handleDelete(row) {
       const ${primaryColumn.javaField} = row.${primaryColumn.javaField};
       this.#[[$modal]]#.confirm('是否确认删除${table.classComment}编号为"' + ${primaryColumn.javaField} + '"的数据项?').then(function() {
-          return delete${simpleClassName}(${primaryColumn.javaField});
+          return del(${primaryColumn.javaField});
         }).then(() => {
           this.getList();
           this.#[[$modal]]#.msgSuccess("删除成功");
@@ -358,7 +358,7 @@ export default {
       params.pageSize = undefined;
       this.#[[$modal]]#.confirm('是否确认导出所有${table.classComment}数据项?').then(() => {
           this.exportLoading = true;
-          return export${simpleClassName}Excel(params);
+          return exportExcel(params);
         }).then(response => {
           this.#[[$]]#download.excel(response, '${table.classComment}.xls');
           this.exportLoading = false;

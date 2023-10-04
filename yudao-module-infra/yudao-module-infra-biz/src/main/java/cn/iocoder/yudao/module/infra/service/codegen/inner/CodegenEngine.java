@@ -106,7 +106,7 @@ public class CodegenEngine {
             .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/index.vue"),
                     vue3FilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
             .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("views/form.vue"),
-                    vue3FilePath("views/${table.moduleName}/${classNameVar}/${simpleClassName}Form.vue"))
+                    vue3FilePath("views/${table.moduleName}/${classNameVar}/Form.vue"))
             .put(CodegenFrontTypeEnum.VUE3.getType(), vue3TemplatePath("api/api.ts"),
                     vue3FilePath("api/${table.moduleName}/${classNameVar}/index.ts"))
             // Vue3 Schema 模版
@@ -115,7 +115,7 @@ public class CodegenEngine {
             .put(CodegenFrontTypeEnum.VUE3_SCHEMA.getType(), vue3SchemaTemplatePath("views/index.vue"),
                     vue3FilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
             .put(CodegenFrontTypeEnum.VUE3_SCHEMA.getType(), vue3SchemaTemplatePath("views/form.vue"),
-                    vue3FilePath("views/${table.moduleName}/${classNameVar}/${simpleClassName}Form.vue"))
+                    vue3FilePath("views/${table.moduleName}/${classNameVar}/Form.vue"))
             .put(CodegenFrontTypeEnum.VUE3_SCHEMA.getType(), vue3SchemaTemplatePath("api/api.ts"),
                     vue3FilePath("api/${table.moduleName}/${classNameVar}/index.ts"))
             // Vue3 vben 模版
@@ -124,7 +124,7 @@ public class CodegenEngine {
             .put(CodegenFrontTypeEnum.VUE3_VBEN.getType(), vue3VbenTemplatePath("views/index.vue"),
                     vue3FilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN.getType(), vue3VbenTemplatePath("views/form.vue"),
-                    vue3FilePath("views/${table.moduleName}/${classNameVar}/${simpleClassName}Modal.vue"))
+                    vue3FilePath("views/${table.moduleName}/${classNameVar}/Modal.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN.getType(), vue3VbenTemplatePath("api/api.ts"),
                     vue3FilePath("api/${table.moduleName}/${classNameVar}/index.ts"))
             .build();
