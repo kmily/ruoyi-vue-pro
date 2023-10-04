@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.mp.dal.mysql.user;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.mp.controller.admin.user.vo.MpUserPageEnhanceReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.user.vo.MpUserPageReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.user.MpUserDO;
 import org.apache.ibatis.annotations.Mapper;
@@ -17,6 +18,17 @@ public interface MpUserMapper extends BaseMapperX<MpUserDO> {
                 .likeIfPresent(MpUserDO::getOpenid, reqVO.getOpenid())
                 .likeIfPresent(MpUserDO::getNickname, reqVO.getNickname())
                 .eqIfPresent(MpUserDO::getAccountId, reqVO.getAccountId())
+                .orderByDesc(MpUserDO::getId));
+    }
+
+    default PageResult<MpUserDO> selectPageEnhance(MpUserPageEnhanceReqVO pageVO){
+        return selectPage(pageVO, new LambdaQueryWrapperX<MpUserDO>()
+                .likeIfPresent(MpUserDO::getOpenid, pageVO.getOpenid())
+                .likeIfPresent(MpUserDO::getNickname, pageVO.getNickname())
+                .eqIfPresent(MpUserDO::getAccountId, pageVO.getAccountId())
+                .eqIfPresent(MpUserDO::getProvince, pageVO.getProvince())
+                .eqIfPresent(MpUserDO::getCity, pageVO.getCity())
+                .inIfPresent(MpUserDO::getTagIds, pageVO.getTagId())
                 .orderByDesc(MpUserDO::getId));
     }
 

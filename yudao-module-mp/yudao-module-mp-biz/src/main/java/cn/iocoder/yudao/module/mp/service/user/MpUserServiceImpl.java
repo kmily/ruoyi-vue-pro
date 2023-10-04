@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.mp.controller.admin.user.vo.MpUserPageEnhanceReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.user.vo.MpUserPageReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.user.vo.MpUserUpdateReqVO;
 import cn.iocoder.yudao.module.mp.convert.user.MpUserConvert;
@@ -73,6 +74,11 @@ public class MpUserServiceImpl implements MpUserService {
     @Override
     public PageResult<MpUserDO> getUserPage(MpUserPageReqVO pageReqVO) {
         return mpUserMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public PageResult<MpUserDO> getUserPageEnhance(MpUserPageEnhanceReqVO pageVO) {
+        return mpUserMapper.selectPageEnhance(pageVO);
     }
 
     @Override
