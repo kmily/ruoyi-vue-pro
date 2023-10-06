@@ -91,9 +91,10 @@
         </el-row>
       </el-form>
       <div>
-        <div style="padding: 5px 0; border-bottom: 1px solid #b0b0b0; margin-bottom: 10px;color: #666;padding-right: 101px;display: flex;justify-content: space-between;">
+        <div style="padding: 5px 0; border-bottom: 1px solid #b0b0b0; margin-bottom: 10px;color: #666;padding-right: 50px;display: flex;justify-content: space-between;">
           <span style="font-size: 20px; font-weight: bold;">利息总和</span>
-          <span style="margin-left:20px;">{{totalAmount}}</span>
+          <span style="margin-left:20px;padding: 6px;"><template v-if="totalAmount!=null && totalAmount>0">{{totalAmount}}元</template></span>
+          <el-button type="primary" @click="download">下载</el-button>
         </div>
         <el-table v-loading="loading" :data="list" :height="500">
           <el-table-column label="时间段" align="center"  >
@@ -116,7 +117,7 @@
 </template>
 
 <script>
-import { execCalcInterestLxData,execCalcInterestFxData } from "@/api/biz/calcInterestRateData.js";
+import { execCalcInterestLxData, exportExcel } from "@/api/biz/calcInterestRateData.js";
 
 
 export default {
@@ -162,6 +163,9 @@ export default {
 
   },
   methods: {
+    download(){
+      this.exportExcel();
+    },
     count(){
       this.execCalcInterestLxData();
     },
@@ -169,6 +173,14 @@ export default {
       execCalcInterestLxData(this.data).then((res)=>{
         this.list=res.data.sectionList;
         this.totalAmount=res.data.totalAmount;
+      })
+    },
+    exportExcel(){
+      if(this.list==null || this.list.length==0){
+        return
+      }
+      exportExcel(this.list).then((res)=>{
+        this.$download.excel(res, '利率数据.xls');
       })
     },
   }
