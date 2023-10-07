@@ -33,6 +33,7 @@ import javax.validation.Valid;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -85,33 +86,9 @@ public class CalcInterestRateDataController {
     @PostMapping("/excel")
     @PermitAll
     public void downloadExcelFile(HttpServletResponse response, @RequestBody List<SectionIndexVO> sectionList) throws IOException {
-        //设置文件路径
-        try {
-            String filePath = parseExcel(sectionList);
-            InputStream inputStream = new FileInputStream(new File(filePath));
-            try (ServletOutputStream outputStream = response.getOutputStream()) {
-                //设置响应头信息，包括下载后的文件名和编码等
-                response.addHeader("content-disposition", String.format("attachment;filename= %s", URLEncoder.encode("数据.xlsx", "utf-8")));
-                response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-                response.setCharacterEncoding("UTF-8");
-                //在文件夹里获取到文件并转为流
-                byte[] b = IoUtil.readBytes(inputStream);
-                response.getOutputStream().write(b);
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if (inputStream != null) {
-                    try {
-                        inputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
+        List<CalcInterestRateLxDataExcelVO> datas=parseExcel2(sectionList);
+        ExcelUtils.write(response, "数据.xlsx", "数据", CalcInterestRateLxDataExcelVO.class, datas);
 
     }
 
@@ -158,6 +135,27 @@ public class CalcInterestRateDataController {
             }
         }
         return filePath;
+    }
+
+    public List<CalcInterestRateLxDataExcelVO> parseExcel2(List<SectionIndexVO> sectionList) {
+
+        List<CalcInterestRateLxDataExcelVO> list=new ArrayList();
+        //遍历Excel中所有的sheet
+        for (int i = 0; i < sectionList.size(); i++) {
+            SectionIndexVO index = sectionList.get(i);
+            CalcInterestRateLxDataExcelVO cir=new CalcInterestRateLxDataExcelVO();
+            //获取第一列
+            String column1 = index.getStartDate() + "至" + index.getEndDate();
+            cir.setTimeFrame(column1);
+            //获取第二列
+            cir.setDays(index.getDays());
+            //获取第三列
+            cir.setBenchmarkRate(index.getSuiteRate());
+            //获取第四列
+            cir.setAmount(index.getSectionAmount());
+            list.add(cir);
+        }
+        return list;
     }
 
     @PostMapping("/exec/lx")

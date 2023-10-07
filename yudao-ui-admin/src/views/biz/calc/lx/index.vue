@@ -180,7 +180,7 @@ export default {
         return
       }
       exportExcel(this.list).then((res)=>{
-        this.$download.excel(res, '数据.xls');
+        this.$download.excel(res, '数据.xlsx');
       })
     },
   }
