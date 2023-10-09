@@ -8,7 +8,7 @@
   </Dialog>
 </template>
 <script setup lang="ts">
-  import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${classNameVar}'
+  import * as Api from '@/api/${table.moduleName}/${classNameVar}'
 import { rules, allSchemas } from './${classNameVar}.data'
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
@@ -28,7 +28,7 @@ const open = async (type: string, id?: number) => {
   if (id) {
     formLoading.value = true
     try {
-      const data = await ${simpleClassName}Api.get${simpleClassName}(id)
+      const data = await Api.get(id)
       formRef.value.setValues(data)
     } finally {
       formLoading.value = false
@@ -47,12 +47,12 @@ const submitForm = async () => {
   // 提交请求
   formLoading.value = true
   try {
-    const data = formRef.value.formModel as ${simpleClassName}Api.${simpleClassName}VO
+    const data = formRef.value.formModel as Api.VO
     if (formType.value === 'create') {
-      await ${simpleClassName}Api.create${simpleClassName}(data)
+      await Api.create(data)
       message.success(t('common.createSuccess'))
     } else {
-      await ${simpleClassName}Api.update${simpleClassName}(data)
+      await Api.update(data)
       message.success(t('common.updateSuccess'))
     }
     dialogVisible.value = false

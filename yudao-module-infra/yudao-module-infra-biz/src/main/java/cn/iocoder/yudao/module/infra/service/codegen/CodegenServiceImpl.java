@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.infra.service.codegen;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenCreateListReqVO;
@@ -13,6 +15,7 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.codegen.CodegenColumnMapper;
 import cn.iocoder.yudao.module.infra.dal.mysql.codegen.CodegenTableMapper;
+import cn.iocoder.yudao.module.infra.enums.codegen.CodegenColumnHtmlTypeEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
 import cn.iocoder.yudao.module.infra.framework.codegen.config.CodegenProperties;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenBuilder;
@@ -21,6 +24,9 @@ import cn.iocoder.yudao.module.infra.service.db.DatabaseTableService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.baomidou.mybatisplus.generator.config.po.TableField;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
+import com.testlk.util.GenerateSqlUtil;
+import com.testlk.util.TransApi;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,11 +68,14 @@ public class CodegenServiceImpl implements CodegenService {
     @Resource
     private CodegenProperties codegenProperties;
 
+    public boolean devEnv = true;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<Long> createCodegenList(Long userId, CodegenCreateListReqVO reqVO) {
         List<Long> ids = new ArrayList<>(reqVO.getTableNames().size());
         // 遍历添加。虽然效率会低一点，但是没必要做成完全批量，因为不会这么大量
+        // todo  数据多的时候，太慢了。。
         reqVO.getTableNames().forEach(tableName -> ids.add(createCodegen(userId, reqVO.getDataSourceConfigId(), tableName)));
         return ids;
     }
@@ -84,7 +93,11 @@ public class CodegenServiceImpl implements CodegenService {
         // 校验是否已经存在
         if (codegenTableMapper.selectByTableNameAndDataSourceConfigId(tableInfo.getName(),
                 dataSourceConfigId) != null) {
-            throw exception(CODEGEN_TABLE_EXISTS);
+                if (devEnv) {
+                    return -1L;
+                } else {
+                    throw exception(CODEGEN_TABLE_EXISTS);
+                }
         }
 
         // 构建 CodegenTableDO 对象，插入到 DB 中
@@ -101,6 +114,24 @@ public class CodegenServiceImpl implements CodegenService {
         if (!tableInfo.isHavePrimaryKey()) {
             columns.get(0).setPrimaryKey(true);
         }
+
+        for (int i = 0; i < columns.size(); i++) {
+            CodegenColumnDO column =  columns.get(i);
+            String columnComment = column.getColumnComment().trim();
+            String[] columnCommentArr = columnComment.split("\\|\\|\\|");
+            if (columnCommentArr.length > 1) {
+                columnComment = columnCommentArr[0];
+                String example = columnCommentArr[1];
+                // 短波超短波微波通信设备（部） 为什么 变成了空格？ 没有了名称 ？
+//                String example2 = example.split("\\(|（|,|，| ")[0];
+                column.setColumnComment(columnComment);
+                column.setExample(example);
+            } else {
+                column.setColumnComment(columnComment);
+            }
+        }
+        List<String> ret = setDictType(columns);
+
         codegenColumnMapper.insertBatch(columns);
         return table.getId();
     }
@@ -135,6 +166,9 @@ public class CodegenServiceImpl implements CodegenService {
         codegenTableMapper.updateById(updateTableObj);
         // 更新 column 字段定义
         List<CodegenColumnDO> updateColumnObjs = CodegenConvert.INSTANCE.convertList03(updateReqVO.getColumns());
+
+//        List<String> ret = setDictType(updateColumnObjs);
+
         updateColumnObjs.forEach(updateColumnObj -> codegenColumnMapper.updateById(updateColumnObj));
     }
 
@@ -248,6 +282,143 @@ public class CodegenServiceImpl implements CodegenService {
                 codegenTableMapper.selectListByDataSourceConfigId(dataSourceConfigId), CodegenTableDO::getTableName);
         tables.removeIf(table -> existsTables.contains(table.getName()));
         return CodegenConvert.INSTANCE.convertList04(tables);
+    }
+
+
+    @Override
+    public List<String> genDict(Long tableId) {
+        // 校验是否已经存在
+        CodegenTableDO table = codegenTableMapper.selectById(tableId);
+        if (table == null) {
+            throw exception(CODEGEN_TABLE_NOT_EXISTS);
+        }
+        List<CodegenColumnDO> columns = codegenColumnMapper.selectListByTableId(tableId);
+        List<String> ret = setDictType(columns);
+        return ret;
+    }
+
+    /**
+     * 设置字段展示的需要的数据字典
+     * @param columns
+     * @return
+     */
+    @NotNull
+    private List<String> setDictType(List<CodegenColumnDO> columns) {
+        if (CollUtil.isEmpty(columns)) {
+            throw exception(CODEGEN_COLUMN_NOT_EXISTS);
+        }
+        List<String> ret = new ArrayList<>();
+        for (int i = 0; i < columns.size(); i++) {
+            CodegenColumnDO codegenColumnDO = columns.get(i);
+            String dictType = codegenColumnDO.getDictType();
+//            if (dictType == null) { // 如果之前已经设置过一次， 这里不需要再次设置。
+            if (1 == 1) { // 如果之前已经设置过一次， 这里不需要再次设置。
+                String htmlType = codegenColumnDO.getHtmlType();
+                if (CodegenColumnHtmlTypeEnum.valueOf(htmlType.toUpperCase()).equals(CodegenColumnHtmlTypeEnum.SELECT)
+                || CodegenColumnHtmlTypeEnum.valueOf(htmlType.toUpperCase()).equals(CodegenColumnHtmlTypeEnum.RADIO)
+                || CodegenColumnHtmlTypeEnum.valueOf(htmlType.toUpperCase()).equals(CodegenColumnHtmlTypeEnum.CHECKBOX)) {
+                    String columnComment = codegenColumnDO.getColumnComment();
+                    String[] fieldAndComments = columnComment.split("\\|\\|\\|");
+                    String columnName = codegenColumnDO.getColumnName();
+                    if (GenerateSqlUtil.knownDictTypes.containsKey(columnName) ) {
+                        codegenColumnDO.setDictType(GenerateSqlUtil.knownDictTypes.getProperty(columnName));
+                    } else if ( GenerateSqlUtil.knownDictTypes.containsKey(fieldAndComments[0])) {
+                        codegenColumnDO.setDictType(GenerateSqlUtil.knownDictTypes.getProperty(fieldAndComments[0]));
+                    } else {
+                        String transRetHead = "yj_tmp";
+                        String fieldName = fieldAndComments[0];
+                        // String transRetHead = Chinese2VariableNameUtil.hanzi2FiledName(fieldName);
+                        if (fieldAndComments.length > 1) {
+                            String commentArr = fieldAndComments[1].replaceAll("\\s+", "");
+                            String[] options = commentArr.split("☑|□");
+                            if (options.length <= 1) {
+                                System.out.println("非选择项， 不需要数据字典 = " + commentArr);
+                            } else {
+                                String comment__ = commentArr.replaceAll("☑|□", "__").trim();
+                                if (GenerateSqlUtil.knownDictDatas.containsKey(comment__)) {
+                                    transRetHead = GenerateSqlUtil.knownDictDatas.getProperty(comment__);
+                                }
+                            }
+                        }
+                        codegenColumnDO.setDictType(transRetHead);
+                    }
+//                    String[] split = columnComment.split("|||");
+//                    if (split.length == 2) {
+//                        String comment = split[1];
+//                        String[] options = comment.split("☑|□");
+//                        if (options.length > 1) {
+//                            for (int j = 0; j < options.length; j++) {
+//                                String option = options[j];
+//                                int i1 = option.indexOf("(");
+//                                if (i1 < 0) {
+//                                    i1 = option.indexOf("（");
+//                                    if (i1 < 0) {
+//                                        option = option.substring(0, i1).trim();
+//                                        String transRet = trans(option);
+//                                        String insertTypeSql = "insert into system_dict_type values()";
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+                }
+                String dataType = codegenColumnDO.getDataType();
+
+            }
+        }
+        return ret;
+    }
+
+
+    static {
+        GenerateSqlUtil.knownDictDatas.put("__是__否", "infra_boolean_string");
+        GenerateSqlUtil.knownDictTypes.put("数据状态", "data_status");
+        GenerateSqlUtil.knownDictTypes.put("审核状态", "audit_status");
+        GenerateSqlUtil.knownDictTypes.put("audit_ret", "audit_status");
+        GenerateSqlUtil.knownDictTypes.put("data_source", "data_source");
+        GenerateSqlUtil.knownDictTypes.put("status", "biz_status");
+        GenerateSqlUtil.knownDictTypes.put("tmp", "yj_tmp");
+    }
+
+    public static void test() {
+        // System.out.println("CodegenServiceImpl.test");
+    }
+
+    // 重复： 	disaster_relief_tentsd varchar(256) CHARACTER SET utf8mb4  NOT NULL  COMMENT '救灾帐篷',
+    private static String trans(String chinese) {
+        if (StrUtil.isEmpty(chinese)) {
+            return "";
+        }
+        String dst = "err";
+        try {
+            if (chinese.startsWith("若有，") || chinese.startsWith("若有、")) {
+                chinese = chinese.substring(3, chinese.length());
+            } else if (chinese.startsWith("有限公司")) {
+                chinese = chinese.substring(0, chinese.length() - 4);
+            }
+            String transResult = TransApi.getInstance().getTransResult(chinese, "zh", "en");
+            JSONObject jsonObject = new JSONObject(transResult);
+//                System.out.println("jsonObject = " + jsonObject);
+            JSONArray trans_result = jsonObject.getJSONArray("trans_result");
+            JSONObject o = trans_result.getJSONObject(0);
+//                System.out.println("o = " + o);
+            dst = o.getStr("dst");
+//                dst = dst.toLowerCase();
+//                dst2 = dst.replaceAll(" +", "_");
+        } catch (Exception e) {
+//            throw new RuntimeException(e);
+            e.printStackTrace();
+        }
+        // 	previous_year's_income_and_expenditure_situation varchar(256) CHARACTER SET utf8mb4  NOT NULL  COMMENT '六、上一年度收支情况|||',
+        //
+        dst = dst.replaceAll("-", "_");
+        dst = dst.replaceAll("'s", "_");
+        dst = dst.replaceAll("'\\.", "");
+        dst = dst.replaceAll("'\\d+、", "");
+        dst = dst.replaceAll("'\\d+\\.", "");
+        dst = dst.replaceAll("'\\d+,", "");
+        dst = dst.replaceAll("'\\d+ ", "");
+        return dst;
     }
 
 }

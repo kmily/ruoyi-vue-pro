@@ -91,4 +91,5 @@ public interface CodegenService {
      */
     List<DatabaseTableRespVO> getDatabaseTableList(Long dataSourceConfigId, String name, String comment);
 
+    List<String> genDict(Long tableId);
 }

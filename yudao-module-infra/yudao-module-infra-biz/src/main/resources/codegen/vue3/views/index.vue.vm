@@ -15,8 +15,9 @@
             #set ($javaField = $column.javaField)
             #set ($javaType = $column.javaType)
             #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+            #set ($label = $column.columnComment.split("[(（,，\s]")[0])
             #set ($comment = $column.columnComment)
-            #set ($dictMethod = "getDictOptions")## 计算使用哪个 dict 字典方法
+          #set ($dictMethod = "getDictOptions")## 计算使用哪个 dict 字典方法
             #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
                 #set ($dictMethod = "getIntDictOptions")
             #elseif ($javaType == "String")
@@ -25,7 +26,7 @@
                 #set ($dictMethod = "getBoolDictOptions")
             #end
             #if ($column.htmlType == "input")
-      <el-form-item label="${comment}" prop="${javaField}">
+      <el-form-item label="${label}" prop="${javaField}">
         <el-input
           v-model="queryParams.${javaField}"
           placeholder="请输入${comment}"
@@ -35,7 +36,7 @@
         />
       </el-form-item>
             #elseif ($column.htmlType == "select" || $column.htmlType == "radio")
-      <el-form-item label="${comment}" prop="${javaField}">
+      <el-form-item label="${label}" prop="${javaField}">
                 #if ($javaField.length() + $comment.length() > 8)
         <el-select
           v-model="queryParams.${javaField}"
@@ -63,7 +64,7 @@
       </el-form-item>
     #elseif($column.htmlType == "datetime")
       #if ($column.listOperationCondition != "BETWEEN")## 非范围
-      <el-form-item label="${comment}" prop="${javaField}">
+      <el-form-item label="${label}" prop="${javaField}">
         <el-date-picker
           v-model="queryParams.${javaField}"
           value-format="YYYY-MM-DD"
@@ -74,7 +75,7 @@
         />
       </el-form-item>
       #else## 范围
-      <el-form-item label="${comment}" prop="${javaField}">
+      <el-form-item label="${label}" prop="${javaField}">
         <el-date-picker
           v-model="queryParams.${javaField}"
           value-format="YYYY-MM-DD HH:mm:ss"
@@ -126,22 +127,23 @@
         #set ($javaField = $column.javaField)
         #set ($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
         #set ($comment=$column.columnComment)
+        #set ($label = $column.columnComment.split("[(（,，\s]")[0])
         #if ($column.javaType == "LocalDateTime")## 时间类型
       <el-table-column
-        label="${comment}"
+        label="${label}"
         align="center"
         prop="${javaField}"
         :formatter="dateFormatter"
         width="150px"
       />
         #elseif("" != $column.dictType)## 数据字典
-      <el-table-column label="${comment}" align="center" prop="${javaField}" width="150px">
+      <el-table-column label="${label}" align="center" prop="${javaField}" width="150px">
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="scope.row.${column.javaField}" />
         </template>
       </el-table-column>
         #else
-      <el-table-column label="${comment}" align="center" prop="${javaField}" width="150px" />
+      <el-table-column label="${label}" align="center" prop="${javaField}" width="150px" />
         #end
       #end
     #end
@@ -176,7 +178,7 @@
   </ContentWrap>
 
   <!-- 表单弹窗：添加/修改 -->
-  <${simpleClassName}Form ref="formRef" @success="getList" />
+  <Form ref="formRef" @success="getList" />
 </template>
 
 <script setup lang="ts">
@@ -190,8 +192,8 @@ import { dateFormatter } from '@/utils/formatTime'
     #end
 #end
 import download from '@/utils/download'
-import * as ${simpleClassName}Api from '@/api/${table.moduleName}/${classNameVar}'
-import ${simpleClassName}Form from './${simpleClassName}Form.vue'
+import * as Api from '@/api/${table.moduleName}/${classNameVar}'
+import Form from './Form.vue'
 
 defineOptions({ name: '${table.className}' })
 
@@ -228,7 +230,7 @@ const exportLoading = ref(false) // 导出的加载中
 const getList = async () => {
   loading.value = true
   try {
-    const data = await ${simpleClassName}Api.get${simpleClassName}Page(queryParams)
+    const data = await Api.page(queryParams)
     list.value = data.list
     total.value = data.total
   } finally {
@@ -260,7 +262,7 @@ const handleDelete = async (id: number) => {
     // 删除的二次确认
     await message.delConfirm()
     // 发起删除
-    await ${simpleClassName}Api.delete${simpleClassName}(id)
+    await Api.del(id)
     message.success(t('common.delSuccess'))
     // 刷新列表
     await getList()
@@ -274,7 +276,7 @@ const handleExport = async () => {
     await message.exportConfirm()
     // 发起导出
     exportLoading.value = true
-    const data = await ${simpleClassName}Api.export${simpleClassName}(queryParams)
+    const data = await Api.exportExcel(queryParams)
     download.excel(data, '${table.classComment}.xls')
   } catch {
   } finally {

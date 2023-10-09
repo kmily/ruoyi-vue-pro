@@ -117,6 +117,8 @@ public class CodegenColumnDO extends BaseDO {
     private Boolean updateOperation;
     /**
      * 是否为 List 查询操作的字段
+     *
+     * listOperation 命名不太好， 实际意为查询条件，所以不如改为 queryOperation 、 searchOperation
      */
     private Boolean listOperation;
     /**
@@ -129,6 +131,16 @@ public class CodegenColumnDO extends BaseDO {
      * 是否为 List 查询操作的返回字段
      */
     private Boolean listOperationResult;
+
+    /**
+     * 是否为 Excel导入字段
+     */
+    private Boolean importExcelOperation;
+
+    /**
+     * 是否为 Excel导出字段
+     */
+    private Boolean exportExcelOperation;
 
     // ========== UI 相关字段 ==========
 

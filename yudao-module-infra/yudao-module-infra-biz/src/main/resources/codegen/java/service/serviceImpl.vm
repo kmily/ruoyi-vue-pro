@@ -25,58 +25,58 @@ import static ${basePackage}.module.${table.moduleName}.enums.ErrorCodeConstants
 public class ${table.className}ServiceImpl implements ${table.className}Service {
 
     @Resource
-    private ${table.className}Mapper ${classNameVar}Mapper;
+    private ${table.className}Mapper mapper;
 
     @Override
-    public ${primaryColumn.javaType} create${simpleClassName}(${sceneEnum.prefixClass}${table.className}CreateReqVO createReqVO) {
+    public ${primaryColumn.javaType} create(${sceneEnum.prefixClass}${table.className}CreateReqVO createReqVO) {
         // 插入
         ${table.className}DO ${classNameVar} = ${table.className}Convert.INSTANCE.convert(createReqVO);
-        ${classNameVar}Mapper.insert(${classNameVar});
+        mapper.insert(${classNameVar});
         // 返回
         return ${classNameVar}.getId();
     }
 
     @Override
-    public void update${simpleClassName}(${sceneEnum.prefixClass}${table.className}UpdateReqVO updateReqVO) {
+    public void update(${sceneEnum.prefixClass}${table.className}UpdateReqVO updateReqVO) {
         // 校验存在
-        validate${simpleClassName}Exists(updateReqVO.getId());
+        validateExists(updateReqVO.getId());
         // 更新
         ${table.className}DO updateObj = ${table.className}Convert.INSTANCE.convert(updateReqVO);
-        ${classNameVar}Mapper.updateById(updateObj);
+        mapper.updateById(updateObj);
     }
 
     @Override
-    public void delete${simpleClassName}(${primaryColumn.javaType} id) {
+    public void delete(${primaryColumn.javaType} id) {
         // 校验存在
-        validate${simpleClassName}Exists(id);
+        validateExists(id);
         // 删除
-        ${classNameVar}Mapper.deleteById(id);
+        mapper.deleteById(id);
     }
 
-    private void validate${simpleClassName}Exists(${primaryColumn.javaType} id) {
-        if (${classNameVar}Mapper.selectById(id) == null) {
+    private void validateExists(${primaryColumn.javaType} id) {
+        if (mapper.selectById(id) == null) {
             throw exception(${simpleClassName_underlineCase.toUpperCase()}_NOT_EXISTS);
         }
     }
 
     @Override
-    public ${table.className}DO get${simpleClassName}(${primaryColumn.javaType} id) {
-        return ${classNameVar}Mapper.selectById(id);
+    public ${table.className}DO get(${primaryColumn.javaType} id) {
+        return mapper.selectById(id);
     }
 
     @Override
-    public List<${table.className}DO> get${simpleClassName}List(Collection<${primaryColumn.javaType}> ids) {
-        return ${classNameVar}Mapper.selectBatchIds(ids);
+    public List<${table.className}DO> getList(Collection<${primaryColumn.javaType}> ids) {
+        return mapper.selectBatchIds(ids);
     }
 
     @Override
-    public PageResult<${table.className}DO> get${simpleClassName}Page(${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO) {
-        return ${classNameVar}Mapper.selectPage(pageReqVO);
+    public PageResult<${table.className}DO> getPage(${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO) {
+        return mapper.selectPage(pageReqVO);
     }
 
     @Override
-    public List<${table.className}DO> get${simpleClassName}List(${sceneEnum.prefixClass}${table.className}ExportReqVO exportReqVO) {
-        return ${classNameVar}Mapper.selectList(exportReqVO);
+    public List<${table.className}DO> getList(${sceneEnum.prefixClass}${table.className}ExportReqVO exportReqVO) {
+        return mapper.selectList(exportReqVO);
     }
 
 }
