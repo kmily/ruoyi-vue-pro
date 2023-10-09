@@ -5,7 +5,10 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.token.OAuth2AccessTokenPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,4 +33,11 @@ public interface OAuth2AccessTokenMapper extends BaseMapperX<OAuth2AccessTokenDO
                 .orderByDesc(OAuth2AccessTokenDO::getId));
     }
 
+    default void deleteByUserId(Long userId) {
+        delete(Wrappers.lambdaUpdate(OAuth2AccessTokenDO.class).eq(OAuth2AccessTokenDO::getUserId, userId));
+    }
+
+    default List<OAuth2AccessTokenDO> selectListByUserId(Long userId) {
+        return selectList(OAuth2AccessTokenDO::getAccessToken, userId);
+    }
 }

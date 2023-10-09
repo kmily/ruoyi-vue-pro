@@ -5,7 +5,9 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
+import cn.iocoder.yudao.framework.security.config.SecurityProperties;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.token.OAuth2AccessTokenPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
@@ -19,8 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.Calendar;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -43,6 +45,9 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
 
     @Resource
     private OAuth2ClientService oauth2ClientService;
+
+    @Resource
+    private SecurityProperties securityProperties;
 
     @Override
     @Transactional
@@ -134,6 +139,10 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
     }
 
     private OAuth2AccessTokenDO createOAuth2AccessToken(OAuth2RefreshTokenDO refreshTokenDO, OAuth2ClientDO clientDO) {
+        //根据用户类型判断是否允许多设备登录 如果是 则清理掉该账号之前生成的token
+        if (!securityProperties.getMultipleDeviceLogin().contains(refreshTokenDO.getUserType())) {
+            removeByUser(refreshTokenDO.getUserId());
+        }
         OAuth2AccessTokenDO accessTokenDO = new OAuth2AccessTokenDO().setAccessToken(generateAccessToken())
                 .setUserId(refreshTokenDO.getUserId()).setUserType(refreshTokenDO.getUserType())
                 .setClientId(clientDO.getClientId()).setScopes(refreshTokenDO.getScopes())
@@ -163,4 +172,14 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
         return IdUtil.fastSimpleUUID();
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void removeByUser(Long id) {
+        List<OAuth2AccessTokenDO> oAuth2AccessTokenDOList = oauth2AccessTokenMapper.selectListByUserId(id);
+        if (!CollectionUtils.isAnyEmpty(oAuth2AccessTokenDOList)) {
+            oauth2AccessTokenRedisDAO.deleteList(oAuth2AccessTokenDOList.stream().map(OAuth2AccessTokenDO::getAccessToken).collect(Collectors.toList()));
+        }
+        oauth2AccessTokenMapper.deleteByUserId(id);
+        oauth2RefreshTokenMapper.deleteByUserId(id);
+    }
 }
