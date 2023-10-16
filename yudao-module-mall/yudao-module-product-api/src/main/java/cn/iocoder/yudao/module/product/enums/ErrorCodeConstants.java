@@ -52,4 +52,7 @@ public interface ErrorCodeConstants {
     ErrorCode FAVORITE_EXISTS = new ErrorCode(1_008_008_000, "该商品已经被收藏");
     ErrorCode FAVORITE_NOT_EXISTS = new ErrorCode(1_008_008_001, "商品收藏不存在");
 
+    // ========== 计量 单位 1-008-009-000 ==========
+    ErrorCode UNIT_NOT_EXISTS = new ErrorCode(1_008_009_000, "计量单位不存在");
+
 }

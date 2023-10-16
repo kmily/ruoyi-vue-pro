@@ -196,6 +196,7 @@ export default {
       })
     },
     toLastView(visitedViews, view) {
+      debugger
       const latestView = visitedViews.slice(-1)[0]
       if (latestView) {
         this.$router.push(latestView.fullPath)

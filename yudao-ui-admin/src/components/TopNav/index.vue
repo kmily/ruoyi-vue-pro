@@ -3,10 +3,14 @@
     :default-active="activeMenu"
     mode="horizontal"
     @select="handleSelect"
+    background-color="#4E9FD5"
+    text-color="#FFF"
+    active-text-color="#FFFFff"
+    id="top-menu"
   >
     <template v-for="(item, index) in topMenus">
       <el-menu-item :style="{'--theme': theme}" :index="item.path" :key="index" v-if="index < visibleNumber">
-        <svg-icon :icon-class="item.meta.icon"/>
+        <!-- <svg-icon :icon-class="item.meta.icon"/> -->
         {{ item.meta.title }}
       </el-menu-item>
     </template>
@@ -20,7 +24,7 @@
           :key="index"
           v-if="index >= visibleNumber"
         >
-          <svg-icon :icon-class="item.meta.icon"/>
+          <!-- <svg-icon :icon-class="item.meta.icon"/> -->
           {{ item.meta.title }}
         </el-menu-item>
       </template>
@@ -38,7 +42,7 @@ export default {
   data() {
     return {
       // 顶部栏初始数
-      visibleNumber: 5,
+      visibleNumber: 8,
       // 当前激活菜单的 index
       currentIndex: undefined
     };
@@ -166,13 +170,13 @@ export default {
   float: left;
   height: 50px !important;
   line-height: 50px !important;
-  color: #999093 !important;
+  color: #FFF ;
   padding: 0 5px !important;
   margin: 0 10px !important;
 }
 
 .topmenu-container.el-menu--horizontal > .el-menu-item.is-active, .el-menu--horizontal > .el-submenu.is-active .el-submenu__title {
-  border-bottom: 2px solid #{'var(--theme)'} !important;
+  border-bottom: 2px solid #{'var(--theme)'};
   color: #303133;
 }
 
@@ -181,8 +185,14 @@ export default {
   float: left;
   height: 50px !important;
   line-height: 50px !important;
-  color: #999093 !important;
+  color: #FFF;
   padding: 0 5px !important;
   margin: 0 10px !important;
 }
+
+.topmenu-container > .el-menu-item.is-active{
+  background-color: #3FB2FF!important;
+  border-bottom-color: #3FB2FF!important;
+}
+
 </style>
