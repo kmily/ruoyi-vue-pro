@@ -2,12 +2,12 @@
   <div class="app-container">
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="系统模块" prop="title">
-        <el-input v-model="queryParams.title" placeholder="请输入系统模块" clearable style="width: 240px;"
+      <el-form-item label="系统模块" prop="module">
+        <el-input v-model="queryParams.module" placeholder="请输入系统模块" clearable style="width: 240px;"
                   @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="操作人员" prop="operName">
-        <el-input v-model="queryParams.operName" placeholder="请输入操作人员" clearable style="width: 240px;"
+      <el-form-item label="操作人员" prop="userNickname">
+        <el-input v-model="queryParams.userNickname" placeholder="请输入操作人员" clearable style="width: 240px;"
                   @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="类型" prop="type">
@@ -153,8 +153,8 @@ export default {
       queryParams: {
         pageNo: 1,
         pageSize: 10,
-        title: undefined,
-        operName: undefined,
+        module: undefined,
+        userNickname: undefined,
         businessType: undefined,
         status: undefined,
         startTime: []
