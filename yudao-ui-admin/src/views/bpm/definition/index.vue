@@ -1,6 +1,5 @@
 <template>
   <div class="app-container">
-    <doc-alert title="工作流" url="https://doc.iocoder.cn/bpm" />
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">

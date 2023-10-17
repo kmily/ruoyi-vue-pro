@@ -11,10 +11,12 @@ import cn.iocoder.yudao.module.product.service.category.ProductCategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.checkerframework.checker.initialization.qual.Initialized;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.Comparator;
@@ -72,5 +74,14 @@ public class ProductCategoryController {
         list.sort(Comparator.comparing(ProductCategoryDO::getSort));
         return success(ProductCategoryConvert.INSTANCE.convertList(list));
     }
+
+
+    @PostConstruct
+    public void init(){
+
+        System.out.println("====我被创建了");
+
+    }
+
 
 }

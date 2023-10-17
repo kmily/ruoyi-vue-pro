@@ -5,7 +5,7 @@
       <el-menu
         :default-active="activeMenu"
         :collapse="isCollapse"
-        :background-color="settings.sideTheme === 'theme-dark' ? variables.menuBackground : variables.menuLightBackground"
+        :background-color="settings.sideTheme === 'theme-dark' ? variables.menuBackground : '#EBEDF4'"
         :text-color="settings.sideTheme === 'theme-dark' ? variables.menuColor : variables.menuLightColor"
         :unique-opened="true"
         :active-text-color="settings.theme"
@@ -56,3 +56,4 @@ export default {
   }
 };
 </script>
+

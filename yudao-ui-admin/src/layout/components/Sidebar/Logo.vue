@@ -1,5 +1,5 @@
 <template>
-  <div class="sidebar-logo-container" :class="{'collapse':collapse}" :style="{ backgroundColor: sideTheme === 'theme-dark' ? variables.menuBackground : variables.menuLightBackground }">
+  <div class="sidebar-logo-container" :class="{'collapse':collapse}" :style="{ backgroundColor: sideTheme === 'theme-dark' ? variables.menuBackground : variables.logoBackground }">
     <transition name="sidebarLogoFade">
       <router-link v-if="collapse" key="collapse" class="sidebar-logo-link" to="/">
         <img v-if="logo" :src="logo" class="sidebar-logo" />
@@ -35,8 +35,8 @@ export default {
   },
   data() {
     return {
-      title: '芋道管理系统',
-      logo: logoImg
+      title: '上门护理平台',
+      logo: null
     }
   }
 }

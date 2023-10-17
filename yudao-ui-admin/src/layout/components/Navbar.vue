@@ -1,6 +1,6 @@
 <template>
   <div class="navbar">
-    <hamburger id="hamburger-container" :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
+    <!-- <hamburger id="hamburger-container" :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" /> -->
 
     <breadcrumb id="breadcrumb-container" class="breadcrumb-container" v-if="!topNav"/>
     <top-nav id="topmenu-container" class="topmenu-container" v-if="topNav"/>
@@ -12,7 +12,7 @@
         <!-- 站内信 -->
         <notify-message class="right-menu-item hover-effect" />
 
-        <el-tooltip content="源码地址" effect="dark" placement="bottom">
+        <!-- <el-tooltip content="源码地址" effect="dark" placement="bottom">
           <ruo-yi-git id="ruoyi-git" class="right-menu-item hover-effect" />
         </el-tooltip>
 
@@ -24,7 +24,7 @@
 
         <el-tooltip content="布局大小" effect="dark" placement="bottom">
           <size-select id="size-select" class="right-menu-item hover-effect" />
-        </el-tooltip>
+        </el-tooltip> -->
 
       </template>
 
@@ -38,9 +38,9 @@
           <router-link to="/user/profile">
             <el-dropdown-item>个人中心</el-dropdown-item>
           </router-link>
-          <el-dropdown-item @click.native="setting = true">
+          <!-- <el-dropdown-item @click.native="setting = true">
             <span>布局设置</span>
-          </el-dropdown-item>
+          </el-dropdown-item> -->
           <el-dropdown-item divided @click.native="logout">
             <span>退出登录</span>
           </el-dropdown-item>
@@ -119,7 +119,7 @@ export default {
   height: 50px;
   overflow: hidden;
   position: relative;
-  background: #fff;
+  background: #4E9FD5;
   box-shadow: 0 1px 4px rgba(0,21,41,.08);
 
   .hamburger-container {
@@ -153,7 +153,6 @@ export default {
     float: right;
     height: 100%;
     line-height: 50px;
-
     &:focus {
       outline: none;
     }
@@ -163,7 +162,7 @@ export default {
       padding: 0 8px;
       height: 100%;
       font-size: 18px;
-      color: #5a5e66;
+      color: #FFF;
       vertical-align: text-bottom;
 
       &.hover-effect {
