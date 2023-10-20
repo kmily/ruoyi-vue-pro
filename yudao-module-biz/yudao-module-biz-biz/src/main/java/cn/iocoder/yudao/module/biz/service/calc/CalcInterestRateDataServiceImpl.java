@@ -101,11 +101,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
                 //超过1000万元的部分
                 level = 5;
             }
-            if (level >= 1 && execVO.getTotalAmount().compareTo(new BigDecimal("50")) < 0) {
-                //执行金额或者价额不超过1万元的，每件交纳50元；
-                zxfAmount = zxfAmount.add(execVO.getTotalAmount());
-            }
-            if (level >= 1 && execVO.getTotalAmount().compareTo(new BigDecimal("50")) >= 0) {
+            if (level >= 1 ) {
                 //执行金额或者价额不超过1万元的，每件交纳50元；
                 zxfAmount = zxfAmount.add(new BigDecimal("50"));
             }
@@ -142,7 +138,7 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
             //第一梯队的
             if (execVO.getTotalAmount() != null && execVO.getTotalAmount().compareTo(new BigDecimal("50")) < 0) {
                 //执行金额或者价额不超过1万元的，每件交纳50元
-                zxfAmount = new BigDecimal("50");
+                zxfAmount = execVO.getTotalAmount();
                 leftAmount = BigDecimal.ZERO;
             }
             if (execVO.getTotalAmount() != null && execVO.getTotalAmount().compareTo(leve1) <= 0 && execVO.getTotalAmount().compareTo(new BigDecimal("50")) >= 0) {
