@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.biz.controller.admin.calc.dto.ExecProcessDataDTO;
 import cn.iocoder.yudao.module.biz.controller.admin.calc.dto.MonthInfoDTO;
 import cn.iocoder.yudao.module.biz.controller.admin.calc.dto.YearInfoDTO;
+import cn.iocoder.yudao.module.biz.controller.admin.calc.util.IpUtil;
 import cn.iocoder.yudao.module.biz.controller.admin.calc.vo.*;
 import cn.iocoder.yudao.module.biz.convert.calc.CalcInterestRateDataConvert;
 import cn.iocoder.yudao.module.biz.dal.dataobject.calc.CalcInterestRateDataDO;
@@ -100,7 +101,11 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
                 //超过1000万元的部分
                 level = 5;
             }
-            if (level >= 1) {
+            if (level >= 1 && execVO.getTotalAmount().compareTo(new BigDecimal("50")) < 0) {
+                //执行金额或者价额不超过1万元的，每件交纳50元；
+                zxfAmount = zxfAmount.add(execVO.getTotalAmount());
+            }
+            if (level >= 1 && execVO.getTotalAmount().compareTo(new BigDecimal("50")) >= 0) {
                 //执行金额或者价额不超过1万元的，每件交纳50元；
                 zxfAmount = zxfAmount.add(new BigDecimal("50"));
             }
@@ -135,7 +140,12 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
             BigDecimal leve4 = new BigDecimal("10077400");
             //计算总执行费，即计算zxfAmount和leftAmount
             //第一梯队的
-            if (execVO.getTotalAmount() == null || execVO.getTotalAmount().compareTo(leve1) <= 0) {
+            if (execVO.getTotalAmount() != null && execVO.getTotalAmount().compareTo(new BigDecimal("50")) < 0) {
+                //执行金额或者价额不超过1万元的，每件交纳50元
+                zxfAmount = new BigDecimal("50");
+                leftAmount = BigDecimal.ZERO;
+            }
+            if (execVO.getTotalAmount() != null && execVO.getTotalAmount().compareTo(leve1) <= 0 && execVO.getTotalAmount().compareTo(new BigDecimal("50")) >= 0) {
                 //执行金额或者价额不超过1万元的，每件交纳50元
                 zxfAmount = new BigDecimal("50");
                 leftAmount = execVO.getTotalAmount().subtract(zxfAmount);
@@ -558,18 +568,27 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
 
     private void insertDataList(List<ExecProcessDataDTO> dataList) {
         if (!CollectionUtils.isEmpty(dataList)) {
+            for (ExecProcessDataDTO index : dataList) {
+                index.setIp(IpUtil.getHostIp());
+            }
             calcInterestRateDataMapper.insertExecProcessDataBatch(dataList);
         }
     }
 
     private void insertDataListMonth(List<ExecProcessDataDTO> dataList) {
         if (!CollectionUtils.isEmpty(dataList)) {
+            for (ExecProcessDataDTO index : dataList) {
+                index.setIp(IpUtil.getHostIp());
+            }
             calcInterestRateDataMapper.insertExecProcessDataMonthBatch(dataList);
         }
     }
 
     private void insertDataListYear(List<ExecProcessDataDTO> dataList) {
         if (!CollectionUtils.isEmpty(dataList)) {
+            for (ExecProcessDataDTO index : dataList) {
+                index.setIp(IpUtil.getHostIp());
+            }
             calcInterestRateDataMapper.insertExecProcessDataYearBatch(dataList);
         }
     }

@@ -30,28 +30,29 @@
 
 
     <insert id="insertExecProcessDataBatch">
-        INSERT INTO biz_calc_exec_data ( id,  process_id, rate_id, date_index, date_index_end, day_rate, day_amount,year_rate,days,calc_proc_type)
+        INSERT INTO biz_calc_exec_data ( id,  process_id, rate_id, date_index, date_index_end, day_rate, day_amount,year_rate,days,calc_proc_type,ip)
         VALUES
         <foreach collection="list" index="index" item="item" separator=",">
-            (  #{item.id},  #{item.processId},  #{item.rateId},  #{item.dateIndex},  #{item.dateIndexEnd}, #{item.dayRate}, #{item.dayAmount} , #{item.yearRate} , #{item.days}, #{item.calcProcType} )
+            (  #{item.id},  #{item.processId},  #{item.rateId},  #{item.dateIndex},  #{item.dateIndexEnd}, #{item.dayRate}, #{item.dayAmount} , #{item.yearRate}
+            , #{item.days}, #{item.calcProcType}, #{item.ip} )
         </foreach>
     </insert>
 
     <insert id="insertExecProcessDataMonthBatch">
         INSERT INTO biz_calc_exec_data ( id,  process_id, rate_id, date_index, date_index_end, day_rate, day_amount,days,year_rate
-        ,full_days,is_full )
+        ,full_days,is_full,ip )
         VALUES
         <foreach collection="list" index="index" item="item" separator=",">
             (  #{item.id},  #{item.processId},  #{item.rateId},  #{item.dateIndex},  #{item.dateIndexEnd}, #{item.dayRate}, #{item.dayAmount}
-            , #{item.days} , #{item.yearRate}, #{item.fullDays}, #{item.isFull} )
+            , #{item.days} , #{item.yearRate}, #{item.fullDays}, #{item.isFull} , #{item.ip})
         </foreach>
     </insert>
 
     <insert id="insertExecProcessDataYearBatch">
-        INSERT INTO biz_calc_exec_data ( id,  process_id, rate_id, date_index, date_index_end, day_rate, day_amount,days,year_rate )
+        INSERT INTO biz_calc_exec_data ( id,  process_id, rate_id, date_index, date_index_end, day_rate, day_amount,days,year_rate,ip )
         VALUES
         <foreach collection="list" index="index" item="item" separator=",">
-            (  #{item.id},  #{item.processId},  #{item.rateId},  #{item.dateIndex},  #{item.dateIndexEnd}, #{item.dayRate}, #{item.dayAmount} , #{item.days} , #{item.yearRate} )
+            (  #{item.id},  #{item.processId},  #{item.rateId},  #{item.dateIndex},  #{item.dateIndexEnd}, #{item.dayRate}, #{item.dayAmount} , #{item.days} , #{item.yearRate}, #{item.ip} )
         </foreach>
     </insert>
 

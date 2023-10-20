@@ -112,4 +112,6 @@ public class ExecProcessDataDTO {
      */
     private Integer calcProcType;
 
+    private String ip;
+
 }

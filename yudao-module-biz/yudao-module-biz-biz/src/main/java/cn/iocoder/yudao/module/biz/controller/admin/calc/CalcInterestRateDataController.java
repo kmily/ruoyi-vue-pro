@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.*;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -87,7 +88,7 @@ public class CalcInterestRateDataController {
     @PermitAll
     public void downloadExcelFile(HttpServletResponse response, @RequestBody List<SectionIndexVO> sectionList) throws IOException {
 
-        List<CalcInterestRateLxDataExcelVO> datas=parseExcel2(sectionList);
+        List<CalcInterestRateLxDataExcelVO> datas = parseExcel2(sectionList);
         ExcelUtils.write(response, "数据.xlsx", "数据", CalcInterestRateLxDataExcelVO.class, datas);
 
     }
@@ -139,11 +140,15 @@ public class CalcInterestRateDataController {
 
     public List<CalcInterestRateLxDataExcelVO> parseExcel2(List<SectionIndexVO> sectionList) {
 
-        List<CalcInterestRateLxDataExcelVO> list=new ArrayList();
+        List<CalcInterestRateLxDataExcelVO> list = new ArrayList();
         //遍历Excel中所有的sheet
+        BigDecimal totalDays = BigDecimal.ZERO;
+        BigDecimal totalAmount = BigDecimal.ZERO;
         for (int i = 0; i < sectionList.size(); i++) {
             SectionIndexVO index = sectionList.get(i);
-            CalcInterestRateLxDataExcelVO cir=new CalcInterestRateLxDataExcelVO();
+            totalDays = totalDays.add(new BigDecimal(index.getDays()));
+            totalAmount = totalAmount.add(index.getSectionAmount());
+            CalcInterestRateLxDataExcelVO cir = new CalcInterestRateLxDataExcelVO();
             //获取第一列
             String column1 = index.getStartDate() + "至" + index.getEndDate();
             cir.setTimeFrame(column1);
@@ -155,6 +160,10 @@ public class CalcInterestRateDataController {
             cir.setAmount(index.getSectionAmount());
             list.add(cir);
         }
+        CalcInterestRateLxDataExcelVO cir = new CalcInterestRateLxDataExcelVO();
+        cir.setDays(totalDays.toString());
+        cir.setAmount(totalAmount);
+        list.add(cir);
         return list;
     }
 
