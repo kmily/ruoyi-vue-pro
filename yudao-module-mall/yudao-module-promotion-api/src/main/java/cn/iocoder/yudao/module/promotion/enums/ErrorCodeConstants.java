@@ -110,4 +110,11 @@ public interface ErrorCodeConstants {
     ErrorCode BARGAIN_HELP_CREATE_FAIL_CONFLICT = new ErrorCode(1_013_014_003, "助力失败，请重试");
     ErrorCode BARGAIN_HELP_CREATE_FAIL_HELP_EXISTS = new ErrorCode(1_013_014_004, "助力失败，您已经助力过了");
 
+    // ========== 文章分类 1-013-015-000 ==========
+    ErrorCode ARTICLE_CATEGORY_NOT_EXISTS = new ErrorCode(1_013_015_000, "文章分类不存在");
+    ErrorCode ARTICLE_CATEGORY_DELETE_FAIL_HAVE_ARTICLES = new ErrorCode(1_013_015_001, "文章分类删除失败，存在关联文章");
+
+    // ========== 文章管理 1-013-016-000 ==========
+    ErrorCode ARTICLE_NOT_EXISTS = new ErrorCode(1_013_016_000, "文章不存在");
+
 }
