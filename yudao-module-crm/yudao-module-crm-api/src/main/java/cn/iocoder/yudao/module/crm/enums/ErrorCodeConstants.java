@@ -15,4 +15,8 @@ public interface ErrorCodeConstants {
     // TODO @wanwan：要单独一个分段噢
     ErrorCode CLUE_NOT_EXISTS = new ErrorCode(1_020_000_001, "线索不存在");
 
+    ErrorCode RECEIVABLE_NOT_EXISTS = new ErrorCode(1_030_000_001, "回款管理不存在");
+
+    ErrorCode RECEIVABLE_PLAN_NOT_EXISTS = new ErrorCode(1_040_000_001, "回款计划不存在");
+
 }
