@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespD
 import cn.iocoder.yudao.module.promotion.service.reward.RewardActivityService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
  * @author 芋道源码
  */
 @Service
+@Validated
 public class RewardActivityApiImpl implements RewardActivityApi {
 
     @Resource

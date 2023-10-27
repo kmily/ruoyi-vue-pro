@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.promotion.convert.discount.DiscountActivityConver
 import cn.iocoder.yudao.module.promotion.service.discount.DiscountActivityService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
  * @author 芋道源码
  */
 @Service
+@Validated
 public class DiscountActivityApiImpl implements DiscountActivityApi {
 
     @Resource

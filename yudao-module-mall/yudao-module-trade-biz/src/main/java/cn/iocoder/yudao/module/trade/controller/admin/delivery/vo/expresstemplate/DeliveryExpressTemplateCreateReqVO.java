@@ -16,10 +16,10 @@ public class DeliveryExpressTemplateCreateReqVO extends DeliveryExpressTemplateB
 
     @Schema(description = "区域运费列表")
     @Valid
-    private List<ExpressTemplateChargeBaseVO> templateCharge;
+    private List<DeliveryExpressTemplateChargeBaseVO> charges;
 
     @Schema(description = "包邮区域列表")
     @Valid
-    private List<ExpressTemplateFreeBaseVO> templateFree;
+    private List<DeliveryExpressTemplateFreeBaseVO> frees;
 
 }

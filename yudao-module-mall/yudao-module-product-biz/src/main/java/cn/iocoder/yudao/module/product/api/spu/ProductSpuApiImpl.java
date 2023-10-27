@@ -27,10 +27,12 @@ public class ProductSpuApiImpl implements ProductSpuApi {
 
     @Override
     public List<ProductSpuRespDTO> getSpuList(Collection<Long> ids) {
-        if (CollectionUtil.isEmpty(ids)) {
-            return Collections.emptyList();
-        }
         return ProductSpuConvert.INSTANCE.convertList2(spuService.getSpuList(ids));
+    }
+
+    @Override
+    public List<ProductSpuRespDTO> validateSpuList(Collection<Long> ids) {
+        return ProductSpuConvert.INSTANCE.convertList2(spuService.validateSpuList(ids));
     }
 
     @Override

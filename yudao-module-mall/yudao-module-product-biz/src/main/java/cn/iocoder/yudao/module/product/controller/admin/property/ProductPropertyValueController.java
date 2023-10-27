@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.Produc
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValuePageReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueUpdateReqVO;
-import cn.iocoder.yudao.module.product.convert.propertyvalue.ProductPropertyValueConvert;
+import cn.iocoder.yudao.module.product.convert.property.ProductPropertyValueConvert;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

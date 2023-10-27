@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 
 /**
  * Infra 模块的 Security 配置
@@ -29,8 +29,6 @@ public class SecurityConfiguration {
                         .requestMatchers("/swagger-resources/**").anonymous()
                         .requestMatchers("/webjars/**").anonymous()
                         .requestMatchers("/*/api-docs").anonymous();
-                // 积木报表
-                registry.requestMatchers("/jmreport/**").permitAll();
                 // Spring Boot Actuator 的安全配置
                 registry.requestMatchers("/actuator").anonymous()
                         .requestMatchers("/actuator/**").anonymous();

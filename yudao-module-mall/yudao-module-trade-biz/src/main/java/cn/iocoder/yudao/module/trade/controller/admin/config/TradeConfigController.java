@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Value;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,6 +26,9 @@ public class TradeConfigController {
     @Resource
     private TradeConfigService tradeConfigService;
 
+    @Value("${yudao.tencent-lbs-key}")
+    private String tencentLbsKey;
+
     @PutMapping("/save")
     @Operation(summary = "更新交易中心配置")
     @PreAuthorize("@ss.hasPermission('trade:config:save')")
@@ -38,7 +42,11 @@ public class TradeConfigController {
     @PreAuthorize("@ss.hasPermission('trade:config:query')")
     public CommonResult<TradeConfigRespVO> getConfig() {
         TradeConfigDO config = tradeConfigService.getTradeConfig();
-        return success(TradeConfigConvert.INSTANCE.convert(config));
+        TradeConfigRespVO configVO = TradeConfigConvert.INSTANCE.convert(config);
+        if (configVO != null) {
+            configVO.setTencentLbsKey(tencentLbsKey);
+        }
+        return success(configVO);
     }
 
 }

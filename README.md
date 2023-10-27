@@ -42,7 +42,7 @@
 
 ##  🐳 项目关系
 
-![架构演进](https://static.iocoder.cn/yudao-roadmap.png?imageView2/2/format/webp)
+![架构演进](/.image/common/yudao-roadmap.png)
 
 三个项目的功能对比，可见社区共同整理的 [国产开源项目对比](https://www.yuque.com/xiatian-bsgny/lm0ec1/wqf8mn) 表格。
 
@@ -70,12 +70,12 @@
 
 |       | JDK 8 完整版                                                 | JDK 8 精简版                                                          | JDK 17 完整版                                                                  |
 |-------|-----------------------------------------------------------|--------------------------------------------------------------------|-----------------------------------------------------------------------------|
-| 分支    | [`master`](https://gitee.com/zhijiantianya/ruoyi-vue-pro) | [`mini`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/mini/) | [`boot-dev`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/boot3-dev/) |
+| 分支    | [`master`](https://gitee.com/zhijiantianya/ruoyi-vue-pro) | [`mini`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/mini/) | [`master-boot3`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master-boot3/) |
 | 说明    | 包括所有功能                                                    | 只保留核心功能                                                            | 适配 Spring Boot 3.X                                                          |
 | 系统功能  | √                                                         | √                                                                  | √                                                                           |
 | 基础设施  | √                                                         | √                                                                  | √                                                                           |
 | 会员中心  | √                                                         | √                                                                  | √                                                                           |
-| 工作流程  | √                                                         | x                                                                  | 适配中                                                                         |
+| 工作流程  | √                                                         | x                                                                  | √                                                                         |
 | 数据报表  | √                                                         | x                                                                  | 适配中                                                                         |
 | 商城系统  | √                                                         | x                                                                  | √                                                                           |
 | 微信公众号 | √                                                         | x                                                                  | √                                                                           |
@@ -88,7 +88,7 @@
 
 ② 代码全部开源，不会像其他项目一样，只开源部分代码，让你无法了解整个项目的架构设计。[国产开源项目对比](https://www.yuque.com/xiatian-bsgny/lm0ec1/wqf8mn)
 
-![开源项目对比](https://static.iocoder.cn/project-vs.png?imageView2/2/format/webp/w/1280)
+![开源项目对比](/.image/common/project-vs.png)
 
 ③ 代码整洁、架构整洁，遵循《阿里巴巴 Java 开发手册》规范，代码注释详细，57000 行 Java 代码，22000 行代码注释。
 

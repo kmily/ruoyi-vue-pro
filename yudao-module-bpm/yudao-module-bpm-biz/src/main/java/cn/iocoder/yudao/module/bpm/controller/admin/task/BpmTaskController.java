@@ -74,7 +74,7 @@ public class BpmTaskController {
         return success(true);
     }
 
-    @GetMapping("/get-return-list")
+    @GetMapping("/return-list")
     @Operation(summary = "获取所有可回退的节点", description = "用于【流程详情】的【回退】按钮")
     @Parameter(name = "taskId", description = "当前任务ID", required = true)
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
@@ -94,9 +94,32 @@ public class BpmTaskController {
     @Operation(summary = "委派任务", description = "用于【流程详情】的【委派】按钮。和向前【加签】有点像，唯一区别是【委托】没有单独创立任务")
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
     public CommonResult<Boolean> delegateTask(@Valid @RequestBody BpmTaskDelegateReqVO reqVO) {
-        // TODO @海：, 后面要有空格
-        taskService.delegateTask(reqVO,getLoginUserId());
+        taskService.delegateTask(getLoginUserId(), reqVO);
         return success(true);
+    }
+
+    @PutMapping("/create-sign")
+    @Operation(summary = "加签", description = "before 前加签，after 后加签")
+    @PreAuthorize("@ss.hasPermission('bpm:task:update')")
+    public CommonResult<Boolean> createSignTask(@Valid @RequestBody BpmTaskAddSignReqVO reqVO) {
+        taskService.createSignTask(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete-sign")
+    @Operation(summary = "减签")
+    @PreAuthorize("@ss.hasPermission('bpm:task:update')")
+    public CommonResult<Boolean> deleteSignTask(@Valid @RequestBody BpmTaskSubSignReqVO reqVO) {
+        taskService.deleteSignTask(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
+    @GetMapping("children-list")
+    @Operation(summary = "获取能被减签的任务")
+    @Parameter(name = "parentId", description = "父级任务 ID", required = true)
+    @PreAuthorize("@ss.hasPermission('bpm:task:update')")
+    public CommonResult<List<BpmTaskSubSignRespVO>> getChildrenTaskList(@RequestParam("parentId") String parentId) {
+        return success(taskService.getChildrenTaskList(parentId));
     }
 
 }

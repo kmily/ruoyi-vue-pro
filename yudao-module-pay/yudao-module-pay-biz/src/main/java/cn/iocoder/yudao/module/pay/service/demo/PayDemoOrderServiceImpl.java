@@ -156,7 +156,7 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
         PayOrderRespDTO payOrder = payOrderApi.getOrder(payOrderId);
         if (payOrder == null) {
             log.error("[validateDemoOrderCanPaid][order({}) payOrder({}) 不存在，请进行处理！]", id, payOrderId);
-            throw exception(ORDER_NOT_FOUND);
+            throw exception(PAY_ORDER_NOT_FOUND);
         }
         // 2.2 校验支付单已支付
         if (!PayOrderStatusEnum.isSuccess(payOrder.getStatus())) {

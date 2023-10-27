@@ -13,8 +13,10 @@ import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelUpdateR
 import cn.iocoder.yudao.module.pay.convert.channel.PayChannelConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.channel.PayChannelMapper;
+import cn.iocoder.yudao.module.pay.framework.pay.core.WalletPayClient;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import jakarta.validation.Validator;
 import lombok.Getter;
@@ -67,6 +69,14 @@ public class PayChannelServiceImpl implements PayChannelService {
 
     @Resource
     private Validator validator;
+
+    /**
+     * 初始化，为了注册钱包
+     */
+    @PostConstruct
+    public void init() {
+        payClientFactory.registerPayClientClass(PayChannelEnum.WALLET, WalletPayClient.class);
+    }
 
     @Override
     public Long createChannel(PayChannelCreateReqVO reqVO) {

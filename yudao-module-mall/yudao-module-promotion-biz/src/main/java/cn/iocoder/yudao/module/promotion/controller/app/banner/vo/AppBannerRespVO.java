@@ -8,6 +8,13 @@ import lombok.Data;
 @Data
 public class AppBannerRespVO {
 
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Long id;
+
+    @Schema(description = "标题", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "标题不能为空")
+    private String title;
+
     @Schema(description = "跳转链接", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "跳转链接不能为空")
     private String url;
