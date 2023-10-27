@@ -18,11 +18,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.findFirst;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.diffList;
 import static cn.iocoder.yudao.module.trade.convert.delivery.DeliveryExpressTemplateConvert.INSTANCE;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.EXPRESS_TEMPLATE_NAME_DUPLICATE;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.EXPRESS_TEMPLATE_NOT_EXISTS;

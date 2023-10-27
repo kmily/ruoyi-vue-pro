@@ -7,11 +7,10 @@ import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.Ar
 import cn.iocoder.yudao.module.promotion.controller.admin.article.vo.category.ArticleCategoryUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.article.ArticleCategoryDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.article.ArticleCategoryMapper;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-
-import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;

@@ -5,11 +5,10 @@ import cn.iocoder.yudao.module.system.api.social.dto.SocialWxJsapiSignatureRespD
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxPhoneNumberInfoRespDTO;
 import cn.iocoder.yudao.module.system.convert.social.SocialClientConvert;
 import cn.iocoder.yudao.module.system.service.social.SocialClientService;
+import jakarta.annotation.Resource;
 import me.chanjar.weixin.common.bean.WxJsapiSignature;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-
-import javax.annotation.Resource;
 
 /**
  * 社交应用的 API 实现类

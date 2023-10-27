@@ -2,10 +2,9 @@ package cn.iocoder.yudao.module.member.mq.producer.user;
 
 import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;
 import cn.iocoder.yudao.module.member.mq.message.user.MemberUserCreateMessage;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 
 /**
  * 会员用户 Producer

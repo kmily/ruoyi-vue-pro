@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.module.promotion.mq.message.coupon;
 
 import cn.iocoder.yudao.framework.mq.core.stream.AbstractStreamMessage;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * 会员用户创建消息

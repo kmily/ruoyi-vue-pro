@@ -3,10 +3,9 @@ package cn.iocoder.yudao.module.promotion.mq.consumer.coupon;
 import cn.iocoder.yudao.framework.mq.core.stream.AbstractStreamMessageListener;
 import cn.iocoder.yudao.module.promotion.mq.message.coupon.UserCreateMessage;
 import cn.iocoder.yudao.module.promotion.service.coupon.CouponService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 
 /**
  * 针对 {@link UserCreateMessage} 的消费者
