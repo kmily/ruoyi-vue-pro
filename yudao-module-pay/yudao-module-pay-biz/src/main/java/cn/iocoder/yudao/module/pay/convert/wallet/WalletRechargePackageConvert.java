@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.rechargepackage.WalletRechargePackageCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.rechargepackage.WalletRechargePackageRespVO;
 import cn.iocoder.yudao.module.pay.controller.admin.wallet.vo.rechargepackage.WalletRechargePackageUpdateReqVO;
+import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.recharge.AppPayWalletPackageRespVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletRechargePackageDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -26,4 +27,5 @@ public interface WalletRechargePackageConvert {
 
     PageResult<WalletRechargePackageRespVO> convertPage(PageResult<PayWalletRechargePackageDO> page);
 
+    PageResult<AppPayWalletPackageRespVO> convertAppPage(PageResult<PayWalletRechargePackageDO> page);
 }
