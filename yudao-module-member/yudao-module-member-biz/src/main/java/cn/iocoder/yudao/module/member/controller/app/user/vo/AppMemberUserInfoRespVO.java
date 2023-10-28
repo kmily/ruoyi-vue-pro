@@ -32,6 +32,12 @@ public class AppMemberUserInfoRespVO {
     @Schema(description = "是否成为推广员", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     private Boolean brokerageEnabled;
 
+    @Schema(description = "用户钱包", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Wallet wallet;
+
+    @Schema(description = "余额", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
+    private Integer nowMoney;
+
     @Schema(description = "用户 App - 会员等级")
     @Data
     public static class Level {
@@ -49,5 +55,23 @@ public class AppMemberUserInfoRespVO {
         private String icon;
 
     }
+
+    @Schema(description = "用户App - 余额")
+    @Data
+    public static class Wallet {
+
+            @Schema(description = "余额", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
+            private Integer balance;
+
+            @Schema(description = "冻结金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
+            private Integer freezePrice;
+
+            @Schema(description = "累计充值金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
+            private Integer totalRecharge;
+
+            @Schema(description = "累计消费金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
+            private Integer totalExpense;
+    }
+
 
 }

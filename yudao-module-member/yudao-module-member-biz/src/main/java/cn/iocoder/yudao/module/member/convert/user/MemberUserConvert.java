@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.member.dal.dataobject.group.MemberGroupDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.tag.MemberTagDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -29,7 +30,8 @@ public interface MemberUserConvert {
 
     @Mapping(source = "level", target = "level")
     @Mapping(source = "bean.experience", target = "experience")
-    AppMemberUserInfoRespVO convert(MemberUserDO bean, MemberLevelDO level);
+    @Mapping(source = "wallet.balance", target = "nowMoney")
+    AppMemberUserInfoRespVO convert(MemberUserDO bean, MemberLevelDO level, PayWalletDO wallet);
 
     MemberUserRespDTO convert2(MemberUserDO bean);
 
