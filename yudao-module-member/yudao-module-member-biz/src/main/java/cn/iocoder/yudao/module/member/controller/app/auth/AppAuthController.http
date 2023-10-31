@@ -28,6 +28,17 @@ tenant-id: {{appTenentId}}
   "code": 9999
 }
 
+### 请求 /social-login 接口 => 成功
+POST {{appApi}}/member/auth/social-login
+Content-Type: application/json
+tenant-id: {{appTenentId}}
+
+{
+  "type": 34,
+  "code": "0e1oc9000CTjFQ1oim200bhtb61oc90g",
+  "state": "default"
+}
+
 ### 请求 /weixin-mini-app-login 接口 => 成功
 POST {{appApi}}/member/auth/weixin-mini-app-login
 Content-Type: application/json
@@ -38,7 +49,6 @@ tenant-id: {{appTenentId}}
   "loginCode": "001frTkl21JUf94VGxol2hSlff1frTkR"
 }
 
-
 ### 请求 /logout 接口 => 成功
 POST {{appApi}}/member/auth/logout
 Content-Type: application/json
@@ -48,4 +58,9 @@ tenant-id: {{appTenentId}}
 ### 请求 /auth/refresh-token 接口 => 成功
 POST {{appApi}}/member/auth/refresh-token?refreshToken=bc43d929094849a28b3a69f6e6940d70
 Content-Type: application/json
+tenant-id: {{appTenentId}}
+
+### 请求 /auth/create-weixin-jsapi-signature 接口 => 成功
+POST {{appApi}}/member/auth/create-weixin-jsapi-signature?url=http://www.iocoder.cn
+Authorization: Bearer {{appToken}}
 tenant-id: {{appTenentId}}

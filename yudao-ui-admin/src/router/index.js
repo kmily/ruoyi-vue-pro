@@ -100,18 +100,19 @@ export const constantRoutes = [
     children: [{
         path: 'type/data/:dictId(\\d+)',
         component: (resolve) => require(['@/views/system/dict/data'], resolve),
-        name: 'Data',
+        name: 'SystemDictData',
         meta: {title: '字典数据', icon: '', activeMenu: '/system/dict'}
       }
     ]
-  }, {
+  },
+  {
     path: '/job',
     component: Layout,
     hidden: true,
     children: [{
         path: 'log',
         component: (resolve) => require(['@/views/infra/job/log'], resolve),
-        name: 'JobLog',
+        name: 'InfraJobLog',
         meta: {title: '调度日志', activeMenu: '/infra/job'}
       }
     ]
@@ -122,7 +123,7 @@ export const constantRoutes = [
     children: [{
         path: 'edit/:tableId(\\d+)',
         component: (resolve) => require(['@/views/infra/codegen/editTable'], resolve),
-        name: 'GenEdit',
+        name: 'InfraCodegenEditTable',
         meta: {title: '修改生成配置', activeMenu: '/infra/codegen'}
       }
     ]

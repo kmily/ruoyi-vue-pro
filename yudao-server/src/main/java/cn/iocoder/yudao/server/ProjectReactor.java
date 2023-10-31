@@ -1,10 +1,10 @@
-package cn.iocoder.yudao.server;
+package cn.iocoder.yudao;
+
 import cn.hutool.core.io.FileTypeUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -24,6 +24,7 @@ import static java.io.File.separator;
  */
 @Slf4j
 public class ProjectReactor {
+
     private static final String GROUP_ID = "cn.iocoder.boot";
     private static final String ARTIFACT_ID = "yudao";
     private static final String PACKAGE_NAME = "cn.iocoder.yudao";
@@ -41,10 +42,10 @@ public class ProjectReactor {
         log.info("[main][原项目路劲改地址 ({})]", projectBaseDir);
 
         // ========== 配置，需要你手动修改 ==========
-        String groupIdNew = "com.starter.boot";
-        String artifactIdNew = "starter";
-        String packageNameNew = "com.starter.boot";
-        String titleNew = "star管理系统";
+        String groupIdNew = "cn.star.gg";
+        String artifactIdNew = "star";
+        String packageNameNew = "cn.start.pp";
+        String titleNew = "土豆管理系统";
         String projectBaseDirNew = projectBaseDir + "-new"; // 一键改名后，“新”项目所在的目录
         log.info("[main][检测新项目目录 ({})是否存在]", projectBaseDirNew);
         if (FileUtil.exist(projectBaseDirNew)) {
@@ -53,7 +54,8 @@ public class ProjectReactor {
         }
         // 如果新目录中存在 PACKAGE_NAME，ARTIFACT_ID 等关键字，路径会被替换，导致生成的文件不在预期目录
         if (StrUtil.containsAny(projectBaseDirNew, PACKAGE_NAME, ARTIFACT_ID, StrUtil.upperFirst(ARTIFACT_ID))) {
-            log.error("[main][新项目目录检测 ({}) 存在冲突名称「{}」或者「{}」，请更改新的目录！程序退出]", projectBaseDirNew, PACKAGE_NAME, ARTIFACT_ID);
+            log.error("[main][新项目目录 `projectBaseDirNew` 检测 ({}) 存在冲突名称「{}」或者「{}」，请更改新的目录！程序退出]",
+                    projectBaseDirNew, PACKAGE_NAME, ARTIFACT_ID);
             return;
         }
         log.info("[main][完成新项目目录检测，新项目路径地址 ({})]", projectBaseDirNew);
@@ -64,7 +66,7 @@ public class ProjectReactor {
         // 写入文件
         files.forEach(file -> {
             // 如果是白名单的文件类型，不进行重写，直接拷贝
-            String fileType = FileTypeUtil.getType(file);
+            String fileType = getFileType(file);
             if (WHITE_FILE_TYPES.contains(fileType)) {
                 copyFile(file, projectBaseDir, projectBaseDirNew, packageNameNew, artifactIdNew);
                 return;
@@ -85,7 +87,7 @@ public class ProjectReactor {
     }
 
     private static Collection<File> listFiles(String projectBaseDir) {
-        Collection<File> files = FileUtils.listFiles(new File(projectBaseDir), null, true);
+        Collection<File> files = FileUtil.loopFiles(projectBaseDir);
         // 移除 IDEA、Git 自身的文件、Node 编译出来的文件
         files = files.stream()
                 .filter(file -> !file.getPath().contains(separator + "target" + separator)
@@ -104,7 +106,7 @@ public class ProjectReactor {
                                              String titleNew) {
         String content = FileUtil.readString(file, StandardCharsets.UTF_8);
         // 如果是白名单的文件类型，不进行重写
-        String fileType = FileTypeUtil.getType(file);
+        String fileType = getFileType(file);
         if (WHITE_FILE_TYPES.contains(fileType)) {
             return content;
         }
@@ -136,4 +138,9 @@ public class ProjectReactor {
                 .replace(ARTIFACT_ID, artifactIdNew) //
                 .replaceAll(StrUtil.upperFirst(ARTIFACT_ID), StrUtil.upperFirst(artifactIdNew));
     }
+
+    private static String getFileType(File file) {
+        return file.length() > 0 ? FileTypeUtil.getType(file) : "";
+    }
+
 }
