@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.crm.service.business;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
+import cn.iocoder.yudao.module.crm.framework.core.service.CrmPermissionValidateService;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -13,7 +14,7 @@ import java.util.List;
  *
  * @author ljlleo
  */
-public interface CrmBusinessService {
+public interface CrmBusinessService extends CrmPermissionValidateService {
 
     /**
      * 创建商机
@@ -58,9 +59,10 @@ public interface CrmBusinessService {
      * 获得商机分页
      *
      * @param pageReqVO 分页查询
+     * @param userId    用户编号
      * @return 商机分页
      */
-    PageResult<CrmBusinessDO> getBusinessPage(CrmBusinessPageReqVO pageReqVO);
+    PageResult<CrmBusinessDO> getBusinessPage(CrmBusinessPageReqVO pageReqVO, Long userId);
 
     /**
      * 获得商机列表, 用于 Excel 导出
@@ -76,6 +78,6 @@ public interface CrmBusinessService {
      * @param reqVO  请求
      * @param userId 用户编号
      */
-    void transferBusiness(CrmTransferBusinessReqVO reqVO, Long userId);
+    void transferBusiness(CrmBusinessTransferReqVO reqVO, Long userId);
 
 }

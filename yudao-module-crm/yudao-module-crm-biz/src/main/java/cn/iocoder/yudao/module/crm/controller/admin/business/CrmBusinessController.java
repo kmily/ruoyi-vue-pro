@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.*;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -71,8 +72,15 @@ public class CrmBusinessController {
     @Operation(summary = "获得商机分页")
     @PreAuthorize("@ss.hasPermission('crm:business:query')")
     public CommonResult<PageResult<CrmBusinessRespVO>> getBusinessPage(@Valid CrmBusinessPageReqVO pageVO) {
-        PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPage(pageVO);
+        PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPage(pageVO, getLoginUserId());
+        return success(CrmBusinessConvert.INSTANCE.convertPage(pageResult));
+    }
 
+    @GetMapping("/pool-page")
+    @Operation(summary = "获得商机公海分页")
+    @PreAuthorize("@ss.hasPermission('crm:business:query')")
+    public CommonResult<PageResult<CrmBusinessRespVO>> getBusinessPoolPage(@Valid CrmBusinessPageReqVO pageVO) {
+        PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPage(pageVO, CrmPermissionDO.POOL_USER_ID);
         return success(CrmBusinessConvert.INSTANCE.convertPage(pageResult));
     }
 
@@ -91,7 +99,7 @@ public class CrmBusinessController {
     @PutMapping("/transfer")
     @Operation(summary = "商机转移")
     @PreAuthorize("@ss.hasPermission('crm:business:update')")
-    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmTransferBusinessReqVO reqVO) {
+    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmBusinessTransferReqVO reqVO) {
         businessService.transferBusiness(reqVO, getLoginUserId());
         return success(true);
     }

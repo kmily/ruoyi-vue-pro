@@ -2,16 +2,18 @@ package cn.iocoder.yudao.module.crm.service.business;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.business.vo.*;
 import cn.iocoder.yudao.module.crm.convert.business.CrmBusinessConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessMapper;
 import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
-import cn.iocoder.yudao.module.crm.framework.enums.CrmEnum;
-import cn.iocoder.yudao.module.crm.framework.enums.OperationTypeEnum;
+import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
-import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -19,8 +21,10 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.BUSINESS_NOT_EXISTS;
 
 /**
@@ -46,8 +50,8 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         businessMapper.insert(business);
 
         // 创建数据权限
-        crmPermissionService.createCrmPermission(new CrmPermissionCreateBO().setCrmType(CrmEnum.CRM_BUSINESS.getType())
-                .setCrmDataId(business.getId()).setOwnerUserId(userId)); // 设置当前操作的人为负责人
+        crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType())
+                .setBizId(business.getId()).setUserId(userId).setPermissionLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
 
         // 返回
         return business.getId();
@@ -55,7 +59,8 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(crmType = CrmEnum.CRM_BUSINESS, operationType = OperationTypeEnum.UPDATE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, getIdFor = CrmBusinessUpdateReqVO.class,
+            permissionLevel = CrmPermissionLevelEnum.WRITE)
     public void updateBusiness(CrmBusinessUpdateReqVO updateReqVO) {
         // 校验存在
         validateBusinessExists(updateReqVO.getId());
@@ -66,7 +71,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(crmType = CrmEnum.CRM_BUSINESS, operationType = OperationTypeEnum.DELETE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, permissionLevel = CrmPermissionLevelEnum.WRITE)
     public void deleteBusiness(Long id) {
         // 校验存在
         validateBusinessExists(id);
@@ -83,7 +88,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
-    @CrmPermission(crmType = CrmEnum.CRM_BUSINESS, operationType = OperationTypeEnum.READ)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, permissionLevel = CrmPermissionLevelEnum.READ)
     public CrmBusinessDO getBusiness(Long id) {
         return businessMapper.selectById(id);
     }
@@ -97,8 +102,18 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
-    public PageResult<CrmBusinessDO> getBusinessPage(CrmBusinessPageReqVO pageReqVO) {
-        return businessMapper.selectPage(pageReqVO);
+    public PageResult<CrmBusinessDO> getBusinessPage(CrmBusinessPageReqVO pageReqVO, Long userId) {
+        // 1. 获取当前用户能看的分页数据
+        PageResult<CrmPermissionDO> permissionPage = crmPermissionService.getPermissionPage(
+                CrmBusinessConvert.INSTANCE.convert(pageReqVO).setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType()).setUserId(userId));
+        Set<Long> ids = convertSet(permissionPage.getList(), CrmPermissionDO::getBizId);
+        if (CollUtil.isEmpty(ids)) { // 没得说明没有什么给他看的
+            return PageResult.empty();
+        }
+
+        // 2. 获取商机分页数据
+        List<CrmBusinessDO> businessList = businessMapper.selectList(pageReqVO, ids);
+        return new PageResult<>(businessList, (long) businessList.size());
     }
 
     @Override
@@ -108,14 +123,25 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void transferBusiness(CrmTransferBusinessReqVO reqVO, Long userId) {
+    public void transferBusiness(CrmBusinessTransferReqVO reqVO, Long userId) {
         // 1 校验商机是否存在
         validateBusinessExists(reqVO.getId());
 
         // 2. 数据权限转移
-        crmPermissionService.transferCrmPermission(
-                CrmBusinessConvert.INSTANCE.convert(reqVO, userId).setCrmType(CrmEnum.CRM_BUSINESS.getType()));
+        crmPermissionService.transferPermission(
+                CrmBusinessConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType()));
 
+        // 3. TODO 记录转移日志
+    }
+
+    @Override
+    public boolean validateBizIdExists(Integer bizType, Long bizId) {
+        // 1. 校验模块类型
+        if (!ObjUtil.equal(CrmBizTypeEnum.CRM_BUSINESS.getType(), bizId)) {
+            return false;
+        }
+        // 2. 校验是否存在
+        return businessMapper.selectById(bizId) != null;
     }
 
 }
