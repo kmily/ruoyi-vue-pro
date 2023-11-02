@@ -22,6 +22,10 @@ public class LoginUser {
      */
     private Long id;
     /**
+     * 用户昵称
+     */
+    private String nickname;
+    /**
      * 用户类型
      *
      * 关联 {@link UserTypeEnum}

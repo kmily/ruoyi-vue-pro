@@ -12,10 +12,12 @@ import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FileUploadReq
 import cn.iocoder.yudao.module.infra.convert.file.FileConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileDO;
 import cn.iocoder.yudao.module.infra.service.file.FileService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -61,9 +63,14 @@ public class FileController {
     @GetMapping("/{configId}/get/**")
     @PermitAll
     @Operation(summary = "下载文件")
-    @Parameter(name = "configId", description = "配置编号",  required = true)
+    @Parameters({
+            @Parameter(name = "configId", description = "配置编号",  required = true),
+            @Parameter(name = "fileName", description = "文件实际名称")
+    })
     public void getFileContent(HttpServletRequest request,
                                HttpServletResponse response,
+                               @RequestHeader HttpHeaders headers,
+                               String fileName,
                                @PathVariable("configId") Long configId) throws Exception {
         // 获取请求的路径
         String path = StrUtil.subAfter(request.getRequestURI(), "/get/", false);
@@ -78,7 +85,10 @@ public class FileController {
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return;
         }
-        ServletUtils.writeAttachment(response, path, content);
+        if(StrUtil.isBlank(fileName)){
+            fileName=StrUtil.subAfter(path, "/", true);
+        }
+        ServletUtils.writeAttachment(response, headers, fileName, content);
     }
 
     @GetMapping("/page")
