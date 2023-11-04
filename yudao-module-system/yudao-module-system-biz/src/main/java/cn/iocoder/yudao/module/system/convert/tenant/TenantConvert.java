@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.system.convert.tenant;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantExcelVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantRespVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.*;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserCreateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import org.mapstruct.Mapper;
@@ -42,4 +39,5 @@ public interface TenantConvert {
         return reqVO;
     }
 
+    TenantSimpleRespVO convertSimple(TenantDO tenantDO);
 }

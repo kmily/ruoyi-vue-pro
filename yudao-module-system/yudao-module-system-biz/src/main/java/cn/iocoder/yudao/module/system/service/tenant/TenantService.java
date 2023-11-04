@@ -2,10 +2,7 @@ package cn.iocoder.yudao.module.system.service.tenant;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantExportReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.*;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantInfoHandler;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantMenuHandler;
@@ -82,6 +79,14 @@ public interface TenantService {
      * @return 租户
      */
     TenantDO getTenantByName(String name);
+
+    /**
+     * 获得域名对应的租户
+     *
+     * @param domain 域名
+     * @return 租户精简信息
+     */
+    TenantSimpleRespVO getTenantByDomain(String domain);
 
     /**
      * 获得使用指定套餐的租户数量

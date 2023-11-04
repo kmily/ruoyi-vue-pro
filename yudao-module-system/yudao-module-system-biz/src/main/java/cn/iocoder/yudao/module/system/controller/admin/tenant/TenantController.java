@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.controller.admin.tenant;
 
+import cn.hutool.core.util.ReUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -8,14 +9,15 @@ import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.*;
 import cn.iocoder.yudao.module.system.convert.tenant.TenantConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -39,6 +41,15 @@ public class TenantController {
     public CommonResult<Long> getTenantIdByName(@RequestParam("name") String name) {
         TenantDO tenantDO = tenantService.getTenantByName(name);
         return success(tenantDO != null ? tenantDO.getId() : null);
+    }
+
+    @GetMapping("/get-by-domain")
+    @PermitAll
+    @Operation(summary = "使用域名，获得租户精简信息", description = "登录界面，根据用户访问的域名，获得租户精简信息")
+    public CommonResult<TenantSimpleRespVO> getTenantByDomain(HttpServletRequest request) {
+        String domain = ReUtil.get("http(s)?://(?<domain>.*?)/.*?", request.getRequestURL().toString(), "domain");
+        TenantSimpleRespVO tenantDO = tenantService.getTenantByDomain(domain);
+        return success(tenantDO);
     }
 
     @PostMapping("/create")

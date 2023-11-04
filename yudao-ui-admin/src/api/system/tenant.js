@@ -11,6 +11,14 @@ export function getTenantIdByName(name) {
   })
 }
 
+// 使用域名，获得租户精简信息
+export function getTenantByDomain() {
+  return request({
+    url: '/system/tenant/get-by-domain',
+    method: 'get',
+  })
+}
+
 // 创建租户
 export function createTenant(data) {
   return request({
