@@ -167,4 +167,7 @@ public interface MemberUserService {
      * @return 更新结果
      */
     boolean updateUserPoint(Long userId, Integer point);
+
+    boolean updateUserHaveStore(Long memberId, Long orgId);
+
 }

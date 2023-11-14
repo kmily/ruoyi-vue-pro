@@ -216,6 +216,14 @@ yudao:
     enable: false
   demo: false # 关闭演示模式
   tencent-lbs-key: TVDBZ-TDILD-4ON4B-PFDZA-RNLKH-VVF6E # QQ 地图的密钥 https://lbs.qq.com/service/staticV2/staticGuide/staticDoc
+  data:
+    elasticsearch:
+      cluster-name: goods-es
+      cluster-nodes:
+        - localhost:9200
+      index:
+        number-of-replicas: 1
+        number-of-shards: 2
 
 justauth:
   enabled: true
@@ -244,4 +252,9 @@ justauth:
     type: REDIS
     prefix: 'social_auth_state:' # 缓存前缀，目前只对 Redis 缓存生效，默认 JUSTAUTH::STATE::
     timeout: 24h # 超时时长，目前只对 Redis 缓存生效，默认 3 分钟
-
+spring:
+  data:
+    elasticsearch:
+      repositories:
+        enabled: true
+      cluster-name: ss

@@ -62,4 +62,16 @@ public class MemberUserBaseVO {
     @Schema(description = "用户分组编号", example = "1")
     private Long groupId;
 
+    /**
+     * 机构ID
+     *
+     * 关联 关联机构表ID
+     */
+    private Long orgId;
+
+    /**
+     * 是否拥有 机构
+     */
+    private Boolean haveStore;
+
 }

@@ -6,6 +6,7 @@ import ${PageResultClassName};
 import ${QueryWrapperClassName};
 import ${BaseMapperClassName};
 import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
 
@@ -47,7 +48,7 @@ import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePack
  * @author ${table.author}
  */
 @Mapper
-public interface ${table.className}Mapper extends BaseMapperX<${table.className}DO> {
+public interface ${table.className}Mapper extends BaseMapperX<${table.className}DO>,BaseMapper<${table.className}DO> {
 
     default PageResult<${table.className}DO> selectPage(${sceneEnum.prefixClass}${table.className}PageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<${table.className}DO>()

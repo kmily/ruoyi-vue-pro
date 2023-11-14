@@ -42,6 +42,7 @@
         <module>yudao-spring-boot-starter-captcha</module>
         <module>yudao-spring-boot-starter-websocket</module>
         <module>yudao-spring-boot-starter-desensitize</module>
+<!--        <module>yudao-spring-boot-starter-elasticsearch</module>-->
     </modules>
 
     <artifactId>yudao-framework</artifactId>

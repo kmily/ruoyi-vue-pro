@@ -171,6 +171,14 @@ yudao:
     refund-notify-url: http://yunai.natapp1.cc/admin-api/pay/notify/refund # 支付渠道的【退款】回调地址
   demo: true # 开启演示模式
   tencent-lbs-key: TVDBZ-TDILD-4ON4B-PFDZA-RNLKH-VVF6E # QQ 地图的密钥 https://lbs.qq.com/service/staticV2/staticGuide/staticDoc
+  data:
+    elasticsearch:
+      cluster-name: goods-es
+      cluster-nodes:
+        - localhost:9200
+      index:
+        number-of-replicas: 1
+        number-of-shards: 2
 
 justauth:
   enabled: true

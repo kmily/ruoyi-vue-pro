@@ -56,4 +56,13 @@ public interface MemberUserApi {
      * @return 用户信息
      */
     MemberUserRespDTO getUserByMobile(String mobile);
+
+    /**
+     * 更改 用户拥有一个机构
+     * @param memberId 用户ID
+     * @param orgId 店铺ID
+     * @return
+     */
+    boolean updateUserHaveStore(Long memberId, Long orgId);
+
 }

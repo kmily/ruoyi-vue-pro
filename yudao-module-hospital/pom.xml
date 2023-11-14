@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>cn.iocoder.boot</groupId>
+        <artifactId>yudao</artifactId>
+        <version>${revision}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>yudao-module-hospital</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>yudao-module-hospital-api</module>
+        <module>yudao-module-hospital-biz</module>
+    </modules>
+
+
+    <name>${project.artifactId}</name>
+    <description>
+        hospital 模块，存放医院信息
+        包括医院、医护人员等
+    </description>
+
+</project>

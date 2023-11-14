@@ -290,4 +290,11 @@ public class MemberUserServiceImpl implements MemberUserService {
         return true;
     }
 
+    @Override
+    public boolean updateUserHaveStore(Long memberId, Long orgId) {
+        int update = memberUserMapper.updateById(new MemberUserDO().setId(memberId)
+                .setHaveStore(true).setOrgId(orgId));
+        return update > 0;
+    }
+
 }

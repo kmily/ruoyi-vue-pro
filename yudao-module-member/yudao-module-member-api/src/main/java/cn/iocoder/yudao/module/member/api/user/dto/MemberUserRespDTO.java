@@ -52,4 +52,8 @@ public class MemberUserRespDTO {
      */
     private Integer point;
 
+    /**
+     * 存在机构
+     */
+    private Boolean haveStore;
 }

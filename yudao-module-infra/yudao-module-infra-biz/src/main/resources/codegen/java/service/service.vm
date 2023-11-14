@@ -5,13 +5,13 @@ import javax.validation.*;
 import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
 import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
 import ${PageResultClassName};
-
+import com.baomidou.mybatisplus.extension.service.IService;
 /**
  * ${table.classComment} Service 接口
  *
  * @author ${table.author}
  */
-public interface ${table.className}Service {
+public interface ${table.className}Service extends IService<${table.className}DO>{
 
     /**
      * 创建${table.classComment}

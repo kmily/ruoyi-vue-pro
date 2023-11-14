@@ -136,4 +136,16 @@ public class MemberUserDO extends TenantBaseDO {
      */
     private Long groupId;
 
+    /**
+     * 机构ID
+     *
+     * 关联 关联机构表ID
+     */
+    private Long orgId;
+
+    /**
+     * 是否拥有 机构
+     */
+    private Boolean haveStore;
+
 }
