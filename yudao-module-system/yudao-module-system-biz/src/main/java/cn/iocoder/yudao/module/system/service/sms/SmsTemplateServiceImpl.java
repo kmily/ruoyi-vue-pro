@@ -4,14 +4,12 @@ import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
 import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsTemplateRespDTO;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplatePageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateUpdateReqVO;
-import cn.iocoder.yudao.module.system.convert.sms.SmsTemplateConvert;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsTemplateMapper;
@@ -53,7 +51,12 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     private SmsChannelService smsChannelService;
 
     @Override
-    public Long createSmsTemplate(SmsTemplateCreateReqVO createReqVO) {
+    public Long createSmsTemplate(SmsTemplateSaveReqVO createReqVO) {
+        // TODO puhui999: 如果存在 id 编号是直接转到更新方法去还是直接处置为null走更新?
+        if (createReqVO.getId() != null) {
+            //createReqVO.setId(null); // 处置为 null
+            //updateSmsTemplate(createReqVO); // TODO 转给更新去处理的话 api 接口是否存在职责上的冲突？这样的话创建既能创建也能更新了
+        }
         // 校验短信渠道
         SmsChannelDO channelDO = validateSmsChannel(createReqVO.getChannelId());
         // 校验短信编码是否重复
@@ -62,7 +65,8 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
         validateApiTemplate(createReqVO.getChannelId(), createReqVO.getApiTemplateId());
 
         // 插入
-        SmsTemplateDO template = SmsTemplateConvert.INSTANCE.convert(createReqVO);
+        //SmsTemplateDO template = SmsTemplateConvert.INSTANCE.convert(createReqVO); // TODO 原有方式
+        SmsTemplateDO template = BeanUtils.toBean(createReqVO, SmsTemplateDO.class); // TODO 现有方式
         template.setParams(parseTemplateContentParams(template.getContent()));
         template.setChannelCode(channelDO.getCode());
         smsTemplateMapper.insert(template);
@@ -73,7 +77,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     @Override
     @CacheEvict(cacheNames = RedisKeyConstants.SMS_TEMPLATE,
             allEntries = true) // allEntries 清空所有缓存，因为可能修改到 code 字段，不好清理
-    public void updateSmsTemplate(SmsTemplateUpdateReqVO updateReqVO) {
+    public void updateSmsTemplate(SmsTemplateSaveReqVO updateReqVO) {
         // 校验存在
         validateSmsTemplateExists(updateReqVO.getId());
         // 校验短信渠道
@@ -84,7 +88,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
         validateApiTemplate(updateReqVO.getChannelId(), updateReqVO.getApiTemplateId());
 
         // 更新
-        SmsTemplateDO updateObj = SmsTemplateConvert.INSTANCE.convert(updateReqVO);
+        SmsTemplateDO updateObj = BeanUtils.toBean(updateReqVO, SmsTemplateDO.class);
         updateObj.setParams(parseTemplateContentParams(updateObj.getContent()));
         updateObj.setChannelCode(channelDO.getCode());
         smsTemplateMapper.updateById(updateObj);
@@ -121,11 +125,6 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     @Override
     public PageResult<SmsTemplateDO> getSmsTemplatePage(SmsTemplatePageReqVO pageReqVO) {
         return smsTemplateMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public List<SmsTemplateDO> getSmsTemplateList(SmsTemplateExportReqVO exportReqVO) {
-        return smsTemplateMapper.selectList(exportReqVO);
     }
 
     @Override

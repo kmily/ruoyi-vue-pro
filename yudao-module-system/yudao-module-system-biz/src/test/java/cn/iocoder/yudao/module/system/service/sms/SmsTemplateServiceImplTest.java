@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.system.service.sms;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
@@ -9,10 +10,8 @@ import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
 import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplatePageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsTemplateMapper;
@@ -67,7 +66,7 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
     @SuppressWarnings("unchecked")
     public void testCreateSmsTemplate_success() {
         // 准备参数
-        SmsTemplateCreateReqVO reqVO = randomPojo(SmsTemplateCreateReqVO.class, o -> {
+        SmsTemplateSaveReqVO reqVO = randomPojo(SmsTemplateSaveReqVO.class, o -> {
             o.setContent("正在进行登录操作{operation}，您的验证码是{code}");
             o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
             o.setType(randomEle(SmsTemplateTypeEnum.values()).getType()); // 保证 type 的 范围
@@ -101,7 +100,7 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
         SmsTemplateDO dbSmsTemplate = randomSmsTemplateDO();
         smsTemplateMapper.insert(dbSmsTemplate);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        SmsTemplateUpdateReqVO reqVO = randomPojo(SmsTemplateUpdateReqVO.class, o -> {
+        SmsTemplateSaveReqVO reqVO = randomPojo(SmsTemplateSaveReqVO.class, o -> {
             o.setId(dbSmsTemplate.getId()); // 设置更新的 ID
             o.setContent("正在进行登录操作{operation}，您的验证码是{code}");
             o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
@@ -130,7 +129,7 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateSmsTemplate_notExists() {
         // 准备参数
-        SmsTemplateUpdateReqVO reqVO = randomPojo(SmsTemplateUpdateReqVO.class);
+        SmsTemplateSaveReqVO reqVO = randomPojo(SmsTemplateSaveReqVO.class);
 
         // 调用, 并断言异常
         assertServiceException(() -> smsTemplateService.updateSmsTemplate(reqVO), SMS_TEMPLATE_NOT_EXISTS);
@@ -232,7 +231,7 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
         // 测试 createTime 不匹配
         smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setCreateTime(buildTime(2021, 12, 12))));
         // 准备参数
-        SmsTemplateExportReqVO reqVO = new SmsTemplateExportReqVO();
+        SmsTemplatePageReqVO reqVO = new SmsTemplatePageReqVO();
         reqVO.setType(SmsTemplateTypeEnum.PROMOTION.getType());
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
         reqVO.setCode("tu");
@@ -242,7 +241,8 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
         reqVO.setCreateTime(buildBetweenTime(2021, 11, 1, 2021, 12, 1));
 
         // 调用
-        List<SmsTemplateDO> list = smsTemplateService.getSmsTemplateList(reqVO);
+        reqVO.setPageSize(PageParam.PAGE_SIZE_NONE); // 设置不分页
+        List<SmsTemplateDO> list = smsTemplateService.getSmsTemplatePage(reqVO).getList();
         // 断言
         assertEquals(1, list.size());
         assertPojoEquals(dbSmsTemplate, list.get(0));
