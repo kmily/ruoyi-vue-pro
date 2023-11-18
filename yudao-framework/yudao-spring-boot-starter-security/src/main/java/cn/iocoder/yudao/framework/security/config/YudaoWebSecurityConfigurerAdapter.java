@@ -19,6 +19,8 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -95,7 +97,7 @@ public class YudaoWebSecurityConfigurerAdapter {
      * authenticated       |   用户登录后可访问
      */
     @Bean
-    protected SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+    protected SecurityFilterChain filterChain(HttpSecurity httpSecurity, MvcRequestMatcher.Builder mvc) throws Exception {
         // 登出
         httpSecurity
                 // 开启跨域
@@ -117,20 +119,20 @@ public class YudaoWebSecurityConfigurerAdapter {
                 // ①：全局共享规则
                 .authorizeHttpRequests()
                 // 1.1 静态资源，可匿名访问
-                .requestMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
+                .requestMatchers(mvc.pattern(HttpMethod.GET, "/*.html"), mvc.pattern(HttpMethod.GET, "/**/*.html"), mvc.pattern(HttpMethod.GET, "/**/*.css"), mvc.pattern(HttpMethod.GET, "/**/*.js")).permitAll()
                 // 1.2 设置 @PermitAll 无需认证
-                .requestMatchers(HttpMethod.GET, permitAllUrls.get(HttpMethod.GET).toArray(new String[0])).permitAll()
-                .requestMatchers(HttpMethod.POST, permitAllUrls.get(HttpMethod.POST).toArray(new String[0])).permitAll()
-                .requestMatchers(HttpMethod.PUT, permitAllUrls.get(HttpMethod.PUT).toArray(new String[0])).permitAll()
-                .requestMatchers(HttpMethod.DELETE, permitAllUrls.get(HttpMethod.DELETE).toArray(new String[0])).permitAll()
+                .requestMatchers(permitAllUrls.get(HttpMethod.GET).stream().map(url -> mvc.pattern(HttpMethod.GET, url)).toArray(RequestMatcher[]::new)).permitAll()
+                .requestMatchers(permitAllUrls.get(HttpMethod.POST).stream().map(url -> mvc.pattern(HttpMethod.POST, url)).toArray(RequestMatcher[]::new)).permitAll()
+                .requestMatchers(permitAllUrls.get(HttpMethod.PUT).stream().map(url -> mvc.pattern(HttpMethod.PUT, url)).toArray(RequestMatcher[]::new)).permitAll()
+                .requestMatchers(permitAllUrls.get(HttpMethod.DELETE).stream().map(url -> mvc.pattern(HttpMethod.DELETE, url)).toArray(RequestMatcher[]::new)).permitAll()
                 // 1.3 基于 yudao.security.permit-all-urls 无需认证
-                .requestMatchers(securityProperties.getPermitAllUrls().toArray(new String[0])).permitAll()
+                .requestMatchers(securityProperties.getPermitAllUrls().stream().map(mvc::pattern).toArray(RequestMatcher[]::new)).permitAll()
                 // 1.4 设置 App API 无需认证
-                .requestMatchers(buildAppApi("/**")).permitAll()
+                .requestMatchers(mvc.pattern(buildAppApi("/**"))).permitAll()
                 // 1.5 验证码captcha 允许匿名访问
-                .requestMatchers("/captcha/get", "/captcha/check").permitAll()
+                .requestMatchers(mvc.pattern("/captcha/get"), mvc.pattern("/captcha/check")).permitAll()
                 // 1.6 webSocket 允许匿名访问
-                .requestMatchers("/websocket/message").permitAll()
+                .requestMatchers(mvc.pattern("/websocket/message")).permitAll()
                 // ②：每个项目的自定义规则
                 .and().authorizeHttpRequests(registry -> // 下面，循环设置自定义规则
                         authorizeRequestsCustomizers.forEach(customizer -> customizer.customize(registry)))
