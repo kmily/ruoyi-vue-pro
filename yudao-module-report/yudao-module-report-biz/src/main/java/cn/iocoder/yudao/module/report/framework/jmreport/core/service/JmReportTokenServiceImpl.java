@@ -90,6 +90,11 @@ public class JmReportTokenServiceImpl implements JmReportTokenServiceI {
         return user == null ? null : String.valueOf(user.getId());
     }
 
+    @Override
+    public String[] getRoles(String s) {
+        return new String[0];
+    }
+
     /**
      * 基于 token 构建登录用户
      *
