@@ -62,7 +62,7 @@ public class YudaoWebSecurityConfigurerAdapter {
     /**
      * 自定义的权限映射 Bean 们
      *
-     * @see #filterChain(HttpSecurity)
+     * @see #filterChain(HttpSecurity, MvcRequestMatcher.Builder)
      */
     @Resource
     private List<AuthorizeRequestsCustomizer> authorizeRequestsCustomizers;
@@ -97,6 +97,7 @@ public class YudaoWebSecurityConfigurerAdapter {
      * authenticated       |   用户登录后可访问
      */
     @Bean
+    @SuppressWarnings("removal") // TODO 芋艿：需要迁移不使用的 API
     protected SecurityFilterChain filterChain(HttpSecurity httpSecurity, MvcRequestMatcher.Builder mvc) throws Exception {
         // 登出
         httpSecurity
