@@ -52,6 +52,16 @@ spring:
           url: jdbc:sqlserver://localhost:1433;SelectMethod=cursor;DatabaseName=ruoyi-vue-pro;encrypt=true;trustServerCertificate=true
           username: sa
           password: Arlen
+#        slave: # 模拟从库，可根据自己需要修改
+#          name: ruoyi-vue-pro
+#          lazy: true # 开启懒加载，保证启动速度
+#          url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
+#          #          url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT # MySQL Connector/J 5.X 连接的示例
+#          #          url: jdbc:postgresql://127.0.0.1:5432/${spring.datasource.dynamic.datasource.slave.name} # PostgreSQL 连接的示例
+#          #          url: jdbc:oracle:thin:@127.0.0.1:1521:xe # Oracle 连接的示例
+#          #          url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=${spring.datasource.dynamic.datasource.slave.name} # SQLServer 连接的示例
+#          username: root
+#          password: 123456
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   redis:
     host: 127.0.0.1 # 地址
@@ -90,6 +100,23 @@ spring:
     jdbc: # 使用 JDBC 的 JobStore 的时候，JDBC 的配置
       initialize-schema: NEVER # 是否自动使用 SQL 初始化 Quartz 表结构。这里设置成 never ，我们手动创建表结构。
 
+--- #################### 消息队列相关 ####################
+
+# rocketmq 配置项，对应 RocketMQProperties 配置类
+rocketmq:
+  name-server: 127.0.0.1:9876 # RocketMQ Namesrv
+
+spring:
+  # RabbitMQ 配置项，对应 RabbitProperties 配置类
+  rabbitmq:
+    host: 127.0.0.1 # RabbitMQ 服务的地址
+    port: 5672 # RabbitMQ 服务的端口
+    username: guest # RabbitMQ 服务的账号
+    password: guest # RabbitMQ 服务的密码
+  # Kafka 配置项，对应 KafkaProperties 配置类
+  kafka:
+    bootstrap-servers: 127.0.0.1:9092 # 指定 Kafka Broker 地址，可以设置多个，以逗号分隔
+
 --- #################### 服务保障相关配置 ####################
 
 # Lock4j 配置项
@@ -102,7 +129,7 @@ resilience4j:
   ratelimiter:
     instances:
       backendA:
-        limit-for-period: 1 # 每个周期内，允许的请求数。默认为 50~~
+        limit-for-period: 1 # 每个周期内，允许的请求数。默认为 50
         limit-refresh-period: 60s # 每个周期的时长，单位：微秒。默认为 500
         timeout-duration: 1s # 被限流时，阻塞等待的时长，单位：微秒。默认为 5s
         register-health-indicator: true # 是否注册到健康监测
@@ -155,8 +182,8 @@ debug: false
 --- #################### 微信公众号、小程序相关配置 ####################
 wx:
   mp: # 公众号配置（必填），参见 https://github.com/Wechat-Group/WxJava/blob/develop/spring-boot-starters/wx-java-mp-spring-boot-starter/README.md 文档
-#    app-id: wx041349c6f39b268b
-#    secret: 5abee519483bc9f8cb37ce280e814bd0
+    #    app-id: wx041349c6f39b268b
+    #    secret: 5abee519483bc9f8cb37ce280e814bd0
     app-id: wx5b23ba7a5589ecbb # 测试号
     secret: 2a7b3b20c537e52e74afd395eb85f61f
     # 存储配置，解决 AccessToken 的跨节点的共享
@@ -165,8 +192,8 @@ wx:
       key-prefix: wx # Redis Key 的前缀
       http-client-type: HttpClient # 采用 HttpClient 请求微信公众号平台
   miniapp: # 小程序配置（必填），参见 https://github.com/Wechat-Group/WxJava/blob/develop/spring-boot-starters/wx-java-miniapp-spring-boot-starter/README.md 文档
-#    appid: wx62056c0d5e8db250
-#    secret: 333ae72f41552af1e998fe1f54e1584a
+    #    appid: wx62056c0d5e8db250
+    #    secret: 333ae72f41552af1e998fe1f54e1584a
     appid: wx63c280fe3248a3e7 # wenhualian的接口测试号
     secret: 6f270509224a7ae1296bbf1c8cb97aed
     config-storage:
