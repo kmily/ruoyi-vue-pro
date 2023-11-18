@@ -1695,7 +1695,7 @@ CREATE TABLE [dbo].[infra_api_error_log] (
   [create_time] datetime2(7)  NOT NULL,
   [updater] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [update_time] datetime2(7)  NOT NULL,
-  [tenant_id] bigint  NOT NULL,
+  [tenant_id] bigint  DEFAULT 0 NOT NULL,
   [deleted] bit DEFAULT 0 NOT NULL
 )
 GO
@@ -6224,7 +6224,7 @@ CREATE TABLE [dbo].[system_login_log] (
   [create_time] datetime2(7)  NOT NULL,
   [updater] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [update_time] datetime2(7)  NOT NULL,
-  [tenant_id] bigint  NOT NULL,
+  [tenant_id] bigint  DEFAULT 0 NOT NULL,
   [deleted] bit DEFAULT 0 NOT NULL
 )
 GO
@@ -6377,9 +6377,11 @@ CREATE TABLE [dbo].[system_menu] (
   [path] nvarchar(200) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [icon] nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [component] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
+  [component_name] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [status] tinyint  NOT NULL,
   [visible] varchar(1) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
   [keep_alive] varchar(1) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL,
+  [always_show] varchar(1) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL  DEFAULT N'1',
   [creator] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [create_time] datetime2(7)  NOT NULL,
   [updater] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
@@ -6453,6 +6455,12 @@ EXEC sp_addextendedproperty
 'TABLE', N'system_menu',
 'COLUMN', N'component'
 GO
+EXEC sp_addextendedproperty
+     'MS_Description', N'组件名',
+     'SCHEMA', N'dbo',
+     'TABLE', N'system_menu',
+     'COLUMN', N'component_name'
+GO
 
 EXEC sp_addextendedproperty
 'MS_Description', N'菜单状态',
@@ -6473,6 +6481,12 @@ EXEC sp_addextendedproperty
 'SCHEMA', N'dbo',
 'TABLE', N'system_menu',
 'COLUMN', N'keep_alive'
+GO
+EXEC sp_addextendedproperty
+     'MS_Description', N'是否总是显示',
+     'SCHEMA', N'dbo',
+     'TABLE', N'system_menu',
+     'COLUMN', N'always_show'
 GO
 
 EXEC sp_addextendedproperty
@@ -8031,7 +8045,7 @@ CREATE TABLE [dbo].[system_oauth2_refresh_token] (
   [updater] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [update_time] datetime2(7)  NOT NULL,
   [deleted] bit DEFAULT 0 NOT NULL,
-  [tenant_id] bigint  NOT NULL,
+  [tenant_id] bigint DEFAULT 0 NOT NULL,
   [scopes] nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS DEFAULT '' NULL
 )
 GO
@@ -8185,7 +8199,7 @@ CREATE TABLE [dbo].[system_operate_log] (
   [create_time] datetime2(7)  NOT NULL,
   [updater] nvarchar(64) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL,
   [update_time] datetime2(7)  NOT NULL,
-  [tenant_id] bigint  NOT NULL,
+  [tenant_id] bigint DEFAULT 0  NOT NULL,
   [deleted] bit DEFAULT 0 NOT NULL
 )
 GO
