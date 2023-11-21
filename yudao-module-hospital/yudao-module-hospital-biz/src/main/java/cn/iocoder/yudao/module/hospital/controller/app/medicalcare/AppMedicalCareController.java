@@ -3,6 +3,9 @@ package cn.iocoder.yudao.module.hospital.controller.app.medicalcare;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.hospital.controller.admin.medicalcare.vo.MedicalCareRespVO;
+import cn.iocoder.yudao.module.hospital.controller.admin.medicalcare.vo.MedicalCareUpdateReqVO;
+import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCarePerfectVO;
+import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppRealNameReqVO;
 import cn.iocoder.yudao.module.hospital.convert.medicalcare.MedicalCareConvert;
 import cn.iocoder.yudao.module.hospital.dal.dataobject.medicalcare.MedicalCareDO;
 import cn.iocoder.yudao.module.hospital.service.medicalcare.MedicalCareService;
@@ -11,12 +14,10 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -45,4 +46,23 @@ public class AppMedicalCareController {
         MedicalCareDO medicalCare = medicalCareService.getByMemberId(memberId);
         return success(MedicalCareConvert.INSTANCE.convert(medicalCare));
     }
+
+    @PutMapping("/perfect")
+    @Operation(summary = "完善医护信息")
+    @PreAuthenticated
+    public CommonResult<Boolean> perfectMedicalCare(@Valid @RequestBody AppMedicalCarePerfectVO perfectVO) {
+        medicalCareService.perfectMedicalCare(perfectVO);
+        return success(true);
+    }
+
+    @PutMapping("/real-name")
+    @Operation(summary = "医护人员实名")
+    @PreAuthenticated
+    public CommonResult<Boolean> realNameMedicalCare(@Valid @RequestBody AppRealNameReqVO realNameReqVO) {
+        medicalCareService.realNameMedicalCare(realNameReqVO);
+        return success(true);
+    }
+
+
+
 }

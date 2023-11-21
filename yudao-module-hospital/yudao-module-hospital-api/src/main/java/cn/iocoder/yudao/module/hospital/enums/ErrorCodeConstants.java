@@ -23,4 +23,9 @@ public interface ErrorCodeConstants {
 
     /** 医院菜单 */
     ErrorCode MENU_NOT_EXISTS = new ErrorCode(300010, "菜单不存在");
+
+    /** 资质信息 */
+    ErrorCode APTITUDE_NOT_EXISTS = new ErrorCode(400010, "资质信息不存在");
+    ErrorCode APTITUDE_NOT_ENABLE = new ErrorCode(400011, "资质未启用");
+    ErrorCode CARE_APTITUDE_NOT_EXISTS = new ErrorCode(500010, "资质信息不存在");
 }

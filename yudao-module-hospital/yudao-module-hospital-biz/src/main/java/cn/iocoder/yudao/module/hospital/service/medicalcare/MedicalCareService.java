@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.hospital.service.medicalcare;
 import java.util.*;
 import javax.validation.*;
 import cn.iocoder.yudao.module.hospital.controller.admin.medicalcare.vo.*;
+import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCarePerfectVO;
+import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppRealNameReqVO;
 import cn.iocoder.yudao.module.hospital.dal.dataobject.medicalcare.MedicalCareDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.hospital.enums.medicalcare.MedicalCareStatusEnum;
@@ -102,4 +104,18 @@ public interface MedicalCareService extends IService<MedicalCareDO>{
      * @param auditVO 审核请求
      */
     void auditMedicalCare(MedicalCareAuditVO auditVO);
+
+    /**
+     * 完善医护信息
+     * @param perfectVO
+     */
+    void perfectMedicalCare(AppMedicalCarePerfectVO perfectVO);
+
+    void realNameMedicalCare(AppRealNameReqVO realNameReqVO);
+
+    /**
+     * 更新医护资质认证
+     * @param careId 医护编号
+     */
+    void updateMedicalCareAptitude(Long careId);
 }

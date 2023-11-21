@@ -5,6 +5,8 @@ import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCarePerfectVO;
+import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppRealNameReqVO;
 import cn.iocoder.yudao.module.hospital.dal.dataobject.medicalcarechecklog.MedicalCareCheckLogDO;
 import cn.iocoder.yudao.module.hospital.enums.medicalcare.MedicalCareStatusEnum;
 import cn.iocoder.yudao.module.hospital.service.medicalcarechecklog.MedicalCareCheckLogService;
@@ -239,6 +241,28 @@ public class MedicalCareServiceImpl extends ServiceImpl<MedicalCareMapper, Medic
 
     }
 
+    @Override
+    public void realNameMedicalCare(AppRealNameReqVO realNameReqVO) {
+        validateMedicalCareExists(realNameReqVO.getId());
+        medicalCareMapper.updateById(new MedicalCareDO().setRealname(CommonStatusEnum.YES.name())
+              .setCardPath(realNameReqVO.picPaths())
+              .setId(realNameReqVO.getId()));
+    }
+
+    @Override
+    public void updateMedicalCareAptitude(Long careId) {
+        medicalCareMapper.updateById(new MedicalCareDO().setAptitude(CommonStatusEnum.YES.name()).setId(careId));
+    }
+
+    @Override
+    public void perfectMedicalCare(AppMedicalCarePerfectVO perfectVO) {
+        // 校验存在
+        validateMedicalCareExists(perfectVO.getId());
+        // 更新
+        MedicalCareDO perfectObj = MedicalCareConvert.INSTANCE.convert(perfectVO);
+        perfectObj.setPerfect(CommonStatusEnum.YES.name());
+        medicalCareMapper.updateById(perfectObj);
+    }
 
     /**
      * 对密码进行加密

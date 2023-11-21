@@ -4,6 +4,7 @@ import java.util.*;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
+import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCarePerfectVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import cn.iocoder.yudao.module.hospital.controller.admin.medicalcare.vo.*;
@@ -22,6 +23,7 @@ public interface MedicalCareConvert {
     MedicalCareDO convert(MedicalCareCreateReqVO bean);
 
     MedicalCareDO convert(MedicalCareUpdateReqVO bean);
+    MedicalCareDO convert(AppMedicalCarePerfectVO bean);
 
     MedicalCareRespVO convert(MedicalCareDO bean);
 

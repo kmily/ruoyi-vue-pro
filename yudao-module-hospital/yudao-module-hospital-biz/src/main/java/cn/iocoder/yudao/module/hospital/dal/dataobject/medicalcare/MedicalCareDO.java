@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.hospital.dal.dataobject.medicalcare;
 
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -17,7 +18,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
  *
  * @author 芋道源码
  */
-@TableName("hospital_medical_care")
+@TableName(value = "hospital_medical_care", autoResultMap = true)
 @KeySequence("hospital_medical_care_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -54,7 +55,8 @@ public class MedicalCareDO extends BaseDO {
     /**
      * 身份证图片[正,反]
      */
-    private String cardPath;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> cardPath;
     /**
      * 联系方式
      */
@@ -98,7 +100,8 @@ public class MedicalCareDO extends BaseDO {
     /**
      * 主要擅长
      */
-    private String genius;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Set<String> genius;
     /**
      * 是否完善 NO-未实名，YES-实名
      */
@@ -147,6 +150,10 @@ public class MedicalCareDO extends BaseDO {
     /**
      * 来源 来源 0-自册, 1-后台添加
      */
-    @Schema(description = "来源 0-自册, 1-后台添加")
     private String source;
+
+    /**
+     * 头像路径
+     */
+    private String avatar;
 }

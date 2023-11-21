@@ -35,7 +35,7 @@ public class MedicalCareExcelVO {
     private String idCard;
 
     @ExcelProperty("身份证图片[正,反]")
-    private String cardPath;
+    private List<String> cardPath;
 
     @ExcelProperty("联系方式")
     private String mobile;
@@ -68,7 +68,7 @@ public class MedicalCareExcelVO {
     private LocalDateTime practiceTime;
 
     @ExcelProperty("主要擅长")
-    private String genius;
+    private Set<String> genius;
 
     @ExcelProperty("是否完善 NO-未实名，YES-实名")
     private String perfect;

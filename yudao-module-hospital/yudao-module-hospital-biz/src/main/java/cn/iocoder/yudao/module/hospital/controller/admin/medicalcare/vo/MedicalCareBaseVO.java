@@ -33,16 +33,13 @@ public class MedicalCareBaseVO {
     @Schema(description = "姓名", example = "张三")
     private String name;
 
-
-
-
     @Schema(description = "身份证号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "身份证号不能为空")
     @IDCard(message = "身份证号格式不正确")
     private String idCard;
 
     @Schema(description = "身份证图片[正,反]")
-    private String cardPath;
+    private List<String> cardPath;
 
     @Schema(description = "联系方式", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "联系方式不能为空")
@@ -59,7 +56,7 @@ public class MedicalCareBaseVO {
     @Schema(description = "紧急联系人")
     private String critical;
 
-    @Schema(description = "是否实名 NO-未实名，YES-实名", example = "赵六")
+    @Schema(description = "是否实名 NO-未实名，YES-实名", example = "NO")
     private String realname;
 
     @Schema(description = "职称")
@@ -75,11 +72,11 @@ public class MedicalCareBaseVO {
     private Integer timeLength;
 
     @Schema(description = "从业时间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime practiceTime;
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY)
+    private LocalDate practiceTime;
 
     @Schema(description = "主要擅长")
-    private String genius;
+    private Set<String> genius;
 
     @Schema(description = "是否完善 NO-未实名，YES-实名")
     private String perfect;
@@ -122,4 +119,7 @@ public class MedicalCareBaseVO {
      */
     @Schema(description = "来源 SELF-自册, BACK_ADD-后台添加")
     private String source;
+
+    @Schema(description = "头像路径")
+    private String avatar;
 }

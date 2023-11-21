@@ -206,6 +206,7 @@ yudao:
       - tmp_report_data_1
       - tmp_report_data_income
       - system_organization_package
+      - hospital_aptitude
   sms-code: # 短信验证码相关的配置项
     expire-times: 10m
     send-frequency: 1m
