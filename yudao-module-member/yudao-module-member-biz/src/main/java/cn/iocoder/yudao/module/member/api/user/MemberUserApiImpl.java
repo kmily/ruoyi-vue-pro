@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.api.user;
 
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserReqDTO;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
@@ -46,8 +47,13 @@ public class MemberUserApiImpl implements MemberUserApi {
     }
 
     @Override
-    public boolean updateUserHaveStore(Long memberId, Long orgId) {
-        return  userService.updateUserHaveStore(memberId, orgId);
+    public Long createMember(MemberUserReqDTO reqDTO) {
+        MemberUserDO user = userService.getUserByMobile(reqDTO.getMobile());
+        if(user != null){
+            return user.getId();
+        }
+        MemberUserDO memberUserDO = MemberUserConvert.INSTANCE.convert04(reqDTO);
+        userService.save(memberUserDO);
+        return memberUserDO.getId();
     }
-
 }

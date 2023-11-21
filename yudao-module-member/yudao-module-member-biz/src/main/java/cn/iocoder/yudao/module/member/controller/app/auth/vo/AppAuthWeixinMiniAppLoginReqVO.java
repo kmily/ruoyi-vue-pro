@@ -23,4 +23,7 @@ public class AppAuthWeixinMiniAppLoginReqVO {
     @NotEmpty(message = "登录 code 不能为空")
     private String loginCode;
 
+    @Schema(description = "登录类型 0-用户，1-医护", example = "1")
+    private Integer loginType;
+
 }

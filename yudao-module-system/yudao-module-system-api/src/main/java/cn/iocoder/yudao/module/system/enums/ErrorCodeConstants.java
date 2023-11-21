@@ -163,4 +163,16 @@ public interface ErrorCodeConstants {
     // ========== 站内信发送 1-002-028-000 ==========
     ErrorCode NOTIFY_SEND_TEMPLATE_PARAM_MISS = new ErrorCode(1_002_028_000, "模板参数({})缺失");
 
+   // =============== 机构
+    ErrorCode ORGANIZATION_NOT_EXISTS = new ErrorCode(100010, "机构不存在");
+
+    ErrorCode ORGANIZATION_NAME_EXIST_ERROR = new ErrorCode(100011, "机构名称已存在");
+
+    ErrorCode ORGANIZATION_APPLY_DOUBLE_ERROR = new ErrorCode(100012, "已经拥有机构!");
+
+    ErrorCode ORGANIZATION_CLOSE_ERROR = new ErrorCode(100013, "机构关闭，请联系管理员");
+
+    // ============ 机构套餐
+    ErrorCode ORGANIZATION_PACKAGE_NOT_EXISTS = new ErrorCode(100010, "机构套餐不存在!");
+    ErrorCode ORGANIZATION_PACKAGE_USED = new ErrorCode(100011, "机构正在使用该套餐，请给租户重新设置套餐后再尝试删除");
 }

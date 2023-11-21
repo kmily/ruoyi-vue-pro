@@ -27,6 +27,7 @@ import cn.iocoder.yudao.module.system.enums.oauth2.OAuth2ClientConstants;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,8 @@ import java.util.Objects;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.system.enums.oauth2.OAuth2ClientConstants.CLIENT_ID_DEFAULT;
+import static cn.iocoder.yudao.module.system.enums.oauth2.OAuth2ClientConstants.CLIENT_ID_STORE;
 
 /**
  * 会员的认证 Service 接口
@@ -56,7 +59,6 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     private SocialUserApi socialUserApi;
     @Resource
     private OAuth2TokenApi oauth2TokenApi;
-
     @Resource
     private WxMaService wxMaService;
 
@@ -73,7 +75,8 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         }
 
         // 创建 Token 令牌，记录登录日志
-        return createTokenAfterLoginSuccess(user, reqVO.getMobile(), LoginLogTypeEnum.LOGIN_MOBILE, openid);
+        return createTokenAfterLoginSuccess(user, reqVO.getMobile(), LoginLogTypeEnum.LOGIN_MOBILE, openid, null)
+                .setMobile(user.getMobile());
     }
 
     @Override
@@ -95,7 +98,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         }
 
         // 创建 Token 令牌，记录登录日志
-        return createTokenAfterLoginSuccess(user, reqVO.getMobile(), LoginLogTypeEnum.LOGIN_SMS, openid);
+        return createTokenAfterLoginSuccess(user, reqVO.getMobile(), LoginLogTypeEnum.LOGIN_SMS, openid, null);
     }
 
     @Override
@@ -114,7 +117,8 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         }
 
         // 创建 Token 令牌，记录登录日志
-        return createTokenAfterLoginSuccess(user, user.getMobile(), LoginLogTypeEnum.LOGIN_SOCIAL, socialUser.getOpenid());
+        return createTokenAfterLoginSuccess(user, user.getMobile(), LoginLogTypeEnum.LOGIN_SOCIAL, socialUser.getOpenid(), null)
+                .setMobile(user.getMobile());
     }
 
     @Override
@@ -131,22 +135,24 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         MemberUserDO user = userService.createUserIfAbsent(phoneNumberInfo.getPurePhoneNumber(), getClientIP());
         Assert.notNull(user, "获取用户失败，结果为空");
 
+
         // 绑定社交用户
         String openid = socialUserApi.bindSocialUser(new SocialUserBindReqDTO(user.getId(), getUserType().getValue(),
                 SocialTypeEnum.WECHAT_MINI_APP.getType(), reqVO.getLoginCode(), ""));
 
         // 创建 Token 令牌，记录登录日志
-        return createTokenAfterLoginSuccess(user, user.getMobile(), LoginLogTypeEnum.LOGIN_SOCIAL, openid);
+        return createTokenAfterLoginSuccess(user, user.getMobile(), LoginLogTypeEnum.LOGIN_SOCIAL, openid, null)
+                .setMobile(phoneNumberInfo.getPurePhoneNumber());
     }
 
     private AppAuthLoginRespVO createTokenAfterLoginSuccess(MemberUserDO user, String mobile,
-                                                            LoginLogTypeEnum logType, String openid) {
+                                                            LoginLogTypeEnum logType, String openid, Long orgId) {
         // 插入登陆日志
         createLoginLog(user.getId(), mobile, logType, LoginResultEnum.SUCCESS);
         // 创建 Token 令牌
         OAuth2AccessTokenRespDTO accessTokenRespDTO = oauth2TokenApi.createAccessToken(new OAuth2AccessTokenCreateReqDTO()
                 .setUserId(user.getId()).setUserType(getUserType().getValue())
-                .setClientId(OAuth2ClientConstants.CLIENT_ID_DEFAULT));
+                .setClientId(Objects.isNull(orgId)?CLIENT_ID_DEFAULT: CLIENT_ID_STORE).setOrgId(orgId));
         // 构建返回结果
         return AuthConvert.INSTANCE.convert(accessTokenRespDTO, openid);
     }
@@ -234,9 +240,11 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     @Override
     public AppAuthLoginRespVO refreshToken(String refreshToken) {
         OAuth2AccessTokenRespDTO accessTokenDO = oauth2TokenApi.refreshAccessToken(refreshToken,
-                OAuth2ClientConstants.CLIENT_ID_DEFAULT);
+                CLIENT_ID_DEFAULT);
         return AuthConvert.INSTANCE.convert(accessTokenDO, null);
     }
+
+
 
     private void createLogoutLog(Long userId) {
         LoginLogCreateReqDTO reqDTO = new LoginLogCreateReqDTO();

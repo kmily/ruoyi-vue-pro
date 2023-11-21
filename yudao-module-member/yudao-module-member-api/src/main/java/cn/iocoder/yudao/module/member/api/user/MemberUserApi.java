@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.api.user;
 
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserReqDTO;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 
 import java.util.Collection;
@@ -57,12 +58,12 @@ public interface MemberUserApi {
      */
     MemberUserRespDTO getUserByMobile(String mobile);
 
+
     /**
-     * 更改 用户拥有一个机构
-     * @param memberId 用户ID
-     * @param orgId 店铺ID
-     * @return
+     * 创建会员信息
+     * @param reqDTO 请求参数
+     * @return 创建会员的ID
      */
-    boolean updateUserHaveStore(Long memberId, Long orgId);
+    Long createMember(MemberUserReqDTO reqDTO);
 
 }

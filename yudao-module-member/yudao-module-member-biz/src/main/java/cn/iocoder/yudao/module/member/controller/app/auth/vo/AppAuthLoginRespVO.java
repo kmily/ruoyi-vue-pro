@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.controller.app.auth.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,4 +36,10 @@ public class AppAuthLoginRespVO {
     @Schema(description = "社交用户 openid", example = "qq768")
     private String openid;
 
+    @Schema(description = "医护编号")
+    private Long careId;
+
+    @Schema(deprecated = true)
+    @JsonIgnore
+    private String mobile;
 }

@@ -6,6 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RolePageReqVO;
@@ -58,6 +59,7 @@ public class RoleServiceImpl implements RoleService {
         role.setType(ObjectUtil.defaultIfNull(type, RoleTypeEnum.CUSTOM.getType()));
         role.setStatus(CommonStatusEnum.ENABLE.getStatus());
         role.setDataScope(DataScopeEnum.ALL.getScope()); // 默认可查看所有数据。原因是，可能一些项目不需要项目权限
+        role.setOrgId(SecurityFrameworkUtils.getLoginOrgId());
         roleMapper.insert(role);
         // 返回
         return role.getId();
@@ -243,6 +245,16 @@ public class RoleServiceImpl implements RoleService {
                 throw exception(ROLE_IS_DISABLE, role.getName());
             }
         });
+    }
+
+    @Override
+    public RoleDO getRoleByCode(String code) {
+        return roleMapper.selectOne(RoleDO::getCode, code);
+    }
+
+    @Override
+    public List<RoleDO> getRoleListByOrgId(Long orgId) {
+        return roleMapper.selectList(RoleDO::getOrgId, orgId);
     }
 
     /**

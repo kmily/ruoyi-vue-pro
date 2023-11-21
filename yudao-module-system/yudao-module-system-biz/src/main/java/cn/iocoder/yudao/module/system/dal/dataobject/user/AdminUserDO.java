@@ -93,4 +93,9 @@ public class AdminUserDO extends TenantBaseDO {
      */
     private LocalDateTime loginDate;
 
+    /**
+     * 机构编号
+     */
+    private Long orgId;
+
 }

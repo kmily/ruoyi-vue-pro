@@ -75,4 +75,9 @@ public class RoleDO extends TenantBaseDO {
     @TableField(typeHandler = JsonLongSetTypeHandler.class)
     private Set<Long> dataScopeDeptIds;
 
+    /**
+     * 机构编号
+     */
+    private Long orgId;
+
 }

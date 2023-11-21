@@ -11,4 +11,16 @@ public interface ErrorCodeConstants {
     ErrorCode STORE_NAME_EXIST_ERROR = new ErrorCode(100011, "机构名称已存在");
 
     ErrorCode STORE_APPLY_DOUBLE_ERROR = new ErrorCode(100012, "已经拥有机构!");
+
+    ErrorCode STORE_CLOSE_ERROR = new ErrorCode(100013, "店铺关闭，请联系管理员");
+
+
+    /**   医护任务 */
+    ErrorCode MEDICAL_CARE_NOT_EXISTS = new ErrorCode(200010, "用户不存在");
+    ErrorCode MEDICAL_CARE_HAS_EXISTS = new ErrorCode(200011, "用户已存在");
+    ErrorCode MEDICAL_CARE_CREATE_FAIL = new ErrorCode(200012, "用户创建失败!");
+
+
+    /** 医院菜单 */
+    ErrorCode MENU_NOT_EXISTS = new ErrorCode(300010, "菜单不存在");
 }

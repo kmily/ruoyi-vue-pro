@@ -32,4 +32,6 @@ public class UserExportReqVO {
     @Schema(description = "部门编号，同时筛选子部门", example = "1024")
     private Long deptId;
 
+    private Long orgId;
+
 }

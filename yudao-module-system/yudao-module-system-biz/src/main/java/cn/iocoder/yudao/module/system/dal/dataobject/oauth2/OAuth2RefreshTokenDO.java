@@ -60,4 +60,9 @@ public class OAuth2RefreshTokenDO extends BaseDO {
      */
     private LocalDateTime expiresTime;
 
+    /**
+     * 机构ID
+     */
+    private Long orgId;
+
 }

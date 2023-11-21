@@ -36,6 +36,11 @@ public class LoginUser {
      */
     private List<String> scopes;
 
+    /**
+     * 机构编号
+     */
+    private Long orgId;
+
     // ========== 上下文 ==========
     /**
      * 上下文字段，不进行持久化

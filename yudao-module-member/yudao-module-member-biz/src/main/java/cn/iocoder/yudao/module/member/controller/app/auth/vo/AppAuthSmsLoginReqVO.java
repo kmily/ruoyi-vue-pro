@@ -55,4 +55,7 @@ public class AppAuthSmsLoginReqVO {
         return socialType == null || StrUtil.isNotEmpty(socialState);
     }
 
+    @Schema(description = "登录类型 0-用户，1-医护", example = "1")
+    private Integer loginType;
+
 }

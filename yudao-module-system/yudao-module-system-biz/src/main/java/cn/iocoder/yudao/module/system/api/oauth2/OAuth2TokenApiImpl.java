@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.system.service.oauth2.OAuth2TokenService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * OAuth2.0 Token API 实现类
@@ -23,8 +24,16 @@ public class OAuth2TokenApiImpl implements OAuth2TokenApi {
 
     @Override
     public OAuth2AccessTokenRespDTO createAccessToken(OAuth2AccessTokenCreateReqDTO reqDTO) {
-        OAuth2AccessTokenDO accessTokenDO = oauth2TokenService.createAccessToken(
-                reqDTO.getUserId(), reqDTO.getUserType(), reqDTO.getClientId(), reqDTO.getScopes());
+        OAuth2AccessTokenDO accessTokenDO = null;
+        if(Objects.isNull(reqDTO.getOrgId())){
+            accessTokenDO = oauth2TokenService.createAccessToken(
+                    reqDTO.getUserId(), reqDTO.getUserType(), reqDTO.getClientId(), reqDTO.getScopes());
+        }else{
+            accessTokenDO = oauth2TokenService.createAccessToken(
+                    reqDTO.getUserId(), reqDTO.getUserType(), reqDTO.getClientId(), reqDTO.getScopes(), reqDTO.getOrgId());
+
+        }
+
         return OAuth2TokenConvert.INSTANCE.convert2(accessTokenDO);
     }
 

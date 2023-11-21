@@ -139,4 +139,17 @@ public interface RoleService {
      */
     void validateRoleList(Collection<Long> ids);
 
+    /**
+     * 根据角色编号查询角色
+     * @param code 角色编号
+     * @return
+     */
+    RoleDO getRoleByCode(String code);
+
+    /**
+     * 查询属于此机构的所有角色
+     * @param orgId 机构编号
+     * @return 此机构下的角色
+     */
+    List<RoleDO> getRoleListByOrgId(Long orgId);
 }

@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
  * @author 芋道源码
  */
 @Mapper
-public interface MemberUserMapper extends BaseMapperX<MemberUserDO> {
+public interface MemberUserMapper extends BaseMapperX<MemberUserDO>, BaseMapper<MemberUserDO> {
 
     default MemberUserDO selectByMobile(String mobile) {
         return selectOne(MemberUserDO::getMobile, mobile);

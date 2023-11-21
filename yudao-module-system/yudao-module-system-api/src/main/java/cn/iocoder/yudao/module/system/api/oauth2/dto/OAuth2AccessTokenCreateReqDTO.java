@@ -37,4 +37,9 @@ public class OAuth2AccessTokenCreateReqDTO implements Serializable {
      */
     private List<String> scopes;
 
+    /**
+     * 机构ID
+     */
+    private Long orgId;
+
 }

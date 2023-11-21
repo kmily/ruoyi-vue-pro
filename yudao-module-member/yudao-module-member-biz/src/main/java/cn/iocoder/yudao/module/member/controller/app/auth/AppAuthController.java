@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.hospital.api.medicalcare.MedicalCareApi;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
 import cn.iocoder.yudao.module.member.service.auth.MemberAuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,6 +20,8 @@ import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -36,10 +39,18 @@ public class AppAuthController {
     @Resource
     private SecurityProperties securityProperties;
 
+    @Resource
+    private MedicalCareApi medicalCareApi;
+
     @PostMapping("/login")
     @Operation(summary = "使用手机 + 密码登录")
     public CommonResult<AppAuthLoginRespVO> login(@RequestBody @Valid AppAuthLoginReqVO reqVO) {
-        return success(authService.login(reqVO));
+        AppAuthLoginRespVO respVO = authService.login(reqVO);
+        if(Objects.equals(1, reqVO.getLoginType())){
+            long careId = medicalCareApi.createMedicalCare(respVO.getUserId(), reqVO.getMobile());
+            respVO.setCareId(careId);
+        }
+        return success(respVO);
     }
 
     @PostMapping("/logout")
@@ -66,7 +77,12 @@ public class AppAuthController {
     @PostMapping("/sms-login")
     @Operation(summary = "使用手机 + 验证码登录")
     public CommonResult<AppAuthLoginRespVO> smsLogin(@RequestBody @Valid AppAuthSmsLoginReqVO reqVO) {
-        return success(authService.smsLogin(reqVO));
+        AppAuthLoginRespVO respVO = authService.smsLogin(reqVO);
+        if(Objects.equals(1, reqVO.getLoginType())){
+            long careId = medicalCareApi.createMedicalCare(respVO.getUserId(), reqVO.getMobile());
+            respVO.setCareId(careId);
+        }
+        return success(respVO);
     }
 
     @PostMapping("/send-sms-code")
@@ -99,13 +115,23 @@ public class AppAuthController {
     @PostMapping("/social-login")
     @Operation(summary = "社交快捷登录，使用 code 授权码", description = "适合未登录的用户，但是社交账号已绑定用户")
     public CommonResult<AppAuthLoginRespVO> socialLogin(@RequestBody @Valid AppAuthSocialLoginReqVO reqVO) {
-        return success(authService.socialLogin(reqVO));
+        AppAuthLoginRespVO respVO = authService.socialLogin(reqVO);
+        if(Objects.equals(1, reqVO.getLoginType())){
+            long careId = medicalCareApi.createMedicalCare(respVO.getUserId(), respVO.getMobile());
+            respVO.setCareId(careId);
+        }
+        return success(respVO);
     }
 
     @PostMapping("/weixin-mini-app-login")
     @Operation(summary = "微信小程序的一键登录")
     public CommonResult<AppAuthLoginRespVO> weixinMiniAppLogin(@RequestBody @Valid AppAuthWeixinMiniAppLoginReqVO reqVO) {
-        return success(authService.weixinMiniAppLogin(reqVO));
+        AppAuthLoginRespVO respVO = authService.weixinMiniAppLogin(reqVO);
+        if(Objects.equals(1, reqVO.getLoginType())){
+            long careId = medicalCareApi.createMedicalCare(respVO.getUserId(), respVO.getMobile());
+            respVO.setCareId(careId);
+        }
+        return success(respVO);
     }
 
 }

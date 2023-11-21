@@ -22,6 +22,7 @@ public interface ErrorCodeConstants {
     ErrorCode AUTH_WEIXIN_MINI_APP_PHONE_CODE_ERROR = new ErrorCode(1_004_003_006, "获得手机号失败");
     ErrorCode AUTH_MOBILE_USED = new ErrorCode(1_004_003_007, "手机号已经被使用");
 
+
     // ========== 用户收件地址 1-004-004-000 ==========
     ErrorCode ADDRESS_NOT_EXISTS = new ErrorCode(1_004_004_000, "用户收件地址不存在");
 

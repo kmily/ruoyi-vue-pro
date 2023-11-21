@@ -31,4 +31,6 @@ public class AppAuthSocialLoginReqVO {
     @NotEmpty(message = "state 不能为空")
     private String state;
 
+    @Schema(description = "登录类型 0-用户，1-医护", example = "1")
+    private Integer loginType;
 }

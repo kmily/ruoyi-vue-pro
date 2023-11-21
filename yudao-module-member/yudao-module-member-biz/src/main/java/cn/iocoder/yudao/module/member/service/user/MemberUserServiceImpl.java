@@ -22,6 +22,7 @@ import cn.iocoder.yudao.module.member.mq.producer.user.UserCreateProducer;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,7 +50,7 @@ import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
 @Service
 @Valid
 @Slf4j
-public class MemberUserServiceImpl implements MemberUserService {
+public class MemberUserServiceImpl extends ServiceImpl<MemberUserMapper, MemberUserDO> implements MemberUserService {
 
     @Resource
     private MemberUserMapper memberUserMapper;
@@ -289,12 +290,4 @@ public class MemberUserServiceImpl implements MemberUserService {
         }
         return true;
     }
-
-    @Override
-    public boolean updateUserHaveStore(Long memberId, Long orgId) {
-        int update = memberUserMapper.updateById(new MemberUserDO().setId(memberId)
-                .setHaveStore(true).setOrgId(orgId));
-        return update > 0;
-    }
-
 }

@@ -13,6 +13,7 @@ public enum RoleCodeEnum {
 
     SUPER_ADMIN("super_admin", "超级管理员"),
     TENANT_ADMIN("tenant_admin", "租户管理员"),
+    STORE_ADMIN("store_admin", "商户管理员"),
     ;
 
     /**

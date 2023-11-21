@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.member.convert.user;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserReqDTO;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserRespVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
@@ -60,4 +61,5 @@ public interface MemberUserConvert {
         return result;
     }
 
+    MemberUserDO convert04(MemberUserReqDTO reqDTO);
 }

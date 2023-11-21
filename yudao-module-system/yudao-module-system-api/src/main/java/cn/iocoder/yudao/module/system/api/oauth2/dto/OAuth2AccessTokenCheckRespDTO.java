@@ -30,4 +30,9 @@ public class OAuth2AccessTokenCheckRespDTO implements Serializable {
      */
     private List<String> scopes;
 
+    /**
+     * 机构ID
+     */
+    private Long orgId;
+
 }

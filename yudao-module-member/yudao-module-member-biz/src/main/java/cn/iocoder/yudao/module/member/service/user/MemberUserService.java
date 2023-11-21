@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdate
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
+import com.baomidou.mybatisplus.extension.service.IService;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -19,7 +20,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-public interface MemberUserService {
+public interface MemberUserService extends IService<MemberUserDO> {
 
     /**
      * 通过手机查询用户
@@ -167,7 +168,5 @@ public interface MemberUserService {
      * @return 更新结果
      */
     boolean updateUserPoint(Long userId, Integer point);
-
-    boolean updateUserHaveStore(Long memberId, Long orgId);
 
 }
