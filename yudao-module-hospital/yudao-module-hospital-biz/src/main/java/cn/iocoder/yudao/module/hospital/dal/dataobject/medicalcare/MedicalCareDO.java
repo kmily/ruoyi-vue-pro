@@ -156,4 +156,14 @@ public class MedicalCareDO extends BaseDO {
      * 头像路径
      */
     private String avatar;
+
+    /**
+     * 评论分数
+     */
+    private Integer commentScore;
+
+    /**
+     * 评论条数
+     */
+    private Integer commentCount;
 }

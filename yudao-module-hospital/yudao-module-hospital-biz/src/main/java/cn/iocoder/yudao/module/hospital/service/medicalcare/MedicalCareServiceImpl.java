@@ -5,8 +5,10 @@ import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCarePageReqVO;
 import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCarePerfectVO;
 import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppRealNameReqVO;
+import cn.iocoder.yudao.module.hospital.dal.dataobject.careaptitude.CareAptitudeDO;
 import cn.iocoder.yudao.module.hospital.dal.dataobject.medicalcarechecklog.MedicalCareCheckLogDO;
 import cn.iocoder.yudao.module.hospital.enums.medicalcare.MedicalCareStatusEnum;
 import cn.iocoder.yudao.module.hospital.service.medicalcarechecklog.MedicalCareCheckLogService;
@@ -17,6 +19,7 @@ import cn.iocoder.yudao.module.system.api.organization.dto.OrganizationDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -252,6 +255,23 @@ public class MedicalCareServiceImpl extends ServiceImpl<MedicalCareMapper, Medic
     @Override
     public void updateMedicalCareAptitude(Long careId) {
         medicalCareMapper.updateById(new MedicalCareDO().setAptitude(CommonStatusEnum.YES.name()).setId(careId));
+    }
+
+    @Override
+    public PageResult<MedicalCareDO> getCareAptitudePage(AppMedicalCarePageReqVO pageVO) {
+        if(CollUtil.isNotEmpty(pageVO.getAptitudes())){
+            // 如果资质不为空
+            return medicalCareMapper.selectPageByAptitude(pageVO);
+        }
+        return medicalCareMapper.selectPage(pageVO);
+    }
+
+    @Override
+    public void updateCareComment(Long id, Integer commentScore) {
+        int score = commentScore == null? 0: commentScore;
+        medicalCareMapper.update(new MedicalCareDO(), new LambdaUpdateWrapper<MedicalCareDO>()
+                .setSql("`comment_score` = `comment_score` + ?, `comment_count` = `comment_count` + 1", score)
+                .eq(MedicalCareDO::getId, id));
     }
 
     @Override

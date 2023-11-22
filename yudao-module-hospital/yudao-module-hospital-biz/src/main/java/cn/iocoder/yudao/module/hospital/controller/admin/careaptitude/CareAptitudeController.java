@@ -1,14 +1,8 @@
 package cn.iocoder.yudao.module.hospital.controller.admin.careaptitude;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.hospital.controller.admin.careaptitude.vo.CareAptitudeAuditReqVO;
-import cn.iocoder.yudao.module.hospital.controller.admin.medicalcare.vo.MedicalCareAuditVO;
-import cn.iocoder.yudao.module.hospital.controller.app.careaptitude.vo.AppCareAptitudeCreateReqVO;
-import cn.iocoder.yudao.module.hospital.controller.app.careaptitude.vo.AppCareAptitudePageReqVO;
 import cn.iocoder.yudao.module.hospital.controller.app.careaptitude.vo.AppCareAptitudeRespVO;
-import cn.iocoder.yudao.module.hospital.controller.app.careaptitude.vo.AppCareAptitudeUpdateReqVO;
 import cn.iocoder.yudao.module.hospital.convert.careaptitude.CareAptitudeConvert;
 import cn.iocoder.yudao.module.hospital.dal.dataobject.careaptitude.CareAptitudeDO;
 import cn.iocoder.yudao.module.hospital.service.careaptitude.CareAptitudeService;
@@ -26,7 +20,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Tag(name = "用户 APP - 医护资质")
+@Tag(name = "管理后台 - 医护资质")
 @RestController
 @RequestMapping("/hospital/care-aptitude")
 @Validated

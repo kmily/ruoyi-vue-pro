@@ -3,8 +3,10 @@ package cn.iocoder.yudao.module.hospital.service.medicalcare;
 import java.util.*;
 import javax.validation.*;
 import cn.iocoder.yudao.module.hospital.controller.admin.medicalcare.vo.*;
+import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCarePageReqVO;
 import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCarePerfectVO;
 import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppRealNameReqVO;
+import cn.iocoder.yudao.module.hospital.dal.dataobject.careaptitude.CareAptitudeDO;
 import cn.iocoder.yudao.module.hospital.dal.dataobject.medicalcare.MedicalCareDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.hospital.enums.medicalcare.MedicalCareStatusEnum;
@@ -118,4 +120,20 @@ public interface MedicalCareService extends IService<MedicalCareDO>{
      * @param careId 医护编号
      */
     void updateMedicalCareAptitude(Long careId);
+
+    /**
+     * APP端分页查询
+     * @param pageVO 查询条件
+     * @return
+     */
+    PageResult<MedicalCareDO> getCareAptitudePage(AppMedicalCarePageReqVO pageVO);
+
+
+    /**
+     * 更新医护人员评价得分
+     * @param id 医护编号
+     * @param commentScore 此次评分
+     */
+    void updateCareComment(Long id, Integer commentScore);
+
 }

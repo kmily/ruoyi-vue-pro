@@ -5,10 +5,12 @@ import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.hospital.controller.admin.careaptitude.vo.CareAptitudeAuditReqVO;
 import cn.iocoder.yudao.module.hospital.dal.dataobject.aptitude.AptitudeDO;
 
+import cn.iocoder.yudao.module.hospital.dal.dataobject.careaptitude.CareAptitudeCheckLogDO;
 import cn.iocoder.yudao.module.hospital.service.aptitude.AptitudeService;
 import cn.iocoder.yudao.module.hospital.service.medicalcare.MedicalCareService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
@@ -52,6 +54,9 @@ public class CareAptitudeServiceImpl extends ServiceImpl<CareAptitudeMapper, Car
     @Resource
     private AdminUserApi adminUserApi;
 
+    @Resource
+    private CareAptitudeCheckLogService checkLogService;
+
     @Override
     public Long createCareAptitude(AppCareAptitudeCreateReqVO createReqVO) {
         // 插入
@@ -64,7 +69,19 @@ public class CareAptitudeServiceImpl extends ServiceImpl<CareAptitudeMapper, Car
         }
         careAptitude.setAptitudeName(aptitude.getName());
         careAptitude.setCheckStatus(APPLYING.value());
-        careAptitudeMapper.insert(careAptitude);
+
+        CareAptitudeDO aptitudeDO = this.getOne(new LambdaQueryWrapper<CareAptitudeDO>().eq(CareAptitudeDO::getCareId, careAptitude.getCareId())
+                .eq(CareAptitudeDO::getAptitudeId, careAptitude.getAptitudeId()));
+        if(Objects.nonNull(aptitudeDO)){
+            careAptitude.setId(aptitudeDO.getId());
+            careAptitudeMapper.updateById(careAptitude);
+
+            // TODO  更新资质时是否要处理如果没有存在已认证的资质，把医护资质认证设置为 NO
+
+        }else{
+            careAptitudeMapper.insert(careAptitude);
+        }
+
         // 返回
         return careAptitude.getId();
     }
@@ -131,6 +148,14 @@ public class CareAptitudeServiceImpl extends ServiceImpl<CareAptitudeMapper, Car
             // 审核通过
             medicalCareService.updateMedicalCareAptitude(aptitudeDO.getCareId());
         }
+
+        checkLogService.save(new CareAptitudeCheckLogDO()
+                .setCareId(aptitudeDO.getCareId())
+                .setAptitudeId(aptitudeDO.getAptitudeId())
+                .setOpinion(auditVO.getOpinion())
+                .setCheckStatus(auditVO.getStatus())
+                .setCheckName(user.getNickname())
+                .setCheckTime(LocalDateTime.now()));
     }
 
 }

@@ -4,6 +4,8 @@ import java.util.*;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
+import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCareRespVO;
+import cn.iocoder.yudao.module.hospital.dal.dataobject.medicalcare.MedicalCareDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import cn.iocoder.yudao.module.hospital.controller.app.careaptitude.vo.*;
@@ -28,6 +30,7 @@ public interface CareAptitudeConvert {
     List<AppCareAptitudeRespVO> convertList(List<CareAptitudeDO> list);
 
     PageResult<AppCareAptitudeRespVO> convertPage(PageResult<CareAptitudeDO> page);
+    PageResult<AppMedicalCareRespVO> convertPage01(PageResult<MedicalCareDO> page);
 
     List<AppCareAptitudeExcelVO> convertList02(List<CareAptitudeDO> list);
 

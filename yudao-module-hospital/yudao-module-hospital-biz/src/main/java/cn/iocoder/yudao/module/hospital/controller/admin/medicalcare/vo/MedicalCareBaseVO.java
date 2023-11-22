@@ -122,4 +122,11 @@ public class MedicalCareBaseVO {
 
     @Schema(description = "头像路径")
     private String avatar;
+
+
+    @Schema(description = "评论分数")
+    private Integer commentScore;
+
+    @Schema(description = "评论条数")
+    private Integer commentCount;
 }

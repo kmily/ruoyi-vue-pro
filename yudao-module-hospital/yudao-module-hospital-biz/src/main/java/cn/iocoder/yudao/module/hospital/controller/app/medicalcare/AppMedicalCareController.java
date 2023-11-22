@@ -1,13 +1,23 @@
 package cn.iocoder.yudao.module.hospital.controller.app.medicalcare;
 
+import cn.hutool.core.util.IdcardUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.hospital.controller.admin.medicalcare.vo.MedicalCareRespVO;
 import cn.iocoder.yudao.module.hospital.controller.admin.medicalcare.vo.MedicalCareUpdateReqVO;
+import cn.iocoder.yudao.module.hospital.controller.app.careaptitude.vo.AppCareAptitudePageReqVO;
+import cn.iocoder.yudao.module.hospital.controller.app.careaptitude.vo.AppCareAptitudeRespVO;
+import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCarePageReqVO;
 import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCarePerfectVO;
+import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCareRespVO;
 import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppRealNameReqVO;
+import cn.iocoder.yudao.module.hospital.convert.careaptitude.CareAptitudeConvert;
 import cn.iocoder.yudao.module.hospital.convert.medicalcare.MedicalCareConvert;
+import cn.iocoder.yudao.module.hospital.dal.dataobject.careaptitude.CareAptitudeDO;
 import cn.iocoder.yudao.module.hospital.dal.dataobject.medicalcare.MedicalCareDO;
+import cn.iocoder.yudao.module.hospital.service.medicalcare.CareFavoriteService;
 import cn.iocoder.yudao.module.hospital.service.medicalcare.MedicalCareService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -38,6 +48,9 @@ public class AppMedicalCareController {
     @Resource
     private MedicalCareService medicalCareService;
 
+    @Resource
+    private CareFavoriteService careFavoriteService;
+
     @GetMapping("/{memberId}/member")
     @Operation(summary = "根据手机号查询医护")
     @Parameter(name = "memberId", description = "手机号", required = true)
@@ -63,6 +76,26 @@ public class AppMedicalCareController {
         return success(true);
     }
 
+
+    @GetMapping("/page")
+    @Operation(summary = "获得医护分页")
+    @PreAuthenticated
+    public CommonResult<PageResult<AppMedicalCareRespVO>> getCareAptitudePage(@Valid AppMedicalCarePageReqVO pageVO) {
+        PageResult<MedicalCareDO> pageResult = medicalCareService.getCareAptitudePage(pageVO);
+        return success(CareAptitudeConvert.INSTANCE.convertPage01(pageResult));
+    }
+
+    @GetMapping("/get")
+    @Operation(summary = "获得医护信息")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    public CommonResult<AppMedicalCareRespVO> getMedicalCare(@RequestParam("id") Long id) {
+        MedicalCareDO medicalCare = medicalCareService.getMedicalCare(id);
+        AppMedicalCareRespVO convert = MedicalCareConvert.INSTANCE.convert02(medicalCare);
+        // TODO  此处后面添加查询搜藏数量
+        Long careFavorite = careFavoriteService.getCareFavorite(convert.getId(), null);
+        convert.setCollect(careFavorite);
+        return success(convert);
+    }
 
 
 }
