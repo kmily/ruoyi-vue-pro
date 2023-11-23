@@ -1,16 +1,11 @@
 package cn.iocoder.yudao.module.crm.service.customer;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.customer.CrmCustomerMapper;
-import cn.iocoder.yudao.module.crm.enums.customer.CrmCustomerSceneEnum;
 import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
@@ -21,10 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 
 /**
@@ -42,6 +39,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     private CrmPermissionService crmPermissionService;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Long createCustomer(CrmCustomerCreateReqVO createReqVO, Long userId) {
         // 插入
         CrmCustomerDO customer = CrmCustomerConvert.INSTANCE.convert(createReqVO);
@@ -92,31 +90,19 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     public PageResult<CrmCustomerDO> getCustomerPage(CrmCustomerPageReqVO pageReqVO, Long userId) {
-        // 1.1 TODO 如果是超级管理员
+        // 1.1. TODO 如果是超级管理员
         boolean admin = false;
-        if (admin && ObjUtil.notEqual(userId, CrmPermissionDO.POOL_USER_ID)) {
-            return customerMapper.selectPage(pageReqVO, Collections.emptyList());
+        if (admin) {
+            return customerMapper.selectPage(pageReqVO);
         }
-        // 1.2 获取当前用户能看的分页数据
-        // TODO @puhui999：如果业务的数据量比较大，in 太多可能有性能问题噢；看看是不是搞成 join 连表了；可以微信讨论下；
-        List<CrmPermissionDO> permissions = crmPermissionService.getPermissionListByBizTypeAndUserId(
-                CrmBizTypeEnum.CRM_CUSTOMER.getType(), userId);
-        // 1.3 TODO 场景数据过滤
-        if (CrmCustomerSceneEnum.isOwner(pageReqVO.getSceneType())) { // 场景一：我负责的数据
-            permissions = CollectionUtils.filterList(permissions, item -> CrmPermissionLevelEnum.isOwner(item.getLevel()));
-        }
-        Set<Long> ids = convertSet(permissions, CrmPermissionDO::getBizId);
-        if (CollUtil.isEmpty(ids)) { // 没得说明没有什么给他看的
-            return PageResult.empty();
-        }
-
-        // 2. 获取客户分页数据
-        return customerMapper.selectPage(pageReqVO, ids);
+        // 1.2. 获取当前用户能看的分页数据
+        return customerMapper.selectPage(pageReqVO, userId);
     }
 
     @Override
     public List<CrmCustomerDO> getCustomerList(CrmCustomerExportReqVO exportReqVO) {
         //return customerMapper.selectList(exportReqVO);
+        // TODO puhui999: 等数据权限完善后再实现
         return Collections.emptyList();
     }
 
@@ -137,8 +123,9 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#reqVO.id", level = CrmPermissionLevelEnum.OWNER)
     public void transferCustomer(CrmCustomerTransferReqVO reqVO, Long userId) {
-        // 1. 校验合同是否存在
+        // 1. 校验客户是否存在
         validateCustomer(reqVO.getId());
 
         // 2. 数据权限转移
@@ -162,16 +149,61 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void receive(List <Long> ids) {
-        transferCustomerOwner(ids,SecurityFrameworkUtils.getLoginUserId());
+    public void receive(List<Long> ids) {
+        transferCustomerOwner(ids, SecurityFrameworkUtils.getLoginUserId());
     }
 
     @Override
-    public void distributeByIds(List <Long> cIds, Long ownerId) {
-        transferCustomerOwner(cIds,ownerId);
+    public void distributeByIds(List<Long> cIds, Long ownerId) {
+        transferCustomerOwner(cIds, ownerId);
     }
 
-    private void transferCustomerOwner(List <Long> cIds, Long ownerId){
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void receive(Long id, Long userId) {
+        // 1. 校验存在
+        CrmCustomerDO customer = customerMapper.selectById(id);
+        if (customer == null) {
+            throw exception(CUSTOMER_NOT_EXISTS);
+        }
+        // 1.2. 校验是否为公海数据
+        if (customer.getOwnerUserId() != null) {
+            throw exception(CUSTOMER_NOT_IN_POOL);
+        }
+
+        // 2. 领取公海数据-设置负责人
+        customerMapper.updateById(new CrmCustomerDO().setId(customer.getId()).setOwnerUserId(userId));
+        // 3. 创建负责人数据权限
+        crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
+                .setBizId(customer.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
+    public void putPool(Long id) {
+        // 1. 校验存在
+        CrmCustomerDO customer = customerMapper.selectById(id);
+        if (customer == null) {
+            throw exception(CUSTOMER_NOT_EXISTS);
+        }
+        // 1.2. 校验是否为公海数据
+        if (customer.getOwnerUserId() == null) {
+            throw exception(CUSTOMER_IN_POOL);
+        }
+        // 1.3. 校验客户是否锁定、
+        if (customer.getLockStatus()) {
+            throw exception(CUSTOMER_LOCKED_PUT_POOL_FAIL);
+        }
+
+        // 2. 公海数据-设置负责人 NULL
+        customerMapper.updateById(new CrmCustomerDO().setId(customer.getId()).setOwnerUserId(null));
+        // 3. 删除负责人数据权限
+        crmPermissionService.deletePermission(CrmBizTypeEnum.CRM_CUSTOMER.getType(), customer.getId(),
+                CrmPermissionLevelEnum.OWNER.getLevel());
+    }
+
+    private void transferCustomerOwner(List<Long> cIds, Long ownerId) {
         // 先一次性校验完成客户是否可用
         // TODO @xiaqing：批量一次性加载客户列表，然后去逐个校验；
         for (Long cId : cIds) {
@@ -185,8 +217,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
             validCustomerDeal(cId);
         }
         // TODO @xiaqing：每个客户更新的时候，where 条件，加上 owner_user_id is null，防止并发问题；
-        List<CrmCustomerDO> updateDos = new ArrayList <>();
-        for (Long cId : cIds){
+        List<CrmCustomerDO> updateDos = new ArrayList<>();
+        for (Long cId : cIds) {
             CrmCustomerDO customerDO = new CrmCustomerDO();
             customerDO.setId(cId);
             customerDO.setOwnerUserId(SecurityFrameworkUtils.getLoginUserId());
@@ -196,19 +228,19 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     }
 
     private void validCustomerOwnerExist(Long id) {
-        if (customerMapper.selectById(id).getOwnerUserId()!=null) {
+        if (customerMapper.selectById(id).getOwnerUserId() != null) {
             throw exception(CUSTOMER_OWNER_EXISTS);
         }
     }
 
     private void validCustomerIsLocked(Long id) {
-        if (customerMapper.selectById(id).getLockStatus() ==true) {
+        if (customerMapper.selectById(id).getLockStatus() == true) {
             throw exception(CUSTOMER_LOCKED);
         }
     }
 
     private void validCustomerDeal(Long id) {
-        if (customerMapper.selectById(id).getDealStatus() ==true) {
+        if (customerMapper.selectById(id).getDealStatus() == true) {
             throw exception(CUSTOMER_ALREADY_DEAL);
         }
     }

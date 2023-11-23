@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.crm.enums.customer;
+package cn.iocoder.yudao.module.crm.enums.common;
 
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
@@ -7,20 +7,19 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
-// TODO @puhui999：这个应该是 crm 全局的，不仅仅属于 customer 客户哈；
 /**
- * CRM 客户等级
+ * CRM 列表检索场景
  *
- * @author Wanwan
+ * @author HUIHUI
  */
 @Getter
 @AllArgsConstructor
-public enum CrmCustomerSceneEnum implements IntArrayValuable {
+public enum CrmSceneEnum implements IntArrayValuable {
 
-    OWNER(1, "我负责的客户"),
-    FOLLOW(2, "我关注的客户");
+    OWNER(1, "我负责的"),
+    FOLLOW(2, "我关注的");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmCustomerSceneEnum::getType).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmSceneEnum::getType).toArray();
 
     /**
      * 场景类型
