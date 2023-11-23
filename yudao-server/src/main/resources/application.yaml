@@ -138,6 +138,7 @@ yudao:
   info:
     version: 1.0.0
     base-package: cn.iocoder.yudao
+    base-package-arlen: cn.iocoder.arlen
   web:
     admin-ui:
       url: http://dashboard.yudao.iocoder.cn # Admin 管理后台 UI 的地址
@@ -160,7 +161,7 @@ yudao:
   captcha:
     enable: false # 验证码的开关，默认为 true
   codegen:
-    base-package: ${yudao.info.base-package}
+    base-package: ${yudao.info.base-package-arlen}
     db-schemas: ${spring.datasource.dynamic.datasource.master.name}
     front-type: 10 # 前端模版的类型，参见 CodegenFrontTypeEnum 枚举类
   error-code: # 错误码相关配置项

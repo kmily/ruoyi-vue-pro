@@ -35,6 +35,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -54,6 +55,8 @@ import static cn.hutool.core.text.CharSequenceUtil.*;
  */
 @Component
 public class CodegenEngine {
+    //Arlen:23-11-23:改导出的包地址。
+    private static String namePackage="arlen";
 
     /**
      * 后端的模板配置
@@ -436,14 +439,14 @@ public class CodegenEngine {
     }
 
     private static String javaModuleFilePath(String path, String module, String src) {
-        return "yudao-module-${table.moduleName}/" + // 顶级模块
-                "yudao-module-${table.moduleName}-" + module + "/" + // 子模块
+        return namePackage+"-module-${table.moduleName}/" + // 顶级模块
+                namePackage+"-module-${table.moduleName}-" + module + "/" + // 子模块
                 "src/" + src + "/java/${basePackage}/module/${table.moduleName}/" + path + ".java";
     }
 
     private static String mapperXmlFilePath() {
-        return "yudao-module-${table.moduleName}/" + // 顶级模块
-                "yudao-module-${table.moduleName}-biz/" + // 子模块
+        return namePackage+"-module-${table.moduleName}/" + // 顶级模块
+                namePackage+"-module-${table.moduleName}-biz/" + // 子模块
                 "src/main/resources/mapper/${table.businessName}/${table.className}Mapper.xml";
     }
 
