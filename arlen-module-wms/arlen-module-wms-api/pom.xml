@@ -3,23 +3,26 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>yudao</artifactId>
+        <artifactId>arlen-module-wms</artifactId>
         <groupId>cn.iocoder.boot</groupId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>arlen-module-wms</artifactId>
-    <packaging>pom</packaging> <!-- 2. 新增 packaging 为 pom -->
+    <artifactId>arlen-module-wms-api</artifactId>
+    <packaging>jar</packaging> <!-- 2. 新增 packaging 为 jar -->
 
     <name>${project.artifactId}</name> <!-- 3. 新增 name 为 ${project.artifactId} -->
     <description> <!-- 4. 新增 description 为该模块的描述 -->
-        demo 模块，主要实现 XXX、YYY、ZZZ 等功能。
+        demo 模块 API，暴露给其它模块调用
     </description>
-    <modules>
-        <module>arlen-module-wms-api</module>
-        <module>arlen-module-wms-biz</module>
-    </modules>
+
+    <dependencies>  <!-- 5. 新增 yudao-common 依赖 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-common</artifactId>
+        </dependency>
+    </dependencies>
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
