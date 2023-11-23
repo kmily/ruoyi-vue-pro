@@ -50,6 +50,8 @@ public class DatabaseTableServiceImpl implements DatabaseTableService {
         DataSourceConfig dataSourceConfig = new DataSourceConfig.Builder(config.getUrl(), config.getUsername(),
                 config.getPassword()).build();
         StrategyConfig.Builder strategyConfig = new StrategyConfig.Builder();
+//        SqlServer数据库中mybatisPlusGenerator会把table和view都查询出来，导致空指针异常，
+        strategyConfig.enableSkipView();
         if (StrUtil.isNotEmpty(name)) {
             strategyConfig.addInclude(name);
         } else {
@@ -57,9 +59,9 @@ public class DatabaseTableServiceImpl implements DatabaseTableService {
             strategyConfig.addExclude("ACT_[\\S\\s]+|QRTZ_[\\S\\s]+|FLW_[\\S\\s]+");
         }
 
-        GlobalConfig globalConfig = new GlobalConfig.Builder().dateType(DateType.TIME_PACK).build(); // 只使用 LocalDateTime 类型，不使用 LocalDate
+        //GlobalConfig globalConfig = new GlobalConfig.Builder().dateType(DateType.TIME_PACK).build(); // 只使用 LocalDateTime 类型，不使用 LocalDate
         ConfigBuilder builder = new ConfigBuilder(null, dataSourceConfig, strategyConfig.build(),
-                null, globalConfig, null);
+                null, null, null);
         // 按照名字排序
         List<TableInfo> tables = builder.getTableInfoList();
         tables.sort(Comparator.comparing(TableInfo::getName));

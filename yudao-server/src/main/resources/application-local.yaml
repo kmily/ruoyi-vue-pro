@@ -48,9 +48,12 @@ spring:
       primary: master
       datasource:
         master:
-          driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-          url: jdbc:sqlserver://localhost:1433;SelectMethod=cursor;DatabaseName=ruoyi-vue-pro;encrypt=true;trustServerCertificate=true
-          username: sa
+          name: ruoyi-vue-pro
+          url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
+#          driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+#          url: jdbc:sqlserver://localhost:1433;SelectMethod=cursor;DatabaseName=ruoyi-vue-pro;encrypt=true;trustServerCertificate=true
+          username: root
+#          username: sa
           password: Arlen
 #        slave: # 模拟从库，可根据自己需要修改
 #          name: ruoyi-vue-pro
