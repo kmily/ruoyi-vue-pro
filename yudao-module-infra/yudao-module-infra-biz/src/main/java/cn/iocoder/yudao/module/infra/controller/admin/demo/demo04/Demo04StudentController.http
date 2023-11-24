@@ -1,0 +1,9 @@
+### 请求 /menu/list 接口 => 成功
+POST {{baseUrl}}/infra/demo04-student/create
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
+
+### 请求 /menu/list 接口 => 成功
+GET {{baseUrl}}/infra/demo04-student/list
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
