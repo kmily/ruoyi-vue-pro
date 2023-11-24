@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.mp.service.user;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.mp.controller.admin.user.vo.MpUserPageEnhanceReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.user.vo.MpUserPageReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.user.vo.MpUserUpdateReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.user.MpUserDO;
@@ -99,4 +100,11 @@ public interface MpUserService {
      */
     void updateUser(MpUserUpdateReqVO updateReqVO);
 
+    /**
+     * 获得公众号粉丝分页，拥有更多的条件筛选
+     *
+     * @param pageVO 分页查询条件
+     * @return 用户实体
+     */
+    PageResult<MpUserDO> getUserPageEnhance(MpUserPageEnhanceReqVO pageVO);
 }

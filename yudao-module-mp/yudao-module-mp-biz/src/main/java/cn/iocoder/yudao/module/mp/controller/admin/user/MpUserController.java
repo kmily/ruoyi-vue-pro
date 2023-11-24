@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.mp.controller.admin.user;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.mp.controller.admin.user.vo.MpUserPageEnhanceReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.user.vo.MpUserPageReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.user.vo.MpUserRespVO;
 import cn.iocoder.yudao.module.mp.controller.admin.user.vo.MpUserUpdateReqVO;
@@ -35,6 +36,14 @@ public class MpUserController {
     public CommonResult<PageResult<MpUserRespVO>> getUserPage(@Valid MpUserPageReqVO pageVO) {
         PageResult<MpUserDO> pageResult = mpUserService.getUserPage(pageVO);
         return success(MpUserConvert.INSTANCE.convertPage(pageResult));
+    }
+
+    @GetMapping("/pageEnhance")
+    @Operation(summary = "获得公众号粉丝分页，更多的条件筛选")
+    @PreAuthorize("@ss.hasPermission('mp:user:query')")
+    public CommonResult<PageResult<MpUserRespVO>> getUserPageEnhance(@Valid MpUserPageEnhanceReqVO pageVO) {
+        PageResult<MpUserDO> pageResult = mpUserService.getUserPageEnhance(pageVO);
+        return success(MpUserConvert.INSTANCE.convertPageEnhance(pageResult));
     }
 
     @GetMapping("/get")

@@ -52,4 +52,5 @@ public interface MpUserConvert {
 
     MpUserDO convert(MpUserUpdateReqVO bean);
 
+    PageResult<MpUserRespVO> convertPageEnhance(PageResult<MpUserDO> pageResult);
 }
