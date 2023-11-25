@@ -122,7 +122,8 @@ public class YudaoWebSecurityConfigurerAdapter {
                 // ①：全局共享规则
                 .authorizeHttpRequests()
                 // 1.1 静态资源，可匿名访问
-                .requestMatchers(mvc.pattern(HttpMethod.GET, "/*.html"), mvc.pattern(HttpMethod.GET, "/**/*.html"), mvc.pattern(HttpMethod.GET, "/**/*.css"), mvc.pattern(HttpMethod.GET, "/**/*.js")).permitAll()
+                .requestMatchers(mvc.pattern(HttpMethod.GET,
+                        "/**.html"), mvc.pattern(HttpMethod.GET, "/**.css"), mvc.pattern(HttpMethod.GET, "/**.js")).permitAll()
                 // 1.2 设置 @PermitAll 无需认证
                 .requestMatchers(permitAllUrls.get(HttpMethod.GET).stream().map(url -> mvc.pattern(HttpMethod.GET, url)).toArray(RequestMatcher[]::new)).permitAll()
                 .requestMatchers(permitAllUrls.get(HttpMethod.POST).stream().map(url -> mvc.pattern(HttpMethod.POST, url)).toArray(RequestMatcher[]::new)).permitAll()

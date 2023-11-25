@@ -6,10 +6,9 @@ import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import cn.iocoder.yudao.framework.websocket.core.util.WebSocketFrameworkUtils;
 import cn.iocoder.yudao.module.infra.websocket.message.DemoReceiveMessage;
 import cn.iocoder.yudao.module.infra.websocket.message.DemoSendMessage;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
-
-import javax.annotation.Resource;
 
 /**
  * WebSocket 示例：单发消息
