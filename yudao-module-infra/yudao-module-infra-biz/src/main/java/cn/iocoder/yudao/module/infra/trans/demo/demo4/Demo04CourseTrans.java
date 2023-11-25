@@ -18,7 +18,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  *
  * @author HUIHUI
  */
-@Component
+@Component // TODO puhui999: 问题：翻译结果只能返回一个 courseName，不符合预期的返回 courseNames
 @AutoTrans(namespace = "demo04course", fields = "name", defaultAlias = "course")
 public class Demo04CourseTrans implements VOAutoTransable<Demo04CourseDO> {
 

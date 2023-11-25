@@ -63,7 +63,6 @@
         <tika-core.version>2.7.0</tika-core.version>
         <ip2region.version>2.7.0</ip2region.version>
         <easy-trans.version>2.2.9</easy-trans.version>
-        <easy-trans.version>2.2.9</easy-trans.version>
         <!-- 三方云服务相关 -->
         <okio.version>3.5.0</okio.version>
         <okhttp3.version>4.11.0</okhttp3.version>

@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.infra.controller.admin.demo.demo04.vo;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
-import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo04.Demo04CourseDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo04.Demo04GradeDO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -56,13 +55,16 @@ public class Demo04StudentRespVO implements TransPojo {
     /**
      * 学生课程
      */
-    // TODO puhui999: 系统自动查表作为数据源
-    @Trans(type = TransType.SIMPLE, target = Demo04CourseDO.class, fields = "name", ref = "courseNames")
+    // TODO puhui999: 系统自动查表作为数据源-翻译正常
+    //@Trans(type = TransType.SIMPLE, target = Demo04CourseDO.class, fields = "name", ref = "courseNames")
+    //private Set<Long> courseIds;
+
+    // TODO puhui999: 自定义数据源翻译-问题：只显示第一个
+    //@Trans(type = TransType.AUTO_TRANS, key = "demo04course", fields = "name", ref = "courseNames")
+    @Trans(type = TransType.AUTO_TRANS, key = "demo04course")
     private Set<Long> courseIds;
 
-    // TODO puhui999: 自动自定义数据源翻译
-    //@Trans(type = TransType.AUTO_TRANS, key = "demo04course")
-    //private Set<Long> courseIds;
+    //private Set<String> courseNames; TODO 收不到值
 
     private String courseNames;
 
