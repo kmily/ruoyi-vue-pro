@@ -47,9 +47,12 @@ spring:
           name: ruoyi-vue-pro
           #url: jdbc:mysql://400-infra.server.iocoder.cn:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&serverTimezone=CTT&allowPublicKeyRetrieval=true
           #driver-class-name: com.mysql.jdbc.Driver
-          driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-          url: jdbc:sqlserver://localhost:1433;SelectMethod=cursor;DatabaseName=ruoyi-vue-pro
-          username: sa
+#          driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+#          url: jdbc:sqlserver://localhost:1433;SelectMethod=cursor;DatabaseName=ruoyi-vue-pro
+#          username: sa
+#          password: Arlen
+          url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
+          username: root
           password: Arlen
 #        slave: # 模拟从库，可根据自己需要修改 # 模拟从库，可根据自己需要修改
 #          name: ruoyi-vue-pro
@@ -60,7 +63,7 @@ spring:
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   redis:
-    host: 400-infra.server.iocoder.cn # 地址
+    host: 127.0.0.1  # 地址
     port: 6379 # 端口
     database: 1 # 数据库索引
 #    password: 123456 # 密码，建议生产环境开启

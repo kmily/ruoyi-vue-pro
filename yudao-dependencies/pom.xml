@@ -78,6 +78,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>arlen-module-wms-biz</artifactId>
+                <version>1.8.3-snapshot</version>
+            </dependency>
             <!-- 统一依赖管理 -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
