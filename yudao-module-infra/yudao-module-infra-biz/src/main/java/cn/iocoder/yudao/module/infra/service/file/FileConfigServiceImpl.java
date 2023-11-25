@@ -31,6 +31,7 @@ import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.cache.CacheUtils.buildAsyncReloadingCache;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.getToday;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_CONFIG_DELETE_FAIL_MASTER;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_CONFIG_NOT_EXISTS;
 
@@ -174,7 +175,7 @@ public class FileConfigServiceImpl implements FileConfigService {
         validateFileConfigExists(id);
         // 上传文件
         byte[] content = ResourceUtil.readBytes("file/erweima.jpg");
-        return getFileClient(id).upload(content, IdUtil.fastSimpleUUID() + ".jpg", "image/jpeg");
+        return getFileClient(id).upload(content, getToday() + '/' + IdUtil.fastSimpleUUID() + ".jpg", "image/jpeg");
     }
 
     @Override
