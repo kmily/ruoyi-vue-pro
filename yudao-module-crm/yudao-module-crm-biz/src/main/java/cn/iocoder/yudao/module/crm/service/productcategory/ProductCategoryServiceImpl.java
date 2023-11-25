@@ -6,10 +6,10 @@ import cn.iocoder.yudao.module.crm.controller.admin.productcategory.vo.ProductCa
 import cn.iocoder.yudao.module.crm.convert.productcategory.ProductCategoryConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.productcategory.ProductCategoryDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.productcategory.ProductCategoryMapper;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;

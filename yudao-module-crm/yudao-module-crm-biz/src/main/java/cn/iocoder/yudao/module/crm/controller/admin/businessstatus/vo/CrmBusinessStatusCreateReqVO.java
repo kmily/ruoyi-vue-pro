@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.module.crm.controller.admin.businessstatus.vo;
 
 import lombok.*;
-import java.util.*;
 import io.swagger.v3.oas.annotations.media.Schema;
-import javax.validation.constraints.*;
 
 @Schema(description = "管理后台 - 商机状态创建 Request VO")
 @Data

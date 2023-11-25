@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 // TODO @wanwan：vo 下，可以新建一个 limitconfig，放它的 vo；

@@ -5,8 +5,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerLimit
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerLimitConfigPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerLimitConfigUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customerlimitconfig.CrmCustomerLimitConfigDO;
-
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * 客户限制配置 Service 接口

@@ -2,9 +2,8 @@ package cn.iocoder.yudao.module.crm.controller.admin.contract.vo;
 
 import cn.iocoder.yudao.module.crm.framework.enums.CrmPermissionLevelEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - CRM 合同转移 Request VO")
 @Data

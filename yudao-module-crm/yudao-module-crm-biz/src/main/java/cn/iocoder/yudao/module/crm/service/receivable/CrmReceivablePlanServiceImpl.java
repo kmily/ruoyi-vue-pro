@@ -17,10 +17,10 @@ import cn.iocoder.yudao.module.crm.dal.mysql.receivable.CrmReceivablePlanMapper;
 import cn.iocoder.yudao.module.crm.enums.AuditStatusEnum;
 import cn.iocoder.yudao.module.crm.service.contract.ContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 

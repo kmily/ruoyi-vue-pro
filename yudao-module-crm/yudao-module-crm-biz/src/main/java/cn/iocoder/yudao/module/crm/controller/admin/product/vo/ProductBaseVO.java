@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.crm.controller.admin.product.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
 
 // TODO @zange：需要加 CRM 前置噢
 /**

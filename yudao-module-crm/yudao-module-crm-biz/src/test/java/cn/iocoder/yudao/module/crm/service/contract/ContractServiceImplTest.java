@@ -8,11 +8,11 @@ import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.ContractPageReqV
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.ContractUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.ContractDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contract.ContractMapper;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;

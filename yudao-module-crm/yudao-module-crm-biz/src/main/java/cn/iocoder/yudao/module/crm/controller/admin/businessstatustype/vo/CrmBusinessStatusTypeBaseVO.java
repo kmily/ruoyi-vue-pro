@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.crm.controller.admin.businessstatustype.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * 商机状态类型 Base VO，提供给添加、修改、详细的子 VO 使用

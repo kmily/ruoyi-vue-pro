@@ -1,10 +1,15 @@
 package cn.iocoder.yudao.module.crm.service.clue;
 
-import java.util.*;
-import javax.validation.*;
-import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.*;
-import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueCreateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueExportReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmClueUpdateReqVO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
+import jakarta.validation.Valid;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 线索 Service 接口

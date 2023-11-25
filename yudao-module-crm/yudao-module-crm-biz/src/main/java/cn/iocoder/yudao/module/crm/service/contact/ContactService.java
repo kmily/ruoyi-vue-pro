@@ -6,8 +6,8 @@ import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactExportReqV
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.ContactUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.ContactDO;
+import jakarta.validation.Valid;
 
-import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 

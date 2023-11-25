@@ -7,10 +7,10 @@ import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerPoolC
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerPoolConfigDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.customer.CrmCustomerPoolConfigMapper;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -24,6 +24,7 @@ import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CUSTOMER_POOL
 @Service
 @Validated
 public class CrmCustomerPoolConfigServiceImpl implements CrmCustomerPoolConfigService {
+
     @Resource
     private CrmCustomerPoolConfigMapper customerPoolConfigMapper;
 

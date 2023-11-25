@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.crm.service.productcategory;
 
-import java.util.*;
-import javax.validation.*;
-import cn.iocoder.yudao.module.crm.controller.admin.productcategory.vo.*;
+import cn.iocoder.yudao.module.crm.controller.admin.productcategory.vo.ProductCategoryCreateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.productcategory.vo.ProductCategoryListReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.productcategory.vo.ProductCategoryUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.productcategory.ProductCategoryDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import jakarta.validation.Valid;
+
+import java.util.List;
 
 /**
  * 产品分类 Service 接口

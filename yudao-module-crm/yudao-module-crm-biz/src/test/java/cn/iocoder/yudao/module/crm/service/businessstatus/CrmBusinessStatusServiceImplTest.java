@@ -6,11 +6,11 @@ import cn.iocoder.yudao.module.crm.controller.admin.businessstatus.vo.CrmBusines
 import cn.iocoder.yudao.module.crm.controller.admin.businessstatus.vo.CrmBusinessStatusUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.businessstatus.CrmBusinessStatusDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.businessstatus.CrmBusinessStatusMapper;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;

@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.crm.controller.admin.customer.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-
-import javax.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - 客户限制配置更新 Request VO")
 @Data

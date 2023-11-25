@@ -10,10 +10,10 @@ import cn.iocoder.yudao.module.crm.controller.admin.businessstatus.vo.CrmBusines
 import cn.iocoder.yudao.module.crm.convert.businessstatus.CrmBusinessStatusConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.businessstatus.CrmBusinessStatusDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.businessstatus.CrmBusinessStatusMapper;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 

@@ -8,11 +8,11 @@ import cn.iocoder.yudao.module.crm.controller.admin.businessstatustype.vo.CrmBus
 import cn.iocoder.yudao.module.crm.controller.admin.businessstatustype.vo.CrmBusinessStatusTypeUpdateReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.businessstatustype.CrmBusinessStatusTypeDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.businessstatustype.CrmBusinessStatusTypeMapper;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;

@@ -1,32 +1,25 @@
 package cn.iocoder.yudao.module.crm.controller.admin.productcategory;
 
-import org.springframework.web.bind.annotation.*;
-import javax.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Operation;
-
-import javax.validation.constraints.*;
-import javax.validation.*;
-import javax.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
-
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
-
-import cn.iocoder.yudao.module.crm.controller.admin.productcategory.vo.*;
-import cn.iocoder.yudao.module.crm.dal.dataobject.productcategory.ProductCategoryDO;
+import cn.iocoder.yudao.module.crm.controller.admin.productcategory.vo.ProductCategoryCreateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.productcategory.vo.ProductCategoryListReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.productcategory.vo.ProductCategoryRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.productcategory.vo.ProductCategoryUpdateReqVO;
 import cn.iocoder.yudao.module.crm.convert.productcategory.ProductCategoryConvert;
+import cn.iocoder.yudao.module.crm.dal.dataobject.productcategory.ProductCategoryDO;
 import cn.iocoder.yudao.module.crm.service.productcategory.ProductCategoryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "管理后台 - 产品分类")
 @RestController
