@@ -27,4 +27,8 @@ public class ErrorCodeBaseVO {
     @Schema(description = "备注", example = "哈哈哈")
     private String memo;
 
+    @Schema(description = "多语言", requiredMode = Schema.RequiredMode.REQUIRED, example = "zh_CN")
+    @NotNull(message = "多语言不能为空")
+    private String langType;
+
 }
