@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.*;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -46,6 +47,15 @@ public interface CrmCustomerService {
     CrmCustomerDO getCustomer(Long id);
 
     /**
+     * 获得客户列表
+     *
+     * @param ids 客户编号数组
+     * @author ljlleo
+     * @return 客户列表
+     */
+    List<CrmCustomerDO> getCustomerList(Collection<Long> ids);
+
+    /**
      * 获得客户分页
      *
      * @param pageReqVO 分页查询
@@ -85,22 +95,43 @@ public interface CrmCustomerService {
      */
     void lockCustomer(@Valid CrmCustomerUpdateReqVO updateReqVO);
 
-    // TODO @xiaqing：根据 controller 的建议，改下
+    // ==================== 公海相关操作 ====================
+
+    /**
+     * 客户放入公海
+     *
+     * @param id 客户编号
+     */
+    void putCustomerPool(Long id);
+
     /**
      * 领取公海客户
      *
-     * @param ids 要领取的客户 id
+     * @param ids 要领取的客户编号数组
      */
-    void receive(List<Long>ids);
+    void receiveCustomer(List<Long>ids, Long ownerUserId);
 
-    // TODO @xiaqing：根据 controller 的建议，改下
     /**
      * 分配公海客户
      *
-     * @param cIds 要分配的客户 id
-     * @param ownerId 分配的负责人id
+     * @param ids 要分配的客户编号数组
+     * @param ownerUserId 分配的负责人编号
      * @author xiaqing
      */
-    void distributeByIds(List<Long>cIds,Long ownerId);
+    void distributeCustomer(List<Long>ids, Long ownerUserId);
 
+    /**
+     * 领取公海客户
+     *
+     * @param id     编号
+     * @param userId 用户编号
+     */
+    void receive(Long id, Long userId);
+
+    /**
+     * 获取客户列表
+     * @return 客户列表
+     * @author zyna
+     */
+    List<CrmCustomerDO> getCustomerList();
 }
