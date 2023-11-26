@@ -68,6 +68,11 @@ public class RandomUtils {
         });
     }
 
+//arlen:23-11-26,添加test中获取stringID的
+    public static String randomStringId() {
+        return randomString();
+//        return RandomUtil.randomString(RANDOM_STRING_LENGTH);
+    }
     public static String randomString() {
         return RandomUtil.randomString(RANDOM_STRING_LENGTH);
     }

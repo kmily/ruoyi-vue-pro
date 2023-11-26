@@ -80,8 +80,13 @@
         <dependencies>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
+                <artifactId>arlen-module-db-biz</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
                 <artifactId>arlen-module-wms-biz</artifactId>
-                <version>1.8.3-snapshot</version>
+                <version>${revision}</version>
             </dependency>
             <!-- 统一依赖管理 -->
             <dependency>

@@ -23,6 +23,7 @@
 <!--        <module>yudao-module-mall</module>-->
         <module>yudao-module-crm</module>
         <module>arlen-module-wms</module>
+        <module>arlen-module-db</module>
         <!-- 示例项目 -->
 <!--        <module>yudao-example</module>-->
     </modules>
