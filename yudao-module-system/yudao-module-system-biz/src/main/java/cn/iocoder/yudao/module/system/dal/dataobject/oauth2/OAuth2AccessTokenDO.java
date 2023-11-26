@@ -22,7 +22,8 @@ import java.util.List;
  * @author 芋道源码
  */
 @TableName(value = "system_oauth2_access_token", autoResultMap = true)
-@KeySequence("system_oauth2_access_token_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+// 由于 Oracle 12.2 之前的版本， SEQ 的名字有 30 个字符的长度限制，所以将 system 前缀缩写为 sys
+@KeySequence("sys_oauth2_access_token_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class OAuth2AccessTokenDO extends TenantBaseDO {

@@ -2,11 +2,13 @@ package cn.iocoder.yudao.module.bpm.dal.dataobject.definition;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
+import org.flowable.engine.repository.ProcessDefinition;
 
 import java.util.List;
 
@@ -17,6 +19,7 @@ import java.util.List;
  * @author 芋道源码
  */
 @TableName(value = "bpm_process_definition_ext", autoResultMap = true)
+@KeySequence("bpm_pd_ext_seq")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

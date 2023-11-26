@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.JsonLongSetTypeHandler;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskRuleScriptEnum;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -21,6 +22,7 @@ import java.util.Set;
  * @author 芋道源码
  */
 @TableName(value = "bpm_task_assign_rule", autoResultMap = true)
+@KeySequence("bpm_task_assign_rule_seq")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -64,7 +66,6 @@ public class BpmTaskAssignRuleDO extends BaseDO {
      *
      * 枚举 {@link BpmTaskAssignRuleTypeEnum}
      */
-    @TableField("`type`")
     private Integer type;
     /**
      * 规则值数组，一般关联指定表的编号

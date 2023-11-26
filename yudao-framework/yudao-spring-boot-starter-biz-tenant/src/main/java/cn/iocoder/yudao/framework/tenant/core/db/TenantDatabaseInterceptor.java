@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.framework.tenant.core.db;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.tenant.config.TenantProperties;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
+import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
@@ -18,15 +20,31 @@ import java.util.Set;
 public class TenantDatabaseInterceptor implements TenantLineHandler {
 
     private final Set<String> ignoreTables = new HashSet<>();
+    private final GlobalConfig.DbConfig dbConfig;
 
-    public TenantDatabaseInterceptor(TenantProperties properties) {
+    public TenantDatabaseInterceptor(TenantProperties properties, GlobalConfig.DbConfig dbConfig) {
+        this.dbConfig = dbConfig;
         // 不同 DB 下，大小写的习惯不同，所以需要都添加进去
         properties.getIgnoreTables().forEach(table -> {
-            ignoreTables.add(table.toLowerCase());
-            ignoreTables.add(table.toUpperCase());
+            // 配置了表名转义，返回转义后的表名
+            String tableName = StrUtil.isNotEmpty(dbConfig.getTableFormat())
+                    ? String.format(dbConfig.getTableFormat(), table)
+                    : table;
+            ignoreTables.add(tableName.toLowerCase());
+            ignoreTables.add(tableName.toUpperCase());
         });
         // 在 OracleKeyGenerator 中，生成主键时，会查询这个表，查询这个表后，会自动拼接 TENANT_ID 导致报错
         ignoreTables.add("DUAL");
+    }
+
+    @Override
+    public String getTenantIdColumn() {
+        String column = TenantLineHandler.super.getTenantIdColumn();
+        // 配置了字段名转义，返回转义后的字段名
+        if (StrUtil.isNotBlank(dbConfig.getColumnFormat())) {
+            return String.format(dbConfig.getColumnFormat(), column);
+        }
+        return column;
     }
 
     @Override
