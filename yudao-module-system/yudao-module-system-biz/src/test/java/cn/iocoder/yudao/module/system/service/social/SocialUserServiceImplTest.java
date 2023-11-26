@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.system.service.social;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.framework.social.core.YudaoAuthRequestFactory;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
@@ -15,12 +14,13 @@ import com.xingyuv.jushauth.model.AuthCallback;
 import com.xingyuv.jushauth.model.AuthResponse;
 import com.xingyuv.jushauth.model.AuthUser;
 import com.xingyuv.jushauth.request.AuthRequest;
-import jakarta.annotation.Resource;
+import com.xingyuv.justauth.AuthRequestFactory;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.hutool.core.util.RandomUtil.*;
@@ -46,7 +46,7 @@ public class SocialUserServiceImplTest extends BaseDbUnitTest {
     private SocialUserBindMapper socialUserBindMapper;
 
     @MockBean
-    private YudaoAuthRequestFactory authRequestFactory;
+    private AuthRequestFactory authRequestFactory;
 
     // TODO 芋艿：后续统一修复
 //    @Test
