@@ -52,6 +52,8 @@ public class Demo04StudentRespVO implements TransPojo {
 
     private String gradeName;
 
+    // TODO puhui999: 1、定义一个父接口 DataTranslationHandler-一个单查询接口-一个批量查询接口(统一返回 Map)，需要翻译的数据api实现这个接口
+    // TODO puhui999: 2、定义一个属性注解 DataTrans-
     /**
      * 学生课程
      */
