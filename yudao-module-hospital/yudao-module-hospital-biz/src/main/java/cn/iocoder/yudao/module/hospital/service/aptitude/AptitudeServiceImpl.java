@@ -70,11 +70,9 @@ public class AptitudeServiceImpl extends ServiceImpl<AptitudeMapper, AptitudeDO>
     }
 
     @Override
-    public List<AptitudeDO> getAptitudeList(Collection<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return ListUtil.empty();
-        }
-        return aptitudeMapper.selectBatchIds(ids);
+    public List<AptitudeDO> getAptitudeList() {
+
+        return aptitudeMapper.selectList(AptitudeDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
     }
 
     @Override

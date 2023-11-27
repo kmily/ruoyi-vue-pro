@@ -1,29 +1,32 @@
 package cn.iocoder.yudao.module.promotion.service.banner;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.promotion.controller.admin.banner.vo.BannerCreateReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.banner.vo.BannerPageReqVO;
-import cn.iocoder.yudao.module.promotion.controller.admin.banner.vo.BannerUpdateReqVO;
-import cn.iocoder.yudao.module.promotion.convert.banner.BannerConvert;
-import cn.iocoder.yudao.module.promotion.dal.dataobject.banner.BannerDO;
-import cn.iocoder.yudao.module.promotion.dal.mysql.banner.BannerMapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
-import java.util.List;
+import java.util.*;
+import cn.iocoder.yudao.module.promotion.controller.admin.banner.vo.*;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.banner.BannerDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+
+import cn.iocoder.yudao.module.promotion.convert.banner.BannerConvert;
+import cn.iocoder.yudao.module.promotion.dal.mysql.banner.BannerMapper;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.BANNER_NOT_EXISTS;
+import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
+
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 
 /**
- * 首页 banner 实现类
+ * Banner Service 实现类
  *
- * @author xia
+ * @author 芋道源码
  */
 @Service
 @Validated
-public class BannerServiceImpl implements BannerService {
+public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerDO> implements BannerService {
 
     @Resource
     private BannerMapper bannerMapper;
@@ -40,7 +43,7 @@ public class BannerServiceImpl implements BannerService {
     @Override
     public void updateBanner(BannerUpdateReqVO updateReqVO) {
         // 校验存在
-        this.validateBannerExists(updateReqVO.getId());
+        validateBannerExists(updateReqVO.getId());
         // 更新
         BannerDO updateObj = BannerConvert.INSTANCE.convert(updateReqVO);
         bannerMapper.updateById(updateObj);
@@ -49,7 +52,7 @@ public class BannerServiceImpl implements BannerService {
     @Override
     public void deleteBanner(Long id) {
         // 校验存在
-        this.validateBannerExists(id);
+        validateBannerExists(id);
         // 删除
         bannerMapper.deleteById(id);
     }
@@ -66,13 +69,21 @@ public class BannerServiceImpl implements BannerService {
     }
 
     @Override
-    public List<BannerDO> getBannerList() {
-        return bannerMapper.selectList();
+    public List<BannerDO> getBannerList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return ListUtil.empty();
+        }
+        return bannerMapper.selectBatchIds(ids);
     }
 
     @Override
     public PageResult<BannerDO> getBannerPage(BannerPageReqVO pageReqVO) {
         return bannerMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<BannerDO> getBannerList(BannerExportReqVO exportReqVO) {
+        return bannerMapper.selectList(exportReqVO);
     }
 
 }

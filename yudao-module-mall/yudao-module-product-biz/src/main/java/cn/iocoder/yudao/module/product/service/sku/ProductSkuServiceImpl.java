@@ -219,15 +219,18 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     @Transactional(rollbackFor = Exception.class)
     public void updateSkuList(Long spuId, List<ProductSkuCreateOrUpdateReqVO> skus) {
         // 构建属性与 SKU 的映射关系;
+//        Map<String, Long> existsSkuMap = convertMap(productSkuMapper.selectListBySpuId(spuId),
+//                ProductSkuConvert.INSTANCE::buildPropertyKey, ProductSkuDO::getId);
+
         Map<String, Long> existsSkuMap = convertMap(productSkuMapper.selectListBySpuId(spuId),
-                ProductSkuConvert.INSTANCE::buildPropertyKey, ProductSkuDO::getId);
+                ProductSkuDO::getSkuName, ProductSkuDO::getId);
 
         // 拆分三个集合，新插入的、需要更新的、需要删除的
         List<ProductSkuDO> insertSkus = new ArrayList<>();
         List<ProductSkuDO> updateSkus = new ArrayList<>();
         List<ProductSkuDO> allUpdateSkus = ProductSkuConvert.INSTANCE.convertList06(skus, spuId);
         allUpdateSkus.forEach(sku -> {
-            String propertiesKey = ProductSkuConvert.INSTANCE.buildPropertyKey(sku);
+            String propertiesKey = sku.getSkuName();//ProductSkuConvert.INSTANCE.buildPropertyKey(sku);
             // 1、找得到的，进行更新
             Long existsSkuId = existsSkuMap.remove(propertiesKey);
             if (existsSkuId != null) {

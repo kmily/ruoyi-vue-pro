@@ -40,6 +40,12 @@ public class ProductSkuDO extends BaseDO {
      * 关联 {@link ProductSpuDO#getId()}
      */
     private Long spuId;
+
+    /**
+     * sku 名称
+     */
+    private String skuName;
+
     /**
      * 属性数组，JSON 格式
      */

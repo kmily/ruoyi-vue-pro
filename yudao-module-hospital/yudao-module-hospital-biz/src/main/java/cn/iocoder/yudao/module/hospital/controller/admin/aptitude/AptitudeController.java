@@ -72,10 +72,9 @@ public class AptitudeController {
 
     @GetMapping("/list")
     @Operation(summary = "获得资质信息列表")
-    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
     @PreAuthorize("@ss.hasPermission('hospital:aptitude:query')")
-    public CommonResult<List<AptitudeRespVO>> getAptitudeList(@RequestParam("ids") Collection<Long> ids) {
-        List<AptitudeDO> list = aptitudeService.getAptitudeList(ids);
+    public CommonResult<List<AptitudeRespVO>> getAptitudeList() {
+        List<AptitudeDO> list = aptitudeService.getAptitudeList();
         return success(AptitudeConvert.INSTANCE.convertList(list));
     }
 

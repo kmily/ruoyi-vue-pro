@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 商品 SPU DO
@@ -80,6 +81,13 @@ public class ProductSpuDO extends BaseDO {
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> sliderPicUrls;
+
+    /**
+     * 资质编号数组
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Set<Long> aptitudes;
+
     /**
      * 商品视频
      */

@@ -58,6 +58,8 @@ public class ProductSkuBaseVO {
 
     @Schema(description = "属性数组")
     private List<Property> properties;
+    @Schema(description = "sku名称")
+    private String skuName;
 
     @Schema(description = "商品属性")
     @Data

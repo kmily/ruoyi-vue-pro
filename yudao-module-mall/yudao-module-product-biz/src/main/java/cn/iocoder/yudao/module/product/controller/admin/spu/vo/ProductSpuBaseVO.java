@@ -6,6 +6,7 @@ import lombok.Data;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Set;
 
 /**
 * 商品 SPU Base VO，提供给添加、修改、详细的子 VO 使用
@@ -110,5 +111,7 @@ public class ProductSpuBaseVO {
 
     @Schema(description = "虚拟销量", example = "芋道")
     private Integer virtualSalesCount;
+    @Schema(description = "资质编号数组", example = "芋道")
+    private Set<Long> aptitudes;
 
 }

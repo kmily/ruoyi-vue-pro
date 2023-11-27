@@ -17,8 +17,30 @@ public enum CommonStatusEnum implements IntArrayValuable {
 
     ENABLE(0, "开启"),
     DISABLE(1, "关闭"),
+
     YES(1, "是"),
-    NO(0, "否");
+    NO(0, "否"),
+
+    /**
+     * 开启中
+     */
+    OPEN(1,"开启中"),
+    /**
+     * 店铺关闭
+     */
+    CLOSED(2,"关闭"),
+    /**
+     * 申请开店
+     */
+    APPLY(3,"申请"),
+    /**
+     * 审核拒绝
+     */
+    REFUSED(4,"审核拒绝"),
+    /**
+     * 申请中
+     */
+    APPLYING(5,"待审核");;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CommonStatusEnum::getStatus).toArray();
 

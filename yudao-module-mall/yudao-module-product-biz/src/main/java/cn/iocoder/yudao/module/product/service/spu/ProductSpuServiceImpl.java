@@ -61,10 +61,10 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     public Long createSpu(ProductSpuCreateReqVO createReqVO) {
         // 校验分类、品牌
         validateCategory(createReqVO.getCategoryId());
-        brandService.validateProductBrand(createReqVO.getBrandId());
+        //brandService.validateProductBrand(createReqVO.getBrandId());
         // 校验 SKU
         List<ProductSkuCreateOrUpdateReqVO> skuSaveReqList = createReqVO.getSkus();
-        productSkuService.validateSkuList(skuSaveReqList, createReqVO.getSpecType());
+        //productSkuService.validateSkuList(skuSaveReqList, createReqVO.getSpecType());
 
         ProductSpuDO spu = ProductSpuConvert.INSTANCE.convert(createReqVO);
         // 初始化 SPU 中 SKU 相关属性
@@ -84,10 +84,10 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         validateSpuExists(updateReqVO.getId());
         // 校验分类、品牌
         validateCategory(updateReqVO.getCategoryId());
-        brandService.validateProductBrand(updateReqVO.getBrandId());
+        //brandService.validateProductBrand(updateReqVO.getBrandId());
         // 校验SKU
         List<ProductSkuCreateOrUpdateReqVO> skuSaveReqList = updateReqVO.getSkus();
-        productSkuService.validateSkuList(skuSaveReqList, updateReqVO.getSpecType());
+       // productSkuService.validateSkuList(skuSaveReqList, updateReqVO.getSpecType());
 
         // 更新 SPU
         ProductSpuDO updateObj = ProductSpuConvert.INSTANCE.convert(updateReqVO);

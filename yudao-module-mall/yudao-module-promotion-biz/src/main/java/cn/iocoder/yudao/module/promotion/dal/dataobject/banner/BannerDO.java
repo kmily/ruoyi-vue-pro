@@ -1,15 +1,19 @@
 package cn.iocoder.yudao.module.promotion.dal.dataobject.banner;
 
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+import java.util.*;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+import com.baomidou.mybatisplus.annotation.*;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
- * banner DO
+ * Banner DO
  *
- * @author xia
+ * @author 芋道源码
  */
-@TableName("market_banner")
+@TableName("promotion_banner")
+@KeySequence("promotion_banner_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -19,35 +23,45 @@ import lombok.*;
 public class BannerDO extends BaseDO {
 
     /**
-     * 编号
+     * Banner 编号
      */
+    @TableId
     private Long id;
     /**
-     * 标题
+     * Banner 标题
      */
     private String title;
     /**
-     * 跳转链接
+     * 图片 URL
+     */
+    private String picUrl;
+    /**
+     * 跳转地址
      */
     private String url;
     /**
-     * 图片链接
+     * 活动状态
+     *
+     * 枚举 {@link TODO common_status 对应的类}
      */
-    private String picUrl;
+    private Byte status;
     /**
      * 排序
      */
     private Integer sort;
-
     /**
-     * 状态 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum}
+     * 位置
+     *
+     * 枚举 {@link TODO promotion_banner_position 对应的类}
      */
-    private Integer status;
+    private Byte position;
     /**
-     * 备注
+     * 描述
      */
     private String memo;
-
-    // TODO 芋艿 点击次数。&& 其他数据相关
+    /**
+     * Banner 点击次数
+     */
+    private Integer browseCount;
 
 }

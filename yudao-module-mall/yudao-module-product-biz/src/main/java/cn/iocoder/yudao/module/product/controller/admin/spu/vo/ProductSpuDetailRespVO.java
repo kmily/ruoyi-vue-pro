@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.Set;
 
 @Schema(description = "管理后台 - 商品 SPU 详细 Response VO")
 @Data

@@ -22,7 +22,10 @@ public class ProductSkuRespDTO {
      * SPU 编号
      */
     private Long spuId;
-
+    /**
+     * sku 名称
+     */
+    private String skuName;
     /**
      * 属性数组
      */

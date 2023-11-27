@@ -49,7 +49,7 @@ public interface AptitudeService extends IService<AptitudeDO>{
      * @param ids 编号
      * @return 资质信息列表
      */
-    List<AptitudeDO> getAptitudeList(Collection<Long> ids);
+    List<AptitudeDO> getAptitudeList();
 
     /**
      * 获得资质信息分页
