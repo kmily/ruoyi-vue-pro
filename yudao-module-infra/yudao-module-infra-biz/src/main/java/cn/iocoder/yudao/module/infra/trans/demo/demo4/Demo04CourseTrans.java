@@ -1,14 +1,18 @@
 package cn.iocoder.yudao.module.infra.trans.demo.demo4;
 
-import cn.iocoder.yudao.framework.easytrans.core.VOAutoTransable;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.easytrans.core.DataTranslationHandler;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo04.Demo04CourseDO;
 import cn.iocoder.yudao.module.infra.service.demo.demo04.Demo04StudentService;
-import com.fhs.core.trans.anno.AutoTrans;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 /**
@@ -18,16 +22,19 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  *
  * @author HUIHUI
  */
-@Component // TODO puhui999: 问题：翻译结果只能返回一个 courseName，不符合预期的返回 courseNames
-@AutoTrans(namespace = "demo04course", fields = "name", defaultAlias = "course")
-public class Demo04CourseTrans implements VOAutoTransable<Demo04CourseDO> {
+@Component
+public class Demo04CourseTrans implements DataTranslationHandler {
 
     @Resource
     private Demo04StudentService studentService;
 
     @Override
-    public List<Demo04CourseDO> selectByIds(List<?> ids) {
-        return studentService.getDemo04CourseList(convertSet(ids, i -> Long.parseLong(i.toString().trim())));
+    public List<Map<String, Object>> selectByIds(String handlerType, List<Object> ids) {
+        if (ObjUtil.equal(handlerType, "Demo04CourseTrans")) {
+            return Collections.emptyList();
+        }
+        List<Demo04CourseDO> demo04CourseList = studentService.getDemo04CourseList(convertSet(ids, id -> (Long) id));
+        return convertList(demo04CourseList, BeanUtil::beanToMap);
     }
 
 }

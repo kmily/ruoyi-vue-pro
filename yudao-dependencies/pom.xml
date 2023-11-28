@@ -62,7 +62,6 @@
         <jsch.version>0.1.55</jsch.version>
         <tika-core.version>2.7.0</tika-core.version>
         <ip2region.version>2.7.0</ip2region.version>
-        <easy-trans.version>2.2.9</easy-trans.version>
         <!-- 三方云服务相关 -->
         <okio.version>3.5.0</okio.version>
         <okhttp3.version>4.11.0</okhttp3.version>
@@ -556,27 +555,6 @@
                 <groupId>org.jsoup</groupId>
                 <artifactId>jsoup</artifactId>
                 <version>${jsoup.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.fhs-opensource</groupId>
-                <artifactId>easy-trans-spring-boot-starter</artifactId> <!-- 解决 vo 转换问题 -->
-                <version>${easy-trans.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-context</artifactId>
-                    </exclusion>
-                    <exclusion> <!-- 排除 spring-cloud -->
-                        <groupId>org.springframework.cloud</groupId>
-                        <artifactId>spring-cloud-commons</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.fhs-opensource</groupId>
-                <artifactId>easy-trans-mybatis-plus-extend</artifactId> <!-- 解决 vo 转换问题  -->
-                <version>${easy-trans.version}</version>
             </dependency>
 
             <!-- 三方云服务相关 -->

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo04;
 
-import cn.iocoder.yudao.framework.easytrans.db.TransBaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -19,7 +19,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Demo04CourseDO extends TransBaseDO {
+public class Demo04CourseDO extends BaseDO {
 
     /**
      * 编号

@@ -2,10 +2,10 @@ package cn.iocoder.yudao.module.infra.controller.admin.demo.demo04;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.easytrans.core.annotations.DataTranslation;
 import cn.iocoder.yudao.module.infra.controller.admin.demo.demo04.vo.Demo04StudentRespVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo04.Demo04StudentDO;
 import cn.iocoder.yudao.module.infra.service.demo.demo04.Demo04StudentService;
-import com.fhs.core.trans.anno.TransMethodResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
@@ -36,7 +36,7 @@ public class Demo04StudentController {
 
     @GetMapping("/list")
     @Operation(summary = "获得学生信息列表")
-    @TransMethodResult
+    @DataTranslation
     public CommonResult<List<Demo04StudentRespVO>> getDemo04StudentList() {
         List<Demo04StudentDO> demo04StudentList = demo04StudentService.getDemo04StudentList();
         return success(BeanUtils.toBean(demo04StudentList, Demo04StudentRespVO.class));

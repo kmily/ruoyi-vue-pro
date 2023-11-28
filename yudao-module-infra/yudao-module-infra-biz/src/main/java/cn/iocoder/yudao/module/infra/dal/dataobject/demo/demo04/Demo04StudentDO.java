@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo04;
 
-import cn.iocoder.yudao.framework.easytrans.db.TransBaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.JsonLongSetTypeHandler;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -24,7 +24,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Demo04StudentDO extends TransBaseDO {
+public class Demo04StudentDO extends BaseDO {
 
     /**
      * 编号

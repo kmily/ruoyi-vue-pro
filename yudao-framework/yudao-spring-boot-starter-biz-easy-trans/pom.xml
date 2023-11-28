@@ -20,27 +20,11 @@
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-common</artifactId>
         </dependency>
-
-        <!-- 租户相关 -->
+        <!-- Web 相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-biz-tenant</artifactId>
-        </dependency>
-
-        <!-- DB 相关 -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-mybatis</artifactId>
-        </dependency>
-
-        <!-- 工具类相关 -->
-        <dependency>
-            <groupId>com.fhs-opensource</groupId>
-            <artifactId>easy-trans-spring-boot-starter</artifactId> <!-- 解决 vo 转换问题 -->
-        </dependency>
-        <dependency>
-            <groupId>com.fhs-opensource</groupId>
-            <artifactId>easy-trans-mybatis-plus-extend</artifactId> <!-- 解决 vo 转换问题  -->
+            <artifactId>yudao-spring-boot-starter-web</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

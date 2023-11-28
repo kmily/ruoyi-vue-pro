@@ -1,15 +1,10 @@
 package cn.iocoder.yudao.framework.easytrans.core.aop;
 
-import cn.iocoder.yudao.framework.easytrans.core.DataTranslationHandler;
 import cn.iocoder.yudao.framework.easytrans.core.annotations.DataTranslation;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
-import java.util.List;
+import org.aspectj.lang.annotation.Before;
 
 
 /**
@@ -17,17 +12,17 @@ import java.util.List;
  *
  * @author HUIHUI
  */
-@Component
 @Aspect
 @Slf4j
 public class DataTranslationAspect {
 
-    @Resource
-    public List<DataTranslationHandler> translationHandlers;
+    //@Resource
+    //public List<DataTranslationHandler> translationHandlers;
 
-    @After("@annotation(dataTranslation)")
+    @Before("@annotation(dataTranslation)")
     public void doBefore(JoinPoint joinPoint, DataTranslation dataTranslation) {
-
+        log.info("DataTranslationAspect triggered for method: {}", joinPoint.getSignature().toShortString());
+        System.out.println(joinPoint);
     }
 
 }

@@ -1,13 +1,10 @@
 package cn.iocoder.yudao.module.infra.controller.admin.demo.demo04.vo;
 
+import cn.iocoder.yudao.framework.easytrans.core.annotations.DataTrans;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
-import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo04.Demo04GradeDO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.fhs.core.trans.anno.Trans;
-import com.fhs.core.trans.constant.TransType;
-import com.fhs.core.trans.vo.TransPojo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -17,7 +14,7 @@ import java.util.Set;
 @Schema(description = "管理后台 - 学生 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class Demo04StudentRespVO implements TransPojo {
+public class Demo04StudentRespVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "8525")
     @ExcelProperty("编号")
@@ -47,7 +44,7 @@ public class Demo04StudentRespVO implements TransPojo {
     /**
      * 学生班级
      */
-    @Trans(type = TransType.SIMPLE, target = Demo04GradeDO.class, fields = "name", ref = "gradeName")
+    //@Trans(type = TransType.SIMPLE, target = Demo04GradeDO.class, fields = "name", ref = "gradeName")
     private Long gradeId;
 
     private String gradeName;
@@ -63,7 +60,8 @@ public class Demo04StudentRespVO implements TransPojo {
 
     // TODO puhui999: 自定义数据源翻译-问题：只显示第一个
     //@Trans(type = TransType.AUTO_TRANS, key = "demo04course", fields = "name", ref = "courseNames")
-    @Trans(type = TransType.AUTO_TRANS, key = "demo04course")
+    //@Trans(type = TransType.AUTO_TRANS, key = "demo04course")
+    @DataTrans(type = "Demo04CourseTrans", fields = "name", resultMapping = "courseNames")
     private Set<Long> courseIds;
 
     //private Set<String> courseNames; TODO 收不到值

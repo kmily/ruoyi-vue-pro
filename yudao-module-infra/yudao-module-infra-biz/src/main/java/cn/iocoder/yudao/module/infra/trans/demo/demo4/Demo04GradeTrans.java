@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.infra.trans.demo.demo4;
 
-import cn.iocoder.yudao.framework.easytrans.core.VOAutoTransable;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo04.Demo04GradeDO;
 import cn.iocoder.yudao.module.infra.service.demo.demo04.Demo04StudentService;
 import org.springframework.stereotype.Component;
@@ -15,12 +14,11 @@ import javax.annotation.Resource;
  * @author HUIHUI
  */
 @Component
-public class Demo04GradeTrans implements VOAutoTransable<Demo04GradeDO> {
+public class Demo04GradeTrans {
 
     @Resource
     private Demo04StudentService studentService;
 
-    @Override
     public Demo04GradeDO selectById(Object o) {
         return studentService.getDemo04GradeById((Long) o);
     }
