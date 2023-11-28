@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.infra.controller.admin.demo.demo04.vo;
 
-import cn.iocoder.yudao.framework.easytrans.core.annotations.DataTrans;
+import cn.iocoder.yudao.framework.datatranslation.core.annotations.DataTrans;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;

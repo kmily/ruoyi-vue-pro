@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.infra.trans.demo.demo4;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjUtil;
-import cn.iocoder.yudao.framework.easytrans.core.DataTranslationHandler;
+import cn.iocoder.yudao.framework.datatranslation.core.DataTranslationHandler;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo04.Demo04CourseDO;
 import cn.iocoder.yudao.module.infra.service.demo.demo04.Demo04StudentService;
 import org.springframework.stereotype.Component;

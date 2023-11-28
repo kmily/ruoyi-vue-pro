@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.infra.controller.admin.demo.demo04;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.easytrans.core.annotations.DataTranslation;
+import cn.iocoder.yudao.framework.datatranslation.core.annotations.DataTranslation;
 import cn.iocoder.yudao.module.infra.controller.admin.demo.demo04.vo.Demo04StudentRespVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo04.Demo04StudentDO;
 import cn.iocoder.yudao.module.infra.service.demo.demo04.Demo04StudentService;

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.easytrans.core;
+package cn.iocoder.yudao.framework.datatranslation.core;
 
 import java.util.Collections;
 import java.util.List;

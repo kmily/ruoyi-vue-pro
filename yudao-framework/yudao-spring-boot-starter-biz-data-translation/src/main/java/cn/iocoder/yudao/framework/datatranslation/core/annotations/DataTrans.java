@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.easytrans.core.annotations;
+package cn.iocoder.yudao.framework.datatranslation.core.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
