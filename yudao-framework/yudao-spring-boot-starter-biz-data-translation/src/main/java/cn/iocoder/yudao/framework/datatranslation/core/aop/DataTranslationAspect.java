@@ -60,7 +60,7 @@ public class DataTranslationAspect {
             if (field.isAnnotationPresent(DataTrans.class)) {
                 DataTrans dataTrans = field.getAnnotation(DataTrans.class);
                 List<Map<String, Object>> maps = handlerField(obj, field, dataTrans);
-                setFieldValue(obj, clazz, dataTrans, maps);
+                setFieldValue(obj, clazz, field, dataTrans, maps);
             }
         }
     }
@@ -82,14 +82,12 @@ public class DataTranslationAspect {
         // 使用反射获取属性值
         field.setAccessible(true);
         try {
+            // 获取翻译数据源
             Object value = field.get(obj);
-
             if (value instanceof Collection) {
-                // TODO puhui999: 获取翻译数据源
                 Collection<?> collection = (Collection<?>) value;
                 return translationHandler.selectByIds(collection);
             }
-            // TODO puhui999: 是不是也得校验一下 value 类型？
             return Collections.singletonList(translationHandler.selectById(value));
         } catch (IllegalAccessException ignored) {
         }
@@ -104,38 +102,58 @@ public class DataTranslationAspect {
      * @param dataTrans 属性注解
      * @param maps      翻译数据源
      */
-    private static void setFieldValue(Object obj, Class<?> clazz, DataTrans dataTrans, List<Map<String, Object>> maps) {
+    private static void setFieldValue(Object obj, Class<?> clazz, Field classField, DataTrans dataTrans, List<Map<String, Object>> maps) {
         if (CollUtil.isEmpty(maps)) {
             log.warn("没有获取到【{}】数据源", dataTrans.type());
             return;
         }
         String[] fields = dataTrans.fields(); // 需要获取的字段
         String[] resultMapping = dataTrans.resultMapping(); // 映射在哪些属性上（与 fields 一一对应）
-        for (int i = 0; i < fields.length; i++) {
-            try {
-                String field = fields[i]; // 需要获取的值
-                // 获取属性字段
-                Field classField = clazz.getDeclaredField(resultMapping[i]);
-                // 设置字段可访问（如果是私有字段）
-                classField.setAccessible(true);
-                // 获取属性类型
-                Type fieldType = classField.getGenericType();
-                // 检查属性类型是否为 Collection
-                List<Object> values = CollectionUtils.convertList(maps, item -> item.get(field));
-                if (fieldType instanceof ParameterizedType) { // 情况一：集合类型
-                    // 设置属性值
-                    classField.set(obj, values);
-                } else if (fieldType == String.class) { // 情况二：如果目标是字符串类型则将值已 "," 拼接后设置
-                    String collect = values.stream()
-                            .filter(Objects::nonNull)
-                            .map(Object::toString)
-                            .collect(Collectors.joining(","));
-                    // 设置属性值
-                    classField.set(obj, collect);
+        try {
+            Object value = classField.get(obj);
+            if (value instanceof Collection) {  // 多数据翻译,比如说 postIds 翻译
+                for (int i = 0; i < fields.length; i++) {
+                    String field = fields[i]; // 需要获取的值
+                    // 获取属性字段
+                    Field targetField = clazz.getDeclaredField(resultMapping[i]);
+                    // 设置字段可访问（如果是私有字段）
+                    targetField.setAccessible(true);
+                    // 获取目标属性类型
+                    Type fieldType = targetField.getGenericType();
+                    // 检查属性类型是否为 Collection
+                    if (fieldType instanceof ParameterizedType) { // 情况一：集合类型
+                        ParameterizedType parameterizedType = (ParameterizedType) fieldType;
+                        if (List.class.isAssignableFrom((Class<?>) parameterizedType.getRawType())) { // List
+                            // 设置属性值
+                            targetField.set(obj, CollectionUtils.convertList(maps, item -> item.get(field)));
+                        } else if (Set.class.isAssignableFrom((Class<?>) parameterizedType.getRawType())) { // Set
+                            // 设置属性值
+                            targetField.set(obj, CollectionUtils.convertSet(maps, item -> item.get(field)));
+                        }
+                    } else if (fieldType == String.class) { // 情况二：如果目标是字符串类型则将值已 "," 拼接后设置
+                        List<Object> objects = CollectionUtils.convertList(maps, item -> item.get(field));
+                        String collect = objects.stream()
+                                .filter(Objects::nonNull)
+                                .map(Object::toString)
+                                .collect(Collectors.joining(","));
+                        // 设置属性值
+                        targetField.set(obj, collect);
+                    }
                 }
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                log.warn("存在注解【{}】的属性数据翻译失败", dataTrans);
+            } else { // 单数据翻译,比如说 userId 翻译
+                // 获取数据
+                Map<String, Object> objectMap = maps.get(0);
+                for (int i = 0; i < fields.length; i++) {
+                    String field = fields[i]; // 需要获取的值
+                    // 获取属性字段
+                    Field targetField = clazz.getDeclaredField(resultMapping[i]);
+                    // 设置字段可访问（如果是私有字段）
+                    targetField.setAccessible(true);
+                    targetField.set(obj, objectMap.get(field));
+                }
             }
+        } catch (Exception e) {
+            log.warn("存在注解【{}】的属性数据翻译失败", dataTrans);
         }
     }
 

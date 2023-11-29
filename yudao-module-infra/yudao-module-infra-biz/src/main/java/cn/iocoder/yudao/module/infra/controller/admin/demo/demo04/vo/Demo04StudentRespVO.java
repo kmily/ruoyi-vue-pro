@@ -61,4 +61,27 @@ public class Demo04StudentRespVO {
      */
     private List<String> courseNames;
 
+    /**
+     * 创建者
+     */
+    @DataTrans(type = "adminUserApiImpl", fields = {"nickname", "mobile", "postIds"}, resultMapping = {"creatorName", "creatorMobile", "postIds"})
+    private String creator;
+// TODO puhui999: 嵌套数据翻译需保障属性先后顺如先翻译出 postIds 再翻译出 postNames
+    /**
+     * 岗位编号数组
+     */
+    @DataTrans(type = "postApiImpl", fields = "name", resultMapping = "postNames")
+    private Set<Long> postIds;
+    private String postNames;
+
+    /**
+     * 创建者用户昵称
+     */
+    private String creatorName;
+
+    /**
+     * 创建者手机号码
+     */
+    private String creatorMobile;
+
 }
