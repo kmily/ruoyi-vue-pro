@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.infra.service.demo.demo04;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo04.vo.Demo04StudentPageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo04.Demo04CourseDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo04.Demo04GradeDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo04.Demo04StudentDO;
@@ -77,6 +79,16 @@ public class Demo04StudentServiceImpl implements Demo04StudentService {
     @Override
     public Demo04GradeDO getDemo04GradeById(Long id) {
         return demo04GradeMapper.selectById(id);
+    }
+
+    @Override
+    public Demo04StudentDO getDemo04StudentById(Long id) {
+        return demo04StudentMapper.selectById(id);
+    }
+
+    @Override
+    public PageResult<Demo04StudentDO> getDemo04StudentPage(Demo04StudentPageReqVO pageReqVO) {
+        return demo04StudentMapper.selectPage(pageReqVO, null);
     }
 
 }

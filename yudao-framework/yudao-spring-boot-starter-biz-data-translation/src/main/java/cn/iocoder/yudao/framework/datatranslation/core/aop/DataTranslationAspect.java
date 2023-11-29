@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.datatranslation.core.aop;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.datatranslation.core.DataTranslationHandler;
 import cn.iocoder.yudao.framework.datatranslation.core.annotations.DataTrans;
@@ -40,7 +41,7 @@ public class DataTranslationAspect {
         // 执行目标方法，获取返回值
         CommonResult<?> result = (CommonResult<?>) joinPoint.proceed();
         Object data = result.getData();
-        if (data instanceof Collection) {
+        if (data instanceof Collection) { // 情况一：返回的是 list
             Collection<?> collection = (Collection<?>) data;
             for (Object obj : collection) {
                 if (obj == null) {
@@ -48,6 +49,17 @@ public class DataTranslationAspect {
                 }
                 handlerFields(obj);
             }
+        } else if (data instanceof PageResult) { // 情况二：返回的是 PageResult
+            PageResult<?> pageResult = (PageResult<?>) data;
+            List<?> list = pageResult.getList();
+            for (Object obj : list) {
+                if (obj == null) {
+                    break; // 遇到 null 直接结束
+                }
+                handlerFields(obj);
+            }
+        } else { // 情况三：返回的是一个 respVO
+            handlerFields(data);
         }
         return result;
     }

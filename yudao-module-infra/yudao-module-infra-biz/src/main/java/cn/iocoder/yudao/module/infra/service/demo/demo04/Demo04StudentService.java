@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.infra.service.demo.demo04;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo04.vo.Demo04StudentPageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo04.Demo04CourseDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo04.Demo04GradeDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo04.Demo04StudentDO;
@@ -51,5 +53,21 @@ public interface Demo04StudentService {
      * @return 学生班级
      */
     Demo04GradeDO getDemo04GradeById(Long id);
+
+    /**
+     * 获得学生详情
+     *
+     * @param id 编号
+     * @return 学生DO
+     */
+    Demo04StudentDO getDemo04StudentById(Long id);
+
+    /**
+     * 获得学生分页
+     *
+     * @param pageReqVO 分页条件
+     * @return 学生分页数据
+     */
+    PageResult<Demo04StudentDO> getDemo04StudentPage(Demo04StudentPageReqVO pageReqVO);
 
 }
