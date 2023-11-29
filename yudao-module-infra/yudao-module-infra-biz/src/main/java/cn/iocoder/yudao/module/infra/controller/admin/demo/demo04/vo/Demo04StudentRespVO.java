@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Schema(description = "管理后台 - 学生 Response VO")
@@ -44,28 +45,20 @@ public class Demo04StudentRespVO {
     /**
      * 学生班级
      */
-    //@Trans(type = TransType.SIMPLE, target = Demo04GradeDO.class, fields = "name", ref = "gradeName")
+    @DataTrans(type = "demo04GradeTrans", fields = "name", resultMapping = "gradeName")
     private Long gradeId;
-
+    /**
+     * 学生班级名称
+     */
     private String gradeName;
-
-    // TODO puhui999: 1、定义一个父接口 DataTranslationHandler-一个单查询接口-一个批量查询接口(统一返回 Map)，需要翻译的数据api实现这个接口
-    // TODO puhui999: 2、定义一个属性注解 DataTrans-
     /**
      * 学生课程
      */
-    // TODO puhui999: 系统自动查表作为数据源-翻译正常
-    //@Trans(type = TransType.SIMPLE, target = Demo04CourseDO.class, fields = "name", ref = "courseNames")
-    //private Set<Long> courseIds;
-
-    // TODO puhui999: 自定义数据源翻译-问题：只显示第一个
-    //@Trans(type = TransType.AUTO_TRANS, key = "demo04course", fields = "name", ref = "courseNames")
-    //@Trans(type = TransType.AUTO_TRANS, key = "demo04course")
-    @DataTrans(type = "Demo04CourseTrans", fields = "name", resultMapping = "courseNames")
+    @DataTrans(type = "demo04CourseTrans", fields = "name", resultMapping = "courseNames")
     private Set<Long> courseIds;
-
-    //private Set<String> courseNames; TODO 收不到值
-
-    private String courseNames;
+    /**
+     * 学生课程名称列表
+     */
+    private List<String> courseNames;
 
 }

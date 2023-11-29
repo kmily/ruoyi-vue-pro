@@ -1,14 +1,13 @@
 package cn.iocoder.yudao.module.infra.trans.demo.demo4;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.datatranslation.core.DataTranslationHandler;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo04.Demo04CourseDO;
 import cn.iocoder.yudao.module.infra.service.demo.demo04.Demo04StudentService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -29,10 +28,7 @@ public class Demo04CourseTrans implements DataTranslationHandler {
     private Demo04StudentService studentService;
 
     @Override
-    public List<Map<String, Object>> selectByIds(String handlerType, List<Object> ids) {
-        if (ObjUtil.equal(handlerType, "Demo04CourseTrans")) {
-            return Collections.emptyList();
-        }
+    public List<Map<String, Object>> selectByIds(Collection<?> ids) {
         List<Demo04CourseDO> demo04CourseList = studentService.getDemo04CourseList(convertSet(ids, id -> (Long) id));
         return convertList(demo04CourseList, BeanUtil::beanToMap);
     }

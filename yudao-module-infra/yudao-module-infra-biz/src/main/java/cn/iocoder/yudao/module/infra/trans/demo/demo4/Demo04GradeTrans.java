@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.infra.trans.demo.demo4;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.iocoder.yudao.framework.datatranslation.core.DataTranslationHandler;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo04.Demo04GradeDO;
 import cn.iocoder.yudao.module.infra.service.demo.demo04.Demo04StudentService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Map;
 
 /**
  * 学生班级翻译
@@ -14,13 +17,15 @@ import javax.annotation.Resource;
  * @author HUIHUI
  */
 @Component
-public class Demo04GradeTrans {
+public class Demo04GradeTrans implements DataTranslationHandler {
 
     @Resource
     private Demo04StudentService studentService;
 
-    public Demo04GradeDO selectById(Object o) {
-        return studentService.getDemo04GradeById((Long) o);
+    @Override
+    public Map<String, Object> selectById(Object o) {
+        Demo04GradeDO demo04Grade = studentService.getDemo04GradeById((Long) o);
+        return BeanUtil.beanToMap(demo04Grade);
     }
 
 }
