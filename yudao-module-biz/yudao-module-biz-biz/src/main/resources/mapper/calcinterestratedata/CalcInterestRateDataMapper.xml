@@ -12,6 +12,7 @@
         SELECT
             t.id id,
             t.start_date startDate,
+            t.end_date endDate,
             t.rate_half_year rateHalfYear,
             t.rate_one_year rateOneYear,
             t.rate_three_year rateThreeYear,
@@ -29,26 +30,29 @@
 
 
     <insert id="insertExecProcessDataBatch">
-        INSERT INTO biz_calc_exec_data ( id,  process_id, rate_id, date_index, day_rate, day_amount,year_rate )
+        INSERT INTO biz_calc_exec_data ( id,  process_id, rate_id, date_index, date_index_end, day_rate, day_amount,year_rate,days,calc_proc_type,ip)
         VALUES
         <foreach collection="list" index="index" item="item" separator=",">
-            (  #{item.id},  #{item.processId},  #{item.rateId},  #{item.dateIndex}, #{item.dayRate}, #{item.dayAmount} , #{item.yearRate}  )
+            (  #{item.id},  #{item.processId},  #{item.rateId},  #{item.dateIndex},  #{item.dateIndexEnd}, #{item.dayRate}, #{item.dayAmount} , #{item.yearRate}
+            , #{item.days}, #{item.calcProcType}, #{item.ip} )
         </foreach>
     </insert>
 
     <insert id="insertExecProcessDataMonthBatch">
-        INSERT INTO biz_calc_exec_data ( id,  process_id, rate_id, date_index, day_rate, day_amount,days,year_rate )
+        INSERT INTO biz_calc_exec_data ( id,  process_id, rate_id, date_index, date_index_end, day_rate, day_amount,days,year_rate
+        ,full_days,is_full,ip )
         VALUES
         <foreach collection="list" index="index" item="item" separator=",">
-            (  #{item.id},  #{item.processId},  #{item.rateId},  #{item.dateIndex}, #{item.dayRate}, #{item.dayAmount} , #{item.days} , #{item.yearRate} )
+            (  #{item.id},  #{item.processId},  #{item.rateId},  #{item.dateIndex},  #{item.dateIndexEnd}, #{item.dayRate}, #{item.dayAmount}
+            , #{item.days} , #{item.yearRate}, #{item.fullDays}, #{item.isFull} , #{item.ip})
         </foreach>
     </insert>
 
     <insert id="insertExecProcessDataYearBatch">
-        INSERT INTO biz_calc_exec_data ( id,  process_id, rate_id, date_index, date_index_end, day_rate, day_amount,days,year_rate )
+        INSERT INTO biz_calc_exec_data ( id,  process_id, rate_id, date_index, date_index_end, day_rate, day_amount,days,year_rate,ip )
         VALUES
         <foreach collection="list" index="index" item="item" separator=",">
-            (  #{item.id},  #{item.processId},  #{item.rateId},  #{item.dateIndex},  #{item.dateIndexEnd}, #{item.dayRate}, #{item.dayAmount} , #{item.days} , #{item.yearRate} )
+            (  #{item.id},  #{item.processId},  #{item.rateId},  #{item.dateIndex},  #{item.dateIndexEnd}, #{item.dayRate}, #{item.dayAmount} , #{item.days} , #{item.yearRate}, #{item.ip} )
         </foreach>
     </insert>
 
@@ -105,12 +109,13 @@
     </select>
 
 
-    <select id="selectSectionListByFixMonthRate" parameterType="java.lang.String"   resultType="cn.iocoder.yudao.module.biz.controller.admin.calc.vo.SectionIndexVO">
+    <select id="selectSectionListByFixMonthRate" parameterType="java.lang.String"
+            resultType="cn.iocoder.yudao.module.biz.controller.admin.calc.vo.SectionIndexVO">
         SELECT
             DATE_FORMAT(a.date_index,'%Y-%m')  startDate,
             ''  endDate,
             round(a.year_rate,5)  suiteRate,
-            c.days AS  days,
+           case a.is_full when 1 then 1 else concat(a.days,'/',a.full_days) end  AS  days,
             ROUND(SUM(day_amount),2)  AS sectionAmount,
             a.days days
         FROM biz_calc_exec_data a
@@ -121,6 +126,25 @@
         WHERE a.process_id = #{processId}
         GROUP BY DATE_FORMAT(a.date_index,'%Y-%m')
     </select>
+
+    <select id="selectSectionListByFixLPRs" parameterType="java.lang.String"
+            resultType="cn.iocoder.yudao.module.biz.controller.admin.calc.vo.SectionIndexVO">
+        SELECT
+            c.startDate startDate,
+            c.endDate  endDate,
+            ROUND(a.year_rate,5)  suiteRate,
+            c.days  days,
+            ROUND(SUM(day_amount),2)  AS sectionAmount
+        FROM biz_calc_exec_data a
+        LEFT JOIN biz_calc_interest_rate_data b ON a.rate_id = b.id
+        LEFT JOIN (
+            SELECT rate_id, process_id ,COUNT(1) days,MIN(date_index) startDate,MAX(date_index) endDate FROM biz_calc_exec_data WHERE process_id = #{processId} GROUP BY rate_id
+        ) c ON a.rate_id = c.rate_id
+        WHERE a.process_id = #{processId}
+        GROUP BY a.rate_id
+        ORDER BY a.date_index
+    </select>
+
 
     <select id="selectSectionListByFixYearRate" parameterType="java.lang.String"   resultType="cn.iocoder.yudao.module.biz.controller.admin.calc.vo.SectionIndexVO">
         SELECT

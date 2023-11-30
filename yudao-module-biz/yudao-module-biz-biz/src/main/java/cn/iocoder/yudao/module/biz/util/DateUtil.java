@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
+ *
  */
 @Slf4j
 public class DateUtil {
@@ -293,6 +294,82 @@ public class DateUtil {
         cal.add(Calendar.DATE, -1);// 下2个月1号减去一天，即得到下1一个月最后一天
         String currentMonth = df.format(cal.getTime());
         return currentMonth;
+    }
+
+    public static Date getYearLastDay(Date date) {
+        // 获取当前年份
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int currentYear = calendar.get(Calendar.YEAR);
+        // 构建最后一天的日期
+        calendar.set(currentYear, Calendar.DECEMBER, 31);
+        // 将小时至0
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        // 将分钟至0
+        calendar.set(Calendar.MINUTE, 0);
+        // 将秒至0
+        calendar.set(Calendar.SECOND, 0);
+        // 将毫秒至0
+        calendar.set(Calendar.MILLISECOND, 0);
+        Date lastDayOfYear = calendar.getTime();
+        return lastDayOfYear;
+    }
+
+    public static Date getYearFirstDay(Date date) {
+        // 获取当前年份
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int currentYear = calendar.get(Calendar.YEAR);
+        // 构建最后一天的日期
+        calendar.set(currentYear, Calendar.JANUARY, 1);
+        // 将小时至0
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        // 将分钟至0
+        calendar.set(Calendar.MINUTE, 0);
+        // 将秒至0
+        calendar.set(Calendar.SECOND, 0);
+        // 将毫秒至0
+        calendar.set(Calendar.MILLISECOND, 0);
+        Date lastDayOfYear = calendar.getTime();
+        return lastDayOfYear;
+    }
+
+
+    public static Date getMonthLastDay(Date date, String format) {
+        java.text.SimpleDateFormat df = new java.text.SimpleDateFormat(format);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.DATE, 1);// 将下2个月1号作为日期初始值
+        cal.add(Calendar.MONTH, 1);// 当前月＋2，即下2个月
+        cal.add(Calendar.DATE, -1);// 下2个月1号减去一天，即得到下1一个月最后一天
+        return cal.getTime();
+    }
+
+    /**
+     * 获取本月第一天
+     */
+    public static Date getMonthFirstDay(Date date, String format) {
+        Calendar cale = Calendar.getInstance();
+        cale.setTime(date);
+        cale.add(Calendar.MONTH, 0);
+        cale.set(Calendar.DAY_OF_MONTH, 1);
+        // 将小时至0
+        cale.set(Calendar.HOUR_OF_DAY, 0);
+        // 将分钟至0
+        cale.set(Calendar.MINUTE, 0);
+        // 将秒至0
+        cale.set(Calendar.SECOND, 0);
+        // 将毫秒至0
+        cale.set(Calendar.MILLISECOND, 0);
+        return cale.getTime();
+    }
+
+    public static void main(String[] args) {
+        Date ed = getYearLastDay(new Date());
+        System.out.println(DateUtil.format(ed, DateUtil.TIME_FORMAT_NORMAL));
+        Date fd = getYearFirstDay(new Date());
+        System.out.println(DateUtil.format(fd, DateUtil.TIME_FORMAT_NORMAL));
+
     }
 
     public static String format(Date date) {
@@ -631,7 +708,6 @@ public class DateUtil {
         calendar.set(Calendar.MONTH, month);
         return calendar.getActualMaximum(Calendar.DATE);
     }
-
 
 
     /**

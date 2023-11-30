@@ -81,3 +81,13 @@ export function execCalcZxfData(data) {
 }
 
 
+
+// 导出利率数据 Excel
+export function exportExcel(data) {
+  return request({
+    url: '/biz/calc-interest-rate-data/excel',
+    method: 'post',
+    data: data,
+    responseType: 'blob'
+  })
+}

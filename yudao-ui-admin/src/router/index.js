@@ -67,7 +67,7 @@ export const constantRoutes = [
   {
     path: '',
     component: Layout,
-    redirect: 'index',
+    redirect: 'calc',
     children: [{
         path: 'index',
         component: (resolve) => require(['@/views/index'], resolve),
@@ -75,6 +75,11 @@ export const constantRoutes = [
         meta: {title: '首页', icon: 'dashboard', affix: true}
       }
     ]
+  },
+  {
+    path: '/calc',
+    component: (resolve) => require(['@/views/index2'], resolve),
+    hidden: true
   },
   {
     path: '/user',

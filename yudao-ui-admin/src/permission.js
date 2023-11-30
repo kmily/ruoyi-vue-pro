@@ -9,7 +9,7 @@ import { isRelogin } from '@/utils/request'
 NProgress.configure({ showSpinner: false })
 
 // 增加三方登陆 update by 芋艿
-const whiteList = ['/login', '/social-login',  '/auth-redirect', '/bind', '/register', '/oauthLogin/gitee']
+const whiteList = ['/login', '/social-login',  '/auth-redirect', '/bind', '/register', '/oauthLogin/gitee','/calc']
 
 router.beforeEach((to, from, next) => {
   NProgress.start()

@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.biz.controller.admin.calc;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -24,14 +26,24 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.*;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+
+import jxl.Cell;
+import jxl.Workbook;
+import jxl.write.Label;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -70,22 +82,89 @@ public class CalcInterestRateDataController {
             }
         }
 
-//        File file=ResourceUtils.getFile("classpath:测试阶段说明.docx");
-//        FileSystemResource fileResource = new FileSystemResource(file);
-//        String fileName="测试阶段说明.docx";
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-//        headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", URLEncoder.encode(fileName, "UTF-8")));
-//        headers.add("Pragma", "no-cache");
-//        headers.add("Expires", "0");
-//
-//        return ResponseEntity
-//                .ok()
-//                .headers(headers)
-//                .contentLength(fileResource.contentLength())
-//                .contentType(MediaType.parseMediaType("application/octet-stream"))
-//                .body(new InputStreamResource(fileResource.getInputStream()));
+    }
+
+    @PostMapping("/excel")
+    @PermitAll
+    public void downloadExcelFile(HttpServletResponse response, @RequestBody List<SectionIndexVO> sectionList) throws IOException {
+
+        List<CalcInterestRateLxDataExcelVO> datas = parseExcel2(sectionList);
+        ExcelUtils.write(response, "数据.xlsx", "数据", CalcInterestRateLxDataExcelVO.class, datas);
+
+    }
+
+
+    public String parseExcel(List<SectionIndexVO> sectionList) throws Exception {
+        //读取excel
+        org.springframework.core.io.Resource resource = new ClassPathResource("利息数据.xls");
+        String filePath = resource.getFile().getParentFile().getPath() + "/" + System.currentTimeMillis() + ".xls";
+        File resultfile = FileUtil.copy(resource.getFile().getAbsolutePath(), filePath, true);
+        //ping
+        {
+            //创建Excel工作薄
+            Workbook workbookIn = Workbook.getWorkbook(resultfile);
+            WritableWorkbook workbook = Workbook.createWorkbook(resultfile, workbookIn);
+            if (null == workbook) {
+                throw new Exception("创建Excel工作薄为空！");
+            }
+            WritableSheet sheet = workbook.getSheet(0);
+            //遍历Excel中所有的sheet
+            for (int i = 0; i < sectionList.size(); i++) {
+                SectionIndexVO index = sectionList.get(i);
+                //获取第一列
+                String column1 = index.getStartDate() + "至" + index.getEndDate();
+                Label label1 = new Label(0, i + 1, column1);
+                sheet.addCell(label1);
+                //获取第二列
+                String column2 = index.getDays();
+                Label label2 = new Label(1, i + 1, column2);
+                sheet.addCell(label2);
+                //获取第三列
+                String column3 = index.getSuiteRate();
+                Label label3 = new Label(2, i + 1, column3);
+                sheet.addCell(label3);
+                //获取第四列
+                String column4 = index.getSectionAmount().toString();
+                Label label4 = new Label(3, i + 1, column4);
+                sheet.addCell(label4);
+            }
+            {
+                //写入数据
+                workbook.write();
+                //一定要关闭，不然不会写入文件内。
+                workbook.close();
+            }
+        }
+        return filePath;
+    }
+
+    public List<CalcInterestRateLxDataExcelVO> parseExcel2(List<SectionIndexVO> sectionList) {
+
+        List<CalcInterestRateLxDataExcelVO> list = new ArrayList();
+        //遍历Excel中所有的sheet
+        BigDecimal totalDays = BigDecimal.ZERO;
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        for (int i = 0; i < sectionList.size(); i++) {
+            SectionIndexVO index = sectionList.get(i);
+            totalDays = totalDays.add(new BigDecimal(index.getDays()));
+            totalAmount = totalAmount.add(index.getSectionAmount());
+            CalcInterestRateLxDataExcelVO cir = new CalcInterestRateLxDataExcelVO();
+            //获取第一列
+            String column1 = index.getStartDate() + "至" + index.getEndDate();
+            cir.setTimeFrame(column1);
+            //获取第二列
+            cir.setDays(index.getDays());
+            //获取第三列
+            cir.setBenchmarkRate(index.getSuiteRate());
+            //获取第四列
+            cir.setAmount(index.getSectionAmount());
+            list.add(cir);
+        }
+        CalcInterestRateLxDataExcelVO cir = new CalcInterestRateLxDataExcelVO();
+        cir.setDays(totalDays.toString());
+        cir.setAmount(totalAmount);
+        list.add(cir);
+        return list;
     }
 
     @PostMapping("/exec/lx")

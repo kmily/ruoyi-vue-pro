@@ -13,11 +13,12 @@ import java.util.Date;
 public class MonthInfoDTO {
 
 
-    public MonthInfoDTO(Date monthStartDate, Date monthEndDate, Integer isFull, Integer days) {
+    public MonthInfoDTO(Date monthStartDate, Date monthEndDate, Integer isFull, Integer days,Integer fullDays) {
         this.monthStartDate = monthStartDate;
         this.monthEndDate = monthEndDate;
         this.isFull = isFull;
         this.days = days;
+        this.fullDays = fullDays;
     }
 
     private Date monthStartDate;
