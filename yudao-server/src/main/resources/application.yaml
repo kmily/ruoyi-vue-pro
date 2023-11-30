@@ -132,6 +132,16 @@ spring:
     listener:
       missing-topics-fatal: false # 消费监听接口监听的主题不存在时，默认会报错。所以通过设置为 false ，解决报错
 
+--- #################### VO 转换（数据翻译）相关 ####################
+
+easy-trans:
+  is-enable-redis: true # 开启 redis 支持 微服务模式推荐使用 redis 如果不用 redis 请设置为 false
+  dict-use-redis: true # 字典缓存是否放到 redis 中做二级缓存，微服务模式推荐开启
+  is-enable-global: false # 启用全局翻译 ( 拦截所有 responseBody 进行自动翻译 )，如果对于性能要求很高可关闭此配置
+  is-enable-tile: true # 开启平铺模式 ( transMap 的 key 平铺到和 vo 一个级别 )
+  is-enable-map-result: false # 开启 map 自动翻译 ( ruoyi 的 ajaxResult 可以使用此配置)
+  db-type: mysql # 数据库类型，反向翻译时使用，目前仅支持 mysql
+
 --- #################### 芋道相关配置 ####################
 
 yudao:

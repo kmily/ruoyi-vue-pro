@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.system.api.user;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.iocoder.yudao.framework.datatranslation.core.DataTranslationHandler;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.system.convert.user.UserConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
@@ -9,6 +11,10 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 /**
  * Admin 用户 API 实现类
@@ -16,7 +22,7 @@ import java.util.List;
  * @author 芋道源码
  */
 @Service
-public class AdminUserApiImpl implements AdminUserApi {
+public class AdminUserApiImpl implements AdminUserApi, DataTranslationHandler {
 
     @Resource
     private AdminUserService userService;
@@ -48,6 +54,16 @@ public class AdminUserApiImpl implements AdminUserApi {
     @Override
     public void validateUserList(Collection<Long> ids) {
         userService.validateUserList(ids);
+    }
+
+    @Override
+    public List<Map<String, Object>> selectByIds(Collection<?> ids) {
+        return convertList(getUserList(convertSet(ids, id -> Long.parseLong(id.toString()))), BeanUtil::beanToMap);
+    }
+
+    @Override
+    public Map<String, Object> selectById(Object o) {
+        return BeanUtil.beanToMap(getUser(Long.parseLong(o.toString())));
     }
 
 }

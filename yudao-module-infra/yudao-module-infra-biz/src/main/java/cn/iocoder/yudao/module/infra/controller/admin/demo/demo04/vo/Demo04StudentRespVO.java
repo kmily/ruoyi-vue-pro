@@ -1,0 +1,87 @@
+package cn.iocoder.yudao.module.infra.controller.admin.demo.demo04.vo;
+
+import cn.iocoder.yudao.framework.datatranslation.core.annotations.DataTrans;
+import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
+import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+
+@Schema(description = "管理后台 - 学生 Response VO")
+@Data
+@ExcelIgnoreUnannotated
+public class Demo04StudentRespVO {
+
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "8525")
+    @ExcelProperty("编号")
+    private Long id;
+
+    @Schema(description = "名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @ExcelProperty("名字")
+    private String name;
+
+    @Schema(description = "性别", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty(value = "性别", converter = DictConvert.class)
+    @DictFormat("system_user_sex") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
+    private Integer sex;
+
+    @Schema(description = "出生日期", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("出生日期")
+    private LocalDateTime birthday;
+
+    @Schema(description = "简介", requiredMode = Schema.RequiredMode.REQUIRED, example = "随便")
+    @ExcelProperty("简介")
+    private String description;
+
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("创建时间")
+    private LocalDateTime createTime;
+
+    /**
+     * 学生班级
+     */
+    @DataTrans(type = "demo04GradeTrans", fields = "name", resultMapping = "gradeName")
+    private Long gradeId;
+    /**
+     * 学生班级名称
+     */
+    private String gradeName;
+    /**
+     * 学生课程
+     */
+    @DataTrans(type = "demo04CourseTrans", fields = "name", resultMapping = "courseNames")
+    private Set<Long> courseIds;
+    /**
+     * 学生课程名称列表
+     */
+    private List<String> courseNames;
+
+    /**
+     * 创建者
+     */
+    @DataTrans(type = "adminUserApiImpl", fields = {"nickname", "mobile", "postIds"}, resultMapping = {"creatorName", "creatorMobile", "postIds"})
+    private String creator;
+// TODO puhui999: 嵌套数据翻译需保障属性先后顺如先翻译出 postIds 再翻译出 postNames
+    /**
+     * 岗位编号数组
+     */
+    @DataTrans(type = "postApiImpl", fields = "name", resultMapping = "postNames")
+    private Set<Long> postIds;
+    private String postNames;
+
+    /**
+     * 创建者用户昵称
+     */
+    private String creatorName;
+
+    /**
+     * 创建者手机号码
+     */
+    private String creatorMobile;
+
+}
