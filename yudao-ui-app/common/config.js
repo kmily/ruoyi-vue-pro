@@ -1,6 +1,6 @@
 module.exports = {
   //后端接口地址
-  baseUrl: 'http://47.93.215.64:48080/app-api',
+  baseUrl: 'http://101.200.62.14:48080/app-api',
 
   // baseUrl: 'http://api-dashboard.yudao.iocoder.cn/app-api',
   // 超时

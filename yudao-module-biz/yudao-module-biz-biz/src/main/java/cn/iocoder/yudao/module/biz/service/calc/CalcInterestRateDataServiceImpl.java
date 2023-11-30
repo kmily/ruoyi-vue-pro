@@ -65,11 +65,10 @@ public class CalcInterestRateDataServiceImpl implements CalcInterestRateDataServ
      */
     @Override
     public CalcInterestRateExecZxfResVO execCalcFeeData(CalcInterestRateExecZxfParamVO execVO) {
-        execVO.setTotalAmount(execVO.getTotalAmount().multiply(new BigDecimal("10000")));
+        execVO.setTotalAmount(execVO.getTotalAmount());
         CalcInterestRateExecZxfResVO vo = new CalcInterestRateExecZxfResVO();
         BigDecimal zxfAmount = BigDecimal.ZERO;
         BigDecimal leftAmount = BigDecimal.ZERO;
-        BigDecimal totalAmount = BigDecimal.ZERO;
         //一万
         BigDecimal ten_thousand = new BigDecimal("10000");
         //五十万
