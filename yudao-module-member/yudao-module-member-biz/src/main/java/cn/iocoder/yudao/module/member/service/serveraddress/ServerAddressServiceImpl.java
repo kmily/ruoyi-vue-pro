@@ -39,6 +39,10 @@ public class ServerAddressServiceImpl extends ServiceImpl<ServerAddressMapper, S
     public Long createServerAddress(ServerAddressCreateReqVO createReqVO) {
         // 插入
         ServerAddressDO serverAddress = ServerAddressConvert.INSTANCE.convert(createReqVO);
+        //从后台获取用户ID
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        assert loginUser != null;
+        serverAddress.setUserId(loginUser.getId());
         serverAddressMapper.insert(serverAddress);
         // 返回
         return serverAddress.getId();
@@ -91,7 +95,7 @@ public class ServerAddressServiceImpl extends ServiceImpl<ServerAddressMapper, S
     }
 
     @Override
-    public ServerAddressDO getServerAddress4Api(Long id, Long usrId) {
+    public ServerAddressDO getServerAddressApiDTO(Long id, Long usrId) {
         return serverAddressMapper.selectOne("id", id,
                 "user_id", usrId);
     }

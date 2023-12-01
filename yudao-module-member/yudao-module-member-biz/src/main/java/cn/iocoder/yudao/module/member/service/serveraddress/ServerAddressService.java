@@ -70,5 +70,5 @@ public interface ServerAddressService extends IService<ServerAddressDO>{
     /**
      * 根据id和userId获取服务地址
      */
-    ServerAddressDO getServerAddress4Api(Long id,Long usrId);
+    ServerAddressDO getServerAddressApiDTO(Long id,Long usrId);
 }
