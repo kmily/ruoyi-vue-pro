@@ -125,6 +125,10 @@ public class ServerPersonServiceImpl extends ServiceImpl<ServerPersonMapper, Ser
                 .setId(auditVO.getId()));
 
         serverPersonCheckLogService.save(ServerPersonCheckLogConvert.INSTANCE.convert(auditVO, auditVO.getId(),user.getNickname()));
+
+        if(CommonStatusEnum.OPEN.name().equals(status)){
+            // TODO 如果审核通过 发布消息, 有关联的未分配的订单进行更新操作
+        }
     }
 
 }
