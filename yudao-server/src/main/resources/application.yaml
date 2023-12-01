@@ -178,6 +178,7 @@ yudao:
       - system_mail_template
       - system_mail_log
       - system_notify_template
+      - system_help_center
       - infra_codegen_column
       - infra_codegen_table
       - infra_test_demo

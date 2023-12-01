@@ -175,4 +175,7 @@ public interface ErrorCodeConstants {
     // ============ 机构套餐
     ErrorCode ORGANIZATION_PACKAGE_NOT_EXISTS = new ErrorCode(100010, "机构套餐不存在!");
     ErrorCode ORGANIZATION_PACKAGE_USED = new ErrorCode(100011, "机构正在使用该套餐，请给租户重新设置套餐后再尝试删除");
+
+    // ========== 常见问题 1-009-012-000==========
+    ErrorCode HELP_CENTER_NOT_EXISTS = new ErrorCode(100012, "常见问题不存在");
 }
