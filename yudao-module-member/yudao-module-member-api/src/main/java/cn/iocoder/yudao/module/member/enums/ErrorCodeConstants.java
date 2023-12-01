@@ -61,4 +61,7 @@ public interface ErrorCodeConstants {
     ErrorCode SERVER_PERSON_HAS_EXISTS = new ErrorCode(1_004_013_001, "身份证[{}]已经存在");
     ErrorCode SERVER_PERSON_STATUS_ERROR = new ErrorCode(1_004_013_002, "被护人状态不正确");
 
+    //========== 服务地址 1-004-013-000 ==========
+    ErrorCode SERVER_ADDRESS_NOT_EXISTS = new ErrorCode(1_004_013_000, "服务地址不存在");
+
 }
