@@ -12,17 +12,20 @@ import cn.iocoder.yudao.module.trade.enums.order.TradeOrderRefundStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 交易订单 DO
  *
  * @author 芋道源码
  */
-@TableName("trade_order")
+@TableName(value = "trade_order", autoResultMap = true)
 @KeySequence("trade_order_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -330,4 +333,65 @@ public class TradeOrderDO extends BaseDO {
      */
     private Long combinationRecordId;
 
+    /**
+     * 医护人员编号
+     */
+    private Long careId;
+
+    /**
+     * 服务日期
+     */
+    private String serviceDate;
+
+    /**
+     * 服务时间
+     */
+    private String serviceTime;
+
+
+    /**
+     * 被户人编号
+     */
+    private Long servicePersonId;
+    /**
+     * 被户人信息
+     */
+    private String servicePerson;
+    /**
+     * 图片资料
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> images;
+    /**
+     * 分派类型 用户指定，系统分派
+     */
+    private String assignType;
+    /**
+     * 分派人编号
+     */
+    private Long assignId;
+    /**
+     * 分派人姓名
+     */
+    private String assignName;
+    /**
+     * 分派时间
+     */
+    private LocalDateTime assignTime;
+    /**
+     * 接受时间
+     */
+    private LocalDateTime acceptTime;
+    /**
+     * 出发时间
+     */
+    private LocalDateTime setOutTime;
+    /**
+     * 开始时间
+     */
+    private LocalDateTime startTime;
+    /**
+     * 完成时间
+     */
+    private LocalDateTime completeTime;
 }

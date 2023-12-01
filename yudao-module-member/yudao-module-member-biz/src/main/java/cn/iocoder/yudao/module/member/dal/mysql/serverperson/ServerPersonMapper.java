@@ -20,6 +20,7 @@ public interface ServerPersonMapper extends BaseMapperX<ServerPersonDO>,BaseMapp
 
     default PageResult<ServerPersonDO> selectPage(AppServerPersonPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ServerPersonDO>()
+                .eqIfPresent(ServerPersonDO::getMemberId, reqVO.getMemberId())
                 .likeIfPresent(ServerPersonDO::getName, reqVO.getName())
                 .eqIfPresent(ServerPersonDO::getMobile, reqVO.getMobile())
                 .likeIfPresent(ServerPersonDO::getRealname, reqVO.getRealname())

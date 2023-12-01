@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.controller.app.order;
 
+import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
@@ -16,6 +17,7 @@ import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -77,6 +80,7 @@ public class AppTradeOrderController {
     @GetMapping("/get-detail")
     @Operation(summary = "获得交易订单")
     @Parameter(name = "id", description = "交易订单编号")
+    @PreAuthenticated
     public CommonResult<AppTradeOrderDetailRespVO> getOrder(@RequestParam("id") Long id) {
         // 查询订单
         TradeOrderDO order = tradeOrderQueryService.getOrder(getLoginUserId(), id);
@@ -87,10 +91,12 @@ public class AppTradeOrderController {
         // 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(order.getId());
         // 查询物流公司
-        DeliveryExpressDO express = order.getLogisticsId() != null && order.getLogisticsId() > 0 ?
-                deliveryExpressService.getDeliveryExpress(order.getLogisticsId()) : null;
+//        DeliveryExpressDO express = order.getLogisticsId() != null && order.getLogisticsId() > 0 ?
+//                deliveryExpressService.getDeliveryExpress(order.getLogisticsId()) : null;
         // 最终组合
-        return success(TradeOrderConvert.INSTANCE.convert02(order, orderItems, tradeOrderProperties, express));
+        AppTradeOrderDetailRespVO detailRespVO = TradeOrderConvert.INSTANCE.convert02(order, orderItems, tradeOrderProperties,  null);
+        detailRespVO.setServerPerson(JSON.parseObject(order.getServicePerson(), AppServerPersonRespVO.class));
+        return success(detailRespVO);
     }
 
     @GetMapping("/get-express-track-list")
@@ -103,6 +109,7 @@ public class AppTradeOrderController {
 
     @GetMapping("/page")
     @Operation(summary = "获得交易订单分页")
+    @PreAuthenticated
     public CommonResult<PageResult<AppTradeOrderPageItemRespVO>> getOrderPage(AppTradeOrderPageReqVO reqVO) {
         // 查询订单
         PageResult<TradeOrderDO> pageResult = tradeOrderQueryService.getOrderPage(getLoginUserId(), reqVO);
@@ -115,6 +122,7 @@ public class AppTradeOrderController {
 
     @GetMapping("/get-count")
     @Operation(summary = "获得交易订单数量")
+    @PreAuthenticated
     public CommonResult<Map<String, Long>> getOrderCount() {
         Map<String, Long> orderCount = Maps.newLinkedHashMapWithExpectedSize(5);
         // 全部
@@ -122,21 +130,28 @@ public class AppTradeOrderController {
         // 待付款（未支付）
         orderCount.put("unpaidCount", tradeOrderQueryService.getOrderCount(getLoginUserId(),
                 TradeOrderStatusEnum.UNPAID.getStatus(), null));
-        // 待发货
-        orderCount.put("undeliveredCount", tradeOrderQueryService.getOrderCount(getLoginUserId(),
-                TradeOrderStatusEnum.UNDELIVERED.getStatus(), null));
-        // 待收货
+        // 派单中
+        orderCount.put("unassignCount", tradeOrderQueryService.getOrderCount(getLoginUserId(),
+                Arrays.asList(TradeOrderStatusEnum.UNABSORBED.getStatus(), TradeOrderStatusEnum.UNRECEIVE.getStatus())));
+        // 服务中
         orderCount.put("deliveredCount", tradeOrderQueryService.getOrderCount(getLoginUserId(),
-                TradeOrderStatusEnum.DELIVERED.getStatus(), null));
+                Arrays.asList(TradeOrderStatusEnum.NOSTART.getStatus(), TradeOrderStatusEnum.UNSERVER.getStatus(),
+                        TradeOrderStatusEnum.SERVERING.getStatus())));
         // 待评价
         orderCount.put("uncommentedCount", tradeOrderQueryService.getOrderCount(getLoginUserId(),
                 TradeOrderStatusEnum.COMPLETED.getStatus(), false));
+
+
+        orderCount.put("cancelCount", tradeOrderQueryService.getOrderCount(getLoginUserId(),
+                TradeOrderStatusEnum.CANCELED.getStatus(), false));
+
         return success(orderCount);
     }
 
     @PutMapping("/receive")
     @Operation(summary = "确认交易订单收货")
     @Parameter(name = "id", description = "交易订单编号")
+    @PreAuthenticated
     public CommonResult<Boolean> receiveOrder(@RequestParam("id") Long id) {
         tradeOrderUpdateService.receiveOrderByMember(getLoginUserId(), id);
         return success(true);
@@ -145,6 +160,7 @@ public class AppTradeOrderController {
     @DeleteMapping("/cancel")
     @Operation(summary = "取消交易订单")
     @Parameter(name = "id", description = "交易订单编号")
+    @PreAuthenticated
     public CommonResult<Boolean> cancelOrder(@RequestParam("id") Long id) {
         tradeOrderUpdateService.cancelOrderByMember(getLoginUserId(), id);
         return success(true);
@@ -153,6 +169,7 @@ public class AppTradeOrderController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除交易订单")
     @Parameter(name = "id", description = "交易订单编号")
+    @PreAuthenticated
     public CommonResult<Boolean> deleteOrder(@RequestParam("id") Long id) {
         tradeOrderUpdateService.deleteOrder(getLoginUserId(), id);
         return success(true);

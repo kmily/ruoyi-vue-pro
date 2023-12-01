@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -91,8 +92,8 @@ public class AppServerPersonController {
     @Operation(summary = "获得被服务人分页")
     @PreAuthenticated
     public CommonResult<PageResult<AppServerPersonRespVO>> getServerPersonPage(@Valid AppServerPersonPageReqVO pageVO) {
+        pageVO.setMemberId(SecurityFrameworkUtils.getLoginUserId());
         PageResult<ServerPersonDO> pageResult = serverPersonService.getServerPersonPage(pageVO);
-
         PageResult<AppServerPersonRespVO> voPageResult = ServerPersonConvert.INSTANCE.convertPage(pageResult);
         List<AppServerPersonRespVO> list = voPageResult.getList();
         if(CollUtil.isNotEmpty(list)){

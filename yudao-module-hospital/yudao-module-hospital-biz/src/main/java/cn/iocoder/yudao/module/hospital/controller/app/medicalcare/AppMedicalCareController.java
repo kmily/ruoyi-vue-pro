@@ -5,14 +5,12 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.hospital.controller.admin.medicalcare.vo.MedicalCareRespVO;
 import cn.iocoder.yudao.module.hospital.controller.admin.medicalcare.vo.MedicalCareUpdateReqVO;
 import cn.iocoder.yudao.module.hospital.controller.app.careaptitude.vo.AppCareAptitudePageReqVO;
 import cn.iocoder.yudao.module.hospital.controller.app.careaptitude.vo.AppCareAptitudeRespVO;
-import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCarePageReqVO;
-import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCarePerfectVO;
-import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCareRespVO;
-import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppRealNameReqVO;
+import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.*;
 import cn.iocoder.yudao.module.hospital.convert.careaptitude.CareAptitudeConvert;
 import cn.iocoder.yudao.module.hospital.convert.medicalcare.MedicalCareConvert;
 import cn.iocoder.yudao.module.hospital.dal.dataobject.careaptitude.CareAptitudeDO;
@@ -29,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.error;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 /**
@@ -98,4 +97,13 @@ public class AppMedicalCareController {
     }
 
 
+    @GetMapping("/favorite-page")
+    @Operation(summary = "查询我的收藏")
+    @PreAuthenticated
+    public CommonResult<PageResult<AppMedicalCareRespVO>> getCareFavoritePage(@Valid CareFavoritePageReqVO pageVO) {
+        Long userId = SecurityFrameworkUtils.getLoginUserId();
+        pageVO.setUserId(userId);
+        PageResult<MedicalCareDO> pageResult = medicalCareService.getCareFavoritePage(pageVO);
+        return success(CareAptitudeConvert.INSTANCE.convertPage01(pageResult));
+    }
 }

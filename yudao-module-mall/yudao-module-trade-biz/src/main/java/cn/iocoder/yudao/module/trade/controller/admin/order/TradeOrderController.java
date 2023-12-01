@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.trade.controller.admin.order;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.member.api.serverperson.ServerPersonApi;
+import cn.iocoder.yudao.module.member.api.serverperson.dto.ServerPersonRespDTO;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.*;
@@ -22,6 +24,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +47,10 @@ public class TradeOrderController {
 
     @Resource
     private MemberUserApi memberUserApi;
+
+    @Resource
+    private ServerPersonApi serverPersonApi;
+
 
     @GetMapping("/page")
     @Operation(summary = "获得交易订单分页")
@@ -102,6 +109,14 @@ public class TradeOrderController {
         return success(true);
     }
 
+    @PutMapping("/assign")
+    @Operation(summary = "订单分派")
+    @PreAuthorize("@ss.hasPermission('trade:order:assign')")
+    public CommonResult<Boolean> assignOrder(@RequestBody TradeOrderAssignReqVO assignReqVO) {
+        tradeOrderUpdateService.assignOrder(assignReqVO);
+        return success(true);
+    }
+
     @PutMapping("/update-remark")
     @Operation(summary = "订单备注")
     @PreAuthorize("@ss.hasPermission('trade:order:update')")
@@ -132,6 +147,30 @@ public class TradeOrderController {
     public CommonResult<Boolean> pickUpOrder(@RequestParam("id") Long id) {
         tradeOrderUpdateService.pickUpOrder(id);
         return success(true);
+    }
+
+
+    @GetMapping("/unassign")
+    @Operation(summary = "查询未分配订单")
+    public CommonResult<List<TradeOrderUnAssignRespVO>> getUnAssignOrder(){
+
+
+
+        // 查询订单
+        List<TradeOrderDO> tradeOrderDOList = tradeOrderQueryService.getUnAssignOrder();
+        if (CollUtil.isEmpty(tradeOrderDOList)) {
+            return success(new ArrayList<>());
+        }
+        // 查询用户信息
+        Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(convertSet(tradeOrderDOList, TradeOrderDO::getUserId));
+
+        Map<Long, ServerPersonRespDTO> personMap = serverPersonApi.getServerPersonMap(convertSet(tradeOrderDOList, TradeOrderDO::getServicePersonId));
+
+        // 查询订单项
+        List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(
+                convertSet(tradeOrderDOList, TradeOrderDO::getId));
+        // 最终组合
+        return success(TradeOrderConvert.INSTANCE.convertList(tradeOrderDOList, orderItems, userMap, personMap));
     }
 
 }

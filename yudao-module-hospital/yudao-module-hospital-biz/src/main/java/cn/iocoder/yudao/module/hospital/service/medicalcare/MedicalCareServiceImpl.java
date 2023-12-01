@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCarePageReqVO;
 import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCarePerfectVO;
 import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppRealNameReqVO;
+import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.CareFavoritePageReqVO;
 import cn.iocoder.yudao.module.hospital.dal.dataobject.careaptitude.CareAptitudeDO;
 import cn.iocoder.yudao.module.hospital.dal.dataobject.medicalcarechecklog.MedicalCareCheckLogDO;
 import cn.iocoder.yudao.module.hospital.enums.medicalcare.MedicalCareStatusEnum;
@@ -272,6 +273,11 @@ public class MedicalCareServiceImpl extends ServiceImpl<MedicalCareMapper, Medic
         medicalCareMapper.update(new MedicalCareDO(), new LambdaUpdateWrapper<MedicalCareDO>()
                 .setSql("`comment_score` = `comment_score` + ?, `comment_count` = `comment_count` + 1", score)
                 .eq(MedicalCareDO::getId, id));
+    }
+
+    @Override
+    public PageResult<MedicalCareDO> getCareFavoritePage(CareFavoritePageReqVO pageVO) {
+        return medicalCareMapper.selectCareFavoritePage(pageVO);
     }
 
     @Override

@@ -8,7 +8,9 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCarePageReqVO;
+import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.CareFavoritePageReqVO;
 import cn.iocoder.yudao.module.hospital.dal.dataobject.careaptitude.CareAptitudeDO;
+import cn.iocoder.yudao.module.hospital.dal.dataobject.medicalcare.CareFavoriteDO;
 import cn.iocoder.yudao.module.hospital.dal.dataobject.medicalcare.MedicalCareDO;
 import cn.iocoder.yudao.module.hospital.enums.medicalcare.MedicalCareStatusEnum;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -81,5 +83,18 @@ public interface MedicalCareMapper extends BaseMapperX<MedicalCareDO>,BaseMapper
                 .setTotal(careDOIPage.getTotal());
 
 
+    }
+
+    default PageResult<MedicalCareDO> selectCareFavoritePage(CareFavoritePageReqVO pageVO){
+        IPage<MedicalCareDO> page = new Page<>(pageVO.getPageNo(), pageVO.getPageSize());
+        IPage<MedicalCareDO> careDOIPage = selectJoinPage(page, MedicalCareDO.class, new MPJLambdaWrapper<MedicalCareDO>()
+                .selectAll(MedicalCareDO.class)
+                .rightJoin(CareFavoriteDO.class, CareFavoriteDO::getCareId, MedicalCareDO::getId)
+                .eq(MedicalCareDO::getStatus, MedicalCareStatusEnum.OPEN.value())
+                .eq(CareFavoriteDO::getMemberId, pageVO.getUserId())
+                .like(StrUtil.isNotBlank(pageVO.getName()), MedicalCareDO::getName, pageVO.getName()));
+        return new PageResult<MedicalCareDO>()
+                .setList(careDOIPage.getRecords())
+                .setTotal(careDOIPage.getTotal());
     }
 }

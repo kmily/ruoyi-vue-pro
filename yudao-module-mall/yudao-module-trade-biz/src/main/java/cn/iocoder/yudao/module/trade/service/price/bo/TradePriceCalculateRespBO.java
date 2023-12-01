@@ -131,6 +131,12 @@ public class TradePriceCalculateRespBO {
          * SKU 编号
          */
         private Long skuId;
+
+        /**
+         * SKU 名称
+         */
+        private String skuName;
+
         /**
          * 购买数量
          */

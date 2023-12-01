@@ -69,6 +69,14 @@ public class TradeOrderItemDO extends BaseDO {
      * 关联 ProductSkuDO 的 id 编号
      */
     private Long skuId;
+
+    /**
+     * 商品 SKU 名称
+     *
+     * 关联 ProductSkuDO 的 skuName 编号
+     */
+    private String skuName;
+
     /**
      * 属性数组，JSON 格式
      *

@@ -48,6 +48,11 @@
             <artifactId>yudao-module-system-api</artifactId>
             <version>${revision}</version>
         </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-hospital-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
 
         <!-- 业务组件 -->
         <dependency>

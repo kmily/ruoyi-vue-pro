@@ -1,9 +1,6 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderRemarkReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdateAddressReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdatePriceReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.*;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
@@ -189,4 +186,9 @@ public interface TradeOrderUpdateService {
      */
     void cancelPaidOrder(Long userId, Long orderId);
 
+    /**
+     * 订单分配
+     * @param assignReqVO 分配参数
+     */
+    void assignOrder(TradeOrderAssignReqVO assignReqVO);
 }

@@ -18,10 +18,14 @@ import java.util.Arrays;
 public enum TradeOrderStatusEnum implements IntArrayValuable {
 
     UNPAID(0, "待支付"),
-    UNDELIVERED(10, "待发货"),
-    DELIVERED(20, "已发货"),
-    COMPLETED(30, "已完成"),
-    CANCELED(40, "已取消");
+    UNABSORBED(10, "待分配"),
+    UNRECEIVE(20, "待接单"),
+    NOSTART(30, "待出发"),
+    UNSERVER(40, "待服务"),
+    SERVERING(50, "服务中"),
+    COMPLETED(60, "已完成"),
+    CANCELED(70, "已取消"),
+    ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(TradeOrderStatusEnum::getStatus).toArray();
 
@@ -58,9 +62,9 @@ public enum TradeOrderStatusEnum implements IntArrayValuable {
      * @param status 指定状态
      * @return 是否
      */
-    public static boolean isUndelivered(Integer status) {
-        return ObjectUtil.equal(UNDELIVERED.getStatus(), status);
-    }
+//    public static boolean isUndelivered(Integer status) {
+//        return ObjectUtil.equal(UNDELIVERED.getStatus(), status);
+//    }
 
     /**
      * 判断指定状态，是否正处于【已发货】状态
@@ -68,9 +72,9 @@ public enum TradeOrderStatusEnum implements IntArrayValuable {
      * @param status 指定状态
      * @return 是否
      */
-    public static boolean isDelivered(Integer status) {
-        return ObjectUtil.equals(status, DELIVERED.getStatus());
-    }
+//    public static boolean isDelivered(Integer status) {
+//        return ObjectUtil.equals(status, DELIVERED.getStatus());
+//    }
 
     /**
      * 判断指定状态，是否正处于【已取消】状态
@@ -99,8 +103,8 @@ public enum TradeOrderStatusEnum implements IntArrayValuable {
      * @return 是否
      */
     public static boolean havePaid(Integer status) {
-        return ObjectUtils.equalsAny(status, UNDELIVERED.getStatus(),
-                DELIVERED.getStatus(), COMPLETED.getStatus());
+        return ObjectUtils.equalsAny(status, UNABSORBED.getStatus(),
+                NOSTART.getStatus(), UNSERVER.getStatus(), SERVERING.getStatus(), COMPLETED.getStatus());
     }
 
     /**
@@ -110,7 +114,7 @@ public enum TradeOrderStatusEnum implements IntArrayValuable {
      * @return 是否
      */
     public static boolean haveDelivered(Integer status) {
-        return ObjectUtils.equalsAny(status, DELIVERED.getStatus(), COMPLETED.getStatus());
+        return ObjectUtils.equalsAny(status, UNSERVER.getStatus(), COMPLETED.getStatus());
     }
 
 }

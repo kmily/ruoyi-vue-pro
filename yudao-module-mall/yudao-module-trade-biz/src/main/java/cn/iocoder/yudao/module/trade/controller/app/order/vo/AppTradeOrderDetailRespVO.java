@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.trade.controller.app.order.vo;
 
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemRespVO;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -133,5 +135,44 @@ public class AppTradeOrderDetailRespVO {
      * 订单项数组
      */
     private List<AppTradeOrderItemRespVO> items;
+
+
+
+
+    @Schema(description = "医护人员编号")
+    private Long careId;
+
+
+    @Schema(description = "服务日期")
+    private String serviceDate;
+
+
+    @Schema(description = "服务时间")
+    private String serviceTime;
+
+    @Schema(description = "被户人信息")
+    private AppServerPersonRespVO serverPerson;
+
+    @Schema(description = "图片资料")
+    private List<String> images;
+
+    @Schema(description = "分派类型 用户指定，系统分派")
+    private String assignType;
+
+
+    @Schema(description = "分派时间")
+    private LocalDateTime assignTime;
+
+    @Schema(description = "接受时间")
+    private LocalDateTime acceptTime;
+
+    @Schema(description = "出发时间")
+    private LocalDateTime setOutTime;
+
+    @Schema(description = "开始时间")
+    private LocalDateTime startTime;
+
+    @Schema(description = "完成时间")
+    private LocalDateTime completeTime;
 
 }

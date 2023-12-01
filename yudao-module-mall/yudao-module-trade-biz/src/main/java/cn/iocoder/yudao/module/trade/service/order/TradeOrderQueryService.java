@@ -146,4 +146,11 @@ public interface TradeOrderQueryService {
      */
     List<TradeOrderItemDO> getOrderItemListByOrderId(Collection<Long> orderIds);
 
+    Long getOrderCount(Long userId, List<Integer> statusList);
+
+    /**
+     * 查询未分配订单
+     * @return
+     */
+    List<TradeOrderDO> getUnAssignOrder();
 }

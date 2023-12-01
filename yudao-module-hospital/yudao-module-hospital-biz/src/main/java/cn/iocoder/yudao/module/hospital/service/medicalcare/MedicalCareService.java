@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.hospital.controller.admin.medicalcare.vo.*;
 import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCarePageReqVO;
 import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCarePerfectVO;
 import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppRealNameReqVO;
+import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.CareFavoritePageReqVO;
 import cn.iocoder.yudao.module.hospital.dal.dataobject.careaptitude.CareAptitudeDO;
 import cn.iocoder.yudao.module.hospital.dal.dataobject.medicalcare.MedicalCareDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -136,4 +137,10 @@ public interface MedicalCareService extends IService<MedicalCareDO>{
      */
     void updateCareComment(Long id, Integer commentScore);
 
+    /**
+     * 查询我的收藏
+     * @param pageVO 查询条件
+     * @return
+     */
+    PageResult<MedicalCareDO> getCareFavoritePage(CareFavoritePageReqVO pageVO);
 }

@@ -212,6 +212,16 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
         return tradeOrderItemMapper.selectListByOrderId(orderIds);
     }
 
+    @Override
+    public Long getOrderCount(Long userId, List<Integer> statusList) {
+        return tradeOrderMapper.selectCountByUserIdAndStatus(userId, statusList);
+    }
+
+    @Override
+    public List<TradeOrderDO> getUnAssignOrder() {
+        return tradeOrderMapper.selectList(TradeOrderDO::getStatus, TradeOrderStatusEnum.UNABSORBED.getStatus());
+    }
+
     /**
      * 获得自身的代理对象，解决 AOP 生效问题
      *

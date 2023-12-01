@@ -17,6 +17,9 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class ServerPersonPageReqVO extends PageParam {
 
+    @Schema(description = "会员编号")
+    private Long memberId;
+
     @Schema(description = "被服务人姓名", example = "赵六")
     private String name;
 

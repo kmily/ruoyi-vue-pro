@@ -4,6 +4,7 @@ import java.util.*;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
+import cn.iocoder.yudao.module.member.api.serverperson.dto.ServerPersonRespDTO;
 import cn.iocoder.yudao.module.member.controller.admin.serverperson.vo.ServerPersonPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.serverperson.vo.ServerPersonRespVO;
 import org.mapstruct.Mapper;
@@ -29,10 +30,14 @@ public interface ServerPersonConvert {
 
     ServerPersonRespVO convert01(ServerPersonDO bean);
 
+    ServerPersonRespDTO convert02(ServerPersonDO bean);
+
     List<AppServerPersonRespVO> convertList(List<ServerPersonDO> list);
 
     PageResult<AppServerPersonRespVO> convertPage(PageResult<ServerPersonDO> page);
     PageResult<ServerPersonRespVO> convertPage01(PageResult<ServerPersonDO> page);
 
     AppServerPersonPageReqVO convert(ServerPersonPageReqVO pageVO);
+
+    List<ServerPersonRespDTO> convertList02(List<ServerPersonDO> serverPersonList);
 }

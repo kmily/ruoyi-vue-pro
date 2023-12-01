@@ -57,7 +57,8 @@ public interface ErrorCodeConstants {
     ErrorCode GROUP_NOT_EXISTS = new ErrorCode(1_004_012_000, "用户分组不存在");
     ErrorCode GROUP_HAS_USER = new ErrorCode(1_004_012_001, "用户分组下存在用户，无法删除");
 
-    ErrorCode SERVER_PERSON_NOT_EXISTS = new ErrorCode(1_004_013_000, "用户服务人员不存在");
+    ErrorCode SERVER_PERSON_NOT_EXISTS = new ErrorCode(1_004_013_000, "被护人不存在");
     ErrorCode SERVER_PERSON_HAS_EXISTS = new ErrorCode(1_004_013_001, "身份证[{}]已经存在");
+    ErrorCode SERVER_PERSON_STATUS_ERROR = new ErrorCode(1_004_013_002, "被护人状态不正确");
 
 }

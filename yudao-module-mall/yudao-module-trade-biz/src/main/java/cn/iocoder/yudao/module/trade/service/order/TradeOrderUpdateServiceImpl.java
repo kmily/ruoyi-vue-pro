@@ -8,22 +8,25 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.hospital.api.medicalcare.MedicalCareApi;
+import cn.iocoder.yudao.module.hospital.api.medicalcare.dto.MedicalCareRepsDTO;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.member.api.serverperson.ServerPersonApi;
+import cn.iocoder.yudao.module.member.api.serverperson.dto.ServerPersonRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.product.api.comment.ProductCommentApi;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderRemarkReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdateAddressReqVO;
-import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdatePriceReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.*;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderSettlementRespVO;
@@ -31,6 +34,7 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderI
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.cart.CartDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.OrderCareDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderItemMapper;
@@ -50,6 +54,7 @@ import cn.iocoder.yudao.module.trade.service.price.TradePriceService;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculatorHelper;
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -65,6 +70,9 @@ import java.util.Set;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.minusTime;
+import static cn.iocoder.yudao.module.hospital.enums.ErrorCodeConstants.MEDICAL_CARE_NOT_EXISTS;
+import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.SERVER_PERSON_NOT_EXISTS;
+import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.SERVER_PERSON_STATUS_ERROR;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
 
 /**
@@ -97,6 +105,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private TradeMessageService tradeMessageService;
 
     @Resource
+    private OrderCareService orderCareService;
+
+    @Resource
     private PayOrderApi payOrderApi;
     @Resource
     private AddressApi addressApi;
@@ -104,7 +115,15 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private ProductCommentApi productCommentApi;
 
     @Resource
+    private MedicalCareApi medicalCareApi;
+    
+    @Resource
+    private ServerPersonApi serverPersonApi;
+
+    @Resource
     private TradeOrderProperties tradeOrderProperties;
+
+
 
     // =================== Order ===================
 
@@ -160,10 +179,26 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Transactional(rollbackFor = Exception.class)
     @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.MEMBER_CREATE)
     public TradeOrderDO createOrder(Long userId, String userIp, AppTradeOrderCreateReqVO createReqVO) {
+
+        LocalDateTime assignTime = null;
+
+        // 判断指定类型, 如果是用户指定医护，医护编号不能为空
+        if(TradeOrderAssignTypeEnum.isUser(createReqVO.getAssignType())){
+            if(Objects.isNull(createReqVO.getCareId())){
+                throw exception(CARE_ID_IS_NULL);
+            }
+            assignTime = LocalDateTime.now();
+            validateMedicalCare(createReqVO.getCareId());
+        }
+
+        ServerPersonRespDTO serverPerson = serverPersonApi.validateServerPerson(createReqVO.getServicePersonId(), userId);
+
         // 1.1 价格计算
         TradePriceCalculateRespBO calculateRespBO = calculatePrice(userId, createReqVO);
         // 1.2 构建订单
         TradeOrderDO order = buildTradeOrder(userId, userIp, createReqVO, calculateRespBO);
+        order.setAssignTime(assignTime);// 设置分配时间
+        order.setServicePerson(JSON.toJSONString(serverPerson)); // 保存被护人
         List<TradeOrderItemDO> orderItems = buildTradeOrderItems(order, calculateRespBO);
 
         // 2. 订单创建前的逻辑
@@ -174,9 +209,19 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         orderItems.forEach(orderItem -> orderItem.setOrderId(order.getId()));
         tradeOrderItemMapper.insertBatch(orderItems);
 
-        // 4. 订单创建后的逻辑
+        // 4. 订单医护映射表中加入记录
+        orderCareService.save(order);
+
+        // 5. 订单创建后的逻辑
         afterCreateTradeOrder(order, orderItems, createReqVO);
         return order;
+    }
+
+
+
+    private void validateMedicalCare(Long careId) {
+        MedicalCareRepsDTO medicalCare = medicalCareApi.validateMedicalCare(careId);
+        // TODO  接下来校验当前医护是否有可以处理当前订单
     }
 
     private TradeOrderDO buildTradeOrder(Long userId, String clientIp, AppTradeOrderCreateReqVO createReqVO,
@@ -230,11 +275,15 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             cartService.deleteCart(order.getUserId(), cartIds);
         }
 
+
         // 3. 生成预支付
         createPayOrder(order, orderItems);
 
+
+
         // 4. 插入订单日志
         TradeOrderLogUtils.setOrderInfo(order.getId(), null, order.getStatus());
+
 
         // TODO @LeeYan9: 是可以思考下, 订单的营销优惠记录, 应该记录在哪里, 微信讨论起来!
     }
@@ -258,11 +307,24 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         KeyValue<TradeOrderDO, PayOrderRespDTO> orderResult = validateOrderPayable(id, payOrderId);
         TradeOrderDO order = orderResult.getKey();
         PayOrderRespDTO payOrder = orderResult.getValue();
+        int updateCount = 0;
+        if(TradeOrderAssignTypeEnum.isUser(order.getAssignType())){
+             // 如果是用户选择了医护人员，改为待接单
+            updateCount = tradeOrderMapper.updateByIdAndStatus(id, order.getStatus(),
+                    new TradeOrderDO().setStatus(TradeOrderStatusEnum.UNRECEIVE.getStatus()).setPayStatus(true)
+                            .setPayTime(LocalDateTime.now()).setPayChannelCode(payOrder.getChannelCode()));
+            if(updateCount > 0){
+                orderCareService.updateByOrderIdAndCareId(id, order.getCareId(), TradeOrderStatusEnum.UNRECEIVE.getStatus());
+            }
+        }else{
+            // 有后台调度分配医护
+            // 2. 更新 TradeOrderDO 状态为已支付，改为待分配
+             updateCount = tradeOrderMapper.updateByIdAndStatus(id, order.getStatus(),
+                    new TradeOrderDO().setStatus(TradeOrderStatusEnum.UNABSORBED.getStatus()).setPayStatus(true)
+                            .setPayTime(LocalDateTime.now()).setPayChannelCode(payOrder.getChannelCode()));
+        }
 
-        // 2. 更新 TradeOrderDO 状态为已支付，等待发货
-        int updateCount = tradeOrderMapper.updateByIdAndStatus(id, order.getStatus(),
-                new TradeOrderDO().setStatus(TradeOrderStatusEnum.UNDELIVERED.getStatus()).setPayStatus(true)
-                        .setPayTime(LocalDateTime.now()).setPayChannelCode(payOrder.getChannelCode()));
+
         if (updateCount == 0) {
             throw exception(ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
@@ -272,7 +334,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         tradeOrderHandlers.forEach(handler -> handler.afterPayOrder(order, orderItems));
 
         // 4. 记录订单日志
-        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.UNDELIVERED.getStatus());
+        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.UNABSORBED.getStatus());
         TradeOrderLogUtils.setUserInfo(order.getUserId(), UserTypeEnum.MEMBER.getValue());
     }
 
@@ -352,16 +414,16 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             updateOrderObj.setLogisticsId(0L).setLogisticsNo("");
         }
         // 执行更新
-        updateOrderObj.setStatus(TradeOrderStatusEnum.DELIVERED.getStatus()).setDeliveryTime(LocalDateTime.now());
+        //updateOrderObj.setStatus(TradeOrderStatusEnum.DELIVERED.getStatus()).setDeliveryTime(LocalDateTime.now());
         int updateCount = tradeOrderMapper.updateByIdAndStatus(order.getId(), order.getStatus(), updateOrderObj);
         if (updateCount == 0) {
             throw exception(ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED);
         }
 
         // 3. 记录订单日志
-        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.DELIVERED.getStatus(),
-                MapUtil.<String, Object>builder().put("expressName", express != null ? express.getName() : "")
-                        .put("logisticsNo", express != null ? deliveryReqVO.getLogisticsNo() : "").build());
+//        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.DELIVERED.getStatus(),
+//                MapUtil.<String, Object>builder().put("expressName", express != null ? express.getName() : "")
+//                        .put("logisticsNo", express != null ? deliveryReqVO.getLogisticsNo() : "").build());
 
         // 4. 发送站内信
         tradeMessageService.sendMessageWhenDeliveryOrder(new TradeOrderMessageWhenDeliveryOrderReqBO()
@@ -414,7 +476,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 1. 查询过期的待支付订单
         LocalDateTime expireTime = minusTime(tradeOrderProperties.getReceiveExpireTime());
         List<TradeOrderDO> orders = tradeOrderMapper.selectListByStatusAndDeliveryTimeLt(
-                TradeOrderStatusEnum.DELIVERED.getStatus(), expireTime);
+                TradeOrderStatusEnum.UNPAID.getStatus(), expireTime);
         if (CollUtil.isEmpty(orders)) {
             return 0;
         }
@@ -476,9 +538,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             throw exception(ORDER_NOT_FOUND);
         }
         // 校验订单是否是待收货状态
-        if (!TradeOrderStatusEnum.isDelivered(order.getStatus())) {
-            throw exception(ORDER_RECEIVE_FAIL_STATUS_NOT_DELIVERED);
-        }
+//        if (!TradeOrderStatusEnum.isDelivered(order.getStatus())) {
+//            throw exception(ORDER_RECEIVE_FAIL_STATUS_NOT_DELIVERED);
+//        }
         return order;
     }
 
@@ -658,9 +720,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 校验交易订单
         TradeOrderDO order = validateOrderExists(reqVO.getId());
         // 只有待发货状态，才可以修改订单收货地址；
-        if (!TradeOrderStatusEnum.isUndelivered(order.getStatus())) {
-            throw exception(ORDER_UPDATE_ADDRESS_FAIL_STATUS_NOT_DELIVERED);
-        }
+//        if (!TradeOrderStatusEnum.isUndelivered(order.getStatus())) {
+//            throw exception(ORDER_UPDATE_ADDRESS_FAIL_STATUS_NOT_DELIVERED);
+//        }
 
         // 更新
         tradeOrderMapper.updateById(TradeOrderConvert.INSTANCE.convert(reqVO));
@@ -829,6 +891,27 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             throw exception(ORDER_NOT_FOUND);
         }
         cancelOrder0(order, TradeOrderCancelTypeEnum.MEMBER_CANCEL);
+    }
+
+    @Override
+    public void assignOrder(TradeOrderAssignReqVO assignReqVO) {
+        TradeOrderDO order = tradeOrderMapper.selectById(assignReqVO.getId());
+        if (order == null) {
+            throw exception(ORDER_NOT_FOUND);
+        }
+        Long careId = assignReqVO.getCareId();
+        MedicalCareRepsDTO medicalCare = medicalCareApi.validateMedicalCare(careId);
+        int updateCount = tradeOrderMapper.updateByIdAndStatus(assignReqVO.getId(), order.getStatus(),
+                new TradeOrderDO().setStatus(TradeOrderStatusEnum.UNRECEIVE.getStatus())
+                        .setCareId(careId).setAssignId(SecurityFrameworkUtils.getLoginUserId())
+                        .setAssignTime(LocalDateTime.now()));
+        if(updateCount > 0){
+            orderCareService.save(new OrderCareDO()
+                    .setOrderId(assignReqVO.getId())
+                    .setCareId(careId)
+                    .setStatus(TradeOrderStatusEnum.UNRECEIVE.getStatus())
+                    .setUserId(order.getUserId()));
+        }
     }
 
     /**

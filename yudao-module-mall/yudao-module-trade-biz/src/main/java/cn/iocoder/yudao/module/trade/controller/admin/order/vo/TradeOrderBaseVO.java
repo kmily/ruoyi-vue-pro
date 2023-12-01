@@ -1,9 +1,13 @@
 package cn.iocoder.yudao.module.trade.controller.admin.order.vo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 交易订单 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -145,4 +149,46 @@ public class TradeOrderBaseVO {
     @Schema(description = "VIP 减免金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "888")
     private Integer vipPrice;
 
+    @Schema(description = "医护人员编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "888")
+    private Long careId;
+
+    @Schema(description = "服务日期", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String serviceDate;
+
+    @Schema(description = "服务时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String serviceTime;
+
+    @Schema(description = "被护人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "888")
+    private Long servicePersonId;
+
+    @Schema(description = "被护人详情",  example = "888")
+    private String servicePerson;
+
+    @Schema(description = "图片资料", example = "888")
+    private List<String> images;
+
+    @Schema(description = "指派类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "888")
+    @Pattern(message = "状态只能是，USER 或 SYSTEM", regexp = "USER|SYSTEM")
+    private String assignType;
+
+    @Schema(description = "分派人编号",  example = "888")
+    private Long assignId;
+
+    @Schema(description = "分派人姓名",  example = "888")
+    private String assignName;
+
+    @Schema(description = "分派时间",  example = "888")
+    private LocalDateTime assignTime;
+
+    @Schema(description = "医护接收时间",  example = "888")
+    private LocalDateTime acceptTime;
+
+    @Schema(description = "医护出发时间",  example = "888")
+    private LocalDateTime setOutTime;
+
+    @Schema(description = "开始时间",  example = "888")
+    private LocalDateTime startTime;
+
+    @Schema(description = "完成时间",  example = "888")
+    private LocalDateTime completeTime;
 }

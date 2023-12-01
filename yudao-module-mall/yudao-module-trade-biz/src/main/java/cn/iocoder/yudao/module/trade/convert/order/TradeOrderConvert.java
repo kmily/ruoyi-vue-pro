@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.member.api.serverperson.dto.ServerPersonRespDTO;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.enums.DictTypeConstants;
@@ -129,6 +130,24 @@ public interface TradeOrderConvert {
             return orderVO;
         });
         return new PageResult<>(orderVOs, pageResult.getTotal());
+    }
+
+
+    default List<TradeOrderPageItemRespVO> convertPage(List<TradeOrderDO> orderDOList,
+                                                             List<TradeOrderItemDO> orderItems,
+                                                             Map<Long, MemberUserRespDTO> memberUserMap) {
+        Map<Long, List<TradeOrderItemDO>> orderItemMap = convertMultiMap(orderItems, TradeOrderItemDO::getOrderId);
+        // 转化 List
+        List<TradeOrderPageItemRespVO> orderVOs = CollectionUtils.convertList(orderDOList, order -> {
+            List<TradeOrderItemDO> xOrderItems = orderItemMap.get(order.getId());
+            TradeOrderPageItemRespVO orderVO = convert(order, xOrderItems);
+            // 处理收货地址
+            orderVO.setReceiverAreaName(AreaUtils.format(order.getReceiverAreaId()));
+            // 增加用户昵称
+            orderVO.setUser(memberUserMap.get(orderVO.getUserId()));
+            return orderVO;
+        });
+        return orderVOs;
     }
 
     TradeOrderPageItemRespVO convert(TradeOrderDO order, List<TradeOrderItemDO> items);
@@ -282,4 +301,24 @@ public interface TradeOrderConvert {
     })
     CombinationRecordCreateReqDTO convert(TradeOrderDO order, TradeOrderItemDO item);
 
+    default List<TradeOrderUnAssignRespVO> convertList(List<TradeOrderDO> tradeOrderDOList,
+                                                       List<TradeOrderItemDO> orderItems,
+                                                       Map<Long, MemberUserRespDTO> userMap,
+                                                       Map<Long, ServerPersonRespDTO> personMap){
+        Map<Long, List<TradeOrderItemDO>> orderItemMap = convertMultiMap(orderItems, TradeOrderItemDO::getOrderId);
+
+        return CollectionUtils.convertList(tradeOrderDOList, order -> {
+            List<TradeOrderItemDO> xOrderItems = orderItemMap.get(order.getId());
+            TradeOrderUnAssignRespVO orderVO = convert10(order);
+            TradeOrderItemDO itemDO = xOrderItems.get(0);
+            orderVO.setSpuName(itemDO.getSpuName())
+                    .setSkuName(itemDO.getSkuName())
+                    .setUser(userMap.get(order.getUserId()))
+                    .setServerPerson(personMap.get(order.getServicePersonId()));
+
+            return orderVO;
+        });
+    }
+
+    TradeOrderUnAssignRespVO convert10(TradeOrderDO order);
 }

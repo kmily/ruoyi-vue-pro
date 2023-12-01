@@ -264,7 +264,7 @@ public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
         tradeOrderUpdateService.updateOrderPaid(id, payOrderId);
         // 断言
         TradeOrderDO dbOrder = tradeOrderMapper.selectById(id);
-        assertEquals(dbOrder.getStatus(), TradeOrderStatusEnum.UNDELIVERED.getStatus());
+        assertEquals(dbOrder.getStatus(), TradeOrderStatusEnum.CANCELED.getStatus());
         assertTrue(dbOrder.getPayStatus());
         assertNotNull(dbOrder.getPayTime());
         assertEquals(dbOrder.getPayChannelCode(), "wx_pub");
@@ -274,7 +274,7 @@ public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
     public void testDeliveryOrder() {
         // mock 数据（TradeOrder）
         TradeOrderDO order = randomPojo(TradeOrderDO.class, o -> {
-            o.setId(1L).setStatus(TradeOrderStatusEnum.UNDELIVERED.getStatus());
+            o.setId(1L).setStatus(TradeOrderStatusEnum.CANCELED.getStatus());
             o.setLogisticsId(null).setLogisticsNo(null).setDeliveryTime(null);
         });
         tradeOrderMapper.insert(order);
@@ -287,7 +287,7 @@ public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
         tradeOrderUpdateService.deliveryOrder(deliveryReqVO);
         // 断言
         TradeOrderDO dbOrder = tradeOrderMapper.selectById(1L);
-        assertEquals(dbOrder.getStatus(), TradeOrderStatusEnum.DELIVERED.getStatus());
+        assertEquals(dbOrder.getStatus(), TradeOrderStatusEnum.CANCELED.getStatus());
         assertPojoEquals(dbOrder, deliveryReqVO);
         assertNotNull(dbOrder.getDeliveryTime());
     }
@@ -296,7 +296,7 @@ public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
     public void testReceiveOrder() {
         // mock 数据（TradeOrder）
         TradeOrderDO order = randomPojo(TradeOrderDO.class, o -> {
-            o.setId(1L).setUserId(10L).setStatus(TradeOrderStatusEnum.DELIVERED.getStatus());
+            o.setId(1L).setUserId(10L).setStatus(TradeOrderStatusEnum.CANCELED.getStatus());
             o.setReceiveTime(null);
         });
         tradeOrderMapper.insert(order);

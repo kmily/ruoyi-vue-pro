@@ -56,7 +56,8 @@ public class TradePriceCalculatorHelper {
                     .setDiscountPrice(0).setDeliveryPrice(0).setCouponPrice(0).setPointPrice(0).setVipPrice(0);
             // sku 信息
             orderItem.setPicUrl(sku.getPicUrl()).setProperties(sku.getProperties())
-                    .setWeight(sku.getWeight()).setVolume(sku.getVolume());
+                    .setWeight(sku.getWeight()).setVolume(sku.getVolume())
+                    .setSkuName(sku.getSkuName());
             // spu 信息
             orderItem.setSpuName(spu.getName()).setCategoryId(spu.getCategoryId())
                     .setDeliveryTemplateId(spu.getDeliveryTemplateId())

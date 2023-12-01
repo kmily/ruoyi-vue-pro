@@ -79,7 +79,7 @@ public class AfterSaleServiceTest extends BaseDbUnitTest {
         when(tradeOrderQueryService.getOrderItem(eq(1024L), eq(1L)))
                 .thenReturn(orderItem);
         // mock 方法（交易订单）
-        TradeOrderDO order = randomPojo(TradeOrderDO.class, o -> o.setStatus(TradeOrderStatusEnum.DELIVERED.getStatus())
+        TradeOrderDO order = randomPojo(TradeOrderDO.class, o -> o.setStatus(TradeOrderStatusEnum.CANCELED.getStatus())
                 .setNo("202211301234"));
         when(tradeOrderQueryService.getOrder(eq(1024L), eq(111L))).thenReturn(order);
 

@@ -32,6 +32,9 @@ public class TradeOrderItemBaseVO {
     @Schema(description = "商品 SKU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long skuId;
 
+    @Schema(description = "商品 SKU 名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private String skuName;
+
     @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.png")
     private String picUrl;
 

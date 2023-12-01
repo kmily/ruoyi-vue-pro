@@ -19,6 +19,7 @@ public interface ErrorCodeConstants {
     ErrorCode MEDICAL_CARE_NOT_EXISTS = new ErrorCode(200010, "用户不存在");
     ErrorCode MEDICAL_CARE_HAS_EXISTS = new ErrorCode(200011, "用户已存在");
     ErrorCode MEDICAL_CARE_CREATE_FAIL = new ErrorCode(200012, "用户创建失败!");
+    ErrorCode MEDICAL_CARE_STATUS_ERROR = new ErrorCode(200013, "医护当前状态不可用!");
 
 
     /** 医院菜单 */
