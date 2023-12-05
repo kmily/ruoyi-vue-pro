@@ -42,4 +42,9 @@ public interface ServerAddressMapper extends BaseMapperX<ServerAddressDO>,BaseMa
                 .orderByDesc(ServerAddressDO::getId));
     }
 
+    default List<ServerAddressDO> selectListByUserIdAndDefaulted(Long userId, Boolean defaulted) {
+        return selectList(new LambdaQueryWrapperX<ServerAddressDO>().eq(ServerAddressDO::getUserId, userId)
+                .eqIfPresent(ServerAddressDO::getDefaultStatus, defaulted));
+    }
+
 }

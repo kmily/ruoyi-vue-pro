@@ -71,4 +71,13 @@ public interface ServerAddressService extends IService<ServerAddressDO>{
      * 根据id和userId获取服务地址
      */
     ServerAddressDO getServerAddressApiDTO(Long id,Long usrId);
+
+
+    /**
+     * 更新该员工下的默认地址
+     * @param updateReqVO
+     */
+    void updateAddressDefaultStatus(@Valid ServerAddressUpdateReqVO updateReqVO);
+
+    List<ServerAddressDO> getAddressListByUserId(Long userId);
 }

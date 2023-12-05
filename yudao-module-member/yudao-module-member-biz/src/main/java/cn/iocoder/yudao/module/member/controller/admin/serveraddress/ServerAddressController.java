@@ -99,4 +99,19 @@ public class ServerAddressController {
         ExcelUtils.write(response, "服务地址.xls", "数据", ServerAddressExcelVO.class, datas);
     }
 
+    /**
+     * 会员详情-获取会员的服务地址
+     * @param userId
+     * @return
+     */
+    @GetMapping("/queryByUserId/list")
+    @Operation(summary = "获得用户服务地址列表")
+    @Parameter(name = "userId", description = "用户编号", required = true)
+    @PreAuthorize("@ss.hasPermission('member:server-address:query')")
+    public CommonResult<List<ServerAddressRespVO>> getAddressListByUserId(@RequestParam("userId") Long userId) {
+        List<ServerAddressDO> list = serverAddressService.getAddressListByUserId(userId);
+        return success(ServerAddressConvert.INSTANCE.convertList(list));
+    }
+
+
 }
