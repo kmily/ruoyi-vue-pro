@@ -22,7 +22,7 @@ public interface CrmContactService {
      * 创建联系人
      *
      * @param createReqVO 创建信息
-     * @param userId 用户编号
+     * @param userId      用户编号
      * @return 编号
      */
     Long createContact(@Valid CrmContactCreateReqVO createReqVO, Long userId);
@@ -37,9 +37,10 @@ public interface CrmContactService {
     /**
      * 删除联系人
      *
-     * @param id 编号
+     * @param id     编号
+     * @param userId 用户编号
      */
-    void deleteContact(Long id);
+    void deleteContact(Long id, Long userId);
 
     /**
      * 获得联系人
@@ -63,9 +64,10 @@ public interface CrmContactService {
      * 数据权限：基于 {@link CrmContactDO}
      *
      * @param pageReqVO 分页查询
+     * @param userId    用户编号
      * @return 联系人分页
      */
-    PageResult<CrmContactDO> getContactPage(CrmContactPageReqVO pageReqVO);
+    PageResult<CrmContactDO> getContactPage(CrmContactPageReqVO pageReqVO, Long userId);
 
     /**
      * 获得联系人分页，基于指定客户

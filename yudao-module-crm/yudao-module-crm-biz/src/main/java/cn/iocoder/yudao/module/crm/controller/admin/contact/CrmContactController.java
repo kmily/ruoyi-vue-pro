@@ -78,7 +78,7 @@ public class CrmContactController {
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('crm:contact:delete')")
     public CommonResult<Boolean> deleteContact(@RequestParam("id") Long id) {
-        contactService.deleteContact(id);
+        contactService.deleteContact(id, getLoginUserId());
         return success(true);
     }
 
@@ -113,7 +113,7 @@ public class CrmContactController {
     @Operation(summary = "获得联系人分页")
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")
     public CommonResult<PageResult<CrmContactRespVO>> getContactPage(@Valid CrmContactPageReqVO pageVO) {
-        PageResult<CrmContactDO> pageResult = contactService.getContactPage(pageVO);
+        PageResult<CrmContactDO> pageResult = contactService.getContactPage(pageVO, getLoginUserId());
         return success(convertDetailContactPage(pageResult));
     }
 
@@ -132,7 +132,7 @@ public class CrmContactController {
     public void exportContactExcel(@Valid CrmContactPageReqVO exportReqVO,
                                    HttpServletResponse response) throws IOException {
         exportReqVO.setPageNo(PageParam.PAGE_SIZE_NONE);
-        PageResult<CrmContactDO> pageResult = contactService.getContactPage(exportReqVO);
+        PageResult<CrmContactDO> pageResult = contactService.getContactPage(exportReqVO, getLoginUserId());
         ExcelUtils.write(response, "联系人.xls", "数据", CrmContactRespVO.class,
                 convertDetailContactPage(pageResult).getList());
     }

@@ -37,9 +37,10 @@ public interface CrmCustomerService {
     /**
      * 删除客户
      *
-     * @param id 编号
+     * @param id     编号
+     * @param userId 用户编号
      */
-    void deleteCustomer(Long id);
+    void deleteCustomer(Long id, Long userId);
 
     /**
      * 获得客户
@@ -90,6 +91,22 @@ public interface CrmCustomerService {
      */
     void lockCustomer(@Valid CrmCustomerUpdateReqVO updateReqVO);
 
+    /**
+     * 关注客户
+     *
+     * @param ids    客户编号
+     * @param userId 用户编号
+     */
+    void concernCustomer(List<Long> ids, Long userId);
+
+    /**
+     * 取消关注客户
+     *
+     * @param ids    客户编号
+     * @param userId 用户编号
+     */
+    void cancelConcernCustomer(List<Long> ids, Long userId);
+
     // ==================== 公海相关操作 ====================
 
     /**
@@ -109,8 +126,10 @@ public interface CrmCustomerService {
 
     /**
      * 获取客户列表
+     *
      * @return 客户列表
      * @author zyna
      */
     List<CrmCustomerDO> getCustomerList();
+
 }

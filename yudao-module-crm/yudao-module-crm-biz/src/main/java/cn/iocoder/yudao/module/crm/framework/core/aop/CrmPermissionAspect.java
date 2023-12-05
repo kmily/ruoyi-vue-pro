@@ -6,9 +6,11 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.spring.SpringExpressionUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionDO;
-import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
+import cn.iocoder.yudao.module.crm.dal.dataobject.permission.CrmPermissionExtendedDO;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
+import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionExtendedService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -38,6 +40,8 @@ public class CrmPermissionAspect {
 
     @Resource
     private CrmPermissionService crmPermissionService;
+    @Resource
+    private CrmPermissionExtendedService crmPermissionExtendedService;
 
     @Before("@annotation(crmPermission)")
     public void doBefore(JoinPoint joinPoint, CrmPermission crmPermission) {
@@ -59,6 +63,15 @@ public class CrmPermissionAspect {
 
         // 1. 获取数据权限
         List<CrmPermissionDO> bizPermissions = crmPermissionService.getPermissionListByBiz(bizType, bizId);
+        // 检查父权限是否存在
+        // 一直往上找到顶只要有父级数据权限的都能操作
+        List<CrmPermissionExtendedDO> permissionExtendedBySubBiz = crmPermissionExtendedService.getPermissionExtendedBySubBiz(bizType, bizId);
+        if (CollUtil.isNotEmpty(permissionExtendedBySubBiz)) { // 存在则合并权限-也就是继承父权限
+            permissionExtendedBySubBiz.forEach(item -> {
+                bizPermissions.addAll(crmPermissionService.getPermissionListByBiz(
+                        item.getParentBizType(), item.getParentBizId()));
+            });
+        }
         if (CollUtil.isEmpty(bizPermissions)) { // 数据权限不存存那么数据也不存在
             throw exception(CRM_PERMISSION_MODEL_NOT_EXISTS, CrmBizTypeEnum.getNameByType(bizType));
         }
