@@ -35,4 +35,6 @@ public class ProductCategoryBaseVO {
     @NotNull(message = "开启状态不能为空")
     private Integer status;
 
+    @Schema(description = "是否首页显示", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Boolean isIndex;
 }

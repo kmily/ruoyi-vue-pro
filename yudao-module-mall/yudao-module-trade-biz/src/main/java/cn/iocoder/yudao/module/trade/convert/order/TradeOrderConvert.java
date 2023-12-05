@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
+import cn.iocoder.yudao.module.hospital.api.medicalcare.dto.MedicalCareRepsDTO;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
 import cn.iocoder.yudao.module.member.api.serverperson.dto.ServerPersonRespDTO;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
@@ -117,7 +118,8 @@ public interface TradeOrderConvert {
 
     default PageResult<TradeOrderPageItemRespVO> convertPage(PageResult<TradeOrderDO> pageResult,
                                                              List<TradeOrderItemDO> orderItems,
-                                                             Map<Long, MemberUserRespDTO> memberUserMap) {
+                                                             Map<Long, MemberUserRespDTO> memberUserMap,
+                                                             Map<Long, MedicalCareRepsDTO> careMap) {
         Map<Long, List<TradeOrderItemDO>> orderItemMap = convertMultiMap(orderItems, TradeOrderItemDO::getOrderId);
         // 转化 List
         List<TradeOrderPageItemRespVO> orderVOs = CollectionUtils.convertList(pageResult.getList(), order -> {
@@ -127,6 +129,7 @@ public interface TradeOrderConvert {
             orderVO.setReceiverAreaName(AreaUtils.format(order.getReceiverAreaId()));
             // 增加用户昵称
             orderVO.setUser(memberUserMap.get(orderVO.getUserId()));
+            orderVO.setCare(careMap.getOrDefault(order.getCareId(), new MedicalCareRepsDTO()).getName());
             return orderVO;
         });
         return new PageResult<>(orderVOs, pageResult.getTotal());

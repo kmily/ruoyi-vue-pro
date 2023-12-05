@@ -37,6 +37,22 @@ public class ProductCommentCreateReqDTO {
      * 服务星级 1-5 分
      */
     private Integer benefitScores;
+
+    /**
+     * 服务质量评分 1-5
+     */
+    private Integer attitudeScores;
+
+    /**
+     * 服务速度 1-5
+     */
+    private Integer speedScores;
+
+    /**
+     * 专业程度 1-5
+     */
+    private Integer specialityScores;
+
     /**
      * 评论内容
      */

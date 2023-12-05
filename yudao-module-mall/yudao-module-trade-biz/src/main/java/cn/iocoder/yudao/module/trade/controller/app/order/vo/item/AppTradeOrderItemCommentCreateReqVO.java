@@ -27,6 +27,27 @@ public class AppTradeOrderItemCommentCreateReqVO {
     @NotNull(message = "服务星级 1-5 分不能为空")
     private Integer benefitScores;
 
+    /**
+     * 服务质量评分 1-5
+     */
+    @Schema(description = "服务质量星级 1-5 分", requiredMode = Schema.RequiredMode.REQUIRED, example = "5")
+    @NotNull(message = "服务质量星级分不能为空")
+    private Integer attitudeScores;
+
+    /**
+     * 服务速度 1-5
+     */
+    @Schema(description = "服务速度 1-5 分", requiredMode = Schema.RequiredMode.REQUIRED, example = "5")
+    @NotNull(message = "服务速度星级分不能为空")
+    private Integer speedScores;
+
+    /**
+     * 专业程度 1-5
+     */
+    @Schema(description = "专业程度星级 1-5 分", requiredMode = Schema.RequiredMode.REQUIRED, example = "5")
+    @NotNull(message = "专业程度星级分不能为空")
+    private Integer specialityScores;
+
     @Schema(description = "评论内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "穿身上很漂亮诶(*^▽^*)")
     @NotNull(message = "评论内容不能为空")
     private String content;

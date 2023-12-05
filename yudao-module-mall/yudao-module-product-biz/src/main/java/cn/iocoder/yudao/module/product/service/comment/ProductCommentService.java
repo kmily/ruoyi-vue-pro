@@ -91,4 +91,10 @@ public interface ProductCommentService {
      */
     List<AppProductCommentRespVO> getCommentList(Long spuId, Integer count);
 
+    /**
+     * 查询订单评分
+     * @param orderId
+     * @return
+     */
+    Integer getScoreListByOrder(Long orderId);
 }

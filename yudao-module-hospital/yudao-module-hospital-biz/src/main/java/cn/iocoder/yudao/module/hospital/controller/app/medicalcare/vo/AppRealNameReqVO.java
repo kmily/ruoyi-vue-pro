@@ -23,7 +23,7 @@ import java.util.List;
 public class AppRealNameReqVO {
 
     @Schema(description = "医护编号", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "医护编号不能为空")
+    //@NotNull(message = "医护编号不能为空")
     private Long id;
 
     @Schema(description = "正面", requiredMode = Schema.RequiredMode.REQUIRED)

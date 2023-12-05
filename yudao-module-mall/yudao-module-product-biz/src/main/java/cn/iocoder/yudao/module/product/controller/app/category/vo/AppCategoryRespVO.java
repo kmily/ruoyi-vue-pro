@@ -25,4 +25,6 @@ public class AppCategoryRespVO {
     @NotBlank(message = "分类图片不能为空")
     private String picUrl;
 
+    @Schema(description = "是否首页显示", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Boolean isIndex;
 }

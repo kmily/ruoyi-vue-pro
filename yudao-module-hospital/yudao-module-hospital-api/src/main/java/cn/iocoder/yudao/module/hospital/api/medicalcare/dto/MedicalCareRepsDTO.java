@@ -14,6 +14,6 @@ public class MedicalCareRepsDTO {
 
     private Long id;
 
-
+    private String name;
 
 }

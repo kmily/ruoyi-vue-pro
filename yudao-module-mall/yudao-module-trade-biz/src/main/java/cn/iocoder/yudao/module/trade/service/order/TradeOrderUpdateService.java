@@ -191,4 +191,10 @@ public interface TradeOrderUpdateService {
      * @param assignReqVO 分配参数
      */
     void assignOrder(TradeOrderAssignReqVO assignReqVO);
+
+    /**
+     * 更新被护人编号 更新订单的被护人信息
+     * @param personId 被护人编号
+     */
+    void updateOrderPerson(Long personId);
 }

@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.product.search;
 
 import cn.hutool.json.JSONUtil;
-import cn.iocoder.yudao.framework.core.BaseElasticsearchService;
-import cn.iocoder.yudao.module.product.search.po.EsGoodsIndex;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+//import cn.iocoder.yudao.framework.core.BaseElasticsearchService;
+//import cn.iocoder.yudao.module.product.search.po.EsGoodsIndex;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -18,7 +18,7 @@ import javax.annotation.PostConstruct;
  */
 
 @Component
-public class EsGoodsIndexServiceImpl extends BaseElasticsearchService {
+public class EsGoodsIndexServiceImpl /*extends BaseElasticsearchService*/ {
 
 
 

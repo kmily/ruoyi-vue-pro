@@ -25,6 +25,7 @@ public enum TradeOrderStatusEnum implements IntArrayValuable {
     SERVERING(50, "服务中"),
     COMPLETED(60, "已完成"),
     CANCELED(70, "已取消"),
+    REFUSE(80, "已拒绝"),
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(TradeOrderStatusEnum::getStatus).toArray();

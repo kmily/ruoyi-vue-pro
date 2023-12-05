@@ -1,20 +1,26 @@
 package cn.iocoder.yudao.module.trade.controller.app.order;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.hospital.api.medicalcare.MedicalCareApi;
+import cn.iocoder.yudao.module.hospital.api.medicalcare.dto.MedicalCareRepsDTO;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.*;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemRespVO;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.OrderCareDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
+import cn.iocoder.yudao.module.trade.service.order.OrderCareService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
 import com.alibaba.fastjson.JSON;
@@ -31,8 +37,10 @@ import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -53,6 +61,13 @@ public class AppTradeOrderController {
 
     @Resource
     private TradeOrderProperties tradeOrderProperties;
+
+    @Resource
+    private OrderCareService orderCareService;
+
+    @Resource
+    private MedicalCareApi medicalCareApi;
+
 
     @GetMapping("/settlement")
     @Operation(summary = "获得订单结算信息")
@@ -118,6 +133,33 @@ public class AppTradeOrderController {
                 convertSet(pageResult.getList(), TradeOrderDO::getId));
         // 最终组合
         return success(TradeOrderConvert.INSTANCE.convertPage02(pageResult, orderItems));
+    }
+
+
+    @GetMapping("/page-care")
+    @Operation(summary = "医护端-分页查询订单")
+    @PreAuthenticated
+    public CommonResult<PageResult<AppTradeOrderPageItemRespVO>> getOrderPageByCare(@Valid AppTradeOrderCarePageReqVO reqVO){
+
+        //MedicalCareRepsDTO care = medicalCareApi.getMedicalCareByMember(SecurityFrameworkUtils.getLoginUserId());
+
+        PageResult<OrderCareDO> pageResult = orderCareService.getOrderPage(reqVO.setCareId(getLoginUserId()));
+        if(CollUtil.isEmpty(pageResult.getList())){
+            return success(PageResult.empty());
+        }
+
+        Set<Long> orderIds = convertSet(pageResult.getList(), OrderCareDO::getOrderId);
+
+        List<TradeOrderDO> orderList = tradeOrderQueryService.getOrderList(orderIds);
+        Map<Long, OrderCareDO> careDOMap = convertMap(pageResult.getList(), OrderCareDO::getOrderId);
+        orderList.forEach(item -> {
+            item.setStatus(careDOMap.get(item.getId()).getStatus());
+        });
+
+        List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(
+                convertSet(orderList, TradeOrderDO::getId));
+
+        return success(TradeOrderConvert.INSTANCE.convertPage02(new PageResult<TradeOrderDO>().setList(orderList).setTotal(pageResult.getTotal()), orderItems));
     }
 
     @GetMapping("/get-count")

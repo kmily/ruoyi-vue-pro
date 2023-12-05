@@ -57,15 +57,15 @@ import cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculat
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -74,6 +74,7 @@ import static cn.iocoder.yudao.module.hospital.enums.ErrorCodeConstants.MEDICAL_
 import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.SERVER_PERSON_NOT_EXISTS;
 import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.SERVER_PERSON_STATUS_ERROR;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.trade.enums.TradeRedisKeyConstants.SERVER_PERSON_ORDER;
 
 /**
  * 交易订单【写】Service 实现类
@@ -118,10 +119,14 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private MedicalCareApi medicalCareApi;
     
     @Resource
+    @Lazy
     private ServerPersonApi serverPersonApi;
 
     @Resource
     private TradeOrderProperties tradeOrderProperties;
+
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
 
 
 
@@ -214,6 +219,12 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
         // 5. 订单创建后的逻辑
         afterCreateTradeOrder(order, orderItems, createReqVO);
+
+
+        if(!CommonStatusEnum.APPLYING.name().equals(serverPerson.getStatus())){
+            // 如果关联的被护人为待审核 则保存订单编号，等审核通过后统一更新
+            redisTemplate.opsForValue().set(String.format(SERVER_PERSON_ORDER, serverPerson.getId()), order.getId(), 1L, TimeUnit.DAYS);
+        }
         return order;
     }
 
@@ -845,6 +856,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         if (!anyMatch(orderItems, item -> Objects.equals(item.getCommentStatus(), Boolean.FALSE))) {
             tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId()).setCommentStatus(Boolean.TRUE)
                     .setFinishTime(LocalDateTime.now()));
+            updateMedicalCareComment(order.getId(), order.getCareId());
             // 增加订单日志。注意：只有在所有订单项都评价后，才会增加
             TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus());
         }
@@ -853,7 +865,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     public int createOrderItemCommentBySystem() {
-        // 1. 查询过期的待支付订单
+        // 1. 查询过期的未评论的订单
         LocalDateTime expireTime = minusTime(tradeOrderProperties.getCommentExpireTime());
         List<TradeOrderDO> orders = tradeOrderMapper.selectListByStatusAndReceiveTimeLt(
                 TradeOrderStatusEnum.COMPLETED.getStatus(), expireTime, false);
@@ -914,6 +926,20 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         }
     }
 
+    @Override
+    public void updateOrderPerson(Long personId) {
+        Object orderId = redisTemplate.opsForValue().getAndDelete(String.format(SERVER_PERSON_ORDER, personId));
+        if(Objects.nonNull(orderId)){
+            long id = Long.parseLong(orderId.toString());
+            TradeOrderDO orderDO = tradeOrderMapper.selectById(id);
+            if(orderDO != null){
+                ServerPersonRespDTO serverPerson = serverPersonApi.getServerPerson(personId);
+                tradeOrderMapper.updateById(new TradeOrderDO().setServicePerson(JSON.toJSONString(serverPerson))
+                        .setId(id));
+            }
+        }
+    }
+
     /**
      * 创建单个订单的评论
      *
@@ -934,7 +960,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             // 2.1 创建评价
             AppTradeOrderItemCommentCreateReqVO commentCreateReqVO = new AppTradeOrderItemCommentCreateReqVO()
                     .setOrderItemId(orderItem.getId()).setAnonymous(false).setContent("")
-                    .setBenefitScores(5).setDescriptionScores(5);
+                    .setBenefitScores(5).setDescriptionScores(5)
+                    .setAttitudeScores(5).setSpeedScores(5).setSpecialityScores(5);
             createOrderItemComment0(orderItem, commentCreateReqVO);
 
             // 2.2 更新订单项评价状态
@@ -944,6 +971,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         // 3. 所有订单项都评论了，则更新订单评价状态
         tradeOrderMapper.updateById(new TradeOrderDO().setId(order.getId()).setCommentStatus(Boolean.TRUE)
                 .setFinishTime(LocalDateTime.now()));
+
+        updateMedicalCareComment(order.getId(), order.getCareId());
+
         // 增加订单日志。注意：只有在所有订单项都评价后，才会增加
         TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus());
     }
@@ -964,6 +994,17 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         tradeOrderItemMapper.updateById(new TradeOrderItemDO().setId(orderItem.getId()).setCommentStatus(Boolean.TRUE));
         return commentId;
     }
+
+
+    /**
+     * 更新 处理此订单的医护的评分
+     * @param orderId 订单编号
+     */
+    private void updateMedicalCareComment(Long orderId, Long careId){
+        Integer total = productCommentApi.getScoreByOrder(orderId);
+        medicalCareApi.updateComment(careId, total);
+    }
+
 
     // =================== 营销相关的操作 ===================
 

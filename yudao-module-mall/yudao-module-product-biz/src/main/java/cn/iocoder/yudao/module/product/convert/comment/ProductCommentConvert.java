@@ -84,10 +84,17 @@ public interface ProductCommentConvert {
         return divide.intValue();
     }
 
+    @Named("convertScores01")
+    default Integer convertScores01(Integer attitudeScores, Integer speedScores, Integer specialityScores){
+        BigDecimal sumScore = new BigDecimal(attitudeScores + speedScores + specialityScores);
+        BigDecimal divide = sumScore.divide(BigDecimal.valueOf(3L), 0, RoundingMode.DOWN);
+        return divide.intValue();
+    }
+
     ProductCommentDO convert(ProductCommentCreateReqDTO createReqDTO);
 
     @Mapping(target = "scores",
-            expression = "java(convertScores(createReqDTO.getDescriptionScores(), createReqDTO.getBenefitScores()))")
+            expression = "java(convertScores01(createReqDTO.getAttitudeScores(), createReqDTO.getSpeedScores(), createReqDTO.getSpecialityScores()))")
     default ProductCommentDO convert(ProductCommentCreateReqDTO createReqDTO, ProductSpuDO spuDO, ProductSkuDO skuDO, MemberUserRespDTO user) {
         ProductCommentDO commentDO = convert(createReqDTO);
         if (user != null) {
@@ -113,7 +120,7 @@ public interface ProductCommentConvert {
     @Mapping(target = "orderItemId", constant = "0L")
     @Mapping(target = "anonymous", expression = "java(Boolean.FALSE)")
     @Mapping(target = "scores",
-            expression = "java(convertScores(createReq.getDescriptionScores(), createReq.getBenefitScores()))")
+            expression = "java(convertScores01(createReq.getAttitudeScores(), createReq.getSpeedScores(), createReq.getSpecialityScores()))")
     ProductCommentDO convert(ProductCommentCreateReqVO createReq);
 
     List<AppProductCommentRespVO> convertList02(List<ProductCommentDO> list);

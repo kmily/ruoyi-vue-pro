@@ -29,12 +29,33 @@ public class ProductCommentBaseVO {
     private Long skuId;
 
     @Schema(description = "描述星级 1-5 分", requiredMode = Schema.RequiredMode.REQUIRED, example = "5")
-    @NotNull(message = "描述星级不能为空")
+    //@NotNull(message = "描述星级不能为空")
     private Integer descriptionScores;
 
     @Schema(description = "服务星级 1-5 分", requiredMode = Schema.RequiredMode.REQUIRED, example = "5")
-    @NotNull(message = "服务星级分不能为空")
+    //@NotNull(message = "服务星级分不能为空")
     private Integer benefitScores;
+
+    /**
+     * 服务质量评分 1-5
+     */
+    @Schema(description = "服务质量星级 1-5 分", requiredMode = Schema.RequiredMode.REQUIRED, example = "5")
+    @NotNull(message = "服务质量星级分不能为空")
+    private Integer attitudeScores;
+
+    /**
+     * 服务速度 1-5
+     */
+    @Schema(description = "服务速度 1-5 分", requiredMode = Schema.RequiredMode.REQUIRED, example = "5")
+    @NotNull(message = "服务速度星级分不能为空")
+    private Integer speedScores;
+
+    /**
+     * 专业程度 1-5
+     */
+    @Schema(description = "专业程度星级 1-5 分", requiredMode = Schema.RequiredMode.REQUIRED, example = "5")
+    @NotNull(message = "专业程度星级分不能为空")
+    private Integer specialityScores;
 
     @Schema(description = "评论内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "穿起来非常丝滑凉快")
     @NotNull(message = "评论内容不能为空")

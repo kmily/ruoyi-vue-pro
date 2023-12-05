@@ -15,7 +15,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class AppCareAptitudePageReqVO extends PageParam {
 
-    @Schema(description = "医护编号", example = "2903")
+    @Schema(description = "医护编号", example = "2903", hidden = true)
     private Long careId;
 
     @Schema(description = "创建时间")

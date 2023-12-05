@@ -4,6 +4,7 @@ import java.util.*;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCarePageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -28,4 +29,5 @@ public interface OrderCareConvert {
     OrderCareDO convert(TradeOrderDO bean);
 
 
+    AppTradeOrderCarePageReqVO convert(TradeOrderCarePageReqVO reqVO);
 }

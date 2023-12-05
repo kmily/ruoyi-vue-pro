@@ -129,6 +129,20 @@ public class ProductCommentDO extends BaseDO {
      */
     private Integer benefitScores;
     /**
+     * 服务质量评分 1-5
+     */
+    private Integer attitudeScores;
+
+    /**
+     * 服务速度 1-5
+     */
+    private Integer speedScores;
+
+    /**
+     * 专业程度 1-5
+     */
+    private Integer specialityScores;
+    /**
      * 评论内容
      */
     private String content;

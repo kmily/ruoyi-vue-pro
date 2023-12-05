@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.hospital.controller.app.careaptitude;
 
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.hospital.dal.dataobject.medicalcare.MedicalCareDO;
+import cn.iocoder.yudao.module.hospital.service.medicalcare.MedicalCareService;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -38,10 +41,16 @@ public class AppCareAptitudeController {
     @Resource
     private CareAptitudeService careAptitudeService;
 
+    @Resource
+    private MedicalCareService medicalCareService;
+
     @PostMapping("/create")
     @Operation(summary = "创建医护资质")
     @PreAuthenticated
     public CommonResult<Long> createCareAptitude(@Valid @RequestBody AppCareAptitudeCreateReqVO createReqVO) {
+
+//        MedicalCareDO careDO = medicalCareService.getByMemberId(SecurityFrameworkUtils.getLoginUserId());
+        createReqVO.setCareId(SecurityFrameworkUtils.getLoginUserId());
         return success(careAptitudeService.createCareAptitude(createReqVO));
     }
 
@@ -49,6 +58,8 @@ public class AppCareAptitudeController {
     @Operation(summary = "更新医护资质")
     @PreAuthenticated
     public CommonResult<Boolean> updateCareAptitude(@Valid @RequestBody AppCareAptitudeUpdateReqVO updateReqVO) {
+//        MedicalCareDO careDO = medicalCareService.getByMemberId(SecurityFrameworkUtils.getLoginUserId());
+      // updateReqVO.setCareId(SecurityFrameworkUtils.getLoginUserId());
         careAptitudeService.updateCareAptitude(updateReqVO);
         return success(true);
     }
@@ -73,10 +84,10 @@ public class AppCareAptitudeController {
 
     @GetMapping("/list")
     @Operation(summary = "获得医护资质列表")
-    @Parameter(name = "careId", description = "医护编号", required = true, example = "1024")
     @PreAuthenticated
-    public CommonResult<List<AppCareAptitudeRespVO>> getCareAptitudeList(@RequestParam("careId") Long careId) {
-        List<CareAptitudeDO> list = careAptitudeService.getCareAptitudeList(careId);
+    public CommonResult<List<AppCareAptitudeRespVO>> getCareAptitudeList() {
+        //MedicalCareDO careDO = medicalCareService.getByMemberId(SecurityFrameworkUtils.getLoginUserId());
+        List<CareAptitudeDO> list = careAptitudeService.getCareAptitudeList(SecurityFrameworkUtils.getLoginUserId());
         return success(CareAptitudeConvert.INSTANCE.convertList(list));
     }
 
@@ -84,6 +95,8 @@ public class AppCareAptitudeController {
     @Operation(summary = "获得医护资质分页")
     @PreAuthenticated
     public CommonResult<PageResult<AppCareAptitudeRespVO>> getCareAptitudePage(@Valid AppCareAptitudePageReqVO pageVO) {
+       // MedicalCareDO careDO = medicalCareService.getByMemberId(SecurityFrameworkUtils.getLoginUserId());
+        pageVO.setCareId(SecurityFrameworkUtils.getLoginUserId());
         PageResult<CareAptitudeDO> pageResult = careAptitudeService.getCareAptitudePage(pageVO);
         return success(CareAptitudeConvert.INSTANCE.convertPage(pageResult));
     }

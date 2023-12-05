@@ -24,4 +24,11 @@ public class ProductCommentApiImpl implements ProductCommentApi {
         return productCommentService.createComment(createReqDTO);
     }
 
+    @Override
+    public Integer getScoreByOrder(Long orderId) {
+
+      return   productCommentService.getScoreListByOrder(orderId);
+
+    }
+
 }

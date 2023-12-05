@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCarePageReqVO;
 import cn.iocoder.yudao.module.trade.convert.order.OrderCareConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderAssignTypeEnum;
@@ -59,5 +60,10 @@ public class OrderCareServiceImpl extends ServiceImpl<OrderCareMapper, OrderCare
     public void updateByOrderIdAndCareId(Long orderId, Long careId, Integer status) {
         orderCareMapper.update(new OrderCareDO().setStatus(status), new LambdaUpdateWrapper<OrderCareDO>()
                 .eq(OrderCareDO::getOrderId, orderId).eq(OrderCareDO::getCareId, careId));
+    }
+
+    @Override
+    public PageResult<OrderCareDO> getOrderPage(AppTradeOrderCarePageReqVO reqVO) {
+        return orderCareMapper.getPage(reqVO);
     }
 }

@@ -143,4 +143,5 @@ public interface MedicalCareService extends IService<MedicalCareDO>{
      * @return
      */
     PageResult<MedicalCareDO> getCareFavoritePage(CareFavoritePageReqVO pageVO);
+
 }
