@@ -37,4 +37,7 @@ public interface CrmCustomerConvert {
     })
     CrmTransferPermissionReqBO convert(CrmCustomerTransferReqVO reqVO, Long userId);
 
+    CrmCustomerDO convert(CrmCustomerLockReqVO bean);
+
+
 }

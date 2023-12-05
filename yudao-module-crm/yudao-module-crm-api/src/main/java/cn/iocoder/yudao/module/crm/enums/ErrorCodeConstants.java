@@ -35,6 +35,13 @@ public interface ErrorCodeConstants {
     // ========== 客户管理 1_020_006_000 ==========
     ErrorCode CUSTOMER_NOT_EXISTS = new ErrorCode(1_020_006_000, "客户不存在");
 
+    ErrorCode CUSTOMER_UNLOCK_STATUS_NO_REPETITION = new ErrorCode(1_020_006_001, "无需重复操作锁定/解锁状态");
+
+    ErrorCode CUSTOMER_NO_DEPARTMENT_FOUND = new ErrorCode(1_020_006_002, "操作失败,请先绑定部门再进行操作");
+
+    ErrorCode CUSTOMER_EXCEED_LOCK_LIMIT = new ErrorCode(1_020_006_003, "操作失败,超出锁定规则上限");
+
+
     // ========== 权限管理 1_020_007_000 ==========
     ErrorCode CRM_PERMISSION_NOT_EXISTS = new ErrorCode(1_020_007_000, "数据权限不存在");
     ErrorCode CRM_PERMISSION_DENIED = new ErrorCode(1_020_007_001, "{}操作失败，原因：没有权限");

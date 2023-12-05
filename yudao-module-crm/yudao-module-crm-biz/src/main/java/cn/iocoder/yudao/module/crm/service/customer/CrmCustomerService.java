@@ -83,6 +83,6 @@ public interface CrmCustomerService {
      *
      * @param updateReqVO 更新信息
      */
-    void lockCustomer(@Valid CrmCustomerUpdateReqVO updateReqVO);
+    void lockCustomer(@Valid CrmCustomerLockReqVO lockReqVO);
 
 }
