@@ -37,4 +37,10 @@ public interface TradeOrderApi {
      */
     void cancelPaidOrder(Long userId, Long orderId);
 
+
+    /**
+     * 根据被护人更新订单状态
+     * @param personId 被护人编号
+     */
+    void updateOrderServerPerson(Long personId);
 }

@@ -65,4 +65,9 @@ public class ProductCategoryDO extends BaseDO {
      */
     private Integer status;
 
+    /**
+     * 是否首页显示
+     */
+    private Boolean isIndex;
+
 }

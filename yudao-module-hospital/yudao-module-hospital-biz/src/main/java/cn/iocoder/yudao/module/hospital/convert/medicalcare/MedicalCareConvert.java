@@ -37,4 +37,5 @@ public interface MedicalCareConvert {
 
     List<MedicalCareExcelVO> convertList02(List<MedicalCareDO> list);
 
+    List<MedicalCareRepsDTO> convertList03(List<MedicalCareDO> medicalCareList);
 }

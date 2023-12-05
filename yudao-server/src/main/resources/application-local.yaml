@@ -172,6 +172,7 @@ logging:
     cn.iocoder.yudao.module.promotion.dal.mysql: debug
     cn.iocoder.yudao.module.statistics.dal.mysql: debug
     cn.iocoder.yudao.module.hospital.dal.mysql: debug
+    cn.iocoder.yudao.module.product.dal.mysql: debug
 
 debug: false
 

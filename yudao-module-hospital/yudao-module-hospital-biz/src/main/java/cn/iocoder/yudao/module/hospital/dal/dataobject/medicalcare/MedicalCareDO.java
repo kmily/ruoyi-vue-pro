@@ -31,7 +31,7 @@ public class MedicalCareDO extends BaseDO {
     /**
      * 编号
      */
-    @TableId
+    @TableId(type = IdType.INPUT)
     private Long id;
     /**
      * 组织编号

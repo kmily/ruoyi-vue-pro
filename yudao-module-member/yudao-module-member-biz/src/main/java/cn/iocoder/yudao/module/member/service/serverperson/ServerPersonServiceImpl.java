@@ -9,7 +9,9 @@ import cn.iocoder.yudao.module.member.controller.admin.serverperson.vo.ServerPer
 import cn.iocoder.yudao.module.member.convert.serverperson.ServerPersonCheckLogConvert;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -43,6 +45,10 @@ public class ServerPersonServiceImpl extends ServiceImpl<ServerPersonMapper, Ser
 
     @Resource
     private AdminUserApi adminUserApi;
+
+    @Resource
+    @Lazy
+    private TradeOrderApi tradeOrderApi;
 
     @Resource
     private ServerPersonCheckLogService serverPersonCheckLogService;
@@ -128,6 +134,7 @@ public class ServerPersonServiceImpl extends ServiceImpl<ServerPersonMapper, Ser
 
         if(CommonStatusEnum.OPEN.name().equals(status)){
             // TODO 如果审核通过 发布消息, 有关联的未分配的订单进行更新操作
+            tradeOrderApi.updateOrderServerPerson(auditVO.getId());
         }
     }
 

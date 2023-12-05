@@ -17,4 +17,10 @@ public interface ProductCommentApi {
      */
     Long createComment(ProductCommentCreateReqDTO createReqDTO);
 
+    /**
+     * 查询订单的总评分
+     * @param orderId 订单编号
+     * @return
+     */
+    Integer getScoreByOrder(Long orderId);
 }

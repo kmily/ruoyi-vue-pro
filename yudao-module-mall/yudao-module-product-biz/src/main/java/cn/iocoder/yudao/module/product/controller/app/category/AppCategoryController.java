@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -32,6 +33,16 @@ public class AppCategoryController {
     public CommonResult<List<AppCategoryRespVO>> getProductCategoryList() {
         List<ProductCategoryDO> list = categoryService.getEnableCategoryList();
         list.sort(Comparator.comparing(ProductCategoryDO::getSort));
+        return success(ProductCategoryConvert.INSTANCE.convertList03(list));
+    }
+
+
+
+    @GetMapping("/index")
+    @Operation(summary = "查询首页显示数据")
+    public CommonResult<List<AppCategoryRespVO>> getProductCategoryListForIndex(){
+        List<ProductCategoryDO> enableCategoryList = categoryService.getEnableCategoryList();
+        List<ProductCategoryDO> list = enableCategoryList.stream().filter(item -> Boolean.TRUE.equals(item.getIsIndex())).sorted(Comparator.comparing(ProductCategoryDO::getSort)).collect(Collectors.toList());
         return success(ProductCategoryConvert.INSTANCE.convertList03(list));
     }
 

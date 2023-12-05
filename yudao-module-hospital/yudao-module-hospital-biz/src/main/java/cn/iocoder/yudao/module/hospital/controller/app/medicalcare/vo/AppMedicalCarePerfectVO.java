@@ -29,7 +29,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 public class AppMedicalCarePerfectVO {
 
     @Schema(description = "医护编号", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "编号不能为空")
+    //@NotNull(message = "编号不能为空")
     private Long id;
 
     @Schema(description = "姓名", example = "张三")

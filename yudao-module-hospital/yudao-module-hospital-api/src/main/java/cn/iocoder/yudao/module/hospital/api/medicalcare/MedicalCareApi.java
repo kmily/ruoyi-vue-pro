@@ -2,6 +2,9 @@ package cn.iocoder.yudao.module.hospital.api.medicalcare;
 
 import cn.iocoder.yudao.module.hospital.api.medicalcare.dto.MedicalCareRepsDTO;
 
+import java.util.Map;
+import java.util.Set;
+
 /**
  * @author whycode
  * @title: MedicalCareApi
@@ -29,4 +32,24 @@ public interface MedicalCareApi {
     MedicalCareRepsDTO validateMedicalCare(Long careId);
 
 
+    /**
+     * 查询医护信息
+     * @param ids 医护Id
+     * @return
+     */
+    Map<Long, MedicalCareRepsDTO> getMedicalCareMap(Set<Long> ids);
+
+    /**
+     * 根据用户ID 查询医护ID
+     * @param userId 用户ID
+     * @return
+     */
+    MedicalCareRepsDTO getMedicalCareByMember(Long userId);
+
+    /**
+     * 更新医护的评分
+     * @param scores 分数
+     * @param careId 医护编号
+     */
+    void updateComment(Long careId, Integer scores);
 }

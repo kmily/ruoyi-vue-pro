@@ -3,15 +3,20 @@ package cn.iocoder.yudao.module.trade.controller.admin.order;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.hospital.api.medicalcare.MedicalCareApi;
+import cn.iocoder.yudao.module.hospital.api.medicalcare.dto.MedicalCareRepsDTO;
 import cn.iocoder.yudao.module.member.api.serverperson.ServerPersonApi;
 import cn.iocoder.yudao.module.member.api.serverperson.dto.ServerPersonRespDTO;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.*;
+import cn.iocoder.yudao.module.trade.convert.order.OrderCareConvert;
 import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
+import cn.iocoder.yudao.module.trade.dal.dataobject.order.OrderCareDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderLogDO;
+import cn.iocoder.yudao.module.trade.service.order.OrderCareService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderLogService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
@@ -25,10 +30,12 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - 交易订单")
@@ -51,6 +58,12 @@ public class TradeOrderController {
     @Resource
     private ServerPersonApi serverPersonApi;
 
+    @Resource
+    private MedicalCareApi medicalCareApi;
+
+    @Resource
+    private OrderCareService orderCareService;
+
 
     @GetMapping("/page")
     @Operation(summary = "获得交易订单分页")
@@ -62,14 +75,53 @@ public class TradeOrderController {
             return success(PageResult.empty());
         }
 
+        Map<Long, MedicalCareRepsDTO> careMap = medicalCareApi.getMedicalCareMap(convertSet(pageResult.getList(), TradeOrderDO::getCareId));
+
         // 查询用户信息
         Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(convertSet(pageResult.getList(), TradeOrderDO::getUserId));;
         // 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(
                 convertSet(pageResult.getList(), TradeOrderDO::getId));
         // 最终组合
-        return success(TradeOrderConvert.INSTANCE.convertPage(pageResult, orderItems, userMap));
+        return success(TradeOrderConvert.INSTANCE.convertPage(pageResult, orderItems, userMap, careMap));
     }
+
+
+    @GetMapping("/page-care")
+    @Operation(summary = "获得交易订单分页")
+    @PreAuthorize("@ss.hasPermission('trade:order:query')")
+    public CommonResult<PageResult<TradeOrderPageItemRespVO>> getOrderCarePage(TradeOrderCarePageReqVO reqVO) {
+        // 查询订单
+        PageResult<OrderCareDO> pageResult = orderCareService.getOrderPage(OrderCareConvert.INSTANCE.convert(reqVO));
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty());
+        }
+
+
+
+        List<TradeOrderDO> orderList = tradeOrderQueryService.getOrderList(convertSet(pageResult.getList(), OrderCareDO::getOrderId));
+
+        Map<Long, OrderCareDO> careDOMap = convertMap(pageResult.getList(), OrderCareDO::getOrderId);
+
+        // 医护端查询的状态按 OrderCare 表中的状态为准
+        orderList.forEach(item -> {
+            item.setStatus(careDOMap.get(item.getId()).getStatus());
+        });
+
+       // Map<Long, MedicalCareRepsDTO> careMap = medicalCareApi.getMedicalCareMap(convertSet(orderList, TradeOrderDO::getCareId));
+
+        // 查询用户信息
+        Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(convertSet(orderList, TradeOrderDO::getUserId));;
+        // 查询订单项
+        List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(
+                convertSet(orderList, TradeOrderDO::getId));
+
+
+        // 最终组合
+        return success(TradeOrderConvert.INSTANCE.convertPage(new PageResult<TradeOrderDO>().setTotal(pageResult.getTotal()).setList(orderList), orderItems, userMap, new HashMap<>()));
+    }
+
+
 
     @GetMapping("/get-detail")
     @Operation(summary = "获得交易订单详情")

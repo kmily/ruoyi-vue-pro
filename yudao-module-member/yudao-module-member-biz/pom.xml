@@ -38,6 +38,11 @@
             <artifactId>yudao-module-hospital-api</artifactId>
             <version>${revision}</version>
         </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-trade-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
 
         <!-- 业务组件 -->
         <dependency>
@@ -97,6 +102,12 @@
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-biz-ip</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-trade-api</artifactId>
+            <version>1.8.2-snapshot</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

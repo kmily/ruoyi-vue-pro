@@ -63,7 +63,8 @@ public class AppMedicalCareController {
     @Operation(summary = "完善医护信息")
     @PreAuthenticated
     public CommonResult<Boolean> perfectMedicalCare(@Valid @RequestBody AppMedicalCarePerfectVO perfectVO) {
-        medicalCareService.perfectMedicalCare(perfectVO);
+        MedicalCareDO medicalCareDO = medicalCareService.getByMemberId(SecurityFrameworkUtils.getLoginUserId());
+        medicalCareService.perfectMedicalCare(perfectVO.setId(medicalCareDO.getId()));
         return success(true);
     }
 
@@ -71,7 +72,8 @@ public class AppMedicalCareController {
     @Operation(summary = "医护人员实名")
     @PreAuthenticated
     public CommonResult<Boolean> realNameMedicalCare(@Valid @RequestBody AppRealNameReqVO realNameReqVO) {
-        medicalCareService.realNameMedicalCare(realNameReqVO);
+       // MedicalCareDO medicalCareDO = medicalCareService.getByMemberId(SecurityFrameworkUtils.getLoginUserId());
+        medicalCareService.realNameMedicalCare(realNameReqVO.setId(SecurityFrameworkUtils.getLoginUserId()));
         return success(true);
     }
 

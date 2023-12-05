@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.service.order;
 import java.util.*;
 import javax.validation.*;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.*;
+import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCarePageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.OrderCareDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
@@ -44,4 +45,11 @@ public interface OrderCareService extends IService<OrderCareDO>{
      * @param status 状态
      */
     void updateByOrderIdAndCareId(Long orderId, Long careId, Integer status);
+
+    /**
+     * 分页查询
+     * @param reqVO 查询条件
+     * @return
+     */
+    PageResult<OrderCareDO> getOrderPage(AppTradeOrderCarePageReqVO reqVO);
 }

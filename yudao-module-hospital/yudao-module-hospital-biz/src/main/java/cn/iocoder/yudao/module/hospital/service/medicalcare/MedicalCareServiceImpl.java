@@ -93,12 +93,27 @@ public class MedicalCareServiceImpl extends ServiceImpl<MedicalCareMapper, Medic
     public Long createMedicalCare(MedicalCareCreateReqVO createReqVO) {
         // 插入
         MedicalCareDO medicalCare = MedicalCareConvert.INSTANCE.convert(createReqVO);
+        String password = createReqVO.getPassword();
+        if(StrUtil.isBlank(password)){
+            password = DEFAULT_PWD;
+        }
+        Long memberId = memberUserApi.createMember(new MemberUserReqDTO()
+                .setMobile(medicalCare.getMobile())
+                .setName(medicalCare.getName())
+                .setNickname(medicalCare.getName())
+                .setPassword(encodePassword(password))
+                .setStatus(CommonStatusEnum.ENABLE.getStatus()));
 
-        MedicalCareDO medicalCareDO = this.selectOneByMobile(medicalCare.getMobile());
-        if(Objects.nonNull(medicalCareDO)){
-            throw exception(MEDICAL_CARE_HAS_EXISTS);
+        if(memberId == null){
+           throw exception(MEDICAL_CARE_CREATE_FAIL);
         }
 
+//        MedicalCareDO medicalCareDO = this.selectOneByMobile(medicalCare.getMobile());
+//        if(Objects.nonNull(medicalCareDO)){
+//            throw exception(MEDICAL_CARE_HAS_EXISTS);
+//        }
+
+        medicalCare.setId(memberId);
         if(Objects.equals(BACK_ADD.value(), medicalCare.getSource())){
             // 后台管理端添加默认审核通过
             medicalCare.setStatus(MedicalCareStatusEnum.OPEN.value());
@@ -117,16 +132,7 @@ public class MedicalCareServiceImpl extends ServiceImpl<MedicalCareMapper, Medic
 
         if(save){
 
-            String password = createReqVO.getPassword();
-            if(StrUtil.isBlank(password)){
-                password = DEFAULT_PWD;
-            }
-            Long memberId = memberUserApi.createMember(new MemberUserReqDTO()
-                    .setMobile(medicalCare.getMobile())
-                    .setName(medicalCare.getName())
-                    .setNickname(medicalCare.getName())
-                    .setPassword(encodePassword(password))
-                    .setStatus(CommonStatusEnum.ENABLE.getStatus()));
+
             medicalCareMapper.updateById(new MedicalCareDO().setMemberId(memberId).setId(medicalCare.getId()));
         }else {
             throw exception(MEDICAL_CARE_CREATE_FAIL);
@@ -191,33 +197,37 @@ public class MedicalCareServiceImpl extends ServiceImpl<MedicalCareMapper, Medic
 
     @Override
     public MedicalCareDO getByMemberId(Long memberId) {
-        return this.getOne(new LambdaQueryWrapper<MedicalCareDO>().eq(MedicalCareDO::getMemberId, memberId));
+        MedicalCareDO one = this.getById(memberId);//this.getOne(new LambdaQueryWrapper<MedicalCareDO>().eq(MedicalCareDO::getMemberId, memberId));
+        if(one == null){
+            throw exception(MEDICAL_CARE_NOT_EXISTS);
+        }
+        return one;
     }
 
     @Override
     public long createMedicalCare(Long memberId, String mobile) {
-        MedicalCareDO medicalCareDO = this.getByMemberId(memberId);
+        MedicalCareDO medicalCareDO = this.getMedicalCare(memberId);
         if(medicalCareDO != null){
             return medicalCareDO.getId();
         }
         OrganizationDTO organization = organizationApi.getSelfOrganization();
-        medicalCareDO = this.selectOneByMobile(mobile);
-         if(medicalCareDO != null && Objects.equals(memberId, medicalCareDO.getMemberId())) {
-             return medicalCareDO.getId();
-         }else if(medicalCareDO != null){
-             this.updateById(new MedicalCareDO()
-                     .setMemberId(memberId)
-                     .setOrgId(organization.getId())
-                     .setId(medicalCareDO.getId()));
-             return medicalCareDO.getId();
-         }else {
-             medicalCareDO = new MedicalCareDO().setMemberId(memberId).setMobile(mobile)
+        //medicalCareDO = this.selectOneByMobile(mobile);
+//         if(medicalCareDO != null && Objects.equals(memberId, medicalCareDO.getMemberId())) {
+//             return medicalCareDO.getId();
+//         }else if(medicalCareDO != null){
+//             this.updateById(new MedicalCareDO()
+//                     .setMemberId(memberId)
+//                     .setOrgId(organization.getId())
+//                     .setId(medicalCareDO.getId()));
+//             return medicalCareDO.getId();
+//         }else {
+             medicalCareDO = new MedicalCareDO().setId(memberId).setMemberId(memberId).setMobile(mobile)
                      .setStatus(MedicalCareStatusEnum.APPLYING.value())
                      .setOrgId(organization.getId())
                      .setSource(SELF.value());
             this.save(medicalCareDO);
             return medicalCareDO.getId();
-        }
+        //}
     }
 
     @Override
@@ -269,9 +279,11 @@ public class MedicalCareServiceImpl extends ServiceImpl<MedicalCareMapper, Medic
 
     @Override
     public void updateCareComment(Long id, Integer commentScore) {
-        int score = commentScore == null? 0: commentScore;
+        if(commentScore == null || commentScore <= 0){
+            return;
+        }
         medicalCareMapper.update(new MedicalCareDO(), new LambdaUpdateWrapper<MedicalCareDO>()
-                .setSql("`comment_score` = `comment_score` + ?, `comment_count` = `comment_count` + 1", score)
+                .setSql("`comment_score` = `comment_score` + ?, `comment_count` = `comment_count` + 1", commentScore)
                 .eq(MedicalCareDO::getId, id));
     }
 
@@ -279,6 +291,8 @@ public class MedicalCareServiceImpl extends ServiceImpl<MedicalCareMapper, Medic
     public PageResult<MedicalCareDO> getCareFavoritePage(CareFavoritePageReqVO pageVO) {
         return medicalCareMapper.selectCareFavoritePage(pageVO);
     }
+
+
 
     @Override
     public void perfectMedicalCare(AppMedicalCarePerfectVO perfectVO) {

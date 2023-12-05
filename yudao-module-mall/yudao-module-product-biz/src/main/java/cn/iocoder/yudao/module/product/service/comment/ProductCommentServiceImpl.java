@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.service.comment;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
@@ -23,6 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -152,6 +155,16 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     @Override
     public List<AppProductCommentRespVO> getCommentList(Long spuId, Integer count) {
         return ProductCommentConvert.INSTANCE.convertList02(productCommentMapper.selectCommentList(spuId, count).getList());
+    }
+
+    @Override
+    public Integer getScoreListByOrder(Long orderId) {
+        List<ProductCommentDO> commentDOList = productCommentMapper.selectList(ProductCommentDO::getOrderId, orderId);
+        if(CollUtil.isEmpty(commentDOList)){
+            return 0;
+        }
+        int total = commentDOList.stream().map(ProductCommentDO::getScores).mapToInt(i -> i).sum();
+        return new BigDecimal(total).divide(BigDecimal.valueOf(commentDOList.size()), 0, RoundingMode.DOWN).intValue();
     }
 
     @Override

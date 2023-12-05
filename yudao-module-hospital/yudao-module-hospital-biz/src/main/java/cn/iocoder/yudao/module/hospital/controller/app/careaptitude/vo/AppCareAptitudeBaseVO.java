@@ -26,7 +26,7 @@ public class AppCareAptitudeBaseVO {
     private String aptitudeName;
 
     @Schema(description = "医护编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2903")
-    @NotNull(message = "医护编号不能为空")
+    //@NotNull(message = "医护编号不能为空")
     private Long careId;
 
     @Schema(description = "证书正面")
