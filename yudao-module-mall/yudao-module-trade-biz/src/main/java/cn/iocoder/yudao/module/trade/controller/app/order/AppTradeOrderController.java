@@ -44,6 +44,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum.*;
 
 @Tag(name = "用户 App - 交易订单")
 @RestController
@@ -174,10 +175,10 @@ public class AppTradeOrderController {
                 TradeOrderStatusEnum.UNPAID.getStatus(), null));
         // 派单中
         orderCount.put("unassignCount", tradeOrderQueryService.getOrderCount(getLoginUserId(),
-                Arrays.asList(TradeOrderStatusEnum.UNABSORBED.getStatus(), TradeOrderStatusEnum.UNRECEIVE.getStatus())));
+                Arrays.asList(TradeOrderStatusEnum.UNABSORBED.getStatus(), UNRECEIVE.getStatus())));
         // 服务中
         orderCount.put("deliveredCount", tradeOrderQueryService.getOrderCount(getLoginUserId(),
-                Arrays.asList(TradeOrderStatusEnum.NOSTART.getStatus(), TradeOrderStatusEnum.UNSERVER.getStatus(),
+                Arrays.asList(NOSTART.getStatus(), TradeOrderStatusEnum.UNSERVER.getStatus(),
                         TradeOrderStatusEnum.SERVERING.getStatus())));
         // 待评价
         orderCount.put("uncommentedCount", tradeOrderQueryService.getOrderCount(getLoginUserId(),
@@ -233,4 +234,50 @@ public class AppTradeOrderController {
         return success(tradeOrderUpdateService.createOrderItemCommentByMember(getLoginUserId(), createReqVO));
     }
 
+
+    @PutMapping("/accept/{id}")
+    @Operation(summary = "护士端接受订单")
+    @Parameter(description = "订单编号")
+    @PreAuthenticated
+    public CommonResult<Boolean> acceptOrder(@PathVariable("id") Long orderId){
+        tradeOrderUpdateService.updateStatus(orderId, UNRECEIVE.getStatus(), NOSTART.getStatus());
+        return success(true);
+    }
+
+    @PutMapping("/set-out/{id}")
+    @Operation(summary = "护士端 出发")
+    @Parameter(description = "订单编号")
+    @PreAuthenticated
+    public CommonResult<Boolean> setOutOrder(@PathVariable("id") Long orderId){
+        tradeOrderUpdateService.updateStatus(orderId, NOSTART.getStatus(), UNSERVER.getStatus());
+        return success(true);
+    }
+
+    @PutMapping("/start/{id}")
+    @Operation(summary = "护士端 开始服务")
+    @Parameter(description = "订单编号")
+    @PreAuthenticated
+    public CommonResult<Boolean> startOrder(@PathVariable("id") Long orderId){
+        tradeOrderUpdateService.updateStatus(orderId, UNSERVER.getStatus(), SERVERING.getStatus());
+        return success(true);
+    }
+
+    @PutMapping("/complete/{id}")
+    @Operation(summary = "护士端 完成服务")
+    @Parameter(description = "订单编号")
+    @PreAuthenticated
+    public CommonResult<Boolean> completeOrder(@PathVariable("id") Long orderId){
+        tradeOrderUpdateService.updateStatus(orderId, SERVERING.getStatus(), COMPLETED.getStatus());
+        return success(true);
+    }
+
+    @PutMapping("/refuse/{id}")
+    @Operation(summary = "护士端 拒绝服务")
+    @Parameter(description = "订单编号")
+    @PreAuthenticated
+    public CommonResult<Boolean> refuseOrder(@PathVariable("id") Long orderId,
+                                             @RequestParam("reason") String reason){
+        tradeOrderUpdateService.refuseOrder(orderId, reason);
+        return success(true);
+    }
 }

@@ -52,4 +52,21 @@ public interface OrderCareService extends IService<OrderCareDO>{
      * @return
      */
     PageResult<OrderCareDO> getOrderPage(AppTradeOrderCarePageReqVO reqVO);
+
+    /**
+     * 更新状态
+     * @param orderId
+     * @param careId
+     * @param beforeStatus
+     * @param afterStatus
+     */
+    void updateByOrderIdAndStatus(Long orderId, Long careId, Integer beforeStatus, Integer afterStatus);
+
+    /**
+     * 拒绝任务
+     * @param orderId 订单编号
+     * @param careId 医护编号
+     * @param reason 原因
+     */
+    void refuseOrder(Long orderId, Long careId, String reason);
 }

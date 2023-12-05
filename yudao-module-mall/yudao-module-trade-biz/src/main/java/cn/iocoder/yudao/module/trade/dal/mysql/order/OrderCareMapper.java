@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCarePageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.OrderCareDO;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.*;
@@ -27,5 +28,10 @@ public interface OrderCareMapper extends BaseMapperX<OrderCareDO>,BaseMapper<Ord
                 .eqIfPresent(OrderCareDO::getCareId, reqVO.getCareId())
                 .inIfPresent(OrderCareDO::getStatus, reqVO.queryStatus())
                 .betweenIfPresent(BaseDO::getCreateTime, reqVO.getCreateTime()));
+    }
+
+    default void updateByOrderIdAndStatus(Long orderId, Long careId, Integer beforeStatus, OrderCareDO orderCareDO){
+        update(orderCareDO, new LambdaUpdateWrapper<OrderCareDO>().eq(OrderCareDO::getOrderId, orderId)
+                .eq(OrderCareDO::getCareId, careId).eq(OrderCareDO::getStatus, beforeStatus));
     }
 }

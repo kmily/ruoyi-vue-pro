@@ -912,7 +912,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             throw exception(ORDER_NOT_FOUND);
         }
         Long careId = assignReqVO.getCareId();
-        MedicalCareRepsDTO medicalCare = medicalCareApi.validateMedicalCare(careId);
+        medicalCareApi.validateMedicalCare(careId);
         int updateCount = tradeOrderMapper.updateByIdAndStatus(assignReqVO.getId(), order.getStatus(),
                 new TradeOrderDO().setStatus(TradeOrderStatusEnum.UNRECEIVE.getStatus())
                         .setCareId(careId).setAssignId(SecurityFrameworkUtils.getLoginUserId())
@@ -924,6 +924,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                     .setStatus(TradeOrderStatusEnum.UNRECEIVE.getStatus())
                     .setUserId(order.getUserId()));
         }
+
+        // 增加订单日志
+        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.UNRECEIVE.getStatus());
     }
 
     @Override
@@ -937,6 +940,45 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                 tradeOrderMapper.updateById(new TradeOrderDO().setServicePerson(JSON.toJSONString(serverPerson))
                         .setId(id));
             }
+        }
+    }
+
+    @Override
+    public void updateStatus(Long orderId, Integer beforeStatus, Integer afterStatus) {
+        TradeOrderDO tradeOrderDO =  this.validateOrderExists(orderId);
+        TradeOrderDO after = new TradeOrderDO().setStatus(afterStatus);
+
+        if(Objects.equals(afterStatus, TradeOrderStatusEnum.NOSTART.getStatus())){
+            // 接单 待出发
+            after.setAcceptTime(LocalDateTime.now());
+        }else if(Objects.equals(afterStatus, TradeOrderStatusEnum.UNSERVER.getStatus())){
+            // 出发 待服务
+            after.setSetOutTime(LocalDateTime.now());
+        }else if(Objects.equals(afterStatus, TradeOrderStatusEnum.SERVERING.getStatus())){
+            // 开始服务
+            after.setStartTime(LocalDateTime.now());
+        }else if(Objects.equals(afterStatus, TradeOrderStatusEnum.COMPLETED.getStatus())){
+            // 服务结束
+            after.setCompleteTime(LocalDateTime.now());
+        }
+        int updateCount = tradeOrderMapper.updateByIdAndStatus(orderId, beforeStatus,after);
+        if(updateCount > 0){
+            orderCareService.updateByOrderIdAndStatus(orderId, tradeOrderDO.getCareId(),  beforeStatus, afterStatus);
+        }
+        TradeOrderLogUtils.setOrderInfo(orderId, beforeStatus, afterStatus);
+    }
+
+    @Override
+    public void refuseOrder(Long orderId, String reason) {
+        TradeOrderDO tradeOrderDO =  this.validateOrderExists(orderId);
+
+        Long careId = tradeOrderDO.getCareId();
+        Assert.isTrue(Objects.equals(careId, SecurityFrameworkUtils.getLoginUserId()), "此订单不在你名下");
+
+        int count = tradeOrderMapper.refuseOrder(orderId, TradeOrderStatusEnum.UNRECEIVE.getStatus(), TradeOrderStatusEnum.UNABSORBED.getStatus());
+        if(count > 0){
+            orderCareService.refuseOrder(orderId, tradeOrderDO.getCareId(), reason);
+            TradeOrderLogUtils.setOrderInfo(orderId, TradeOrderStatusEnum.UNRECEIVE.getStatus(), TradeOrderStatusEnum.UNABSORBED.getStatus());
         }
     }
 

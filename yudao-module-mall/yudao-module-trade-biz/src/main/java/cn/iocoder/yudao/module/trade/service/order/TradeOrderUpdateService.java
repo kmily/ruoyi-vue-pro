@@ -197,4 +197,19 @@ public interface TradeOrderUpdateService {
      * @param personId 被护人编号
      */
     void updateOrderPerson(Long personId);
+
+    /**
+     * 更新订单状态
+     * @param orderId 订单编号
+     * @param beforeStatus 当前状态
+     * @param afterStatus 更改后状态
+     */
+    void updateStatus(Long orderId, Integer beforeStatus, Integer afterStatus);
+
+    /**
+     * 拒绝服务
+     * @param orderId 订单编号
+     * @param reason 原因
+     */
+    void refuseOrder(Long orderId, String reason);
 }
