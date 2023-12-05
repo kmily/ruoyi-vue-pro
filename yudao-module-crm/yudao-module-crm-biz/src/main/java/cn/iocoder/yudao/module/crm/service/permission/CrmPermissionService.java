@@ -60,10 +60,19 @@ public interface CrmPermissionService {
     /**
      * 批量删除数据权限
      *
-     * @param ids 权限编号
+     * @param ids    权限编号
      * @param userId 用户编号
      */
     void deletePermissionBatch(Collection<Long> ids, Long userId);
+
+    /**
+     * 批量删除数据权限
+     *
+     * @param bizType 数据类型，关联 {@link CrmBizTypeEnum}
+     * @param bizId   数据编号，关联 {@link CrmBizTypeEnum} 对应模块 DO#getId()
+     * @param userId  用户编号
+     */
+    void deletePermissionBatch(Integer bizType, Long bizId, Long userId);
 
     /**
      * 删除指定用户数据权限

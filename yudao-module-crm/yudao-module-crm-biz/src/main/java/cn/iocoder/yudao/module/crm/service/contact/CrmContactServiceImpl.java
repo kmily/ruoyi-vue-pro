@@ -10,12 +10,14 @@ import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactUpdateR
 import cn.iocoder.yudao.module.crm.convert.contact.ContactConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contact.CrmContactMapper;
-import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
+import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionExtendedService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
+import cn.iocoder.yudao.module.crm.service.permission.bo.extended.CrmPermissionExtendedCreateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -46,6 +49,8 @@ public class CrmContactServiceImpl implements CrmContactService {
     private CrmCustomerService customerService;
     @Resource
     private CrmPermissionService crmPermissionService;
+    @Resource
+    private CrmPermissionExtendedService crmPermissionExtendedService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -59,10 +64,14 @@ public class CrmContactServiceImpl implements CrmContactService {
         CrmContactDO contact = ContactConvert.INSTANCE.convert(createReqVO);
         contactMapper.insert(contact);
 
-        // 2. 创建数据权限
+        // 2.1 创建数据权限
         crmPermissionService.createPermission(new CrmPermissionCreateReqBO().setUserId(userId)
                 .setBizType(CrmBizTypeEnum.CRM_CONTACT.getType()).setBizId(contact.getId())
                 .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
+        // 2.2 创建数据权限扩展
+        crmPermissionExtendedService.createPermissionExtended(new CrmPermissionExtendedCreateReqBO()
+                .setParentBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType()).setParentBizId(createReqVO.getCustomerId())
+                .setSubBizType(CrmBizTypeEnum.CRM_CONTACT.getType()).setSubBizId(contact.getId()));
         return contact.getId();
     }
 
@@ -82,7 +91,7 @@ public class CrmContactServiceImpl implements CrmContactService {
      *
      * @param saveReqVO 新增/修改请求 VO
      */
-    private void validateRelationDataExists(CrmContactBaseVO saveReqVO){
+    private void validateRelationDataExists(CrmContactBaseVO saveReqVO) {
         // 1. 校验客户
         if (saveReqVO.getCustomerId() != null && customerService.getCustomer(saveReqVO.getCustomerId()) == null) {
             throw exception(CUSTOMER_NOT_EXISTS);
@@ -98,12 +107,18 @@ public class CrmContactServiceImpl implements CrmContactService {
     }
 
     @Override
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#id", level = CrmPermissionLevelEnum.WRITE)
-    public void deleteContact(Long id) {
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
+    public void deleteContact(Long id, Long userId) {
         // 校验存在
         validateContactExists(id);
+
         // 删除
         contactMapper.deleteById(id);
+        // 删除数据权限
+        crmPermissionService.deletePermissionBatch(CrmBizTypeEnum.CRM_CONTACT.getType(), id, userId);
+        // 删除数据扩展
+        crmPermissionExtendedService.deletePermissionExtendedBySubBizBatch(
+                CrmBizTypeEnum.CRM_CONTACT.getType(), Collections.singletonList(id));
     }
 
     private void validateContactExists(Long id) {
@@ -128,9 +143,10 @@ public class CrmContactServiceImpl implements CrmContactService {
     }
 
     @Override
-    public PageResult<CrmContactDO> getContactPage(CrmContactPageReqVO pageReqVO) {
-        // TODO puhui999：后面要改成，基于数据权限的查询
-        return contactMapper.selectPage(pageReqVO);
+    public PageResult<CrmContactDO> getContactPage(CrmContactPageReqVO pageReqVO, Long userId) {
+        boolean admin = false; // TODO 如果是管理员
+        // TODO puhui999: 看看怎么聚合继承父级数据权限查询
+        return contactMapper.selectPage(pageReqVO, userId, adminUserApi.getSubordinateIds(userId), admin);
     }
 
     @Override

@@ -71,7 +71,7 @@ public class CrmCustomerController {
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('crm:customer:delete')")
     public CommonResult<Boolean> deleteCustomer(@RequestParam("id") Long id) {
-        customerService.deleteCustomer(id);
+        customerService.deleteCustomer(id, getLoginUserId());
         return success(true);
     }
 

@@ -80,12 +80,14 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
-    public void deleteCustomer(Long id) {
+    public void deleteCustomer(Long id, Long userId) {
         // 校验存在
         validateCustomerExists(id);
 
         // 删除
         customerMapper.deleteById(id);
+        // 删除数据权限
+        crmPermissionService.deletePermissionBatch(CrmBizTypeEnum.CRM_CUSTOMER.getType(), id, userId);
     }
 
     private void validateCustomerExists(Long id) {

@@ -37,9 +37,10 @@ public interface CrmCustomerService {
     /**
      * 删除客户
      *
-     * @param id 编号
+     * @param id     编号
+     * @param userId 用户编号
      */
-    void deleteCustomer(Long id);
+    void deleteCustomer(Long id, Long userId);
 
     /**
      * 获得客户

@@ -92,7 +92,7 @@ public class CrmCustomerServiceImplTest extends BaseDbUnitTest {
         Long id = dbCustomer.getId();
 
         // 调用
-        customerService.deleteCustomer(id);
+        customerService.deleteCustomer(id, 1L);
         // 校验数据不存在了
         assertNull(customerMapper.selectById(id));
     }
@@ -103,7 +103,7 @@ public class CrmCustomerServiceImplTest extends BaseDbUnitTest {
         Long id = randomLongId();
 
         // 调用, 并断言异常
-        assertServiceException(() -> customerService.deleteCustomer(id), CUSTOMER_NOT_EXISTS);
+        assertServiceException(() -> customerService.deleteCustomer(id, 1L), CUSTOMER_NOT_EXISTS);
     }
 
     @Test
