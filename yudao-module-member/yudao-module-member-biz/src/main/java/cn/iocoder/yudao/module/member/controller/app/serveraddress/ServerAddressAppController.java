@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.member.controller.admin.serveraddress.vo.*;
 import cn.iocoder.yudao.module.member.controller.app.serveraddress.vo.ServerAddressAppCreateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.serveraddress.vo.ServerAddressAppExportReqVO;
@@ -29,7 +30,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-@Tag(name = "管理后台 - 服务地址")
+@Tag(name = "用户App后台 - 服务地址")
 @RestController
 @RequestMapping("/member/server-address")
 @Validated
@@ -40,14 +41,14 @@ public class ServerAddressAppController {
 
     @PostMapping("/create")
     @Operation(summary = "创建服务地址")
-    @PreAuthorize("@ss.hasPermission('member:server-address:create')")
+    @PreAuthenticated
     public CommonResult<Long> createServerAddress(@Valid @RequestBody ServerAddressAppCreateReqVO createReqVO) {
         return success(serverAddressService.createServerAddress(ServerAddressConvert.INSTANCE.convert(createReqVO)));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新服务地址")
-    @PreAuthorize("@ss.hasPermission('member:server-address:update')")
+    @PreAuthenticated
     public CommonResult<Boolean> updateServerAddress(@Valid @RequestBody ServerAddressAppUpdateReqVO updateReqVO) {
         serverAddressService.updateServerAddress(ServerAddressConvert.INSTANCE.convert(updateReqVO));
         return success(true);
@@ -56,7 +57,7 @@ public class ServerAddressAppController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除服务地址")
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('member:server-address:delete')")
+    @PreAuthenticated
     public CommonResult<Boolean> deleteServerAddress(@RequestParam("id") Long id) {
         serverAddressService.deleteServerAddress(id);
         return success(true);
@@ -65,7 +66,7 @@ public class ServerAddressAppController {
     @GetMapping("/get")
     @Operation(summary = "获得服务地址")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('member:server-address:query')")
+    @PreAuthenticated
     public CommonResult<ServerAddressRespVO> getServerAddress(@RequestParam("id") Long id) {
         ServerAddressDO serverAddress = serverAddressService.getServerAddress(id);
         return success(ServerAddressConvert.INSTANCE.convert(serverAddress));
@@ -74,7 +75,7 @@ public class ServerAddressAppController {
     @GetMapping("/list")
     @Operation(summary = "获得服务地址列表")
     @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
-    @PreAuthorize("@ss.hasPermission('member:server-address:query')")
+    @PreAuthenticated
     public CommonResult<List<ServerAddressRespVO>> getServerAddressList(@RequestParam("ids") Collection<Long> ids) {
         List<ServerAddressDO> list = serverAddressService.getServerAddressList(ids);
         return success(ServerAddressConvert.INSTANCE.convertList(list));
@@ -82,7 +83,7 @@ public class ServerAddressAppController {
 
     @GetMapping("/page")
     @Operation(summary = "获得服务地址分页")
-    @PreAuthorize("@ss.hasPermission('member:server-address:query')")
+    @PreAuthenticated
     public CommonResult<PageResult<ServerAddressRespVO>> getServerAddressPage(@Valid ServerAddressAppPageReqVO pageVO) {
         PageResult<ServerAddressDO> pageResult = serverAddressService.getServerAddressPage(ServerAddressConvert.INSTANCE.convert(pageVO));
         return success(ServerAddressConvert.INSTANCE.convertPage(pageResult));
@@ -90,7 +91,7 @@ public class ServerAddressAppController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出服务地址 Excel")
-    @PreAuthorize("@ss.hasPermission('member:server-address:export')")
+    @PreAuthenticated
     @OperateLog(type = EXPORT)
     public void exportServerAddressExcel(@Valid ServerAddressAppExportReqVO exportReqVO,
               HttpServletResponse response) throws IOException {
@@ -98,6 +99,27 @@ public class ServerAddressAppController {
         // 导出 Excel
         List<ServerAddressExcelVO> datas = ServerAddressConvert.INSTANCE.convertList02(list);
         ExcelUtils.write(response, "服务地址.xls", "数据", ServerAddressExcelVO.class, datas);
+    }
+
+    /**
+     * 2023-12-04新增接口
+     * 当app端勾选了默认地址后，进行地址的变更
+     */
+    @PutMapping("/updateAddressDefaultStatus")
+    @Operation(summary = "更新默认地址")
+    @PreAuthenticated
+    public CommonResult<Boolean> updateAddressDefaultStatus(@Valid @RequestBody ServerAddressUpdateReqVO updateReqVO) {
+        serverAddressService.updateAddressDefaultStatus(updateReqVO);
+        return success(true);
+    }
+
+    @GetMapping("/queryByUserId/list")
+    @Operation(summary = "获得用户服务地址列表")
+    @Parameter(name = "userId", description = "用户编号", required = true)
+    @PreAuthenticated
+    public CommonResult<List<ServerAddressRespVO>> getAddressListByUserId(@RequestParam("userId") Long userId) {
+        List<ServerAddressDO> list = serverAddressService.getAddressListByUserId(userId);
+        return success(ServerAddressConvert.INSTANCE.convertList(list));
     }
 
 }
