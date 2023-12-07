@@ -40,12 +40,11 @@ public class ServerAddressServiceImpl extends ServiceImpl<ServerAddressMapper, S
         // 插入
         ServerAddressDO serverAddress = ServerAddressConvert.INSTANCE.convert(createReqVO);
         //从后台获取用户ID
-        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        assert loginUser != null;
-        serverAddress.setUserId(loginUser.getId());
+        Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
+        serverAddress.setUserId(loginUserId);
         // 如果添加的是默认收件地址，则将原默认地址修改为非默认
         if (Boolean.TRUE.equals(createReqVO.getDefaultStatus())) {
-            List<ServerAddressDO> addresses = serverAddressMapper.selectListByUserIdAndDefaulted(loginUser.getId(), true);
+            List<ServerAddressDO> addresses = serverAddressMapper.selectListByUserIdAndDefaulted(loginUserId, true);
             addresses.forEach(address -> serverAddressMapper.updateById(new ServerAddressDO().setId(address.getId()).setDefaultStatus(false)));
         }
         serverAddressMapper.insert(serverAddress);
@@ -57,11 +56,10 @@ public class ServerAddressServiceImpl extends ServiceImpl<ServerAddressMapper, S
     public void updateServerAddress(ServerAddressUpdateReqVO updateReqVO) {
         // 校验存在
         validateServerAddressExists(updateReqVO.getId());
-        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        assert loginUser != null;
+        Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
         // 如果修改的是默认收件地址，则将原默认地址修改为非默认
         if (Boolean.TRUE.equals(updateReqVO.getDefaultStatus())) {
-            List<ServerAddressDO> addresses = serverAddressMapper.selectListByUserIdAndDefaulted(loginUser.getId(), true);
+            List<ServerAddressDO> addresses = serverAddressMapper.selectListByUserIdAndDefaulted(loginUserId, true);
             addresses.stream().filter(u -> !u.getId().equals(updateReqVO.getId())) // 排除自己
                     .forEach(address -> serverAddressMapper.updateById(new ServerAddressDO().setId(address.getId()).setDefaultStatus(false)));
         }
@@ -117,11 +115,10 @@ public class ServerAddressServiceImpl extends ServiceImpl<ServerAddressMapper, S
     public void updateAddressDefaultStatus(ServerAddressUpdateReqVO updateReqVO) {
         // 校验存在
         validateServerAddressExists(updateReqVO.getId());
-        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        assert loginUser != null;
+        Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
         // 如果修改的是默认收件地址，则将原默认地址修改为非默认
         if (Boolean.TRUE.equals(updateReqVO.getDefaultStatus())) {
-            List<ServerAddressDO> addresses = serverAddressMapper.selectListByUserIdAndDefaulted(loginUser.getId(), true);
+            List<ServerAddressDO> addresses = serverAddressMapper.selectListByUserIdAndDefaulted(loginUserId, true);
             addresses.stream().filter(u -> !u.getId().equals(updateReqVO.getId())) // 排除自己
                     .forEach(address -> serverAddressMapper.updateById(new ServerAddressDO().setId(address.getId()).setDefaultStatus(false)));
         }
