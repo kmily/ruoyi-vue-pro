@@ -161,13 +161,7 @@ public class TradeOrderController {
         return success(true);
     }
 
-    @PutMapping("/assign")
-    @Operation(summary = "订单分派")
-    @PreAuthorize("@ss.hasPermission('trade:order:assign')")
-    public CommonResult<Boolean> assignOrder(@RequestBody TradeOrderAssignReqVO assignReqVO) {
-        tradeOrderUpdateService.assignOrder(assignReqVO);
-        return success(true);
-    }
+
 
     @PutMapping("/update-remark")
     @Operation(summary = "订单备注")
@@ -204,10 +198,8 @@ public class TradeOrderController {
 
     @GetMapping("/unassign")
     @Operation(summary = "查询未分配订单")
+    @PreAuthorize("@ss.hasPermission('trade:order:query')")
     public CommonResult<List<TradeOrderUnAssignRespVO>> getUnAssignOrder(){
-
-
-
         // 查询订单
         List<TradeOrderDO> tradeOrderDOList = tradeOrderQueryService.getUnAssignOrder();
         if (CollUtil.isEmpty(tradeOrderDOList)) {
@@ -224,5 +216,15 @@ public class TradeOrderController {
         // 最终组合
         return success(TradeOrderConvert.INSTANCE.convertList(tradeOrderDOList, orderItems, userMap, personMap));
     }
+
+
+    @PutMapping("/assign")
+    @Operation(summary = "订单分派")
+    @PreAuthorize("@ss.hasPermission('trade:order:assign')")
+    public CommonResult<Boolean> assignOrder(@RequestBody TradeOrderAssignReqVO assignReqVO) {
+        tradeOrderUpdateService.assignOrder(assignReqVO);
+        return success(true);
+    }
+
 
 }

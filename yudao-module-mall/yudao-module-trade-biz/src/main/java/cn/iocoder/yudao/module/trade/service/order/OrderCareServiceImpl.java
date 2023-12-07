@@ -5,12 +5,14 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCarePa
 import cn.iocoder.yudao.module.trade.convert.order.OrderCareConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderAssignTypeEnum;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.OrderCareDO;
@@ -65,5 +67,19 @@ public class OrderCareServiceImpl extends ServiceImpl<OrderCareMapper, OrderCare
     @Override
     public PageResult<OrderCareDO> getOrderPage(AppTradeOrderCarePageReqVO reqVO) {
         return orderCareMapper.getPage(reqVO);
+    }
+
+    @Override
+    public void updateByOrderIdAndStatus(Long orderId, Long careId, Integer beforeStatus, Integer afterStatus) {
+        orderCareMapper.updateByOrderIdAndStatus(orderId, careId, beforeStatus, new OrderCareDO().setStatus(afterStatus));
+    }
+
+    @Override
+    public void refuseOrder(Long orderId, Long careId, String reason) {
+        orderCareMapper.update(new OrderCareDO().setStatus(TradeOrderStatusEnum.REFUSE.getStatus())
+                                    .setRefuse(reason).setRefuseTime(LocalDateTime.now()),
+                new LambdaUpdateWrapper<OrderCareDO>().eq(OrderCareDO::getOrderId, orderId)
+                .eq(OrderCareDO::getCareId,careId));
+
     }
 }

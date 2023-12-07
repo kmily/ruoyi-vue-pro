@@ -8,6 +8,8 @@ import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageRe
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Update;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -114,4 +116,7 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
     }
 
 
+    @Update(" UPDATE `trade_order` SET `care_id` = NULL, `assign_time` = NULL, `assign_id` = NULL, `assign_name` = '', `status` = #{afterStatus} " +
+            " WHERE `id` = #{orderId} AND `status` = #{beforeStatus} ")
+    int refuseOrder(@Param("orderId") Long orderId, @Param("beforeStatus") Integer beforeStatus, @Param("afterStatus") Integer afterStatus);
 }
