@@ -13,7 +13,6 @@ import javax.validation.constraints.NotNull;
 public class ServerAddressAppBaseVO {
 
     @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "14625")
-    @NotNull(message = "用户编号不能为空")
     private Long userId;
 
     @Schema(description = "地区编码", requiredMode = Schema.RequiredMode.REQUIRED, example = "28471")

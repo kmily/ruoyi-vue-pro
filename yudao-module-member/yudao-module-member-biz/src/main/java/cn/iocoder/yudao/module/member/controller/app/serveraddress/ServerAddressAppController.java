@@ -74,10 +74,10 @@ public class ServerAddressAppController {
 
     @GetMapping("/list")
     @Operation(summary = "获得服务地址列表")
-    @Parameter(name = "ids", description = "编号列表", required = true, example = "1024,2048")
+    @Parameter(name = "userId", description = "用户编号", required = true)
     @PreAuthenticated
-    public CommonResult<List<ServerAddressRespVO>> getServerAddressList(@RequestParam("ids") Collection<Long> ids) {
-        List<ServerAddressDO> list = serverAddressService.getServerAddressList(ids);
+    public CommonResult<List<ServerAddressRespVO>> getAddressListByUserId(@RequestParam("userId") Long userId) {
+        List<ServerAddressDO> list = serverAddressService.getAddressListByUserId(userId);
         return success(ServerAddressConvert.INSTANCE.convertList(list));
     }
 
@@ -87,18 +87,6 @@ public class ServerAddressAppController {
     public CommonResult<PageResult<ServerAddressRespVO>> getServerAddressPage(@Valid ServerAddressAppPageReqVO pageVO) {
         PageResult<ServerAddressDO> pageResult = serverAddressService.getServerAddressPage(ServerAddressConvert.INSTANCE.convert(pageVO));
         return success(ServerAddressConvert.INSTANCE.convertPage(pageResult));
-    }
-
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出服务地址 Excel")
-    @PreAuthenticated
-    @OperateLog(type = EXPORT)
-    public void exportServerAddressExcel(@Valid ServerAddressAppExportReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
-        List<ServerAddressDO> list = serverAddressService.getServerAddressList(ServerAddressConvert.INSTANCE.convert(exportReqVO));
-        // 导出 Excel
-        List<ServerAddressExcelVO> datas = ServerAddressConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "服务地址.xls", "数据", ServerAddressExcelVO.class, datas);
     }
 
     /**
@@ -113,13 +101,5 @@ public class ServerAddressAppController {
         return success(true);
     }
 
-    @GetMapping("/queryByUserId/list")
-    @Operation(summary = "获得用户服务地址列表")
-    @Parameter(name = "userId", description = "用户编号", required = true)
-    @PreAuthenticated
-    public CommonResult<List<ServerAddressRespVO>> getAddressListByUserId(@RequestParam("userId") Long userId) {
-        List<ServerAddressDO> list = serverAddressService.getAddressListByUserId(userId);
-        return success(ServerAddressConvert.INSTANCE.convertList(list));
-    }
 
 }

@@ -29,4 +29,7 @@ public interface ErrorCodeConstants {
     ErrorCode APTITUDE_NOT_EXISTS = new ErrorCode(400010, "资质信息不存在");
     ErrorCode APTITUDE_NOT_ENABLE = new ErrorCode(400011, "资质未启用");
     ErrorCode CARE_APTITUDE_NOT_EXISTS = new ErrorCode(500010, "资质信息不存在");
+
+    /** 银行卡 */
+    ErrorCode CARE_BANK_CARD_NOT_EXISTS = new ErrorCode(300010, "提现银行卡不存在");
 }
