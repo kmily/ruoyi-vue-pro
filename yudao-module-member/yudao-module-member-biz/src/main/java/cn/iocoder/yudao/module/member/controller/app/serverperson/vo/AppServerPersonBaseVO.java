@@ -23,8 +23,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class AppServerPersonBaseVO {
 
-    @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1470")
-    @NotNull(message = "用户编号不能为空")
+    @Schema(description = "用户编号", hidden = true,  example = "1470")
     private Long memberId;
 
     @Schema(description = "被服务人姓名", example = "赵六")

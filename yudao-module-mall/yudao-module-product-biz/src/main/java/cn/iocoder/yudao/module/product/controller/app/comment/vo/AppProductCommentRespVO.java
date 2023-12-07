@@ -72,6 +72,9 @@ public class AppProductCommentRespVO {
     @NotNull(message = "商品 SKU 编号不能为空")
     private Long skuId;
 
+    @Schema(description = "商品 SKU 名称", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String skuName;
+
     @Schema(description = "商品 SKU 属性", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<AppProductPropertyValueDetailRespVO> skuProperties;
 

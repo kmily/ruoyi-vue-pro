@@ -5,6 +5,7 @@ import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCarePageReqVO;
 import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppMedicalCarePerfectVO;
 import cn.iocoder.yudao.module.hospital.controller.app.medicalcare.vo.AppRealNameReqVO;
@@ -17,6 +18,7 @@ import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserReqDTO;
 import cn.iocoder.yudao.module.system.api.organization.OrganizationApi;
 import cn.iocoder.yudao.module.system.api.organization.dto.OrganizationDTO;
+import cn.iocoder.yudao.module.system.api.tenant.TenantApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -64,8 +66,8 @@ public class MedicalCareServiceImpl extends ServiceImpl<MedicalCareMapper, Medic
     @Resource
     private PasswordEncoder passwordEncoder;
 
-    @Resource
-    private OrganizationApi organizationApi;
+//    @Resource
+//    private OrganizationApi organizationApi;
 
     @Resource
     private MemberUserApi memberUserApi;
@@ -117,26 +119,24 @@ public class MedicalCareServiceImpl extends ServiceImpl<MedicalCareMapper, Medic
         if(Objects.equals(BACK_ADD.value(), medicalCare.getSource())){
             // 后台管理端添加默认审核通过
             medicalCare.setStatus(MedicalCareStatusEnum.OPEN.value());
-            medicalCare.setOrgId(SecurityFrameworkUtils.getLoginOrgId());
-            OrganizationDTO organization = organizationApi.getOrganization(SecurityFrameworkUtils.getLoginOrgId());
-            medicalCare.setOrganization(organization.getName());
 
+            // 去掉机构概念 统一使用租户概念
+            //medicalCare.setOrgId(SecurityFrameworkUtils.getLoginOrgId());
+            //OrganizationDTO organization = organizationApi.getOrganization(SecurityFrameworkUtils.getLoginOrgId());
         }else{
             // 否则为自册需要审核
             medicalCare.setSource(SELF.value())
                     .setStatus(MedicalCareStatusEnum.APPLYING.value());
-            OrganizationDTO organization = organizationApi.getSelfOrganization();
-            medicalCare.setOrgId(organization.getId());
+//            OrganizationDTO organization = organizationApi.getSelfOrganization();
+//            medicalCare.setOrgId(organization.getId());
         }
         boolean save = this.save(medicalCare);
 
-        if(save){
-
-
-            medicalCareMapper.updateById(new MedicalCareDO().setMemberId(memberId).setId(medicalCare.getId()));
-        }else {
-            throw exception(MEDICAL_CARE_CREATE_FAIL);
-        }
+//        if(save){
+//            medicalCareMapper.updateById(new MedicalCareDO().setMemberId(memberId).setId(medicalCare.getId()));
+//        }else {
+//            throw exception(MEDICAL_CARE_CREATE_FAIL);
+//        }
 
         // 返回
         return medicalCare.getId();
@@ -210,7 +210,7 @@ public class MedicalCareServiceImpl extends ServiceImpl<MedicalCareMapper, Medic
         if(medicalCareDO != null){
             return medicalCareDO.getId();
         }
-        OrganizationDTO organization = organizationApi.getSelfOrganization();
+        //OrganizationDTO organization = organizationApi.getSelfOrganization();
         //medicalCareDO = this.selectOneByMobile(mobile);
 //         if(medicalCareDO != null && Objects.equals(memberId, medicalCareDO.getMemberId())) {
 //             return medicalCareDO.getId();
@@ -223,7 +223,6 @@ public class MedicalCareServiceImpl extends ServiceImpl<MedicalCareMapper, Medic
 //         }else {
              medicalCareDO = new MedicalCareDO().setId(memberId).setMemberId(memberId).setMobile(mobile)
                      .setStatus(MedicalCareStatusEnum.APPLYING.value())
-                     .setOrgId(organization.getId())
                      .setSource(SELF.value());
             this.save(medicalCareDO);
             return medicalCareDO.getId();
@@ -283,7 +282,7 @@ public class MedicalCareServiceImpl extends ServiceImpl<MedicalCareMapper, Medic
             return;
         }
         medicalCareMapper.update(new MedicalCareDO(), new LambdaUpdateWrapper<MedicalCareDO>()
-                .setSql("`comment_score` = `comment_score` + ?, `comment_count` = `comment_count` + 1", commentScore)
+                .setSql("`comment_score` = `comment_score` + " + commentScore + ", `comment_count` = `comment_count` + 1")
                 .eq(MedicalCareDO::getId, id));
     }
 

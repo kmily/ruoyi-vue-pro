@@ -45,6 +45,15 @@ public class AppTradeOrderPageItemRespVO {
     @Schema(description = "配送方式", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer deliveryType;
 
+    @Schema(description = "收件人地区名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "上海 上海市 普陀区")
+    private String receiverAreaName;
+
+    @Schema(description = "地域编号", example = "888")
+    private Integer receiverAreaId;
+
+    @Schema(description = "详细地址", example = "888")
+    private String receiverDetailAddress;
+
     /**
      * 订单项数组
      */

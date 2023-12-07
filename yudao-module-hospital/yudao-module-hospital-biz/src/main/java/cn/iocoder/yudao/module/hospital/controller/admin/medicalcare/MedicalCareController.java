@@ -131,7 +131,7 @@ public class MedicalCareController {
     @Operation(summary = "获得医护管理分页")
     @PreAuthorize("@ss.hasPermission('hospital:medical-care:query')")
     public CommonResult<PageResult<MedicalCareRespVO>> getMedicalCarePage(@Valid MedicalCarePageReqVO pageVO) {
-        pageVO.setOrgId(SecurityFrameworkUtils.getLoginOrgId());
+        //pageVO.setOrgId(SecurityFrameworkUtils.getLoginOrgId());
         PageResult<MedicalCareDO> pageResult = medicalCareService.getMedicalCarePage(pageVO);
 //        List<MedicalCareDO> list = pageResult.getList();
 //        list.forEach(medicalCareDO -> {
@@ -147,7 +147,7 @@ public class MedicalCareController {
     @OperateLog(type = EXPORT)
     public void exportMedicalCareExcel(@Valid MedicalCareExportReqVO exportReqVO,
               HttpServletResponse response) throws IOException {
-        exportReqVO.setOrgId(SecurityFrameworkUtils.getLoginOrgId());
+        //exportReqVO.setOrgId(SecurityFrameworkUtils.getLoginOrgId());
         List<MedicalCareDO> list = medicalCareService.getMedicalCareList(exportReqVO);
         // 导出 Excel
         List<MedicalCareExcelVO> datas = MedicalCareConvert.INSTANCE.convertList02(list);

@@ -24,7 +24,7 @@ public class AppTradeOrderSettlementReqVO {
     @NotEmpty(message = "商品不能为空")
     private List<Item> items;
 
-    @Schema(description = "优惠劵编号", example = "1024")
+    @Schema(description = "优惠劵编号", example = "1024", hidden = true)
     private Long couponId;
 
     @Schema(description = "是否使用积分", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
@@ -32,35 +32,42 @@ public class AppTradeOrderSettlementReqVO {
     private Boolean pointStatus;
 
     // ========== 配送相关相关字段 ==========
-    @Schema(description = "配送方式", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "配送方式", requiredMode = Schema.RequiredMode.REQUIRED, example = "3")
     @InEnum(value = DeliveryTypeEnum.class, message = "配送方式不正确")
     private Integer deliveryType;
 
     @Schema(description = "收件地址编号", example = "1")
     private Long addressId;
 
-    @Schema(description = "自提门店编号", example = "1088")
+    @Schema(description = "自提门店编号", example = "1088", hidden = true)
     private Long pickUpStoreId;
-    @Schema(description = "收件人名称", example = "芋艿") // 选择门店自提时，该字段为联系人名
+    @Schema(description = "收件人名称", example = "芋艿" , hidden = true) // 选择门店自提时，该字段为联系人名
     private String receiverName;
-    @Schema(description = "收件人手机", example = "15601691300") // 选择门店自提时，该字段为联系人手机
+    @Schema(description = "收件人手机", example = "15601691300" , hidden = true) // 选择门店自提时，该字段为联系人手机
     @Mobile(message = "收件人手机格式不正确")
     private String receiverMobile;
 
     // ========== 秒杀活动相关字段 ==========
-    @Schema(description = "秒杀活动编号", example = "1024")
+    @Schema(description = "秒杀活动编号", example = "1024" , hidden = true)
     private Long seckillActivityId;
 
     // ========== 拼团活动相关字段 ==========
-    @Schema(description = "拼团活动编号", example = "1024")
+    @Schema(description = "拼团活动编号", example = "1024", hidden = true)
     private Long combinationActivityId;
 
-    @Schema(description = "拼团团长编号", example = "2048")
+    @Schema(description = "拼团团长编号", example = "2048", hidden = true)
     private Long combinationHeadId;
 
     // ========== 砍价活动相关字段 ==========
-    @Schema(description = "砍价记录编号", example = "123")
+    @Schema(description = "砍价记录编号", example = "123", hidden = true)
     private Long bargainRecordId;
+
+    @Schema(description = "医护人员编号",  example = "888")
+    private Long careId;
+
+    @Schema(description = "医护人员姓名",  example = "王一云", hidden = true)
+    private String careName;
+
 
     @AssertTrue(message = "活动商品每次只能购买一种规格")
     @JsonIgnore

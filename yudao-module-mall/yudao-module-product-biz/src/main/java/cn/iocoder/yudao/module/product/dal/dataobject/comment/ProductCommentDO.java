@@ -12,6 +12,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 商品评论 DO
@@ -102,6 +103,14 @@ public class ProductCommentDO extends BaseDO {
      */
     @TableField(typeHandler = ProductSkuDO.PropertyTypeHandler.class)
     private List<ProductSkuDO.Property> skuProperties;
+
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Map<String, Object> additional;
+
+    /**
+     * SKU 名称
+     */
+    private String skuName;
 
     /**
      * 是否可见

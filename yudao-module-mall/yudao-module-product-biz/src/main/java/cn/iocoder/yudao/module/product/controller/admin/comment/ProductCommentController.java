@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.product.controller.admin.comment;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.controller.admin.comment.vo.*;
 import cn.iocoder.yudao.module.product.convert.comment.ProductCommentConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
@@ -14,6 +16,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;

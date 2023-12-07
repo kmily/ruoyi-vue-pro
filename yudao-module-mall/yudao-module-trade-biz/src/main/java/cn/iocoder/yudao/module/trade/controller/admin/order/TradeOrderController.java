@@ -75,15 +75,13 @@ public class TradeOrderController {
             return success(PageResult.empty());
         }
 
-        Map<Long, MedicalCareRepsDTO> careMap = medicalCareApi.getMedicalCareMap(convertSet(pageResult.getList(), TradeOrderDO::getCareId));
-
         // 查询用户信息
         Map<Long, MemberUserRespDTO> userMap = memberUserApi.getUserMap(convertSet(pageResult.getList(), TradeOrderDO::getUserId));;
         // 查询订单项
         List<TradeOrderItemDO> orderItems = tradeOrderQueryService.getOrderItemListByOrderId(
                 convertSet(pageResult.getList(), TradeOrderDO::getId));
         // 最终组合
-        return success(TradeOrderConvert.INSTANCE.convertPage(pageResult, orderItems, userMap, careMap));
+        return success(TradeOrderConvert.INSTANCE.convertPage(pageResult, orderItems, userMap));
     }
 
 
@@ -96,8 +94,6 @@ public class TradeOrderController {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(PageResult.empty());
         }
-
-
 
         List<TradeOrderDO> orderList = tradeOrderQueryService.getOrderList(convertSet(pageResult.getList(), OrderCareDO::getOrderId));
 
@@ -118,7 +114,7 @@ public class TradeOrderController {
 
 
         // 最终组合
-        return success(TradeOrderConvert.INSTANCE.convertPage(new PageResult<TradeOrderDO>().setTotal(pageResult.getTotal()).setList(orderList), orderItems, userMap, new HashMap<>()));
+        return success(TradeOrderConvert.INSTANCE.convertPage(new PageResult<TradeOrderDO>().setTotal(pageResult.getTotal()).setList(orderList), orderItems, userMap));
     }
 
 

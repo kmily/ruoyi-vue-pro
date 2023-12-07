@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.controller.admin.tenant;
 
+import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -20,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
@@ -39,6 +41,19 @@ public class TenantController {
     public CommonResult<Long> getTenantIdByName(@RequestParam("name") String name) {
         TenantDO tenantDO = tenantService.getTenantByName(name);
         return success(tenantDO != null ? tenantDO.getId() : null);
+    }
+
+    @GetMapping("/get-id-by-domain")
+    @PermitAll
+    @Operation(summary = "根据域名，获得租户编号", description = "登录界面，根据域名的租户名，获得租户编号")
+    @Parameter(name = "domain", description = "域名", required = true, example = "1024")
+    public CommonResult<TenantRespVO> getTenantIdByDomain(@RequestParam("domain") String domain) {
+        TenantDO tenantDO = tenantService.getTenantByDomain(domain);
+        Assert.notNull(tenantDO, "域名[{}]不存在", domain);
+        TenantRespVO tenantRespVO = new TenantRespVO();
+        tenantRespVO.setId(tenantDO.getId())
+                .setName(tenantDO.getName());
+        return success(tenantRespVO);
     }
 
     @PostMapping("/create")

@@ -1,8 +1,11 @@
 package cn.iocoder.yudao.module.product.api.comment.dto;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 评论创建请求 DTO
@@ -71,5 +74,19 @@ public class ProductCommentCreateReqDTO {
      */
     private Long userId;
 
+    /**
+     * 附加信息
+     */
+    private Map<String, Object> additional;
 
+
+    public void put(String key, Object value){
+        if(StrUtil.isBlank(key)){
+            return;
+        }
+        if(additional == null){
+            additional = new HashMap<>();
+        }
+        additional.put(key, value);
+    }
 }

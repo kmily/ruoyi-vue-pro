@@ -95,6 +95,11 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
+    public TenantDO getTenantByDomain(String domain) {
+        return tenantMapper.selectByDomain(domain);
+    }
+
+    @Override
     @DSTransactional // 多数据源，使用 @DSTransactional 保证本地事务，以及数据源的切换
     public Long createTenant(TenantCreateReqVO createReqVO) {
         // 校验租户名称是否重复

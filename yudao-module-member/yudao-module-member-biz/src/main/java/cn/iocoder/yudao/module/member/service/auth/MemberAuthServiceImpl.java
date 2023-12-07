@@ -98,7 +98,8 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         }
 
         // 创建 Token 令牌，记录登录日志
-        return createTokenAfterLoginSuccess(user, reqVO.getMobile(), LoginLogTypeEnum.LOGIN_SMS, openid, null);
+        return createTokenAfterLoginSuccess(user, reqVO.getMobile(), LoginLogTypeEnum.LOGIN_SMS, openid, null)
+                .setFirst(Objects.isNull(user.getLoginDate()));
     }
 
     @Override

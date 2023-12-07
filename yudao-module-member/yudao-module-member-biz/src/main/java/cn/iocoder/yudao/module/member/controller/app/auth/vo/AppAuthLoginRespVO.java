@@ -42,4 +42,7 @@ public class AppAuthLoginRespVO {
     @Schema(deprecated = true)
     @JsonIgnore
     private String mobile;
+
+    @Schema(description = "是否第一次登录")
+    private Boolean first;
 }

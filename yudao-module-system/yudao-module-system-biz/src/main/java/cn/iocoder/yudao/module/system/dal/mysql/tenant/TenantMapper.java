@@ -50,4 +50,7 @@ public interface TenantMapper extends BaseMapperX<TenantDO> {
         return selectList(TenantDO::getPackageId, packageId);
     }
 
+    default TenantDO selectByDomain(String domain){
+        return selectOne(TenantDO::getDomain, domain);
+    }
 }

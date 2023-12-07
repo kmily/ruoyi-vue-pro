@@ -4,10 +4,13 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 租户 DO
@@ -79,4 +82,14 @@ public class TenantDO extends BaseDO {
      */
     private Integer accountCount;
 
+    /**
+     * 宣传图册
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> images;
+
+    /**
+     * 机构logo
+     */
+    private String logo;
 }

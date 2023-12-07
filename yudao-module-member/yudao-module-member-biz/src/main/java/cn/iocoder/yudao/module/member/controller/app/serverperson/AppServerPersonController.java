@@ -46,6 +46,7 @@ public class AppServerPersonController {
     @Operation(summary = "创建被服务人")
     @PreAuthenticated
     public CommonResult<Long> createServerPerson(@Valid @RequestBody AppServerPersonCreateReqVO createReqVO) {
+        createReqVO.setMemberId(SecurityFrameworkUtils.getLoginUserId());
         return success(serverPersonService.createServerPerson(createReqVO));
     }
 

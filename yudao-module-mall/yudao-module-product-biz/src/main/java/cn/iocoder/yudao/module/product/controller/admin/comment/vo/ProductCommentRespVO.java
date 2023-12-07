@@ -9,6 +9,7 @@ import lombok.ToString;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Schema(description = "管理后台 - 商品评价 Response VO")
 @Data
@@ -54,10 +55,16 @@ public class ProductCommentRespVO extends ProductCommentBaseVO {
     @NotNull(message = "商品 SPU 名称不能为空")
     private String spuName;
 
+    @Schema(description = "商品 SKU 名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "赵六")
+    private String skuName;
+
     @Schema(description = "商品 SKU 图片地址", example = "https://www.iocoder.cn/yudao.jpg")
     private String skuPicUrl;
 
     @Schema(description = "商品 SKU 规格值数组")
     private List<ProductSkuBaseVO.Property> skuProperties;
+
+    @Schema(description = "附加信息")
+    private Map<String, Object> additional;
 
 }

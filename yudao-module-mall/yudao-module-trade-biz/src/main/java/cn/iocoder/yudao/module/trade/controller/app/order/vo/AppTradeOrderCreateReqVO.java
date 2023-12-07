@@ -18,9 +18,6 @@ public class AppTradeOrderCreateReqVO extends AppTradeOrderSettlementReqVO {
     @Schema(description = "备注", example = "这个是我的订单哟")
     private String remark;
 
-    @Schema(description = "医护人员编号",  example = "888")
-    private Long careId;
-
     @Schema(description = "服务日期", requiredMode = Schema.RequiredMode.REQUIRED, example = "2023-01-01")
     @NotNull(message = "服务日期不能为空")
     private String serviceDate;

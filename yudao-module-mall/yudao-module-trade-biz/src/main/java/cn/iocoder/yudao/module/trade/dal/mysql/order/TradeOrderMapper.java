@@ -116,7 +116,7 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
     }
 
 
-    @Update(" UPDATE `trade_order` SET `care_id` = NULL, `assign_time` = NULL, `assign_id` = NULL, `assign_name` = '', `status` = #{afterStatus} " +
+    @Update(" UPDATE `trade_order` SET `care_id` = NULL, `care_name`= '', `assign_time` = NULL, `assign_id` = NULL, `assign_name` = '', `status` = #{afterStatus} " +
             " WHERE `id` = #{orderId} AND `status` = #{beforeStatus} ")
     int refuseOrder(@Param("orderId") Long orderId, @Param("beforeStatus") Integer beforeStatus, @Param("afterStatus") Integer afterStatus);
 }

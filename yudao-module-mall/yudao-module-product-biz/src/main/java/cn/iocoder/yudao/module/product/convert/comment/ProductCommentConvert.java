@@ -91,6 +91,8 @@ public interface ProductCommentConvert {
         return divide.intValue();
     }
 
+    @Mapping(target = "scores",
+            expression = "java(convertScores01(createReqDTO.getAttitudeScores(), createReqDTO.getSpeedScores(), createReqDTO.getSpecialityScores()))")
     ProductCommentDO convert(ProductCommentCreateReqDTO createReqDTO);
 
     @Mapping(target = "scores",
@@ -109,6 +111,7 @@ public interface ProductCommentConvert {
         if (skuDO != null) {
             commentDO.setSkuPicUrl(skuDO.getPicUrl());
             commentDO.setSkuProperties(skuDO.getProperties());
+            commentDO.setSkuName(skuDO.getSkuName());
         }
         return commentDO;
     }
@@ -131,7 +134,8 @@ public interface ProductCommentConvert {
             commentDO.setSpuId(spu.getId()).setSpuName(spu.getName());
         }
         if (sku != null) {
-            commentDO.setSkuPicUrl(sku.getPicUrl()).setSkuProperties(sku.getProperties());
+            commentDO.setSkuPicUrl(sku.getPicUrl()).setSkuProperties(sku.getProperties())
+                    .setSkuName(sku.getSkuName());
         }
         return commentDO;
     }

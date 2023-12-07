@@ -118,8 +118,8 @@ public interface TradeOrderConvert {
 
     default PageResult<TradeOrderPageItemRespVO> convertPage(PageResult<TradeOrderDO> pageResult,
                                                              List<TradeOrderItemDO> orderItems,
-                                                             Map<Long, MemberUserRespDTO> memberUserMap,
-                                                             Map<Long, MedicalCareRepsDTO> careMap) {
+                                                             Map<Long, MemberUserRespDTO> memberUserMap
+                                                             ) {
         Map<Long, List<TradeOrderItemDO>> orderItemMap = convertMultiMap(orderItems, TradeOrderItemDO::getOrderId);
         // 转化 List
         List<TradeOrderPageItemRespVO> orderVOs = CollectionUtils.convertList(pageResult.getList(), order -> {
@@ -129,7 +129,6 @@ public interface TradeOrderConvert {
             orderVO.setReceiverAreaName(AreaUtils.format(order.getReceiverAreaId()));
             // 增加用户昵称
             orderVO.setUser(memberUserMap.get(orderVO.getUserId()));
-            orderVO.setCare(careMap.getOrDefault(order.getCareId(), new MedicalCareRepsDTO()).getName());
             return orderVO;
         });
         return new PageResult<>(orderVOs, pageResult.getTotal());
@@ -182,7 +181,7 @@ public interface TradeOrderConvert {
         // 转化 List
         List<AppTradeOrderPageItemRespVO> orderVOs = CollectionUtils.convertList(pageResult.getList(), order -> {
             List<TradeOrderItemDO> xOrderItems = orderItemMap.get(order.getId());
-            return convert02(order, xOrderItems);
+            return convert02(order, xOrderItems).setReceiverAreaName(AreaUtils.format(order.getReceiverAreaId()));
         });
         return new PageResult<>(orderVOs, pageResult.getTotal());
     }
@@ -313,6 +312,7 @@ public interface TradeOrderConvert {
         return CollectionUtils.convertList(tradeOrderDOList, order -> {
             List<TradeOrderItemDO> xOrderItems = orderItemMap.get(order.getId());
             TradeOrderUnAssignRespVO orderVO = convert10(order);
+            orderVO.setReceiverAreaName(AreaUtils.format(order.getReceiverAreaId()));
             TradeOrderItemDO itemDO = xOrderItems.get(0);
             orderVO.setSpuName(itemDO.getSpuName())
                     .setSkuName(itemDO.getSkuName())

@@ -339,6 +339,11 @@ public class TradeOrderDO extends BaseDO {
     private Long careId;
 
     /**
+     * 医护姓名
+     */
+    private String careName;
+
+    /**
      * 服务日期
      */
     private String serviceDate;

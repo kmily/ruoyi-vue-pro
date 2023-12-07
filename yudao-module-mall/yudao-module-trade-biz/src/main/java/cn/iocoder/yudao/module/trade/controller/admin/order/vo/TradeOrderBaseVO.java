@@ -152,6 +152,9 @@ public class TradeOrderBaseVO {
     @Schema(description = "医护人员编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "888")
     private Long careId;
 
+    @Schema(description = "医护人员姓名",  example = "王一云")
+    private String careName;
+
     @Schema(description = "服务日期", requiredMode = Schema.RequiredMode.REQUIRED)
     private String serviceDate;
 

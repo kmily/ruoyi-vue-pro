@@ -6,6 +6,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -18,6 +19,8 @@ import cn.iocoder.yudao.module.hospital.api.medicalcare.MedicalCareApi;
 import cn.iocoder.yudao.module.hospital.api.medicalcare.dto.MedicalCareRepsDTO;
 import cn.iocoder.yudao.module.member.api.address.AddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.AddressRespDTO;
+import cn.iocoder.yudao.module.member.api.serveraddress.ServerAddressApi;
+import cn.iocoder.yudao.module.member.api.serveraddress.dto.ServerAddressApiDTO;
 import cn.iocoder.yudao.module.member.api.serverperson.ServerPersonApi;
 import cn.iocoder.yudao.module.member.api.serverperson.dto.ServerPersonRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
@@ -55,14 +58,17 @@ import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculatorHelper;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -121,6 +127,10 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Resource
     @Lazy
     private ServerPersonApi serverPersonApi;
+
+    @Resource
+    @Lazy
+    private ServerAddressApi serverAddressApi;
 
     @Resource
     private TradeOrderProperties tradeOrderProperties;
@@ -193,7 +203,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                 throw exception(CARE_ID_IS_NULL);
             }
             assignTime = LocalDateTime.now();
-            validateMedicalCare(createReqVO.getCareId());
+            MedicalCareRepsDTO medicalCare = validateMedicalCare(createReqVO.getCareId());
+            createReqVO.setCareName(medicalCare.getName());
         }
 
         ServerPersonRespDTO serverPerson = serverPersonApi.validateServerPerson(createReqVO.getServicePersonId(), userId);
@@ -221,7 +232,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         afterCreateTradeOrder(order, orderItems, createReqVO);
 
 
-        if(!CommonStatusEnum.APPLYING.name().equals(serverPerson.getStatus())){
+        if(!CommonStatusEnum.OPEN.name().equals(serverPerson.getStatus())){
             // 如果关联的被护人为待审核 则保存订单编号，等审核通过后统一更新
             redisTemplate.opsForValue().set(String.format(SERVER_PERSON_ORDER, serverPerson.getId()), order.getId(), 1L, TimeUnit.DAYS);
         }
@@ -230,9 +241,11 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
 
 
-    private void validateMedicalCare(Long careId) {
+    private MedicalCareRepsDTO validateMedicalCare(Long careId) {
         MedicalCareRepsDTO medicalCare = medicalCareApi.validateMedicalCare(careId);
         // TODO  接下来校验当前医护是否有可以处理当前订单
+
+        return medicalCare;
     }
 
     private TradeOrderDO buildTradeOrder(Long userId, String clientIp, AppTradeOrderCreateReqVO createReqVO,
@@ -257,6 +270,10 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         } else if (Objects.equals(createReqVO.getDeliveryType(), DeliveryTypeEnum.PICK_UP.getType())) {
             order.setReceiverName(createReqVO.getReceiverName()).setReceiverMobile(createReqVO.getReceiverMobile());
             order.setPickUpVerifyCode(RandomUtil.randomNumbers(8)); // 随机一个核销码，长度为 8 位
+        }else if(Objects.equals(createReqVO.getDeliveryType(), DeliveryTypeEnum.OTHER.getType())){
+            ServerAddressApiDTO address = serverAddressApi.getServerAddressApiDTO(createReqVO.getAddressId(), userId);
+            Assert.notNull(address, "地址({}) 不能为空", createReqVO.getAddressId());
+            order.setReceiverAreaId(address.getAreaId().intValue()).setReceiverDetailAddress(address.getDetailAddress());
         }
         return order;
     }
@@ -849,7 +866,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         }
 
         // 2. 创建评价
-        Long commentId = createOrderItemComment0(orderItem, createReqVO);
+        Long commentId = createOrderItemComment0(orderItem, createReqVO, order);
 
         // 3. 如果订单项都评论了，则更新订单评价状态
         List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(order.getId());
@@ -912,10 +929,10 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             throw exception(ORDER_NOT_FOUND);
         }
         Long careId = assignReqVO.getCareId();
-        medicalCareApi.validateMedicalCare(careId);
+        MedicalCareRepsDTO medicalCare = this.validateMedicalCare(careId);
         int updateCount = tradeOrderMapper.updateByIdAndStatus(assignReqVO.getId(), order.getStatus(),
                 new TradeOrderDO().setStatus(TradeOrderStatusEnum.UNRECEIVE.getStatus())
-                        .setCareId(careId).setAssignId(SecurityFrameworkUtils.getLoginUserId())
+                        .setCareId(careId).setCareName(medicalCare.getName()).setAssignId(SecurityFrameworkUtils.getLoginUserId())
                         .setAssignTime(LocalDateTime.now()));
         if(updateCount > 0){
             orderCareService.save(new OrderCareDO()
@@ -931,14 +948,20 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
     @Override
     public void updateOrderPerson(Long personId) {
-        Object orderId = redisTemplate.opsForValue().getAndDelete(String.format(SERVER_PERSON_ORDER, personId));
+        String key = String.format(SERVER_PERSON_ORDER, personId);
+        Object orderId = redisTemplate.opsForValue().get(key);
         if(Objects.nonNull(orderId)){
-            long id = Long.parseLong(orderId.toString());
-            TradeOrderDO orderDO = tradeOrderMapper.selectById(id);
-            if(orderDO != null){
-                ServerPersonRespDTO serverPerson = serverPersonApi.getServerPerson(personId);
-                tradeOrderMapper.updateById(new TradeOrderDO().setServicePerson(JSON.toJSONString(serverPerson))
-                        .setId(id));
+            try {
+                redisTemplate.opsForValue().set(key, 0, Duration.ofSeconds(1));
+                long id = Long.parseLong(orderId.toString());
+                TradeOrderDO orderDO = tradeOrderMapper.selectById(id);
+                if(orderDO != null){
+                    ServerPersonRespDTO serverPerson = serverPersonApi.getServerPerson(personId);
+                    tradeOrderMapper.updateById(new TradeOrderDO().setServicePerson(JSON.toJSONString(serverPerson))
+                            .setId(id));
+                }
+            } catch (Exception e) {
+               log.error("ORDER - 订单[{}]更新被护人[{}]信息出现异常", orderId, personId, e);
             }
         }
     }
@@ -1004,7 +1027,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                     .setOrderItemId(orderItem.getId()).setAnonymous(false).setContent("")
                     .setBenefitScores(5).setDescriptionScores(5)
                     .setAttitudeScores(5).setSpeedScores(5).setSpecialityScores(5);
-            createOrderItemComment0(orderItem, commentCreateReqVO);
+            createOrderItemComment0(orderItem, commentCreateReqVO, order);
 
             // 2.2 更新订单项评价状态
             tradeOrderItemMapper.updateById(new TradeOrderItemDO().setId(orderItem.getId()).setCommentStatus(Boolean.TRUE));
@@ -1027,9 +1050,20 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
      * @param createReqVO 评论内容
      * @return 评论编号
      */
-    private Long createOrderItemComment0(TradeOrderItemDO orderItem, AppTradeOrderItemCommentCreateReqVO createReqVO) {
+    private Long createOrderItemComment0(TradeOrderItemDO orderItem, AppTradeOrderItemCommentCreateReqVO createReqVO, TradeOrderDO orderDO) {
+
         // 1. 创建评价
         ProductCommentCreateReqDTO productCommentCreateReqDTO = TradeOrderConvert.INSTANCE.convert04(createReqVO, orderItem);
+
+        productCommentCreateReqDTO.put("careId", orderDO.getCareId());
+        productCommentCreateReqDTO.put("careName", orderDO.getCareName());
+        String servicePerson = orderDO.getServicePerson();
+        if(StrUtil.isNotBlank(servicePerson)){
+            JSONObject person = JSON.parseObject(servicePerson);
+            productCommentCreateReqDTO.put("person", person.getString("name"));
+            productCommentCreateReqDTO.put("personId", person.getLong("id"));
+        }
+
         Long commentId = productCommentApi.createComment(productCommentCreateReqDTO);
 
         // 2. 更新订单项评价状态

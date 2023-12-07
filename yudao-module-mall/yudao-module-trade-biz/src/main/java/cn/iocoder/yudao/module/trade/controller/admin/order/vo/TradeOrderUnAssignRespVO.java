@@ -72,4 +72,14 @@ public class TradeOrderUnAssignRespVO {
     private MemberUserRespDTO user;
 
     private ServerPersonRespDTO serverPerson;
+
+
+    @Schema(description = "地域编号", example = "888")
+    private Integer receiverAreaId;
+
+    @Schema(description = "详细地址", example = "888")
+    private String receiverDetailAddress;
+
+    @Schema(description = "收件人地区名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "上海 上海市 普陀区")
+    private String receiverAreaName;
 }

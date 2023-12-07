@@ -59,7 +59,7 @@ public class RoleServiceImpl implements RoleService {
         role.setType(ObjectUtil.defaultIfNull(type, RoleTypeEnum.CUSTOM.getType()));
         role.setStatus(CommonStatusEnum.ENABLE.getStatus());
         role.setDataScope(DataScopeEnum.ALL.getScope()); // 默认可查看所有数据。原因是，可能一些项目不需要项目权限
-        role.setOrgId(SecurityFrameworkUtils.getLoginOrgId());
+        //role.setOrgId(SecurityFrameworkUtils.getLoginOrgId());
         roleMapper.insert(role);
         // 返回
         return role.getId();

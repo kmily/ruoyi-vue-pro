@@ -29,7 +29,7 @@ public interface ServerPersonCheckLogConvert {
     ServerPersonCheckLogDO convert(ServerPersonAuditVO auditVO);
 
    default ServerPersonCheckLogDO convert(ServerPersonAuditVO auditVO, Long personId, String checkName){
-       return convert(auditVO).setCheckName(checkName).setPersonId(personId);
+       return convert(auditVO).setId(null).setCheckName(checkName).setPersonId(personId);
    }
 
 }

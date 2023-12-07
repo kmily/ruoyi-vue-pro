@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 租户 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -43,4 +46,10 @@ public class TenantBaseVO {
     @NotNull(message = "账号数量不能为空")
     private Integer accountCount;
 
+
+    @Schema(description = "宣传图册", requiredMode = Schema.RequiredMode.REQUIRED)
+    private List<String> images;
+
+    @Schema(description = "租户logo", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String logo;
 }

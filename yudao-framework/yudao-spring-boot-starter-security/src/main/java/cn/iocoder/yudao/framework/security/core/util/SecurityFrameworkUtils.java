@@ -85,10 +85,10 @@ public class SecurityFrameworkUtils {
      * 获取当前登录用户机构编号
      * @return
      */
-    public static Long getLoginOrgId(){
-        LoginUser loginUser = getLoginUser();
-        return loginUser == null? null: loginUser.getOrgId();
-    }
+//    public static Long getLoginOrgId(){
+//        LoginUser loginUser = getLoginUser();
+//        return loginUser == null? null: loginUser.getOrgId();
+//    }
 
     /**
      * 设置当前用户

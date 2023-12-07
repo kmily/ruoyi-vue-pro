@@ -128,4 +128,11 @@ public interface TenantService {
      * @param id 租户编号
      */
     void validTenant(Long id);
+
+    /**
+     * 根据域名查询租户
+     * @param domain 域名
+     * @return
+     */
+    TenantDO getTenantByDomain(String domain);
 }

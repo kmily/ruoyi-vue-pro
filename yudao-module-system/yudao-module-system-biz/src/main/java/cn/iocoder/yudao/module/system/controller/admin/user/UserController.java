@@ -92,7 +92,7 @@ public class UserController {
     @PreAuthorize("@ss.hasPermission('system:user:list')")
     public CommonResult<PageResult<UserPageItemRespVO>> getUserPage(@Valid UserPageReqVO reqVO) {
         // 获得用户分页列表
-        reqVO.setOrgId(SecurityFrameworkUtils.getLoginOrgId());
+        //reqVO.setOrgId(SecurityFrameworkUtils.getLoginOrgId());
         PageResult<AdminUserDO> pageResult = userService.getUserPage(reqVO);
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(new PageResult<>(pageResult.getTotal())); // 返回空
