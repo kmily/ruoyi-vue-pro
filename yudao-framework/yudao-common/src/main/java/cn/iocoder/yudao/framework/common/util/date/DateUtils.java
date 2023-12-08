@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.common.util.date;
 import cn.hutool.core.date.LocalDateTimeUtil;
 
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -24,6 +25,8 @@ public class DateUtils {
     public static final long SECOND_MILLIS = 1000;
 
     public static final String FORMAT_YEAR_MONTH_DAY = "yyyy-MM-dd";
+
+    public static final String FORMAT_YEAR_MONTH_DAY_FILE = "yyyyMMdd";
 
     public static final String FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND = "yyyy-MM-dd HH:mm:ss";
 
@@ -175,6 +178,17 @@ public class DateUtils {
      */
     public static boolean isToday(LocalDateTime date) {
         return LocalDateTimeUtil.isSameDay(date, LocalDateTime.now());
+    }
+
+    /**
+     * 获取当天时间
+     *
+     * @return date 当天时间
+     */
+    public static String getToday() {
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(FORMAT_YEAR_MONTH_DAY_FILE);
+        return currentDate.format(formatter);
     }
 
 }

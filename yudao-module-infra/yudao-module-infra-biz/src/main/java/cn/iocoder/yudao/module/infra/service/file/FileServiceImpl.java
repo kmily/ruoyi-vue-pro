@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.getToday;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_NOT_EXISTS;
 
 /**
@@ -48,6 +49,8 @@ public class FileServiceImpl implements FileService {
         if (StrUtil.isEmpty(name)) {
             name = path;
         }
+        // 文件上传到当天的目录下
+        path = getToday() + '/' + path;
 
         // 上传到文件存储器
         FileClient client = fileConfigService.getMasterFileClient();
