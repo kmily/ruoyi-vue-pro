@@ -23,9 +23,10 @@ public interface ErrorCodeConstants {
 
     // ========== 联系人管理 1-020-003-000 ==========
     ErrorCode CONTACT_NOT_EXISTS = new ErrorCode(1_020_003_000, "联系人不存在");
+    ErrorCode CONTACT_BUSINESS_LINK_NOT_EXISTS = new ErrorCode( 1_020_003_001, "联系人商机关联不存在");
 
-    // ========== 回款管理 1-020-004-000 ==========
-    ErrorCode RECEIVABLE_NOT_EXISTS = new ErrorCode(1_020_004_000, "回款管理不存在");
+    // ========== 回款 1-020-004-000 ==========
+    ErrorCode RECEIVABLE_NOT_EXISTS = new ErrorCode(1_020_004_000, "回款不存在");
 
     // ========== 合同管理 1-020-005-000 ==========
     ErrorCode RECEIVABLE_PLAN_NOT_EXISTS = new ErrorCode(1_020_005_000, "回款计划不存在");
@@ -55,6 +56,11 @@ public interface ErrorCodeConstants {
 
     // ========== 产品分类 1_020_009_000 ==========
     ErrorCode PRODUCT_CATEGORY_NOT_EXISTS = new ErrorCode(1_020_009_000, "产品分类不存在");
+    ErrorCode PRODUCT_CATEGORY_EXISTS = new ErrorCode(1_020_009_001, "产品分类已存在");
+    ErrorCode PRODUCT_CATEGORY_USED = new ErrorCode(1_020_009_002, "产品分类已关联产品");
+    ErrorCode PRODUCT_CATEGORY_PARENT_NOT_EXISTS = new ErrorCode(1_020_009_003, "父分类不存在");
+    ErrorCode PRODUCT_CATEGORY_PARENT_NOT_FIRST_LEVEL = new ErrorCode(1_020_009_004, "父分类不能是二级分类");
+    ErrorCode product_CATEGORY_EXISTS_CHILDREN = new ErrorCode(1_020_009_005, "存在子分类，无法删除");
 
     // ========== 商机状态类型 1_020_010_000 ==========
     ErrorCode BUSINESS_STATUS_TYPE_NOT_EXISTS = new ErrorCode(1_020_010_000, "商机状态类型不存在");
@@ -63,7 +69,7 @@ public interface ErrorCodeConstants {
     // ========== 商机状态 1_020_011_000 ==========
     ErrorCode BUSINESS_STATUS_NOT_EXISTS = new ErrorCode(1_020_011_000, "商机状态不存在");
 
-    // ========== 客户公海规则设置 1_020_011_000 ==========
+    // ========== 客户公海规则设置 1_020_012_000 ==========
     ErrorCode CUSTOMER_LIMIT_CONFIG_NOT_EXISTS = new ErrorCode(1_020_012_000, "客户限制配置不存在");
 
 }

@@ -9,9 +9,8 @@ import cn.iocoder.yudao.framework.file.core.client.FileClient;
 import cn.iocoder.yudao.framework.file.core.client.FileClientConfig;
 import cn.iocoder.yudao.framework.file.core.client.FileClientFactory;
 import cn.iocoder.yudao.framework.file.core.enums.FileStorageEnum;
-import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigCreateReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigPageReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigUpdateReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigSaveReqVO;
 import cn.iocoder.yudao.module.infra.convert.file.FileConfigConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileConfigDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.file.FileConfigMapper;
@@ -23,8 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
-import javax.validation.Validator;
+import jakarta.annotation.Resource;
+import jakarta.validation.Validator;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
@@ -63,7 +62,7 @@ public class FileConfigServiceImpl implements FileConfigService {
                     return fileClientFactory.getFileClient(null == config ? id : config.getId());
                 }
 
-             });
+            });
 
     @Resource
     private FileClientFactory fileClientFactory;
@@ -75,7 +74,7 @@ public class FileConfigServiceImpl implements FileConfigService {
     private Validator validator;
 
     @Override
-    public Long createFileConfig(FileConfigCreateReqVO createReqVO) {
+    public Long createFileConfig(FileConfigSaveReqVO createReqVO) {
         FileConfigDO fileConfig = FileConfigConvert.INSTANCE.convert(createReqVO)
                 .setConfig(parseClientConfig(createReqVO.getStorage(), createReqVO.getConfig()))
                 .setMaster(false); // 默认非 master
@@ -84,7 +83,7 @@ public class FileConfigServiceImpl implements FileConfigService {
     }
 
     @Override
-    public void updateFileConfig(FileConfigUpdateReqVO updateReqVO) {
+    public void updateFileConfig(FileConfigSaveReqVO updateReqVO) {
         // 校验存在
         FileConfigDO config = validateFileConfigExists(updateReqVO.getId());
         // 更新
@@ -126,7 +125,7 @@ public class FileConfigServiceImpl implements FileConfigService {
         // 校验存在
         FileConfigDO config = validateFileConfigExists(id);
         if (Boolean.TRUE.equals(config.getMaster())) {
-             throw exception(FILE_CONFIG_DELETE_FAIL_MASTER);
+            throw exception(FILE_CONFIG_DELETE_FAIL_MASTER);
         }
         // 删除
         fileConfigMapper.deleteById(id);

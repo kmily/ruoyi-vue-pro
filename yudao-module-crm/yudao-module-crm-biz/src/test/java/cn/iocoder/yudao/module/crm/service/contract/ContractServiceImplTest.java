@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -27,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author dhb52
  */
-@Disabled // TODO 芋艿：后续 fix 补充的单测
 @Import(CrmContractServiceImpl.class)
 public class ContractServiceImplTest extends BaseDbUnitTest {
 
@@ -118,8 +117,6 @@ public class ContractServiceImplTest extends BaseDbUnitTest {
         contractMapper.insert(cloneIgnoreId(dbContract, o -> o.setName(null)));
         // 测试 customerId 不匹配
         contractMapper.insert(cloneIgnoreId(dbContract, o -> o.setCustomerId(null)));
-        // 测试 businessId 不匹配
-        contractMapper.insert(cloneIgnoreId(dbContract, o -> o.setBusinessId(null)));
         // 测试 no 不匹配
         contractMapper.insert(cloneIgnoreId(dbContract, o -> o.setNo(null)));
         // 准备参数

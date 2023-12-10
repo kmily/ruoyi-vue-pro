@@ -20,9 +20,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
@@ -73,7 +73,7 @@ public class PostController {
         return success(BeanUtils.toBean(post, PostRespVO.class));
     }
 
-    @GetMapping("/list-all-simple")
+    @GetMapping(value = {"/list-all-simple", "simple-list"})
     @Operation(summary = "获取岗位全列表", description = "只包含被开启的岗位，主要用于前端的下拉选项")
     public CommonResult<List<PostSimpleRespVO>> getSimplePostList() {
         // 获得岗位列表，只要开启状态的

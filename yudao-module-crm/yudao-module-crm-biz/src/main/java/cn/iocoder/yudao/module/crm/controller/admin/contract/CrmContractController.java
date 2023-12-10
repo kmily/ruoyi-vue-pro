@@ -22,9 +22,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -112,10 +112,10 @@ public class CrmContractController {
     }
 
     /**
-     * 转换成详细的联系人分页，即读取关联信息
+     * 转换成详细的合同分页，即读取关联信息
      *
-     * @param pageResult 联系人分页
-     * @return 详细的联系人分页
+     * @param pageResult 合同分页
+     * @return 详细的合同分页
      */
     private PageResult<ContractRespVO> convertDetailContractPage(PageResult<CrmContractDO> pageResult) {
         List<CrmContractDO> contactList = pageResult.getList();

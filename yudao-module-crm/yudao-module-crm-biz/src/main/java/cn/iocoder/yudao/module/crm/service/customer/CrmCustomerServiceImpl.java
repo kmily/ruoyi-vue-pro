@@ -9,9 +9,9 @@ import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.CrmCustomerUpdat
 import cn.iocoder.yudao.module.crm.convert.customer.CrmCustomerConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.customer.CrmCustomerMapper;
-import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -102,12 +102,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Override
     public PageResult<CrmCustomerDO> getCustomerPage(CrmCustomerPageReqVO pageReqVO, Long userId) {
-        boolean admin = false;
-        if (admin) { // 1.1. 情况一： TODO 如果是管理员; TODO @puhui999：要不如果是超管，就复用 selectPage；
-            customerMapper.selectPageWithAdmin(pageReqVO, userId);
-        }
-        // 1.2. 情况二：获取当前用户能看的分页数据
-        return customerMapper.selectPage(pageReqVO, userId);
+        boolean admin = false; // TODO 如果是管理员
+        return customerMapper.selectPage(pageReqVO, userId, adminUserApi.getSubordinateIds(userId), admin);
     }
 
     /**
