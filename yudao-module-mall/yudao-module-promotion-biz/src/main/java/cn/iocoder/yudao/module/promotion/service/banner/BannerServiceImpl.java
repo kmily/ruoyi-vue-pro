@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.promotion.dal.mysql.banner.BannerMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -66,13 +66,21 @@ public class BannerServiceImpl implements BannerService {
     }
 
     @Override
-    public List<BannerDO> getBannerList() {
-        return bannerMapper.selectList();
+    public PageResult<BannerDO> getBannerPage(BannerPageReqVO pageReqVO) {
+        return bannerMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public PageResult<BannerDO> getBannerPage(BannerPageReqVO pageReqVO) {
-        return bannerMapper.selectPage(pageReqVO);
+    public void addBannerBrowseCount(Long id) {
+        // 校验 Banner 是否存在
+        validateBannerExists(id);
+        // 增加点击次数
+        bannerMapper.updateBrowseCount(id);
+    }
+
+    @Override
+    public List<BannerDO> getBannerListByPosition(Integer position) {
+        return bannerMapper.selectBannerListByPosition(position);
     }
 
 }

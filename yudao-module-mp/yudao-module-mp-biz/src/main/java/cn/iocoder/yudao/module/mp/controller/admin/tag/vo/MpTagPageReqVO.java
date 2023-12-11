@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 @Schema(description = "管理后台 - 公众号标签分页 Request VO")
 @Data
@@ -18,7 +18,7 @@ public class MpTagPageReqVO extends PageParam {
     @NotEmpty(message = "公众号账号的编号不能为空")
     private Long accountId;
 
-    @Schema(description = "标签名 模糊匹配", example = "哈哈")
+    @Schema(description = "标签名，模糊匹配", example = "哈哈")
     private String name;
 
 }

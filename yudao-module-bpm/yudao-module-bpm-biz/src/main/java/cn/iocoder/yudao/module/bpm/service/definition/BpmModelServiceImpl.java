@@ -28,8 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -202,7 +202,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
         // 执行删除
         repositoryService.deleteModel(id);
-        // 禁用流程实例
+        // 禁用流程定义
         updateProcessDefinitionSuspended(model.getDeploymentId());
     }
 
@@ -231,6 +231,11 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
         BpmnXMLConverter converter = new BpmnXMLConverter();
         return converter.convertToBpmnModel(new BytesStreamSource(bpmnBytes), true, true);
+    }
+
+    @Override
+    public BpmnModel getBpmnModelByDefinitionId(String processDefinitionId) {
+        return repositoryService.getBpmnModel(processDefinitionId);
     }
 
     private void checkKeyNCName(String key) {
@@ -282,6 +287,5 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
         processDefinitionService.updateProcessDefinitionState(oldDefinition.getId(), SuspensionState.SUSPENDED.getStateCode());
     }
-
 
 }

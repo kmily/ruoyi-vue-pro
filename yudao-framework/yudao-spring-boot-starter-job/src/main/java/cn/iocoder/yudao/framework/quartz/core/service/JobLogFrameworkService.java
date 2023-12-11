@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.quartz.core.service;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**
@@ -40,5 +40,4 @@ public interface JobLogFrameworkService {
                                  @NotNull(message = "结束时间不能为空") LocalDateTime endTime,
                                  @NotNull(message = "运行时长不能为空") Integer duration,
                                  boolean success, String result);
-
 }

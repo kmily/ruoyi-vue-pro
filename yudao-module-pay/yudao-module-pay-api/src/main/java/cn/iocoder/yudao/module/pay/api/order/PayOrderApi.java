@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.pay.api.order;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * 支付单 API 接口
@@ -28,5 +28,13 @@ public interface PayOrderApi {
      * @return 支付单
      */
     PayOrderRespDTO getOrder(Long id);
+
+    /**
+     * 更新支付订单价格
+     *
+     * @param id 支付单编号
+     * @param payPrice   支付单价格
+     */
+    void updatePayOrderPrice(Long id, Integer payPrice);
 
 }

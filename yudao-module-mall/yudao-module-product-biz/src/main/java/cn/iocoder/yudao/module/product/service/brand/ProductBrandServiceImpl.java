@@ -13,7 +13,7 @@ import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 
@@ -112,6 +112,11 @@ public class ProductBrandServiceImpl implements ProductBrandService {
     @Override
     public PageResult<ProductBrandDO> getBrandPage(ProductBrandPageReqVO pageReqVO) {
         return brandMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<ProductBrandDO> getBrandListByStatus(Integer status) {
+        return brandMapper.selectListByStatus(status);
     }
 
 }

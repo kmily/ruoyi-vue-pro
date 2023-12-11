@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -120,7 +120,7 @@ public class BpmTaskAssignRuleServiceImplTest extends BaseDbUnitTest {
         // mock 方法
         List<AdminUserRespDTO> users = CollectionUtils.convertList(asSet(11L, 22L),
                 id -> new AdminUserRespDTO().setId(id));
-        when(adminUserApi.getUsersByPostIds(eq(rule.getOptions()))).thenReturn(users);
+        when(adminUserApi.getUserListByPostIds(eq(rule.getOptions()))).thenReturn(users);
         mockGetUserMap(asSet(11L, 22L));
 
         // 调用

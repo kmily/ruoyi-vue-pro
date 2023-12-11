@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.brand.vo.*;
 import cn.iocoder.yudao.module.product.dal.dataobject.brand.ProductBrandDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 
@@ -76,4 +76,11 @@ public interface ProductBrandService {
      */
     PageResult<ProductBrandDO> getBrandPage(ProductBrandPageReqVO pageReqVO);
 
+    /**
+     * 获取指定状态的品牌列表
+     *
+     * @param status 状态
+     * @return  返回品牌列表
+     */
+    List<ProductBrandDO> getBrandListByStatus(Integer status);
 }

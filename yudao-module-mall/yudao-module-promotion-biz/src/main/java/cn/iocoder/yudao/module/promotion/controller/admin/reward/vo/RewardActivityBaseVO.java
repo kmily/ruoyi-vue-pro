@@ -8,11 +8,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.Valid;
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.Future;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -84,7 +84,7 @@ public class RewardActivityBaseVO {
         @Schema(description = "赠送的优惠劵编号的数组", example = "1,2,3")
         private List<Long> couponIds;
 
-        @Schema(description = "赠送的优惠卷数量的数组", example = "1,2,3")
+        @Schema(description = "赠送的优惠券数量的数组", example = "1,2,3")
         private List<Integer> couponCounts;
 
         @AssertTrue(message = "优惠劵和数量必须一一对应")

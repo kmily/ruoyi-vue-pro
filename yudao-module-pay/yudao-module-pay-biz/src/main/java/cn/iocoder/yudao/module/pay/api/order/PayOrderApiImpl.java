@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * 支付单 API 实现类
@@ -22,13 +22,18 @@ public class PayOrderApiImpl implements PayOrderApi {
 
     @Override
     public Long createOrder(PayOrderCreateReqDTO reqDTO) {
-        return payOrderService.createPayOrder(reqDTO);
+        return payOrderService.createOrder(reqDTO);
     }
 
     @Override
     public PayOrderRespDTO getOrder(Long id) {
         PayOrderDO order = payOrderService.getOrder(id);
         return PayOrderConvert.INSTANCE.convert2(order);
+    }
+
+    @Override
+    public void updatePayOrderPrice(Long id, Integer payPrice) {
+        payOrderService.updatePayOrderPrice(id, payPrice);
     }
 
 }

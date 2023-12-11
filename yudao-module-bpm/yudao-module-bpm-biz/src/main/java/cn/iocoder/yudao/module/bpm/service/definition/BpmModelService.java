@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
 import org.flowable.bpmn.model.BpmnModel;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * Flowable流程模型接口
@@ -12,6 +12,7 @@ import javax.validation.Valid;
  * @author yunlongn
  */
 public interface BpmModelService {
+
     /**
      * 获得流程模型分页
      *
@@ -73,5 +74,13 @@ public interface BpmModelService {
      * @return BPMN Model
      */
     BpmnModel getBpmnModel(String id);
+
+    /**
+     * 获得流程定义编号对应的 BPMN Model
+     *
+     * @param processDefinitionId 流程定义编号
+     * @return BPMN Model
+     */
+    BpmnModel getBpmnModelByDefinitionId(String processDefinitionId);
 
 }

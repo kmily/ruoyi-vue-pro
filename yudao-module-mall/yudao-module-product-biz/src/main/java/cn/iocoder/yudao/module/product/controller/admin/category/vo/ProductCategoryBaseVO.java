@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.product.controller.admin.category.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 /**
 * 商品分类 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -21,15 +21,15 @@ public class ProductCategoryBaseVO {
     @NotBlank(message = "分类名称不能为空")
     private String name;
 
-    @Schema(description = "分类图片", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "分类图片不能为空")
+    @Schema(description = "移动端分类图", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "移动端分类图不能为空")
     private String picUrl;
+
+    @Schema(description = "PC 端分类图")
+    private String bigPicUrl;
 
     @Schema(description = "分类排序", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer sort;
-
-    @Schema(description = "分类描述", requiredMode = Schema.RequiredMode.REQUIRED, example = "描述")
-    private String description;
 
     @Schema(description = "开启状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @NotNull(message = "开启状态不能为空")

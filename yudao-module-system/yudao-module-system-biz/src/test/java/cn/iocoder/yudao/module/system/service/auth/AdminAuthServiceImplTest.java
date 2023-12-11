@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.*;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
@@ -25,10 +26,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
-import javax.annotation.Resource;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validation;
-import javax.validation.Validator;
+import jakarta.annotation.Resource;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -148,7 +149,7 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
         );
     }
 
-        @Test
+    @Test
     public void testLogin_success() {
         // 准备参数
         AuthLoginReqVO reqVO = randomPojo(AuthLoginReqVO.class, o ->
@@ -174,9 +175,9 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
         assertPojoEquals(accessTokenDO, loginRespVO);
         // 校验调用参数
         verify(loginLogService).createLoginLog(
-            argThat(o -> o.getLogType().equals(LoginLogTypeEnum.LOGIN_USERNAME.getType())
-                    && o.getResult().equals(LoginResultEnum.SUCCESS.getResult())
-                    && o.getUserId().equals(user.getId()))
+                argThat(o -> o.getLogType().equals(LoginLogTypeEnum.LOGIN_USERNAME.getType())
+                        && o.getResult().equals(LoginResultEnum.SUCCESS.getResult())
+                        && o.getUserId().equals(user.getId()))
         );
         verify(socialUserService).bindSocialUser(eq(new SocialUserBindReqDTO(
                 user.getId(), UserTypeEnum.ADMIN.getValue(),
@@ -235,8 +236,8 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
         AuthSocialLoginReqVO reqVO = randomPojo(AuthSocialLoginReqVO.class);
         // mock 方法（绑定的用户编号）
         Long userId = 1L;
-        when(socialUserService.getBindUserId(eq(UserTypeEnum.ADMIN.getValue()), eq(reqVO.getType()),
-                eq(reqVO.getCode()), eq(reqVO.getState()))).thenReturn(userId);
+        when(socialUserService.getSocialUser(eq(UserTypeEnum.ADMIN.getValue()), eq(reqVO.getType()),
+                eq(reqVO.getCode()), eq(reqVO.getState()))).thenReturn(new SocialUserRespDTO(randomString(), userId));
         // mock（用户）
         AdminUserDO user = randomPojo(AdminUserDO.class, o -> o.setId(userId));
         when(userService.getUser(eq(userId))).thenReturn(user);
@@ -317,8 +318,8 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
         assertServiceException(() -> authService.validateCaptcha(reqVO), AUTH_LOGIN_CAPTCHA_CODE_ERROR, "就是不对");
         // 校验调用参数
         verify(loginLogService).createLoginLog(
-            argThat(o -> o.getLogType().equals(LoginLogTypeEnum.LOGIN_USERNAME.getType())
-                    && o.getResult().equals(LoginResultEnum.CAPTCHA_CODE_ERROR.getResult()))
+                argThat(o -> o.getLogType().equals(LoginLogTypeEnum.LOGIN_USERNAME.getType())
+                        && o.getResult().equals(LoginResultEnum.CAPTCHA_CODE_ERROR.getResult()))
         );
     }
 
@@ -349,8 +350,9 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
         // 调用
         authService.logout(token, LoginLogTypeEnum.LOGOUT_SELF.getType());
         // 校验调用参数
-        verify(loginLogService).createLoginLog(argThat(o -> o.getLogType().equals(LoginLogTypeEnum.LOGOUT_SELF.getType())
-                    && o.getResult().equals(LoginResultEnum.SUCCESS.getResult()))
+        verify(loginLogService).createLoginLog(
+                argThat(o -> o.getLogType().equals(LoginLogTypeEnum.LOGOUT_SELF.getType())
+                        && o.getResult().equals(LoginResultEnum.SUCCESS.getResult()))
         );
         // 调用，并校验
 

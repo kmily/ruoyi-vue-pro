@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.Produc
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValuePageReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.value.ProductPropertyValueUpdateReqVO;
-import cn.iocoder.yudao.module.product.convert.propertyvalue.ProductPropertyValueConvert;
+import cn.iocoder.yudao.module.product.convert.property.ProductPropertyValueConvert;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,8 +15,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -32,14 +32,14 @@ public class ProductPropertyValueController {
     @PostMapping("/create")
     @Operation(summary = "创建属性值")
     @PreAuthorize("@ss.hasPermission('product:property:create')")
-    public CommonResult<Long> createProperty(@Valid @RequestBody ProductPropertyValueCreateReqVO createReqVO) {
+    public CommonResult<Long> createPropertyValue(@Valid @RequestBody ProductPropertyValueCreateReqVO createReqVO) {
         return success(productPropertyValueService.createPropertyValue(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新属性值")
     @PreAuthorize("@ss.hasPermission('product:property:update')")
-    public CommonResult<Boolean> updateProperty(@Valid @RequestBody ProductPropertyValueUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updatePropertyValue(@Valid @RequestBody ProductPropertyValueUpdateReqVO updateReqVO) {
         productPropertyValueService.updatePropertyValue(updateReqVO);
         return success(true);
     }
@@ -48,7 +48,7 @@ public class ProductPropertyValueController {
     @Operation(summary = "删除属性值")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('product:property:delete')")
-    public CommonResult<Boolean> deleteProperty(@RequestParam("id") Long id) {
+    public CommonResult<Boolean> deletePropertyValue(@RequestParam("id") Long id) {
         productPropertyValueService.deletePropertyValue(id);
         return success(true);
     }
@@ -57,7 +57,7 @@ public class ProductPropertyValueController {
     @Operation(summary = "获得属性值")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('product:property:query')")
-    public CommonResult<ProductPropertyValueRespVO> getProperty(@RequestParam("id") Long id) {
+    public CommonResult<ProductPropertyValueRespVO> getPropertyValue(@RequestParam("id") Long id) {
         return success(ProductPropertyValueConvert.INSTANCE.convert(productPropertyValueService.getPropertyValue(id)));
     }
 

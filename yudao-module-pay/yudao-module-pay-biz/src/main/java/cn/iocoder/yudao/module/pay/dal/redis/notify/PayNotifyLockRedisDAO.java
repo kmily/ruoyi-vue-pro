@@ -4,7 +4,7 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Repository;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
 import static cn.iocoder.yudao.module.pay.dal.redis.RedisKeyConstants.PAY_NOTIFY_LOCK;
@@ -33,7 +33,7 @@ public class PayNotifyLockRedisDAO {
     }
 
     private static String formatKey(Long id) {
-        return String.format(PAY_NOTIFY_LOCK.getKeyTemplate(), id);
+        return String.format(PAY_NOTIFY_LOCK, id);
     }
 
 }

@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.system.service.mail;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.mail.MailAccount;
-import cn.hutool.extra.mail.MailUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.module.system.convert.mail.MailAccountConvert;
@@ -15,10 +13,12 @@ import cn.iocoder.yudao.module.system.service.member.MemberService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.hutool.extra.mail.MailAccount;
+import org.dromara.hutool.extra.mail.MailUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -89,13 +89,14 @@ public class MailSendServiceImpl implements MailSendService {
 
         // 创建发送日志。如果模板被禁用，则不发送短信，只记录日志
         Boolean isSend = CommonStatusEnum.ENABLE.getStatus().equals(template.getStatus());
+        String title = mailTemplateService.formatMailTemplateContent(template.getTitle(), templateParams);
         String content = mailTemplateService.formatMailTemplateContent(template.getContent(), templateParams);
         Long sendLogId = mailLogService.createMailLog(userId, userType, mail,
                 account, template, content, templateParams, isSend);
         // 发送 MQ 消息，异步执行发送短信
         if (isSend) {
             mailProducer.sendMailSendMessage(sendLogId, mail, account.getId(),
-                    template.getNickname(), template.getTitle(), content);
+                    template.getNickname(), title, content);
         }
         return sendLogId;
     }
@@ -108,7 +109,7 @@ public class MailSendServiceImpl implements MailSendService {
         // 2. 发送邮件
         try {
             String messageId = MailUtil.send(mailAccount, message.getMail(),
-                    message.getTitle(), message.getContent(),true);
+                    message.getTitle(), message.getContent(), true);
             // 3. 更新结果（成功）
             mailLogService.updateMailSendResult(message.getLogId(), messageId, null);
         } catch (Exception e) {

@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.mp.controller.admin.tag.vo.MpTagPageReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.tag.vo.MpTagUpdateReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.tag.MpTagDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 /**
@@ -45,6 +45,13 @@ public interface MpTagService {
      * @return 公众号标签分页
      */
     PageResult<MpTagDO> getTagPage(MpTagPageReqVO pageReqVO);
+
+    /**
+     * 获得公众号标签详情
+     * @param id id查询
+     * @return 公众号标签详情
+     */
+    MpTagDO get(Long id);
 
     List<MpTagDO> getTagList();
 

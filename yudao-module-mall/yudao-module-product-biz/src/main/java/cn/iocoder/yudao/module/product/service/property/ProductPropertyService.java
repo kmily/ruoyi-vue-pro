@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.property.*;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 
@@ -40,6 +40,7 @@ public interface ProductPropertyService {
 
     /**
      * 获得属性项列表
+     *
      * @param listReqVO 集合查询
      * @return 属性项集合
      */

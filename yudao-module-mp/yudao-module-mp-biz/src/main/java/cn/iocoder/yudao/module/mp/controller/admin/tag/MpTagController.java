@@ -13,8 +13,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -50,6 +50,14 @@ public class MpTagController {
     public CommonResult<Boolean> deleteTag(@RequestParam("id") Long id) {
         mpTagService.deleteTag(id);
         return success(true);
+    }
+
+    @GetMapping("/get")
+    @Operation(summary = "获取公众号标签详情")
+    @PreAuthorize("@ss.hasPermission('mp:tag:query')")
+    public CommonResult<MpTagRespVO> get(@RequestParam("id") Long id) {
+        MpTagDO mpTagDO = mpTagService.get(id);
+        return success(MpTagConvert.INSTANCE.convert(mpTagDO));
     }
 
     @GetMapping("/page")

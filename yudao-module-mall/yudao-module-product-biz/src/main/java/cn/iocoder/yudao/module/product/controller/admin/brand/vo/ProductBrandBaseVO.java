@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.product.controller.admin.brand.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
 * 商品品牌 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class ProductBrandBaseVO {
 
-    @Schema(description = "品牌名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
+    @Schema(description = "品牌名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "苹果")
     @NotNull(message = "品牌名称不能为空")
     private String name;
 

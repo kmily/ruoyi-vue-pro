@@ -10,8 +10,8 @@ import cn.iocoder.yudao.module.system.enums.mail.MailSendStatusEnum;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
-import java.util.Date;
+import jakarta.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;
 
@@ -65,12 +65,12 @@ public class MailLogServiceImpl implements MailLogService {
     public void updateMailSendResult(Long logId, String messageId, Exception exception) {
         // 1. 成功
         if (exception == null) {
-            mailLogMapper.updateById(new MailLogDO().setId(logId).setSendTime(new Date())
+            mailLogMapper.updateById(new MailLogDO().setId(logId).setSendTime(LocalDateTime.now())
                     .setSendStatus(MailSendStatusEnum.SUCCESS.getStatus()).setSendMessageId(messageId));
             return;
         }
         // 2. 失败
-        mailLogMapper.updateById(new MailLogDO().setId(logId).setSendTime(new Date())
+        mailLogMapper.updateById(new MailLogDO().setId(logId).setSendTime(LocalDateTime.now())
                 .setSendStatus(MailSendStatusEnum.FAILURE.getStatus()).setSendException(getRootCauseMessage(exception)));
 
     }

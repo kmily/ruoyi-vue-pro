@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
@@ -114,6 +114,11 @@ public class MpTagServiceImpl implements MpTagService {
     @Override
     public PageResult<MpTagDO> getTagPage(MpTagPageReqVO pageReqVO) {
         return mpTagMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public MpTagDO get(Long id) {
+        return mpTagMapper.selectById(id);
     }
 
     @Override

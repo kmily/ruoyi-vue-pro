@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * 支付通知 Job
@@ -15,16 +15,16 @@ import javax.annotation.Resource;
  * @author 芋道源码
  */
 @Component
-@TenantJob // 多租户
 @Slf4j
 public class PayNotifyJob implements JobHandler {
 
     @Resource
-    private PayNotifyService payNotifyCoreService;
+    private PayNotifyService payNotifyService;
 
     @Override
+    @TenantJob
     public String execute(String param) throws Exception {
-        int notifyCount = payNotifyCoreService.executeNotify();
+        int notifyCount = payNotifyService.executeNotify();
         return String.format("执行支付通知 %s 个", notifyCount);
     }
 

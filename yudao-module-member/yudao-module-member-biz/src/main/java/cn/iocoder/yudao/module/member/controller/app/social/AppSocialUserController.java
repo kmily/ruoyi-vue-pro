@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.member.controller.app.social;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.member.controller.app.social.vo.AppSocialUserBindReqVO;
 import cn.iocoder.yudao.module.member.controller.app.social.vo.AppSocialUserUnbindReqVO;
 import cn.iocoder.yudao.module.member.convert.social.SocialUserConvert;
@@ -11,8 +12,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -34,6 +35,7 @@ public class AppSocialUserController {
 
     @DeleteMapping("/unbind")
     @Operation(summary = "取消社交绑定")
+    @PreAuthenticated
     public CommonResult<Boolean> socialUnbind(@RequestBody AppSocialUserUnbindReqVO reqVO) {
         socialUserApi.unbindSocialUser(SocialUserConvert.INSTANCE.convert(getLoginUserId(), UserTypeEnum.MEMBER.getValue(), reqVO));
         return CommonResult.success(true);
