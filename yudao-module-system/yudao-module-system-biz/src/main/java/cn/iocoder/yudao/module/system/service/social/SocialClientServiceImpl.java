@@ -12,10 +12,9 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.cache.CacheUtils;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientCreateReqVO;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientUpdateReqVO;
-import cn.iocoder.yudao.module.system.convert.social.SocialClientConvert;
+import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialClientMapper;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
@@ -42,7 +41,7 @@ import me.chanjar.weixin.mp.config.impl.WxMpRedisConfigImpl;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.Duration;
 import java.util.Objects;
 
@@ -143,7 +142,8 @@ public class SocialClientServiceImpl implements SocialClientService {
      * @param userType 用户类型
      * @return AuthRequest 对象
      */
-    private AuthRequest buildAuthRequest(Integer socialType, Integer userType) {
+    @VisibleForTesting
+    AuthRequest buildAuthRequest(Integer socialType, Integer userType) {
         // 1. 先查找默认的配置项，从 application-*.yaml 中读取
         AuthRequest request = authRequestFactory.get(SocialTypeEnum.valueOfType(socialType).getSource());
         Assert.notNull(request, String.format("社交平台(%d) 不存在", socialType));
@@ -181,7 +181,8 @@ public class SocialClientServiceImpl implements SocialClientService {
      * @param userType 用户类型
      * @return WxMpService 对象
      */
-    private WxMpService getWxMpService(Integer userType) {
+    @VisibleForTesting
+    WxMpService getWxMpService(Integer userType) {
         // 第一步，查询 DB 的配置项，获得对应的 WxMpService 对象
         SocialClientDO client = socialClientMapper.selectBySocialTypeAndUserType(
                 SocialTypeEnum.WECHAT_MP.getType(), userType);
@@ -199,7 +200,7 @@ public class SocialClientServiceImpl implements SocialClientService {
      * @param clientSecret 微信公众号 secret
      * @return WxMpService 对象
      */
-    private WxMpService buildWxMpService(String clientId, String clientSecret) {
+    public WxMpService buildWxMpService(String clientId, String clientSecret) {
         // 第一步，创建 WxMpRedisConfigImpl 对象
         WxMpRedisConfigImpl configStorage = new WxMpRedisConfigImpl(
                 new RedisTemplateWxRedisOps(stringRedisTemplate),
@@ -232,7 +233,8 @@ public class SocialClientServiceImpl implements SocialClientService {
      * @param userType 用户类型
      * @return WxMpService 对象
      */
-    private WxMaService getWxMaService(Integer userType) {
+    @VisibleForTesting
+    WxMaService getWxMaService(Integer userType) {
         // 第一步，查询 DB 的配置项，获得对应的 WxMaService 对象
         SocialClientDO client = socialClientMapper.selectBySocialTypeAndUserType(
                 SocialTypeEnum.WECHAT_MINI_APP.getType(), userType);
@@ -267,26 +269,25 @@ public class SocialClientServiceImpl implements SocialClientService {
     // =================== 客户端管理 ===================
 
     @Override
-    public Long createSocialClient(SocialClientCreateReqVO createReqVO) {
+    public Long createSocialClient(SocialClientSaveReqVO createReqVO) {
         // 校验重复
         validateSocialClientUnique(null, createReqVO.getUserType(), createReqVO.getSocialType());
 
         // 插入
-        SocialClientDO socialClient = SocialClientConvert.INSTANCE.convert(createReqVO);
-        socialClientMapper.insert(socialClient);
-        // 返回
-        return socialClient.getId();
+        SocialClientDO client = BeanUtils.toBean(createReqVO, SocialClientDO.class);
+        socialClientMapper.insert(client);
+        return client.getId();
     }
 
     @Override
-    public void updateSocialClient(SocialClientUpdateReqVO updateReqVO) {
+    public void updateSocialClient(SocialClientSaveReqVO updateReqVO) {
         // 校验存在
         validateSocialClientExists(updateReqVO.getId());
         // 校验重复
         validateSocialClientUnique(updateReqVO.getId(), updateReqVO.getUserType(), updateReqVO.getSocialType());
 
         // 更新
-        SocialClientDO updateObj = SocialClientConvert.INSTANCE.convert(updateReqVO);
+        SocialClientDO updateObj = BeanUtils.toBean(updateReqVO, SocialClientDO.class);
         socialClientMapper.updateById(updateObj);
     }
 
@@ -313,7 +314,6 @@ public class SocialClientServiceImpl implements SocialClientService {
      * @param userType 用户类型
      * @param socialType 社交类型
      */
-    @VisibleForTesting
     private void validateSocialClientUnique(Long id, Integer userType, Integer socialType) {
         SocialClientDO client = socialClientMapper.selectBySocialTypeAndUserType(
                 socialType, userType);

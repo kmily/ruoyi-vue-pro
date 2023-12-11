@@ -17,13 +17,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -66,6 +66,20 @@ public class AppCouponTemplateController {
         // 3.1 领取数量
         Map<Long, Boolean> canCanTakeMap = couponService.getUserCanCanTakeMap(getLoginUserId(), list);
         // 3.2 拼接返回
+        return success(CouponTemplateConvert.INSTANCE.convertAppList(list, canCanTakeMap));
+    }
+
+    @GetMapping("/list-by-ids")
+    @Operation(summary = "获得优惠劵模版列表")
+    @Parameter(name = "ids", description = "优惠券模板编号列表")
+    public CommonResult<List<AppCouponTemplateRespVO>> getCouponTemplateList(
+            @RequestParam(value = "ids", required = false) Set<Long> ids) {
+        // 1. 查询
+        List<CouponTemplateDO> list = couponTemplateService.getCouponTemplateList(ids);
+
+        // 2.1 领取数量
+        Map<Long, Boolean> canCanTakeMap = couponService.getUserCanCanTakeMap(getLoginUserId(), list);
+        // 2.2 拼接返回
         return success(CouponTemplateConvert.INSTANCE.convertAppList(list, canCanTakeMap));
     }
 

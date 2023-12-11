@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.system.controller.admin.dict.vo.data;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 @Schema(description = "管理后台 - 字典类型分页列表 Request VO")
 @Data
@@ -21,6 +23,7 @@ public class DictDataPageReqVO extends PageParam {
     private String dictType;
 
     @Schema(description = "展示状态，参见 CommonStatusEnum 枚举类", example = "1")
+    @InEnum(value = CommonStatusEnum.class, message = "修改状态必须是 {value}")
     private Integer status;
 
 }
