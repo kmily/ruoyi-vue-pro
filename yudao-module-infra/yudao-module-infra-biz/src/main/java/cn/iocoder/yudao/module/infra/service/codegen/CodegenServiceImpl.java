@@ -14,8 +14,7 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.codegen.CodegenColumnMapper;
 import cn.iocoder.yudao.module.infra.dal.mysql.codegen.CodegenTableMapper;
-import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
-import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
+import cn.iocoder.yudao.module.infra.enums.codegen.*;
 import cn.iocoder.yudao.module.infra.framework.codegen.config.CodegenProperties;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenBuilder;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenEngine;
@@ -30,10 +29,10 @@ import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.generator.config.po.TableField;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.Resource;
 import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
@@ -299,7 +298,7 @@ public class CodegenServiceImpl implements CodegenService {
     @Override
     public String fakeData(Long tableId, Integer num) {
         //获取表单信息
-        CodegenTableDO table = getCodegenTablePage(tableId);
+        CodegenTableDO table = getCodegenTable(tableId);
         //获取列表信息
         List<CodegenColumnDO> columns = getCodegenColumnListByTableId(tableId);
         // 初始化结果数据

@@ -13,26 +13,24 @@ import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.DatabaseT
 import cn.iocoder.yudao.module.infra.convert.codegen.CodegenConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
-import cn.iocoder.yudao.module.infra.enums.codegen.MockTypeEnum;
 import cn.iocoder.yudao.module.infra.service.codegen.CodegenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
-import javax.validation.constraints.PositiveOrZero;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -156,14 +154,14 @@ public class CodegenController {
             @Parameter(name = "num", description = "数据源配置的编号", required = false, example = "1"),
     })
     public CommonResult<String> fakeData(@RequestParam("tableId") Long tableId,
-                                               @PositiveOrZero @RequestParam(value = "num", required = false, defaultValue = "1") Integer num) {
+                                         @PositiveOrZero @RequestParam(value = "num", required = false, defaultValue = "1") Integer num) {
         return success(codegenService.fakeData(tableId, num));
     }
 
     @Operation(summary = "获取模拟类型")
     @GetMapping("/fake-data/types")
     @PreAuthorize("@ss.hasPermission('infra:codegen:preview')")
-    public CommonResult<List<CodegenMockTypeRespVO>> getMockTypes(){
+    public CommonResult<List<CodegenMockTypeRespVO>> getMockTypes() {
         return success(codegenService.getMockTypes());
     }
 
@@ -173,7 +171,7 @@ public class CodegenController {
     @Parameters({
             @Parameter(name = "mockType", description = "模拟类型的标签", required = true)
     })
-    public CommonResult<List<String>> getMockParamsByMockType(@RequestParam("mockType") Integer mockType){
+    public CommonResult<List<String>> getMockParamsByMockType(@RequestParam("mockType") Integer mockType) {
         return success(codegenService.getMockParamsByMockType(mockType));
     }
 
