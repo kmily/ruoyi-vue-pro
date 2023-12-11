@@ -5,9 +5,9 @@ import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractCreateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractUpdateReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractTransferReqVO;
-import cn.iocoder.yudao.module.crm.convert.contract.ContractConvert;
+import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.CrmContractUpdateReqVO;
+import cn.iocoder.yudao.module.crm.convert.contract.CrmContractConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
@@ -15,11 +15,11 @@ import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 
@@ -44,7 +44,7 @@ public class CrmContractServiceImpl implements CrmContractService {
     @Override
     public Long createContract(CrmContractCreateReqVO createReqVO, Long userId) {
         // 插入
-        CrmContractDO contract = ContractConvert.INSTANCE.convert(createReqVO);
+        CrmContractDO contract = CrmContractConvert.INSTANCE.convert(createReqVO);
         contractMapper.insert(contract);
 
         // 创建数据权限
@@ -56,23 +56,25 @@ public class CrmContractServiceImpl implements CrmContractService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, level = CrmPermissionLevelEnum.WRITE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateContract(CrmContractUpdateReqVO updateReqVO) {
         // 校验存在
         validateContractExists(updateReqVO.getId());
         // 更新
-        CrmContractDO updateObj = ContractConvert.INSTANCE.convert(updateReqVO);
+        CrmContractDO updateObj = CrmContractConvert.INSTANCE.convert(updateReqVO);
         contractMapper.updateById(updateObj);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, bizId = "#id", level = CrmPermissionLevelEnum.WRITE)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteContract(Long id) {
         // 校验存在
         validateContractExists(id);
         // 删除
         contractMapper.deleteById(id);
+        // 删除数据权限
+        crmPermissionService.deletePermission(CrmBizTypeEnum.CRM_CONTRACT.getType(), id);
     }
 
     private CrmContractDO validateContractExists(Long id) {
@@ -83,7 +85,6 @@ public class CrmContractServiceImpl implements CrmContractService {
         return contract;
     }
 
-    // TODO 芋艿：是否要做数据权限的校验？？？
     @Override
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, bizId = "#id", level = CrmPermissionLevelEnum.READ)
     public CrmContractDO getContract(Long id) {
@@ -99,27 +100,30 @@ public class CrmContractServiceImpl implements CrmContractService {
     }
 
     @Override
-    public PageResult<CrmContractDO> getContractPage(CrmContractPageReqVO pageReqVO) {
-        return contractMapper.selectPage(pageReqVO);
+    public PageResult<CrmContractDO> getContractPage(CrmContractPageReqVO pageReqVO, Long userId) {
+        return contractMapper.selectPage(pageReqVO, userId);
     }
 
     @Override
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#pageReqVO.customerId", level = CrmPermissionLevelEnum.READ)
-    public PageResult<CrmContractDO> getContractPageByCustomer(CrmContractPageReqVO pageReqVO) {
-        return contractMapper.selectPageByCustomer(pageReqVO);
+    public PageResult<CrmContractDO> getContractPageByCustomerId(CrmContractPageReqVO pageReqVO) {
+        return contractMapper.selectPageByCustomerId(pageReqVO);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void transferContract(CrmContractTransferReqVO reqVO, Long userId) {
-        // 1 校验合同是否存在
+        // 1. 校验合同是否存在
         validateContractExists(reqVO.getId());
 
-        // 2. 数据权限转移
+        // 2.1 数据权限转移
         crmPermissionService.transferPermission(
-                ContractConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CONTRACT.getType()));
+                CrmContractConvert.INSTANCE.convert(reqVO, userId).setBizType(CrmBizTypeEnum.CRM_CONTRACT.getType()));
+        // 2.2 设置负责人
+        contractMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
 
         // 3. TODO 记录转移日志
+
     }
 
 }

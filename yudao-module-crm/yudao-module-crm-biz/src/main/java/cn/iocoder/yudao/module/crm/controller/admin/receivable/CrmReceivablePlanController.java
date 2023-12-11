@@ -7,10 +7,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanCreateReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanPageReqVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanRespVO;
-import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanUpdateReqVO;
+import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.*;
 import cn.iocoder.yudao.module.crm.convert.receivable.CrmReceivablePlanConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
@@ -25,22 +22,24 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.pojo.PageParam.PAGE_SIZE_NONE;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertListByFlatMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - CRM 回款计划")
 @RestController
@@ -64,7 +63,7 @@ public class CrmReceivablePlanController {
     @Operation(summary = "创建回款计划")
     @PreAuthorize("@ss.hasPermission('crm:receivable-plan:create')")
     public CommonResult<Long> createReceivablePlan(@Valid @RequestBody CrmReceivablePlanCreateReqVO createReqVO) {
-        return success(receivablePlanService.createReceivablePlan(createReqVO));
+        return success(receivablePlanService.createReceivablePlan(createReqVO, getLoginUserId()));
     }
 
     @PutMapping("/update")
@@ -97,7 +96,7 @@ public class CrmReceivablePlanController {
     @Operation(summary = "获得回款计划分页")
     @PreAuthorize("@ss.hasPermission('crm:receivable-plan:query')")
     public CommonResult<PageResult<CrmReceivablePlanRespVO>> getReceivablePlanPage(@Valid CrmReceivablePlanPageReqVO pageReqVO) {
-        PageResult<CrmReceivablePlanDO> pageResult = receivablePlanService.getReceivablePlanPage(pageReqVO);
+        PageResult<CrmReceivablePlanDO> pageResult = receivablePlanService.getReceivablePlanPage(pageReqVO, getLoginUserId());
         return success(convertDetailReceivablePlanPage(pageResult));
     }
 
@@ -105,7 +104,7 @@ public class CrmReceivablePlanController {
     @Operation(summary = "获得回款计划分页，基于指定客户")
     public CommonResult<PageResult<CrmReceivablePlanRespVO>> getReceivablePlanPageByCustomer(@Valid CrmReceivablePlanPageReqVO pageReqVO) {
         Assert.notNull(pageReqVO.getCustomerId(), "客户编号不能为空");
-        PageResult<CrmReceivablePlanDO> pageResult = receivablePlanService.getReceivablePlanPageByCustomer(pageReqVO);
+        PageResult<CrmReceivablePlanDO> pageResult = receivablePlanService.getReceivablePlanPageByCustomerId(pageReqVO);
         return success(convertDetailReceivablePlanPage(pageResult));
     }
 
@@ -115,8 +114,9 @@ public class CrmReceivablePlanController {
     @PreAuthorize("@ss.hasPermission('crm:receivable-plan:export')")
     @OperateLog(type = EXPORT)
     public void exportReceivablePlanExcel(@Valid CrmReceivablePlanPageReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
-        PageResult<CrmReceivablePlanDO> pageResult = receivablePlanService.getReceivablePlanPage(exportReqVO);
+                                          HttpServletResponse response) throws IOException {
+        exportReqVO.setPageSize(PAGE_SIZE_NONE);
+        PageResult<CrmReceivablePlanDO> pageResult = receivablePlanService.getReceivablePlanPage(exportReqVO, getLoginUserId());
         // 导出 Excel
         ExcelUtils.write(response, "回款计划.xls", "数据", CrmReceivablePlanRespVO.class,
                 convertDetailReceivablePlanPage(pageResult).getList());
@@ -135,7 +135,7 @@ public class CrmReceivablePlanController {
         }
         // 1. 获取客户列表
         List<CrmCustomerDO> customerList = customerService.getCustomerList(
-                convertSet(receivablePlanList, CrmReceivablePlanDO::getCustomerId));
+                convertSet(receivablePlanList, CrmReceivablePlanDO::getCustomerId), getLoginUserId());
         // 2. 获取创建人、负责人列表
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(receivablePlanList,
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));
@@ -146,6 +146,14 @@ public class CrmReceivablePlanController {
         List<CrmReceivableDO> receivableList = receivableService.getReceivableList(
                 convertSet(receivablePlanList, CrmReceivablePlanDO::getReceivableId));
         return CrmReceivablePlanConvert.INSTANCE.convertPage(pageResult, userMap, customerList, contractList, receivableList);
+    }
+
+    @PutMapping("/transfer")
+    @Operation(summary = "回款计划转移")
+    @PreAuthorize("@ss.hasPermission('crm:receivable-plan:update')")
+    public CommonResult<Boolean> transfer(@Valid @RequestBody CrmReceivablePlanTransferReqVO reqVO) {
+        receivablePlanService.transferReceivablePlan(reqVO, getLoginUserId());
+        return success(true);
     }
 
 }

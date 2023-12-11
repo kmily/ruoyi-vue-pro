@@ -8,7 +8,7 @@ import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.*;
-import cn.iocoder.yudao.module.crm.convert.contract.ContractConvert;
+import cn.iocoder.yudao.module.crm.convert.contract.CrmContractConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
@@ -18,13 +18,13 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -80,14 +80,14 @@ public class CrmContractController {
     @PreAuthorize("@ss.hasPermission('crm:contract:query')")
     public CommonResult<ContractRespVO> getContract(@RequestParam("id") Long id) {
         CrmContractDO contract = contractService.getContract(id);
-        return success(ContractConvert.INSTANCE.convert(contract));
+        return success(CrmContractConvert.INSTANCE.convert(contract));
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得合同分页")
     @PreAuthorize("@ss.hasPermission('crm:contract:query')")
     public CommonResult<PageResult<ContractRespVO>> getContractPage(@Valid CrmContractPageReqVO pageVO) {
-        PageResult<CrmContractDO> pageResult = contractService.getContractPage(pageVO);
+        PageResult<CrmContractDO> pageResult = contractService.getContractPage(pageVO, getLoginUserId());
         return success(convertDetailContractPage(pageResult));
     }
 
@@ -95,7 +95,7 @@ public class CrmContractController {
     @Operation(summary = "获得联系人分页，基于指定客户")
     public CommonResult<PageResult<ContractRespVO>> getContractPageByCustomer(@Valid CrmContractPageReqVO pageVO) {
         Assert.notNull(pageVO.getCustomerId(), "客户编号不能为空");
-        PageResult<CrmContractDO> pageResult = contractService.getContractPageByCustomer(pageVO);
+        PageResult<CrmContractDO> pageResult = contractService.getContractPageByCustomerId(pageVO);
         return success(convertDetailContractPage(pageResult));
     }
 
@@ -105,10 +105,10 @@ public class CrmContractController {
     @OperateLog(type = EXPORT)
     public void exportContractExcel(@Valid CrmContractPageReqVO exportReqVO,
                                     HttpServletResponse response) throws IOException {
-        PageResult<CrmContractDO> pageResult = contractService.getContractPage(exportReqVO);
+        PageResult<CrmContractDO> pageResult = contractService.getContractPage(exportReqVO, getLoginUserId());
         // 导出 Excel
         ExcelUtils.write(response, "合同.xls", "数据", CrmContractExcelVO.class,
-                ContractConvert.INSTANCE.convertList02(pageResult.getList()));
+                CrmContractConvert.INSTANCE.convertList02(pageResult.getList()));
     }
 
     /**
@@ -124,11 +124,11 @@ public class CrmContractController {
         }
         // 1. 获取客户列表
         List<CrmCustomerDO> customerList = customerService.getCustomerList(
-                convertSet(contactList, CrmContractDO::getCustomerId));
+                convertSet(contactList, CrmContractDO::getCustomerId), getLoginUserId());
         // 2. 获取创建人、负责人列表
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(contactList,
                 contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));
-        return ContractConvert.INSTANCE.convertPage(pageResult, userMap, customerList);
+        return CrmContractConvert.INSTANCE.convertPage(pageResult, userMap, customerList);
     }
 
     @PutMapping("/transfer")
