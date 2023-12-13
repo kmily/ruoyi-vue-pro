@@ -25,27 +25,16 @@ public class MpUtils {
         // 获得对应的校验 group
         Class<?> group;
         switch (type) {
-            case WxConsts.XmlMsgType.TEXT:
-                group = TextMessageGroup.class;
-                break;
-            case WxConsts.XmlMsgType.IMAGE:
-                group = ImageMessageGroup.class;
-                break;
-            case WxConsts.XmlMsgType.VOICE:
-                group = VoiceMessageGroup.class;
-                break;
-            case WxConsts.XmlMsgType.VIDEO:
-                group = VideoMessageGroup.class;
-                break;
-            case WxConsts.XmlMsgType.NEWS:
-                group = NewsMessageGroup.class;
-                break;
-            case WxConsts.XmlMsgType.MUSIC:
-                group = MusicMessageGroup.class;
-                break;
-            default:
+            case WxConsts.XmlMsgType.TEXT -> group = TextMessageGroup.class;
+            case WxConsts.XmlMsgType.IMAGE -> group = ImageMessageGroup.class;
+            case WxConsts.XmlMsgType.VOICE -> group = VoiceMessageGroup.class;
+            case WxConsts.XmlMsgType.VIDEO -> group = VideoMessageGroup.class;
+            case WxConsts.XmlMsgType.NEWS -> group = NewsMessageGroup.class;
+            case WxConsts.XmlMsgType.MUSIC -> group = MusicMessageGroup.class;
+            default -> {
                 log.error("[validateMessage][未知的消息类型({})]", message);
                 throw new IllegalArgumentException("不支持的消息类型：" + type);
+            }
         }
         // 执行校验
         ValidationUtils.validate(validator, message, group);
@@ -58,32 +47,25 @@ public class MpUtils {
         // 获得对应的校验 group
         Class<?> group;
         switch (type) {
-            case WxConsts.MenuButtonType.CLICK:
+            case WxConsts.MenuButtonType.CLICK -> {
                 group = ClickButtonGroup.class;
                 validateMessage(validator, messageType, button); // 需要额外校验回复的消息格式
-                break;
-            case WxConsts.MenuButtonType.VIEW:
-                group = ViewButtonGroup.class;
-                break;
-            case WxConsts.MenuButtonType.MINIPROGRAM:
-                group = MiniProgramButtonGroup.class;
-                break;
-            case WxConsts.MenuButtonType.SCANCODE_WAITMSG:
+            }
+            case WxConsts.MenuButtonType.VIEW -> group = ViewButtonGroup.class;
+            case WxConsts.MenuButtonType.MINIPROGRAM -> group = MiniProgramButtonGroup.class;
+            case WxConsts.MenuButtonType.SCANCODE_WAITMSG -> {
                 group = ScanCodeWaitMsgButtonGroup.class;
                 validateMessage(validator, messageType, button); // 需要额外校验回复的消息格式
-                break;
-            case "article_" + WxConsts.MenuButtonType.VIEW_LIMITED:
-                group = ViewLimitedButtonGroup.class;
-                break;
-            case WxConsts.MenuButtonType.SCANCODE_PUSH: // 不用校验，直接 return 即可
-            case WxConsts.MenuButtonType.PIC_SYSPHOTO:
-            case WxConsts.MenuButtonType.PIC_PHOTO_OR_ALBUM:
-            case WxConsts.MenuButtonType.PIC_WEIXIN:
-            case WxConsts.MenuButtonType.LOCATION_SELECT:
+            }
+            case "article_" + WxConsts.MenuButtonType.VIEW_LIMITED -> group = ViewLimitedButtonGroup.class;
+            // 不用校验，直接 return 即可
+            case WxConsts.MenuButtonType.SCANCODE_PUSH, WxConsts.MenuButtonType.PIC_SYSPHOTO, WxConsts.MenuButtonType.PIC_PHOTO_OR_ALBUM, WxConsts.MenuButtonType.PIC_WEIXIN, WxConsts.MenuButtonType.LOCATION_SELECT -> {
                 return;
-            default:
+            }
+            default -> {
                 log.error("[validateButton][未知的按钮({})]", button);
                 throw new IllegalArgumentException("不支持的按钮类型：" + type);
+            }
         }
         // 执行校验
         ValidationUtils.validate(validator, button, group);
@@ -98,16 +80,12 @@ public class MpUtils {
      * @return 媒体文件类型 {@link WxConsts.MediaFileType}
      */
     public static String getMediaFileType(String messageType) {
-        switch (messageType) {
-            case WxConsts.XmlMsgType.IMAGE:
-                return WxConsts.MediaFileType.IMAGE;
-            case WxConsts.XmlMsgType.VOICE:
-                return WxConsts.MediaFileType.VOICE;
-            case WxConsts.XmlMsgType.VIDEO:
-                return WxConsts.MediaFileType.VIDEO;
-            default:
-                return WxConsts.MediaFileType.FILE;
-        }
+        return switch (messageType) {
+            case WxConsts.XmlMsgType.IMAGE -> WxConsts.MediaFileType.IMAGE;
+            case WxConsts.XmlMsgType.VOICE -> WxConsts.MediaFileType.VOICE;
+            case WxConsts.XmlMsgType.VIDEO -> WxConsts.MediaFileType.VIDEO;
+            default -> WxConsts.MediaFileType.FILE;
+        };
     }
 
     /**

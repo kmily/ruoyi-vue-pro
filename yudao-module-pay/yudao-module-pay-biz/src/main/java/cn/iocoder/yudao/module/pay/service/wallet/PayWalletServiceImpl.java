@@ -131,18 +131,10 @@ public class PayWalletServiceImpl implements  PayWalletService {
         // 2.1 扣除余额
         int updateCounts;
         switch (bizType) {
-            case PAYMENT: {
-                updateCounts = walletMapper.updateWhenConsumption(payWallet.getId(), price);
-                break;
-            }
-            case RECHARGE_REFUND: {
-                updateCounts = walletMapper.updateWhenRechargeRefund(payWallet.getId(), price);
-                break;
-            }
-            default: {
-                // TODO 其它类型待实现
-                throw new UnsupportedOperationException("待实现");
-            }
+            case PAYMENT -> updateCounts = walletMapper.updateWhenConsumption(payWallet.getId(), price);
+            case RECHARGE_REFUND -> updateCounts = walletMapper.updateWhenRechargeRefund(payWallet.getId(), price);
+            default -> // TODO 其它类型待实现
+                    throw new UnsupportedOperationException("待实现");
         }
         if (updateCounts == 0) {
             throw exception(WALLET_BALANCE_NOT_ENOUGH);
@@ -166,18 +158,12 @@ public class PayWalletServiceImpl implements  PayWalletService {
         }
         // 1.2 更新钱包金额
         switch (bizType) {
-            case PAYMENT_REFUND: { // 退款更新
-                walletMapper.updateWhenConsumptionRefund(payWallet.getId(), price);
-                break;
-            }
-            case RECHARGE: { // 充值更新
-                walletMapper.updateWhenRecharge(payWallet.getId(), price);
-                break;
-            }
-            default: {
-                // TODO 其它类型待实现
-                throw new UnsupportedOperationException("待实现");
-            }
+            case PAYMENT_REFUND -> // 退款更新
+                    walletMapper.updateWhenConsumptionRefund(payWallet.getId(), price);
+            case RECHARGE -> // 充值更新
+                    walletMapper.updateWhenRecharge(payWallet.getId(), price);
+            default -> // TODO 其它类型待实现
+                    throw new UnsupportedOperationException("待实现");
         }
 
         // 2. 生成钱包流水

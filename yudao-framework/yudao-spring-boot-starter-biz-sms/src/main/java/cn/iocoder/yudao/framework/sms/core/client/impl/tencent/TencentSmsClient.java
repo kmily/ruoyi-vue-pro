@@ -139,12 +139,12 @@ public class TencentSmsClient extends AbstractSmsClient {
 
     @VisibleForTesting
     Integer convertSmsTemplateAuditStatus(int templateStatus) {
-        switch (templateStatus) {
-            case 1: return SmsTemplateAuditStatusEnum.CHECKING.getStatus();
-            case 0: return SmsTemplateAuditStatusEnum.SUCCESS.getStatus();
-            case -1: return SmsTemplateAuditStatusEnum.FAIL.getStatus();
-            default: throw new IllegalArgumentException(String.format("未知审核状态(%d)", templateStatus));
-        }
+        return switch (templateStatus) {
+            case 1 -> SmsTemplateAuditStatusEnum.CHECKING.getStatus();
+            case 0 -> SmsTemplateAuditStatusEnum.SUCCESS.getStatus();
+            case -1 -> SmsTemplateAuditStatusEnum.FAIL.getStatus();
+            default -> throw new IllegalArgumentException(String.format("未知审核状态(%d)", templateStatus));
+        };
     }
 
     @Data

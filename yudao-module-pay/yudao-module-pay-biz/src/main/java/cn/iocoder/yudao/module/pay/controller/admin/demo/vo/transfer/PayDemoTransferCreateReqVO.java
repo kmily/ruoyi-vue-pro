@@ -50,17 +50,9 @@ public class PayDemoTransferCreateReqVO {
     public void validate(Validator validator) {
         PayTransferTypeEnum transferType = PayTransferTypeEnum.typeOf(type);
         switch (transferType) {
-            case ALIPAY_BALANCE: {
-                ValidationUtils.validate(validator, this, Alipay.class);
-                break;
-            }
-            case WX_BALANCE: {
-                ValidationUtils.validate(validator, this, WxPay.class);
-                break;
-            }
-            default: {
-                throw new UnsupportedOperationException("待实现");
-            }
+            case ALIPAY_BALANCE -> ValidationUtils.validate(validator, this, Alipay.class);
+            case WX_BALANCE -> ValidationUtils.validate(validator, this, WxPay.class);
+            default -> throw new UnsupportedOperationException("待实现");
         }
     }
 

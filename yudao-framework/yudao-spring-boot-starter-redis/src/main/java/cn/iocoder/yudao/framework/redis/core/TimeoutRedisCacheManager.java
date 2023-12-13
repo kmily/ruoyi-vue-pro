@@ -56,18 +56,13 @@ public class TimeoutRedisCacheManager extends RedisCacheManager {
      */
     private Duration parseDuration(String ttlStr) {
         String timeUnit = StrUtil.subSuf(ttlStr, -1);
-        switch (timeUnit) {
-            case "d":
-                return Duration.ofDays(removeDurationSuffix(ttlStr));
-            case "h":
-                return Duration.ofHours(removeDurationSuffix(ttlStr));
-            case "m":
-                return Duration.ofMinutes(removeDurationSuffix(ttlStr));
-            case "s":
-                return Duration.ofSeconds(removeDurationSuffix(ttlStr));
-            default:
-                return Duration.ofSeconds(Long.parseLong(ttlStr));
-        }
+        return switch (timeUnit) {
+            case "d" -> Duration.ofDays(removeDurationSuffix(ttlStr));
+            case "h" -> Duration.ofHours(removeDurationSuffix(ttlStr));
+            case "m" -> Duration.ofMinutes(removeDurationSuffix(ttlStr));
+            case "s" -> Duration.ofSeconds(removeDurationSuffix(ttlStr));
+            default -> Duration.ofSeconds(Long.parseLong(ttlStr));
+        };
     }
 
     /**

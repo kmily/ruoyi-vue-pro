@@ -211,16 +211,11 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
 
     private double getChargeValue(OrderItem orderItem, Integer chargeMode) {
         DeliveryExpressChargeModeEnum chargeModeEnum = DeliveryExpressChargeModeEnum.valueOf(chargeMode);
-        switch (chargeModeEnum) {
-            case COUNT:
-                return orderItem.getCount();
-            case WEIGHT:
-                return orderItem.getWeight() != null ? orderItem.getWeight() * orderItem.getCount() : 0;
-            case VOLUME:
-                return orderItem.getVolume() != null ? orderItem.getVolume() * orderItem.getCount() : 0;
-            default:
-                throw new IllegalArgumentException(StrUtil.format("未知的计费模式({})", chargeMode));
-        }
+        return switch (chargeModeEnum) {
+            case COUNT -> orderItem.getCount();
+            case WEIGHT -> orderItem.getWeight() != null ? orderItem.getWeight() * orderItem.getCount() : 0;
+            case VOLUME -> orderItem.getVolume() != null ? orderItem.getVolume() * orderItem.getCount() : 0;
+        };
     }
 
 }

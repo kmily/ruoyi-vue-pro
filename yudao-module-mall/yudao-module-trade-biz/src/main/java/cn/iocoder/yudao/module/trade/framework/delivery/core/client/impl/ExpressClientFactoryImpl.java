@@ -41,14 +41,10 @@ public class ExpressClientFactoryImpl implements ExpressClientFactory {
 
     private ExpressClient createExpressClient(ExpressClientEnum queryProviderEnum,
                                                 TradeExpressProperties tradeExpressProperties) {
-        switch (queryProviderEnum) {
-            case NOT_PROVIDE:
-                return new NoProvideExpressClient();
-            case KD_NIAO:
-                return new KdNiaoExpressClient(restTemplate, tradeExpressProperties.getKdNiao());
-            case KD_100:
-                return new Kd100ExpressClient(restTemplate, tradeExpressProperties.getKd100());
-        }
-        return null;
+        return switch (queryProviderEnum) {
+            case NOT_PROVIDE -> new NoProvideExpressClient();
+            case KD_NIAO -> new KdNiaoExpressClient(restTemplate, tradeExpressProperties.getKdNiao());
+            case KD_100 -> new Kd100ExpressClient(restTemplate, tradeExpressProperties.getKd100());
+        };
     }
 }

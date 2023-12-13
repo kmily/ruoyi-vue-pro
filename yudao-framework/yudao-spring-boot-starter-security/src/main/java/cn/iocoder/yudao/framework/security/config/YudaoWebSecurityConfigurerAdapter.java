@@ -180,24 +180,12 @@ public class YudaoWebSecurityConfigurerAdapter {
             // 根据请求方法，添加到 result 结果
             entry.getKey().getMethodsCondition().getMethods().forEach(requestMethod -> {
                 switch (requestMethod) {
-                    case GET:
-                        result.putAll(HttpMethod.GET, urls);
-                        break;
-                    case POST:
-                        result.putAll(HttpMethod.POST, urls);
-                        break;
-                    case PUT:
-                        result.putAll(HttpMethod.PUT, urls);
-                        break;
-                    case DELETE:
-                        result.putAll(HttpMethod.DELETE, urls);
-                        break;
-                    case HEAD:
-                        result.putAll(HttpMethod.HEAD, urls);
-                        break;
-                    case PATCH:
-                        result.putAll(HttpMethod.PATCH, urls);
-                        break;
+                    case GET -> result.putAll(HttpMethod.GET, urls);
+                    case POST -> result.putAll(HttpMethod.POST, urls);
+                    case PUT -> result.putAll(HttpMethod.PUT, urls);
+                    case DELETE -> result.putAll(HttpMethod.DELETE, urls);
+                    case HEAD -> result.putAll(HttpMethod.HEAD, urls);
+                    case PATCH -> result.putAll(HttpMethod.PATCH, urls);
                 }
             });
         }
