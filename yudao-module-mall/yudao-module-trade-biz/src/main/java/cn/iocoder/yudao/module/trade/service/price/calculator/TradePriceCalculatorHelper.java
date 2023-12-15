@@ -245,7 +245,7 @@ public class TradePriceCalculatorHelper {
      * @return 分摊金额数组，和传入的 orderItems 一一对应
      */
     public static List<Integer> dividePrice2(List<TradeOrderItemDO> items, Integer price) {
-        Integer total = getSumValue(items, TradeOrderItemDO::getPrice, Integer::sum);
+        Integer total = getSumValue(items, TradeOrderItemDO::getPayPrice, Integer::sum);
         assert total != null;
         // 遍历每一个，进行分摊
         List<Integer> prices = new ArrayList<>(items.size());
