@@ -205,17 +205,9 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     private void validatePayTransferReqDTO(PayTransferUnifiedReqDTO reqDTO) {
         PayTransferTypeEnum transferType = PayTransferTypeEnum.typeOf(reqDTO.getType());
         switch (transferType) {
-            case ALIPAY_BALANCE: {
-                ValidationUtils.validate(reqDTO,  PayTransferTypeEnum.Alipay.class);
-                break;
-            }
-            case WX_BALANCE: {
-                ValidationUtils.validate(reqDTO, PayTransferTypeEnum.WxPay.class);
-                break;
-            }
-            default: {
-                throw exception(NOT_IMPLEMENTED);
-            }
+            case ALIPAY_BALANCE -> ValidationUtils.validate(reqDTO, PayTransferTypeEnum.Alipay.class);
+            case WX_BALANCE -> ValidationUtils.validate(reqDTO, PayTransferTypeEnum.WxPay.class);
+            default -> throw exception(NOT_IMPLEMENTED);
         }
     }
 

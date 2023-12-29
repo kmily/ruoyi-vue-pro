@@ -296,18 +296,13 @@ public class OperateLogAspect {
         if (requestMethod == null) {
             return null;
         }
-        switch (requestMethod) {
-            case GET:
-                return OperateTypeEnum.GET;
-            case POST:
-                return OperateTypeEnum.CREATE;
-            case PUT:
-                return OperateTypeEnum.UPDATE;
-            case DELETE:
-                return OperateTypeEnum.DELETE;
-            default:
-                return OperateTypeEnum.OTHER;
-        }
+        return switch (requestMethod) {
+            case GET -> OperateTypeEnum.GET;
+            case POST -> OperateTypeEnum.CREATE;
+            case PUT -> OperateTypeEnum.UPDATE;
+            case DELETE -> OperateTypeEnum.DELETE;
+            default -> OperateTypeEnum.OTHER;
+        };
     }
 
     private static RequestMethod[] obtainRequestMethod(ProceedingJoinPoint joinPoint) {

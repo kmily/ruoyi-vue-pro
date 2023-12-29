@@ -62,34 +62,19 @@ public class PayTransferCreateReqVO {
     public void validate(Validator validator) {
        PayTransferTypeEnum transferType = typeOf(type);
         switch (transferType) {
-            case ALIPAY_BALANCE: {
-                ValidationUtils.validate(validator, this, Alipay.class);
-                break;
-            }
-            case WX_BALANCE: {
-                ValidationUtils.validate(validator, this, WxPay.class);
-                break;
-            }
-            default: {
-                throw new UnsupportedOperationException("待实现");
-            }
+            case ALIPAY_BALANCE -> ValidationUtils.validate(validator, this, Alipay.class);
+            case WX_BALANCE -> ValidationUtils.validate(validator, this, WxPay.class);
+            default -> throw new UnsupportedOperationException("待实现");
         }
     }
 
     @AssertTrue(message = "转账类型和转账渠道不匹配")
     public boolean isValidChannelCode() {
         PayTransferTypeEnum transferType = typeOf(type);
-        switch (transferType) {
-            case ALIPAY_BALANCE: {
-                return PayChannelEnum.isAlipay(channelCode);
-            }
-            case WX_BALANCE:
-            case BANK_CARD:
-            case WALLET_BALANCE: {
-                throw exception(NOT_IMPLEMENTED);
-            }
-        }
-        return Boolean.FALSE;
+        return switch (transferType) {
+            case ALIPAY_BALANCE -> PayChannelEnum.isAlipay(channelCode);
+            case WX_BALANCE, BANK_CARD, WALLET_BALANCE -> throw exception(NOT_IMPLEMENTED);
+        };
     }
 
 }
