@@ -8,6 +8,8 @@ import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.service.level.MemberLevelService;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
+import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
+import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUser;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "用户 APP - 用户个人中心")
@@ -32,13 +35,17 @@ public class AppMemberUserController {
     @Resource
     private MemberLevelService levelService;
 
+    @Resource
+    private PayWalletService payWalletService;
+
     @GetMapping("/get")
     @Operation(summary = "获得基本信息")
     @PreAuthenticated
     public CommonResult<AppMemberUserInfoRespVO> getUserInfo() {
         MemberUserDO user = userService.getUser(getLoginUserId());
         MemberLevelDO level = levelService.getLevel(user.getLevelId());
-        return success(MemberUserConvert.INSTANCE.convert(user, level));
+        PayWalletDO payWalletDO = payWalletService.getOrCreateWallet(getLoginUserId(), getLoginUser().getUserType());
+        return success(MemberUserConvert.INSTANCE.convert(user, level, payWalletDO));
     }
 
     @PutMapping("/update")
