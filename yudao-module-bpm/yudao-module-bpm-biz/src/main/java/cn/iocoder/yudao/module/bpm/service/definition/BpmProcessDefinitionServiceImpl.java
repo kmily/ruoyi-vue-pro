@@ -6,6 +6,8 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.flowable.core.util.BpmnModelUtils;
+import cn.iocoder.yudao.framework.flowable.core.util.FlowableUtils;
+import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionListReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionPageItemRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionPageReqVO;
@@ -27,8 +29,8 @@ import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
+import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -124,6 +126,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         Deployment deploy = repositoryService.createDeployment()
                 .key(createReqDTO.getKey()).name(createReqDTO.getName()).category(createReqDTO.getCategory())
                 .addBytes(createReqDTO.getKey() + BPMN_FILE_SUFFIX, createReqDTO.getBpmnBytes())
+                .tenantId(TenantContextHolder.getTenantIdStr())
                 .deploy();
 
         // 设置 ProcessDefinition 的 category 分类
@@ -234,6 +237,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
             definitionQuery.active();
         }
         // 执行查询
+        definitionQuery.processDefinitionTenantId(TenantContextHolder.getTenantIdStr());
         List<ProcessDefinition> processDefinitions = definitionQuery.list();
         if (CollUtil.isEmpty(processDefinitions)) {
             return Collections.emptyList();
