@@ -26,7 +26,7 @@ public class AppTradeOrderSettlementRespVO {
     private Address address;
 
     @Schema(description = "已使用的积分", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
-    private Integer usePoint;
+    private Integer usedPoint;
 
     @Schema(description = "总积分", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     private Integer totalPoint;

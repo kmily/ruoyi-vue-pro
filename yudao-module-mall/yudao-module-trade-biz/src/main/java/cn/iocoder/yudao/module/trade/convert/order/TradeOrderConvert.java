@@ -249,6 +249,9 @@ public interface TradeOrderConvert {
         return respVO;
     }
 
+    @Mappings({
+            @Mapping(target = "usedPoint", source = "calculate.usePoint"),
+    })
     AppTradeOrderSettlementRespVO convert0(TradePriceCalculateRespBO calculate, MemberAddressRespDTO address);
 
     List<AppOrderExpressTrackRespDTO> convertList02(List<ExpressTrackRespDTO> list);
