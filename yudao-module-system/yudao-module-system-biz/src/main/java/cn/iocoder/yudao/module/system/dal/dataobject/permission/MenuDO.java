@@ -43,6 +43,7 @@ public class MenuDO extends BaseDO {
      * 当我们把该 MenuDO 赋予给角色后，意味着该角色有该资源：
      * - 对于后端，配合 @PreAuthorize 注解，配置 API 接口需要该权限，从而对 API 接口进行权限控制。
      * - 对于前端，配合前端标签，配置按钮是否展示，避免用户没有该权限时，结果可以看到该操作。
+     * 支持使用,拼接多个权限，如system:admin:add,system:admin:query
      */
     private String permission;
     /**

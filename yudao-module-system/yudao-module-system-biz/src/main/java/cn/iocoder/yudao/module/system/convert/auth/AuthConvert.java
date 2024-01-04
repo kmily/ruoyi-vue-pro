@@ -28,11 +28,13 @@ public interface AuthConvert {
     AuthLoginRespVO convert(OAuth2AccessTokenDO bean);
 
     default AuthPermissionInfoRespVO convert(AdminUserDO user, List<RoleDO> roleList, List<MenuDO> menuList) {
+        Set<String> permissions = convertSet(menuList, MenuDO::getPermission);
+        Set<String> extraPermissions = permissions.stream().flatMap(permission -> Arrays.stream(permission.split(","))).collect(Collectors.toSet());
         return AuthPermissionInfoRespVO.builder()
                 .user(AuthPermissionInfoRespVO.UserVO.builder().id(user.getId()).nickname(user.getNickname()).avatar(user.getAvatar()).build())
                 .roles(convertSet(roleList, RoleDO::getCode))
                 // 权限标识信息
-                .permissions(convertSet(menuList, MenuDO::getPermission))
+                .permissions(extraPermissions)
                 // 菜单树
                 .menus(buildMenuTree(menuList))
                 .build();
