@@ -54,6 +54,11 @@ public class TradePriceCalculateRespBO {
     private Integer usePoint;
 
     /**
+     * 用户总积分
+     */
+    private Integer totalPoint;
+
+    /**
      * 使用的积分
      */
     private Integer givePoint;
