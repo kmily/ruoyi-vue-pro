@@ -54,8 +54,6 @@ public class TradePointUsePriceCalculator implements TradePriceCalculator {
         if (user.getPoint() == null || user.getPoint() <= 0) {
             return;
         }
-        // 记录用户总积分
-        result.setTotalPoint(user.getPoint());
 
         // 2.1 计算积分优惠金额
         int pointPrice = calculatePointPrice(config, user.getPoint(), result);
