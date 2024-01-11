@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.system.service.permission;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuSaveVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
@@ -77,6 +78,11 @@ public class MenuServiceImpl implements MenuService {
         MenuDO updateObj = BeanUtils.toBean(updateReqVO, MenuDO.class);
         initMenuProperty(updateObj);
         menuMapper.updateById(updateObj);
+
+        //子菜单的开启状态随着父级菜单的开启状态变化
+        if (updateObj.getStatus() != null) {
+            updateChildrenMenuStatus(updateObj.getId(), updateObj.getStatus());
+        }
     }
 
     @Override
@@ -202,6 +208,31 @@ public class MenuServiceImpl implements MenuService {
             menu.setComponentName("");
             menu.setIcon("");
             menu.setPath("");
+        }
+    }
+
+
+    /**
+     * 递归更新子菜单的开启状态
+     * @param id 父级id
+     * @param status 状态
+     */
+    private void updateChildrenMenuStatus(Long id, Integer status) {
+        //如果两个参数有一个为空都返回
+        if (id == null || status == null) {
+            return;
+        }
+
+        //查询子菜单信息
+        LambdaQueryWrapperX<MenuDO> queryWrapperX = new LambdaQueryWrapperX<>();
+        queryWrapperX.eq(MenuDO::getParentId, id);
+        List<MenuDO> menuDOS = menuMapper.selectList(queryWrapperX);
+
+        //更新子菜单并继续更新下一级子菜单
+        for (MenuDO menuDO : menuDOS) {
+            menuDO.setStatus(status);
+            menuMapper.updateById(menuDO);
+            updateChildrenMenuStatus(menuDO.getId(), status);
         }
     }
 
