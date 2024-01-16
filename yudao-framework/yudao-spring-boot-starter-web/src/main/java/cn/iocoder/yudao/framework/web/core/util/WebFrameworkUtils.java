@@ -37,8 +37,11 @@ public class WebFrameworkUtils {
 
     private static WebProperties properties;
 
-    public WebFrameworkUtils(WebProperties webProperties) {
+    public static void init(WebProperties webProperties) {
         WebFrameworkUtils.properties = webProperties;
+    }
+
+    private WebFrameworkUtils() {
     }
 
     /**
