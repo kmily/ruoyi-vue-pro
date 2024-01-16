@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.framework.web.config;
 
-import cn.iocoder.yudao.framework.apilog.core.service.ApiErrorLogFrameworkService;
 import cn.iocoder.yudao.framework.common.enums.WebFilterOrderEnum;
 import cn.iocoder.yudao.framework.web.core.filter.CacheRequestBodyFilter;
 import cn.iocoder.yudao.framework.web.core.filter.DemoFilter;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalResponseBodyHandler;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
-import org.springframework.beans.factory.annotation.Value;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
+import jakarta.servlet.Filter;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration;
@@ -24,20 +25,17 @@ import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.Filter;
-
 @AutoConfiguration
 @EnableConfigurationProperties(WebProperties.class)
 public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
 
     @Resource
     private WebProperties webProperties;
-    /**
-     * 应用名
-     */
-    @Value("${spring.application.name}")
-    private String applicationName;
+
+    @PostConstruct
+    public void postConstruct() {
+        WebFrameworkUtils.init(webProperties);
+    }
 
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
@@ -58,20 +56,13 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public GlobalExceptionHandler globalExceptionHandler(ApiErrorLogFrameworkService ApiErrorLogFrameworkService) {
-        return new GlobalExceptionHandler(applicationName, ApiErrorLogFrameworkService);
+    public GlobalExceptionHandler globalExceptionHandler() {
+        return new GlobalExceptionHandler();
     }
 
     @Bean
     public GlobalResponseBodyHandler globalResponseBodyHandler() {
         return new GlobalResponseBodyHandler();
-    }
-
-    @Bean
-    @SuppressWarnings("InstantiationOfUtilityClass")
-    public WebFrameworkUtils webFrameworkUtils(WebProperties webProperties) {
-        // 由于 WebFrameworkUtils 需要使用到 webProperties 属性，所以注册为一个 Bean
-        return new WebFrameworkUtils(webProperties);
     }
 
     // ========== Filter 相关 ==========

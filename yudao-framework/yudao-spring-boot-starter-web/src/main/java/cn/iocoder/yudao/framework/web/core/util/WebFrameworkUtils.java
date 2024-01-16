@@ -1,18 +1,15 @@
 package cn.iocoder.yudao.framework.web.core.util;
 
 import cn.hutool.core.util.NumberUtil;
-import cn.hutool.extra.servlet.ServletUtil;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 专属于 web 包的工具类
@@ -37,8 +34,11 @@ public class WebFrameworkUtils {
 
     private static WebProperties properties;
 
-    public WebFrameworkUtils(WebProperties webProperties) {
+    public static void init(WebProperties webProperties) {
         WebFrameworkUtils.properties = webProperties;
+    }
+
+    private WebFrameworkUtils() {
     }
 
     /**
