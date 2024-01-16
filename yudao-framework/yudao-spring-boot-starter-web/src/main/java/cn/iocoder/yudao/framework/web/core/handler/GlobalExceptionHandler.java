@@ -11,9 +11,11 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
-import lombok.AllArgsConstructor;
+import jakarta.annotation.Resource;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.util.Assert;
 import org.springframework.validation.BindException;
@@ -42,12 +44,14 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
  * @author 芋道源码
  */
 @RestControllerAdvice
-@AllArgsConstructor
+@NoArgsConstructor(force = true)
 @Slf4j
 public class GlobalExceptionHandler {
 
+    @Value("${spring.application.name}")
     private final String applicationName;
 
+    @Resource
     private final ApiErrorLogFrameworkService apiErrorLogFrameworkService;
 
     /**
