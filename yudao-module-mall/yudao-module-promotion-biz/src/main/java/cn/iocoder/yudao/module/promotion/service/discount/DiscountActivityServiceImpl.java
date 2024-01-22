@@ -63,6 +63,7 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
         // 插入商品
         // TODO @zhangshuai：activityStatus 最好代码里，也做下设置噢。
         
+        // TODO @bumianri: 是不是使用 CollectionUtils.convertMap 来处理好一些呀？最后放 DiscountActivityConvert 里
          List<DiscountProductDO> discountProducts = createReqVO.getProducts().stream().map(product -> {
             DiscountProductDO discountProductDO = new DiscountProductDO();
             BeanUtils.copyProperties(product, discountProductDO);
