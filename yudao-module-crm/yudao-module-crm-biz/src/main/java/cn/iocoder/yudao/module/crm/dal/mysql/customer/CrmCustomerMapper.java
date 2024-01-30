@@ -119,7 +119,9 @@ public interface CrmCustomerMapper extends BaseMapperX<CrmCustomerDO> {
         // 拼接数据权限的查询条件
         CrmQueryWrapperUtils.appendPermissionCondition(query, CrmBizTypeEnum.CRM_CUSTOMER.getType(),
                 CrmCustomerDO::getId, userId, pageReqVO.getSceneType(), null);
-        // TODO @dhb52：lock 的情况，不需要提醒哈；
+
+        // 没有锁定的情况下才提醒
+        query.eq(CrmCustomerDO::getLockStatus, false);
 
         // 拼接自身的查询条件
         query.selectAll(CrmCustomerDO.class);
