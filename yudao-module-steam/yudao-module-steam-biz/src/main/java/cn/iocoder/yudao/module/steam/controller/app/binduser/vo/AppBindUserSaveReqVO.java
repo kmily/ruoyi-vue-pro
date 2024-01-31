@@ -1,0 +1,35 @@
+package cn.iocoder.yudao.module.steam.controller.app.binduser.vo;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+import java.util.*;
+import javax.validation.constraints.*;
+
+@Schema(description = "用户 APP -  steam用户绑定新增/修改 Request VO")
+@Data
+public class AppBindUserSaveReqVO {
+
+    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "25045")
+    private Integer id;
+
+    @Schema(description = "steam名称", example = "王五")
+    private String steamName;
+
+    @Schema(description = "用户ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "16812")
+    @NotNull(message = "用户ID不能为空")
+    private Long userId;
+
+    @Schema(description = "SteamId", requiredMode = Schema.RequiredMode.REQUIRED, example = "10768")
+    @NotEmpty(message = "SteamId不能为空")
+    private String steamId;
+
+    @Schema(description = "交易链接", example = "https://www.iocoder.cn")
+    private String tradeUrl;
+
+    @Schema(description = "API KEY")
+    private String apiKey;
+
+    @Schema(description = "备注", example = "你说的对")
+    private String remark;
+
+}
