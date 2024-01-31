@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.steam.controller.admin.binduser.vo.BindUserPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.binduser.vo.BindUserSaveReqVO;
 import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
@@ -12,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -64,28 +64,37 @@ public class SteamService {
     /**
      * 验证用户是否已经被绑定
      * @param openApi steam open返回的信息
-     * @return
-     * @throws UnsupportedEncodingException
+     * @return true 成功  false 失败
+     * @throws UnsupportedEncodingException 异常
      */
     public boolean verifyOpenApi(OpenApi openApi) throws Exception {
         try{
             ConfigDO configByKey = configService.getConfigByKey("steam.host");
-            StringBuffer stringBuffer=new StringBuffer();
-            stringBuffer.append("openid.ns=").append(URLEncoder.encode(openApi.getNs(),"UTF8"));
-            stringBuffer.append("&").append("openid.mode=").append(URLEncoder.encode("check_authentication","UTF8"));
-            stringBuffer.append("&").append("openid.op_endpoint=").append(URLEncoder.encode(openApi.getOpEndpoint(),"UTF8"));
-            stringBuffer.append("&").append("openid.claimed_id=").append(URLEncoder.encode(openApi.getClaimedId(),"UTF8"));
-            stringBuffer.append("&").append("openid.identity=").append(URLEncoder.encode(openApi.getIdentity(),"UTF8"));
-            stringBuffer.append("&openid.return_to=").append(URLEncoder.encode(openApi.getReturnTo(),"utf-8"));
-            stringBuffer.append("&").append("openid.response_nonce=").append(URLEncoder.encode(openApi.getResponseNonce(),"UTF8"));
-            stringBuffer.append("&").append("openid.assoc_handle=").append(URLEncoder.encode(openApi.getAssocHandle(),"UTF8"));
-            stringBuffer.append("&").append("openid.signed=").append(URLEncoder.encode(openApi.getSigned(),"UTF8"));
-            stringBuffer.append("&").append("openid.sig=").append(URLEncoder.encode(openApi.getSig(),"UTF8"));
+//            StringBuffer stringBuffer=new StringBuffer();
+//            stringBuffer.append("openid.ns=").append(URLEncoder.encode(openApi.getNs(),"UTF8"));
+//            stringBuffer.append("&").append("openid.mode=").append(URLEncoder.encode("check_authentication","UTF8"));
+//            stringBuffer.append("&").append("openid.op_endpoint=").append(URLEncoder.encode(openApi.getOpEndpoint(),"UTF8"));
+//            stringBuffer.append("&").append("openid.claimed_id=").append(URLEncoder.encode(openApi.getClaimedId(),"UTF8"));
+//            stringBuffer.append("&").append("openid.identity=").append(URLEncoder.encode(openApi.getIdentity(),"UTF8"));
+//            stringBuffer.append("&openid.return_to=").append(URLEncoder.encode(openApi.getReturnTo(),"utf-8"));
+//            stringBuffer.append("&").append("openid.response_nonce=").append(URLEncoder.encode(openApi.getResponseNonce(),"UTF8"));
+//            stringBuffer.append("&").append("openid.assoc_handle=").append(URLEncoder.encode(openApi.getAssocHandle(),"UTF8"));
+//            stringBuffer.append("&").append("openid.signed=").append(URLEncoder.encode(openApi.getSigned(),"UTF8"));
+//            stringBuffer.append("&").append("openid.sig=").append(URLEncoder.encode(openApi.getSig(),"UTF8"));
             HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
             builder.url(configByKey.getValue() + "/openid/login");
             builder.method(HttpUtil.Method.FORM);
             Map<String,String> post=new HashMap<>();
-
+            post.put("openid.ns",openApi.getNs());
+            post.put("openid.mode","check_authentication");
+            post.put("openid.op_endpoint",openApi.getOpEndpoint());
+            post.put("openid.claimed_id",openApi.getClaimedId());
+            post.put("openid.identity",openApi.getIdentity());
+            post.put("openid.return_to",openApi.getReturnTo());
+            post.put("openid.response_nonce",openApi.getResponseNonce());
+            post.put("openid.assoc_handle",openApi.getAssocHandle());
+            post.put("openid.signed",openApi.getSigned());
+            post.put("openid.sig",openApi.getSig());
             builder.form(post);
             HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
             String html = sent.html();
@@ -102,8 +111,8 @@ public class SteamService {
 
     /**
      * 将identity转成 steamId
-     * @param identity
-     * @return
+     * @param identity openId里返回的steam信息
+     * @return steamId
      */
     private String getSteamId(String identity){
         return identity.replace("https://steamcommunity.com/openid/id/","");
