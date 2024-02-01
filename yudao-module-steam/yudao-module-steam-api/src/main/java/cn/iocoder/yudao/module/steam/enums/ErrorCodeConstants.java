@@ -22,4 +22,12 @@ public interface ErrorCodeConstants {
 
     ErrorCode SEL_RARITY_NOT_EXISTS = new ErrorCode(1_100_003_003, "品质选择不存在");
 
+
+    //外观选择
+    ErrorCode SEL_EXTERIOR_NOT_EXISTS = new ErrorCode(1_100_002_00, "外观选择不存在");
+
+    //类别选择
+    ErrorCode SEL_QUALITY_NOT_EXISTS = new ErrorCode(1_100_003_00, "类别选择不存在");
+
+
 }
