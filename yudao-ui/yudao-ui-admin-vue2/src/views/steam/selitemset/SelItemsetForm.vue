@@ -106,7 +106,7 @@
          async getSelItemsetTree() {
             this.selItemsetTree = [];
             const res = await SelItemsetApi.getSelItemsetList();
-            const root = { id: 0, name: '顶级收藏品选择', children: [] };
+            const root = { id: 0, internalName: '顶级',localizedTagName:'顶级', children: [] };
             root.children = this.handleTree(res.data, 'id', 'parentId')
             this.selItemsetTree.push(root)
           },
@@ -133,4 +133,4 @@
       }
     }
   };
-</script>
+</script>
