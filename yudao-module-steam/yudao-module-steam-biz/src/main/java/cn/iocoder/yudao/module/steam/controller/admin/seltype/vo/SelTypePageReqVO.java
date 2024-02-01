@@ -15,9 +15,6 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class SelTypePageReqVO extends PageParam {
 
-    @Schema(description = "英文名字", example = "芋艿")
-    private String internalName;
-
     @Schema(description = "中文名称", example = "李四")
     private String localizedTagName;
 

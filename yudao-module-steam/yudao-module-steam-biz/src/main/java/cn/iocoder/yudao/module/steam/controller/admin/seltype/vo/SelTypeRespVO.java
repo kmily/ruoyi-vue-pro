@@ -21,9 +21,13 @@ public class SelTypeRespVO {
     @ExcelProperty("英文名字")
     private String internalName;
 
-    @Schema(description = "中文名称", example = "李四")
+    @Schema(description = "中文名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "李四")
     @ExcelProperty("中文名称")
     private String localizedTagName;
+
+    @Schema(description = "创建者")
+    @ExcelProperty("创建者")
+    private String creator;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")

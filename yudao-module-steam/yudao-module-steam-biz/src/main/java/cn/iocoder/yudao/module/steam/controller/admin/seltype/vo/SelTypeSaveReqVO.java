@@ -17,7 +17,8 @@ public class SelTypeSaveReqVO {
     @NotEmpty(message = "英文名字不能为空")
     private String internalName;
 
-    @Schema(description = "中文名称", example = "李四")
+    @Schema(description = "中文名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "李四")
+    @NotEmpty(message = "中文名称不能为空")
     private String localizedTagName;
 
     @Schema(description = "字体颜色")

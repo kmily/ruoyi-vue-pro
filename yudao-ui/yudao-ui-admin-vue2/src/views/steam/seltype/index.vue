@@ -2,9 +2,6 @@
   <div class="app-container">
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="英文名字" prop="internalName">
-        <el-input v-model="queryParams.internalName" placeholder="请输入英文名字" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
       <el-form-item label="中文名称" prop="localizedTagName">
         <el-input v-model="queryParams.localizedTagName" placeholder="请输入中文名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
@@ -41,6 +38,7 @@
                       <el-table-column label="编号" align="center" prop="id" />
       <el-table-column label="英文名字" align="center" prop="internalName" />
       <el-table-column label="中文名称" align="center" prop="localizedTagName" />
+      <el-table-column label="创建者" align="center" prop="creator" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -102,7 +100,6 @@ export default {
       queryParams: {
                     pageNo: 1,
             pageSize: 10,
-        internalName: null,
         localizedTagName: null,
         color: null,
       },

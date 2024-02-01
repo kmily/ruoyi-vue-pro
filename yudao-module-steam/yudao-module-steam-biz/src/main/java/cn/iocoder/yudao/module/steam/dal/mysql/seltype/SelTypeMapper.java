@@ -19,7 +19,6 @@ public interface SelTypeMapper extends BaseMapperX<SelTypeDO> {
 
     default PageResult<SelTypeDO> selectPage(SelTypePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<SelTypeDO>()
-                .likeIfPresent(SelTypeDO::getInternalName, reqVO.getInternalName())
                 .likeIfPresent(SelTypeDO::getLocalizedTagName, reqVO.getLocalizedTagName())
                 .eqIfPresent(SelTypeDO::getColor, reqVO.getColor())
                 .orderByDesc(SelTypeDO::getId));

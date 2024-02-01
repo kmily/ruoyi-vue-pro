@@ -45,6 +45,7 @@
         // 表单校验
         formRules: {
                         internalName: [{ required: true, message: '英文名字不能为空', trigger: 'blur' }],
+                        localizedTagName: [{ required: true, message: '中文名称不能为空', trigger: 'blur' }],
         },
                         };
     },

@@ -43,6 +43,7 @@
         formRules: {
                         typeId: [{ required: true, message: "类型选择编号不能为空", trigger: "blur" }],
                         internalName: [{ required: true, message: "英文名字不能为空", trigger: "blur" }],
+                        localizedTagName: [{ required: true, message: "中文名称不能为空", trigger: "blur" }],
         },
       };
     },

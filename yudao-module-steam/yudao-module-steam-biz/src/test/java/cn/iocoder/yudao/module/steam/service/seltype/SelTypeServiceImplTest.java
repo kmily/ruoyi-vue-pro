@@ -110,20 +110,16 @@ public class SelTypeServiceImplTest extends BaseDbUnitTest {
     public void testGetSelTypePage() {
        // mock 数据
        SelTypeDO dbSelType = randomPojo(SelTypeDO.class, o -> { // 等会查询到
-           o.setInternalName(null);
            o.setLocalizedTagName(null);
            o.setColor(null);
        });
        selTypeMapper.insert(dbSelType);
-       // 测试 internalName 不匹配
-       selTypeMapper.insert(cloneIgnoreId(dbSelType, o -> o.setInternalName(null)));
        // 测试 localizedTagName 不匹配
        selTypeMapper.insert(cloneIgnoreId(dbSelType, o -> o.setLocalizedTagName(null)));
        // 测试 color 不匹配
        selTypeMapper.insert(cloneIgnoreId(dbSelType, o -> o.setColor(null)));
        // 准备参数
        SelTypePageReqVO reqVO = new SelTypePageReqVO();
-       reqVO.setInternalName(null);
        reqVO.setLocalizedTagName(null);
        reqVO.setColor(null);
 
