@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import jakarta.annotation.Resource;
+
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 
@@ -13,8 +13,10 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.selexterior.SelExteriorDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.selexterior.SelExteriorMapper;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
-import jakarta.annotation.Resource;
+
 import org.springframework.context.annotation.Import;
+
+import javax.annotation.Resource;
 import java.util.*;
 import java.time.LocalDateTime;
 
