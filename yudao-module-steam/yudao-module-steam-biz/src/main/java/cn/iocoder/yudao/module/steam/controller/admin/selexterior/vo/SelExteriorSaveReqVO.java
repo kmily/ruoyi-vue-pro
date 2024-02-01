@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.*;
+
 @Schema(description = "管理后台 - 外观选择新增/修改 Request VO")
 @Data
 public class SelExteriorSaveReqVO {
@@ -19,5 +20,8 @@ public class SelExteriorSaveReqVO {
     @Schema(description = "中文名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "略有磨损")
     @NotEmpty(message = "中文名称不能为空")
     private String localizedTagName;
+
+    @Schema(description = "字体颜色", example = "#B7625F")
+    private String color;
 
 }

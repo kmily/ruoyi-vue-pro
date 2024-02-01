@@ -29,4 +29,8 @@ public class SelExteriorRespVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
+    @Schema(description = "字体颜色", example = "#B7625F")
+    @ExcelProperty("字体颜色")
+    private String color;
+
 }
