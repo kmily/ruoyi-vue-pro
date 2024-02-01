@@ -35,5 +35,9 @@ public class SelExteriorDO extends BaseDO {
      * 中文名称
      */
     private String localizedTagName;
+    /**
+     * 字体颜色
+     */
+    private String color;
 
 }

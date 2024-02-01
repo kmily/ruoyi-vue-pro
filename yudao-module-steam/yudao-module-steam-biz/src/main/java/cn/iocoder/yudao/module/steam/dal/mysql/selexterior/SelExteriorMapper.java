@@ -22,6 +22,7 @@ public interface SelExteriorMapper extends BaseMapperX<SelExteriorDO> {
                 .likeIfPresent(SelExteriorDO::getInternalName, reqVO.getInternalName())
                 .likeIfPresent(SelExteriorDO::getLocalizedTagName, reqVO.getLocalizedTagName())
                 .betweenIfPresent(SelExteriorDO::getCreateTime, reqVO.getCreateTime())
+                .eqIfPresent(SelExteriorDO::getColor, reqVO.getColor())
                 .orderByDesc(SelExteriorDO::getId));
     }
 

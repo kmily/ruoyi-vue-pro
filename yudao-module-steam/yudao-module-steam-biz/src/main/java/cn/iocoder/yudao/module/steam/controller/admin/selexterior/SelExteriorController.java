@@ -34,7 +34,6 @@ import javax.validation.Valid;
 @RequestMapping("/steam/sel-exterior")
 @Validated
 @Resource
-@Valid
 public class SelExteriorController {
 
     @Resource

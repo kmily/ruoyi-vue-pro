@@ -9,6 +9,9 @@
                     <el-form-item label="中文名称" prop="localizedTagName">
                       <el-input v-model="formData.localizedTagName" placeholder="请输入中文名称" />
                     </el-form-item>
+                    <el-form-item label="字体颜色" prop="color">
+                      <el-input v-model="formData.color" placeholder="请输入字体颜色" />
+                    </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm" :disabled="formLoading">确 定</el-button>
@@ -37,6 +40,7 @@
                             id: undefined,
                             internalName: undefined,
                             localizedTagName: undefined,
+                            color: undefined,
         },
         // 表单校验
         formRules: {
@@ -93,9 +97,10 @@
                             id: undefined,
                             internalName: undefined,
                             localizedTagName: undefined,
+                            color: undefined,
         };
         this.resetForm("formRef");
       }
     }
   };
-</script>
+</script>

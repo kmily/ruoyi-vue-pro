@@ -20,12 +20,10 @@ public interface ErrorCodeConstants {
     ErrorCode SEL_TYPE_NOT_EXISTS = new ErrorCode(1_100_003_001, "类型选择不存在");
     ErrorCode SEL_WEAPON_NOT_EXISTS = new ErrorCode(1_100_003_002, "武器选择不存在");
 
-    // TODO 待办：请将下面的错误码复制到 yudao-module-steam-api 模块的 ErrorCodeConstants 类中。注意，请给“TODO 补充编号”设置一个错误码编号！！！
-// ========== 外观选择 TODO 补充编号 ==========
+    //外观选择
     ErrorCode SEL_EXTERIOR_NOT_EXISTS = new ErrorCode(1_100_002_00, "外观选择不存在");
 
-    // TODO 待办：请将下面的错误码复制到 yudao-module-steam-api 模块的 ErrorCodeConstants 类中。注意，请给“TODO 补充编号”设置一个错误码编号！！！
-// ========== 类别选择 TODO 补充编号 ==========
+    //类别选择
     ErrorCode SEL_QUALITY_NOT_EXISTS = new ErrorCode(1_100_003_00, "类别选择不存在");
 
 
