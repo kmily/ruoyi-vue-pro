@@ -19,4 +19,7 @@ public interface ErrorCodeConstants {
     //类型选择
     ErrorCode SEL_TYPE_NOT_EXISTS = new ErrorCode(1_100_003_001, "类型选择不存在");
     ErrorCode SEL_WEAPON_NOT_EXISTS = new ErrorCode(1_100_003_002, "武器选择不存在");
+
+    ErrorCode SEL_RARITY_NOT_EXISTS = new ErrorCode(1_100_003_003, "品质选择不存在");
+
 }
