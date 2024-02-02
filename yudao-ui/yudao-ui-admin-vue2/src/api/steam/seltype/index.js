@@ -73,7 +73,7 @@ export function exportSelTypeExcel(params) {
   export function updateSelWeapon(data) {
     return request({
       url: '/steam/sel-type/sel-weapon/update',
-      method: 'post',
+      method: 'put',
       data
     })
   }
@@ -90,4 +90,4 @@ export function exportSelTypeExcel(params) {
       url: '/steam/sel-type/sel-weapon/get?id=' + id,
       method: 'get'
     })
-  }
+  }
