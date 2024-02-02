@@ -24,10 +24,11 @@ public interface ErrorCodeConstants {
 
 
     //外观选择
-    ErrorCode SEL_EXTERIOR_NOT_EXISTS = new ErrorCode(1_100_002_00, "外观选择不存在");
+    ErrorCode SEL_EXTERIOR_NOT_EXISTS = new ErrorCode(1_100_0052_01, "外观选择不存在");
 
     //类别选择
-    ErrorCode SEL_QUALITY_NOT_EXISTS = new ErrorCode(1_100_003_00, "类别选择不存在");
-
+    ErrorCode SEL_QUALITY_NOT_EXISTS = new ErrorCode(1_100_006_01, "类别选择不存在");
+    //开放平台
+    ErrorCode DEV_ACCOUNT_NOT_EXISTS = new ErrorCode(1_100_007_01, "开放平台用户不存在");
 
 }
