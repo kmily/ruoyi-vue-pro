@@ -27,7 +27,7 @@ import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*
 
 import cn.iocoder.yudao.module.steam.controller.admin.seltype.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.seltype.SelTypeDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.selweapon.SelWeaponDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.seltype.SelWeaponDO;
 import cn.iocoder.yudao.module.steam.service.seltype.SelTypeService;
 
 @Tag(name = "管理后台 - 类型选择")

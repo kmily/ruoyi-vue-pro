@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
 import javax.validation.constraints.*;
-import cn.iocoder.yudao.module.steam.dal.dataobject.selweapon.SelWeaponDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.seltype.SelWeaponDO;
 
 @Schema(description = "管理后台 - 类型选择新增/修改 Request VO")
 @Data

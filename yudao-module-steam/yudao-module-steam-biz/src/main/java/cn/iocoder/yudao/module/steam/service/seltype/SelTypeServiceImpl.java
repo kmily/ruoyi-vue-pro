@@ -8,13 +8,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import cn.iocoder.yudao.module.steam.controller.admin.seltype.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.seltype.SelTypeDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.selweapon.SelWeaponDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.seltype.SelWeaponDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 
 import cn.iocoder.yudao.module.steam.dal.mysql.seltype.SelTypeMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.selweapon.SelWeaponMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.seltype.SelWeaponMapper;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants.*;

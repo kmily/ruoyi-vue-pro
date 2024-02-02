@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.steam.dal.dataobject.selweapon;
+package cn.iocoder.yudao.module.steam.dal.dataobject.seltype;
 
 import lombok.*;
 import java.util.*;
