@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.steam.utils;
 
+import cn.iocoder.yudao.module.steam.controller.app.vo.Test;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import me.chanjar.weixin.common.util.RandomUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ArrayUtils;
@@ -415,11 +417,20 @@ public class RSAUtils {
         byte[] byteArray = byteArrayOutputStream.toByteArray();
         return new String(byteArray);
     }
-//    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
 //        KeyPair keyPair = genKey(RandomUtils.getRandomStr());// 构建密钥
 //        logger.info("私钥format：{}", keyPair.getPrivate().getFormat());
 //        logger.info("公钥format：{}", keyPair.getPublic().getFormat());
 //        logger.info("私钥string：{}", base64ToStr(keyPair.getPrivate().getEncoded()));
 //        logger.info("公钥string：{}", base64ToStr(keyPair.getPublic().getEncoded()));
-//    }
+//        私钥string：MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCa8Ty3EAUyf9orPLMTv7ryzYtk6F19oTUatLO8OBbfaSVwZI/2PZiS6CQSuCXGOgoSG7Kf7wPPhg2bgWvVGL1JyZI/LBlxcMlLMS3GeX3m8QJxkkt33m89ImPwcoIrTotYJqHMX8ayW+FZ7amhgDU4a0SMNTR3BO1IjNeuhNLA8gSJDwImslb3c5joP9DF3p0wDSxO9qFzHogwwjt9jFWv9ufTzZnanJ7sZfmwt+sFIVUCXmSU4M9gX4OuMLCC6YR6xL0d3q38hqNhjEW3BfNKBeesrRJsSgJkO/ATb8Du1SQt5cLa/3wUkwdfLOoA1lcmTrc6BMm+0NNM40mZvN43AgMBAAECggEAFAlcO6Qjt+sWsH6x/bzOlTWFcDAoXuWo82Io2A88zflP8R/gCgzfHShN+em8YM0CnmLcj5geGwkP22s6IZ2IZPFfKzItvCDEtyeN7tupL2M9WKh9f+vQ4MwAtohoUudeV7DvPXmpPUlqc/Gq/QqSV1Bv1d3PghCuCrLD9XqRsoeldiw1qrz0H/yJ9eIKQNG/oI+g0HaUpjUpOZ6wSDP0h7awgelENcGF2TvBtAkHZbOFCwETM5MSsHSReeN8OPHKakK+KOsBvur1P6N2WJXr0iJayjTmqDzuWpCvB39Sq+lc8dDgs3dC14UF3P3u7a9fXiGpfjjahDy+2W+Yosrb2QKBgQDoNG9oRoTgtsULwgnP2Mn7bCowlLHr0trZ4ooLe6vK2aQdchUybsQP1iZRFmgV8RKFZPTv3z4pB8v2VTxqx5rvY0uDgc+ZKHeUr9LQ6ELUBcL61kiKNrWUE1rCXoarFmDV0fJFMhb6r6NGdg6PxSd/CGBWzFRNfHMG62d92zxglQKBgQCq0e4NW0+J+rQcZ+j5E5+/3yfISH+zCOAL+4RH1/F/CVXlKB+V8Ed9NkeLXoLWiVJrvIVkBBLEsAQxt6cXaYHkcU2Io9je8TePLLQrrSJhkXbDA8WuJPqKi0SCfab1TlllffBVcdAPITe5W8neCRu08PumDtSeyFMDFErjr6fUmwKBgHJnSzBj9hnE0sZdPnpSBAnEm/C9gf9/LmZFL+BCeTyDCFGdoIXtftmSl+RBltygnpBsUiVQpw6OEdZ23kJ5v4MMN+s97Ks3/dqa2dIlbK+Leyocoza9h67B7mhvLAhlCSavvp6K9DlkiZwwlDIPX8s9tEFvgGWA2CdjmeSvPEsVAoGAX+BUbMrDaf58+TSZXrPVBiyKd6+5fROOLSuOo4Rg15y1yVkr4Uxr06uTnHX/mcqZqD6339spbZwdvooGDu35Ke8uRXMxVnCtbn744Urb8UdkETEc0xGOThS870D3ZNgE9SIqssqerN9IF5GdTDJwiq53kEziqfxmG2RYZFNDL+ECgYAXAFq28dWdLROu1ociI5qcEWBC+DrgWEEX+gObQ6NbCHBvI3FIRlIS9SqBFwM9HCJizgEi4LS2TixUPXid3wipzfWVj3TbUIUYfUca2bNv40QJS9ErYB9QapY9tXO3Q8hMGvfO3JT8KhvzYAbGplFmSOFGMLUD3v0CM/1CM8Dm3Q==
+//        公钥string：MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmvE8txAFMn/aKzyzE7+68s2LZOhdfaE1GrSzvDgW32klcGSP9j2YkugkErglxjoKEhuyn+8Dz4YNm4Fr1Ri9ScmSPywZcXDJSzEtxnl95vECcZJLd95vPSJj8HKCK06LWCahzF/GslvhWe2poYA1OGtEjDU0dwTtSIzXroTSwPIEiQ8CJrJW93OY6D/Qxd6dMA0sTvahcx6IMMI7fYxVr/bn082Z2pye7GX5sLfrBSFVAl5klODPYF+DrjCwgumEesS9Hd6t/IajYYxFtwXzSgXnrK0SbEoCZDvwE2/A7tUkLeXC2v98FJMHXyzqANZXJk63OgTJvtDTTONJmbzeNwIDAQAB
+        ObjectMapper objectMapper=new ObjectMapper();
+        Test test=new Test();
+        test.setName("china");
+        String glzaboy = encryptByPublicKey(objectMapper.writeValueAsString(test), "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmvE8txAFMn/aKzyzE7+68s2LZOhdfaE1GrSzvDgW32klcGSP9j2YkugkErglxjoKEhuyn+8Dz4YNm4Fr1Ri9ScmSPywZcXDJSzEtxnl95vECcZJLd95vPSJj8HKCK06LWCahzF/GslvhWe2poYA1OGtEjDU0dwTtSIzXroTSwPIEiQ8CJrJW93OY6D/Qxd6dMA0sTvahcx6IMMI7fYxVr/bn082Z2pye7GX5sLfrBSFVAl5klODPYF+DrjCwgumEesS9Hd6t/IajYYxFtwXzSgXnrK0SbEoCZDvwE2/A7tUkLeXC2v98FJMHXyzqANZXJk63OgTJvtDTTONJmbzeNwIDAQAB");
+        logger.info("gg"+glzaboy);
+        String s = decryptByPrivateKey("KFjtFJ5q/3GtteMmxqYaNQLkQnw2Gfz8sYK7/q7IZxN8CACDnXzk+Wym5U3CfmRHyj4Q+ZXnaZHBuGzctqHV1FuDQMZ4ivaXu9/9X5UrHR3wgjMJ6cwxDasvCf9NT8eMR0yA4z7irCqKd61i+80xwHYkY3WX+5V36UbE2/9z1s/Gu53X7wpmjMdGolEemsLPxZh+sxlDRBORZ4GkP06eq1qzAo1XcHcuOb9IdiV+dkADWHc9UfhVYO+OYT97gftlPopzV2I1AaPns8tC9WnKtaHRTIg92F8MUnu/3k8YUoChoksx6jFZg12hdkkeO5AMVwWvRW3s+XKeMmgTdQP/Zg==", "MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCa8Ty3EAUyf9orPLMTv7ryzYtk6F19oTUatLO8OBbfaSVwZI/2PZiS6CQSuCXGOgoSG7Kf7wPPhg2bgWvVGL1JyZI/LBlxcMlLMS3GeX3m8QJxkkt33m89ImPwcoIrTotYJqHMX8ayW+FZ7amhgDU4a0SMNTR3BO1IjNeuhNLA8gSJDwImslb3c5joP9DF3p0wDSxO9qFzHogwwjt9jFWv9ufTzZnanJ7sZfmwt+sFIVUCXmSU4M9gX4OuMLCC6YR6xL0d3q38hqNhjEW3BfNKBeesrRJsSgJkO/ATb8Du1SQt5cLa/3wUkwdfLOoA1lcmTrc6BMm+0NNM40mZvN43AgMBAAECggEAFAlcO6Qjt+sWsH6x/bzOlTWFcDAoXuWo82Io2A88zflP8R/gCgzfHShN+em8YM0CnmLcj5geGwkP22s6IZ2IZPFfKzItvCDEtyeN7tupL2M9WKh9f+vQ4MwAtohoUudeV7DvPXmpPUlqc/Gq/QqSV1Bv1d3PghCuCrLD9XqRsoeldiw1qrz0H/yJ9eIKQNG/oI+g0HaUpjUpOZ6wSDP0h7awgelENcGF2TvBtAkHZbOFCwETM5MSsHSReeN8OPHKakK+KOsBvur1P6N2WJXr0iJayjTmqDzuWpCvB39Sq+lc8dDgs3dC14UF3P3u7a9fXiGpfjjahDy+2W+Yosrb2QKBgQDoNG9oRoTgtsULwgnP2Mn7bCowlLHr0trZ4ooLe6vK2aQdchUybsQP1iZRFmgV8RKFZPTv3z4pB8v2VTxqx5rvY0uDgc+ZKHeUr9LQ6ELUBcL61kiKNrWUE1rCXoarFmDV0fJFMhb6r6NGdg6PxSd/CGBWzFRNfHMG62d92zxglQKBgQCq0e4NW0+J+rQcZ+j5E5+/3yfISH+zCOAL+4RH1/F/CVXlKB+V8Ed9NkeLXoLWiVJrvIVkBBLEsAQxt6cXaYHkcU2Io9je8TePLLQrrSJhkXbDA8WuJPqKi0SCfab1TlllffBVcdAPITe5W8neCRu08PumDtSeyFMDFErjr6fUmwKBgHJnSzBj9hnE0sZdPnpSBAnEm/C9gf9/LmZFL+BCeTyDCFGdoIXtftmSl+RBltygnpBsUiVQpw6OEdZ23kJ5v4MMN+s97Ks3/dqa2dIlbK+Leyocoza9h67B7mhvLAhlCSavvp6K9DlkiZwwlDIPX8s9tEFvgGWA2CdjmeSvPEsVAoGAX+BUbMrDaf58+TSZXrPVBiyKd6+5fROOLSuOo4Rg15y1yVkr4Uxr06uTnHX/mcqZqD6339spbZwdvooGDu35Ke8uRXMxVnCtbn744Urb8UdkETEc0xGOThS870D3ZNgE9SIqssqerN9IF5GdTDJwiq53kEziqfxmG2RYZFNDL+ECgYAXAFq28dWdLROu1ociI5qcEWBC+DrgWEEX+gObQ6NbCHBvI3FIRlIS9SqBFwM9HCJizgEi4LS2TixUPXid3wipzfWVj3TbUIUYfUca2bNv40QJS9ErYB9QapY9tXO3Q8hMGvfO3JT8KhvzYAbGplFmSOFGMLUD3v0CM/1CM8Dm3Q==");
+        logger.info(s);
+    }
 }

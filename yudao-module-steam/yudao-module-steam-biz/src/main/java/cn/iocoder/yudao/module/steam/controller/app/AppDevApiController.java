@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.steam.controller.app;
 
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.steam.controller.admin.selexterior.vo.SelExteriorPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selitemset.vo.SelItemsetListReqVO;
@@ -7,6 +9,8 @@ import cn.iocoder.yudao.module.steam.controller.admin.selquality.vo.SelQualityPa
 import cn.iocoder.yudao.module.steam.controller.admin.selrarity.vo.SelRarityPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.seltype.vo.SelTypePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppDropListRespVO;
+import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
+import cn.iocoder.yudao.module.steam.service.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.selexterior.SelExteriorService;
 import cn.iocoder.yudao.module.steam.service.selitemset.SelItemsetService;
 import cn.iocoder.yudao.module.steam.service.selquality.SelQualityService;
@@ -15,11 +19,11 @@ import cn.iocoder.yudao.module.steam.service.seltype.SelTypeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+
+import java.rmi.server.ServerCloneException;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -45,7 +49,21 @@ public class AppDevApiController {
     private SelTypeService selTypeService;
     @Resource
     private SelRarityService selRarityService;
-
+    @Resource
+    private OpenApiService openApiService;
+    /**
+     * 类别选择
+     */
+    @PostMapping("/openapi")
+    @Operation(summary = "获取类别选择下拉信息")
+    public CommonResult<String> openApi(@RequestBody @Validated OpenApiReqVo openApi) {
+        try{
+            String despatch = openApiService.despatch(openApi);
+            return CommonResult.success(despatch);
+        }catch (ServiceException e){
+            return CommonResult.error(new ErrorCode(01,"接口出错原因:"+e.getMessage()));
+        }
+    }
     /**
      * 类别选择
      */

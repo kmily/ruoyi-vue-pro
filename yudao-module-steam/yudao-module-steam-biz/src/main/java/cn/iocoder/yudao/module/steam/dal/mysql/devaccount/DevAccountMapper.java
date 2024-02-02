@@ -24,5 +24,8 @@ public interface DevAccountMapper extends BaseMapperX<DevAccountDO> {
                 .eqIfPresent(DevAccountDO::getStatus, reqVO.getStatus())
                 .orderByDesc(DevAccountDO::getId));
     }
-
+    default DevAccountDO selectByUserName(DevAccountPageReqVO reqVO) {
+        return selectOne(new LambdaQueryWrapperX<DevAccountDO>()
+                .eq(DevAccountDO::getUserName, reqVO.getUserName()));
+    }
 }

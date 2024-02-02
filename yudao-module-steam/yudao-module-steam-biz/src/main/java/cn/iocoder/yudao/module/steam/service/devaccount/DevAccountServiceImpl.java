@@ -97,4 +97,17 @@ public class DevAccountServiceImpl implements DevAccountService {
         }
 
     }
+
+    public DevAccountDO selectByUserName (String userName) {
+        try {
+            DevAccountPageReqVO devAccountPageReqVO=new DevAccountPageReqVO();
+            devAccountPageReqVO.setUserName(userName);
+            DevAccountDO devAccountDO = devAccountMapper.selectByUserName(devAccountPageReqVO);
+            // 返回
+            return devAccountDO;
+        } catch (Exception e) {
+            throw new ServiceException(new ErrorCode(01,"申请权限失败"));
+        }
+
+    }
 }

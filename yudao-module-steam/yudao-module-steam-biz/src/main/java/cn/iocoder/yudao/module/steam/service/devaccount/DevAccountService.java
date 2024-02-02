@@ -58,4 +58,5 @@ public interface DevAccountService {
      * @return 开放平台用户分页
      */
     Long apply(DevAccountSaveReqVO pageReqVO);
+    DevAccountDO selectByUserName (String userName);
 }
