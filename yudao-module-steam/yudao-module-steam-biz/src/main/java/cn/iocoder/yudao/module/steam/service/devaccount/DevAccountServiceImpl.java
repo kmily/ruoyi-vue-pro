@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.steam.service.devaccount;
 
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.utils.RSAUtils;
@@ -78,21 +80,21 @@ public class DevAccountServiceImpl implements DevAccountService {
 
     @Override
     public Long apply(DevAccountSaveReqVO createReqVO) {
-        KeyPair keyPair = null;
         try {
-            keyPair = RSAUtils.genKey();
+            KeyPair keyPair = RSAUtils.genKey();
+            createReqVO.setApiPublicKey(RSAUtils.encryptBASE64(keyPair.getPublic().getEncoded()));
+            createReqVO.setApiPrivateKey(RSAUtils.encryptBASE64(keyPair.getPrivate().getEncoded()));
+            // 插入
+            LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+            createReqVO.setUserId(loginUser.getId());
+            createReqVO.setStatus(0);
+            DevAccountDO devAccount = BeanUtils.toBean(createReqVO, DevAccountDO.class);
+            devAccountMapper.insert(devAccount);
+            // 返回
+            return devAccount.getId();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServiceException(new ErrorCode(01,"申请权限失败"));
         }
-        createReqVO.setApiPublicKey(RSAUtils.encryptBASE64(keyPair.getPublic().getEncoded()));
-        createReqVO.setApiPrivateKey(RSAUtils.encryptBASE64(keyPair.getPrivate().getEncoded()));
-        // 插入
-        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        createReqVO.setUserId(loginUser.getId());
-        createReqVO.setStatus(0);
-        DevAccountDO devAccount = BeanUtils.toBean(createReqVO, DevAccountDO.class);
-        devAccountMapper.insert(devAccount);
-        // 返回
-        return devAccount.getId();
+
     }
 }
