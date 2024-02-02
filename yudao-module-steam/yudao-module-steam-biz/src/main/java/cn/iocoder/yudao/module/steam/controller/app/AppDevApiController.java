@@ -8,15 +8,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.security.PermitAll;
-
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "用户 App - Test")
 @RestController
-@RequestMapping("/demo/test")
+@RequestMapping("/devapi")
 @Validated
-public class AppDemoTestController {
+public class AppDevApiController {
     @GetMapping("/get")
     @Operation(summary = "获取 test 信息")
     public CommonResult<String> get() {
