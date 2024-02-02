@@ -42,9 +42,17 @@ public class SteamService {
 //    @Autowired
 
 //
+
+    /**
+     * 帐号绑定
+     * @param openApi
+     * @return
+     * @throws Exception
+     */
     public int bind(OpenApi openApi) throws Exception {
         Long userId = SecurityFrameworkUtils.getLoginUserId();
 //        Long userId = SecurityUtils.getUserId();
+        // 校验OpenAPI  if
         verifyOpenApi(openApi);
         String steamId = getSteamId(openApi.getIdentity());
         BindUserPageReqVO bindUserPageReqVO=new BindUserPageReqVO();
