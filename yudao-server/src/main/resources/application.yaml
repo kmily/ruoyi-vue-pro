@@ -197,7 +197,7 @@ yudao:
       - /jmreport/* # 积木报表，无法携带租户编号
       - /ureport/* # UReport 报表，无法携带租户编号
       - /admin-api/mp/open/** # 微信公众号开放平台，微信回调接口，无法携带租户编号
-      - /app-api/devapi/** # 微信公众号开放平台，微信回调接口，无法携带租户编号
+      - /app-api/devapi/** # 各类不需要登录接口
     ignore-tables:
       - system_tenant
       - system_tenant_package
