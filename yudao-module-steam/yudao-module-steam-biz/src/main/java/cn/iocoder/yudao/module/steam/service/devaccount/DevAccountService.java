@@ -51,5 +51,11 @@ public interface DevAccountService {
      * @return 开放平台用户分页
      */
     PageResult<DevAccountDO> getDevAccountPage(DevAccountPageReqVO pageReqVO);
-
+    /**
+     * 前台用户申请开放平台权限
+     *
+     * @param pageReqVO 分页查询
+     * @return 开放平台用户分页
+     */
+    Long apply(DevAccountSaveReqVO pageReqVO);
 }

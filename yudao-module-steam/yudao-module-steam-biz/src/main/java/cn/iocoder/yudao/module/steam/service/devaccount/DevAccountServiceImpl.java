@@ -1,10 +1,15 @@
 package cn.iocoder.yudao.module.steam.service.devaccount;
 
+import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.steam.utils.RSAUtils;
+import me.chanjar.weixin.common.util.RandomUtils;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.KeyPair;
 import java.util.*;
 import cn.iocoder.yudao.module.steam.controller.admin.devaccount.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
@@ -71,4 +76,23 @@ public class DevAccountServiceImpl implements DevAccountService {
         return devAccountMapper.selectPage(pageReqVO);
     }
 
+    @Override
+    public Long apply(DevAccountSaveReqVO createReqVO) {
+        KeyPair keyPair = null;
+        try {
+            keyPair = RSAUtils.genKey();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        createReqVO.setApiPublicKey(RSAUtils.encryptBASE64(keyPair.getPublic().getEncoded()));
+        createReqVO.setApiPrivateKey(RSAUtils.encryptBASE64(keyPair.getPrivate().getEncoded()));
+        // 插入
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        createReqVO.setUserId(loginUser.getId());
+        createReqVO.setStatus(0);
+        DevAccountDO devAccount = BeanUtils.toBean(createReqVO, DevAccountDO.class);
+        devAccountMapper.insert(devAccount);
+        // 返回
+        return devAccount.getId();
+    }
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.utils;
 
+import me.chanjar.weixin.common.util.RandomUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -20,8 +22,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 
 public class RSAUtils {
 
@@ -41,14 +41,14 @@ public class RSAUtils {
     private static final String KEY_ALGORITHM = "RSA";
     private static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
 
-
-    // 默认种子 请根据自己的需要定义
-    public static final String DEFAULT_SEED = "xxxxxxxxxxxxxxxxxx";
-
-
-    public static final String PUBLIC_KEY = "PublicKey";
-    public static final String PRIVATE_KEY = "PrivateKey";
-
+    /**
+     * 生成默认密钥
+     * @return
+     * @throws Exception
+     */
+    public static KeyPair genKey() throws Exception{
+        return genKey(RandomUtils.getRandomStr());
+    }
     /**
      * 生成密钥
      *
@@ -56,7 +56,7 @@ public class RSAUtils {
      * @return 密钥对象
      * @throws Exception
      */
-    public static Map<String, Key> initKey(String seed) throws Exception {
+    public static KeyPair genKey(String seed) throws Exception {
         logger.info("生成密钥");
         KeyPairGenerator keygen = KeyPairGenerator.getInstance(KEY_ALGORITHM);
         SecureRandom secureRandom = new SecureRandom();
@@ -64,54 +64,11 @@ public class RSAUtils {
         secureRandom.setSeed(seed.getBytes());
 // Modulus size must range from 512 to 1024 and be a multiple of 64
         keygen.initialize(KEYSIZE, secureRandom);
-        KeyPair keys = keygen.genKeyPair();
-        PrivateKey privateKey = keys.getPrivate();
-        PublicKey publicKey = keys.getPublic();
-        Map<String, Key> map = new HashMap<>(2);
-        map.put(PUBLIC_KEY, publicKey);
-        map.put(PRIVATE_KEY, privateKey);
-        return map;
+        return keygen.genKeyPair();
     }
 
-    /**
-     * 生成默认密钥
-     *
-     * @return 密钥对象
-     * @throws Exception
-     */
-
-    public static Map<String, Key> initKey() throws Exception {
-        return initKey(DEFAULT_SEED);
-    }
-
-    /**
-     * 取得私钥
-     *
-     * @param keyMap
-     * @return
-     * @throws Exception
-     */
-    public static String getPrivateKey(Map<String, Key> keyMap) throws Exception {
-        Key key = (Key) keyMap.get(PRIVATE_KEY);
-        //        return encryptBASE64(key.getEncoded()); // base64加密私钥
-        return base64ToStr(key.getEncoded()); // base64加密私钥
-    }
-
-    private static String base64ToStr(byte[] encoded) {
+    public static String base64ToStr(byte[] encoded) {
         return javax.xml.bind.DatatypeConverter.printBase64Binary(encoded);
-    }
-
-    /**
-     * 取得公钥
-     *
-     * @param keyMap
-     * @return
-     * @throws Exception
-     */
-    public static String getPublicKey(Map<String, Key> keyMap) throws Exception {
-        Key key = (Key) keyMap.get(PUBLIC_KEY);
-        //        return encryptBASE64(key.getEncoded()); // base64加密公钥
-        return base64ToStr(key.getEncoded()); // base64加密公钥
     }
 
     /**
@@ -142,14 +99,14 @@ public class RSAUtils {
      * @param data 要加密的数据
      * @return 加密后的字符串
      */
-    private static String encryptBASE64(byte[] data) {
+    public static String encryptBASE64(byte[] data) {
         //      BASE64Encoder encoder = new BASE64Encoder();
         //      String encode = encoder.encode(data);
         //      return encode;
         return new String(Base64.encodeBase64(data));
     }
 
-    private static byte[] decryptBASE64(String data) {
+    public static byte[] decryptBASE64(String data) {
         // BASE64Decoder 每76个字符换行
         //      BASE64Decoder decoder = new BASE64Decoder();
         //      byte[] buffer = decoder.decodeBuffer(data);
@@ -180,14 +137,12 @@ public class RSAUtils {
      * @throws InvalidKeySpecException
      * @throws NoSuchPaddingException
      * @throws InvalidKeyException
-     * @throws UnsupportedEncodingException
      * @throws BadPaddingException
      * @throws IllegalBlockSizeException
-     * @throws Exception                    加密过程中的异常信息
      */
     public static String encryptByPublicKey(String str, String publicKey)
             throws InvalidKeySpecException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
-            IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException {
+            IllegalBlockSizeException, BadPaddingException {
         // base64编码的公钥
         byte[] keyBytes = decryptBASE64(publicKey);
         RSAPublicKey pubKey = (RSAPublicKey) KeyFactory.getInstance(KEY_ALGORITHM)
@@ -197,7 +152,7 @@ public class RSAUtils {
         cipher.init(Cipher.ENCRYPT_MODE, pubKey);
         logger.info(publicKey);
         logger.info("provider: {}", cipher.getProvider().getClass().getName());
-        byte[] data = str.getBytes("UTF-8");
+        byte[] data = str.getBytes(StandardCharsets.UTF_8);
         // 加密时超过117字节就报错。为此采用分段加密的办法来加密
         byte[] enBytes = null;
         for (int i = 0; i < data.length; i += MAX_ENCRYPT_BLOCK) {
@@ -206,8 +161,7 @@ public class RSAUtils {
             enBytes = ArrayUtils.addAll(enBytes, doFinal);
         }
         logger.info(enBytes.length + "");
-        String outStr = encryptBASE64(enBytes);
-        return outStr;
+        return encryptBASE64(enBytes);
     }
 
     /**
@@ -220,14 +174,12 @@ public class RSAUtils {
      * @throws InvalidKeySpecException
      * @throws NoSuchPaddingException
      * @throws InvalidKeyException
-     * @throws UnsupportedEncodingException
      * @throws BadPaddingException
      * @throws IllegalBlockSizeException
-     * @throws Exception                    加密过程中的异常信息
      */
     public static String encryptByPrivateKey(String str, String privateKey)
             throws InvalidKeySpecException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
-            IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException {
+            IllegalBlockSizeException, BadPaddingException {
         // base64编码的公钥
         byte[] keyBytes = decryptBASE64(privateKey);
         RSAPrivateKey priKey = (RSAPrivateKey) KeyFactory.getInstance(KEY_ALGORITHM)
@@ -236,7 +188,7 @@ public class RSAUtils {
         Cipher cipher = Cipher.getInstance(KEY_ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, priKey);
 
-        byte[] data = str.getBytes("UTF-8");
+        byte[] data = str.getBytes(StandardCharsets.UTF_8);
         // 加密时超过117字节就报错。为此采用分段加密的办法来加密
         byte[] enBytes = null;
         for (int i = 0; i < data.length; i += MAX_ENCRYPT_BLOCK) {
@@ -244,8 +196,7 @@ public class RSAUtils {
             byte[] doFinal = cipher.doFinal(ArrayUtils.subarray(data, i, i + MAX_ENCRYPT_BLOCK));
             enBytes = ArrayUtils.addAll(enBytes, doFinal);
         }
-        String outStr = encryptBASE64(enBytes);
-        return outStr;
+        return encryptBASE64(enBytes);
     }
 
     /**
@@ -260,11 +211,9 @@ public class RSAUtils {
                 CertificateFactory certificatefactory = CertificateFactory.getInstance("X.509");
                 X509Certificate cert = (X509Certificate) certificatefactory.generateCertificate(bais);
                 return cert.getPublicKey();
-            } catch (CertificateException e) {
-                logger.error(e.getMessage(), e);
             } catch (FileNotFoundException e) {
                 logger.error(e.getMessage(), e);
-            } catch (IOException e) {
+            } catch (CertificateException | IOException e) {
                 logger.error(e.getMessage(), e);
             }
         }
@@ -273,15 +222,16 @@ public class RSAUtils {
 
     /**
      * 读取私钥
+     * <p>
+     * //     * @param path
      *
-//     * @param path
      * @return
      */
     public static PrivateKey readPrivate(String privateKeyPath, String privateKeyPwd) {
         if (privateKeyPath == null || privateKeyPwd == null) {
             return null;
         }
-        try (InputStream stream = new FileInputStream(new File(privateKeyPath));) {
+        try (InputStream stream = new FileInputStream(privateKeyPath)) {
             // 获取JKS 服务器私有证书的私钥，取得标准的JKS的 KeyStore实例
             KeyStore store = KeyStore.getInstance("JKS");// JKS，二进制格式，同时包含证书和私钥，一般有密码保护；PKCS12，二进制格式，同时包含证书和私钥，一般有密码保护。
             // jks文件密码，根据实际情况修改
@@ -290,14 +240,13 @@ public class RSAUtils {
             Enumeration<String> en = store.aliases();
             String pName = null;
             while (en.hasMoreElements()) {
-                String n = (String) en.nextElement();
+                String n = en.nextElement();
                 if (store.isKeyEntry(n)) {
                     pName = n;
                 }
             }
             // 获取证书的私钥
-            PrivateKey key = (PrivateKey) store.getKey(pName, privateKeyPwd.toCharArray());
-            return key;
+            return (PrivateKey) store.getKey(pName, privateKeyPwd.toCharArray());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
@@ -316,7 +265,6 @@ public class RSAUtils {
      * @throws BadPaddingException
      * @throws IllegalBlockSizeException
      * @throws InvalidKeyException
-     * @throws Exception                 解密过程中的异常信息
      */
     public static String decryptByPrivateKey(String encryStr, String privateKey)
             throws InvalidKeySpecException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException,
@@ -345,8 +293,8 @@ public class RSAUtils {
     /**
      * RSA公钥解密
      *
-     * @param encryStr   加密字符串
-//     * @param privateKey 私钥
+     * @param encryStr 加密字符串
+     *                 //     * @param privateKey 私钥
      * @return 铭文
      * @throws NoSuchAlgorithmException
      * @throws InvalidKeySpecException
@@ -419,8 +367,7 @@ public class RSAUtils {
         }
         bops.close();
         byte[] encryptedData = bops.toByteArray();
-        String encodeToString = Base64.encodeBase64String(encryptedData);
-        return encodeToString;
+        return Base64.encodeBase64String(encryptedData);
     }
 
 
@@ -469,12 +416,10 @@ public class RSAUtils {
         return new String(byteArray);
     }
 //    public static void main(String[] args) throws Exception {
-//        Map<String, Key> keyMap = initKey();// 构建密钥
-//        PublicKey publicKey = (PublicKey) keyMap.get(PUBLIC_KEY);
-//        PrivateKey privateKey = (PrivateKey) keyMap.get(PRIVATE_KEY);
-//        logger.info("私钥format：{}", privateKey.getFormat());
-//        logger.info("公钥format：{}", publicKey.getFormat());
-//        logger.info("私钥string：{}", getPrivateKey(keyMap));
-//        logger.info("公钥string：{}", getPublicKey(keyMap));
+//        KeyPair keyPair = genKey(RandomUtils.getRandomStr());// 构建密钥
+//        logger.info("私钥format：{}", keyPair.getPrivate().getFormat());
+//        logger.info("公钥format：{}", keyPair.getPublic().getFormat());
+//        logger.info("私钥string：{}", base64ToStr(keyPair.getPrivate().getEncoded()));
+//        logger.info("公钥string：{}", base64ToStr(keyPair.getPublic().getEncoded()));
 //    }
 }
