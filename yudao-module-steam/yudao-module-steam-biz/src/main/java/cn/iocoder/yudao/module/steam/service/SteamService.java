@@ -16,6 +16,8 @@ import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -137,14 +139,899 @@ public class SteamService {
         return identity.replace("https://steamcommunity.com/openid/id/","");
     }
     public InventoryDto fetchInventory(String steamId, String appId){
-        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-        builder.method(HttpUtil.Method.GET).url("https://steamcommunity.com/inventory/:steamId/:app/2?l=schinese&count=75");
-        Map<String,String> pathVar=new HashMap<>();
-        pathVar.put("steamId",steamId);
-        pathVar.put("app",appId);
-        builder.pathVar(pathVar);
-        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
-        InventoryDto json = sent.json(InventoryDto.class);
+//        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+//        builder.method(HttpUtil.Method.GET).url("https://steamcommunity.com/inventory/:steamId/:app/2?l=schinese&count=75");
+//        Map<String,String> pathVar=new HashMap<>();
+//        pathVar.put("steamId",steamId);
+//        pathVar.put("app",appId);
+//        builder.pathVar(pathVar);
+//        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
+//        InventoryDto json = sent.json(InventoryDto.class);
+        String j="{\n" +
+                "\t\"assets\": [{\n" +
+                "\t\t\"appid\": 730,\n" +
+                "\t\t\"contextid\": \"2\",\n" +
+                "\t\t\"assetid\": \"35290397850\",\n" +
+                "\t\t\"classid\": \"5665331088\",\n" +
+                "\t\t\"instanceid\": \"302028390\",\n" +
+                "\t\t\"amount\": \"1\"\n" +
+                "\t}, {\n" +
+                "\t\t\"appid\": 730,\n" +
+                "\t\t\"contextid\": \"2\",\n" +
+                "\t\t\"assetid\": \"35286915802\",\n" +
+                "\t\t\"classid\": \"520026577\",\n" +
+                "\t\t\"instanceid\": \"480085569\",\n" +
+                "\t\t\"amount\": \"1\"\n" +
+                "\t}, {\n" +
+                "\t\t\"appid\": 730,\n" +
+                "\t\t\"contextid\": \"2\",\n" +
+                "\t\t\"assetid\": \"35284793744\",\n" +
+                "\t\t\"classid\": \"5334431299\",\n" +
+                "\t\t\"instanceid\": \"188530170\",\n" +
+                "\t\t\"amount\": \"1\"\n" +
+                "\t}, {\n" +
+                "\t\t\"appid\": 730,\n" +
+                "\t\t\"contextid\": \"2\",\n" +
+                "\t\t\"assetid\": \"35284792879\",\n" +
+                "\t\t\"classid\": \"520026577\",\n" +
+                "\t\t\"instanceid\": \"480085569\",\n" +
+                "\t\t\"amount\": \"1\"\n" +
+                "\t}, {\n" +
+                "\t\t\"appid\": 730,\n" +
+                "\t\t\"contextid\": \"2\",\n" +
+                "\t\t\"assetid\": \"35284753775\",\n" +
+                "\t\t\"classid\": \"3035582416\",\n" +
+                "\t\t\"instanceid\": \"302028390\",\n" +
+                "\t\t\"amount\": \"1\"\n" +
+                "\t}, {\n" +
+                "\t\t\"appid\": 730,\n" +
+                "\t\t\"contextid\": \"2\",\n" +
+                "\t\t\"assetid\": \"35284715816\",\n" +
+                "\t\t\"classid\": \"3035582416\",\n" +
+                "\t\t\"instanceid\": \"302028390\",\n" +
+                "\t\t\"amount\": \"1\"\n" +
+                "\t}, {\n" +
+                "\t\t\"appid\": 730,\n" +
+                "\t\t\"contextid\": \"2\",\n" +
+                "\t\t\"assetid\": \"35284358468\",\n" +
+                "\t\t\"classid\": \"5604816244\",\n" +
+                "\t\t\"instanceid\": \"188530170\",\n" +
+                "\t\t\"amount\": \"1\"\n" +
+                "\t}, {\n" +
+                "\t\t\"appid\": 730,\n" +
+                "\t\t\"contextid\": \"2\",\n" +
+                "\t\t\"assetid\": \"35276486098\",\n" +
+                "\t\t\"classid\": \"4307675336\",\n" +
+                "\t\t\"instanceid\": \"480085569\",\n" +
+                "\t\t\"amount\": \"1\"\n" +
+                "\t}, {\n" +
+                "\t\t\"appid\": 730,\n" +
+                "\t\t\"contextid\": \"2\",\n" +
+                "\t\t\"assetid\": \"35273943602\",\n" +
+                "\t\t\"classid\": \"3770751316\",\n" +
+                "\t\t\"instanceid\": \"480085569\",\n" +
+                "\t\t\"amount\": \"1\"\n" +
+                "\t}, {\n" +
+                "\t\t\"appid\": 730,\n" +
+                "\t\t\"contextid\": \"2\",\n" +
+                "\t\t\"assetid\": \"35273518744\",\n" +
+                "\t\t\"classid\": \"1560433642\",\n" +
+                "\t\t\"instanceid\": \"480085569\",\n" +
+                "\t\t\"amount\": \"1\"\n" +
+                "\t}, {\n" +
+                "\t\t\"appid\": 730,\n" +
+                "\t\t\"contextid\": \"2\",\n" +
+                "\t\t\"assetid\": \"34949559500\",\n" +
+                "\t\t\"classid\": \"2735679255\",\n" +
+                "\t\t\"instanceid\": \"188530170\",\n" +
+                "\t\t\"amount\": \"1\"\n" +
+                "\t}],\n" +
+                "\t\"descriptions\": [{\n" +
+                "\t\t\"appid\": 730,\n" +
+                "\t\t\"classid\": \"5665331088\",\n" +
+                "\t\t\"instanceid\": \"302028390\",\n" +
+                "\t\t\"currency\": 0,\n" +
+                "\t\t\"background_color\": \"\",\n" +
+                "\t\t\"icon_url\": \"-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot621FA957OnHdTRD746JmYWPnuL5feqBwD8Gvpcg3rDDrN30jlHl_kdka2j1JY-SewJoN1CC-lK8xOfrhZai_MOeIIc7ylQ\",\n" +
+                "\t\t\"icon_url_large\": \"-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot621FA957OnHdTRD746JmYWPnuL5DLfQhGxUppQh3L2Wo96k3A228kI9NTzyIYKdegc4YFHX81Xol-a9hZW-uZTNyXJ9-n51oWQQ_Vc\",\n" +
+                "\t\t\"descriptions\": [{\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"外观： 久经沙场\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"高风险，高回报，恶名昭彰的 AWP 因其标志性的枪声和一枪一个的准则而为人熟知。 这把武器使用十二宫的花纹进行了涂装。\\n\\n<i>这对你的敌人来说将是难熬的一个月</i>\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"神魔收藏品\",\n" +
+                "\t\t\t\"color\": \"9da1a9\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}],\n" +
+                "\t\t\"tradable\": 1,\n" +
+                "\t\t\"actions\": [{\n" +
+                "\t\t\t\"link\": \"steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20S%owner_steamid%A%assetid%D16162507490224551977\",\n" +
+                "\t\t\t\"name\": \"在游戏中检视…\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"fraudwarnings\": [\"名称标签：“应当在日暮时咆哮燃烧，怒斥光明的消逝”\"],\n" +
+                "\t\t\"name\": \"AWP | 狮子之日\",\n" +
+                "\t\t\"name_color\": \"D2D2D2\",\n" +
+                "\t\t\"type\": \"工业级 狙击步枪\",\n" +
+                "\t\t\"market_name\": \"AWP | 狮子之日 (久经沙场)\",\n" +
+                "\t\t\"market_hash_name\": \"AWP | Sun in Leo (Field-Tested)\",\n" +
+                "\t\t\"market_actions\": [{\n" +
+                "\t\t\t\"link\": \"steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20M%listingid%A%assetid%D16162507490224551977\",\n" +
+                "\t\t\t\"name\": \"在游戏中检视…\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"commodity\": 0,\n" +
+                "\t\t\"market_tradable_restriction\": 7,\n" +
+                "\t\t\"marketable\": 1,\n" +
+                "\t\t\"tags\": [{\n" +
+                "\t\t\t\"category\": \"Type\",\n" +
+                "\t\t\t\"internal_name\": \"CSGO_Type_SniperRifle\",\n" +
+                "\t\t\t\"localized_category_name\": \"类型\",\n" +
+                "\t\t\t\"localized_tag_name\": \"狙击步枪\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Weapon\",\n" +
+                "\t\t\t\"internal_name\": \"weapon_awp\",\n" +
+                "\t\t\t\"localized_category_name\": \"武器\",\n" +
+                "\t\t\t\"localized_tag_name\": \"AWP\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"ItemSet\",\n" +
+                "\t\t\t\"internal_name\": \"set_gods_and_monsters\",\n" +
+                "\t\t\t\"localized_category_name\": \"收藏品\",\n" +
+                "\t\t\t\"localized_tag_name\": \"神魔收藏品\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Quality\",\n" +
+                "\t\t\t\"internal_name\": \"normal\",\n" +
+                "\t\t\t\"localized_category_name\": \"类别\",\n" +
+                "\t\t\t\"localized_tag_name\": \"普通\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Rarity\",\n" +
+                "\t\t\t\"internal_name\": \"Rarity_Uncommon_Weapon\",\n" +
+                "\t\t\t\"localized_category_name\": \"品质\",\n" +
+                "\t\t\t\"localized_tag_name\": \"工业级\",\n" +
+                "\t\t\t\"color\": \"5e98d9\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Exterior\",\n" +
+                "\t\t\t\"internal_name\": \"WearCategory2\",\n" +
+                "\t\t\t\"localized_category_name\": \"外观\",\n" +
+                "\t\t\t\"localized_tag_name\": \"久经沙场\"\n" +
+                "\t\t}]\n" +
+                "\t}, {\n" +
+                "\t\t\"appid\": 730,\n" +
+                "\t\t\"classid\": \"520026577\",\n" +
+                "\t\t\"instanceid\": \"480085569\",\n" +
+                "\t\t\"currency\": 0,\n" +
+                "\t\t\"background_color\": \"\",\n" +
+                "\t\t\"icon_url\": \"-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposbaqKAxf0Ob3djFN79f7mImagvLnML7fglRd4cJ5nqeQoN3w0QHgrhdoMjylJo7GIVU7ZAzQqQC6k-rs1JHotZvNzSRgvHFx-z-DyPzurK-U\",\n" +
+                "\t\t\"icon_url_large\": \"-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposbaqKAxf0Ob3djFN79f7mImagvLnML7fglRd4cJ5ntbN9J7yjRrl_kI5amz3cdKRI1NoY1CDqQK7xLrv1se47pnKmHU3syYm4SnemUTkn1gSOYPIEaei\",\n" +
+                "\t\t\"descriptions\": [{\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"外观： 崭新出厂\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"格洛克 18 型是把耐用的第一回合手枪，非常适合对付那些没有穿护甲的对手，并且可以进行三连发爆炸开火。 这把武器使用现代图形风格的生物图像进行了自定义涂装。\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"突围收藏品\",\n" +
+                "\t\t\t\"color\": \"9da1a9\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}],\n" +
+                "\t\t\"tradable\": 1,\n" +
+                "\t\t\"actions\": [{\n" +
+                "\t\t\t\"link\": \"steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20S%owner_steamid%A%assetid%D17045106441843134382\",\n" +
+                "\t\t\t\"name\": \"在游戏中检视…\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"name\": \"格洛克 18 型 | 水灵\",\n" +
+                "\t\t\"name_color\": \"D2D2D2\",\n" +
+                "\t\t\"type\": \"保密 手枪\",\n" +
+                "\t\t\"market_name\": \"格洛克 18 型 | 水灵 (崭新出厂)\",\n" +
+                "\t\t\"market_hash_name\": \"Glock-18 | Water Elemental (Factory New)\",\n" +
+                "\t\t\"market_actions\": [{\n" +
+                "\t\t\t\"link\": \"steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20M%listingid%A%assetid%D17045106441843134382\",\n" +
+                "\t\t\t\"name\": \"在游戏中检视…\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"commodity\": 0,\n" +
+                "\t\t\"market_tradable_restriction\": 7,\n" +
+                "\t\t\"marketable\": 1,\n" +
+                "\t\t\"tags\": [{\n" +
+                "\t\t\t\"category\": \"Type\",\n" +
+                "\t\t\t\"internal_name\": \"CSGO_Type_Pistol\",\n" +
+                "\t\t\t\"localized_category_name\": \"类型\",\n" +
+                "\t\t\t\"localized_tag_name\": \"手枪\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Weapon\",\n" +
+                "\t\t\t\"internal_name\": \"weapon_glock\",\n" +
+                "\t\t\t\"localized_category_name\": \"武器\",\n" +
+                "\t\t\t\"localized_tag_name\": \"格洛克 18 型\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"ItemSet\",\n" +
+                "\t\t\t\"internal_name\": \"set_community_4\",\n" +
+                "\t\t\t\"localized_category_name\": \"收藏品\",\n" +
+                "\t\t\t\"localized_tag_name\": \"突围收藏品\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Quality\",\n" +
+                "\t\t\t\"internal_name\": \"normal\",\n" +
+                "\t\t\t\"localized_category_name\": \"类别\",\n" +
+                "\t\t\t\"localized_tag_name\": \"普通\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Rarity\",\n" +
+                "\t\t\t\"internal_name\": \"Rarity_Legendary_Weapon\",\n" +
+                "\t\t\t\"localized_category_name\": \"品质\",\n" +
+                "\t\t\t\"localized_tag_name\": \"保密\",\n" +
+                "\t\t\t\"color\": \"d32ce6\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Exterior\",\n" +
+                "\t\t\t\"internal_name\": \"WearCategory0\",\n" +
+                "\t\t\t\"localized_category_name\": \"外观\",\n" +
+                "\t\t\t\"localized_tag_name\": \"崭新出厂\"\n" +
+                "\t\t}]\n" +
+                "\t}, {\n" +
+                "\t\t\"appid\": 730,\n" +
+                "\t\t\"classid\": \"5334431299\",\n" +
+                "\t\t\"instanceid\": \"188530170\",\n" +
+                "\t\t\"currency\": 0,\n" +
+                "\t\t\"background_color\": \"\",\n" +
+                "\t\t\"icon_url\": \"-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhjxszJemkV09G3h5SOhe7LP7LWnn8fvJYh3-qR942higTmqBZpYGild4adIQQ5ZA6B_AC3lebo0ce-78vOnGwj5HeAJ9sV6g\",\n" +
+                "\t\t\"icon_url_large\": \"-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhjxszJemkV09G3h5SOhe7LP7LWnn9u5MRjjeyPod-l3VfkqRJoMWnxd9OQcQdoMljYqVO5xLi-g8e16JXOnSNh6XYlsGGdwUI-f1fsZg\",\n" +
+                "\t\t\"descriptions\": [{\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"外观： 略有磨损\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"该物品具有 StatTrak™ 技术，在其所有者装备时能跟踪若干统计数据。\",\n" +
+                "\t\t\t\"color\": \"99ccff\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"该物品记录已认证杀敌数。\",\n" +
+                "\t\t\t\"color\": \"CF6A32\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"强大又可靠，AK-47 是世上最流行的突击步枪之一。近距离内控制好的短点射极为致命。 这把武器将花纹和严谨的漏印结合起来，通过热转印贴花加强细节，然后进行了自定义涂装。\\n\\n<i>小心翼翼的娜奥米啊…… 和你干同一个行当的人可不是以长命著称的呢 -《盾与蛇（下）》</i>\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"幻彩 2 号收藏品\",\n" +
+                "\t\t\t\"color\": \"9da1a9\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"<br><div id=\\\"sticker_info\\\" name=\\\"sticker_info\\\" title=\\\"印花\\\" style=\\\"border: 2px solid rgb(102, 102, 102); border-radius: 6px; width=100; margin:4px; padding:8px;\\\"><center><img width=64 height=48 src=\\\"https://steamcdn-a.akamaihd.net/apps/730/icons/econ/stickers/community2022/street_artist_glitter.da23d5efea044dfd36cce81b5f0619c49da91737.png\\\"><img width=64 height=48 src=\\\"https://steamcdn-a.akamaihd.net/apps/730/icons/econ/stickers/rio2022/sig_fame_glitter.e6f2223dbeb984a97492b2f9e8366f6cdf67b5e5.png\\\"><img width=64 height=48 src=\\\"https://steamcdn-a.akamaihd.net/apps/730/icons/econ/stickers/rio2022/sig_fame_glitter.e6f2223dbeb984a97492b2f9e8366f6cdf67b5e5.png\\\"><br>印花: 溜光大道艺人（闪耀）, fame（闪耀）| 2022年里约热内卢锦标赛, fame（闪耀）| 2022年里约热内卢锦标赛</center></div>\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"tradable\": 1,\n" +
+                "\t\t\"actions\": [{\n" +
+                "\t\t\t\"link\": \"steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20S%owner_steamid%A%assetid%D2657307142714950943\",\n" +
+                "\t\t\t\"name\": \"在游戏中检视…\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"name\": \"AK-47（StatTrak™） | 精英之作\",\n" +
+                "\t\t\"name_color\": \"CF6A32\",\n" +
+                "\t\t\"type\": \"StatTrak™ 军规级 步枪\",\n" +
+                "\t\t\"market_name\": \"AK-47（StatTrak™） | 精英之作 (略有磨损)\",\n" +
+                "\t\t\"market_hash_name\": \"StatTrak™ AK-47 | Elite Build (Minimal Wear)\",\n" +
+                "\t\t\"market_actions\": [{\n" +
+                "\t\t\t\"link\": \"steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20M%listingid%A%assetid%D2657307142714950943\",\n" +
+                "\t\t\t\"name\": \"在游戏中检视…\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"commodity\": 0,\n" +
+                "\t\t\"market_tradable_restriction\": 7,\n" +
+                "\t\t\"marketable\": 1,\n" +
+                "\t\t\"tags\": [{\n" +
+                "\t\t\t\"category\": \"Type\",\n" +
+                "\t\t\t\"internal_name\": \"CSGO_Type_Rifle\",\n" +
+                "\t\t\t\"localized_category_name\": \"类型\",\n" +
+                "\t\t\t\"localized_tag_name\": \"步枪\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Weapon\",\n" +
+                "\t\t\t\"internal_name\": \"weapon_ak47\",\n" +
+                "\t\t\t\"localized_category_name\": \"武器\",\n" +
+                "\t\t\t\"localized_tag_name\": \"AK-47\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"ItemSet\",\n" +
+                "\t\t\t\"internal_name\": \"set_community_7\",\n" +
+                "\t\t\t\"localized_category_name\": \"收藏品\",\n" +
+                "\t\t\t\"localized_tag_name\": \"幻彩 2 号收藏品\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Quality\",\n" +
+                "\t\t\t\"internal_name\": \"strange\",\n" +
+                "\t\t\t\"localized_category_name\": \"类别\",\n" +
+                "\t\t\t\"localized_tag_name\": \"StatTrak™\",\n" +
+                "\t\t\t\"color\": \"CF6A32\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Rarity\",\n" +
+                "\t\t\t\"internal_name\": \"Rarity_Rare_Weapon\",\n" +
+                "\t\t\t\"localized_category_name\": \"品质\",\n" +
+                "\t\t\t\"localized_tag_name\": \"军规级\",\n" +
+                "\t\t\t\"color\": \"4b69ff\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Exterior\",\n" +
+                "\t\t\t\"internal_name\": \"WearCategory1\",\n" +
+                "\t\t\t\"localized_category_name\": \"外观\",\n" +
+                "\t\t\t\"localized_tag_name\": \"略有磨损\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Tournament\",\n" +
+                "\t\t\t\"internal_name\": \"Tournament20\",\n" +
+                "\t\t\t\"localized_category_name\": \"锦标赛\",\n" +
+                "\t\t\t\"localized_tag_name\": \"2022年 IEM 里约锦标赛\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"TournamentTeam\",\n" +
+                "\t\t\t\"internal_name\": \"Team109\",\n" +
+                "\t\t\t\"localized_category_name\": \"战队\",\n" +
+                "\t\t\t\"localized_tag_name\": \"Outsiders\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"ProPlayer\",\n" +
+                "\t\t\t\"internal_name\": \"fame\",\n" +
+                "\t\t\t\"localized_category_name\": \"职业选手\",\n" +
+                "\t\t\t\"localized_tag_name\": \"fame（Petr Bolyshev）\"\n" +
+                "\t\t}]\n" +
+                "\t}, {\n" +
+                "\t\t\"appid\": 730,\n" +
+                "\t\t\"classid\": \"3035582416\",\n" +
+                "\t\t\"instanceid\": \"302028390\",\n" +
+                "\t\t\"currency\": 0,\n" +
+                "\t\t\"background_color\": \"\",\n" +
+                "\t\t\"icon_url\": \"-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpou6ryFAZh7PXJdTh94czhq4yCkP_gfb7VwzgGsZAn3L_Codigjge2-0M9Z2D1LIaTcAM_ZQrTqAO7lbrug5Ci_MOeD_P4rHw\",\n" +
+                "\t\t\"icon_url_large\": \"-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpou6ryFAZh7PXJdTh94czhq4yCkP_gDLfQhGxUpsB137qWrNmj3gK3_0dpNWqhJIbEdg84aVjW-FS_xbzs18S56MnIz3R9-n51LuzV2Hc\",\n" +
+                "\t\t\"descriptions\": [{\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"外观： 崭新出厂\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"非常好用，但价格昂贵，德国制造的 MP7 微型冲锋枪非常适合高强度的近距离作战。 这把武器以铬为外表，使用喷笔涂上了相互渐变的透明涂装。\\n\\n<i>这不仅仅是一把武器，更是一种潮流 - 实习军火商伊莫金</i>\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"2018 炼狱小镇收藏品\",\n" +
+                "\t\t\t\"color\": \"9da1a9\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}],\n" +
+                "\t\t\"tradable\": 1,\n" +
+                "\t\t\"actions\": [{\n" +
+                "\t\t\t\"link\": \"steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20S%owner_steamid%A%assetid%D11549064306218822699\",\n" +
+                "\t\t\t\"name\": \"在游戏中检视…\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"name\": \"MP7 | 渐变之色\",\n" +
+                "\t\t\"name_color\": \"D2D2D2\",\n" +
+                "\t\t\"type\": \"受限 微型冲锋枪\",\n" +
+                "\t\t\"market_name\": \"MP7 | 渐变之色 (崭新出厂)\",\n" +
+                "\t\t\"market_hash_name\": \"MP7 | Fade (Factory New)\",\n" +
+                "\t\t\"market_actions\": [{\n" +
+                "\t\t\t\"link\": \"steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20M%listingid%A%assetid%D11549064306218822699\",\n" +
+                "\t\t\t\"name\": \"在游戏中检视…\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"commodity\": 0,\n" +
+                "\t\t\"market_tradable_restriction\": 7,\n" +
+                "\t\t\"marketable\": 1,\n" +
+                "\t\t\"tags\": [{\n" +
+                "\t\t\t\"category\": \"Type\",\n" +
+                "\t\t\t\"internal_name\": \"CSGO_Type_SMG\",\n" +
+                "\t\t\t\"localized_category_name\": \"类型\",\n" +
+                "\t\t\t\"localized_tag_name\": \"微型冲锋枪\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Weapon\",\n" +
+                "\t\t\t\"internal_name\": \"weapon_mp7\",\n" +
+                "\t\t\t\"localized_category_name\": \"武器\",\n" +
+                "\t\t\t\"localized_tag_name\": \"MP7\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"ItemSet\",\n" +
+                "\t\t\t\"internal_name\": \"set_inferno_2\",\n" +
+                "\t\t\t\"localized_category_name\": \"收藏品\",\n" +
+                "\t\t\t\"localized_tag_name\": \"2018 炼狱小镇收藏品\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Quality\",\n" +
+                "\t\t\t\"internal_name\": \"normal\",\n" +
+                "\t\t\t\"localized_category_name\": \"类别\",\n" +
+                "\t\t\t\"localized_tag_name\": \"普通\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Rarity\",\n" +
+                "\t\t\t\"internal_name\": \"Rarity_Mythical_Weapon\",\n" +
+                "\t\t\t\"localized_category_name\": \"品质\",\n" +
+                "\t\t\t\"localized_tag_name\": \"受限\",\n" +
+                "\t\t\t\"color\": \"8847ff\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Exterior\",\n" +
+                "\t\t\t\"internal_name\": \"WearCategory0\",\n" +
+                "\t\t\t\"localized_category_name\": \"外观\",\n" +
+                "\t\t\t\"localized_tag_name\": \"崭新出厂\"\n" +
+                "\t\t}]\n" +
+                "\t}, {\n" +
+                "\t\t\"appid\": 730,\n" +
+                "\t\t\"classid\": \"5604816244\",\n" +
+                "\t\t\"instanceid\": \"188530170\",\n" +
+                "\t\t\"currency\": 0,\n" +
+                "\t\t\"background_color\": \"\",\n" +
+                "\t\t\"icon_url\": \"-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhjxszJemkV09-5k5SDnvnzIITck29Y_cg_i-rHoYrw3VLs_RZlZ2umLYSTdQc_Zl7ZrwPoxefp18Du7Z-bwHZh6z5iuyiJTfqMXg\",\n" +
+                "\t\t\"icon_url_large\": \"-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhjxszJemkV09-5k5SDnvnzIITck29Y_chOhujT8om7iVey_xU5Zj_7ItOcdgRraFrW_VC_xujm0MTquJTPmyQx6yJw7Hvfzgv3309IyM9cTA\",\n" +
+                "\t\t\"descriptions\": [{\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"外观： 久经沙场\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"该物品具有 StatTrak™ 技术，在其所有者装备时能跟踪若干统计数据。\",\n" +
+                "\t\t\t\"color\": \"99ccff\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"该物品记录已认证杀敌数。\",\n" +
+                "\t\t\t\"color\": \"CF6A32\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"强大又可靠，AK-47 是世上最流行的突击步枪之一。近距离内控制好的短点射极为致命。 这把武器采用醒目的绿色和蓝色渐变进行了自定义涂装。\\n\\n<i>触感冰冷</i>\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"反冲收藏品\",\n" +
+                "\t\t\t\"color\": \"9da1a9\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"<br><div id=\\\"sticker_info\\\" name=\\\"sticker_info\\\" title=\\\"印花\\\" style=\\\"border: 2px solid rgb(102, 102, 102); border-radius: 6px; width=100; margin:4px; padding:8px;\\\"><center><img width=64 height=48 src=\\\"https://steamcdn-a.akamaihd.net/apps/730/icons/econ/stickers/paris2023/sig_history_glitter.ba3a5e7fea2a3ab885a1479ad34438fa1d49d997.png\\\"><img width=64 height=48 src=\\\"https://steamcdn-a.akamaihd.net/apps/730/icons/econ/stickers/paris2023/sig_history_glitter.ba3a5e7fea2a3ab885a1479ad34438fa1d49d997.png\\\"><img width=64 height=48 src=\\\"https://steamcdn-a.akamaihd.net/apps/730/icons/econ/stickers/paris2023/sig_history_glitter.ba3a5e7fea2a3ab885a1479ad34438fa1d49d997.png\\\"><img width=64 height=48 src=\\\"https://steamcdn-a.akamaihd.net/apps/730/icons/econ/stickers/paris2023/sig_history_glitter.ba3a5e7fea2a3ab885a1479ad34438fa1d49d997.png\\\"><br>印花: History（闪耀）| 2023年巴黎锦标赛, History（闪耀）| 2023年巴黎锦标赛, History（闪耀）| 2023年巴黎锦标赛, History（闪耀）| 2023年巴黎锦标赛</center></div>\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"tradable\": 1,\n" +
+                "\t\t\"actions\": [{\n" +
+                "\t\t\t\"link\": \"steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20S%owner_steamid%A%assetid%D9711531615027070335\",\n" +
+                "\t\t\t\"name\": \"在游戏中检视…\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"fraudwarnings\": [\"名称标签：“我身后的冰连火都融不了”\"],\n" +
+                "\t\t\"name\": \"AK-47（StatTrak™） | 可燃冰\",\n" +
+                "\t\t\"name_color\": \"CF6A32\",\n" +
+                "\t\t\"type\": \"StatTrak™ 保密 步枪\",\n" +
+                "\t\t\"market_name\": \"AK-47（StatTrak™） | 可燃冰 (久经沙场)\",\n" +
+                "\t\t\"market_hash_name\": \"StatTrak™ AK-47 | Ice Coaled (Field-Tested)\",\n" +
+                "\t\t\"market_actions\": [{\n" +
+                "\t\t\t\"link\": \"steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20M%listingid%A%assetid%D9711531615027070335\",\n" +
+                "\t\t\t\"name\": \"在游戏中检视…\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"commodity\": 0,\n" +
+                "\t\t\"market_tradable_restriction\": 7,\n" +
+                "\t\t\"marketable\": 1,\n" +
+                "\t\t\"tags\": [{\n" +
+                "\t\t\t\"category\": \"Type\",\n" +
+                "\t\t\t\"internal_name\": \"CSGO_Type_Rifle\",\n" +
+                "\t\t\t\"localized_category_name\": \"类型\",\n" +
+                "\t\t\t\"localized_tag_name\": \"步枪\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Weapon\",\n" +
+                "\t\t\t\"internal_name\": \"weapon_ak47\",\n" +
+                "\t\t\t\"localized_category_name\": \"武器\",\n" +
+                "\t\t\t\"localized_tag_name\": \"AK-47\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"ItemSet\",\n" +
+                "\t\t\t\"internal_name\": \"set_community_31\",\n" +
+                "\t\t\t\"localized_category_name\": \"收藏品\",\n" +
+                "\t\t\t\"localized_tag_name\": \"反冲收藏品\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Quality\",\n" +
+                "\t\t\t\"internal_name\": \"strange\",\n" +
+                "\t\t\t\"localized_category_name\": \"类别\",\n" +
+                "\t\t\t\"localized_tag_name\": \"StatTrak™\",\n" +
+                "\t\t\t\"color\": \"CF6A32\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Rarity\",\n" +
+                "\t\t\t\"internal_name\": \"Rarity_Legendary_Weapon\",\n" +
+                "\t\t\t\"localized_category_name\": \"品质\",\n" +
+                "\t\t\t\"localized_tag_name\": \"保密\",\n" +
+                "\t\t\t\"color\": \"d32ce6\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Exterior\",\n" +
+                "\t\t\t\"internal_name\": \"WearCategory2\",\n" +
+                "\t\t\t\"localized_category_name\": \"外观\",\n" +
+                "\t\t\t\"localized_tag_name\": \"久经沙场\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Tournament\",\n" +
+                "\t\t\t\"internal_name\": \"Tournament21\",\n" +
+                "\t\t\t\"localized_category_name\": \"锦标赛\",\n" +
+                "\t\t\t\"localized_tag_name\": \"2023年 BLAST.tv 巴黎锦标赛\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"TournamentTeam\",\n" +
+                "\t\t\t\"internal_name\": \"Team121\",\n" +
+                "\t\t\t\"localized_category_name\": \"战队\",\n" +
+                "\t\t\t\"localized_tag_name\": \"Fluxo\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"ProPlayer\",\n" +
+                "\t\t\t\"internal_name\": \"history\",\n" +
+                "\t\t\t\"localized_category_name\": \"职业选手\",\n" +
+                "\t\t\t\"localized_tag_name\": \"History（Allan Botton）\"\n" +
+                "\t\t}]\n" +
+                "\t}, {\n" +
+                "\t\t\"appid\": 730,\n" +
+                "\t\t\"classid\": \"4307675336\",\n" +
+                "\t\t\"instanceid\": \"480085569\",\n" +
+                "\t\t\"currency\": 0,\n" +
+                "\t\t\"background_color\": \"\",\n" +
+                "\t\t\"icon_url\": \"-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposr-kLAtl7PLFTjVH5c-iq5CHlvnnDKvEhHtd7fp9g-7J4cKi2wOyqUVuZ2vyLNKUdgc2ZA3S_1jryLjv1MC-vMycyHRhvHEisH-PgVXp1mPRINq1\",\n" +
+                "\t\t\"icon_url_large\": \"-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposr-kLAtl7PLFTjVH5c-iq5CHlvnnDKvEhHtd7fp9g-7J4bP5iUazrl1rYG6ldoCXdgQ_aQzR_lC2xLvtgJ_ptcvJmCRhunF35HnfmUS31BgecKUx0pI1kjtX\",\n" +
+                "\t\t\"descriptions\": [{\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"外观： 崭新出厂\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"杀伤力和它的卖价一样高，沙漠之鹰是一把很难驾驭，而在远距离又出乎意料精准的经典手枪。 枪身饰有紫色电镀地图花纹，宛如手工绘制一般。\\n\\n<i>计划是计划，执行是执行。</i>\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"浩劫收藏品\",\n" +
+                "\t\t\t\"color\": \"9da1a9\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"<br><div id=\\\"sticker_info\\\" name=\\\"sticker_info\\\" title=\\\"印花\\\" style=\\\"border: 2px solid rgb(102, 102, 102); border-radius: 6px; width=100; margin:4px; padding:8px;\\\"><center><img width=64 height=48 src=\\\"https://steamcdn-a.akamaihd.net/apps/730/icons/econ/stickers/rmr2020/nip.da62b427774f6a6fea21c05d2136ef072538d2c2.png\\\"><img width=64 height=48 src=\\\"https://steamcdn-a.akamaihd.net/apps/730/icons/econ/stickers/rmr2020/navi.afde6ff3f9bb974066e6791013b44babab5b5f27.png\\\"><img width=64 height=48 src=\\\"https://steamcdn-a.akamaihd.net/apps/730/icons/econ/stickers/broken_fang/battle_scarred.8f95410ed52cdf856221264b667960419e6bbde0.png\\\"><img width=64 height=48 src=\\\"https://steamcdn-a.akamaihd.net/apps/730/icons/econ/stickers/broken_fang/battle_scarred.8f95410ed52cdf856221264b667960419e6bbde0.png\\\"><br>印花: Ninjas in Pyjamas | 2020 RMR, Natus Vincere | 2020 RMR, 战痕累累, 战痕累累</center></div>\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"tradable\": 1,\n" +
+                "\t\t\"actions\": [{\n" +
+                "\t\t\t\"link\": \"steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20S%owner_steamid%A%assetid%D5192308185557823215\",\n" +
+                "\t\t\t\"name\": \"在游戏中检视…\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"name\": \"沙漠之鹰 | 午夜凶匪\",\n" +
+                "\t\t\"name_color\": \"D2D2D2\",\n" +
+                "\t\t\"type\": \"军规级 手枪\",\n" +
+                "\t\t\"market_name\": \"沙漠之鹰 | 午夜凶匪 (崭新出厂)\",\n" +
+                "\t\t\"market_hash_name\": \"Desert Eagle | Night Heist (Factory New)\",\n" +
+                "\t\t\"market_actions\": [{\n" +
+                "\t\t\t\"link\": \"steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20M%listingid%A%assetid%D5192308185557823215\",\n" +
+                "\t\t\t\"name\": \"在游戏中检视…\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"commodity\": 0,\n" +
+                "\t\t\"market_tradable_restriction\": 7,\n" +
+                "\t\t\"marketable\": 1,\n" +
+                "\t\t\"tags\": [{\n" +
+                "\t\t\t\"category\": \"Type\",\n" +
+                "\t\t\t\"internal_name\": \"CSGO_Type_Pistol\",\n" +
+                "\t\t\t\"localized_category_name\": \"类型\",\n" +
+                "\t\t\t\"localized_tag_name\": \"手枪\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Weapon\",\n" +
+                "\t\t\t\"internal_name\": \"weapon_deagle\",\n" +
+                "\t\t\t\"localized_category_name\": \"武器\",\n" +
+                "\t\t\t\"localized_tag_name\": \"沙漠之鹰\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"ItemSet\",\n" +
+                "\t\t\t\"internal_name\": \"set_op10_t\",\n" +
+                "\t\t\t\"localized_category_name\": \"收藏品\",\n" +
+                "\t\t\t\"localized_tag_name\": \"浩劫收藏品\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Quality\",\n" +
+                "\t\t\t\"internal_name\": \"normal\",\n" +
+                "\t\t\t\"localized_category_name\": \"类别\",\n" +
+                "\t\t\t\"localized_tag_name\": \"普通\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Rarity\",\n" +
+                "\t\t\t\"internal_name\": \"Rarity_Rare_Weapon\",\n" +
+                "\t\t\t\"localized_category_name\": \"品质\",\n" +
+                "\t\t\t\"localized_tag_name\": \"军规级\",\n" +
+                "\t\t\t\"color\": \"4b69ff\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Exterior\",\n" +
+                "\t\t\t\"internal_name\": \"WearCategory0\",\n" +
+                "\t\t\t\"localized_category_name\": \"外观\",\n" +
+                "\t\t\t\"localized_tag_name\": \"崭新出厂\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Tournament\",\n" +
+                "\t\t\t\"internal_name\": \"Tournament17\",\n" +
+                "\t\t\t\"localized_category_name\": \"锦标赛\",\n" +
+                "\t\t\t\"localized_tag_name\": \"2020 RMR\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"TournamentTeam\",\n" +
+                "\t\t\t\"internal_name\": \"Team1\",\n" +
+                "\t\t\t\"localized_category_name\": \"战队\",\n" +
+                "\t\t\t\"localized_tag_name\": \"Ninjas in Pyjamas\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"TournamentTeam\",\n" +
+                "\t\t\t\"internal_name\": \"Team12\",\n" +
+                "\t\t\t\"localized_category_name\": \"战队\",\n" +
+                "\t\t\t\"localized_tag_name\": \"Natus Vincere\"\n" +
+                "\t\t}]\n" +
+                "\t}, {\n" +
+                "\t\t\"appid\": 730,\n" +
+                "\t\t\"classid\": \"3770751316\",\n" +
+                "\t\t\"instanceid\": \"480085569\",\n" +
+                "\t\t\"currency\": 0,\n" +
+                "\t\t\"background_color\": \"\",\n" +
+                "\t\t\"icon_url\": \"-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposbaqKAxf0Ob3djFN79fnzL-cluX5MrLVk2Vu5Mx2gv2P8dWsiQKyrxFoMGj3Io_BcwA6YFDSq1a6lLq91J7o6Z3MzHVhvHFz4GGdwUK867nN7w\",\n" +
+                "\t\t\"icon_url_large\": \"-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposbaqKAxf0Ob3djFN79fnzL-cluX5MrLVk2Vu5Mx2gv3--Y3nj1H6r0plMm-lcNSRIQc6Z1GE-1e6wObt1JG46cmbmHo37yAn4HjfmUTmhAYMMLKVxXRrDQ\",\n" +
+                "\t\t\"descriptions\": [{\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"外观： 崭新出厂\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"格洛克 18 型是把耐用的第一回合手枪，非常适合对付那些没有穿护甲的对手，并且可以进行三连发爆炸开火。 黄黑底色上涂有来势汹汹的子弹与穿着粉红夹克的少女。\\n\\n<i>“你说嘘的时候我就停火。”</i>\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"棱彩2号收藏品\",\n" +
+                "\t\t\t\"color\": \"9da1a9\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}],\n" +
+                "\t\t\"tradable\": 1,\n" +
+                "\t\t\"actions\": [{\n" +
+                "\t\t\t\"link\": \"steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20S%owner_steamid%A%assetid%D2595450432077729572\",\n" +
+                "\t\t\t\"name\": \"在游戏中检视…\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"name\": \"格洛克 18 型 | 子弹皇后\",\n" +
+                "\t\t\"name_color\": \"D2D2D2\",\n" +
+                "\t\t\"type\": \"隐秘 手枪\",\n" +
+                "\t\t\"market_name\": \"格洛克 18 型 | 子弹皇后 (崭新出厂)\",\n" +
+                "\t\t\"market_hash_name\": \"Glock-18 | Bullet Queen (Factory New)\",\n" +
+                "\t\t\"market_actions\": [{\n" +
+                "\t\t\t\"link\": \"steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20M%listingid%A%assetid%D2595450432077729572\",\n" +
+                "\t\t\t\"name\": \"在游戏中检视…\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"commodity\": 0,\n" +
+                "\t\t\"market_tradable_restriction\": 7,\n" +
+                "\t\t\"marketable\": 1,\n" +
+                "\t\t\"tags\": [{\n" +
+                "\t\t\t\"category\": \"Type\",\n" +
+                "\t\t\t\"internal_name\": \"CSGO_Type_Pistol\",\n" +
+                "\t\t\t\"localized_category_name\": \"类型\",\n" +
+                "\t\t\t\"localized_tag_name\": \"手枪\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Weapon\",\n" +
+                "\t\t\t\"internal_name\": \"weapon_glock\",\n" +
+                "\t\t\t\"localized_category_name\": \"武器\",\n" +
+                "\t\t\t\"localized_tag_name\": \"格洛克 18 型\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"ItemSet\",\n" +
+                "\t\t\t\"internal_name\": \"set_community_25\",\n" +
+                "\t\t\t\"localized_category_name\": \"收藏品\",\n" +
+                "\t\t\t\"localized_tag_name\": \"棱彩2号收藏品\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Quality\",\n" +
+                "\t\t\t\"internal_name\": \"normal\",\n" +
+                "\t\t\t\"localized_category_name\": \"类别\",\n" +
+                "\t\t\t\"localized_tag_name\": \"普通\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Rarity\",\n" +
+                "\t\t\t\"internal_name\": \"Rarity_Ancient_Weapon\",\n" +
+                "\t\t\t\"localized_category_name\": \"品质\",\n" +
+                "\t\t\t\"localized_tag_name\": \"隐秘\",\n" +
+                "\t\t\t\"color\": \"eb4b4b\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Exterior\",\n" +
+                "\t\t\t\"internal_name\": \"WearCategory0\",\n" +
+                "\t\t\t\"localized_category_name\": \"外观\",\n" +
+                "\t\t\t\"localized_tag_name\": \"崭新出厂\"\n" +
+                "\t\t}]\n" +
+                "\t}, {\n" +
+                "\t\t\"appid\": 730,\n" +
+                "\t\t\"classid\": \"1560433642\",\n" +
+                "\t\t\"instanceid\": \"480085569\",\n" +
+                "\t\t\"currency\": 0,\n" +
+                "\t\t\"background_color\": \"\",\n" +
+                "\t\t\"icon_url\": \"-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot621FAR17PLfYQJP7c-ikZKSqPrxN7LEmyVTsZV33OiT9tys2AG1_UJlZ2HxJ47EIAI_N1CErAe_lOzsgMO66syd1zI97a8kXc4r\",\n" +
+                "\t\t\"icon_url_large\": \"-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot621FAR17PLfYQJP7c-ikZKSqPrxN7LEm1Rd6dd2j6fDrNzz3lXmqENlY2yiIoecdg48YlCBqFW_l-a708C96Z_KzCdl7HF2-z-DyCGf5u7A\",\n" +
+                "\t\t\"descriptions\": [{\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"外观： 久经沙场\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"高风险，高回报，恶名昭彰的 AWP 因其标志性的枪声和一枪一个的准则而为人熟知。 这把武器将花纹和严谨的漏印结合起来，通过热转印贴花加强细节，然后进行了自定义涂装。\\n\\n<i>蔡斯.特纳曾是个伟大的男人… 你现在可是背负着他那重大的使命啊 –《凤凰与崛起（上）》</i>\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"野火收藏品\",\n" +
+                "\t\t\t\"color\": \"9da1a9\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}],\n" +
+                "\t\t\"tradable\": 1,\n" +
+                "\t\t\"actions\": [{\n" +
+                "\t\t\t\"link\": \"steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20S%owner_steamid%A%assetid%D14277657804014900741\",\n" +
+                "\t\t\t\"name\": \"在游戏中检视…\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"name\": \"AWP | 精英之作\",\n" +
+                "\t\t\"name_color\": \"D2D2D2\",\n" +
+                "\t\t\"type\": \"保密 狙击步枪\",\n" +
+                "\t\t\"market_name\": \"AWP | 精英之作 (久经沙场)\",\n" +
+                "\t\t\"market_hash_name\": \"AWP | Elite Build (Field-Tested)\",\n" +
+                "\t\t\"market_actions\": [{\n" +
+                "\t\t\t\"link\": \"steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20M%listingid%A%assetid%D14277657804014900741\",\n" +
+                "\t\t\t\"name\": \"在游戏中检视…\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"commodity\": 0,\n" +
+                "\t\t\"market_tradable_restriction\": 7,\n" +
+                "\t\t\"marketable\": 1,\n" +
+                "\t\t\"tags\": [{\n" +
+                "\t\t\t\"category\": \"Type\",\n" +
+                "\t\t\t\"internal_name\": \"CSGO_Type_SniperRifle\",\n" +
+                "\t\t\t\"localized_category_name\": \"类型\",\n" +
+                "\t\t\t\"localized_tag_name\": \"狙击步枪\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Weapon\",\n" +
+                "\t\t\t\"internal_name\": \"weapon_awp\",\n" +
+                "\t\t\t\"localized_category_name\": \"武器\",\n" +
+                "\t\t\t\"localized_tag_name\": \"AWP\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"ItemSet\",\n" +
+                "\t\t\t\"internal_name\": \"set_community_11\",\n" +
+                "\t\t\t\"localized_category_name\": \"收藏品\",\n" +
+                "\t\t\t\"localized_tag_name\": \"野火收藏品\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Quality\",\n" +
+                "\t\t\t\"internal_name\": \"normal\",\n" +
+                "\t\t\t\"localized_category_name\": \"类别\",\n" +
+                "\t\t\t\"localized_tag_name\": \"普通\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Rarity\",\n" +
+                "\t\t\t\"internal_name\": \"Rarity_Legendary_Weapon\",\n" +
+                "\t\t\t\"localized_category_name\": \"品质\",\n" +
+                "\t\t\t\"localized_tag_name\": \"保密\",\n" +
+                "\t\t\t\"color\": \"d32ce6\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Exterior\",\n" +
+                "\t\t\t\"internal_name\": \"WearCategory2\",\n" +
+                "\t\t\t\"localized_category_name\": \"外观\",\n" +
+                "\t\t\t\"localized_tag_name\": \"久经沙场\"\n" +
+                "\t\t}]\n" +
+                "\t}, {\n" +
+                "\t\t\"appid\": 730,\n" +
+                "\t\t\"classid\": \"2735679255\",\n" +
+                "\t\t\"instanceid\": \"188530170\",\n" +
+                "\t\t\"currency\": 0,\n" +
+                "\t\t\"background_color\": \"\",\n" +
+                "\t\t\"icon_url\": \"-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpoo6m1FBRp3_bGcjhQ09-jq5WYh8j3Jq_um25V4dB8xLCXod2jjgHt_0M4MmrwcoCWIFM-MFDUqATtxey-g5XouJzNwHdgsyc8pSGKt-UEtYA\",\n" +
+                "\t\t\"icon_url_large\": \"-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpoo6m1FBRp3_bGcjhQ09-jq5WYh8j3Jq_um25V4dB8teXA54vwxg3i_0JqNWz6IIbBIwU9N17TqAS-kObr18PvuJ-Yz3E3viEm7HrelhKpwUYbXkaqFVw\",\n" +
+                "\t\t\"descriptions\": [{\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"外观： 久经沙场\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"该物品具有 StatTrak™ 技术，在其所有者装备时能跟踪若干统计数据。\",\n" +
+                "\t\t\t\"color\": \"99ccff\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"该物品记录已认证杀敌数。\",\n" +
+                "\t\t\t\"color\": \"CF6A32\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"从《反恐精英：起源》中穿越而来，是玩家们的最爱，消音版 USP 手枪装有一个可拆卸的消音器，降低后坐力的同时还能抑制住容易引起注意的枪声。 这把武器在银黑底色上采用了粉色点缀。\\n\\n<i>保持冷静</i>\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \"命悬一线收藏品\",\n" +
+                "\t\t\t\"color\": \"9da1a9\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"type\": \"html\",\n" +
+                "\t\t\t\"value\": \" \"\n" +
+                "\t\t}],\n" +
+                "\t\t\"tradable\": 1,\n" +
+                "\t\t\"actions\": [{\n" +
+                "\t\t\t\"link\": \"steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20S%owner_steamid%A%assetid%D16312113606057376555\",\n" +
+                "\t\t\t\"name\": \"在游戏中检视…\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"name\": \"USP 消音版（StatTrak™） | 脑洞大开\",\n" +
+                "\t\t\"name_color\": \"CF6A32\",\n" +
+                "\t\t\"type\": \"StatTrak™ 保密 手枪\",\n" +
+                "\t\t\"market_name\": \"USP 消音版（StatTrak™） | 脑洞大开 (久经沙场)\",\n" +
+                "\t\t\"market_hash_name\": \"StatTrak™ USP-S | Cortex (Field-Tested)\",\n" +
+                "\t\t\"market_actions\": [{\n" +
+                "\t\t\t\"link\": \"steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20M%listingid%A%assetid%D16312113606057376555\",\n" +
+                "\t\t\t\"name\": \"在游戏中检视…\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"commodity\": 0,\n" +
+                "\t\t\"market_tradable_restriction\": 7,\n" +
+                "\t\t\"marketable\": 1,\n" +
+                "\t\t\"tags\": [{\n" +
+                "\t\t\t\"category\": \"Type\",\n" +
+                "\t\t\t\"internal_name\": \"CSGO_Type_Pistol\",\n" +
+                "\t\t\t\"localized_category_name\": \"类型\",\n" +
+                "\t\t\t\"localized_tag_name\": \"手枪\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Weapon\",\n" +
+                "\t\t\t\"internal_name\": \"weapon_usp_silencer\",\n" +
+                "\t\t\t\"localized_category_name\": \"武器\",\n" +
+                "\t\t\t\"localized_tag_name\": \"USP 消音版\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"ItemSet\",\n" +
+                "\t\t\t\"internal_name\": \"set_community_19\",\n" +
+                "\t\t\t\"localized_category_name\": \"收藏品\",\n" +
+                "\t\t\t\"localized_tag_name\": \"命悬一线收藏品\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Quality\",\n" +
+                "\t\t\t\"internal_name\": \"strange\",\n" +
+                "\t\t\t\"localized_category_name\": \"类别\",\n" +
+                "\t\t\t\"localized_tag_name\": \"StatTrak™\",\n" +
+                "\t\t\t\"color\": \"CF6A32\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Rarity\",\n" +
+                "\t\t\t\"internal_name\": \"Rarity_Legendary_Weapon\",\n" +
+                "\t\t\t\"localized_category_name\": \"品质\",\n" +
+                "\t\t\t\"localized_tag_name\": \"保密\",\n" +
+                "\t\t\t\"color\": \"d32ce6\"\n" +
+                "\t\t}, {\n" +
+                "\t\t\t\"category\": \"Exterior\",\n" +
+                "\t\t\t\"internal_name\": \"WearCategory2\",\n" +
+                "\t\t\t\"localized_category_name\": \"外观\",\n" +
+                "\t\t\t\"localized_tag_name\": \"久经沙场\"\n" +
+                "\t\t}]\n" +
+                "\t}],\n" +
+                "\t\"total_inventory_count\": 11,\n" +
+                "\t\"success\": 1,\n" +
+                "\t\"rwgrsn\": -2\n" +
+                "}";
+        ObjectMapper objectMapper=new ObjectMapper();
+        InventoryDto json = null;
+        try {
+            json = objectMapper.readValue(j, InventoryDto.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
         for (InventoryDto.AssetsDTO item:json.getAssets()) {
             InvPageReqVO steamInv=new InvPageReqVO();
             steamInv.setSteamId(steamId);
