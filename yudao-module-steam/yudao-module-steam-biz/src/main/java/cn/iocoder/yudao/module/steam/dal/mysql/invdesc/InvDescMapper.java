@@ -24,8 +24,6 @@ public interface InvDescMapper extends BaseMapperX<InvDescDO> {
                 .eqIfPresent(InvDescDO::getInstanceid, reqVO.getInstanceid())
                 .eqIfPresent(InvDescDO::getCurrency, reqVO.getCurrency())
                 .eqIfPresent(InvDescDO::getBackgroundColor, reqVO.getBackgroundColor())
-                .eqIfPresent(InvDescDO::getIconUrl, reqVO.getIconUrl())
-                .eqIfPresent(InvDescDO::getIconUrlLarge, reqVO.getIconUrlLarge())
                 .eqIfPresent(InvDescDO::getTradable, reqVO.getTradable())
                 .eqIfPresent(InvDescDO::getActions, reqVO.getActions())
                 .eqIfPresent(InvDescDO::getFraudwarnings, reqVO.getFraudwarnings())
@@ -38,6 +36,12 @@ public interface InvDescMapper extends BaseMapperX<InvDescDO> {
                 .eqIfPresent(InvDescDO::getCommodity, reqVO.getCommodity())
                 .eqIfPresent(InvDescDO::getMarketTradableRestriction, reqVO.getMarketTradableRestriction())
                 .eqIfPresent(InvDescDO::getMarketable, reqVO.getMarketable())
+                .eqIfPresent(InvDescDO::getSelQuality, reqVO.getSelQuality())
+                .eqIfPresent(InvDescDO::getSelItemset, reqVO.getSelItemset())
+                .eqIfPresent(InvDescDO::getSelWeapon, reqVO.getSelWeapon())
+                .eqIfPresent(InvDescDO::getSelExterior, reqVO.getSelExterior())
+                .eqIfPresent(InvDescDO::getSelRarity, reqVO.getSelRarity())
+                .eqIfPresent(InvDescDO::getSelType, reqVO.getSelType())
                 .orderByDesc(InvDescDO::getId));
     }
 

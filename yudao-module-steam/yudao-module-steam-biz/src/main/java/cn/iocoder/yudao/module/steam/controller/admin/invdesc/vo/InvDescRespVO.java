@@ -11,19 +11,15 @@ import com.alibaba.excel.annotation.*;
 @ExcelIgnoreUnannotated
 public class InvDescRespVO {
 
-    @Schema(description = "主键", example = "2594")
-    @ExcelProperty("主键")
-    private Long id;
-
-    @Schema(description = "appid", example = "9909")
+    @Schema(description = "appid", example = "835")
     @ExcelProperty("appid")
     private Integer appid;
 
-    @Schema(description = "classid", example = "17461")
+    @Schema(description = "classid", example = "31980")
     @ExcelProperty("classid")
     private String classid;
 
-    @Schema(description = "instanceid", example = "22443")
+    @Schema(description = "instanceid", example = "15663")
     @ExcelProperty("instanceid")
     private String instanceid;
 
@@ -34,14 +30,6 @@ public class InvDescRespVO {
     @Schema(description = "background_color")
     @ExcelProperty("background_color")
     private String backgroundColor;
-
-    @Schema(description = "icon_url", example = "https://www.iocoder.cn")
-    @ExcelProperty("icon_url")
-    private String iconUrl;
-
-    @Schema(description = "icon_url_large")
-    @ExcelProperty("icon_url_large")
-    private String iconUrlLarge;
 
     @Schema(description = "tradable")
     @ExcelProperty("tradable")
@@ -55,7 +43,7 @@ public class InvDescRespVO {
     @ExcelProperty("fraudwarnings")
     private String fraudwarnings;
 
-    @Schema(description = "name", example = "李四")
+    @Schema(description = "name", example = "赵六")
     @ExcelProperty("name")
     private String name;
 
@@ -63,15 +51,15 @@ public class InvDescRespVO {
     @ExcelProperty("name_color")
     private String nameColor;
 
-    @Schema(description = "type", example = "2")
+    @Schema(description = "type", example = "1")
     @ExcelProperty("type")
     private String type;
 
-    @Schema(description = "market_name", example = "芋艿")
+    @Schema(description = "market_name", example = "王五")
     @ExcelProperty("market_name")
     private String marketName;
 
-    @Schema(description = "market_hash_name", example = "张三")
+    @Schema(description = "market_hash_name", example = "赵六")
     @ExcelProperty("market_hash_name")
     private String marketHashName;
 
@@ -91,8 +79,32 @@ public class InvDescRespVO {
     @ExcelProperty("marketable")
     private Integer marketable;
 
-    @Schema(description = "描述")
-    @ExcelProperty("描述")
-    private String tags;
+    @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "21516")
+    @ExcelProperty("主键")
+    private Long id;
+
+    @Schema(description = "类别选择")
+    @ExcelProperty("类别选择")
+    private String selQuality;
+
+    @Schema(description = "收藏品选择")
+    @ExcelProperty("收藏品选择")
+    private String selItemset;
+
+    @Schema(description = "武器选择")
+    @ExcelProperty("武器选择")
+    private String selWeapon;
+
+    @Schema(description = "外观选择")
+    @ExcelProperty("外观选择")
+    private String selExterior;
+
+    @Schema(description = "品质选择")
+    @ExcelProperty("品质选择")
+    private String selRarity;
+
+    @Schema(description = "类型选择", example = "2")
+    @ExcelProperty("类型选择")
+    private String selType;
 
 }

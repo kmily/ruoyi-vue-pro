@@ -115,8 +115,6 @@ public class InvDescServiceImplTest extends BaseDbUnitTest {
            o.setInstanceid(null);
            o.setCurrency(null);
            o.setBackgroundColor(null);
-           o.setIconUrl(null);
-           o.setIconUrlLarge(null);
            o.setTradable(null);
            o.setActions(null);
            o.setFraudwarnings(null);
@@ -129,6 +127,12 @@ public class InvDescServiceImplTest extends BaseDbUnitTest {
            o.setCommodity(null);
            o.setMarketTradableRestriction(null);
            o.setMarketable(null);
+           o.setSelQuality(null);
+           o.setSelItemset(null);
+           o.setSelWeapon(null);
+           o.setSelExterior(null);
+           o.setSelRarity(null);
+           o.setSelType(null);
        });
        invDescMapper.insert(dbInvDesc);
        // 测试 appid 不匹配
@@ -141,10 +145,6 @@ public class InvDescServiceImplTest extends BaseDbUnitTest {
        invDescMapper.insert(cloneIgnoreId(dbInvDesc, o -> o.setCurrency(null)));
        // 测试 backgroundColor 不匹配
        invDescMapper.insert(cloneIgnoreId(dbInvDesc, o -> o.setBackgroundColor(null)));
-       // 测试 iconUrl 不匹配
-       invDescMapper.insert(cloneIgnoreId(dbInvDesc, o -> o.setIconUrl(null)));
-       // 测试 iconUrlLarge 不匹配
-       invDescMapper.insert(cloneIgnoreId(dbInvDesc, o -> o.setIconUrlLarge(null)));
        // 测试 tradable 不匹配
        invDescMapper.insert(cloneIgnoreId(dbInvDesc, o -> o.setTradable(null)));
        // 测试 actions 不匹配
@@ -169,6 +169,18 @@ public class InvDescServiceImplTest extends BaseDbUnitTest {
        invDescMapper.insert(cloneIgnoreId(dbInvDesc, o -> o.setMarketTradableRestriction(null)));
        // 测试 marketable 不匹配
        invDescMapper.insert(cloneIgnoreId(dbInvDesc, o -> o.setMarketable(null)));
+       // 测试 selQuality 不匹配
+       invDescMapper.insert(cloneIgnoreId(dbInvDesc, o -> o.setSelQuality(null)));
+       // 测试 selItemset 不匹配
+       invDescMapper.insert(cloneIgnoreId(dbInvDesc, o -> o.setSelItemset(null)));
+       // 测试 selWeapon 不匹配
+       invDescMapper.insert(cloneIgnoreId(dbInvDesc, o -> o.setSelWeapon(null)));
+       // 测试 selExterior 不匹配
+       invDescMapper.insert(cloneIgnoreId(dbInvDesc, o -> o.setSelExterior(null)));
+       // 测试 selRarity 不匹配
+       invDescMapper.insert(cloneIgnoreId(dbInvDesc, o -> o.setSelRarity(null)));
+       // 测试 selType 不匹配
+       invDescMapper.insert(cloneIgnoreId(dbInvDesc, o -> o.setSelType(null)));
        // 准备参数
        InvDescPageReqVO reqVO = new InvDescPageReqVO();
        reqVO.setAppid(null);
@@ -176,8 +188,6 @@ public class InvDescServiceImplTest extends BaseDbUnitTest {
        reqVO.setInstanceid(null);
        reqVO.setCurrency(null);
        reqVO.setBackgroundColor(null);
-       reqVO.setIconUrl(null);
-       reqVO.setIconUrlLarge(null);
        reqVO.setTradable(null);
        reqVO.setActions(null);
        reqVO.setFraudwarnings(null);
@@ -190,6 +200,12 @@ public class InvDescServiceImplTest extends BaseDbUnitTest {
        reqVO.setCommodity(null);
        reqVO.setMarketTradableRestriction(null);
        reqVO.setMarketable(null);
+       reqVO.setSelQuality(null);
+       reqVO.setSelItemset(null);
+       reqVO.setSelWeapon(null);
+       reqVO.setSelExterior(null);
+       reqVO.setSelRarity(null);
+       reqVO.setSelType(null);
 
        // 调用
        PageResult<InvDescDO> pageResult = invDescService.getInvDescPage(reqVO);

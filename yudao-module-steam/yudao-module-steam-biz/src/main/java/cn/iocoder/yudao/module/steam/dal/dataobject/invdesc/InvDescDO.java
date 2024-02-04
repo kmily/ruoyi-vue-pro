@@ -115,5 +115,29 @@ public class InvDescDO extends BaseDO {
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<InventoryDto.DescriptionsDTOX.TagsDTO> tags;
+    /**
+     * 类别选择
+     */
+    private String selQuality;
+    /**
+     * 收藏品选择
+     */
+    private String selItemset;
+    /**
+     * 武器选择
+     */
+    private String selWeapon;
+    /**
+     * 外观选择
+     */
+    private String selExterior;
+    /**
+     * 品质选择
+     */
+    private String selRarity;
+    /**
+     * 类型选择
+     */
+    private String selType;
 
 }

@@ -15,13 +15,13 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class InvDescPageReqVO extends PageParam {
 
-    @Schema(description = "appid", example = "9909")
+    @Schema(description = "appid", example = "835")
     private Integer appid;
 
-    @Schema(description = "classid", example = "17461")
+    @Schema(description = "classid", example = "31980")
     private String classid;
 
-    @Schema(description = "instanceid", example = "22443")
+    @Schema(description = "instanceid", example = "15663")
     private String instanceid;
 
     @Schema(description = "currency")
@@ -29,12 +29,6 @@ public class InvDescPageReqVO extends PageParam {
 
     @Schema(description = "background_color")
     private String backgroundColor;
-
-    @Schema(description = "icon_url", example = "https://www.iocoder.cn")
-    private String iconUrl;
-
-    @Schema(description = "icon_url_large")
-    private String iconUrlLarge;
 
     @Schema(description = "tradable")
     private Integer tradable;
@@ -45,19 +39,19 @@ public class InvDescPageReqVO extends PageParam {
     @Schema(description = "fraudwarnings")
     private String fraudwarnings;
 
-    @Schema(description = "name", example = "李四")
+    @Schema(description = "name", example = "赵六")
     private String name;
 
     @Schema(description = "name_color")
     private String nameColor;
 
-    @Schema(description = "type", example = "2")
+    @Schema(description = "type", example = "1")
     private String type;
 
-    @Schema(description = "market_name", example = "芋艿")
+    @Schema(description = "market_name", example = "王五")
     private String marketName;
 
-    @Schema(description = "market_hash_name", example = "张三")
+    @Schema(description = "market_hash_name", example = "赵六")
     private String marketHashName;
 
     @Schema(description = "market_actions")
@@ -71,5 +65,23 @@ public class InvDescPageReqVO extends PageParam {
 
     @Schema(description = "marketable")
     private Integer marketable;
+
+    @Schema(description = "类别选择")
+    private String selQuality;
+
+    @Schema(description = "收藏品选择")
+    private String selItemset;
+
+    @Schema(description = "武器选择")
+    private String selWeapon;
+
+    @Schema(description = "外观选择")
+    private String selExterior;
+
+    @Schema(description = "品质选择")
+    private String selRarity;
+
+    @Schema(description = "类型选择", example = "2")
+    private String selType;
 
 }
