@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.steam.controller.admin.binduser.vo.BindUserPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.binduser.vo.BindUserSaveReqVO;
 import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
+import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -126,7 +127,7 @@ public class SteamService {
         return identity.replace("https://steamcommunity.com/openid/id/","");
     }
 //    public InventoryDto fetchInventory(String steamId, String appId){
-//        String steamHost = configService.selectConfigByKey("steam.host");
+//        ConfigDO configByKey = configService.getConfigByKey("steam.host");
 //        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
 //        builder.method(HttpUtil.Method.GET).url("https://steamcommunity.com/inventory/:steamId/:app/2?l=schinese&count=75");
 //        Map<String,String> pathVar=new HashMap<>();
