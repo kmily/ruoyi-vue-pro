@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppDropListRespV
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.dal.mysql.seltype.SelWeaponMapper;
 import cn.iocoder.yudao.module.steam.service.OpenApiService;
+import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.selexterior.SelExteriorService;
 import cn.iocoder.yudao.module.steam.service.selitemset.SelItemsetService;
 import cn.iocoder.yudao.module.steam.service.selquality.SelQualityService;
@@ -23,8 +24,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-
-import java.rmi.server.ServerCloneException;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -47,6 +46,8 @@ public class AppDevApiController {
     private OpenApiService openApiService;
     @Resource
     private SelWeaponMapper selWeaponMapper;
+    @Resource
+    private SteamService steamService;
 
     /**
      * 类别选择
@@ -145,6 +146,12 @@ public class AppDevApiController {
         exterior.setPageNo(1);
         appDropListRespVO.setExterior(selExteriorService.getSelExteriorPage(exterior).getList());
         return CommonResult.success(appDropListRespVO);
+    }
+    @GetMapping("/test")
+
+    public CommonResult<String> test() {
+        steamService.fetchInventory("76561199388019188","730");
+        return success("test");
     }
 
 }

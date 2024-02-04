@@ -1,10 +1,14 @@
 package cn.iocoder.yudao.module.steam.service;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.steam.controller.admin.binduser.vo.BindUserPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.binduser.vo.BindUserSaveReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
+import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
@@ -13,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
@@ -37,8 +42,8 @@ public class SteamService {
     }
 
 
-    //    @Autowired
-//    private SteamInvMapper steamInvMapper;
+    @Resource
+    private InvMapper invMapper;
 //
 //    @Autowired
 
@@ -126,44 +131,40 @@ public class SteamService {
     private String getSteamId(String identity){
         return identity.replace("https://steamcommunity.com/openid/id/","");
     }
-//    public InventoryDto fetchInventory(String steamId, String appId){
-//        ConfigDO configByKey = configService.getConfigByKey("steam.host");
-//        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-//        builder.method(HttpUtil.Method.GET).url("https://steamcommunity.com/inventory/:steamId/:app/2?l=schinese&count=75");
-//        Map<String,String> pathVar=new HashMap<>();
-//        pathVar.put("steamId",steamId);
-//        pathVar.put("app",appId);
-//        builder.pathVar(pathVar);
-//        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
-//        InventoryDto json = sent.json(InventoryDto.class);
-//        for (InventoryDto.AssetsDTO item:json.getAssets()) {
-//            SteamInv steamInv=new SteamInv();
-//            steamInv.setSteamId(steamId);
-//            steamInv.setAppid(item.getAppid().longValue());
-//            steamInv.setAssetid(item.getAssetid());
-//            List<SteamInv> steamInvs = steamInvMapper.selectSteamInvList(steamInv);
-//            if(steamInvs.stream().count()>0){
-//                Optional<SteamInv> first = steamInvs.stream().findFirst();
-//                SteamInv steamInv1 = first.get();
-//                steamInv1.setAmount(item.getAmount());
-//                steamInv1.setClassid(item.getClassid());
+    public InventoryDto fetchInventory(String steamId, String appId){
+        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+        builder.method(HttpUtil.Method.GET).url("https://steamcommunity.com/inventory/:steamId/:app/2?l=schinese&count=75");
+        Map<String,String> pathVar=new HashMap<>();
+        pathVar.put("steamId",steamId);
+        pathVar.put("app",appId);
+        builder.pathVar(pathVar);
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
+        InventoryDto json = sent.json(InventoryDto.class);
+        for (InventoryDto.AssetsDTO item:json.getAssets()) {
+            InvPageReqVO steamInv=new InvPageReqVO();
+            steamInv.setSteamId(steamId);
+            steamInv.setAppid(item.getAppid());
+            steamInv.setAssetid(item.getAssetid());
+            PageResult<InvDO> invDOPageResult = invMapper.selectPage(steamInv);
+            if(invDOPageResult.getTotal()>0){
+                Optional<InvDO> first = invDOPageResult.getList().stream().findFirst();
+                InvDO steamInv1 = first.get();
+                steamInv1.setAmount(item.getAmount());
+                steamInv1.setClassid(item.getClassid());
 //                steamInv1.setUpdateTime(new Date());
-//                steamInvMapper.updateSteamInv(steamInv1);
-//            }else{
-//                SteamInv steamInv1=new SteamInv();
-//                steamInv1.setSteamId(steamId);
-//                steamInv1.setAppid(item.getAppid().longValue());
-//                steamInv1.setAssetid(item.getAssetid());
-//                steamInv1.setAmount(item.getAmount());
-//                steamInv1.setClassid(item.getClassid());
-//                steamInv1.setCreateTime(new Date());
-//                steamInv1.setUpdateTime(new Date());
-//                steamInvMapper.insertSteamInv(steamInv1);
-//            }
-//        }
-//        return json;
-//
-//    }
+                invMapper.updateById(steamInv1);
+            }else{
+                InvDO steamInv1=new InvDO();
+                steamInv1.setSteamId(steamId);
+                steamInv1.setAppid(item.getAppid());
+                steamInv1.setAssetid(item.getAssetid());
+                steamInv1.setAmount(item.getAmount());
+                steamInv1.setClassid(item.getClassid());
+                invMapper.insert(steamInv1);
+            }
+        }
+        return json;
+    }
 
 
 }
