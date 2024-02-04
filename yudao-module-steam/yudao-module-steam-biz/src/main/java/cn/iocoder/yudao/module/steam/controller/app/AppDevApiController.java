@@ -33,13 +33,6 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RequestMapping("/devapi")
 @Validated
 public class AppDevApiController {
-    @GetMapping("/get")
-    @Operation(summary = "获取 test 信息")
-    public CommonResult<String> get() {
-        return success("true");
-    }
-
-
     @Resource
     private SelExteriorService selExteriorService;
     @Resource
