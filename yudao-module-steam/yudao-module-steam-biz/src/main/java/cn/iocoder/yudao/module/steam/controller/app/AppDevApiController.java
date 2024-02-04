@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.selrarity.vo.SelRarityPage
 import cn.iocoder.yudao.module.steam.controller.admin.seltype.vo.SelTypePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppDropListRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
+import cn.iocoder.yudao.module.steam.dal.mysql.seltype.SelWeaponMapper;
 import cn.iocoder.yudao.module.steam.service.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.selexterior.SelExteriorService;
 import cn.iocoder.yudao.module.steam.service.selitemset.SelItemsetService;
@@ -51,19 +52,23 @@ public class AppDevApiController {
     private SelRarityService selRarityService;
     @Resource
     private OpenApiService openApiService;
+    @Resource
+    private SelWeaponMapper selWeaponMapper;
+
     /**
      * 类别选择
      */
     @PostMapping("/openapi")
     @Operation(summary = "获取类别选择下拉信息")
     public CommonResult<String> openApi(@RequestBody @Validated OpenApiReqVo openApi) {
-        try{
+        try {
             String despatch = openApiService.despatch(openApi);
             return CommonResult.success(despatch);
-        }catch (ServiceException e){
-            return CommonResult.error(new ErrorCode(01,"接口出错原因:"+e.getMessage()));
+        } catch (ServiceException e) {
+            return CommonResult.error(new ErrorCode(01, "接口出错原因:" + e.getMessage()));
         }
     }
+
     /**
      * 类别选择
      */
@@ -119,17 +124,18 @@ public class AppDevApiController {
     }
 
     /**
-     * 武器选择  TODO
+     * 武器选择
      */
     @GetMapping("/drop_list_weapon")
     @Operation(summary = "获取武器选择下拉信息")
-    public CommonResult<AppDropListRespVO> getWeapon(Long typeId) {
+    public CommonResult<AppDropListRespVO> getWeapon() {
         AppDropListRespVO appDropListRespVO = new AppDropListRespVO();
         SelTypePageReqVO type_weapon = new SelTypePageReqVO();
         type_weapon.setPageSize(200);
         type_weapon.setPageNo(1);
 //        appDropListRespVO.setWeapon(selTypeService.getSelWeaponPage(type_weapon,typeId).getList());
-
+//        selWeaponMapper.selectList();
+        appDropListRespVO.setWeapon(selWeaponMapper.selectList());
         return CommonResult.success(appDropListRespVO);
 
     }
