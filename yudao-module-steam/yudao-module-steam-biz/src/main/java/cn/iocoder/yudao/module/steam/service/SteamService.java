@@ -7,8 +7,11 @@ import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.steam.controller.admin.binduser.vo.BindUserPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.binduser.vo.BindUserSaveReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.invdesc.vo.InvDescPageReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
@@ -44,6 +47,8 @@ public class SteamService {
 
     @Resource
     private InvMapper invMapper;
+    @Resource
+    private InvDescMapper invDescMapper;
 //
 //    @Autowired
 
@@ -161,6 +166,64 @@ public class SteamService {
                 steamInv1.setAmount(item.getAmount());
                 steamInv1.setClassid(item.getClassid());
                 invMapper.insert(steamInv1);
+            }
+        }
+        List<InventoryDto.DescriptionsDTOX> descriptions = json.getDescriptions();
+        for(InventoryDto.DescriptionsDTOX item:descriptions){
+            InvDescPageReqVO invDescPageReqVO=new InvDescPageReqVO();
+//            invDescPageReqVO.set(steamId);
+            invDescPageReqVO.setAppid(item.getAppid());
+//            invDescPageReqVO.setAppid(123);
+            invDescPageReqVO.setClassid(item.getClassid());
+            invDescPageReqVO.setInstanceid(item.getInstanceid());
+            PageResult<InvDescDO> invDescDOPageResult = invDescMapper.selectPage(invDescPageReqVO);
+            if(invDescDOPageResult.getTotal()>0){
+                Optional<InvDescDO> first = invDescDOPageResult.getList().stream().findFirst();
+                InvDescDO invDescDO = first.get();
+                invDescDO.setAppid(item.getAppid());
+                invDescDO.setClassid(item.getClassid());
+                invDescDO.setInstanceid(item.getInstanceid());
+                invDescDO.setCurrency(item.getCurrency());
+                invDescDO.setBackgroundColor(item.getBackgroundColor());
+                invDescDO.setIconUrl(item.getIconUrl());
+                invDescDO.setIconUrlLarge(item.getIconUrlLarge());
+                invDescDO.setDescriptions(item.getDescriptions());
+                invDescDO.setTradable(item.getTradable());
+                invDescDO.setActions(item.getActions());
+                invDescDO.setName(item.getName());
+                invDescDO.setNameColor(item.getNameColor());
+                invDescDO.setType(item.getType());
+                invDescDO.setMarketName(item.getMarketName());
+                invDescDO.setMarketHashName(item.getMarketHashName());
+                invDescDO.setMarketActions(item.getMarketActions());
+                invDescDO.setCommodity(item.getCommodity());
+                invDescDO.setMarketTradableRestriction(item.getMarketTradableRestriction());
+                invDescDO.setMarketable(item.getMarketable());
+                invDescDO.setTags(item.getTags());
+                invDescMapper.updateById(invDescDO);
+            }else{
+                InvDescDO invDescDO=new InvDescDO();
+                invDescDO.setAppid(item.getAppid());
+                invDescDO.setClassid(item.getClassid());
+                invDescDO.setInstanceid(item.getInstanceid());
+                invDescDO.setCurrency(item.getCurrency());
+                invDescDO.setBackgroundColor(item.getBackgroundColor());
+                invDescDO.setIconUrl(item.getIconUrl());
+                invDescDO.setIconUrlLarge(item.getIconUrlLarge());
+                invDescDO.setDescriptions(item.getDescriptions());
+                invDescDO.setTradable(item.getTradable());
+                invDescDO.setActions(item.getActions());
+                invDescDO.setName(item.getName());
+                invDescDO.setNameColor(item.getNameColor());
+                invDescDO.setType(item.getType());
+                invDescDO.setMarketName(item.getMarketName());
+                invDescDO.setMarketHashName(item.getMarketHashName());
+                invDescDO.setMarketActions(item.getMarketActions());
+                invDescDO.setCommodity(item.getCommodity());
+                invDescDO.setMarketTradableRestriction(item.getMarketTradableRestriction());
+                invDescDO.setMarketable(item.getMarketable());
+                invDescDO.setTags(item.getTags());
+                invDescMapper.insert(invDescDO);
             }
         }
         return json;

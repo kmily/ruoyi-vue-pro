@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.steam.utils;
 
-import cn.iocoder.yudao.module.steam.exceptions.BizException;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -134,13 +134,13 @@ public class HttpUtil {
         }
     }
 
-    public static String object2Json(Object param) throws BizException {
+    public static String object2Json(Object param) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             return objectMapper.writeValueAsString(param);
         } catch (JsonProcessingException e) {
             log.error("对象转json出错", e);
-            throw new BizException("对象转json出错");
+            throw new ServiceException(-1,"对象转json出错");
         }
     }
 
@@ -319,11 +319,11 @@ public class HttpUtil {
                 return builder.build();
             } else {
                 log.error("请求出错，服务器返回{}", Objects.requireNonNull(execute.body()).string());
-                throw new BizException("Http请求出错" + execute.message());
+                throw new ServiceException(-1,"Http请求出错" + execute.message());
             }
         } catch (IOException e) {
             e.printStackTrace();
-            throw new BizException("Http请求出错" + e.getMessage());
+            throw new ServiceException(-1,"Http请求出错" + e.getMessage());
         }
     }
 
@@ -399,7 +399,7 @@ public class HttpUtil {
                 return t;
             } catch (IOException e) {
                 log.error("转换Json出错{}", e.getMessage());
-                throw new BizException("转换Json出错");
+                throw new ServiceException(-1,"转换Json出错");
             }
         }
         List<Cookie> cookies=new ArrayList<>();

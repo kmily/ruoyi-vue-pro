@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.steam.dal.dataobject.invdesc;
 
+import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
@@ -12,7 +12,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
  *
  * @author 芋道源码
  */
-@TableName("steam_inv_desc")
+@TableName(value = "steam_inv_desc" ,autoResultMap = true)
 @KeySequence("steam_inv_desc_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -58,7 +58,8 @@ public class InvDescDO extends BaseDO {
     /**
      * descriptions
      */
-    private String descriptions;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<InventoryDto.DescriptionsDTOX.DescriptionsDTO> descriptions;
     /**
      * tradable
      */
@@ -66,7 +67,8 @@ public class InvDescDO extends BaseDO {
     /**
      * actions
      */
-    private String actions;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<InventoryDto.DescriptionsDTOX.ActionsDTO> actions;
     /**
      * fraudwarnings
      */
@@ -94,7 +96,8 @@ public class InvDescDO extends BaseDO {
     /**
      * market_actions
      */
-    private String marketActions;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<InventoryDto.DescriptionsDTOX.MarketActionsDTO> marketActions;
     /**
      * commodity
      */
@@ -110,6 +113,7 @@ public class InvDescDO extends BaseDO {
     /**
      * 描述
      */
-    private String tags;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<InventoryDto.DescriptionsDTOX.TagsDTO> tags;
 
 }
