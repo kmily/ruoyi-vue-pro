@@ -17,12 +17,6 @@
       <el-form-item label="background_color" prop="backgroundColor">
         <el-input v-model="queryParams.backgroundColor" placeholder="请输入background_color" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="icon_url" prop="iconUrl">
-        <el-input v-model="queryParams.iconUrl" placeholder="请输入icon_url" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="icon_url_large" prop="iconUrlLarge">
-        <el-input v-model="queryParams.iconUrlLarge" placeholder="请输入icon_url_large" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
       <el-form-item label="tradable" prop="tradable">
         <el-input v-model="queryParams.tradable" placeholder="请输入tradable" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
@@ -61,6 +55,26 @@
       <el-form-item label="marketable" prop="marketable">
         <el-input v-model="queryParams.marketable" placeholder="请输入marketable" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
+      <el-form-item label="类别选择" prop="selQuality">
+        <el-input v-model="queryParams.selQuality" placeholder="请输入类别选择" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="收藏品选择" prop="selItemset">
+        <el-input v-model="queryParams.selItemset" placeholder="请输入收藏品选择" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="武器选择" prop="selWeapon">
+        <el-input v-model="queryParams.selWeapon" placeholder="请输入武器选择" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="外观选择" prop="selExterior">
+        <el-input v-model="queryParams.selExterior" placeholder="请输入外观选择" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="品质选择" prop="selRarity">
+        <el-input v-model="queryParams.selRarity" placeholder="请输入品质选择" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="类型选择" prop="selType">
+        <el-select v-model="queryParams.selType" placeholder="请选择类型选择" clearable size="small">
+          <el-option label="请选择字典生成" value="" />
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -86,22 +100,24 @@
       <el-table-column label="instanceid" align="center" prop="instanceid" />
       <el-table-column label="currency" align="center" prop="currency" />
       <el-table-column label="background_color" align="center" prop="backgroundColor" />
-      <el-table-column label="icon_url" align="center" prop="iconUrl" />
-      <el-table-column label="icon_url_large" align="center" prop="iconUrlLarge" />
       <el-table-column label="tradable" align="center" prop="tradable" />
-      <el-table-column label="actions" align="center" prop="actions" />
+
       <el-table-column label="fraudwarnings" align="center" prop="fraudwarnings" />
       <el-table-column label="name" align="center" prop="name" />
       <el-table-column label="name_color" align="center" prop="nameColor" />
       <el-table-column label="type" align="center" prop="type" />
       <el-table-column label="market_name" align="center" prop="marketName" />
       <el-table-column label="market_hash_name" align="center" prop="marketHashName" />
-      <el-table-column label="market_actions" align="center" prop="marketActions" />
       <el-table-column label="commodity" align="center" prop="commodity" />
       <el-table-column label="market_tradable_restriction" align="center" prop="marketTradableRestriction" />
       <el-table-column label="marketable" align="center" prop="marketable" />
-      <el-table-column label="描述" align="center" prop="tags" />
       <el-table-column label="主键" align="center" prop="id" />
+      <el-table-column label="类别选择" align="center" prop="selQuality" />
+      <el-table-column label="收藏品选择" align="center" prop="selItemset" />
+      <el-table-column label="武器选择" align="center" prop="selWeapon" />
+      <el-table-column label="外观选择" align="center" prop="selExterior" />
+      <el-table-column label="品质选择" align="center" prop="selRarity" />
+      <el-table-column label="类型选择" align="center" prop="selType" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
@@ -154,8 +170,6 @@ export default {
         instanceid: null,
         currency: null,
         backgroundColor: null,
-        iconUrl: null,
-        iconUrlLarge: null,
         tradable: null,
         actions: null,
         fraudwarnings: null,
@@ -168,6 +182,12 @@ export default {
         commodity: null,
         marketTradableRestriction: null,
         marketable: null,
+        selQuality: null,
+        selItemset: null,
+        selWeapon: null,
+        selExterior: null,
+        selRarity: null,
+        selType: null,
       },
             };
   },

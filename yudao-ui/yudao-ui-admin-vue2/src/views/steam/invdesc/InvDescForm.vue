@@ -71,6 +71,26 @@
                     <el-form-item label="主键" prop="id">
                       <el-input v-model="formData.id" placeholder="请输入主键" />
                     </el-form-item>
+                    <el-form-item label="类别选择" prop="selQuality">
+                      <el-input v-model="formData.selQuality" placeholder="请输入类别选择" />
+                    </el-form-item>
+                    <el-form-item label="收藏品选择" prop="selItemset">
+                      <el-input v-model="formData.selItemset" placeholder="请输入收藏品选择" />
+                    </el-form-item>
+                    <el-form-item label="武器选择" prop="selWeapon">
+                      <el-input v-model="formData.selWeapon" placeholder="请输入武器选择" />
+                    </el-form-item>
+                    <el-form-item label="外观选择" prop="selExterior">
+                      <el-input v-model="formData.selExterior" placeholder="请输入外观选择" />
+                    </el-form-item>
+                    <el-form-item label="品质选择" prop="selRarity">
+                      <el-input v-model="formData.selRarity" placeholder="请输入品质选择" />
+                    </el-form-item>
+                    <el-form-item label="类型选择" prop="selType">
+                      <el-select v-model="formData.selType" placeholder="请选择类型选择">
+                            <el-option label="请选择字典生成" value="" />
+                      </el-select>
+                    </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm" :disabled="formLoading">确 定</el-button>
@@ -118,9 +138,16 @@
                             marketable: undefined,
                             tags: undefined,
                             id: undefined,
+                            selQuality: undefined,
+                            selItemset: undefined,
+                            selWeapon: undefined,
+                            selExterior: undefined,
+                            selRarity: undefined,
+                            selType: undefined,
         },
         // 表单校验
         formRules: {
+                        id: [{ required: true, message: '主键不能为空', trigger: 'blur' }],
         },
                         };
     },
@@ -191,6 +218,12 @@
                             marketable: undefined,
                             tags: undefined,
                             id: undefined,
+                            selQuality: undefined,
+                            selItemset: undefined,
+                            selWeapon: undefined,
+                            selExterior: undefined,
+                            selRarity: undefined,
+                            selType: undefined,
         };
         this.resetForm("formRef");
       }
