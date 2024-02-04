@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.steam.service;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
@@ -1064,9 +1065,14 @@ public class SteamService {
 //            invDescPageReqVO.setAppid(123);
             invDescPageReqVO.setClassid(item.getClassid());
             invDescPageReqVO.setInstanceid(item.getInstanceid());
-            PageResult<InvDescDO> invDescDOPageResult = invDescMapper.selectPage(invDescPageReqVO);
-            if(invDescDOPageResult.getTotal()>0){
-                Optional<InvDescDO> first = invDescDOPageResult.getList().stream().findFirst();
+            List<InvDescDO> invDescDOS = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+                    .eqIfPresent(InvDescDO::getAppid, item.getAppid())
+                    .eqIfPresent(InvDescDO::getClassid, item.getClassid())
+                    .eqIfPresent(InvDescDO::getInstanceid, item.getInstanceid())
+                    .orderByDesc(InvDescDO::getId));
+//            PageResult<InvDescDO> invDescDOPageResult2 = invDescMapper.selectPage(invDescPageReqVO);
+            if(invDescDOS.size()>0){
+                Optional<InvDescDO> first = invDescDOS.stream().findFirst();
                 InvDescDO invDescDO = first.get();
                 invDescDO.setAppid(item.getAppid());
                 invDescDO.setClassid(item.getClassid());
