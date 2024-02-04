@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Steam相关接口
@@ -1087,6 +1088,37 @@ public class SteamService {
                 invDescDO.setMarketTradableRestriction(item.getMarketTradableRestriction());
                 invDescDO.setMarketable(item.getMarketable());
                 invDescDO.setTags(item.getTags());
+                //解析tags
+                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> type = item.getTags().stream().filter(i -> i.getCategory().equals("Type")).findFirst();
+                if(type.isPresent()){
+                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = type.get();
+                    invDescDO.setSelType(tagsDTO.getInternalName());
+                }
+                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> weapon = item.getTags().stream().filter(i -> i.getCategory().equals("Weapon")).findFirst();
+                if(weapon.isPresent()){
+                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = weapon.get();
+                    invDescDO.setSelWeapon(tagsDTO.getInternalName());
+                }
+                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> itemSet = item.getTags().stream().filter(i -> i.getCategory().equals("ItemSet")).findFirst();
+                if(itemSet.isPresent()){
+                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = itemSet.get();
+                    invDescDO.setSelItemset(tagsDTO.getInternalName());
+                }
+                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> quality = item.getTags().stream().filter(i -> i.getCategory().equals("Quality")).findFirst();
+                if(quality.isPresent()){
+                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = quality.get();
+                    invDescDO.setSelQuality(tagsDTO.getInternalName());
+                }
+                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> rarity = item.getTags().stream().filter(i -> i.getCategory().equals("Rarity")).findFirst();
+                if(rarity.isPresent()){
+                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = rarity.get();
+                    invDescDO.setSelRarity(tagsDTO.getInternalName());
+                }
+                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> exterior = item.getTags().stream().filter(i -> i.getCategory().equals("Exterior")).findFirst();
+                if(exterior.isPresent()){
+                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = exterior.get();
+                    invDescDO.setSelExterior(tagsDTO.getInternalName());
+                }
                 invDescMapper.updateById(invDescDO);
             }else{
                 InvDescDO invDescDO=new InvDescDO();
@@ -1110,6 +1142,37 @@ public class SteamService {
                 invDescDO.setMarketTradableRestriction(item.getMarketTradableRestriction());
                 invDescDO.setMarketable(item.getMarketable());
                 invDescDO.setTags(item.getTags());
+                //解析tags
+                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> type = item.getTags().stream().filter(i -> i.getCategory().equals("Type")).findFirst();
+                if(type.isPresent()){
+                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = type.get();
+                    invDescDO.setSelType(tagsDTO.getInternalName());
+                }
+                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> weapon = item.getTags().stream().filter(i -> i.getCategory().equals("Weapon")).findFirst();
+                if(weapon.isPresent()){
+                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = weapon.get();
+                    invDescDO.setSelWeapon(tagsDTO.getInternalName());
+                }
+                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> itemSet = item.getTags().stream().filter(i -> i.getCategory().equals("ItemSet")).findFirst();
+                if(itemSet.isPresent()){
+                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = itemSet.get();
+                    invDescDO.setSelItemset(tagsDTO.getInternalName());
+                }
+                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> quality = item.getTags().stream().filter(i -> i.getCategory().equals("Quality")).findFirst();
+                if(quality.isPresent()){
+                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = quality.get();
+                    invDescDO.setSelQuality(tagsDTO.getInternalName());
+                }
+                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> rarity = item.getTags().stream().filter(i -> i.getCategory().equals("Rarity")).findFirst();
+                if(rarity.isPresent()){
+                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = rarity.get();
+                    invDescDO.setSelRarity(tagsDTO.getInternalName());
+                }
+                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> exterior = item.getTags().stream().filter(i -> i.getCategory().equals("Exterior")).findFirst();
+                if(exterior.isPresent()){
+                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = exterior.get();
+                    invDescDO.setSelExterior(tagsDTO.getInternalName());
+                }
                 invDescMapper.insert(invDescDO);
             }
         }
