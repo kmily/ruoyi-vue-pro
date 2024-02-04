@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.steam.controller.app;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.selexterior.vo.SelExteriorPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selitemset.vo.SelItemsetListReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selquality.vo.SelQualityPageReqVO;
@@ -150,7 +151,10 @@ public class AppDevApiController {
     @GetMapping("/test")
 
     public CommonResult<String> test() {
-        steamService.fetchInventory("76561199388019188","730");
+        TenantUtils.execute(1l,()->{
+            steamService.fetchInventory("76561199388019188","730");
+        });
+
         return success("test");
     }
 
