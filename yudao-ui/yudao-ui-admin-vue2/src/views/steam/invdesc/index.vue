@@ -81,8 +81,7 @@
     </el-row>
 
             <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
-            <el-table-column label="主键" align="center" prop="id" />
-      <el-table-column label="appid" align="center" prop="appid" />
+            <el-table-column label="appid" align="center" prop="appid" />
       <el-table-column label="classid" align="center" prop="classid" />
       <el-table-column label="instanceid" align="center" prop="instanceid" />
       <el-table-column label="currency" align="center" prop="currency" />
@@ -102,6 +101,7 @@
       <el-table-column label="market_tradable_restriction" align="center" prop="marketTradableRestriction" />
       <el-table-column label="marketable" align="center" prop="marketable" />
       <el-table-column label="描述" align="center" prop="tags" />
+      <el-table-column label="主键" align="center" prop="id" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
@@ -224,4 +224,4 @@ export default {
     },
               }
 };
-</script>
+</script>

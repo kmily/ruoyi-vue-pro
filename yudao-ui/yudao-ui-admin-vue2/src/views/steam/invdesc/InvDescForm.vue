@@ -68,6 +68,9 @@
                     <el-form-item label="描述" prop="tags">
                       <el-input v-model="formData.tags" placeholder="请输入描述" />
                     </el-form-item>
+                    <el-form-item label="主键" prop="id">
+                      <el-input v-model="formData.id" placeholder="请输入主键" />
+                    </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm" :disabled="formLoading">确 定</el-button>
@@ -93,7 +96,6 @@
         formLoading: false,
         // 表单参数
         formData: {
-                            id: undefined,
                             appid: undefined,
                             classid: undefined,
                             instanceid: undefined,
@@ -115,6 +117,7 @@
                             marketTradableRestriction: undefined,
                             marketable: undefined,
                             tags: undefined,
+                            id: undefined,
         },
         // 表单校验
         formRules: {
@@ -166,7 +169,6 @@
                       /** 表单重置 */
       reset() {
         this.formData = {
-                            id: undefined,
                             appid: undefined,
                             classid: undefined,
                             instanceid: undefined,
@@ -188,9 +190,10 @@
                             marketTradableRestriction: undefined,
                             marketable: undefined,
                             tags: undefined,
+                            id: undefined,
         };
         this.resetForm("formRef");
       }
     }
   };
-</script>
+</script>
