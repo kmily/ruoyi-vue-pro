@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -198,6 +199,7 @@ public class SteamService {
             if(invDescDOS.size()>0){
                 Optional<InvDescDO> first = invDescDOS.stream().findFirst();
                 InvDescDO invDescDO = first.get();
+                invDescDO.setSteamId(steamId);
                 invDescDO.setAppid(item.getAppid());
                 invDescDO.setClassid(item.getClassid());
                 invDescDO.setInstanceid(item.getInstanceid());
@@ -249,9 +251,11 @@ public class SteamService {
                     InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = exterior.get();
                     invDescDO.setSelExterior(tagsDTO.getInternalName());
                 }
+                invDescDO.setUpdateTime(LocalDateTime.now());
                 invDescMapper.updateById(invDescDO);
             }else{
                 InvDescDO invDescDO=new InvDescDO();
+                invDescDO.setSteamId(steamId);
                 invDescDO.setAppid(item.getAppid());
                 invDescDO.setClassid(item.getClassid());
                 invDescDO.setInstanceid(item.getInstanceid());
