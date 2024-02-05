@@ -28,7 +28,7 @@ import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Tag(name = "用户 App - Test")
+@Tag(name = "用户 App - devApi")
 @RestController
 @RequestMapping("/devapi")
 @Validated
@@ -152,7 +152,7 @@ public class AppDevApiController {
 
     public CommonResult<String> test() {
         TenantUtils.execute(1l,()->{
-            steamService.fetchInventory("76561199388019188","730");
+            steamService.fetchInventory("76561198316318254","730");
         });
 
         return success("test");
