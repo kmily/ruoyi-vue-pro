@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Steam后台 - Test")
 @RestController
-@RequestMapping("/demo/test")
+@RequestMapping("/steam-admin/test")
 @Validated
 public class DemoTestController {
     @GetMapping("/get")

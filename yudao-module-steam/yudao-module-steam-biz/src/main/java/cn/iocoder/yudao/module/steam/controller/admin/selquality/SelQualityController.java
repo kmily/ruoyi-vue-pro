@@ -31,7 +31,7 @@ import javax.validation.Valid;
 
 @Tag(name = "Steam后台 - 类别选择")
 @RestController
-@RequestMapping("/steam/sel-quality")
+@RequestMapping("/steam-admin/sel-quality")
 @Validated
 @Resource
 public class SelQualityController {

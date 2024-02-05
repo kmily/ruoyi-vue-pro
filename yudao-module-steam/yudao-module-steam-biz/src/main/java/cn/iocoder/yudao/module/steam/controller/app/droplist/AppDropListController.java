@@ -23,7 +23,7 @@ import javax.annotation.Resource;
 
 @Tag(name = "获取下拉选择信息")
 @RestController
-@RequestMapping("/drop_list")
+@RequestMapping("steam-app/drop_list")
 @Validated
 public class AppDropListController {
 
