@@ -28,9 +28,9 @@ import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Tag(name = "用户 App - devApi")
+@Tag(name = "steam后台 - devApi")
 @RestController
-@RequestMapping("/devapi")
+@RequestMapping("steam-app/devapi")
 @Validated
 public class AppDevApiController {
     @Resource

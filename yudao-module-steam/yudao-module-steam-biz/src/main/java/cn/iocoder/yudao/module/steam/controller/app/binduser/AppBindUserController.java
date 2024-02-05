@@ -25,7 +25,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "steam后台 -  steam用户绑定")
 @RestController
-@RequestMapping("/steam/bind-user")
+@RequestMapping("/steam-app/bind-user")
 @Validated
 public class AppBindUserController {
 

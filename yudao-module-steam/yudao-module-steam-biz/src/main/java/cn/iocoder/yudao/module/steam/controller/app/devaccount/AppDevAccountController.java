@@ -19,7 +19,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "管理后台 - 开放平台用户")
 @RestController
-@RequestMapping("/steam/dev-account")
+@RequestMapping("/steam-app/dev-account")
 @Validated
 public class AppDevAccountController {
 

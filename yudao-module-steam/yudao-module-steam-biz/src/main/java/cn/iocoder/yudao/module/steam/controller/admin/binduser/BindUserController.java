@@ -31,7 +31,7 @@ import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 
 @Tag(name = "管理后台 -  steam用户绑定")
 @RestController
-@RequestMapping("/steam/bind-user")
+@RequestMapping("/steam-admin/bind-user")
 @Validated
 public class BindUserController {
 
