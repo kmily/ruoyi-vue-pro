@@ -75,6 +75,9 @@
           <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
+      <el-form-item label="steamId" prop="steamId">
+        <el-input v-model="queryParams.steamId" placeholder="请输入steamId" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -101,23 +104,25 @@
       <el-table-column label="currency" align="center" prop="currency" />
       <el-table-column label="background_color" align="center" prop="backgroundColor" />
       <el-table-column label="tradable" align="center" prop="tradable" />
-
+      <el-table-column label="actions" align="center" prop="actions" />
       <el-table-column label="fraudwarnings" align="center" prop="fraudwarnings" />
       <el-table-column label="name" align="center" prop="name" />
       <el-table-column label="name_color" align="center" prop="nameColor" />
       <el-table-column label="type" align="center" prop="type" />
       <el-table-column label="market_name" align="center" prop="marketName" />
       <el-table-column label="market_hash_name" align="center" prop="marketHashName" />
+      <el-table-column label="market_actions" align="center" prop="marketActions" />
       <el-table-column label="commodity" align="center" prop="commodity" />
       <el-table-column label="market_tradable_restriction" align="center" prop="marketTradableRestriction" />
       <el-table-column label="marketable" align="center" prop="marketable" />
-      <el-table-column label="主键" align="center" prop="id" />
       <el-table-column label="类别选择" align="center" prop="selQuality" />
       <el-table-column label="收藏品选择" align="center" prop="selItemset" />
       <el-table-column label="武器选择" align="center" prop="selWeapon" />
       <el-table-column label="外观选择" align="center" prop="selExterior" />
       <el-table-column label="品质选择" align="center" prop="selRarity" />
       <el-table-column label="类型选择" align="center" prop="selType" />
+      <el-table-column label="主键" align="center" prop="id" />
+      <el-table-column label="steamId" align="center" prop="steamId" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
@@ -188,6 +193,7 @@ export default {
         selExterior: null,
         selRarity: null,
         selType: null,
+        steamId: null,
       },
             };
   },
@@ -244,4 +250,4 @@ export default {
     },
               }
 };
-</script>
+</script>

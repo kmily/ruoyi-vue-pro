@@ -14,6 +14,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class InvDescPageReqVO extends PageParam {
+
     @Schema(description = "appid", example = "835")
     private Integer appid;
 
@@ -82,5 +83,8 @@ public class InvDescPageReqVO extends PageParam {
 
     @Schema(description = "类型选择", example = "2")
     private String selType;
+
+    @Schema(description = "steamId", example = "25194")
+    private String steamId;
 
 }

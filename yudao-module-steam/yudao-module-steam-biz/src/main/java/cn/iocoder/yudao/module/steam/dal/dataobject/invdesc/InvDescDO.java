@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.steam.dal.dataobject.invdesc;
 
-import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 import java.util.*;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
@@ -12,7 +12,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
  *
  * @author 芋道源码
  */
-@TableName(value = "steam_inv_desc" ,autoResultMap = true)
+@TableName("steam_inv_desc")
 @KeySequence("steam_inv_desc_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -22,11 +22,6 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 @AllArgsConstructor
 public class InvDescDO extends BaseDO {
 
-    /**
-     * 主键
-     */
-    @TableId
-    private Long id;
     /**
      * appid
      */
@@ -58,8 +53,7 @@ public class InvDescDO extends BaseDO {
     /**
      * descriptions
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<InventoryDto.DescriptionsDTOX.DescriptionsDTO> descriptions;
+    private String descriptions;
     /**
      * tradable
      */
@@ -67,8 +61,7 @@ public class InvDescDO extends BaseDO {
     /**
      * actions
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<InventoryDto.DescriptionsDTOX.ActionsDTO> actions;
+    private String actions;
     /**
      * fraudwarnings
      */
@@ -96,8 +89,7 @@ public class InvDescDO extends BaseDO {
     /**
      * market_actions
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<InventoryDto.DescriptionsDTOX.MarketActionsDTO> marketActions;
+    private String marketActions;
     /**
      * commodity
      */
@@ -113,8 +105,7 @@ public class InvDescDO extends BaseDO {
     /**
      * 描述
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<InventoryDto.DescriptionsDTOX.TagsDTO> tags;
+    private String tags;
     /**
      * 类别选择
      */
@@ -139,5 +130,14 @@ public class InvDescDO extends BaseDO {
      * 类型选择
      */
     private String selType;
+    /**
+     * 主键
+     */
+    @TableId
+    private Long id;
+    /**
+     * steamId
+     */
+    private String steamId;
 
 }

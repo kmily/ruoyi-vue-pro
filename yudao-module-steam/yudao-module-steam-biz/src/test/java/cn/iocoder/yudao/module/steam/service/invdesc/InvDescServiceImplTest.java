@@ -133,6 +133,7 @@ public class InvDescServiceImplTest extends BaseDbUnitTest {
            o.setSelExterior(null);
            o.setSelRarity(null);
            o.setSelType(null);
+           o.setSteamId(null);
        });
        invDescMapper.insert(dbInvDesc);
        // 测试 appid 不匹配
@@ -181,6 +182,8 @@ public class InvDescServiceImplTest extends BaseDbUnitTest {
        invDescMapper.insert(cloneIgnoreId(dbInvDesc, o -> o.setSelRarity(null)));
        // 测试 selType 不匹配
        invDescMapper.insert(cloneIgnoreId(dbInvDesc, o -> o.setSelType(null)));
+       // 测试 steamId 不匹配
+       invDescMapper.insert(cloneIgnoreId(dbInvDesc, o -> o.setSteamId(null)));
        // 准备参数
        InvDescPageReqVO reqVO = new InvDescPageReqVO();
        reqVO.setAppid(null);
@@ -206,6 +209,7 @@ public class InvDescServiceImplTest extends BaseDbUnitTest {
        reqVO.setSelExterior(null);
        reqVO.setSelRarity(null);
        reqVO.setSelType(null);
+       reqVO.setSteamId(null);
 
        // 调用
        PageResult<InvDescDO> pageResult = invDescService.getInvDescPage(reqVO);

@@ -79,10 +79,6 @@ public class InvDescRespVO {
     @ExcelProperty("marketable")
     private Integer marketable;
 
-    @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "21516")
-    @ExcelProperty("主键")
-    private Long id;
-
     @Schema(description = "类别选择")
     @ExcelProperty("类别选择")
     private String selQuality;
@@ -106,5 +102,13 @@ public class InvDescRespVO {
     @Schema(description = "类型选择", example = "2")
     @ExcelProperty("类型选择")
     private String selType;
+
+    @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "25981")
+    @ExcelProperty("主键")
+    private Long id;
+
+    @Schema(description = "steamId", example = "25194")
+    @ExcelProperty("steamId")
+    private String steamId;
 
 }

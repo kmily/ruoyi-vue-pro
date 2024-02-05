@@ -68,9 +68,6 @@
                     <el-form-item label="描述" prop="tags">
                       <el-input v-model="formData.tags" placeholder="请输入描述" />
                     </el-form-item>
-                    <el-form-item label="主键" prop="id">
-                      <el-input v-model="formData.id" placeholder="请输入主键" />
-                    </el-form-item>
                     <el-form-item label="类别选择" prop="selQuality">
                       <el-input v-model="formData.selQuality" placeholder="请输入类别选择" />
                     </el-form-item>
@@ -90,6 +87,9 @@
                       <el-select v-model="formData.selType" placeholder="请选择类型选择">
                             <el-option label="请选择字典生成" value="" />
                       </el-select>
+                    </el-form-item>
+                    <el-form-item label="steamId" prop="steamId">
+                      <el-input v-model="formData.steamId" placeholder="请输入steamId" />
                     </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
@@ -137,17 +137,17 @@
                             marketTradableRestriction: undefined,
                             marketable: undefined,
                             tags: undefined,
-                            id: undefined,
                             selQuality: undefined,
                             selItemset: undefined,
                             selWeapon: undefined,
                             selExterior: undefined,
                             selRarity: undefined,
                             selType: undefined,
+                            id: undefined,
+                            steamId: undefined,
         },
         // 表单校验
         formRules: {
-                        id: [{ required: true, message: '主键不能为空', trigger: 'blur' }],
         },
                         };
     },
@@ -217,16 +217,17 @@
                             marketTradableRestriction: undefined,
                             marketable: undefined,
                             tags: undefined,
-                            id: undefined,
                             selQuality: undefined,
                             selItemset: undefined,
                             selWeapon: undefined,
                             selExterior: undefined,
                             selRarity: undefined,
                             selType: undefined,
+                            id: undefined,
+                            steamId: undefined,
         };
         this.resetForm("formRef");
       }
     }
   };
-</script>
+</script>

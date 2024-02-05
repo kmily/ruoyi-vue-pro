@@ -42,6 +42,7 @@ public interface InvDescMapper extends BaseMapperX<InvDescDO> {
                 .eqIfPresent(InvDescDO::getSelExterior, reqVO.getSelExterior())
                 .eqIfPresent(InvDescDO::getSelRarity, reqVO.getSelRarity())
                 .eqIfPresent(InvDescDO::getSelType, reqVO.getSelType())
+                .eqIfPresent(InvDescDO::getSteamId, reqVO.getSteamId())
                 .orderByDesc(InvDescDO::getId));
     }
 

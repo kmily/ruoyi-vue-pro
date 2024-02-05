@@ -9,10 +9,7 @@ import javax.validation.constraints.*;
 @Data
 public class InvDescSaveReqVO {
 
-    @Schema(description = "主键", example = "2594")
-    private Long id;
-
-    @Schema(description = "appid", example = "9909")
+    @Schema(description = "appid", example = "835")
     private Integer appid;
 
     @Schema(description = "classid", example = "31980")
@@ -92,5 +89,11 @@ public class InvDescSaveReqVO {
 
     @Schema(description = "类型选择", example = "2")
     private String selType;
+
+    @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "25981")
+    private Long id;
+
+    @Schema(description = "steamId", example = "25194")
+    private String steamId;
 
 }
