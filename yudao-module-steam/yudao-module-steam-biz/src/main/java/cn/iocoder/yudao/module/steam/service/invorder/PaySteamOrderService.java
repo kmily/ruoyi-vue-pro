@@ -3,7 +3,9 @@ package cn.iocoder.yudao.module.steam.service.invorder;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.dal.dataobject.demo.PayDemoOrderDO;
+import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.PaySteamOrderCreateReqVO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 
 import javax.validation.Valid;
 
@@ -29,7 +31,7 @@ public interface PaySteamOrderService {
      * @param id 编号
      * @return 示例订单
      */
-    PayDemoOrderDO getDemoOrder(Long id);
+    InvOrderDO getDemoOrder(Long id);
 
     /**
      * 获得示例订单分页
@@ -37,7 +39,7 @@ public interface PaySteamOrderService {
      * @param pageReqVO 分页查询
      * @return 示例订单分页
      */
-    PageResult<PayDemoOrderDO> getDemoOrderPage(PageParam pageReqVO);
+    PageResult<InvOrderDO> getDemoOrderPage(InvOrderPageReqVO pageReqVO);
 
     /**
      * 更新示例订单为已支付

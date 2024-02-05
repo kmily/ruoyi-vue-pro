@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.steam.service.invorder;
 
-import cn.hutool.core.lang.Assert;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
@@ -9,10 +7,9 @@ import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
-import cn.iocoder.yudao.module.pay.dal.dataobject.demo.PayDemoOrderDO;
-import cn.iocoder.yudao.module.pay.dal.mysql.demo.PayDemoOrderMapper;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
+import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
@@ -23,8 +20,6 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 import static cn.hutool.core.util.ObjectUtil.notEqual;
@@ -51,13 +46,6 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
      */
     private static final Long PAY_APP_ID = 9L;
 
-    /**
-     * 商品信息 Map
-     *
-     * key：商品编号
-     * value：[商品名、商品价格]
-     */
-    private final Map<Long, Object[]> spuNames = new HashMap<>();
 
     @Resource
     private PayOrderApi payOrderApi;
@@ -65,17 +53,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     private PayRefundApi payRefundApi;
 
     @Resource
-    private PayDemoOrderMapper payDemoOrderMapper;
-
-    @Resource
     private InvOrderMapper invOrderMapper;
 
     public PaySteamOrderServiceImpl() {
-        spuNames.put(1L, new Object[]{"华为手机", 1});
-        spuNames.put(2L, new Object[]{"小米电视", 10});
-        spuNames.put(3L, new Object[]{"苹果手表", 100});
-        spuNames.put(4L, new Object[]{"华硕笔记本", 1000});
-        spuNames.put(5L, new Object[]{"蔚来汽车", 200000});
     }
 
     @Override
@@ -109,13 +89,13 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     }
 
     @Override
-    public PayDemoOrderDO getDemoOrder(Long id) {
-        return payDemoOrderMapper.selectById(id);
+    public InvOrderDO getDemoOrder(Long id) {
+        return invOrderMapper.selectById(id);
     }
 
     @Override
-    public PageResult<PayDemoOrderDO> getDemoOrderPage(PageParam pageReqVO) {
-        return payDemoOrderMapper.selectPage(pageReqVO);
+    public PageResult<InvOrderDO> getDemoOrderPage(InvOrderPageReqVO pageReqVO) {
+        return invOrderMapper.selectPage(pageReqVO);
     }
 
     @Override
@@ -191,38 +171,38 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     @Override
     public void refundDemoOrder(Long id, String userIp) {
         // 1. 校验订单是否可以退款
-        PayDemoOrderDO order = validateDemoOrderCanRefund(id);
+        InvOrderDO invOrderDO = validateDemoOrderCanRefund(id);
 
         // 2.1 生成退款单号
         // 一般来说，用户发起退款的时候，都会单独插入一个售后维权表，然后使用该表的 id 作为 refundId
         // 这里我们是个简单的 demo，所以没有售后维权表，直接使用订单 id + "-refund" 来演示
-        String refundId = order.getId() + "-refund";
+        String refundId = invOrderDO.getId() + "-refund";
         // 2.2 创建退款单
         Long payRefundId = payRefundApi.createRefund(new PayRefundCreateReqDTO()
                 .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
-                .setMerchantOrderId(String.valueOf(order.getId())) // 支付单号
+                .setMerchantOrderId(String.valueOf(invOrderDO.getId())) // 支付单号
                 .setMerchantRefundId(refundId)
-                .setReason("想退钱").setPrice(order.getPrice()));// 价格信息
+                .setReason("想退钱").setPrice(invOrderDO.getPrice()));// 价格信息
         // 2.3 更新退款单到 demo 订单
-        payDemoOrderMapper.updateById(new PayDemoOrderDO().setId(id)
-                .setPayRefundId(payRefundId).setRefundPrice(order.getPrice()));
+        invOrderMapper.updateById(new InvOrderDO().setId(id)
+                .setPayRefundId(payRefundId).setRefundPrice(invOrderDO.getPrice()));
     }
 
-    private PayDemoOrderDO validateDemoOrderCanRefund(Long id) {
+    private InvOrderDO validateDemoOrderCanRefund(Long id) {
         // 校验订单是否存在
-        PayDemoOrderDO order = payDemoOrderMapper.selectById(id);
-        if (order == null) {
+        InvOrderDO invOrderDO = invOrderMapper.selectById(id);
+        if (invOrderDO == null) {
             throw exception(DEMO_ORDER_NOT_FOUND);
         }
         // 校验订单是否支付
-        if (!order.getPayStatus()) {
+        if (!invOrderDO.getPayStatus()) {
             throw exception(DEMO_ORDER_REFUND_FAIL_NOT_PAID);
         }
         // 校验订单是否已退款
-        if (order.getPayRefundId() != null) {
+        if (invOrderDO.getPayRefundId() != null) {
             throw exception(DEMO_ORDER_REFUND_FAIL_REFUNDED);
         }
-        return order;
+        return invOrderDO;
     }
 
     @Override
@@ -230,20 +210,20 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         // 1. 校验并获得退款订单（可退款）
         PayRefundRespDTO payRefund = validateDemoOrderCanRefunded(id, payRefundId);
         // 2.2 更新退款单到 demo 订单
-        payDemoOrderMapper.updateById(new PayDemoOrderDO().setId(id)
+        invOrderMapper.updateById(new InvOrderDO().setId(id)
                 .setRefundTime(payRefund.getSuccessTime()));
     }
 
     private PayRefundRespDTO validateDemoOrderCanRefunded(Long id, Long payRefundId) {
         // 1.1 校验示例订单
-        PayDemoOrderDO order = payDemoOrderMapper.selectById(id);
-        if (order == null) {
+        InvOrderDO invOrderDO = invOrderMapper.selectById(id);
+        if (invOrderDO == null) {
             throw exception(DEMO_ORDER_NOT_FOUND);
         }
         // 1.2 校验退款订单匹配
-        if (Objects.equals(order.getPayRefundId(), payRefundId)) {
+        if (Objects.equals(invOrderDO.getPayRefundId(), payRefundId)) {
             log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！order 数据是：{}]",
-                    id, payRefundId, toJsonString(order));
+                    id, payRefundId, toJsonString(invOrderDO));
             throw exception(DEMO_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
         }
 
@@ -257,9 +237,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw exception(DEMO_ORDER_REFUND_FAIL_REFUND_NOT_SUCCESS);
         }
         // 2.3 校验退款金额一致
-        if (notEqual(payRefund.getRefundPrice(), order.getPrice())) {
+        if (notEqual(payRefund.getRefundPrice(), invOrderDO.getPrice())) {
             log.error("[validateDemoOrderCanRefunded][order({}) payRefund({}) 退款金额不匹配，请进行处理！order 数据是：{}，payRefund 数据是：{}]",
-                    id, payRefundId, toJsonString(order), toJsonString(payRefund));
+                    id, payRefundId, toJsonString(invOrderDO), toJsonString(payRefund));
             throw exception(DEMO_ORDER_REFUND_FAIL_REFUND_PRICE_NOT_MATCH);
         }
         // 2.4 校验退款订单匹配（二次）

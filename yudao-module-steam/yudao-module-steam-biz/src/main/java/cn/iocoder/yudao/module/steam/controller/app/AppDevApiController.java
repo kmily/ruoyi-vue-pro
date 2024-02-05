@@ -3,9 +3,11 @@ package cn.iocoder.yudao.module.steam.controller.app;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
+import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.order.PayDemoOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selexterior.vo.SelExteriorPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selitemset.vo.SelItemsetListReqVO;
@@ -38,7 +40,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 
 @Tag(name = "steam后台 - devApi")
 @RestController
-@RequestMapping("steam-app/devapi")
+@RequestMapping("devapi")
 @Validated
 public class AppDevApiController {
     @Resource
@@ -190,6 +192,23 @@ public class AppDevApiController {
     public CommonResult<Boolean> updateDemoOrderPaid(@RequestBody PayOrderNotifyReqDTO notifyReqDTO) {
         payDemoOrderService.updateDemoOrderPaid(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
                 notifyReqDTO.getPayOrderId());
+        return success(true);
+    }
+    @PostMapping("/update-refunded")
+    @Operation(summary = "更新示例订单为已退款") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
+    @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
+    @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
+    public CommonResult<Boolean> updateDemoOrderRefunded(@RequestBody PayRefundNotifyReqDTO notifyReqDTO) {
+        payDemoOrderService.updateDemoOrderRefunded(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
+                notifyReqDTO.getPayRefundId());
+        return success(true);
+    }
+    @PostMapping("/refundDemoOrder")
+    @Operation(summary = "更新示例订单为已支付") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
+    @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
+    @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
+    public CommonResult<Boolean> refundDemoOrder(@RequestParam("id") Long id) {
+        payDemoOrderService.refundDemoOrder(id, ServletUtils.getClientIP());
         return success(true);
     }
 }
