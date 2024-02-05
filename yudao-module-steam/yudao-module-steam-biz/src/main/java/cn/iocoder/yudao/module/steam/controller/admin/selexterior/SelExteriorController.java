@@ -29,7 +29,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-@Tag(name = "管理后台 - 外观选择")
+@Tag(name = "Steam后台 - 外观选择")
 @RestController
 @RequestMapping("/steam/sel-exterior")
 @Validated

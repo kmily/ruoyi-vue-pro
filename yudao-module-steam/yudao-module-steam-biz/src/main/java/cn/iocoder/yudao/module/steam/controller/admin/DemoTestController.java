@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "管理后台 - Test")
+@Tag(name = "Steam后台 - Test")
 @RestController
 @RequestMapping("/demo/test")
 @Validated

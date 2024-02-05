@@ -30,7 +30,7 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.seltype.SelTypeDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.seltype.SelWeaponDO;
 import cn.iocoder.yudao.module.steam.service.seltype.SelTypeService;
 
-@Tag(name = "管理后台 - 类型选择")
+@Tag(name = "Steam后台 - 类型选择")
 @RestController
 @RequestMapping("/steam/sel-type")
 @Validated

@@ -29,7 +29,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.selitemset.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selitemset.SelItemsetDO;
 import cn.iocoder.yudao.module.steam.service.selitemset.SelItemsetService;
 
-@Tag(name = "管理后台 - 收藏品选择")
+@Tag(name = "Steam后台 - 收藏品选择")
 @RestController
 @RequestMapping("/steam/sel-itemset")
 @Validated

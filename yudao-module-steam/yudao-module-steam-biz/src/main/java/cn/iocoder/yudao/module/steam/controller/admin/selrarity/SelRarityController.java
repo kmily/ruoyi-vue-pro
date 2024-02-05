@@ -29,7 +29,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.selrarity.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selrarity.SelRarityDO;
 import cn.iocoder.yudao.module.steam.service.selrarity.SelRarityService;
 
-@Tag(name = "管理后台 - 品质选择")
+@Tag(name = "Steam后台 - 品质选择")
 @RestController
 @RequestMapping("/steam/sel-rarity")
 @Validated

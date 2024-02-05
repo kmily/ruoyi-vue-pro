@@ -29,7 +29,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.invdesc.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.service.invdesc.InvDescService;
 
-@Tag(name = "管理后台 - 库存信息详情")
+@Tag(name = "Steam后台 - 库存信息详情")
 @RestController
 @RequestMapping("/steam/inv-desc")
 @Validated
