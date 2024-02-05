@@ -23,7 +23,7 @@ import java.net.URLEncoder;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Tag(name = "用户 APP -  steam用户绑定")
+@Tag(name = "steam后台 -  steam用户绑定")
 @RestController
 @RequestMapping("/steam/bind-user")
 @Validated
