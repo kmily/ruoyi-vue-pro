@@ -395,7 +395,7 @@ public class HttpUtil {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 T t = objectMapper.readValue(body, classic);
-                log.info("json数据{},对象{}", new String(body), t);
+                log.trace("json数据{}", new String(body));
                 return t;
             } catch (IOException e) {
                 log.error("转换Json出错{}", e.getMessage());

@@ -172,6 +172,7 @@ public class AppDevApiController {
     }
     @PostMapping("/testOrder")
     @Operation(summary = "创建示例订单")
+    @PermitAll
     public CommonResult<Long> createDemoOrder(@Valid @RequestBody PayDemoOrderCreateReqVO createReqVO) {
         TenantUtils.execute(1l,()->{
             PaySteamOrderCreateReqVO paySteamOrderCreateReqVO=new PaySteamOrderCreateReqVO();

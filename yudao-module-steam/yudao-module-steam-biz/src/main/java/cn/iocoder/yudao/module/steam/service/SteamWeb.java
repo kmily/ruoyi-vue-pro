@@ -72,7 +72,7 @@ public class SteamWeb {
         builder.form(stringStringHashMap);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 30000,null));
         SteamCookie json = sent.json(SteamCookie.class);
-        if(json.getCode()!=1){
+        if(json.getCode()!=0){
             log.error("Steam通讯失败{}",json);
             throw new ServiceException(-1,"Steam通讯失败"+json.getMsg());
         }
@@ -133,7 +133,7 @@ public class SteamWeb {
      *	获取API-KEY
      *	@return string $apikey
      */
-    public Optional<String> getApiKey3() {
+    public Optional<String> getApiKey() {
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
 //        builder.url("https://steamcommunity.com/dev/apikey");
         builder.url("http://192.168.0.111:25852/dev/apikey");
@@ -143,6 +143,10 @@ public class SteamWeb {
         builder.form(stringStringHashMap);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(),getClient(true,3000,cookieString));
         SteamString json = sent.json(SteamString.class);
+        if(json.getCode()!=1){
+            log.error("Steam通讯失败{}",json);
+            throw new ServiceException(-1,"Steam通讯失败"+json.getMsg());
+        }
         Pattern compile = Pattern.compile("/<h2>Access Denied</h2>/");
         if(compile.matcher(json.getData().getContent()).find()){
             return Optional.empty();
@@ -229,22 +233,22 @@ public class SteamWeb {
         }
     }
 
-    public static void main2(String[] args) throws  NoSuchAlgorithmException, InvalidKeyException {
-        SteamWeb steamWeb=new SteamWeb();
-        steamWeb.initChromeDriver();
-        steamWeb.login2("pbgx5e","deNXffnN","Um+FCAwJIBh9/a7qn2vP+tigoaM=");
-        Optional<String> apiKey2 = steamWeb.getApiKey2();
-        log.info(apiKey2.get());
-        log.info(steamWeb.getCookie().toString());
-        steamWeb.destory();
-    }
+//    public static void main2(String[] args) throws  NoSuchAlgorithmException, InvalidKeyException {
+//        SteamWeb steamWeb=new SteamWeb();
+//        steamWeb.initChromeDriver();
+//        steamWeb.login2("pbgx5e","deNXffnN","Um+FCAwJIBh9/a7qn2vP+tigoaM=");
+//        Optional<String> apiKey2 = steamWeb.getApiKey2();
+//        log.info(apiKey2.get());
+//        log.info(steamWeb.getCookie().toString());
+//        steamWeb.destory();
+//    }
 
     public static void main(String[] args) throws  NoSuchAlgorithmException, InvalidKeyException {
         SteamWeb steamWeb=new SteamWeb();
         BindUserDO bindUserDO=new BindUserDO();
         bindUserDO.setLoginName("pbgx5e").setLoginPassword("deNXffnN").setLoginSharedSecret("Um+FCAwJIBh9/a7qn2vP+tigoaM=");
         steamWeb.login3(bindUserDO);
-        Optional<String> apiKey3 = steamWeb.getApiKey3();
+        Optional<String> apiKey3 = steamWeb.getApiKey();
         if(apiKey3.isPresent()){
             System.out.println("Api"+apiKey3.get());
         }else{
