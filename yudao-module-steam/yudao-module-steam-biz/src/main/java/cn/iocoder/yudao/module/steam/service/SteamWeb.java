@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.steam.service;
 
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.module.infra.service.config.ConfigService;
+import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.service.steam.CustomCookieJar;
-import cn.iocoder.yudao.module.steam.service.steam.LoginValue;
-import cn.iocoder.yudao.module.steam.service.steam.RsaValue;
+import cn.iocoder.yudao.module.steam.service.steam.SteamCookie;
+import cn.iocoder.yudao.module.steam.service.steam.SteamString;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Cookie;
 import okhttp3.OkHttpClient;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
@@ -15,19 +17,14 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.crypto.*;
+import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.InvalidKeyException;
-import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.RSAPublicKeySpec;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -37,13 +34,20 @@ import java.util.regex.Pattern;
 @Slf4j
 public class SteamWeb {
     private OkHttpClient okHttpClient;
-    private List<Cookie> cookies=new ArrayList<>();
     private WebDriver webDriver;
+    private String cookieString="";
+
+    private ConfigService configService;
+    @Autowired
+    public void setConfigService(ConfigService configService) {
+        this.configService = configService;
+    }
+
 
     public SteamWeb() {
-        okHttpClient=getClient(true,30);
+        okHttpClient=getClient(true,30,null);
     }
-    public static OkHttpClient getClient(boolean retry, int timeOut) {
+    public static OkHttpClient getClient(boolean retry, int timeOut,String cookies) {
         OkHttpClient.Builder OKHTTP_BUILD = new OkHttpClient.Builder();
         OKHTTP_BUILD.writeTimeout(timeOut, TimeUnit.SECONDS);
         OKHTTP_BUILD.readTimeout(timeOut, TimeUnit.SECONDS);
@@ -54,6 +58,27 @@ public class SteamWeb {
         OKHTTP_BUILD.cookieJar(new CustomCookieJar());
         return OKHTTP_BUILD.build();
     }
+    public void login3(BindUserDO bindUserDO){
+        //steam登录代理
+//        ConfigDO configByKey = configService.getConfigByKey("steam.proxy");
+        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+//        builder.url(configByKey.getValue()+"login");
+        builder.url("http://192.168.0.111:25852/login");
+        builder.method(HttpUtil.Method.FORM);
+        HashMap<String, String> stringStringHashMap = new HashMap<>();
+        stringStringHashMap.put("username",bindUserDO.getLoginName());
+        stringStringHashMap.put("password",bindUserDO.getLoginPassword());
+        stringStringHashMap.put("token_code",bindUserDO.getLoginSharedSecret());
+        builder.form(stringStringHashMap);
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 30000,null));
+        SteamCookie json = sent.json(SteamCookie.class);
+        if(json.getCode()!=1){
+            log.error("Steam通讯失败{}",json);
+            throw new ServiceException(-1,"Steam通讯失败"+json.getMsg());
+        }
+        cookieString=json.getData().getCookie();
+    }
+    @Deprecated
     public void login2(String user,String passwd,String sharedSecret) throws NoSuchAlgorithmException, InvalidKeyException {
         webDriver.get("https://steamcommunity.com/login/home/?goto=");
         List<WebElement> input= webDriver.findElements(By.tagName("INPUT"));
@@ -105,108 +130,35 @@ public class SteamWeb {
         }while (!webDriver.getCurrentUrl().startsWith("https://steamcommunity.com/profiles/"));
     }
     /**
-     * 登录 steam帐号
-     * @param user 用户名
-     * @param passwd 密码
-     * @param sharedSecret sharedSecret
-     * @throws IllegalBlockSizeException
-     * @throws BadPaddingException
-     * @throws NoSuchPaddingException
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeySpecException
-     * @throws InvalidKeyException
-     */
-    public void login(String user,String passwd,String sharedSecret) throws IllegalBlockSizeException, BadPaddingException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, InterruptedException {
-        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-        builder.url("https://steamcommunity.com/login/getrsakey");
-        HashMap<String, String> stringStringHashMap = new HashMap<>();
-        stringStringHashMap.put("username",user);
-        builder.form(stringStringHashMap).method(HttpUtil.Method.FORM);
-        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), okHttpClient);
-        cookies.addAll(sent.getCookies());
-        RsaValue json = sent.json(RsaValue.class);
-        RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(new BigInteger(json.getPublickeyMod(), 16), new BigInteger(json.getPublickeyExp(), 16));
-        KeyFactory rsa = KeyFactory.getInstance("RSA");
-        PublicKey publicKey = rsa.generatePublic(rsaPublicKeySpec);
-        Cipher rsa1 = Cipher.getInstance("RSA");
-        rsa1.init(Cipher.ENCRYPT_MODE,publicKey);
-        byte[] bytes1 = rsa1.doFinal(passwd.getBytes());
-        stringStringHashMap.put("password", Base64.getEncoder().encodeToString(bytes1));
-
-        log.info(stringStringHashMap.toString());
-        LoginValue loginValue=new LoginValue();
-        do {
-            HttpUtil.HttpRequest.HttpRequestBuilder builder1 = HttpUtil.HttpRequest.builder();
-            builder1.url("https://steamcommunity.com/login/dologin/");
-            builder1.method(HttpUtil.Method.FORM);
-            stringStringHashMap.put("remember_login", "true");
-            stringStringHashMap.put("rsatimestamp", json.getTimestamp());
-            if(Objects.isNull(stringStringHashMap.get("emailauth"))) {
-                stringStringHashMap.put("emailauth", getSteamAuthCode(sharedSecret));
-            }
-            stringStringHashMap.put("emailsteamid", "");
-            if(Objects.isNull(stringStringHashMap.get("captchagid"))) {
-                stringStringHashMap.put("captchagid", "-1");
-            }
-            if(Objects.isNull(stringStringHashMap.get("twofactorcode"))){
-                stringStringHashMap.put("twofactorcode", getSteamAuthCode(sharedSecret));
-            }
-            builder1.form(stringStringHashMap);
-            HttpUtil.HttpResponse sent1 = HttpUtil.sent(builder1.build(), okHttpClient);
-            cookies.addAll(sent.getCookies());
-            LoginValue json1 = sent1.json(LoginValue.class);
-            BeanUtils.copyProperties(json1,loginValue);
-            Thread.sleep(200L);
-            if(Objects.nonNull(json1.getRequiresTwofactor())){
-                stringStringHashMap.put("twofactorcode", getSteamAuthCode(sharedSecret));
-            }
-            if(Objects.nonNull(json1.getEmailAuthNeeded())){
-                stringStringHashMap.put("emailauth", getSteamAuthCode(sharedSecret));
-            }
-            if(Objects.nonNull(json1.getCaptchaGid())){
-                log.warn("此帐号需要使用图片进行登录验证，https://steamcommunity.com/public/captcha.php?gid="+json1.getCaptchaGid());
-                stringStringHashMap.put("captchagid", json1.getCaptchaGid());
-                Scanner scanner=new Scanner(System.in);
-                String next = scanner.next();
-                stringStringHashMap.put("captcha_text", next);
-            }
-        }while (!loginValue.getSuccess());
-        log.info(loginValue.toString());
-        return;
-    }
-    public static byte[] hexToBytes(String hex) {
-        int len = hex.length();
-        byte[] data = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4)
-                    + Character.digit(hex.charAt(i+1), 16));
-        }
-        return data;
-    }
-
-    /**
      *	获取API-KEY
      *	@return string $apikey
      */
-    public Optional<String> getApiKey() {
+    public Optional<String> getApiKey3() {
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-        builder.url("https://steamcommunity.com/dev/apikey");
-        builder.method(HttpUtil.Method.GET);
-        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(),okHttpClient);
+//        builder.url("https://steamcommunity.com/dev/apikey");
+        builder.url("http://192.168.0.111:25852/dev/apikey");
+        builder.method(HttpUtil.Method.FORM);
+        HashMap<String, String> stringStringHashMap = new HashMap<>();
+        stringStringHashMap.put("cookie",cookieString);
+        builder.form(stringStringHashMap);
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(),getClient(true,3000,cookieString));
+        SteamString json = sent.json(SteamString.class);
         Pattern compile = Pattern.compile("/<h2>Access Denied</h2>/");
-        if(compile.matcher(sent.html()).find()){
+        if(compile.matcher(json.getData().getContent()).find()){
             return Optional.empty();
         }
-        Pattern compile2 = Pattern.compile("/<p>Key: (.*)</p>/");
-        Matcher matcher = compile2.matcher(sent.html());
-        if(matcher.find()){
+        Pattern pattern = Pattern.compile("密钥: (.*?)<"); // 正则表达式匹配API密钥
+        Matcher matcher = pattern.matcher(json.getData().getContent());
+        if (matcher.find()) {
             return Optional.of(matcher.group(1));
+        } else {
+            return Optional.empty();
         }
-        return Optional.empty();
     }
     public Set<org.openqa.selenium.Cookie> getCookie(){
         return webDriver.manage().getCookies();
     }
+    @Deprecated
     public Optional<String> getApiKey2() {
         webDriver.get("https://steamcommunity.com/dev/apikey");
         String pageSource = webDriver.getPageSource();
@@ -218,11 +170,6 @@ public class SteamWeb {
             }
             pageSource = webDriver.getPageSource();
         }while (!pageSource.contains("</html>"));
-//        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-//        builder.url("https://steamcommunity.com/dev/apikey");
-//        builder.method(HttpUtil.Method.GET);
-//        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(),okHttpClient);
-
         Pattern compile = Pattern.compile("/<h2>Access Denied</h2>/");
         if(compile.matcher(pageSource).find()){
             return Optional.empty();
@@ -275,9 +222,6 @@ public class SteamWeb {
             chromeOptions.addArguments("--remote-allow-origins=*");
             webDriver=new ChromeDriver(chromeOptions);
         }
-//        webDriver.get("https://www.selenium.dev/selenium/web/web-form.html");
-//        webDriver.quit();
-
     }
     private void destory(){
         if(Objects.nonNull(webDriver)){
@@ -285,7 +229,7 @@ public class SteamWeb {
         }
     }
 
-    public static void main(String[] args) throws  NoSuchAlgorithmException, InvalidKeyException {
+    public static void main2(String[] args) throws  NoSuchAlgorithmException, InvalidKeyException {
         SteamWeb steamWeb=new SteamWeb();
         steamWeb.initChromeDriver();
         steamWeb.login2("pbgx5e","deNXffnN","Um+FCAwJIBh9/a7qn2vP+tigoaM=");
@@ -295,5 +239,16 @@ public class SteamWeb {
         steamWeb.destory();
     }
 
-
+    public static void main(String[] args) throws  NoSuchAlgorithmException, InvalidKeyException {
+        SteamWeb steamWeb=new SteamWeb();
+        BindUserDO bindUserDO=new BindUserDO();
+        bindUserDO.setLoginName("pbgx5e").setLoginPassword("deNXffnN").setLoginSharedSecret("Um+FCAwJIBh9/a7qn2vP+tigoaM=");
+        steamWeb.login3(bindUserDO);
+        Optional<String> apiKey3 = steamWeb.getApiKey3();
+        if(apiKey3.isPresent()){
+            System.out.println("Api"+apiKey3.get());
+        }else{
+            System.out.println("Api不存在");
+        }
+    }
 }
