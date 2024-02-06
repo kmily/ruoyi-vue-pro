@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
 import javax.validation.constraints.*;
+import org.springframework.format.annotation.DateTimeFormat;
+import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 -  steam用户绑定新增/修改 Request VO")
 @Data
@@ -31,5 +33,20 @@ public class BindUserSaveReqVO {
 
     @Schema(description = "备注", example = "你说的对")
     private String remark;
+
+    @Schema(description = "登录名称", example = "赵六")
+    private String loginName;
+
+    @Schema(description = "登录密码")
+    private String loginPassword;
+
+    @Schema(description = "登录环")
+    private String loginSharedSecret;
+
+    @Schema(description = "登录会话")
+    private String loginSession;
+
+    @Schema(description = "登录时间")
+    private LocalDateTime loginTime;
 
 }

@@ -31,7 +31,7 @@ import cn.iocoder.yudao.module.steam.service.invdesc.InvDescService;
 
 @Tag(name = "Steam后台 - 库存信息详情")
 @RestController
-@RequestMapping("/steam-admin/inv-desc")
+@RequestMapping("/steam/inv-desc")
 @Validated
 public class InvDescController {
 

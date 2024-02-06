@@ -31,7 +31,7 @@ import cn.iocoder.yudao.module.steam.service.inv.InvService;
 
 @Tag(name = "管理后台 - steam用户库存储")
 @RestController
-@RequestMapping("/steam-admin/inv")
+@RequestMapping("/steam/inv")
 @Validated
 public class InvController {
 

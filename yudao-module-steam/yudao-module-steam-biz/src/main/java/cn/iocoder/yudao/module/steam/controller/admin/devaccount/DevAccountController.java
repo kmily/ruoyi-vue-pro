@@ -31,7 +31,7 @@ import cn.iocoder.yudao.module.steam.service.devaccount.DevAccountService;
 
 @Tag(name = "管理后台 - 开放平台用户")
 @RestController
-@RequestMapping("/steam-admin/dev-account")
+@RequestMapping("/steam/dev-account")
 @Validated
 public class DevAccountController {
 

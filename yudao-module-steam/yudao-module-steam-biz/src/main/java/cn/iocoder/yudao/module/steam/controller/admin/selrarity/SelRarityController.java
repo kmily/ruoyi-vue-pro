@@ -31,7 +31,7 @@ import cn.iocoder.yudao.module.steam.service.selrarity.SelRarityService;
 
 @Tag(name = "Steam后台 - 品质选择")
 @RestController
-@RequestMapping("/steam-admin/sel-rarity")
+@RequestMapping("/steam/sel-rarity")
 @Validated
 public class SelRarityController {
 

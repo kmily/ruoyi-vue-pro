@@ -31,7 +31,7 @@ import javax.validation.Valid;
 
 @Tag(name = "Steam后台 - 外观选择")
 @RestController
-@RequestMapping("/steam-admin/sel-exterior")
+@RequestMapping("/steam/sel-exterior")
 @Validated
 @Resource
 public class SelExteriorController {

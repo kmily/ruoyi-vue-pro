@@ -31,7 +31,7 @@ import cn.iocoder.yudao.module.steam.service.selitemset.SelItemsetService;
 
 @Tag(name = "Steam后台 - 收藏品选择")
 @RestController
-@RequestMapping("/steam-admin/sel-itemset")
+@RequestMapping("/steam/sel-itemset")
 @Validated
 public class SelItemsetController {
 

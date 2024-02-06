@@ -4,6 +4,7 @@ import lombok.*;
 import java.util.*;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
+import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
@@ -51,5 +52,25 @@ public class BindUserDO extends BaseDO {
      * 备注
      */
     private String remark;
+    /**
+     * 登录名称
+     */
+    private String loginName;
+    /**
+     * 登录密码
+     */
+    private String loginPassword;
+    /**
+     * 登录环
+     */
+    private String loginSharedSecret;
+    /**
+     * 登录会话
+     */
+    private String loginSession;
+    /**
+     * 登录时间
+     */
+    private LocalDateTime loginTime;
 
 }

@@ -32,7 +32,7 @@ import cn.iocoder.yudao.module.steam.service.seltype.SelTypeService;
 
 @Tag(name = "Steam后台 - 类型选择")
 @RestController
-@RequestMapping("/steam-admin/sel-type")
+@RequestMapping("/steam/sel-type")
 @Validated
 public class SelTypeController {
 

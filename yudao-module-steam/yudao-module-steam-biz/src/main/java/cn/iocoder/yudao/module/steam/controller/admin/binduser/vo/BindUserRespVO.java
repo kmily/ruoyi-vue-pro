@@ -45,4 +45,8 @@ public class BindUserRespVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
+    @Schema(description = "登录名称", example = "赵六")
+    @ExcelProperty("登录名称")
+    private String loginName;
+
 }
