@@ -1,18 +1,21 @@
 package cn.iocoder.yudao.module.steam.service;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.service.steam.SteamCookie;
 import cn.iocoder.yudao.module.steam.service.steam.SteamCustomCookieJar;
+import cn.iocoder.yudao.module.steam.service.steam.SteamInvDto;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
-import lombok.Data;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.InvalidKeyException;
@@ -26,23 +29,33 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Slf4j
-@Data
 public class SteamWeb {
-    private OkHttpClient okHttpClient;
+    /**
+     * 登录后cookie信息
+     */
     private String cookieString="";
+    /**
+     * webapikey
+     */
+    @Getter
     private Optional<String> webApiKey=Optional.empty();
+    /**
+     * steamId
+     */
+    @Getter
     private Optional<String> steamId=Optional.empty();
+    /**
+     * 交易链接
+     */
+    @Getter
     private Optional<String> treadUrl=Optional.empty();
 
+    @Resource
     private ConfigService configService;
-    @Autowired
-    public void setConfigService(ConfigService configService) {
-        this.configService = configService;
-    }
+
 
 
     public SteamWeb() {
-        okHttpClient=getClient(true,30,null,null);
     }
     public static OkHttpClient getClient(boolean retry, int timeOut,String cookies,String url) {
         OkHttpClient.Builder OKHTTP_BUILD = new OkHttpClient.Builder();
@@ -55,11 +68,16 @@ public class SteamWeb {
         OKHTTP_BUILD.cookieJar(new SteamCustomCookieJar(cookies,url));
         return OKHTTP_BUILD.build();
     }
-    public void login3(BindUserDO bindUserDO){
+
+    /**
+     * 登录steam网站
+     * @param bindUserDO
+     */
+    public void login(BindUserDO bindUserDO){
         //steam登录代理
-//        ConfigDO configByKey = configService.getConfigByKey("steam.proxy");
+        ConfigDO configByKey = configService.getConfigByKey("steam.proxy");
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-//        builder.url(configByKey.getValue()+"login");
+        builder.url(configByKey.getValue()+"login");
         builder.url("http://127.0.0.1:25852/login");
         builder.method(HttpUtil.Method.FORM);
         HashMap<String, String> stringStringHashMap = new HashMap<>();
@@ -75,6 +93,9 @@ public class SteamWeb {
         }
         cookieString=json.getData().getCookie();
     }
+    /**
+     * 初始化apikey
+     */
     public void initApiKey() {
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url("https://steamcommunity.com/dev/apikey");
@@ -94,6 +115,10 @@ public class SteamWeb {
             steamId =Optional.of(matcher2.group(1));
         }
     }
+
+    /**
+     * 初始化交易链接
+     */
     public void initTradeUrl() {
         if(!steamId.isPresent()){
             initApiKey();
@@ -116,6 +141,7 @@ public class SteamWeb {
         if (matcher.find()) {
             treadUrl=Optional.of(matcher.group(1));
         }else{
+            log.error("获取tradeUrl失败steamId{}",steamId);
             throw new ServiceException(-1,"获取tradeUrl失败");
         }
     }
@@ -126,7 +152,7 @@ public class SteamWeb {
      * @throws NoSuchAlgorithmException
      * @throws InvalidKeyException
      */
-
+    @Deprecated
     public static String getSteamAuthCode(String secret) throws NoSuchAlgorithmException, InvalidKeyException {
         long time = System.currentTimeMillis() / 30000; // Equivalent to Python's time() / 30
         System.out.println(time);
@@ -148,8 +174,22 @@ public class SteamWeb {
             chars[i] = codestr[binary % 26]; // Equivalent to Python's % 26 and indexing
             binary /= 26; // Equivalent to Python's //= 26
         }
-        String code = new String(chars); // Convert char array to string
-        return code;
+        return new String(chars);
+    }
+
+    /**
+     * 我方发送报价是到对方
+     * 参考
+     * https://www.coder.work/article/8018121#google_vignette
+     * @param steamInvDto 我方交易商品
+     * @param tradeUrl 接收方交易链接 如 https://steamcommunity.com/tradeoffer/new/?partner=1432096359&token=giLGhxtN
+     * @return
+     */
+    public String trade(SteamInvDto steamInvDto, String tradeUrl){
+        URI uri = URI.create(tradeUrl);
+        String query = uri.getQuery();
+//        query.
+        return "";
     }
 
 
@@ -157,7 +197,7 @@ public class SteamWeb {
         SteamWeb steamWeb=new SteamWeb();
         BindUserDO bindUserDO=new BindUserDO();
         bindUserDO.setLoginName("6WwS6f").setLoginPassword("QFhG9jSs").setLoginSharedSecret("NTDfP+vPKSLS2O8lXKJgdAp5QRI=");
-        steamWeb.login3(bindUserDO);
+        steamWeb.login(bindUserDO);
         steamWeb.initApiKey();
         steamWeb.initTradeUrl();
         if(steamWeb.webApiKey.isPresent()){
