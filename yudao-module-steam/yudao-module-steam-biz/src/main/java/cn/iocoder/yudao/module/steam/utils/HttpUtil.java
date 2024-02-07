@@ -214,6 +214,11 @@ public class HttpUtil {
                 }
             }
         }
+        if(Objects.nonNull(httpRequest.headers)){
+            for(Map.Entry<String,String> item:httpRequest.headers.entrySet()){
+                builder.addHeader(item.getKey(),item.getValue());
+            }
+        }
         builder.url(applyQuery(applyPathVar(httpRequest.getUrl(), httpRequest.getPathVar()), httpRequest.getQuery()));
         if (Objects.isNull(httpRequest.getMethod())) {
             httpRequest.setMethod(Method.GET);
@@ -377,6 +382,7 @@ public class HttpUtil {
         private Map<String, File> postFile;
         private HttpAuth auth;
         private Function<HttpAuth, HttpAuthReturn> authFunction;
+        private Map<String, String> headers;
     }
 
     @Data
