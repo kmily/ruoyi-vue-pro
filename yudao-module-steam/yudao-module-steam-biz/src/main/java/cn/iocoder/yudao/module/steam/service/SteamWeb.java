@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.service.steam.CustomCookieJar;
 import cn.iocoder.yudao.module.steam.service.steam.SteamCookie;
+import cn.iocoder.yudao.module.steam.service.steam.SteamCustomCookieJar;
 import cn.iocoder.yudao.module.steam.service.steam.SteamString;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -45,9 +46,9 @@ public class SteamWeb {
 
 
     public SteamWeb() {
-        okHttpClient=getClient(true,30,null);
+        okHttpClient=getClient(true,30,null,null);
     }
-    public static OkHttpClient getClient(boolean retry, int timeOut,String cookies) {
+    public static OkHttpClient getClient(boolean retry, int timeOut,String cookies,String url) {
         OkHttpClient.Builder OKHTTP_BUILD = new OkHttpClient.Builder();
         OKHTTP_BUILD.writeTimeout(timeOut, TimeUnit.SECONDS);
         OKHTTP_BUILD.readTimeout(timeOut, TimeUnit.SECONDS);
@@ -55,7 +56,7 @@ public class SteamWeb {
         OKHTTP_BUILD.retryOnConnectionFailure(retry);
         OKHTTP_BUILD.hostnameVerifier(HttpUtil.getHostnameVerifier());
         OKHTTP_BUILD.sslSocketFactory(HttpUtil.getSSLSocketFactory(), HttpUtil.getTrustManager());
-        OKHTTP_BUILD.cookieJar(new CustomCookieJar());
+        OKHTTP_BUILD.cookieJar(new SteamCustomCookieJar(cookies,url));
         return OKHTTP_BUILD.build();
     }
     public void login3(BindUserDO bindUserDO){
@@ -63,14 +64,14 @@ public class SteamWeb {
 //        ConfigDO configByKey = configService.getConfigByKey("steam.proxy");
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
 //        builder.url(configByKey.getValue()+"login");
-        builder.url("http://192.168.0.111:25852/login");
+        builder.url("http://127.0.0.1:25852/login");
         builder.method(HttpUtil.Method.FORM);
         HashMap<String, String> stringStringHashMap = new HashMap<>();
         stringStringHashMap.put("username",bindUserDO.getLoginName());
         stringStringHashMap.put("password",bindUserDO.getLoginPassword());
         stringStringHashMap.put("token_code",bindUserDO.getLoginSharedSecret());
         builder.form(stringStringHashMap);
-        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 30000,null));
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 30000,null,null));
         SteamCookie json = sent.json(SteamCookie.class);
         if(json.getCode()!=0){
             log.error("Steam通讯失败{}",json);
@@ -136,12 +137,12 @@ public class SteamWeb {
     public Optional<String> getApiKey() {
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
 //        builder.url("https://steamcommunity.com/dev/apikey");
-        builder.url("http://192.168.0.111:25852/dev/apikey");
+        builder.url("http://127.0.0.1:25852/dev/apikey");
         builder.method(HttpUtil.Method.FORM);
         HashMap<String, String> stringStringHashMap = new HashMap<>();
         stringStringHashMap.put("cookie",cookieString);
         builder.form(stringStringHashMap);
-        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(),getClient(true,3000,cookieString));
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(),getClient(true,3000,cookieString,null));
         SteamString json = sent.json(SteamString.class);
         if(json.getCode()!=1){
             log.error("Steam通讯失败{}",json);
