@@ -5,7 +5,6 @@ import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.*;
 
 public class SteamCustomCookieJar implements CookieJar {
