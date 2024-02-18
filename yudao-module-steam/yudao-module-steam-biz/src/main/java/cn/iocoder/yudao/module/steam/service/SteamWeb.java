@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Cookie;
 import okhttp3.OkHttpClient;
 
 import javax.annotation.Resource;
@@ -33,7 +34,7 @@ public class SteamWeb {
     /**
      * 登录后cookie信息
      */
-    private String cookieString="";
+    private String cookieString="timezoneOffset=28800,0; steamRefresh_steam=76561199392362087%7C%7CeyAidHlwIjogIkpXVCIsICJhbGciOiAiRWREU0EiIH0.eyAiaXNzIjogInN0ZWFtIiwgInN1YiI6ICI3NjU2MTE5OTM5MjM2MjA4NyIsICJhdWQiOiBbICJ3ZWIiLCAicmVuZXciLCAiZGVyaXZlIiBdLCAiZXhwIjogMTcyNjM5OTE1MywgIm5iZiI6IDE2OTk1OTg5NjUsICJpYXQiOiAxNzA4MjM4OTY1LCAianRpIjogIjFCNEFfMjNGNzFBNEVfNzNFNzYiLCAib2F0IjogMTcwODIzODk2NSwgInBlciI6IDEsICJpcF9zdWJqZWN0IjogIjExMy4yNTAuNjcuNyIsICJpcF9jb25maXJtZXIiOiAiMTEzLjI1MC42Ny43IiB9.EgQYxYR13O05XKxUCPYQDdnsv9DSANBjFOLp72MBhrD4qhE48TDMpzdpEc2qWoDQlEFoiHN18LaMP8fdZ9g9Aw; ak_bmsc=221E6702EE7231B8FC66B420FD4B854B~000000000000000000000000000000~YAAQLzHFF1KpGmWNAQAAEw36uhYU3R/rzv7Qg+w3w/5x3rAeUt1DmpOFq8Lm4croyiRzy6aNqPIakrwst2Pn5Q+6gnVelMP8YQg1vsEB9uD/jt8B7U7RkxXlwQ3SWp5nHC/uKBg2Gb6SVTJi9MCv7MHc5Jm4CyeWEhDIPX/ioqNW76SaPIuzXWB1jOACQN6eVrWbhK2G7/+6rmIv87BwSfRd7DiMhhJIyHsnOYbDVBCays3xl1/VT+cX7ebIgtMMpB5p/RvdMV4avrt4O/x6tUPDfI0IgitsepC8gcimEALkOxR3RMR+dFEwYLnIMsUQhYtxuXlW/pzvQhbpH1ufiI6sV7wQxYfVkdGmGlX604WiSs9yLT4dxoYtRrFpJ3KMog==; steamCountry=CN%7Cd753c23f070da204866d2ca95871a7f3; steamLoginSecure=76561199392362087%7C%7CeyAidHlwIjogIkpXVCIsICJhbGciOiAiRWREU0EiIH0.eyAiaXNzIjogInI6MUI0QV8yM0Y3MUE0RV83M0U3NiIsICJzdWIiOiAiNzY1NjExOTkzOTIzNjIwODciLCAiYXVkIjogWyAid2ViOmNvbW11bml0eSIgXSwgImV4cCI6IDE3MDgzMjU2ODcsICJuYmYiOiAxNjk5NTk4OTY1LCAiaWF0IjogMTcwODIzODk2NSwgImp0aSI6ICIxQjRCXzIzRjcxQTUwXzFCMDZGIiwgIm9hdCI6IDE3MDgyMzg5NjUsICJydF9leHAiOiAxNzI2Mzk5MTUzLCAicGVyIjogMCwgImlwX3N1YmplY3QiOiAiMTEzLjI1MC42Ny43IiwgImlwX2NvbmZpcm1lciI6ICIxMTMuMjUwLjY3LjciIH0.rq7BkEmo8q5TSOwOOlzoJITtU9kMSmpFphwA_G6-jCvTFCaoXjlU96RooWAmXQwFQSpz8CvG1n0wxvB8sUaaCQ";
     /**
      * webapikey
      */
@@ -61,6 +62,8 @@ public class SteamWeb {
 
     @Resource
     private ObjectMapper objectMapper=new ObjectMapper();
+
+    private Optional<String>  browserid;
 
 
 
@@ -123,12 +126,27 @@ public class SteamWeb {
         if (matcher2.find()) {
             steamId =Optional.of(matcher2.group(1));
         }
-        // 正则表达式，匹配以"g_sessionID = "开头，后面跟着任意数量的非引号字符，最后以";"结尾的字符串
-        Pattern patternSession = Pattern.compile("g_sessionID\\s*=\\s*\"(.*?)\";", Pattern.DOTALL);
-        Matcher matcherSession = patternSession.matcher(sent.html());
-
-        if (matcherSession.find()) {
-            sessionId=Optional.of( matcherSession.group(1));
+////         正则表达式，匹配以"g_sessionID = "开头，后面跟着任意数量的非引号字符，最后以";"结尾的字符串
+//        Pattern patternSession = Pattern.compile("g_sessionID\\s*=\\s*\"(.*?)\";", Pattern.DOTALL);
+//        Matcher matcherSession = patternSession.matcher(sent.html());
+//
+//        if (matcherSession.find()) {
+//            sessionId=Optional.of( matcherSession.group(1));
+//        }
+        //set browserid
+        Optional<Cookie> browserOptional = sent.getCookies().stream().filter(item -> item.name().equals("browserid")).findFirst();
+        if(browserOptional.isPresent()){
+            browserid =Optional.of(browserOptional.get().value());
+            cookieString+=";browserid="+browserid.get();
+        }else{
+            throw new ServiceException(-1,"获取浏览器ID失败");
+        }
+        Optional<Cookie> sessionOptional = sent.getCookies().stream().filter(item -> item.name().equals("sessionid")).findFirst();
+        if(sessionOptional.isPresent()){
+            sessionId =Optional.of(sessionOptional.get().value());
+            cookieString+=";sessionid="+sessionId.get();
+        }else{
+            throw new ServiceException(-1,"获取sesionID失败");
         }
     }
 
@@ -263,7 +281,7 @@ public class SteamWeb {
             header.put("Referer",tradeUrl);
             builder.headers(header);
             log.info("发送到对方服务器数据{}",objectMapper.writeValueAsString(post));
-            HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true,3000,"bCompletedTradeOfferTutorial=true; strTradeLastInventoryContext=730_2; "+cookieString,"https://steamcommunity.com/dev/apikey"));
+            HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true,3000,"browserid="+browserid.get()+"; strTradeLastInventoryContext=730_2; "+cookieString,"https://steamcommunity.com/dev/apikey"));
             log.info("交易结果{}",sent.html());
             return sent.json(SteamTradeOfferResult.class);
         }catch (UnsupportedEncodingException e){
@@ -289,8 +307,8 @@ public class SteamWeb {
         SteamWeb steamWeb=new SteamWeb();
 
         BindUserDO bindUserDO=new BindUserDO();
-        bindUserDO.setLoginName("6WwS6f").setLoginPassword("QFhG9jSs").setLoginSharedSecret("NTDfP+vPKSLS2O8lXKJgdAp5QRI=");
-        steamWeb.login(bindUserDO);
+//        bindUserDO.setLoginName("6WwS6f").setLoginPassword("QFhG9jSs").setLoginSharedSecret("NTDfP+vPKSLS2O8lXKJgdAp5QRI=");
+//        steamWeb.login(bindUserDO);
         steamWeb.initApiKey();
         String tradeUrl="https://steamcommunity.com/tradeoffer/new/?partner=1440000356&token=5_JGX9AA";
         SteamInvDto steamInvDto=new SteamInvDto();
