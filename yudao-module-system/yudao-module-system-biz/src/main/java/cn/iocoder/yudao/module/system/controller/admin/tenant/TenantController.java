@@ -54,12 +54,12 @@ public class TenantController {
         return success(BeanUtils.toBean(tenant, TenantSimpleRespVO.class));
     }
 
-    @PostMapping("/create")
-    @Operation(summary = "创建租户")
-    @PreAuthorize("@ss.hasPermission('system:tenant:create')")
-    public CommonResult<Long> createTenant(@Valid @RequestBody TenantSaveReqVO createReqVO) {
-        return success(tenantService.createTenant(createReqVO));
-    }
+//    @PostMapping("/create")
+//    @Operation(summary = "创建租户")
+//    @PreAuthorize("@ss.hasPermission('system:tenant:create')")
+//    public CommonResult<Long> createTenant(@Valid @RequestBody TenantSaveReqVO createReqVO) {
+//        return success(tenantService.createTenant(createReqVO));
+//    }
 
     @PutMapping("/update")
     @Operation(summary = "更新租户")
