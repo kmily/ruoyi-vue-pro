@@ -4,10 +4,10 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
-import cn.iocoder.yudao.module.steam.service.steam.SteamCookie;
-import cn.iocoder.yudao.module.steam.service.steam.SteamCustomCookieJar;
-import cn.iocoder.yudao.module.steam.service.steam.SteamInvDto;
+import cn.iocoder.yudao.module.steam.service.steam.*;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
@@ -15,15 +15,15 @@ import okhttp3.OkHttpClient;
 import javax.annotation.Resource;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,6 +45,12 @@ public class SteamWeb {
     @Getter
     private Optional<String> steamId=Optional.empty();
     /**
+     * sessionId
+     * 会话ID
+     */
+    @Getter
+    private Optional<String> sessionId=Optional.empty();
+    /**
      * 交易链接
      */
     @Getter
@@ -52,6 +58,9 @@ public class SteamWeb {
 
     @Resource
     private ConfigService configService;
+
+    @Resource
+    private ObjectMapper objectMapper=new ObjectMapper();
 
 
 
@@ -75,9 +84,9 @@ public class SteamWeb {
      */
     public void login(BindUserDO bindUserDO){
         //steam登录代理
-        ConfigDO configByKey = configService.getConfigByKey("steam.proxy");
+//        ConfigDO configByKey = configService.getConfigByKey("steam.proxy");
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-        builder.url(configByKey.getValue()+"login");
+//        builder.url(configByKey.getValue()+"login");
         builder.url("http://127.0.0.1:25852/login");
         builder.method(HttpUtil.Method.FORM);
         HashMap<String, String> stringStringHashMap = new HashMap<>();
@@ -113,6 +122,13 @@ public class SteamWeb {
         Matcher matcher2 = pattern2.matcher(sent.html());
         if (matcher2.find()) {
             steamId =Optional.of(matcher2.group(1));
+        }
+        // 正则表达式，匹配以"g_sessionID = "开头，后面跟着任意数量的非引号字符，最后以";"结尾的字符串
+        Pattern patternSession = Pattern.compile("g_sessionID\\s*=\\s*\"(.*?)\";", Pattern.DOTALL);
+        Matcher matcherSession = patternSession.matcher(sent.html());
+
+        if (matcherSession.find()) {
+            sessionId=Optional.of( matcherSession.group(1));
         }
     }
 
@@ -178,6 +194,26 @@ public class SteamWeb {
     }
 
     /**
+     * 转换ID
+     * @param id
+     * @return
+     */
+    public String toCommunityID(String id) {
+        if (id.startsWith("STEAM_")) {
+            String[] parts = id.split(":");
+            BigInteger part1 = new BigInteger(parts[1]);
+            BigInteger part2 = new BigInteger(parts[2]);
+            BigInteger communityID = part1.add(part2.multiply(BigInteger.valueOf(2))).add(BigInteger.valueOf(76561197960265728L));
+            return communityID.toString();
+        } else if (id.matches("\\d+") && id.length() < 16) {
+            BigInteger steamID = new BigInteger(id);
+            BigInteger communityID = steamID.add(BigInteger.valueOf(76561197960265728L));
+            return communityID.toString();
+        } else {
+            return id;
+        }
+    }
+    /**
      * 我方发送报价是到对方
      * 参考
      * https://www.coder.work/article/8018121#google_vignette
@@ -185,30 +221,87 @@ public class SteamWeb {
      * @param tradeUrl 接收方交易链接 如 https://steamcommunity.com/tradeoffer/new/?partner=1432096359&token=giLGhxtN
      * @return
      */
-    public String trade(SteamInvDto steamInvDto, String tradeUrl){
-        URI uri = URI.create(tradeUrl);
-        String query = uri.getQuery();
-//        query.
-        return "";
+    public SteamTradeOfferResult trade(SteamInvDto steamInvDto, String tradeUrl){
+        try{
+            URI uri = URI.create(tradeUrl);
+            String query = uri.getQuery();
+            log.info(query);
+            Map<String, String> stringStringMap = parseQuery(query);
+            log.info(String.valueOf(stringStringMap));
+            HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+            builder.url("https://steamcommunity.com/tradeoffer/new/send");
+            builder.method(HttpUtil.Method.FORM);
+            Map<String,String> post=new HashMap<>();
+            post.put("sessionid",sessionId.get());
+            post.put("serverid","1");
+            post.put("partner",toCommunityID(stringStringMap.get("partner")));
+            post.put("captcha","");
+            post.put("trade_offer_create_params","{\"trade_offer_access_token\":\""+stringStringMap.get("token")+"\"}");
+            SteamTradeOffer steamTradeOffer=new SteamTradeOffer();
+            steamTradeOffer.setNewversion(true);
+            steamTradeOffer.setVersion(2);
+            SteamTradeOffer.MeDTO meDTO=new SteamTradeOffer.MeDTO();
+            meDTO.setReady(true);
+            meDTO.setCurrency(new ArrayList<>());
+            SteamTradeOffer.MeDTO.AssetsDTO assetsDTO=new SteamTradeOffer.MeDTO.AssetsDTO();
+            assetsDTO.setAppid(steamInvDto.getAppid());
+            assetsDTO.setContextid(steamInvDto.getContextid());
+            assetsDTO.setAmount(Integer.valueOf(steamInvDto.getAmount()));
+            assetsDTO.setAssetid(steamInvDto.getAssetid());
+            meDTO.setAssets(Collections.singletonList(assetsDTO));
+            steamTradeOffer.setMe(meDTO);
+            SteamTradeOffer.ThemDTO themDTO=new SteamTradeOffer.ThemDTO();
+            themDTO.setAssets(Collections.emptyList());
+            themDTO.setCurrency(Collections.emptyList());
+            themDTO.setReady(false);
+            steamTradeOffer.setThem(themDTO);
+            post.put("json_tradeoffer",objectMapper.writeValueAsString(steamTradeOffer));
+            post.put("tradeoffermessage","交易测试");
+            builder.form(post);
+            Map<String,String> header=new HashMap<>();
+            header.put("Accept-Language","zh-CN,zh;q=0.9");
+            header.put("Referer",tradeUrl);
+            builder.headers(header);
+            log.info("发送到对方服务器数据{}",objectMapper.writeValueAsString(post));
+            HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true,3000,"bCompletedTradeOfferTutorial=true; strTradeLastInventoryContext=730_2; "+cookieString,"https://steamcommunity.com/dev/apikey"));
+            log.info("交易结果{}",sent.html());
+            return sent.json(SteamTradeOfferResult.class);
+        }catch (UnsupportedEncodingException e){
+            log.error("解码出错{}",e);
+            throw new ServiceException(-1,"发起交易报价失败原因，解码输入出错");
+        } catch (JsonProcessingException e) {
+            log.error("交易出错，可能 库存不正确{}",e);
+            throw new ServiceException(-1,"发起交易报价失败原因，交易出错，可能 库存不正确");
+        }
+    }
+    private Map<String,String> parseQuery(String query) throws UnsupportedEncodingException {
+        Map<String,String> ret=new HashMap<>();
+        String[] split = query.split("&");
+        for (int i=0;i<split.length;i++){
+            String[] split1 = split[i].split("=");
+            ret.put(split1[0], URLDecoder.decode(split1[1], "utf-8"));
+        }
+        return ret;
     }
 
 
     public static void main(String[] args) {
         SteamWeb steamWeb=new SteamWeb();
+
         BindUserDO bindUserDO=new BindUserDO();
         bindUserDO.setLoginName("6WwS6f").setLoginPassword("QFhG9jSs").setLoginSharedSecret("NTDfP+vPKSLS2O8lXKJgdAp5QRI=");
         steamWeb.login(bindUserDO);
         steamWeb.initApiKey();
-        steamWeb.initTradeUrl();
-        if(steamWeb.webApiKey.isPresent()){
-            System.out.println(steamWeb.webApiKey.get());
-        }
-        if(steamWeb.steamId.isPresent()){
-            System.out.println(steamWeb.steamId.get());
-        }
-        if(steamWeb.treadUrl.isPresent()){
-            System.out.println(steamWeb.treadUrl.get());
-        }
+        String tradeUrl="https://steamcommunity.com/tradeoffer/new/?partner=1440000356&token=5_JGX9AA";
+        SteamInvDto steamInvDto=new SteamInvDto();
+        steamInvDto.setAppid(730);
+        steamInvDto.setContextid("2");
+        steamInvDto.setAssetid("35681966437");
+        steamInvDto.setInstanceid("302028390");
+        steamInvDto.setClassid("4901046679");
+        steamInvDto.setAmount("1");
+        SteamTradeOfferResult trade = steamWeb.trade(steamInvDto, tradeUrl);
+        log.info("将临信息{}",trade);
 
     }
 }
