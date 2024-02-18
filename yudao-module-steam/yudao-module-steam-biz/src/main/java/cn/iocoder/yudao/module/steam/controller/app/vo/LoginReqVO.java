@@ -6,7 +6,4 @@ import lombok.Data;
 @Data
 public class LoginReqVO {
     private Long userid;
-
-    public void setUserid(Long userid) {
-    }
 }
