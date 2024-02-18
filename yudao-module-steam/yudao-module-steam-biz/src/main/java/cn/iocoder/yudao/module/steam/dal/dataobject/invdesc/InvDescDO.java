@@ -10,9 +10,8 @@ import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
- * 库存信息详情 DO
+ *  库存信息详情 DO
  *
- * @author 芋道源码
  */
 @TableName(value = "steam_inv_desc" ,autoResultMap = true)
 @KeySequence("steam_inv_desc_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

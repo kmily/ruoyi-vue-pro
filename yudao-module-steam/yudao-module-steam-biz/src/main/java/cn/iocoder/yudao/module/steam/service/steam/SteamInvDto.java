@@ -3,19 +3,34 @@ package cn.iocoder.yudao.module.steam.service.steam;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ *  SteamInvDto
+ *  steam用户库存储表
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SteamInvDto {
 
+    // steam用户id
     @JsonProperty("appid")
     private Integer appid;
+
+    // 上下文id
     @JsonProperty("contextid")
     private String contextid;
+
+    // 资产id
     @JsonProperty("assetid")
     private String assetid;
+
+    // 类id
     @JsonProperty("classid")
     private String classid;
+
+    // 实例id
     @JsonProperty("instanceid")
     private String instanceid;
+
+    // 数量
     @JsonProperty("amount")
     private String amount;
 
