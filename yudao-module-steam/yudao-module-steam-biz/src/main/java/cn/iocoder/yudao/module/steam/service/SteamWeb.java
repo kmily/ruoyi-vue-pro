@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.steam.service;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.steam.service.steam.*;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
@@ -29,6 +30,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * steam机器人
+ * 注意此类为非线程安全，因此不能作为spring bean直接注入，建议直接new相关接口
+ * @author glzaboy
+ */
 @Slf4j
 public class SteamWeb {
     /**
@@ -67,10 +73,6 @@ public class SteamWeb {
 
     private SteamMaFile steamMaFile;
 
-
-    public SteamWeb() {
-    }
-
     public static OkHttpClient getClient(boolean retry, int timeOut, String cookies, String url) {
         OkHttpClient.Builder OKHTTP_BUILD = new OkHttpClient.Builder();
         OKHTTP_BUILD.writeTimeout(timeOut, TimeUnit.SECONDS);
@@ -86,16 +88,16 @@ public class SteamWeb {
     /**
      * 登录steam网站
      *
-     * @param passwd
-     * @param maFile
+     * @param passwd 密码
+     * @param maFile ma文件结构
      */
     public void login(String passwd, SteamMaFile maFile) {
         steamMaFile = maFile;
         //steam登录代理
-//        ConfigDO configByKey = configService.getConfigByKey("steam.proxy");
+        ConfigDO configByKey = configService.getConfigByKey("steam.proxy");
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-//        builder.url(configByKey.getValue()+"login");
-        builder.url("http://127.0.0.1:25852/login");
+        builder.url(configByKey.getValue()+"login");
+//        builder.url("http://127.0.0.1:25852/login");
         builder.method(HttpUtil.Method.FORM);
         HashMap<String, String> stringStringHashMap = new HashMap<>();
         stringStringHashMap.put("username", steamMaFile.getAccountName());
@@ -109,12 +111,13 @@ public class SteamWeb {
             throw new ServiceException(-1, "Steam通讯失败" + json.getMsg());
         }
         cookieString = json.getData().getCookie();
+        initApiKey();
     }
 
     /**
-     * 初始化apikey
+     * 初始化apikey session browserid等数据为必调接口
      */
-    public void initApiKey() {
+    private void initApiKey() {
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url("https://steamcommunity.com/dev/apikey");
         builder.method(HttpUtil.Method.GET);
@@ -132,13 +135,6 @@ public class SteamWeb {
         if (matcher2.find()) {
             steamId = Optional.of(matcher2.group(1));
         }
-////         正则表达式，匹配以"g_sessionID = "开头，后面跟着任意数量的非引号字符，最后以";"结尾的字符串
-//        Pattern patternSession = Pattern.compile("g_sessionID\\s*=\\s*\"(.*?)\";", Pattern.DOTALL);
-//        Matcher matcherSession = patternSession.matcher(sent.html());
-//
-//        if (matcherSession.find()) {
-//            sessionId=Optional.of( matcherSession.group(1));
-//        }
         //set browserid
         Optional<Cookie> browserOptional = sent.getCookies().stream().filter(item -> item.name().equals("browserid")).findFirst();
         if (browserOptional.isPresent()) {
@@ -351,7 +347,7 @@ public class SteamWeb {
         return confirmHash;
     }
 
-    private SteamResult confirmOffer(MobileConfList.ConfDTO confDTO, ConfirmAction confirmAction) {
+    public SteamResult confirmOffer(MobileConfList.ConfDTO confDTO, ConfirmAction confirmAction) {
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url("https://steamcommunity.com/mobileconf/ajaxop");
         builder.method(HttpUtil.Method.GET);
@@ -393,12 +389,20 @@ public class SteamWeb {
     }
 
     /**
-     * 确认列表
+     * 获取指定待手机确认的订单
      *
      * @param tradeOrderId 订单号
      * @return
      */
-    private Optional<MobileConfList.ConfDTO> confirmOfferList(String tradeOrderId) {
+    public Optional<MobileConfList.ConfDTO> confirmOfferList(String tradeOrderId) {
+        List<MobileConfList.ConfDTO> confDTOS = confirmOfferList();
+        return confDTOS.stream().filter(item -> item.getCreatorId().equals(tradeOrderId)).findFirst();
+    }
+    /**
+     * 获取所有待手机确认的订单
+     * @return
+     */
+    public List<MobileConfList.ConfDTO> confirmOfferList() {
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url("https://steamcommunity.com/mobileconf/getlist");
         builder.method(HttpUtil.Method.GET);
@@ -422,9 +426,8 @@ public class SteamWeb {
         builder.headers(header);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 1000, cookieString, "https://steamcommunity.com/mobileconf/getlist"));
         MobileConfList json = sent.json(MobileConfList.class);
-        return json.getConf().stream().filter(item -> item.getCreatorId().equals(tradeOrderId)).findFirst();
+        return json.getConf();
     }
-
     private Map<String, String> parseQuery(String query) throws UnsupportedEncodingException {
         Map<String, String> ret = new HashMap<>();
         String[] split = query.split("&");
@@ -434,31 +437,27 @@ public class SteamWeb {
         }
         return ret;
     }
-
-
-    public static void main(String[] args) {
-
-        String maFileString = "{\"shared_secret\":\"NTDfP+vPKSLS2O8lXKJgdAp5QRI=\",\"serial_number\":\"3438498994078918164\",\"revocation_code\":\"R34847\",\"uri\":\"otpauth://totp/Steam:6wws6f?secret=GUYN6P7LZ4USFUWY54SVZITAOQFHSQIS&issuer=Steam\",\"server_time\":1701078470,\"account_name\":\"6wws6f\",\"token_gid\":\"2fba3858dfc17a80\",\"identity_secret\":\"q4roYdO+Cz/QOSVHB5m7pbYAyCc=\",\"secret_1\":\"m6OeZ+3cuVr/I/kEK2tjqhgbzSs=\",\"status\":1,\"device_id\":\"android:06ad9382-4690-45c1-90e9-2fc31cf803dc\",\"fully_enrolled\":true,\"Session\":{\"SteamID\":76561199392362087,\"AccessToken\":\"eyAidHlwIjogIkpXVCIsICJhbGciOiAiRWREU0EiIH0.eyAiaXNzIjogInI6MEU3Nl8yM0VDNjYwQV9FNDA1MiIsICJzdWIiOiAiNzY1NjExOTkzOTIzNjIwODciLCAiYXVkIjogWyAid2ViIiwgIm1vYmlsZSIgXSwgImV4cCI6IDE3MDczNzI1MjEsICJuYmYiOiAxNjk4NjQ0Mzc5LCAiaWF0IjogMTcwNzI4NDM3OSwgImp0aSI6ICIwRTdCXzIzRUM2NjEwX0RFREQ0IiwgIm9hdCI6IDE3MDcyODQzNzksICJydF9leHAiOiAxNzI1NTcyOTA5LCAicGVyIjogMCwgImlwX3N1YmplY3QiOiAiMTEzLjI1MS45OS4yMTIiLCAiaXBfY29uZmlybWVyIjogIjExMy4yNTEuOTkuMjEyIiB9.MwVd4CC8DZcjENIKU9X4zDrHYauOsBclYEoyvfOsOtxOM8sYkhhwW9PxzjlweFa7_tkpSKrkXw13Quhwp6X3CA\",\"RefreshToken\":\"eyAidHlwIjogIkpXVCIsICJhbGciOiAiRWREU0EiIH0.eyAiaXNzIjogInN0ZWFtIiwgInN1YiI6ICI3NjU2MTE5OTM5MjM2MjA4NyIsICJhdWQiOiBbICJ3ZWIiLCAicmVuZXciLCAiZGVyaXZlIiwgIm1vYmlsZSIgXSwgImV4cCI6IDE3MjU1NzI5MDksICJuYmYiOiAxNjk4NjQ0Mzc5LCAiaWF0IjogMTcwNzI4NDM3OSwgImp0aSI6ICIwRTc2XzIzRUM2NjBBX0U0MDUyIiwgIm9hdCI6IDE3MDcyODQzNzksICJwZXIiOiAxLCAiaXBfc3ViamVjdCI6ICIxMTMuMjUxLjk5LjIxMiIsICJpcF9jb25maXJtZXIiOiAiMTEzLjI1MS45OS4yMTIiIH0.zYwXhy5shkMyjUJ4s42bbKovBSk6LTmo9-JFUHoGRpUKBRqexr9k35olVDezMX3MVIZ8nN5gwnXYLGQ9ayVWAQ\",\"SessionID\":null}}";
-
-        SteamWeb steamWeb = new SteamWeb();
-        try {
-            SteamMaFile steamMaFile = steamWeb.objectMapper.readValue(maFileString, SteamMaFile.class);
-            steamWeb.login("QFhG9jSs", steamMaFile);
-            steamWeb.initApiKey();
-            String tradeUrl = "https://steamcommunity.com/tradeoffer/new/?partner=1440000356&token=5_JGX9AA";
-            SteamInvDto steamInvDto = new SteamInvDto();
-            steamInvDto.setAppid(730);
-            steamInvDto.setContextid("2");
-            steamInvDto.setAssetid("35681966437");
-            steamInvDto.setInstanceid("302028390");
-            steamInvDto.setClassid("4901046679");
-            steamInvDto.setAmount("1");
-            SteamTradeOfferResult trade = steamWeb.trade(steamInvDto, tradeUrl);
-            log.info("将临信息{}", trade);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
-
-    }
+//    public static void main(String[] args) {
+//
+//        String maFileString = "{\"shared_secret\":\"NTDfP+vPKSLS2O8lXKJgdAp5QRI=\",\"serial_number\":\"3438498994078918164\",\"revocation_code\":\"R34847\",\"uri\":\"otpauth://totp/Steam:6wws6f?secret=GUYN6P7LZ4USFUWY54SVZITAOQFHSQIS&issuer=Steam\",\"server_time\":1701078470,\"account_name\":\"6wws6f\",\"token_gid\":\"2fba3858dfc17a80\",\"identity_secret\":\"q4roYdO+Cz/QOSVHB5m7pbYAyCc=\",\"secret_1\":\"m6OeZ+3cuVr/I/kEK2tjqhgbzSs=\",\"status\":1,\"device_id\":\"android:06ad9382-4690-45c1-90e9-2fc31cf803dc\",\"fully_enrolled\":true,\"Session\":{\"SteamID\":76561199392362087,\"AccessToken\":\"eyAidHlwIjogIkpXVCIsICJhbGciOiAiRWREU0EiIH0.eyAiaXNzIjogInI6MEU3Nl8yM0VDNjYwQV9FNDA1MiIsICJzdWIiOiAiNzY1NjExOTkzOTIzNjIwODciLCAiYXVkIjogWyAid2ViIiwgIm1vYmlsZSIgXSwgImV4cCI6IDE3MDczNzI1MjEsICJuYmYiOiAxNjk4NjQ0Mzc5LCAiaWF0IjogMTcwNzI4NDM3OSwgImp0aSI6ICIwRTdCXzIzRUM2NjEwX0RFREQ0IiwgIm9hdCI6IDE3MDcyODQzNzksICJydF9leHAiOiAxNzI1NTcyOTA5LCAicGVyIjogMCwgImlwX3N1YmplY3QiOiAiMTEzLjI1MS45OS4yMTIiLCAiaXBfY29uZmlybWVyIjogIjExMy4yNTEuOTkuMjEyIiB9.MwVd4CC8DZcjENIKU9X4zDrHYauOsBclYEoyvfOsOtxOM8sYkhhwW9PxzjlweFa7_tkpSKrkXw13Quhwp6X3CA\",\"RefreshToken\":\"eyAidHlwIjogIkpXVCIsICJhbGciOiAiRWREU0EiIH0.eyAiaXNzIjogInN0ZWFtIiwgInN1YiI6ICI3NjU2MTE5OTM5MjM2MjA4NyIsICJhdWQiOiBbICJ3ZWIiLCAicmVuZXciLCAiZGVyaXZlIiwgIm1vYmlsZSIgXSwgImV4cCI6IDE3MjU1NzI5MDksICJuYmYiOiAxNjk4NjQ0Mzc5LCAiaWF0IjogMTcwNzI4NDM3OSwgImp0aSI6ICIwRTc2XzIzRUM2NjBBX0U0MDUyIiwgIm9hdCI6IDE3MDcyODQzNzksICJwZXIiOiAxLCAiaXBfc3ViamVjdCI6ICIxMTMuMjUxLjk5LjIxMiIsICJpcF9jb25maXJtZXIiOiAiMTEzLjI1MS45OS4yMTIiIH0.zYwXhy5shkMyjUJ4s42bbKovBSk6LTmo9-JFUHoGRpUKBRqexr9k35olVDezMX3MVIZ8nN5gwnXYLGQ9ayVWAQ\",\"SessionID\":null}}";
+//
+//        SteamWeb steamWeb = new SteamWeb();
+//        try {
+//            SteamMaFile steamMaFile = steamWeb.objectMapper.readValue(maFileString, SteamMaFile.class);
+//            steamWeb.login("QFhG9jSs", steamMaFile);
+//            steamWeb.initApiKey();
+//            String tradeUrl = "https://steamcommunity.com/tradeoffer/new/?partner=1440000356&token=5_JGX9AA";
+//            SteamInvDto steamInvDto = new SteamInvDto();
+//            steamInvDto.setAppid(730);
+//            steamInvDto.setContextid("2");
+//            steamInvDto.setAssetid("35681966437");
+//            steamInvDto.setInstanceid("302028390");
+//            steamInvDto.setClassid("4901046679");
+//            steamInvDto.setAmount("1");
+//            SteamTradeOfferResult trade = steamWeb.trade(steamInvDto, tradeUrl);
+//            log.info("将临信息{}", trade);
+//        } catch (JsonProcessingException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }

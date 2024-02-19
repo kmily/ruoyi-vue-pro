@@ -143,20 +143,13 @@ public class SteamService {
     }
     public InventoryDto fetchInventory(String steamId, String appId){
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-        builder.method(HttpUtil.Method.GET).url("https://steamcommunity.com/inventory/:steamId/:app/2?l=schinese&count=75");
+        builder.method(HttpUtil.Method.GET).url("https://steamcommunity.com/inventory/:steamId/:app/2?l=schinese&count=1000");
         Map<String,String> pathVar=new HashMap<>();
         pathVar.put("steamId",steamId);
         pathVar.put("app",appId);
         builder.pathVar(pathVar);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         InventoryDto json = sent.json(InventoryDto.class);
-//        ObjectMapper objectMapper=new ObjectMapper();
-//        InventoryDto json = null;
-//        try {
-//            json = objectMapper.readValue(j, InventoryDto.class);
-//        } catch (JsonProcessingException e) {
-//            e.printStackTrace();
-//        }
         for (InventoryDto.AssetsDTO item:json.getAssets()) {
             InvPageReqVO steamInv=new InvPageReqVO();
             steamInv.setSteamId(steamId);
