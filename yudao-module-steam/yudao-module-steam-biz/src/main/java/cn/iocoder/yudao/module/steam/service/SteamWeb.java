@@ -20,8 +20,10 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -65,10 +67,11 @@ public class SteamWeb {
 
     private Optional<String>  browserid;
 
+    private SteamMaFile steamMaFile;
 
 
-    public SteamWeb() {
-    }
+
+    public SteamWeb() {}
     public static OkHttpClient getClient(boolean retry, int timeOut,String cookies,String url) {
         OkHttpClient.Builder OKHTTP_BUILD = new OkHttpClient.Builder();
         OKHTTP_BUILD.writeTimeout(timeOut, TimeUnit.SECONDS);
@@ -83,9 +86,11 @@ public class SteamWeb {
 
     /**
      * 登录steam网站
-     * @param bindUserDO
+     * @param passwd
+     * @param maFile
      */
-    public void login(BindUserDO bindUserDO){
+    public void login(String passwd,SteamMaFile maFile){
+        steamMaFile=maFile;
         //steam登录代理
 //        ConfigDO configByKey = configService.getConfigByKey("steam.proxy");
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
@@ -93,9 +98,9 @@ public class SteamWeb {
         builder.url("http://127.0.0.1:25852/login");
         builder.method(HttpUtil.Method.FORM);
         HashMap<String, String> stringStringHashMap = new HashMap<>();
-        stringStringHashMap.put("username",bindUserDO.getLoginName());
-        stringStringHashMap.put("password",bindUserDO.getLoginPassword());
-        stringStringHashMap.put("token_code",bindUserDO.getLoginSharedSecret());
+        stringStringHashMap.put("username",steamMaFile.getAccountName());
+        stringStringHashMap.put("password",passwd);
+        stringStringHashMap.put("token_code",steamMaFile.getSharedSecret());
         builder.form(stringStringHashMap);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 30000,null,null));
         SteamCookie json = sent.json(SteamCookie.class);
@@ -283,7 +288,9 @@ public class SteamWeb {
             log.info("发送到对方服务器数据{}",objectMapper.writeValueAsString(post));
             HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true,3000,"browserid="+browserid.get()+"; strTradeLastInventoryContext=730_2; "+cookieString,"https://steamcommunity.com/dev/apikey"));
             log.info("交易结果{}",sent.html());
-            return sent.json(SteamTradeOfferResult.class);
+            SteamTradeOfferResult json = sent.json(SteamTradeOfferResult.class);
+            confirmOffer(json);
+            return json;
         }catch (UnsupportedEncodingException e){
             log.error("解码出错{}",e);
             throw new ServiceException(-1,"发起交易报价失败原因，解码输入出错");
@@ -291,6 +298,95 @@ public class SteamWeb {
             log.error("交易出错，可能 库存不正确{}",e);
             throw new ServiceException(-1,"发起交易报价失败原因，交易出错，可能 库存不正确");
         }
+    }
+
+    /**
+     * 生成确认列表签名
+     * @param time
+     * @param tag
+     * @return
+     */
+    public String generateConfirmationHashForTime2(long time, String tag) throws NoSuchAlgorithmException, InvalidKeyException {
+        byte[] arr = new byte[8];
+        // 将 long 类型的 time 转换为 8 个字节的大端序
+        for (int i = 0; i < 8; i++) {
+            arr[i] = (byte) (time >> ((7 - i) * 8));
+        }
+
+        // 将 tag 转换为 UTF-8 编码的字节数组，并确保长度不超过 32 字节
+        byte[] tagBytes = tag.getBytes(StandardCharsets.UTF_8);
+        if (tagBytes.length > 32) {
+            tagBytes = Arrays.copyOf(tagBytes, 32);
+        }
+
+        // 将时间字节和标签字节合并
+        byte[] data = new byte[arr.length + tagBytes.length];
+        System.arraycopy(arr, 0, data, 0, arr.length);
+        System.arraycopy(tagBytes, 0, data, arr.length, tagBytes.length);
+
+        // 创建 HMAC-SHA1 Mac 实例
+        Mac sha1_HMAC = Mac.getInstance("HmacSHA1");
+        byte[] decode = Base64.getDecoder().decode(steamMaFile.getIdentitySecret());
+        SecretKeySpec secret_key = new SecretKeySpec(decode, "HmacSHA1");
+        sha1_HMAC.init(secret_key);
+
+        // 计算 HMAC 并返回 Base64 编码的哈希值
+        byte[] hashedData = sha1_HMAC.doFinal(data);
+        return Base64.getEncoder().encodeToString(hashedData);
+    }
+    public String generateConfirmationHashForTime(long time, String tag) {
+        byte[] decode = Base64.getDecoder().decode(steamMaFile.getIdentitySecret());
+        int n2 = 8;
+        if (tag != null) {
+            n2 = Math.min(8 + tag.length(), 40); // Limit the total length to 40 bytes (8 for time + 32 for tag)
+        }
+        byte[] array = new byte[n2];
+        int n3 = 8;
+        while (n3-- > 0) {
+            array[n3] = (byte)time;
+            time >>= 8;
+        }
+        if (tag != null) {
+            int tagLength = Math.min(tag.length(), n2 - 8); // Ensure we don't go over the array length
+            System.arraycopy(tag.getBytes(StandardCharsets.UTF_8), 0, array, 8, tagLength);
+        }
+
+        try {
+            Mac sha1_HMAC = Mac.getInstance("HmacSHA1");
+            SecretKeySpec secret_key = new SecretKeySpec(decode, "HmacSHA1");
+            sha1_HMAC.init(secret_key);
+            byte[] hashedData = sha1_HMAC.doFinal(array);
+            String encodedData = Base64.getEncoder().encodeToString(hashedData);
+            String hash = URLEncoder.encode(encodedData, "UTF-8");
+            return hash;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    private void confirmOffer(SteamTradeOfferResult tradeOfferResult){
+        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+        builder.url("https://steamcommunity.com/mobileconf/getlist");
+        builder.method(HttpUtil.Method.GET);
+        Map<String,String> query=new HashMap<>();
+        query.put("p",steamMaFile.getDeviceId());
+        query.put("a",steamId.get());
+        try {
+            query.put("k",generateConfirmationHashForTime2(System.currentTimeMillis()/1000l,"conf"));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
+        query.put("t", String.valueOf(System.currentTimeMillis()/1000l));
+        query.put("m","react");
+        query.put("tag","conf");
+        builder.query(query);
+        Map<String,String> header=new HashMap<>();
+        header.put("Accept-Language","zh-CN,zh;q=0.9");
+        builder.headers(header);
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 1000, cookieString, "https://steamcommunity.com/mobileconf/getlist"));
+        log.info(sent.html());
     }
     private Map<String,String> parseQuery(String query) throws UnsupportedEncodingException {
         Map<String,String> ret=new HashMap<>();
@@ -304,22 +400,31 @@ public class SteamWeb {
 
 
     public static void main(String[] args) {
-        SteamWeb steamWeb=new SteamWeb();
 
+        String maFileString="{\"shared_secret\":\"NTDfP+vPKSLS2O8lXKJgdAp5QRI=\",\"serial_number\":\"3438498994078918164\",\"revocation_code\":\"R34847\",\"uri\":\"otpauth://totp/Steam:6wws6f?secret=GUYN6P7LZ4USFUWY54SVZITAOQFHSQIS&issuer=Steam\",\"server_time\":1701078470,\"account_name\":\"6wws6f\",\"token_gid\":\"2fba3858dfc17a80\",\"identity_secret\":\"q4roYdO+Cz/QOSVHB5m7pbYAyCc=\",\"secret_1\":\"m6OeZ+3cuVr/I/kEK2tjqhgbzSs=\",\"status\":1,\"device_id\":\"android:06ad9382-4690-45c1-90e9-2fc31cf803dc\",\"fully_enrolled\":true,\"Session\":{\"SteamID\":76561199392362087,\"AccessToken\":\"eyAidHlwIjogIkpXVCIsICJhbGciOiAiRWREU0EiIH0.eyAiaXNzIjogInI6MEU3Nl8yM0VDNjYwQV9FNDA1MiIsICJzdWIiOiAiNzY1NjExOTkzOTIzNjIwODciLCAiYXVkIjogWyAid2ViIiwgIm1vYmlsZSIgXSwgImV4cCI6IDE3MDczNzI1MjEsICJuYmYiOiAxNjk4NjQ0Mzc5LCAiaWF0IjogMTcwNzI4NDM3OSwgImp0aSI6ICIwRTdCXzIzRUM2NjEwX0RFREQ0IiwgIm9hdCI6IDE3MDcyODQzNzksICJydF9leHAiOiAxNzI1NTcyOTA5LCAicGVyIjogMCwgImlwX3N1YmplY3QiOiAiMTEzLjI1MS45OS4yMTIiLCAiaXBfY29uZmlybWVyIjogIjExMy4yNTEuOTkuMjEyIiB9.MwVd4CC8DZcjENIKU9X4zDrHYauOsBclYEoyvfOsOtxOM8sYkhhwW9PxzjlweFa7_tkpSKrkXw13Quhwp6X3CA\",\"RefreshToken\":\"eyAidHlwIjogIkpXVCIsICJhbGciOiAiRWREU0EiIH0.eyAiaXNzIjogInN0ZWFtIiwgInN1YiI6ICI3NjU2MTE5OTM5MjM2MjA4NyIsICJhdWQiOiBbICJ3ZWIiLCAicmVuZXciLCAiZGVyaXZlIiwgIm1vYmlsZSIgXSwgImV4cCI6IDE3MjU1NzI5MDksICJuYmYiOiAxNjk4NjQ0Mzc5LCAiaWF0IjogMTcwNzI4NDM3OSwgImp0aSI6ICIwRTc2XzIzRUM2NjBBX0U0MDUyIiwgIm9hdCI6IDE3MDcyODQzNzksICJwZXIiOiAxLCAiaXBfc3ViamVjdCI6ICIxMTMuMjUxLjk5LjIxMiIsICJpcF9jb25maXJtZXIiOiAiMTEzLjI1MS45OS4yMTIiIH0.zYwXhy5shkMyjUJ4s42bbKovBSk6LTmo9-JFUHoGRpUKBRqexr9k35olVDezMX3MVIZ8nN5gwnXYLGQ9ayVWAQ\",\"SessionID\":null}}";
+
+        SteamWeb steamWeb=new SteamWeb();
+        try {
+            SteamMaFile steamMaFile = steamWeb.objectMapper.readValue(maFileString, SteamMaFile.class);
+            steamWeb.login("QFhG9jSs",steamMaFile);
+            steamWeb.initApiKey();
+            String tradeUrl="https://steamcommunity.com/tradeoffer/new/?partner=1440000356&token=5_JGX9AA";
+            SteamInvDto steamInvDto=new SteamInvDto();
+            steamInvDto.setAppid(730);
+            steamInvDto.setContextid("2");
+            steamInvDto.setAssetid("35681966437");
+            steamInvDto.setInstanceid("302028390");
+            steamInvDto.setClassid("4901046679");
+            steamInvDto.setAmount("1");
+            SteamTradeOfferResult trade = steamWeb.trade(steamInvDto, tradeUrl);
+            log.info("将临信息{}",trade);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
         BindUserDO bindUserDO=new BindUserDO();
 //        bindUserDO.setLoginName("6WwS6f").setLoginPassword("QFhG9jSs").setLoginSharedSecret("NTDfP+vPKSLS2O8lXKJgdAp5QRI=");
 //        steamWeb.login(bindUserDO);
-        steamWeb.initApiKey();
-        String tradeUrl="https://steamcommunity.com/tradeoffer/new/?partner=1440000356&token=5_JGX9AA";
-        SteamInvDto steamInvDto=new SteamInvDto();
-        steamInvDto.setAppid(730);
-        steamInvDto.setContextid("2");
-        steamInvDto.setAssetid("35681966437");
-        steamInvDto.setInstanceid("302028390");
-        steamInvDto.setClassid("4901046679");
-        steamInvDto.setAmount("1");
-        SteamTradeOfferResult trade = steamWeb.trade(steamInvDto, tradeUrl);
-        log.info("将临信息{}",trade);
+
 
     }
 }
