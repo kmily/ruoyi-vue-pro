@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.steam.service;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
@@ -26,6 +27,8 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -36,43 +39,44 @@ public class SteamWeb {
     /**
      * 登录后cookie信息
      */
-    private String cookieString="timezoneOffset=28800,0; steamRefresh_steam=76561199392362087%7C%7CeyAidHlwIjogIkpXVCIsICJhbGciOiAiRWREU0EiIH0.eyAiaXNzIjogInN0ZWFtIiwgInN1YiI6ICI3NjU2MTE5OTM5MjM2MjA4NyIsICJhdWQiOiBbICJ3ZWIiLCAicmVuZXciLCAiZGVyaXZlIiBdLCAiZXhwIjogMTcyNjM5OTE1MywgIm5iZiI6IDE2OTk1OTg5NjUsICJpYXQiOiAxNzA4MjM4OTY1LCAianRpIjogIjFCNEFfMjNGNzFBNEVfNzNFNzYiLCAib2F0IjogMTcwODIzODk2NSwgInBlciI6IDEsICJpcF9zdWJqZWN0IjogIjExMy4yNTAuNjcuNyIsICJpcF9jb25maXJtZXIiOiAiMTEzLjI1MC42Ny43IiB9.EgQYxYR13O05XKxUCPYQDdnsv9DSANBjFOLp72MBhrD4qhE48TDMpzdpEc2qWoDQlEFoiHN18LaMP8fdZ9g9Aw; ak_bmsc=221E6702EE7231B8FC66B420FD4B854B~000000000000000000000000000000~YAAQLzHFF1KpGmWNAQAAEw36uhYU3R/rzv7Qg+w3w/5x3rAeUt1DmpOFq8Lm4croyiRzy6aNqPIakrwst2Pn5Q+6gnVelMP8YQg1vsEB9uD/jt8B7U7RkxXlwQ3SWp5nHC/uKBg2Gb6SVTJi9MCv7MHc5Jm4CyeWEhDIPX/ioqNW76SaPIuzXWB1jOACQN6eVrWbhK2G7/+6rmIv87BwSfRd7DiMhhJIyHsnOYbDVBCays3xl1/VT+cX7ebIgtMMpB5p/RvdMV4avrt4O/x6tUPDfI0IgitsepC8gcimEALkOxR3RMR+dFEwYLnIMsUQhYtxuXlW/pzvQhbpH1ufiI6sV7wQxYfVkdGmGlX604WiSs9yLT4dxoYtRrFpJ3KMog==; steamCountry=CN%7Cd753c23f070da204866d2ca95871a7f3; steamLoginSecure=76561199392362087%7C%7CeyAidHlwIjogIkpXVCIsICJhbGciOiAiRWREU0EiIH0.eyAiaXNzIjogInI6MUI0QV8yM0Y3MUE0RV83M0U3NiIsICJzdWIiOiAiNzY1NjExOTkzOTIzNjIwODciLCAiYXVkIjogWyAid2ViOmNvbW11bml0eSIgXSwgImV4cCI6IDE3MDgzMjU2ODcsICJuYmYiOiAxNjk5NTk4OTY1LCAiaWF0IjogMTcwODIzODk2NSwgImp0aSI6ICIxQjRCXzIzRjcxQTUwXzFCMDZGIiwgIm9hdCI6IDE3MDgyMzg5NjUsICJydF9leHAiOiAxNzI2Mzk5MTUzLCAicGVyIjogMCwgImlwX3N1YmplY3QiOiAiMTEzLjI1MC42Ny43IiwgImlwX2NvbmZpcm1lciI6ICIxMTMuMjUwLjY3LjciIH0.rq7BkEmo8q5TSOwOOlzoJITtU9kMSmpFphwA_G6-jCvTFCaoXjlU96RooWAmXQwFQSpz8CvG1n0wxvB8sUaaCQ";
+    private String cookieString = "timezoneOffset=28800,0; steamRefresh_steam=76561199392362087%7C%7CeyAidHlwIjogIkpXVCIsICJhbGciOiAiRWREU0EiIH0.eyAiaXNzIjogInN0ZWFtIiwgInN1YiI6ICI3NjU2MTE5OTM5MjM2MjA4NyIsICJhdWQiOiBbICJ3ZWIiLCAicmVuZXciLCAiZGVyaXZlIiBdLCAiZXhwIjogMTcyNjM5OTE1MywgIm5iZiI6IDE2OTk1OTg5NjUsICJpYXQiOiAxNzA4MjM4OTY1LCAianRpIjogIjFCNEFfMjNGNzFBNEVfNzNFNzYiLCAib2F0IjogMTcwODIzODk2NSwgInBlciI6IDEsICJpcF9zdWJqZWN0IjogIjExMy4yNTAuNjcuNyIsICJpcF9jb25maXJtZXIiOiAiMTEzLjI1MC42Ny43IiB9.EgQYxYR13O05XKxUCPYQDdnsv9DSANBjFOLp72MBhrD4qhE48TDMpzdpEc2qWoDQlEFoiHN18LaMP8fdZ9g9Aw; ak_bmsc=221E6702EE7231B8FC66B420FD4B854B~000000000000000000000000000000~YAAQLzHFF1KpGmWNAQAAEw36uhYU3R/rzv7Qg+w3w/5x3rAeUt1DmpOFq8Lm4croyiRzy6aNqPIakrwst2Pn5Q+6gnVelMP8YQg1vsEB9uD/jt8B7U7RkxXlwQ3SWp5nHC/uKBg2Gb6SVTJi9MCv7MHc5Jm4CyeWEhDIPX/ioqNW76SaPIuzXWB1jOACQN6eVrWbhK2G7/+6rmIv87BwSfRd7DiMhhJIyHsnOYbDVBCays3xl1/VT+cX7ebIgtMMpB5p/RvdMV4avrt4O/x6tUPDfI0IgitsepC8gcimEALkOxR3RMR+dFEwYLnIMsUQhYtxuXlW/pzvQhbpH1ufiI6sV7wQxYfVkdGmGlX604WiSs9yLT4dxoYtRrFpJ3KMog==; steamCountry=CN%7Cd753c23f070da204866d2ca95871a7f3; steamLoginSecure=76561199392362087%7C%7CeyAidHlwIjogIkpXVCIsICJhbGciOiAiRWREU0EiIH0.eyAiaXNzIjogInI6MUI0QV8yM0Y3MUE0RV83M0U3NiIsICJzdWIiOiAiNzY1NjExOTkzOTIzNjIwODciLCAiYXVkIjogWyAid2ViOmNvbW11bml0eSIgXSwgImV4cCI6IDE3MDgzMjU2ODcsICJuYmYiOiAxNjk5NTk4OTY1LCAiaWF0IjogMTcwODIzODk2NSwgImp0aSI6ICIxQjRCXzIzRjcxQTUwXzFCMDZGIiwgIm9hdCI6IDE3MDgyMzg5NjUsICJydF9leHAiOiAxNzI2Mzk5MTUzLCAicGVyIjogMCwgImlwX3N1YmplY3QiOiAiMTEzLjI1MC42Ny43IiwgImlwX2NvbmZpcm1lciI6ICIxMTMuMjUwLjY3LjciIH0.rq7BkEmo8q5TSOwOOlzoJITtU9kMSmpFphwA_G6-jCvTFCaoXjlU96RooWAmXQwFQSpz8CvG1n0wxvB8sUaaCQ";
     /**
      * webapikey
      */
     @Getter
-    private Optional<String> webApiKey=Optional.empty();
+    private Optional<String> webApiKey = Optional.empty();
     /**
      * steamId
      */
     @Getter
-    private Optional<String> steamId=Optional.empty();
+    private Optional<String> steamId = Optional.empty();
     /**
      * sessionId
      * 会话ID
      */
     @Getter
-    private Optional<String> sessionId=Optional.empty();
+    private Optional<String> sessionId = Optional.empty();
     /**
      * 交易链接
      */
     @Getter
-    private Optional<String> treadUrl=Optional.empty();
+    private Optional<String> treadUrl = Optional.empty();
 
     @Resource
     private ConfigService configService;
 
     @Resource
-    private ObjectMapper objectMapper=new ObjectMapper();
+    private ObjectMapper objectMapper = new ObjectMapper();
 
-    private Optional<String>  browserid;
+    private Optional<String> browserid;
 
     private SteamMaFile steamMaFile;
 
 
+    public SteamWeb() {
+    }
 
-    public SteamWeb() {}
-    public static OkHttpClient getClient(boolean retry, int timeOut,String cookies,String url) {
+    public static OkHttpClient getClient(boolean retry, int timeOut, String cookies, String url) {
         OkHttpClient.Builder OKHTTP_BUILD = new OkHttpClient.Builder();
         OKHTTP_BUILD.writeTimeout(timeOut, TimeUnit.SECONDS);
         OKHTTP_BUILD.readTimeout(timeOut, TimeUnit.SECONDS);
@@ -80,17 +84,18 @@ public class SteamWeb {
         OKHTTP_BUILD.retryOnConnectionFailure(retry);
         OKHTTP_BUILD.hostnameVerifier(HttpUtil.getHostnameVerifier());
         OKHTTP_BUILD.sslSocketFactory(HttpUtil.getSSLSocketFactory(), HttpUtil.getTrustManager());
-        OKHTTP_BUILD.cookieJar(new SteamCustomCookieJar(cookies,url));
+        OKHTTP_BUILD.cookieJar(new SteamCustomCookieJar(cookies, url));
         return OKHTTP_BUILD.build();
     }
 
     /**
      * 登录steam网站
+     *
      * @param passwd
      * @param maFile
      */
-    public void login(String passwd,SteamMaFile maFile){
-        steamMaFile=maFile;
+    public void login(String passwd, SteamMaFile maFile) {
+        steamMaFile = maFile;
         //steam登录代理
 //        ConfigDO configByKey = configService.getConfigByKey("steam.proxy");
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
@@ -98,18 +103,19 @@ public class SteamWeb {
         builder.url("http://127.0.0.1:25852/login");
         builder.method(HttpUtil.Method.FORM);
         HashMap<String, String> stringStringHashMap = new HashMap<>();
-        stringStringHashMap.put("username",steamMaFile.getAccountName());
-        stringStringHashMap.put("password",passwd);
-        stringStringHashMap.put("token_code",steamMaFile.getSharedSecret());
+        stringStringHashMap.put("username", steamMaFile.getAccountName());
+        stringStringHashMap.put("password", passwd);
+        stringStringHashMap.put("token_code", steamMaFile.getSharedSecret());
         builder.form(stringStringHashMap);
-        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 30000,null,null));
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 30000, null, null));
         SteamCookie json = sent.json(SteamCookie.class);
-        if(json.getCode()!=0){
-            log.error("Steam通讯失败{}",json);
-            throw new ServiceException(-1,"Steam通讯失败"+json.getMsg());
+        if (json.getCode() != 0) {
+            log.error("Steam通讯失败{}", json);
+            throw new ServiceException(-1, "Steam通讯失败" + json.getMsg());
         }
-        cookieString=json.getData().getCookie();
+        cookieString = json.getData().getCookie();
     }
+
     /**
      * 初始化apikey
      */
@@ -117,19 +123,19 @@ public class SteamWeb {
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url("https://steamcommunity.com/dev/apikey");
         builder.method(HttpUtil.Method.GET);
-        Map<String,String> header=new HashMap<>();
-        header.put("Accept-Language","zh-CN,zh;q=0.9");
+        Map<String, String> header = new HashMap<>();
+        header.put("Accept-Language", "zh-CN,zh;q=0.9");
         builder.headers(header);
-        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(),getClient(true,3000,cookieString,"https://steamcommunity.com/dev/apikey"));
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 3000, cookieString, "https://steamcommunity.com/dev/apikey"));
         Pattern pattern = Pattern.compile("密钥: (.*?)<"); // 正则表达式匹配API密钥
         Matcher matcher = pattern.matcher(sent.html());
         if (matcher.find()) {
-            webApiKey=Optional.of(matcher.group(1));
+            webApiKey = Optional.of(matcher.group(1));
         }
         Pattern pattern2 = Pattern.compile("https://steamcommunity.com/profiles/(\\d+)/");
         Matcher matcher2 = pattern2.matcher(sent.html());
         if (matcher2.find()) {
-            steamId =Optional.of(matcher2.group(1));
+            steamId = Optional.of(matcher2.group(1));
         }
 ////         正则表达式，匹配以"g_sessionID = "开头，后面跟着任意数量的非引号字符，最后以";"结尾的字符串
 //        Pattern patternSession = Pattern.compile("g_sessionID\\s*=\\s*\"(.*?)\";", Pattern.DOTALL);
@@ -140,18 +146,18 @@ public class SteamWeb {
 //        }
         //set browserid
         Optional<Cookie> browserOptional = sent.getCookies().stream().filter(item -> item.name().equals("browserid")).findFirst();
-        if(browserOptional.isPresent()){
-            browserid =Optional.of(browserOptional.get().value());
-            cookieString+=";browserid="+browserid.get();
-        }else{
-            throw new ServiceException(-1,"获取浏览器ID失败");
+        if (browserOptional.isPresent()) {
+            browserid = Optional.of(browserOptional.get().value());
+            cookieString += ";browserid=" + browserid.get();
+        } else {
+            throw new ServiceException(-1, "获取浏览器ID失败");
         }
         Optional<Cookie> sessionOptional = sent.getCookies().stream().filter(item -> item.name().equals("sessionid")).findFirst();
-        if(sessionOptional.isPresent()){
-            sessionId =Optional.of(sessionOptional.get().value());
-            cookieString+=";sessionid="+sessionId.get();
-        }else{
-            throw new ServiceException(-1,"获取sesionID失败");
+        if (sessionOptional.isPresent()) {
+            sessionId = Optional.of(sessionOptional.get().value());
+            cookieString += ";sessionid=" + sessionId.get();
+        } else {
+            throw new ServiceException(-1, "获取sesionID失败");
         }
     }
 
@@ -159,33 +165,35 @@ public class SteamWeb {
      * 初始化交易链接
      */
     public void initTradeUrl() {
-        if(!steamId.isPresent()){
+        if (!steamId.isPresent()) {
             initApiKey();
         }
-        if(!steamId.isPresent()){
-            throw new ServiceException(-1,"初始化steam失败，请重新登录");
+        if (!steamId.isPresent()) {
+            throw new ServiceException(-1, "初始化steam失败，请重新登录");
         }
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url("https://steamcommunity.com/profiles/:steamId/tradeoffers/privacy");
         builder.method(HttpUtil.Method.GET);
-        Map<String,String> header=new HashMap<>();
-        header.put("Accept-Language","zh-CN,zh;q=0.9");
+        Map<String, String> header = new HashMap<>();
+        header.put("Accept-Language", "zh-CN,zh;q=0.9");
         builder.headers(header);
-        Map<String,String> pathVar=new HashMap<>();
-        pathVar.put("steamId",steamId.get());
+        Map<String, String> pathVar = new HashMap<>();
+        pathVar.put("steamId", steamId.get());
         builder.pathVar(pathVar);
-        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(),getClient(true,3000,cookieString,"https://steamcommunity.com/dev/apikey"));
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 3000, cookieString, "https://steamcommunity.com/dev/apikey"));
         Pattern pattern = Pattern.compile("value=\"(.*?)\"");
         Matcher matcher = pattern.matcher(sent.html());
         if (matcher.find()) {
-            treadUrl=Optional.of(matcher.group(1));
-        }else{
-            log.error("获取tradeUrl失败steamId{}",steamId);
-            throw new ServiceException(-1,"获取tradeUrl失败");
+            treadUrl = Optional.of(matcher.group(1));
+        } else {
+            log.error("获取tradeUrl失败steamId{}", steamId);
+            throw new ServiceException(-1, "获取tradeUrl失败");
         }
     }
+
     /**
      * 计算桌面令牌
+     *
      * @param secret secret 桌面共享key
      * @return
      * @throws NoSuchAlgorithmException
@@ -202,7 +210,7 @@ public class SteamWeb {
         System.arraycopy(packedTime, 0, msg, 0, 8);
         byte[] decode = Base64.getDecoder().decode(secret);// Equivalent to Python's b64encode
         Mac sha1_HMAC = Mac.getInstance("HmacSHA1");
-        SecretKeySpec secretKeySpec=new SecretKeySpec(decode,"HmacSHA1");
+        SecretKeySpec secretKeySpec = new SecretKeySpec(decode, "HmacSHA1");
         sha1_HMAC.init(secretKeySpec); // Assuming secret is a valid Base64 encoded string
         byte[] mac = sha1_HMAC.doFinal(msg);
         int offset = mac[mac.length - 1] & 0x0f; // Equivalent to Python's & 0x0f
@@ -218,6 +226,7 @@ public class SteamWeb {
 
     /**
      * 转换ID
+     *
      * @param id
      * @return
      */
@@ -236,16 +245,18 @@ public class SteamWeb {
             return id;
         }
     }
+
     /**
-     * 我方发送报价是到对方
+     * 我方发送报价是到对方 本接口会自动进行手机确认
      * 参考
      * https://www.coder.work/article/8018121#google_vignette
+     *
      * @param steamInvDto 我方交易商品
-     * @param tradeUrl 接收方交易链接 如 https://steamcommunity.com/tradeoffer/new/?partner=1432096359&token=giLGhxtN
+     * @param tradeUrl    接收方交易链接 如 https://steamcommunity.com/tradeoffer/new/?partner=1432096359&token=giLGhxtN
      * @return
      */
-    public SteamTradeOfferResult trade(SteamInvDto steamInvDto, String tradeUrl){
-        try{
+    public SteamTradeOfferResult trade(SteamInvDto steamInvDto, String tradeUrl) {
+        try {
             URI uri = URI.create(tradeUrl);
             String query = uri.getQuery();
             log.info(query);
@@ -254,59 +265,66 @@ public class SteamWeb {
             HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
             builder.url("https://steamcommunity.com/tradeoffer/new/send");
             builder.method(HttpUtil.Method.FORM);
-            Map<String,String> post=new HashMap<>();
-            post.put("sessionid",sessionId.get());
-            post.put("serverid","1");
-            post.put("partner",toCommunityID(stringStringMap.get("partner")));
-            post.put("captcha","");
-            post.put("trade_offer_create_params","{\"trade_offer_access_token\":\""+stringStringMap.get("token")+"\"}");
-            SteamTradeOffer steamTradeOffer=new SteamTradeOffer();
+            Map<String, String> post = new HashMap<>();
+            post.put("sessionid", sessionId.get());
+            post.put("serverid", "1");
+            post.put("partner", toCommunityID(stringStringMap.get("partner")));
+            post.put("captcha", "");
+            post.put("trade_offer_create_params", "{\"trade_offer_access_token\":\"" + stringStringMap.get("token") + "\"}");
+            SteamTradeOffer steamTradeOffer = new SteamTradeOffer();
             steamTradeOffer.setNewversion(true);
             steamTradeOffer.setVersion(2);
-            SteamTradeOffer.MeDTO meDTO=new SteamTradeOffer.MeDTO();
+            SteamTradeOffer.MeDTO meDTO = new SteamTradeOffer.MeDTO();
             meDTO.setReady(true);
             meDTO.setCurrency(new ArrayList<>());
-            SteamTradeOffer.MeDTO.AssetsDTO assetsDTO=new SteamTradeOffer.MeDTO.AssetsDTO();
+            SteamTradeOffer.MeDTO.AssetsDTO assetsDTO = new SteamTradeOffer.MeDTO.AssetsDTO();
             assetsDTO.setAppid(steamInvDto.getAppid());
             assetsDTO.setContextid(steamInvDto.getContextid());
             assetsDTO.setAmount(Integer.valueOf(steamInvDto.getAmount()));
             assetsDTO.setAssetid(steamInvDto.getAssetid());
             meDTO.setAssets(Collections.singletonList(assetsDTO));
             steamTradeOffer.setMe(meDTO);
-            SteamTradeOffer.ThemDTO themDTO=new SteamTradeOffer.ThemDTO();
+            SteamTradeOffer.ThemDTO themDTO = new SteamTradeOffer.ThemDTO();
             themDTO.setAssets(Collections.emptyList());
             themDTO.setCurrency(Collections.emptyList());
             themDTO.setReady(false);
             steamTradeOffer.setThem(themDTO);
-            post.put("json_tradeoffer",objectMapper.writeValueAsString(steamTradeOffer));
-            post.put("tradeoffermessage","交易测试");
+            post.put("json_tradeoffer", objectMapper.writeValueAsString(steamTradeOffer));
+            post.put("tradeoffermessage", "交易测试" + LocalDateTime.now());
             builder.form(post);
-            Map<String,String> header=new HashMap<>();
-            header.put("Accept-Language","zh-CN,zh;q=0.9");
-            header.put("Referer",tradeUrl);
+            Map<String, String> header = new HashMap<>();
+            header.put("Accept-Language", "zh-CN,zh;q=0.9");
+            header.put("Referer", tradeUrl);
             builder.headers(header);
-            log.info("发送到对方服务器数据{}",objectMapper.writeValueAsString(post));
-            HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true,3000,"browserid="+browserid.get()+"; strTradeLastInventoryContext=730_2; "+cookieString,"https://steamcommunity.com/dev/apikey"));
-            log.info("交易结果{}",sent.html());
+            log.info("发送到对方服务器数据{}", objectMapper.writeValueAsString(post));
+            HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 3000, "browserid=" + browserid.get() + "; strTradeLastInventoryContext=730_2; " + cookieString, "https://steamcommunity.com/dev/apikey"));
+            log.info("交易结果{}", sent.html());
             SteamTradeOfferResult json = sent.json(SteamTradeOfferResult.class);
-            confirmOffer(json);
+            Optional<MobileConfList.ConfDTO> confDTO = confirmOfferList(json.getTradeofferid());
+            if (confDTO.isPresent()) {
+//                confirmOffer(confDTO.get(), ConfirmAction.CANCEL);
+                confirmOffer(confDTO.get(), ConfirmAction.ALLOW);
+            }else {
+                log.warn("交易单据未进行手机自动确认{}",json.getTradeofferid());
+            }
             return json;
-        }catch (UnsupportedEncodingException e){
-            log.error("解码出错{}",e);
-            throw new ServiceException(-1,"发起交易报价失败原因，解码输入出错");
+        } catch (UnsupportedEncodingException e) {
+            log.error("解码出错{}", e);
+            throw new ServiceException(-1, "发起交易报价失败原因，解码输入出错");
         } catch (JsonProcessingException e) {
-            log.error("交易出错，可能 库存不正确{}",e);
-            throw new ServiceException(-1,"发起交易报价失败原因，交易出错，可能 库存不正确");
+            log.error("交易出错，可能 库存不正确{}", e);
+            throw new ServiceException(-1, "发起交易报价失败原因，交易出错，可能 库存不正确");
         }
     }
 
     /**
      * 生成确认列表签名
-     * @param time
+     *
      * @param tag
      * @return
      */
-    public String generateConfirmationHashForTime2(long time, String tag) throws NoSuchAlgorithmException, InvalidKeyException {
+    private ConfirmHash generateConfirmationHashForTime(String tag) throws NoSuchAlgorithmException, InvalidKeyException {
+        long time = System.currentTimeMillis() / 1000l;
         byte[] arr = new byte[8];
         // 将 long 类型的 time 转换为 8 个字节的大端序
         for (int i = 0; i < 8; i++) {
@@ -332,66 +350,90 @@ public class SteamWeb {
 
         // 计算 HMAC 并返回 Base64 编码的哈希值
         byte[] hashedData = sha1_HMAC.doFinal(data);
-        return Base64.getEncoder().encodeToString(hashedData);
+        ConfirmHash confirmHash = new ConfirmHash();
+        confirmHash.setHash(Base64.getEncoder().encodeToString(hashedData));
+        confirmHash.setTime(time);
+        return confirmHash;
     }
-    public String generateConfirmationHashForTime(long time, String tag) {
-        byte[] decode = Base64.getDecoder().decode(steamMaFile.getIdentitySecret());
-        int n2 = 8;
-        if (tag != null) {
-            n2 = Math.min(8 + tag.length(), 40); // Limit the total length to 40 bytes (8 for time + 32 for tag)
-        }
-        byte[] array = new byte[n2];
-        int n3 = 8;
-        while (n3-- > 0) {
-            array[n3] = (byte)time;
-            time >>= 8;
-        }
-        if (tag != null) {
-            int tagLength = Math.min(tag.length(), n2 - 8); // Ensure we don't go over the array length
-            System.arraycopy(tag.getBytes(StandardCharsets.UTF_8), 0, array, 8, tagLength);
-        }
 
-        try {
-            Mac sha1_HMAC = Mac.getInstance("HmacSHA1");
-            SecretKeySpec secret_key = new SecretKeySpec(decode, "HmacSHA1");
-            sha1_HMAC.init(secret_key);
-            byte[] hashedData = sha1_HMAC.doFinal(array);
-            String encodedData = Base64.getEncoder().encodeToString(hashedData);
-            String hash = URLEncoder.encode(encodedData, "UTF-8");
-            return hash;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    private void confirmOffer(SteamTradeOfferResult tradeOfferResult){
+    private SteamResult confirmOffer(MobileConfList.ConfDTO confDTO, ConfirmAction confirmAction) {
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-        builder.url("https://steamcommunity.com/mobileconf/getlist");
+        builder.url("https://steamcommunity.com/mobileconf/ajaxop");
         builder.method(HttpUtil.Method.GET);
-        Map<String,String> query=new HashMap<>();
-        query.put("p",steamMaFile.getDeviceId());
-        query.put("a",steamId.get());
+        Map<String, String> query = new HashMap<>();
+        query.put("op", confirmAction.getCode());
+        query.put("cid", confDTO.getId());
+        query.put("ck", confDTO.getNonce());
+        query.put("p", steamMaFile.getDeviceId());
+        query.put("a", steamId.get());
+        query.put("m", "react");
+        String tag = "reject";
+        switch (confirmAction) {
+            case ALLOW:
+                tag = "accept";
+                break;
+            case CANCEL:
+                tag = "reject";
+                break;
+            default:
+                throw new ServiceException(-1, "不支持的操作");
+        }
+        query.put("tag", tag);
         try {
-            query.put("k",generateConfirmationHashForTime2(System.currentTimeMillis()/1000l,"conf"));
+            ConfirmHash confirmHash = generateConfirmationHashForTime(tag);
+            query.put("k", confirmHash.getHash());
+            query.put("t", String.valueOf(confirmHash.getTime()));
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (InvalidKeyException e) {
             e.printStackTrace();
         }
-        query.put("t", String.valueOf(System.currentTimeMillis()/1000l));
-        query.put("m","react");
-        query.put("tag","conf");
         builder.query(query);
-        Map<String,String> header=new HashMap<>();
-        header.put("Accept-Language","zh-CN,zh;q=0.9");
+        Map<String, String> header = new HashMap<>();
+        header.put("Accept-Language", "zh-CN,zh;q=0.9");
         builder.headers(header);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 1000, cookieString, "https://steamcommunity.com/mobileconf/getlist"));
-        log.info(sent.html());
+        SteamResult json = sent.json(SteamResult.class);
+        return json;
     }
-    private Map<String,String> parseQuery(String query) throws UnsupportedEncodingException {
-        Map<String,String> ret=new HashMap<>();
+
+    /**
+     * 确认列表
+     *
+     * @param tradeOrderId 订单号
+     * @return
+     */
+    private Optional<MobileConfList.ConfDTO> confirmOfferList(String tradeOrderId) {
+        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+        builder.url("https://steamcommunity.com/mobileconf/getlist");
+        builder.method(HttpUtil.Method.GET);
+        Map<String, String> query = new HashMap<>();
+        query.put("p", steamMaFile.getDeviceId());
+        query.put("a", steamId.get());
+        try {
+            ConfirmHash confirmHash = generateConfirmationHashForTime("conf");
+            query.put("k", confirmHash.getHash());
+            query.put("t", String.valueOf(confirmHash.getTime()));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
+        query.put("m", "react");
+        query.put("tag", "conf");
+        builder.query(query);
+        Map<String, String> header = new HashMap<>();
+        header.put("Accept-Language", "zh-CN,zh;q=0.9");
+        builder.headers(header);
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 1000, cookieString, "https://steamcommunity.com/mobileconf/getlist"));
+        MobileConfList json = sent.json(MobileConfList.class);
+        return json.getConf().stream().filter(item -> item.getCreatorId().equals(tradeOrderId)).findFirst();
+    }
+
+    private Map<String, String> parseQuery(String query) throws UnsupportedEncodingException {
+        Map<String, String> ret = new HashMap<>();
         String[] split = query.split("&");
-        for (int i=0;i<split.length;i++){
+        for (int i = 0; i < split.length; i++) {
             String[] split1 = split[i].split("=");
             ret.put(split1[0], URLDecoder.decode(split1[1], "utf-8"));
         }
@@ -401,15 +443,15 @@ public class SteamWeb {
 
     public static void main(String[] args) {
 
-        String maFileString="{\"shared_secret\":\"NTDfP+vPKSLS2O8lXKJgdAp5QRI=\",\"serial_number\":\"3438498994078918164\",\"revocation_code\":\"R34847\",\"uri\":\"otpauth://totp/Steam:6wws6f?secret=GUYN6P7LZ4USFUWY54SVZITAOQFHSQIS&issuer=Steam\",\"server_time\":1701078470,\"account_name\":\"6wws6f\",\"token_gid\":\"2fba3858dfc17a80\",\"identity_secret\":\"q4roYdO+Cz/QOSVHB5m7pbYAyCc=\",\"secret_1\":\"m6OeZ+3cuVr/I/kEK2tjqhgbzSs=\",\"status\":1,\"device_id\":\"android:06ad9382-4690-45c1-90e9-2fc31cf803dc\",\"fully_enrolled\":true,\"Session\":{\"SteamID\":76561199392362087,\"AccessToken\":\"eyAidHlwIjogIkpXVCIsICJhbGciOiAiRWREU0EiIH0.eyAiaXNzIjogInI6MEU3Nl8yM0VDNjYwQV9FNDA1MiIsICJzdWIiOiAiNzY1NjExOTkzOTIzNjIwODciLCAiYXVkIjogWyAid2ViIiwgIm1vYmlsZSIgXSwgImV4cCI6IDE3MDczNzI1MjEsICJuYmYiOiAxNjk4NjQ0Mzc5LCAiaWF0IjogMTcwNzI4NDM3OSwgImp0aSI6ICIwRTdCXzIzRUM2NjEwX0RFREQ0IiwgIm9hdCI6IDE3MDcyODQzNzksICJydF9leHAiOiAxNzI1NTcyOTA5LCAicGVyIjogMCwgImlwX3N1YmplY3QiOiAiMTEzLjI1MS45OS4yMTIiLCAiaXBfY29uZmlybWVyIjogIjExMy4yNTEuOTkuMjEyIiB9.MwVd4CC8DZcjENIKU9X4zDrHYauOsBclYEoyvfOsOtxOM8sYkhhwW9PxzjlweFa7_tkpSKrkXw13Quhwp6X3CA\",\"RefreshToken\":\"eyAidHlwIjogIkpXVCIsICJhbGciOiAiRWREU0EiIH0.eyAiaXNzIjogInN0ZWFtIiwgInN1YiI6ICI3NjU2MTE5OTM5MjM2MjA4NyIsICJhdWQiOiBbICJ3ZWIiLCAicmVuZXciLCAiZGVyaXZlIiwgIm1vYmlsZSIgXSwgImV4cCI6IDE3MjU1NzI5MDksICJuYmYiOiAxNjk4NjQ0Mzc5LCAiaWF0IjogMTcwNzI4NDM3OSwgImp0aSI6ICIwRTc2XzIzRUM2NjBBX0U0MDUyIiwgIm9hdCI6IDE3MDcyODQzNzksICJwZXIiOiAxLCAiaXBfc3ViamVjdCI6ICIxMTMuMjUxLjk5LjIxMiIsICJpcF9jb25maXJtZXIiOiAiMTEzLjI1MS45OS4yMTIiIH0.zYwXhy5shkMyjUJ4s42bbKovBSk6LTmo9-JFUHoGRpUKBRqexr9k35olVDezMX3MVIZ8nN5gwnXYLGQ9ayVWAQ\",\"SessionID\":null}}";
+        String maFileString = "{\"shared_secret\":\"NTDfP+vPKSLS2O8lXKJgdAp5QRI=\",\"serial_number\":\"3438498994078918164\",\"revocation_code\":\"R34847\",\"uri\":\"otpauth://totp/Steam:6wws6f?secret=GUYN6P7LZ4USFUWY54SVZITAOQFHSQIS&issuer=Steam\",\"server_time\":1701078470,\"account_name\":\"6wws6f\",\"token_gid\":\"2fba3858dfc17a80\",\"identity_secret\":\"q4roYdO+Cz/QOSVHB5m7pbYAyCc=\",\"secret_1\":\"m6OeZ+3cuVr/I/kEK2tjqhgbzSs=\",\"status\":1,\"device_id\":\"android:06ad9382-4690-45c1-90e9-2fc31cf803dc\",\"fully_enrolled\":true,\"Session\":{\"SteamID\":76561199392362087,\"AccessToken\":\"eyAidHlwIjogIkpXVCIsICJhbGciOiAiRWREU0EiIH0.eyAiaXNzIjogInI6MEU3Nl8yM0VDNjYwQV9FNDA1MiIsICJzdWIiOiAiNzY1NjExOTkzOTIzNjIwODciLCAiYXVkIjogWyAid2ViIiwgIm1vYmlsZSIgXSwgImV4cCI6IDE3MDczNzI1MjEsICJuYmYiOiAxNjk4NjQ0Mzc5LCAiaWF0IjogMTcwNzI4NDM3OSwgImp0aSI6ICIwRTdCXzIzRUM2NjEwX0RFREQ0IiwgIm9hdCI6IDE3MDcyODQzNzksICJydF9leHAiOiAxNzI1NTcyOTA5LCAicGVyIjogMCwgImlwX3N1YmplY3QiOiAiMTEzLjI1MS45OS4yMTIiLCAiaXBfY29uZmlybWVyIjogIjExMy4yNTEuOTkuMjEyIiB9.MwVd4CC8DZcjENIKU9X4zDrHYauOsBclYEoyvfOsOtxOM8sYkhhwW9PxzjlweFa7_tkpSKrkXw13Quhwp6X3CA\",\"RefreshToken\":\"eyAidHlwIjogIkpXVCIsICJhbGciOiAiRWREU0EiIH0.eyAiaXNzIjogInN0ZWFtIiwgInN1YiI6ICI3NjU2MTE5OTM5MjM2MjA4NyIsICJhdWQiOiBbICJ3ZWIiLCAicmVuZXciLCAiZGVyaXZlIiwgIm1vYmlsZSIgXSwgImV4cCI6IDE3MjU1NzI5MDksICJuYmYiOiAxNjk4NjQ0Mzc5LCAiaWF0IjogMTcwNzI4NDM3OSwgImp0aSI6ICIwRTc2XzIzRUM2NjBBX0U0MDUyIiwgIm9hdCI6IDE3MDcyODQzNzksICJwZXIiOiAxLCAiaXBfc3ViamVjdCI6ICIxMTMuMjUxLjk5LjIxMiIsICJpcF9jb25maXJtZXIiOiAiMTEzLjI1MS45OS4yMTIiIH0.zYwXhy5shkMyjUJ4s42bbKovBSk6LTmo9-JFUHoGRpUKBRqexr9k35olVDezMX3MVIZ8nN5gwnXYLGQ9ayVWAQ\",\"SessionID\":null}}";
 
-        SteamWeb steamWeb=new SteamWeb();
+        SteamWeb steamWeb = new SteamWeb();
         try {
             SteamMaFile steamMaFile = steamWeb.objectMapper.readValue(maFileString, SteamMaFile.class);
-            steamWeb.login("QFhG9jSs",steamMaFile);
+            steamWeb.login("QFhG9jSs", steamMaFile);
             steamWeb.initApiKey();
-            String tradeUrl="https://steamcommunity.com/tradeoffer/new/?partner=1440000356&token=5_JGX9AA";
-            SteamInvDto steamInvDto=new SteamInvDto();
+            String tradeUrl = "https://steamcommunity.com/tradeoffer/new/?partner=1440000356&token=5_JGX9AA";
+            SteamInvDto steamInvDto = new SteamInvDto();
             steamInvDto.setAppid(730);
             steamInvDto.setContextid("2");
             steamInvDto.setAssetid("35681966437");
@@ -417,13 +459,10 @@ public class SteamWeb {
             steamInvDto.setClassid("4901046679");
             steamInvDto.setAmount("1");
             SteamTradeOfferResult trade = steamWeb.trade(steamInvDto, tradeUrl);
-            log.info("将临信息{}",trade);
+            log.info("将临信息{}", trade);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        BindUserDO bindUserDO=new BindUserDO();
-//        bindUserDO.setLoginName("6WwS6f").setLoginPassword("QFhG9jSs").setLoginSharedSecret("NTDfP+vPKSLS2O8lXKJgdAp5QRI=");
-//        steamWeb.login(bindUserDO);
 
 
     }
