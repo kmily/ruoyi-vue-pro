@@ -99,8 +99,9 @@ public class SteamService {
             log.error("读取maFile失败{}",e);
             throw new ServiceException(-1,"读取maFile失败，请检查后再试。");
         }
-        SteamWeb steamWeb=new SteamWeb();
+        SteamWeb steamWeb=new SteamWeb(configService);
         steamWeb.login(password,steamMaFile);
+        steamWeb.initTradeUrl();
         Optional<String> steamIdOptional = steamWeb.getSteamId();
         if(!steamIdOptional.isPresent()){
             throw new ServiceException(-1,"绑定用户失败原因 无法检测steam帐号密码");
@@ -110,6 +111,8 @@ public class SteamService {
         }
         bindUserDO.setSteamPassword(password);
         bindUserDO.setMaFile(steamMaFile);
+        bindUserDO.setTradeUrl(steamWeb.getTreadUrl().get());
+        bindUserDO.setSteamName(steamMaFile.getAccountName());
         bindUserMapper.updateById(bindUserDO);
     }
     /**

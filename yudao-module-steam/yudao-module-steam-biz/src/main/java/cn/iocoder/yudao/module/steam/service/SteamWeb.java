@@ -63,15 +63,18 @@ public class SteamWeb {
     @Getter
     private Optional<String> treadUrl = Optional.empty();
 
-    @Resource
+
     private ConfigService configService;
 
-    @Resource
     private ObjectMapper objectMapper = new ObjectMapper();
 
     private Optional<String> browserid;
 
     private SteamMaFile steamMaFile;
+
+    public SteamWeb(ConfigService configService) {
+        this.configService = configService;
+    }
 
     public static OkHttpClient getClient(boolean retry, int timeOut, String cookies, String url) {
         OkHttpClient.Builder OKHTTP_BUILD = new OkHttpClient.Builder();
