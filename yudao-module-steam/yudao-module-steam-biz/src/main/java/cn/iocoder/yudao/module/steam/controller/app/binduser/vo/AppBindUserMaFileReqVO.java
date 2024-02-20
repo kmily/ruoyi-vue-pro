@@ -23,7 +23,11 @@ public class AppBindUserMaFileReqVO extends PageParam {
     @NotNull(message = "文件附件不能为空")
     private MultipartFile file;
 
-    @Schema(description = "文件附件", example = "yudaoyuanma.png")
-    private String path;
+    @Schema(description = "steam密码", example = "123456")
+    @NotNull(message = "steam密码不能为空")
+    private String password;
+    @Schema(description = "bindUserId", example = "123456")
+    @NotNull(message = "bindUserId不能为空")
+    private Integer bindUserId;
 
 }

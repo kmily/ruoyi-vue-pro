@@ -20,18 +20,18 @@ import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
+import cn.iocoder.yudao.module.steam.service.steam.SteamMaFile;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Steam相关接口
@@ -52,6 +52,8 @@ public class SteamService {
     private InvDescMapper invDescMapper;
     @Resource
     private BindUserMapper bindUserMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     /**
      * 帐号绑定
@@ -77,6 +79,38 @@ public class SteamService {
                 .setSteamId(steamId);
 
         return bindUserMapper.insert(bindUserDO);
+    }
+    public void bindMaFile(byte[] maFileJsonByte,String password,Integer bindUserId){
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        BindUserDO bindUserDO = bindUserMapper.selectById(bindUserId);
+        if(Objects.isNull(bindUserDO)){
+            throw new ServiceException(-1,"读取maFile失败，请检查后再试。");
+        }
+        if(!bindUserDO.getUserId().equals(loginUser.getId())){
+            throw new ServiceException(-1,"没有权限操作。");
+        }
+        if(!bindUserDO.getUserType().equals(loginUser.getUserType())){
+            throw new ServiceException(-1,"没有权限操作。");
+        }
+        SteamMaFile steamMaFile = null;
+        try {
+            steamMaFile = objectMapper.readValue(maFileJsonByte, SteamMaFile.class);
+        } catch (IOException e) {
+            log.error("读取maFile失败{}",e);
+            throw new ServiceException(-1,"读取maFile失败，请检查后再试。");
+        }
+        SteamWeb steamWeb=new SteamWeb();
+        steamWeb.login(password,steamMaFile);
+        Optional<String> steamIdOptional = steamWeb.getSteamId();
+        if(!steamIdOptional.isPresent()){
+            throw new ServiceException(-1,"绑定用户失败原因 无法检测steam帐号密码");
+        }
+        if (!steamIdOptional.get().equals(bindUserDO.getSteamId())) {
+            throw new ServiceException(-1,"ma文件和绑定的steam文件不一致，请确认后再次操作。");
+        }
+        bindUserDO.setSteamPassword(password);
+        bindUserDO.setMaFile(steamMaFile);
+        bindUserMapper.updateById(bindUserDO);
     }
     /**
      * 验证用户是否已经被绑定

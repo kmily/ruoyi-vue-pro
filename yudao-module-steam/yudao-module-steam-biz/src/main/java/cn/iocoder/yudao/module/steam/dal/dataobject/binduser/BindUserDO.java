@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.module.steam.dal.dataobject.binduser;
 
+import cn.iocoder.yudao.framework.mybatis.core.type.EncryptTypeHandler;
+import cn.iocoder.yudao.module.steam.service.steam.SteamMaFile;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 import java.util.*;
 import java.time.LocalDateTime;
@@ -54,11 +57,13 @@ public class BindUserDO extends BaseDO {
     /**
      * steam密码
      */
+    @TableField(typeHandler = EncryptTypeHandler.class)
     private String steamPassword;
     /**
      * maFile文件
      */
-    private String maFile;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private SteamMaFile maFile;
     /**
      * 用户类型
      */

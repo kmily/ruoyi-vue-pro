@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FileUploadReq
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.infra.service.file.FileService;
+import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppBindUserMaFileReqVO;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
@@ -94,10 +95,11 @@ public class AppBindUserController {
     @Operation(summary = "上传ma文件", description = "上传ma文件")
     @PreAuthenticated
     @OperateLog(logArgs = false) // 上传文件，没有记录操作日志的必要
-    public CommonResult<String> uploadFile(FileUploadReqVO uploadReqVO) throws Exception {
-        MultipartFile file = uploadReqVO.getFile();
-        String path = uploadReqVO.getPath();
-        return success(fileService.createFile(file.getOriginalFilename(), path, IoUtil.readBytes(file.getInputStream())));
+    public CommonResult<String> uploadFile(AppBindUserMaFileReqVO appBindUserMaFileReqVO) throws Exception {
+        MultipartFile file = appBindUserMaFileReqVO.getFile();
+        String path = appBindUserMaFileReqVO.getPassword();
+        steamService.bindMaFile(IoUtil.readBytes(file.getInputStream()),appBindUserMaFileReqVO.getPassword(),appBindUserMaFileReqVO.getBindUserId());
+        return success("成功");
     }
 
 }
