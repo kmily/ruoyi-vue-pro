@@ -25,7 +25,7 @@
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-biz-dict</artifactId>
-            <optional>true</optional> <!-- 如果希望使用 @DictFormat 注解，需要引入该依赖 -->
+<!--            <optional>true</optional> &lt;!&ndash; 如果希望使用 @DictFormat 注解，需要引入该依赖 &ndash;&gt;-->
         </dependency>
 
         <!-- Web 相关 -->
