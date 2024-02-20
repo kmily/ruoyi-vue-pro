@@ -61,7 +61,7 @@ public class SteamService {
      * @return
      * @throws Exception
      */
-    public int bind(OpenApi openApi) throws Exception {
+    public int bind(OpenApi openApi) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         // 校验OpenAPI  if
         verifyOpenApi(openApi);
@@ -73,7 +73,7 @@ public class SteamService {
                 .orderByDesc(BindUserDO::getId));
 
         if(bindUserDOS.size()>0){
-            throw new Exception("此帐号已经被绑定");
+            throw new ServiceException(-1,"此帐号已经被绑定");
         }
         BindUserDO bindUserDO=new BindUserDO().setUserId(loginUser.getId()).setUserType(loginUser.getUserType())
                 .setSteamId(steamId);
