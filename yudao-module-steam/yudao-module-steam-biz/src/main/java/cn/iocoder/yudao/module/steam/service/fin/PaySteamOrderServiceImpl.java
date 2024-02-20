@@ -1,6 +1,7 @@
-package cn.iocoder.yudao.module.steam.service.invorder;
+package cn.iocoder.yudao.module.steam.service.fin;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
@@ -11,8 +12,12 @@ import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.PaySteamOrderCreateReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal.WithdrawalDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
+import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -45,6 +50,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
      * 从 [支付管理 -> 应用信息] 里添加
      */
     private static final Long PAY_APP_ID = 9L;
+    private static final Long PAY_WITHDRAWAL_APP_ID = 10L;
 
 
     @Resource
@@ -54,10 +60,118 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
 
     @Resource
     private InvOrderMapper invOrderMapper;
+    @Resource
+    private WithdrawalMapper withdrawalMapper;
 
     public PaySteamOrderServiceImpl() {
     }
 
+    @Override
+    public Long createWithdrawalOrder(LoginUser loginUser, PayWithdrawalOrderCreateReqVO createReqVO) {
+        WithdrawalDO withdrawalDO=new WithdrawalDO().setPayStatus(false)
+                .setPrice(createReqVO.getAmount()).setUserId(loginUser.getId()).setUserType(loginUser.getUserType())
+                .setRefundPrice(0).setWithdrawalInfo(createReqVO.getWithdrawalInfo());
+        validateWithdrawalCanCreate(withdrawalDO);
+        withdrawalMapper.insert(withdrawalDO);
+        // 2.1 创建支付单
+        Long payOrderId = payOrderApi.createOrder(new PayOrderCreateReqDTO()
+                .setAppId(PAY_WITHDRAWAL_APP_ID).setUserIp(getClientIP()) // 支付应用
+                .setMerchantOrderId(withdrawalDO.getId().toString()) // 业务的订单编号
+                .setSubject("订单提现单号"+withdrawalDO.getId()).setBody("用户ID"+loginUser.getId()+"，提现金额"+withdrawalDO.getWithdrawalInfo()+"分").setPrice(withdrawalDO.getPrice()) // 价格信息
+                .setExpireTime(addTime(Duration.ofHours(2L)))); // 支付的过期时间
+        // 2.2 更新支付单到 demo 订单
+        withdrawalMapper.updateById(new WithdrawalDO().setId(withdrawalDO.getId())
+                .setPayOrderId(payOrderId));
+        // 返回
+        return withdrawalDO.getId();
+    }
+
+    private WithdrawalDO validateWithdrawalCanCreate(WithdrawalDO withdrawalDO) {
+        // 校验订单是否存在
+//        if (invOrderDO == null) {
+//            throw exception(DEMO_ORDER_NOT_FOUND);
+//        }
+        if (Objects.isNull(withdrawalDO.getUserId()) || withdrawalDO.getUserId()<=0) {
+            throw exception(ErrorCodeConstants.WITHDRAWAL_USER_EXCEPT);
+        }
+        if (Objects.isNull(withdrawalDO.getUserType()) || withdrawalDO.getUserType()<=0) {
+            throw exception(ErrorCodeConstants.WITHDRAWAL_USER_EXCEPT);
+        }
+        // 校验订单是否支付
+        if (withdrawalDO.getPrice()<0) {
+            throw exception(ErrorCodeConstants.WITHDRAWAL_AMOUNT_EXCEPT);
+        }
+        return withdrawalDO;
+    }
+    @Override
+    public void updateWithdrawalOrderPaid(Long id, Long payOrderId) {
+        // 校验并获得支付订单（可支付）
+        PayOrderRespDTO payOrder = validateWithdrawalOrderCanPaid(id, payOrderId);
+
+        // 更新 PayDemoOrderDO 状态为已支付
+        int updateCount = withdrawalMapper.updateByIdAndPayed(id, false,
+                new WithdrawalDO().setPayStatus(true).setPayTime(LocalDateTime.now())
+                        .setPayChannelCode(payOrder.getChannelCode()));
+        if (updateCount == 0) {
+            throw exception(DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
+        }
+    }
+
+    /**
+     * 校验交易订单满足被支付的条件
+     *
+     * 1. 交易订单未支付
+     * 2. 支付单已支付
+     *
+     * @param id 交易订单编号
+     * @param payOrderId 支付订单编号
+     * @return 交易订单
+     */
+    private PayOrderRespDTO validateWithdrawalOrderCanPaid(Long id, Long payOrderId) {
+        // 1.1 校验订单是否存在
+        WithdrawalDO withdrawalDO = withdrawalMapper.selectById(id);
+        if (withdrawalDO == null) {
+            throw exception(DEMO_ORDER_NOT_FOUND);
+        }
+        // 1.2 校验订单未支付
+        if (withdrawalDO.getPayStatus()) {
+            log.error("[validateDemoOrderCanPaid][order({}) 不处于待支付状态，请进行处理！order 数据是：{}]",
+                    id, toJsonString(withdrawalDO));
+            throw exception(DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
+        }
+        // 1.3 校验支付订单匹配
+        if (notEqual(withdrawalDO.getPayOrderId(), payOrderId)) { // 支付单号
+            log.error("[validateDemoOrderCanPaid][order({}) 支付单不匹配({})，请进行处理！order 数据是：{}]",
+                    id, payOrderId, toJsonString(withdrawalDO));
+            throw exception(DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR);
+        }
+
+        // 2.1 校验支付单是否存在
+        PayOrderRespDTO payOrder = payOrderApi.getOrder(payOrderId);
+        if (payOrder == null) {
+            log.error("[validateDemoOrderCanPaid][order({}) payOrder({}) 不存在，请进行处理！]", id, payOrderId);
+            throw exception(PAY_ORDER_NOT_FOUND);
+        }
+        // 2.2 校验支付单已支付
+        if (!PayOrderStatusEnum.isSuccess(payOrder.getStatus())) {
+            log.error("[validateDemoOrderCanPaid][order({}) payOrder({}) 未支付，请进行处理！payOrder 数据是：{}]",
+                    id, payOrderId, toJsonString(payOrder));
+            throw exception(DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_STATUS_NOT_SUCCESS);
+        }
+        // 2.3 校验支付金额一致
+        if (notEqual(payOrder.getPrice(), withdrawalDO.getPrice())) {
+            log.error("[validateDemoOrderCanPaid][order({}) payOrder({}) 支付金额不匹配，请进行处理！order 数据是：{}，payOrder 数据是：{}]",
+                    id, payOrderId, toJsonString(withdrawalDO), toJsonString(payOrder));
+            throw exception(DEMO_ORDER_UPDATE_PAID_FAIL_PAY_PRICE_NOT_MATCH);
+        }
+        // 2.4 校验支付订单匹配（二次）
+        if (notEqual(payOrder.getMerchantOrderId(), id.toString())) {
+            log.error("[validateDemoOrderCanPaid][order({}) 支付单不匹配({})，请进行处理！payOrder 数据是：{}]",
+                    id, payOrderId, toJsonString(payOrder));
+            throw exception(DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR);
+        }
+        return payOrder;
+    }
     @Override
     public Long createDemoOrder(Long userId, PaySteamOrderCreateReqVO createReqVO) {
         // 1.1 获得商品

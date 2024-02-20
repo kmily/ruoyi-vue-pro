@@ -47,4 +47,7 @@ public class WithdrawalSaveReqVO {
     @Schema(description = "提现金额", example = "25442")
     private Integer price;
 
+    @Schema(description = "提现信息")
+    private String withdrawalInfo;
+
 }

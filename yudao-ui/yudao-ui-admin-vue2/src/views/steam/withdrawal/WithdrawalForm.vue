@@ -38,6 +38,9 @@
                     <el-form-item label="提现金额" prop="price">
                       <el-input v-model="formData.price" placeholder="请输入提现金额" />
                     </el-form-item>
+                    <el-form-item label="提现信息" prop="withdrawalInfo">
+                      <el-input v-model="formData.withdrawalInfo" placeholder="请输入提现信息" />
+                    </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm" :disabled="formLoading">确 定</el-button>
@@ -74,6 +77,7 @@
                             refundPrice: undefined,
                             refundTime: undefined,
                             price: undefined,
+                            withdrawalInfo: undefined,
         },
         // 表单校验
         formRules: {
@@ -139,6 +143,7 @@
                             refundPrice: undefined,
                             refundTime: undefined,
                             price: undefined,
+                            withdrawalInfo: undefined,
         };
         this.resetForm("formRef");
       }

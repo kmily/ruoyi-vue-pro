@@ -71,5 +71,9 @@ public class WithdrawalDO extends BaseDO {
      * 提现金额
      */
     private Integer price;
+    /**
+     * 提现信息
+     */
+    private String withdrawalInfo;
 
 }

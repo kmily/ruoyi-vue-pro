@@ -38,4 +38,6 @@ public interface ErrorCodeConstants {
     ErrorCode INV_ORDER_NOT_EXISTS = new ErrorCode(1_100_009_01, "steam订单不存在");
     // ========== 提现
     ErrorCode WITHDRAWAL_NOT_EXISTS = new ErrorCode(1_100_010_01, "提现不存在");
+    ErrorCode WITHDRAWAL_AMOUNT_EXCEPT = new ErrorCode(1_100_010_02, "提现金额不正确");
+    ErrorCode WITHDRAWAL_USER_EXCEPT = new ErrorCode(1_100_010_03, "用户不存在");
 }

@@ -5,6 +5,7 @@ import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal.WithdrawalDO;
 import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.steam.controller.admin.withdrawal.vo.*;
@@ -32,5 +33,8 @@ public interface WithdrawalMapper extends BaseMapperX<WithdrawalDO> {
                 .betweenIfPresent(WithdrawalDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(WithdrawalDO::getId));
     }
-
+    default int updateByIdAndPayed(Long id, boolean wherePayed, WithdrawalDO updateObj) {
+        return update(updateObj, new LambdaQueryWrapperX<WithdrawalDO>()
+                .eq(WithdrawalDO::getId, id).eq(WithdrawalDO::getPayStatus, wherePayed));
+    }
 }
