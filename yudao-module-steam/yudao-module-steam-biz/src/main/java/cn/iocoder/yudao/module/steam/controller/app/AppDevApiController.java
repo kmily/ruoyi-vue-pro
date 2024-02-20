@@ -36,7 +36,6 @@ import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "steam后台 - devApi")
 @RestController
@@ -80,26 +79,28 @@ public class AppDevApiController {
     /**
      * 类别选择
      */
-    @GetMapping("/drop_list_quality")
+    @GetMapping("/drop_list")
+    @PermitAll
     @Operation(summary = "获取类别选择下拉信息")
-    public CommonResult<AppDropListRespVO> getQuality() {
+    public CommonResult<SelQualityPageReqVO> getQuality() {
         AppDropListRespVO appDropListRespVO = new AppDropListRespVO();
         SelQualityPageReqVO quality = new SelQualityPageReqVO();
         quality.setPageSize(200);
         quality.setPageNo(1);
         appDropListRespVO.setQuality(selQualityService.getSelQualityPage(quality).getList());
-        return CommonResult.success(appDropListRespVO);
+        return CommonResult.success(quality);
     }
 
     /**
      * 收藏品选择
      */
     @GetMapping("/drop_list_itemSet")
+    @PermitAll
     @Operation(summary = "获取收藏品选择下拉信息")
     public CommonResult<AppDropListRespVO> getItemSet() {
         AppDropListRespVO appDropListRespVO = new AppDropListRespVO();
-        SelItemsetListReqVO itemsetList = new SelItemsetListReqVO();
-        appDropListRespVO.setItemset(selItemsetService.getSelItemsetList(itemsetList));
+        SelItemsetListReqVO itemset = new SelItemsetListReqVO();
+        appDropListRespVO.setItemset(selItemsetService.getSelItemsetList(itemset));
         return CommonResult.success(appDropListRespVO);
     }
 
@@ -107,6 +108,7 @@ public class AppDevApiController {
      * 类型选择
      */
     @GetMapping("/drop_list_type")
+    @PermitAll
     @Operation(summary = "获取类型选择下拉信息")
     public CommonResult<AppDropListRespVO> getType() {
         AppDropListRespVO appDropListRespVO = new AppDropListRespVO();
@@ -121,6 +123,7 @@ public class AppDevApiController {
      * 品质选择
      */
     @GetMapping("/drop_list_rarity")
+    @PermitAll
     @Operation(summary = "获取品质选择下拉信息")
     public CommonResult<AppDropListRespVO> getRarity() {
         AppDropListRespVO appDropListRespVO = new AppDropListRespVO();
@@ -135,6 +138,7 @@ public class AppDevApiController {
      * 武器选择
      */
     @GetMapping("/drop_list_weapon")
+    @PermitAll
     @Operation(summary = "获取武器选择下拉信息")
     public CommonResult<AppDropListRespVO> getWeapon() {
         AppDropListRespVO appDropListRespVO = new AppDropListRespVO();
@@ -152,6 +156,7 @@ public class AppDevApiController {
      * 外观选择
      */
     @GetMapping("/drop_list_exterior")
+    @PermitAll
     @Operation(summary = "获取外观选择下拉信息")
     public CommonResult<AppDropListRespVO> getExterior() {
         AppDropListRespVO appDropListRespVO = new AppDropListRespVO();
@@ -161,6 +166,8 @@ public class AppDevApiController {
         appDropListRespVO.setExterior(selExteriorService.getSelExteriorPage(exterior).getList());
         return CommonResult.success(appDropListRespVO);
     }
+
+
     @GetMapping("/test")
 
     public CommonResult<String> test() {
