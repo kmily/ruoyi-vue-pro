@@ -35,4 +35,7 @@ public class BindUserSaveReqVO {
     @Schema(description = "steam密码")
     private String steamPassword;
 
+    @Schema(description = "maFile文件")
+    private String maFile;
+
 }

@@ -45,4 +45,8 @@ public class BindUserRespVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
+    @Schema(description = "maFile文件")
+    @ExcelProperty("maFile文件")
+    private String maFile;
+
 }

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.steam.service;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
@@ -10,8 +11,10 @@ import cn.iocoder.yudao.module.steam.controller.admin.binduser.vo.BindUserPageRe
 import cn.iocoder.yudao.module.steam.controller.admin.binduser.vo.BindUserSaveReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.invdesc.vo.InvDescPageReqVO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
+import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
@@ -43,22 +46,12 @@ public class SteamService {
     public void setConfigService(ConfigService configService) {
         this.configService = configService;
     }
-//
-    private BindUserService bindUserService;
-    @Autowired
-    public void setBindUserService(BindUserService bindUserService) {
-        this.bindUserService = bindUserService;
-    }
-
-
     @Resource
     private InvMapper invMapper;
     @Resource
     private InvDescMapper invDescMapper;
-//
-//    @Autowired
-
-//
+    @Resource
+    private BindUserMapper bindUserMapper;
 
     /**
      * 帐号绑定
@@ -67,24 +60,23 @@ public class SteamService {
      * @throws Exception
      */
     public int bind(OpenApi openApi) throws Exception {
-        Long userId = SecurityFrameworkUtils.getLoginUserId();
-//        Long userId = SecurityUtils.getUserId();
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         // 校验OpenAPI  if
         verifyOpenApi(openApi);
         String steamId = getSteamId(openApi.getIdentity());
-        BindUserPageReqVO bindUserPageReqVO=new BindUserPageReqVO();
-        bindUserPageReqVO.setSteamId(steamId);
-        bindUserPageReqVO.setUserId(userId);
+        List<BindUserDO> bindUserDOS = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+                .eqIfPresent(BindUserDO::getUserId, loginUser.getId())
+                .eqIfPresent(BindUserDO::getSteamId, steamId)
+                .eqIfPresent(BindUserDO::getUserType, loginUser.getUserType())
+                .orderByDesc(BindUserDO::getId));
 
-        long count = bindUserService.getBindUserPage(bindUserPageReqVO).getTotal();
-        if(count>0){
+        if(bindUserDOS.size()>0){
             throw new Exception("此帐号已经被绑定");
         }
-        BindUserSaveReqVO bindUserSaveReqVO=new BindUserSaveReqVO();
-        bindUserSaveReqVO.setUserId(userId);
-        bindUserSaveReqVO.setSteamId(steamId);
+        BindUserDO bindUserDO=new BindUserDO().setUserId(loginUser.getId()).setUserType(loginUser.getUserType())
+                .setSteamId(steamId);
 
-        return bindUserService.createBindUser(bindUserSaveReqVO);
+        return bindUserMapper.insert(bindUserDO);
     }
     /**
      * 验证用户是否已经被绑定

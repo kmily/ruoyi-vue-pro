@@ -1,9 +1,13 @@
 package cn.iocoder.yudao.module.steam.controller.app.binduser;
 
+import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
+import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FileUploadReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
+import cn.iocoder.yudao.module.infra.service.file.FileService;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
@@ -13,8 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
@@ -79,6 +85,19 @@ public class AppBindUserController {
 
         int bind = steamService.bind(openApi);
         return success(1);
+    }
+
+    @Resource
+    private FileService fileService;
+
+    @PostMapping("/upload/mafile")
+    @Operation(summary = "上传ma文件", description = "上传ma文件")
+    @PreAuthenticated
+    @OperateLog(logArgs = false) // 上传文件，没有记录操作日志的必要
+    public CommonResult<String> uploadFile(FileUploadReqVO uploadReqVO) throws Exception {
+        MultipartFile file = uploadReqVO.getFile();
+        String path = uploadReqVO.getPath();
+        return success(fileService.createFile(file.getOriginalFilename(), path, IoUtil.readBytes(file.getInputStream())));
     }
 
 }

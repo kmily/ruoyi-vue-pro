@@ -24,6 +24,9 @@
                     <el-form-item label="steam密码" prop="steamPassword">
                       <el-input v-model="formData.steamPassword" placeholder="请输入steam密码" />
                     </el-form-item>
+                    <el-form-item label="maFile文件">
+                      <FileUpload v-model="formData.maFile"/>
+                    </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm" :disabled="formLoading">确 定</el-button>
@@ -35,9 +38,11 @@
 
 <script>
   import * as BindUserApi from '@/api/steam/binduser';
+  import FileUpload from '@/components/FileUpload';
       export default {
     name: "BindUserForm",
     components: {
+          FileUpload,
                     },
     data() {
       return {
@@ -57,6 +62,7 @@
                             apiKey: undefined,
                             remark: undefined,
                             steamPassword: undefined,
+                            maFile: undefined,
         },
         // 表单校验
         formRules: {
@@ -118,6 +124,7 @@
                             apiKey: undefined,
                             remark: undefined,
                             steamPassword: undefined,
+                            maFile: undefined,
         };
         this.resetForm("formRef");
       }

@@ -26,6 +26,7 @@ public interface BindUserMapper extends BaseMapperX<BindUserDO> {
                 .eqIfPresent(BindUserDO::getApiKey, reqVO.getApiKey())
                 .eqIfPresent(BindUserDO::getRemark, reqVO.getRemark())
                 .betweenIfPresent(BindUserDO::getCreateTime, reqVO.getCreateTime())
+                .eqIfPresent(BindUserDO::getMaFile, reqVO.getMaFile())
                 .orderByDesc(BindUserDO::getId));
     }
 

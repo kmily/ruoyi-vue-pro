@@ -117,6 +117,7 @@ public class BindUserServiceImplTest extends BaseDbUnitTest {
            o.setApiKey(null);
            o.setRemark(null);
            o.setCreateTime(null);
+           o.setMaFile(null);
        });
        bindUserMapper.insert(dbBindUser);
        // 测试 steamName 不匹配
@@ -133,6 +134,8 @@ public class BindUserServiceImplTest extends BaseDbUnitTest {
        bindUserMapper.insert(cloneIgnoreId(dbBindUser, o -> o.setRemark(null)));
        // 测试 createTime 不匹配
        bindUserMapper.insert(cloneIgnoreId(dbBindUser, o -> o.setCreateTime(null)));
+       // 测试 maFile 不匹配
+       bindUserMapper.insert(cloneIgnoreId(dbBindUser, o -> o.setMaFile(null)));
        // 准备参数
        BindUserPageReqVO reqVO = new BindUserPageReqVO();
        reqVO.setSteamName(null);
@@ -142,6 +145,7 @@ public class BindUserServiceImplTest extends BaseDbUnitTest {
        reqVO.setApiKey(null);
        reqVO.setRemark(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
+       reqVO.setMaFile(null);
 
        // 调用
        PageResult<BindUserDO> pageResult = bindUserService.getBindUserPage(reqVO);

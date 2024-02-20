@@ -1,8 +1,5 @@
 package cn.iocoder.yudao.module.steam.dal.dataobject.binduser;
 
-import cn.iocoder.yudao.framework.mybatis.core.type.EncryptTypeHandler;
-import cn.iocoder.yudao.module.steam.service.steam.SteamMaFile;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 import java.util.*;
 import java.time.LocalDateTime;
@@ -15,7 +12,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
  *
  * @author 芋道源码
  */
-@TableName(value = "steam_bind_user",autoResultMap = true)
+@TableName("steam_bind_user")
 @KeySequence("steam_bind_user_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -55,14 +52,16 @@ public class BindUserDO extends BaseDO {
      */
     private String remark;
     /**
-     * maFile文件
-     */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private SteamMaFile maFile;
-    /**
      * steam密码
      */
-    @TableField(typeHandler = EncryptTypeHandler.class)
     private String steamPassword;
+    /**
+     * maFile文件
+     */
+    private String maFile;
+    /**
+     * 用户类型
+     */
+    private Integer userType;
 
 }

@@ -37,4 +37,7 @@ public class BindUserPageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
+    @Schema(description = "maFile文件")
+    private String maFile;
+
 }
