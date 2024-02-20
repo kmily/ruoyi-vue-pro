@@ -21,20 +21,8 @@
                     <el-form-item label="备注" prop="remark">
                       <el-input v-model="formData.remark" placeholder="请输入备注" />
                     </el-form-item>
-                    <el-form-item label="登录名称" prop="loginName">
-                      <el-input v-model="formData.loginName" placeholder="请输入登录名称" />
-                    </el-form-item>
-                    <el-form-item label="登录密码" prop="loginPassword">
-                      <el-input v-model="formData.loginPassword" placeholder="请输入登录密码" />
-                    </el-form-item>
-                    <el-form-item label="登录环" prop="loginSharedSecret">
-                      <el-input v-model="formData.loginSharedSecret" placeholder="请输入登录环" />
-                    </el-form-item>
-                    <el-form-item label="登录会话" prop="loginSession">
-                      <el-input v-model="formData.loginSession" placeholder="请输入登录会话" />
-                    </el-form-item>
-                    <el-form-item label="登录时间" prop="loginTime">
-                      <el-date-picker clearable v-model="formData.loginTime" type="date" value-format="timestamp" placeholder="选择登录时间" />
+                    <el-form-item label="steam密码" prop="steamPassword">
+                      <el-input v-model="formData.steamPassword" placeholder="请输入steam密码" />
                     </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
@@ -68,11 +56,7 @@
                             tradeUrl: undefined,
                             apiKey: undefined,
                             remark: undefined,
-                            loginName: undefined,
-                            loginPassword: undefined,
-                            loginSharedSecret: undefined,
-                            loginSession: undefined,
-                            loginTime: undefined,
+                            steamPassword: undefined,
         },
         // 表单校验
         formRules: {
@@ -133,11 +117,7 @@
                             tradeUrl: undefined,
                             apiKey: undefined,
                             remark: undefined,
-                            loginName: undefined,
-                            loginPassword: undefined,
-                            loginSharedSecret: undefined,
-                            loginSession: undefined,
-                            loginTime: undefined,
+                            steamPassword: undefined,
         };
         this.resetForm("formRef");
       }

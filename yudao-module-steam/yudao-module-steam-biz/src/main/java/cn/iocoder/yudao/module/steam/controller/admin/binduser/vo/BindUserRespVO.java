@@ -45,19 +45,4 @@ public class BindUserRespVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
-    @Schema(description = "登录名称", example = "赵六")
-    @ExcelProperty("登录名称")
-    private String loginName;
-    @Schema(description = "登录密码", example = "赵六")
-    @ExcelProperty("登录密码")
-    private String loginPassword;
-    @Schema(description = "登录环", example = "赵六")
-    @ExcelProperty("登录环")
-    private String loginSharedSecret;
-
-
-    @Schema(description = "登录会话", example = "赵六")
-    @ExcelProperty("登录会话")
-    private String loginSession;
-
 }
