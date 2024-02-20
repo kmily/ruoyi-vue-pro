@@ -67,7 +67,7 @@ public class AppDevApiController {
      * 类别选择
      */
     @PostMapping("/openapi")
-    @Operation(summary = "获取类别选择下拉信息")
+    @Operation(summary = "")
     public CommonResult<String> openApi(@RequestBody @Validated OpenApiReqVo openApi) {
         try {
             String despatch = openApiService.despatch(openApi);

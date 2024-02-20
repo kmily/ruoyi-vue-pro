@@ -41,7 +41,7 @@ public class AppDropListController {
     /**
      * 类别选择
      */
-    @GetMapping("/drop_list_quality")
+    @GetMapping("/quality")
     @Operation(summary = "获取类别选择下拉信息")
     public CommonResult<AppDropListRespVO> getQuality() {
         AppDropListRespVO appDropListRespVO = new AppDropListRespVO();
@@ -55,7 +55,7 @@ public class AppDropListController {
     /**
      * 收藏品选择
      */
-    @GetMapping("/drop_list_itemSet")
+    @GetMapping("/itemSet")
     @Operation(summary = "获取收藏品选择下拉信息")
     public CommonResult<AppDropListRespVO> getItemSet() {
         AppDropListRespVO appDropListRespVO = new AppDropListRespVO();
@@ -67,7 +67,7 @@ public class AppDropListController {
     /**
      * 类型选择
      */
-    @GetMapping("/drop_list_type")
+    @GetMapping("/type")
     @Operation(summary = "获取类型选择下拉信息")
     public CommonResult<AppDropListRespVO> getType() {
         AppDropListRespVO appDropListRespVO = new AppDropListRespVO();
@@ -81,7 +81,7 @@ public class AppDropListController {
     /**
      * 品质选择
      */
-    @GetMapping("/drop_list_rarity")
+    @GetMapping("/rarity")
     @Operation(summary = "获取品质选择下拉信息")
     public CommonResult<AppDropListRespVO> getRarity() {
         AppDropListRespVO appDropListRespVO = new AppDropListRespVO();
@@ -95,7 +95,7 @@ public class AppDropListController {
     /**
      * 武器选择  TODO
      */
-    @GetMapping("/drop_list_weapon")
+    @GetMapping("/weapon")
     @Operation(summary = "获取武器选择下拉信息")
     public CommonResult<AppDropListRespVO> getWeapon(Long typeId) {
         AppDropListRespVO appDropListRespVO = new AppDropListRespVO();
@@ -111,7 +111,7 @@ public class AppDropListController {
     /**
      * 外观选择
      */
-    @GetMapping("/drop_list_exterior")
+    @GetMapping("/exterior")
     @Operation(summary = "获取外观选择下拉信息")
     public CommonResult<AppDropListRespVO> getExterior() {
         AppDropListRespVO appDropListRespVO = new AppDropListRespVO();
