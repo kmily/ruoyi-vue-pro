@@ -20,7 +20,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.mysql.seltype.SelWeaponMapper;
 import cn.iocoder.yudao.module.steam.service.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.SteamService;
-import cn.iocoder.yudao.module.steam.service.invorder.PaySteamOrderService;
+import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.selexterior.SelExteriorService;
 import cn.iocoder.yudao.module.steam.service.selitemset.SelItemsetService;
 import cn.iocoder.yudao.module.steam.service.selquality.SelQualityService;
