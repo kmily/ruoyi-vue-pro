@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.steam.controller.app.binduser;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.steam.service.SteamService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -40,9 +42,8 @@ public class AppBindUserController {
     /**
      * 查询 steam用户绑定列表
      */
-    @PreAuthorize("@ss.hasPermi('steam:user:list')")
     @GetMapping("/openapi")
-    public void openApi(HttpServletResponse response) throws IOException {
+    public CommonResult<String> openApi(HttpServletResponse response) throws IOException {
         ConfigDO configByKey = configService.getConfigByKey("steam.host");
         ConfigDO siteConfig = configService.getConfigByKey("site.host");
         StringBuilder stringBuffer = new StringBuilder();
@@ -54,13 +55,14 @@ public class AppBindUserController {
         stringBuffer.append("&").append("openid.identity=").append(URLEncoder.encode("http://specs.openid.net/auth/2.0/identifier_select", "UTF8"));
         stringBuffer.append("&").append("openid.claimed_id=").append(URLEncoder.encode("http://specs.openid.net/auth/2.0/identifier_select", "UTF8"));
         stringBuffer.append("&").append("openid.mode=").append(URLEncoder.encode("checkid_setup", "UTF8"));
-        response.sendRedirect(stringBuffer.toString());
+        return success(stringBuffer.toString());
     }
     /**
      * 导出 steam用户绑定列表
      */
-    @PreAuthorize("@ss.hasPermi('steam:user:export')")
+//    @PreAuthorize("@ss.hasPermi('steam:user:export')")
     @Operation(summary = "steam用户绑定")
+    @PreAuthenticated
     @GetMapping("/openapi/back")
     public CommonResult<Integer> openApiBack(HttpServletRequest request) throws Exception {
         OpenApi openApi = new OpenApi();

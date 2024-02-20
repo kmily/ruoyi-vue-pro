@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.service;
 
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
@@ -17,8 +18,6 @@ import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,8 +25,10 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Steam相关接口
@@ -91,20 +92,9 @@ public class SteamService {
      * @return true 成功  false 失败
      * @throws UnsupportedEncodingException 异常
      */
-    public boolean verifyOpenApi(OpenApi openApi) throws Exception {
+    public boolean verifyOpenApi(OpenApi openApi) {
         try{
             ConfigDO configByKey = configService.getConfigByKey("steam.host");
-//            StringBuffer stringBuffer=new StringBuffer();
-//            stringBuffer.append("openid.ns=").append(URLEncoder.encode(openApi.getNs(),"UTF8"));
-//            stringBuffer.append("&").append("openid.mode=").append(URLEncoder.encode("check_authentication","UTF8"));
-//            stringBuffer.append("&").append("openid.op_endpoint=").append(URLEncoder.encode(openApi.getOpEndpoint(),"UTF8"));
-//            stringBuffer.append("&").append("openid.claimed_id=").append(URLEncoder.encode(openApi.getClaimedId(),"UTF8"));
-//            stringBuffer.append("&").append("openid.identity=").append(URLEncoder.encode(openApi.getIdentity(),"UTF8"));
-//            stringBuffer.append("&openid.return_to=").append(URLEncoder.encode(openApi.getReturnTo(),"utf-8"));
-//            stringBuffer.append("&").append("openid.response_nonce=").append(URLEncoder.encode(openApi.getResponseNonce(),"UTF8"));
-//            stringBuffer.append("&").append("openid.assoc_handle=").append(URLEncoder.encode(openApi.getAssocHandle(),"UTF8"));
-//            stringBuffer.append("&").append("openid.signed=").append(URLEncoder.encode(openApi.getSigned(),"UTF8"));
-//            stringBuffer.append("&").append("openid.sig=").append(URLEncoder.encode(openApi.getSig(),"UTF8"));
             HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
             builder.url(configByKey.getValue() + "/openid/login");
             builder.method(HttpUtil.Method.FORM);
@@ -122,14 +112,13 @@ public class SteamService {
             builder.form(post);
             HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
             String html = sent.html();
-//            String s = HttpUtils.sendSSLPost(configByKey.getValue() + "/openid/login", stringBuffer.toString());
             if(html.contains("is_valid:true")){
                 return true;
             }else{
-                throw new Exception("Steam openid 数据不正确");
+                throw new ServiceException(-1,"Steam openid 数据不正确");
             }
         }catch (Exception e){
-            throw new Exception("Steam openid 接口验证异常");
+            throw new ServiceException(-1,"Steam openid 接口验证异常");
         }
     }
 
