@@ -20,7 +20,7 @@ public interface InvService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Integer createInv(@Valid InvSaveReqVO createReqVO);
+    Long createInv(@Valid InvSaveReqVO createReqVO);
 
     /**
      * 更新用户库存储
@@ -34,7 +34,7 @@ public interface InvService {
      *
      * @param id 编号
      */
-    void deleteInv(Integer id);
+    void deleteInv(Long id);
 
     /**
      * 获得用户库存储
@@ -42,7 +42,7 @@ public interface InvService {
      * @param id 编号
      * @return 用户库存储
      */
-    InvDO getInv(Integer id);
+    InvDO getInv(Long id);
 
     /**
      * 获得用户库存储分页

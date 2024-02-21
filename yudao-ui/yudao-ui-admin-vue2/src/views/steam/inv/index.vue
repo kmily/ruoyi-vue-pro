@@ -2,9 +2,6 @@
   <div class="app-container">
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="appid" prop="appid">
-        <el-input v-model="queryParams.appid" placeholder="请输入appid" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
       <el-form-item label="assetid" prop="assetid">
         <el-input v-model="queryParams.assetid" placeholder="请输入assetid" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
@@ -38,6 +35,20 @@
           <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
+      <el-form-item label="csgoid" prop="appid">
+        <el-input v-model="queryParams.appid" placeholder="请输入csgoid" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="用户ID" prop="userId">
+        <el-input v-model="queryParams.userId" placeholder="请输入用户ID" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="用户类型" prop="userType">
+        <el-select v-model="queryParams.userType" placeholder="请选择用户类型" clearable size="small">
+          <el-option label="请选择字典生成" value="" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="绑定用户ID" prop="bindUserId">
+        <el-input v-model="queryParams.bindUserId" placeholder="请输入绑定用户ID" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -58,9 +69,7 @@
     </el-row>
 
             <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
-            <el-table-column label="Primary Key" align="center" prop="id" />
-      <el-table-column label="appid" align="center" prop="appid" />
-      <el-table-column label="assetid" align="center" prop="assetid" />
+            <el-table-column label="assetid" align="center" prop="assetid" />
       <el-table-column label="classid" align="center" prop="classid" />
       <el-table-column label="instanceid" align="center" prop="instanceid" />
       <el-table-column label="amount" align="center" prop="amount" />
@@ -77,6 +86,11 @@
       </el-table-column>
       <el-table-column label="出售价格单价分" align="center" prop="price" />
       <el-table-column label="发货状态" align="center" prop="transferStatus" />
+      <el-table-column label="Primary Key" align="center" prop="id" />
+      <el-table-column label="csgoid" align="center" prop="appid" />
+      <el-table-column label="用户ID" align="center" prop="userId" />
+      <el-table-column label="用户类型" align="center" prop="userType" />
+      <el-table-column label="绑定用户ID" align="center" prop="bindUserId" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
@@ -124,7 +138,6 @@ export default {
       queryParams: {
                     pageNo: 1,
             pageSize: 10,
-        appid: null,
         assetid: null,
         classid: null,
         instanceid: null,
@@ -134,6 +147,10 @@ export default {
         status: null,
         price: null,
         transferStatus: null,
+        appid: null,
+        userId: null,
+        userType: null,
+        bindUserId: null,
       },
             };
   },

@@ -15,14 +15,6 @@ import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 @ExcelIgnoreUnannotated
 public class InvRespVO {
 
-    @Schema(description = "Primary Key", requiredMode = Schema.RequiredMode.REQUIRED, example = "22623")
-    @ExcelProperty("Primary Key")
-    private Integer id;
-
-    @Schema(description = "appid", example = "13212")
-    @ExcelProperty("appid")
-    private Integer appid;
-
     @Schema(description = "assetid", example = "7883")
     @ExcelProperty("assetid")
     private String assetid;
@@ -59,5 +51,25 @@ public class InvRespVO {
     @Schema(description = "发货状态", example = "2")
     @ExcelProperty("发货状态")
     private Integer transferStatus;
+
+    @Schema(description = "Primary Key", requiredMode = Schema.RequiredMode.REQUIRED, example = "10811")
+    @ExcelProperty("Primary Key")
+    private Long id;
+
+    @Schema(description = "csgoid", example = "6292")
+    @ExcelProperty("csgoid")
+    private Integer appid;
+
+    @Schema(description = "用户ID", example = "187")
+    @ExcelProperty("用户ID")
+    private Long userId;
+
+    @Schema(description = "用户类型", example = "2")
+    @ExcelProperty("用户类型")
+    private Integer userType;
+
+    @Schema(description = "绑定用户ID", example = "19319")
+    @ExcelProperty("绑定用户ID")
+    private Long bindUserId;
 
 }

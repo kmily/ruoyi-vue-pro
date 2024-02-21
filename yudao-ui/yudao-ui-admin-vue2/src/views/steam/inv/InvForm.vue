@@ -3,9 +3,6 @@
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="45%" v-dialogDrag append-to-body>
       <el-form ref="formRef" :model="formData" :rules="formRules" v-loading="formLoading" label-width="100px">
-                    <el-form-item label="appid" prop="appid">
-                      <el-input v-model="formData.appid" placeholder="请输入appid" />
-                    </el-form-item>
                     <el-form-item label="assetid" prop="assetid">
                       <el-input v-model="formData.assetid" placeholder="请输入assetid" />
                     </el-form-item>
@@ -35,6 +32,20 @@
                             <el-radio label="1">请选择字典生成</el-radio>
                       </el-radio-group>
                     </el-form-item>
+                    <el-form-item label="csgoid" prop="appid">
+                      <el-input v-model="formData.appid" placeholder="请输入csgoid" />
+                    </el-form-item>
+                    <el-form-item label="用户ID" prop="userId">
+                      <el-input v-model="formData.userId" placeholder="请输入用户ID" />
+                    </el-form-item>
+                    <el-form-item label="用户类型" prop="userType">
+                      <el-select v-model="formData.userType" placeholder="请选择用户类型">
+                            <el-option label="请选择字典生成" value="" />
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item label="绑定用户ID" prop="bindUserId">
+                      <el-input v-model="formData.bindUserId" placeholder="请输入绑定用户ID" />
+                    </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm" :disabled="formLoading">确 定</el-button>
@@ -60,8 +71,6 @@
         formLoading: false,
         // 表单参数
         formData: {
-                            id: undefined,
-                            appid: undefined,
                             assetid: undefined,
                             classid: undefined,
                             instanceid: undefined,
@@ -70,6 +79,12 @@
                             status: undefined,
                             price: undefined,
                             transferStatus: undefined,
+                            id: undefined,
+                            appid: undefined,
+                            tenantId: undefined,
+                            userId: undefined,
+                            userType: undefined,
+                            bindUserId: undefined,
         },
         // 表单校验
         formRules: {
@@ -122,8 +137,6 @@
                       /** 表单重置 */
       reset() {
         this.formData = {
-                            id: undefined,
-                            appid: undefined,
                             assetid: undefined,
                             classid: undefined,
                             instanceid: undefined,
@@ -132,6 +145,12 @@
                             status: undefined,
                             price: undefined,
                             transferStatus: undefined,
+                            id: undefined,
+                            appid: undefined,
+                            tenantId: undefined,
+                            userId: undefined,
+                            userType: undefined,
+                            bindUserId: undefined,
         };
         this.resetForm("formRef");
       }

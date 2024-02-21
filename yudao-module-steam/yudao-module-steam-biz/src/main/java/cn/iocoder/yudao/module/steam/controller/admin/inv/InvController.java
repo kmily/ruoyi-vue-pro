@@ -41,7 +41,7 @@ public class InvController {
     @PostMapping("/create")
     @Operation(summary = "创建用户库存储")
     @PreAuthorize("@ss.hasPermission('steam:inv:create')")
-    public CommonResult<Integer> createInv(@Valid @RequestBody InvSaveReqVO createReqVO) {
+    public CommonResult<Long> createInv(@Valid @RequestBody InvSaveReqVO createReqVO) {
         return success(invService.createInv(createReqVO));
     }
 
@@ -57,7 +57,7 @@ public class InvController {
     @Operation(summary = "删除用户库存储")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('steam:inv:delete')")
-    public CommonResult<Boolean> deleteInv(@RequestParam("id") Integer id) {
+    public CommonResult<Boolean> deleteInv(@RequestParam("id") Long id) {
         invService.deleteInv(id);
         return success(true);
     }
@@ -66,7 +66,7 @@ public class InvController {
     @Operation(summary = "获得用户库存储")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('steam:inv:query')")
-    public CommonResult<InvRespVO> getInv(@RequestParam("id") Integer id) {
+    public CommonResult<InvRespVO> getInv(@RequestParam("id") Long id) {
         InvDO inv = invService.getInv(id);
         return success(BeanUtils.toBean(inv, InvRespVO.class));
     }

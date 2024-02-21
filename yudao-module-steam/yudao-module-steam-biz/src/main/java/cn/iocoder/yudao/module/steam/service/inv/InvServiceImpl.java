@@ -30,7 +30,7 @@ public class InvServiceImpl implements InvService {
     private InvMapper invMapper;
 
     @Override
-    public Integer createInv(InvSaveReqVO createReqVO) {
+    public Long createInv(InvSaveReqVO createReqVO) {
         // 插入
         InvDO inv = BeanUtils.toBean(createReqVO, InvDO.class);
         invMapper.insert(inv);
@@ -48,21 +48,21 @@ public class InvServiceImpl implements InvService {
     }
 
     @Override
-    public void deleteInv(Integer id) {
+    public void deleteInv(Long id) {
         // 校验存在
         validateInvExists(id);
         // 删除
         invMapper.deleteById(id);
     }
 
-    private void validateInvExists(Integer id) {
+    private void validateInvExists(Long id) {
         if (invMapper.selectById(id) == null) {
             throw exception(INV_NOT_EXISTS);
         }
     }
 
     @Override
-    public InvDO getInv(Integer id) {
+    public InvDO getInv(Long id) {
         return invMapper.selectById(id);
     }
 

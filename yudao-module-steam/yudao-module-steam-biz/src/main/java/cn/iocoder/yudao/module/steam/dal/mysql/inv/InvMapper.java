@@ -19,7 +19,6 @@ public interface InvMapper extends BaseMapperX<InvDO> {
 
     default PageResult<InvDO> selectPage(InvPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<InvDO>()
-                .eqIfPresent(InvDO::getAppid, reqVO.getAppid())
                 .eqIfPresent(InvDO::getAssetid, reqVO.getAssetid())
                 .eqIfPresent(InvDO::getClassid, reqVO.getClassid())
                 .eqIfPresent(InvDO::getInstanceid, reqVO.getInstanceid())
@@ -29,6 +28,10 @@ public interface InvMapper extends BaseMapperX<InvDO> {
                 .eqIfPresent(InvDO::getStatus, reqVO.getStatus())
                 .eqIfPresent(InvDO::getPrice, reqVO.getPrice())
                 .eqIfPresent(InvDO::getTransferStatus, reqVO.getTransferStatus())
+                .eqIfPresent(InvDO::getAppid, reqVO.getAppid())
+                .eqIfPresent(InvDO::getUserId, reqVO.getUserId())
+                .eqIfPresent(InvDO::getUserType, reqVO.getUserType())
+                .eqIfPresent(InvDO::getBindUserId, reqVO.getBindUserId())
                 .orderByDesc(InvDO::getId));
     }
 

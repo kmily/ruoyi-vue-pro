@@ -15,9 +15,6 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class InvPageReqVO extends PageParam {
 
-    @Schema(description = "appid", example = "13212")
-    private Integer appid;
-
     @Schema(description = "assetid", example = "7883")
     private String assetid;
 
@@ -45,5 +42,17 @@ public class InvPageReqVO extends PageParam {
 
     @Schema(description = "发货状态", example = "2")
     private Integer transferStatus;
+
+    @Schema(description = "csgoid", example = "6292")
+    private Integer appid;
+
+    @Schema(description = "用户ID", example = "187")
+    private Long userId;
+
+    @Schema(description = "用户类型", example = "2")
+    private Integer userType;
+
+    @Schema(description = "绑定用户ID", example = "19319")
+    private Long bindUserId;
 
 }

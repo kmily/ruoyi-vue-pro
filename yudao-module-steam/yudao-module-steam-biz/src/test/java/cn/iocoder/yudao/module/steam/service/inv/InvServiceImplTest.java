@@ -48,7 +48,7 @@ public class InvServiceImplTest extends BaseDbUnitTest {
         InvSaveReqVO createReqVO = randomPojo(InvSaveReqVO.class).setId(null);
 
         // 调用
-        Integer invId = invService.createInv(createReqVO);
+        Long invId = invService.createInv(createReqVO);
         // 断言
         assertNotNull(invId);
         // 校验记录的属性是否正确
@@ -88,7 +88,7 @@ public class InvServiceImplTest extends BaseDbUnitTest {
         InvDO dbInv = randomPojo(InvDO.class);
         invMapper.insert(dbInv);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        Integer id = dbInv.getId();
+        Long id = dbInv.getId();
 
         // 调用
         invService.deleteInv(id);
@@ -99,7 +99,7 @@ public class InvServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testDeleteInv_notExists() {
         // 准备参数
-        Integer id = 1;
+        Long id = randomLongId();
 
         // 调用, 并断言异常
         assertServiceException(() -> invService.deleteInv(id), INV_NOT_EXISTS);
@@ -110,7 +110,6 @@ public class InvServiceImplTest extends BaseDbUnitTest {
     public void testGetInvPage() {
        // mock 数据
        InvDO dbInv = randomPojo(InvDO.class, o -> { // 等会查询到
-           o.setAppid(null);
            o.setAssetid(null);
            o.setClassid(null);
            o.setInstanceid(null);
@@ -120,10 +119,12 @@ public class InvServiceImplTest extends BaseDbUnitTest {
            o.setStatus(null);
            o.setPrice(null);
            o.setTransferStatus(null);
+           o.setAppid(null);
+           o.setUserId(null);
+           o.setUserType(null);
+           o.setBindUserId(null);
        });
        invMapper.insert(dbInv);
-       // 测试 appid 不匹配
-       invMapper.insert(cloneIgnoreId(dbInv, o -> o.setAppid(null)));
        // 测试 assetid 不匹配
        invMapper.insert(cloneIgnoreId(dbInv, o -> o.setAssetid(null)));
        // 测试 classid 不匹配
@@ -142,9 +143,16 @@ public class InvServiceImplTest extends BaseDbUnitTest {
        invMapper.insert(cloneIgnoreId(dbInv, o -> o.setPrice(null)));
        // 测试 transferStatus 不匹配
        invMapper.insert(cloneIgnoreId(dbInv, o -> o.setTransferStatus(null)));
+       // 测试 appid 不匹配
+       invMapper.insert(cloneIgnoreId(dbInv, o -> o.setAppid(null)));
+       // 测试 userId 不匹配
+       invMapper.insert(cloneIgnoreId(dbInv, o -> o.setUserId(null)));
+       // 测试 userType 不匹配
+       invMapper.insert(cloneIgnoreId(dbInv, o -> o.setUserType(null)));
+       // 测试 bindUserId 不匹配
+       invMapper.insert(cloneIgnoreId(dbInv, o -> o.setBindUserId(null)));
        // 准备参数
        InvPageReqVO reqVO = new InvPageReqVO();
-       reqVO.setAppid(null);
        reqVO.setAssetid(null);
        reqVO.setClassid(null);
        reqVO.setInstanceid(null);
@@ -154,6 +162,10 @@ public class InvServiceImplTest extends BaseDbUnitTest {
        reqVO.setStatus(null);
        reqVO.setPrice(null);
        reqVO.setTransferStatus(null);
+       reqVO.setAppid(null);
+       reqVO.setUserId(null);
+       reqVO.setUserType(null);
+       reqVO.setBindUserId(null);
 
        // 调用
        PageResult<InvDO> pageResult = invService.getInvPage(reqVO);
