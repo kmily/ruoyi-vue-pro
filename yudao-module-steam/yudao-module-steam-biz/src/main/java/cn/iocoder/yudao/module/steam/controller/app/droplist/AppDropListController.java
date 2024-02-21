@@ -122,9 +122,4 @@ public class AppDropListController {
         return CommonResult.success(appDropListRespVO);
     }
 
-
-
-
-
-
 }
