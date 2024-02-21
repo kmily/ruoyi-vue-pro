@@ -68,4 +68,8 @@ public class InvOrderRespVO {
     @ExcelProperty("购买的steamId")
     private String steamId;
 
+    @Schema(description = "用户类型", example = "2")
+    @ExcelProperty("用户类型")
+    private Integer userType;
+
 }

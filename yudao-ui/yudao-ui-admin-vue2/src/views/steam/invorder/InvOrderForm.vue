@@ -39,6 +39,11 @@
                     <el-form-item label="购买的steamId" prop="steamId">
                       <el-input v-model="formData.steamId" placeholder="请输入购买的steamId" />
                     </el-form-item>
+                    <el-form-item label="用户类型" prop="userType">
+                      <el-select v-model="formData.userType" placeholder="请选择用户类型">
+                            <el-option label="请选择字典生成" value="" />
+                      </el-select>
+                    </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm" :disabled="formLoading">确 定</el-button>
@@ -76,6 +81,7 @@
                             price: undefined,
                             invId: undefined,
                             steamId: undefined,
+                            userType: undefined,
         },
         // 表单校验
         formRules: {
@@ -144,6 +150,7 @@
                             price: undefined,
                             invId: undefined,
                             steamId: undefined,
+                            userType: undefined,
         };
         this.resetForm("formRef");
       }

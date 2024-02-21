@@ -27,4 +27,7 @@ public class InvOrderPageReqVO extends PageParam {
     @Schema(description = "购买的steamId", example = "20776")
     private String steamId;
 
+    @Schema(description = "用户类型", example = "2")
+    private Integer userType;
+
 }
