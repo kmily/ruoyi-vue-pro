@@ -45,12 +45,17 @@ public interface ErrorCodeConstants {
     ErrorCode INVORDER_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID = new ErrorCode(1_100_011_04, "订单不是【未支付】状态");
 
 
-    ErrorCode INVORDER_ORDER_NOT_FOUND = new ErrorCode(1_007_900_000, "示例订单不存在");
+    ErrorCode INVORDER_ORDER_NOT_FOUND = new ErrorCode(1_007_900_000, "订单不存在");
+    ErrorCode INVORDER_ORDER_REFUND_FAIL_NOT_PAID = new ErrorCode(1_007_900_005, "发起退款失败，订单未支付");
+    ErrorCode INVORDER_ORDER_REFUND_FAIL_REFUNDED = new ErrorCode(1_007_900_006, "发起退款失败，订单已退款");
     ErrorCode INVORDER_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR = new ErrorCode(1_007_900_002, "更新支付状态失败，支付单编号不匹配");
     ErrorCode INVORDER_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_STATUS_NOT_SUCCESS = new ErrorCode(1_007_900_003, "示例订单更新支付状态失败，支付单状态不是【支付成功】状态");
     ErrorCode INVORDER_ORDER_UPDATE_PAID_FAIL_PAY_PRICE_NOT_MATCH = new ErrorCode(1_007_900_004, "更新支付状态失败，支付单金额不匹配");
 
 
-
+    ErrorCode INVORDER_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR = new ErrorCode(1_007_900_009, "发起退款失败，退款单编号不匹配");
+    ErrorCode INVORDER_ORDER_REFUND_FAIL_REFUND_NOT_FOUND = new ErrorCode(1_007_900_007, "发起退款失败，退款订单不存在");
+    ErrorCode INVORDER_ORDER_REFUND_FAIL_REFUND_PRICE_NOT_MATCH = new ErrorCode(1_007_900_010, "发起退款失败，退款单金额不匹配");
+    ErrorCode INVORDER_ORDER_REFUND_FAIL_REFUND_NOT_SUCCESS = new ErrorCode(1_007_900_008, "发起退款失败，退款订单未退款成功");
 
 }

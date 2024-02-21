@@ -235,7 +235,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     @Override
     public void updateInvOrderPaid(Long id, Long payOrderId) {
         // 校验并获得支付订单（可支付）
-        PayOrderRespDTO payOrder = validateDemoOrderCanPaid(id, payOrderId);
+        PayOrderRespDTO payOrder = validateInvOrderCanPaid(id, payOrderId);
 
         // 更新 PayDemoOrderDO 状态为已支付
         int updateCount = invOrderMapper.updateByIdAndPayed(id, false,
@@ -256,7 +256,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
      * @param payOrderId 支付订单编号
      * @return 交易订单
      */
-    private PayOrderRespDTO validateDemoOrderCanPaid(Long id, Long payOrderId) {
+    private PayOrderRespDTO validateInvOrderCanPaid(Long id, Long payOrderId) {
         // 1.1 校验订单是否存在
         InvOrderDO invOrderDO = invOrderMapper.selectById(id);
         if (invOrderDO == null) {
@@ -305,7 +305,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     @Override
     public void refundInvOrder(Long id, String userIp) {
         // 1. 校验订单是否可以退款
-        InvOrderDO invOrderDO = validateDemoOrderCanRefund(id);
+        InvOrderDO invOrderDO = validateInvOrderCanRefund(id);
 
         // 2.1 生成退款单号
         // 一般来说，用户发起退款的时候，都会单独插入一个售后维权表，然后使用该表的 id 作为 refundId
@@ -322,19 +322,19 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 .setPayRefundId(payRefundId).setRefundPrice(invOrderDO.getPrice()));
     }
 
-    private InvOrderDO validateDemoOrderCanRefund(Long id) {
+    private InvOrderDO validateInvOrderCanRefund(Long id) {
         // 校验订单是否存在
         InvOrderDO invOrderDO = invOrderMapper.selectById(id);
         if (invOrderDO == null) {
-            throw exception(DEMO_ORDER_NOT_FOUND);
+            throw exception(ErrorCodeConstants.INVORDER_ORDER_NOT_FOUND);
         }
         // 校验订单是否支付
         if (!invOrderDO.getPayStatus()) {
-            throw exception(DEMO_ORDER_REFUND_FAIL_NOT_PAID);
+            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_NOT_PAID);
         }
         // 校验订单是否已退款
         if (invOrderDO.getPayRefundId() != null) {
-            throw exception(DEMO_ORDER_REFUND_FAIL_REFUNDED);
+            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUNDED);
         }
         return invOrderDO;
     }
@@ -342,45 +342,45 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     @Override
     public void updateInvOrderRefunded(Long id, Long payRefundId) {
         // 1. 校验并获得退款订单（可退款）
-        PayRefundRespDTO payRefund = validateDemoOrderCanRefunded(id, payRefundId);
+        PayRefundRespDTO payRefund = validateInvOrderCanRefunded(id, payRefundId);
         // 2.2 更新退款单到 demo 订单
         invOrderMapper.updateById(new InvOrderDO().setId(id)
                 .setRefundTime(payRefund.getSuccessTime()));
     }
 
-    private PayRefundRespDTO validateDemoOrderCanRefunded(Long id, Long payRefundId) {
+    private PayRefundRespDTO validateInvOrderCanRefunded(Long id, Long payRefundId) {
         // 1.1 校验示例订单
         InvOrderDO invOrderDO = invOrderMapper.selectById(id);
         if (invOrderDO == null) {
-            throw exception(DEMO_ORDER_NOT_FOUND);
+            throw exception(ErrorCodeConstants.INVORDER_ORDER_NOT_FOUND);
         }
         // 1.2 校验退款订单匹配
         if (Objects.equals(invOrderDO.getPayRefundId(), payRefundId)) {
             log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！order 数据是：{}]",
                     id, payRefundId, toJsonString(invOrderDO));
-            throw exception(DEMO_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
+            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
         }
 
         // 2.1 校验退款订单
         PayRefundRespDTO payRefund = payRefundApi.getRefund(payRefundId);
         if (payRefund == null) {
-            throw exception(DEMO_ORDER_REFUND_FAIL_REFUND_NOT_FOUND);
+            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_NOT_FOUND);
         }
         // 2.2
         if (!PayRefundStatusEnum.isSuccess(payRefund.getStatus())) {
-            throw exception(DEMO_ORDER_REFUND_FAIL_REFUND_NOT_SUCCESS);
+            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_NOT_SUCCESS);
         }
         // 2.3 校验退款金额一致
         if (notEqual(payRefund.getRefundPrice(), invOrderDO.getPrice())) {
             log.error("[validateDemoOrderCanRefunded][order({}) payRefund({}) 退款金额不匹配，请进行处理！order 数据是：{}，payRefund 数据是：{}]",
                     id, payRefundId, toJsonString(invOrderDO), toJsonString(payRefund));
-            throw exception(DEMO_ORDER_REFUND_FAIL_REFUND_PRICE_NOT_MATCH);
+            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_PRICE_NOT_MATCH);
         }
         // 2.4 校验退款订单匹配（二次）
         if (notEqual(payRefund.getMerchantOrderId(), id.toString())) {
             log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！payRefund 数据是：{}]",
                     id, payRefundId, toJsonString(payRefund));
-            throw exception(DEMO_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
+            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
         }
         return payRefund;
     }
