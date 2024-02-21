@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.infra.service.file.FileService;
 import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppBindUserMaFileReqVO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
@@ -29,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -87,7 +89,13 @@ public class AppBindUserController {
         int bind = steamService.bind(openApi);
         return success(1);
     }
-
+    @PostMapping("/steam/list")
+    @Operation(summary = "上传ma文件", description = "上传ma文件")
+    @PreAuthenticated
+    @OperateLog(logArgs = false) // 上传文件，没有记录操作日志的必要
+    public CommonResult<List<BindUserDO>> steamList(){
+        return success(steamService.steamList());
+    }
     @Resource
     private FileService fileService;
 
