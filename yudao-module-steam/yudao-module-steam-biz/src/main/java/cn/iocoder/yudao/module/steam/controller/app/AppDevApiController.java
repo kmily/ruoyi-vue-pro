@@ -82,13 +82,13 @@ public class AppDevApiController {
     @GetMapping("/drop_list_quality")
     @PermitAll
     @Operation(summary = "获取类别选择下拉信息")
-    public CommonResult<SelQualityPageReqVO> getQuality() {
+    public CommonResult<AppDropListRespVO> getQuality() {
         AppDropListRespVO appDropListRespVO = new AppDropListRespVO();
         SelQualityPageReqVO quality = new SelQualityPageReqVO();
         quality.setPageSize(200);
         quality.setPageNo(1);
         appDropListRespVO.setQuality(selQualityService.getSelQualityPage(quality).getList());
-        return CommonResult.success(quality);
+        return CommonResult.success(appDropListRespVO);
     }
 
     /**
