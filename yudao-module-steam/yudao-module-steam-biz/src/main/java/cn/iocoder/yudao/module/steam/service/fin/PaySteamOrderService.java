@@ -33,11 +33,11 @@ public interface PaySteamOrderService {
     /**
      * 创建示例订单
      *
-     * @param userId      用户编号
+     * @param loginUser      用户
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createDemoOrder(Long userId, @Valid PaySteamOrderCreateReqVO createReqVO);
+    Long createInvOrder(LoginUser loginUser, @Valid PaySteamOrderCreateReqVO createReqVO);
 
     /**
      * 获得示例订单

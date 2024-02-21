@@ -177,46 +177,4 @@ public class AppDevApiController {
 
         return success("test");
     }
-    @PostMapping("/testOrder")
-    @Operation(summary = "创建示例订单")
-    @PermitAll
-    public CommonResult<Long> createDemoOrder(@Valid @RequestBody PayDemoOrderCreateReqVO createReqVO) {
-        TenantUtils.execute(1l,()->{
-            PaySteamOrderCreateReqVO paySteamOrderCreateReqVO=new PaySteamOrderCreateReqVO();
-            paySteamOrderCreateReqVO.setPrice(200);
-            paySteamOrderCreateReqVO.setAssetId("35644141857");
-            paySteamOrderCreateReqVO.setClassId("3035569977");
-            paySteamOrderCreateReqVO.setInstanceId("302028390");
-            paySteamOrderCreateReqVO.setName("测试商品");
-            Long demoOrder = payDemoOrderService.createDemoOrder(1l, paySteamOrderCreateReqVO);
-            return CommonResult.success(demoOrder);
-        });
-        return CommonResult.error(-1,"出错");
-    }
-    @PostMapping("/update-paid")
-    @Operation(summary = "更新示例订单为已支付") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
-    @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
-    @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
-    public CommonResult<Boolean> updateDemoOrderPaid(@RequestBody PayOrderNotifyReqDTO notifyReqDTO) {
-        payDemoOrderService.updateDemoOrderPaid(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
-                notifyReqDTO.getPayOrderId());
-        return success(true);
-    }
-    @PostMapping("/update-refunded")
-    @Operation(summary = "更新示例订单为已退款") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
-    @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
-    @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
-    public CommonResult<Boolean> updateDemoOrderRefunded(@RequestBody PayRefundNotifyReqDTO notifyReqDTO) {
-        payDemoOrderService.updateDemoOrderRefunded(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
-                notifyReqDTO.getPayRefundId());
-        return success(true);
-    }
-    @PostMapping("/refundDemoOrder")
-    @Operation(summary = "更新示例订单为已支付") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
-    @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
-    @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
-    public CommonResult<Boolean> refundDemoOrder(@RequestParam("id") Long id) {
-        payDemoOrderService.refundDemoOrder(id, ServletUtils.getClientIP());
-        return success(true);
-    }
 }
