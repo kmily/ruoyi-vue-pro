@@ -159,6 +159,13 @@ public class SteamService {
     private String getSteamId(String identity){
         return identity.replace("https://steamcommunity.com/openid/id/","");
     }
+
+    /**
+     *  获取steam库存信息 跟新库存表
+     * @param steamId
+     * @param appId
+     * @return
+     */
     public InventoryDto fetchInventory(String steamId, String appId){
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.method(HttpUtil.Method.GET).url("https://steamcommunity.com/inventory/:steamId/:app/2?l=schinese&count=1000");
