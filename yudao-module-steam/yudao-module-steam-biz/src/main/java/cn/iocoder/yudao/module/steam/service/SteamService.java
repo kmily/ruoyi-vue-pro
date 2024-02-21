@@ -7,8 +7,6 @@ import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
-import cn.iocoder.yudao.module.steam.controller.admin.binduser.vo.BindUserPageReqVO;
-import cn.iocoder.yudao.module.steam.controller.admin.binduser.vo.BindUserSaveReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.invdesc.vo.InvDescPageReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
@@ -17,7 +15,6 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
-import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
 import cn.iocoder.yudao.module.steam.service.steam.SteamMaFile;
@@ -86,6 +83,10 @@ public class SteamService {
         List<BindUserDO> bindUserDOS = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                 .eqIfPresent(BindUserDO::getUserId, loginUser.getId())
                 .orderByDesc(BindUserDO::getId));
+        for(BindUserDO bindUserDO:bindUserDOS){
+            bindUserDO.setSteamPassword(Objects.isNull(bindUserDO.getSteamPassword())?"0":"1");
+            bindUserDO.setMaFile(null);
+        }
         return bindUserDOS;
     }
     public void bindMaFile(byte[] maFileJsonByte,String password,Integer bindUserId){
