@@ -79,7 +79,7 @@ public class AppDevApiController {
     /**
      * 类别选择
      */
-    @GetMapping("/drop_list")
+    @GetMapping("/drop_list_quality")
     @PermitAll
     @Operation(summary = "获取类别选择下拉信息")
     public CommonResult<SelQualityPageReqVO> getQuality() {
