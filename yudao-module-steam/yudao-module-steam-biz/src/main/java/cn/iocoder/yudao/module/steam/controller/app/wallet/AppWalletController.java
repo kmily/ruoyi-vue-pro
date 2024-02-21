@@ -68,7 +68,7 @@ public class AppWalletController {
     @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
     @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
     public CommonResult<Boolean> updateDemoOrderPaid(@RequestBody PayOrderNotifyReqDTO notifyReqDTO) {
-        paySteamOrderService.updateDemoOrderPaid(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
+        paySteamOrderService.updateInvOrderPaid(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
                 notifyReqDTO.getPayOrderId());
         return success(true);
     }
@@ -79,16 +79,16 @@ public class AppWalletController {
     @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
     @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
     public CommonResult<Boolean> updateInvOrderRefunded(@RequestBody PayRefundNotifyReqDTO notifyReqDTO) {
-        paySteamOrderService.updateDemoOrderRefunded(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
+        paySteamOrderService.updateInvOrderRefunded(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
                 notifyReqDTO.getPayRefundId());
         return success(true);
     }
-    @PostMapping("/invOrder/refundDemoOrder")
+    @PostMapping("/invOrder/refundOrder")
     @Operation(summary = "更新示例订单为已支付") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
     @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
     @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
     public CommonResult<Boolean> refundInvOrder(@RequestParam("id") Long id) {
-        paySteamOrderService.refundDemoOrder(id, ServletUtils.getClientIP());
+        paySteamOrderService.refundInvOrder(id, ServletUtils.getClientIP());
         return success(true);
     }
 }

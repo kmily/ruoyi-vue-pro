@@ -233,7 +233,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     }
 
     @Override
-    public void updateDemoOrderPaid(Long id, Long payOrderId) {
+    public void updateInvOrderPaid(Long id, Long payOrderId) {
         // 校验并获得支付订单（可支付）
         PayOrderRespDTO payOrder = validateDemoOrderCanPaid(id, payOrderId);
 
@@ -303,7 +303,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     }
 
     @Override
-    public void refundDemoOrder(Long id, String userIp) {
+    public void refundInvOrder(Long id, String userIp) {
         // 1. 校验订单是否可以退款
         InvOrderDO invOrderDO = validateDemoOrderCanRefund(id);
 
@@ -340,7 +340,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     }
 
     @Override
-    public void updateDemoOrderRefunded(Long id, Long payRefundId) {
+    public void updateInvOrderRefunded(Long id, Long payRefundId) {
         // 1. 校验并获得退款订单（可退款）
         PayRefundRespDTO payRefund = validateDemoOrderCanRefunded(id, payRefundId);
         // 2.2 更新退款单到 demo 订单
