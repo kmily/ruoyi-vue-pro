@@ -80,6 +80,14 @@ public class SteamService {
 
         return bindUserMapper.insert(bindUserDO);
     }
+    public List<BindUserDO> steamList(){
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+
+        List<BindUserDO> bindUserDOS = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+                .eqIfPresent(BindUserDO::getUserId, loginUser.getId())
+                .orderByDesc(BindUserDO::getId));
+        return bindUserDOS;
+    }
     public void bindMaFile(byte[] maFileJsonByte,String password,Integer bindUserId){
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         BindUserDO bindUserDO = bindUserMapper.selectById(bindUserId);
