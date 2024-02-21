@@ -46,6 +46,7 @@ public interface ErrorCodeConstants {
 
 
     ErrorCode INVORDER_ORDER_NOT_FOUND = new ErrorCode(1_007_900_000, "订单不存在");
+    ErrorCode INVORDER_ORDER_REFUND_USER_ERROR = new ErrorCode(1_007_900_005, "发起退款失败，只有订单发起人才能退款");
     ErrorCode INVORDER_ORDER_REFUND_FAIL_NOT_PAID = new ErrorCode(1_007_900_005, "发起退款失败，订单未支付");
     ErrorCode INVORDER_ORDER_REFUND_FAIL_REFUNDED = new ErrorCode(1_007_900_006, "发起退款失败，订单已退款");
     ErrorCode INVORDER_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR = new ErrorCode(1_007_900_002, "更新支付状态失败，支付单编号不匹配");

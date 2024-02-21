@@ -183,7 +183,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         InvOrderDO invOrderDO = new InvOrderDO().setInvId(createReqVO.getInvId()).setSteamId(createReqVO.getSteamId())
                 .setPrice(createReqVO.getPrice())
                 .setPayStatus(false).setRefundPrice(0).setUserId(loginUser.getId()).setUserType(loginUser.getUserType());
-        validateInvOrderCanCreate(invOrderDO,loginUser);
+        validateInvOrderCanCreate(invOrderDO);
         invOrderMapper.insert(invOrderDO);
 
         // 2.1 创建支付单
@@ -198,19 +198,18 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         // 返回
         return invOrderDO.getId();
     }
-    private InvOrderDO validateInvOrderCanCreate(InvOrderDO invOrderDO,LoginUser loginUser) {
+    private InvOrderDO validateInvOrderCanCreate(InvOrderDO invOrderDO) {
         InvDO invDO = invMapper.selectById(invOrderDO.getInvId());
 //        //校验订单是否存在
         if (invDO == null) {
             throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
         }
-        //todo需要比较库存的用户ID
-//        if(!loginUser.getId().equals(invDO.getUserId())){
-//            throw exception(ErrorCodeConstants.INVORDER_USER_EXCEPT);
-//        }
-//        if(!loginUser.getUserType().equals(invDO.getUserType())){
-//            throw exception(ErrorCodeConstants.INVORDER_USER_EXCEPT);
-//        }
+        if(!invOrderDO.getUserId().equals(invDO.getUserId())){
+            throw exception(ErrorCodeConstants.INVORDER_USER_EXCEPT);
+        }
+        if(!invOrderDO.getUserType().equals(invDO.getUserType())){
+            throw exception(ErrorCodeConstants.INVORDER_USER_EXCEPT);
+        }
         // 校验订单是否支付
         if (invOrderDO.getPrice()<=0) {
             throw exception(ErrorCodeConstants.INVORDER_AMOUNT_EXCEPT);
@@ -303,9 +302,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     }
 
     @Override
-    public void refundInvOrder(Long id, String userIp) {
+    public void refundInvOrder(LoginUser loginUser,Long id, String userIp) {
         // 1. 校验订单是否可以退款
-        InvOrderDO invOrderDO = validateInvOrderCanRefund(id);
+        InvOrderDO invOrderDO = validateInvOrderCanRefund(id,loginUser);
 
         // 2.1 生成退款单号
         // 一般来说，用户发起退款的时候，都会单独插入一个售后维权表，然后使用该表的 id 作为 refundId
@@ -322,11 +321,17 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 .setPayRefundId(payRefundId).setRefundPrice(invOrderDO.getPrice()));
     }
 
-    private InvOrderDO validateInvOrderCanRefund(Long id) {
+    private InvOrderDO validateInvOrderCanRefund(Long id,LoginUser loginUser) {
         // 校验订单是否存在
         InvOrderDO invOrderDO = invOrderMapper.selectById(id);
         if (invOrderDO == null) {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_NOT_FOUND);
+        }
+        if(!invOrderDO.getUserId().equals(loginUser.getId())){
+            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_USER_ERROR);
+        }
+        if(!invOrderDO.getUserType().equals(loginUser.getUserType())){
+            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_USER_ERROR);
         }
         // 校验订单是否支付
         if (!invOrderDO.getPayStatus()) {

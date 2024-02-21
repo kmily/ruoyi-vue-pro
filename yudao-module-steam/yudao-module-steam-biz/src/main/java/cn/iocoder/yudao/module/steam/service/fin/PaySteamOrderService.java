@@ -69,7 +69,7 @@ public interface PaySteamOrderService {
      * @param id 编号
      * @param userIp 用户编号
      */
-    void refundInvOrder(Long id, String userIp);
+    void refundInvOrder(LoginUser loginUser,Long id, String userIp);
 
     /**
      * 更新示例订单为已退款

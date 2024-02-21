@@ -88,7 +88,8 @@ public class AppWalletController {
     @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
     @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
     public CommonResult<Boolean> refundInvOrder(@RequestParam("id") Long id) {
-        paySteamOrderService.refundInvOrder(id, ServletUtils.getClientIP());
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        paySteamOrderService.refundInvOrder(loginUser,id, ServletUtils.getClientIP());
         return success(true);
     }
 }
