@@ -18,7 +18,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants.*;
 
 /**
- * steam用户库存储 Service 实现类
+ * 用户库存储 Service 实现类
  *
  * @author 芋道源码
  */

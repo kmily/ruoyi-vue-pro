@@ -5,33 +5,39 @@ import lombok.*;
 import java.util.*;
 import javax.validation.constraints.*;
 
-@Schema(description = "管理后台 - steam用户库存储新增/修改 Request VO")
+@Schema(description = "管理后台 - 用户库存储新增/修改 Request VO")
 @Data
 public class InvSaveReqVO {
 
-    @Schema(description = "Primary Key", requiredMode = Schema.RequiredMode.REQUIRED, example = "13481")
+    @Schema(description = "Primary Key", requiredMode = Schema.RequiredMode.REQUIRED, example = "22623")
     private Integer id;
 
-    @Schema(description = "appid", example = "24254")
+    @Schema(description = "appid", example = "13212")
     private Integer appid;
 
-    @Schema(description = "assetid", example = "29566")
+    @Schema(description = "assetid", example = "7883")
     private String assetid;
 
-    @Schema(description = "classid", example = "6035")
+    @Schema(description = "classid", example = "31967")
     private String classid;
 
-    @Schema(description = "instanceid", example = "30735")
+    @Schema(description = "instanceid", example = "10375")
     private String instanceid;
 
     @Schema(description = "amount")
     private String amount;
 
-    @Schema(description = "steamId", requiredMode = Schema.RequiredMode.REQUIRED, example = "5752")
+    @Schema(description = "steamId", requiredMode = Schema.RequiredMode.REQUIRED, example = "24553")
     @NotEmpty(message = "steamId不能为空")
     private String steamId;
 
     @Schema(description = "启用", example = "1")
-    private String status;
+    private Boolean status;
+
+    @Schema(description = "出售价格单价分", example = "26052")
+    private Integer price;
+
+    @Schema(description = "发货状态", example = "2")
+    private Integer transferStatus;
 
 }

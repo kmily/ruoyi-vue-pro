@@ -17,11 +17,24 @@
       <el-form-item label="amount" prop="amount">
         <el-input v-model="queryParams.amount" placeholder="请输入amount" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
+      <el-form-item label="创建时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
+      </el-form-item>
       <el-form-item label="steamId" prop="steamId">
         <el-input v-model="queryParams.steamId" placeholder="请输入steamId" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="启用" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择启用" clearable size="small">
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_BOOLEAN_STRING)"
+                       :key="dict.value" :label="dict.label" :value="dict.value"/>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="出售价格单价分" prop="price">
+        <el-input v-model="queryParams.price" placeholder="请输入出售价格单价分" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="发货状态" prop="transferStatus">
+        <el-select v-model="queryParams.transferStatus" placeholder="请选择发货状态" clearable size="small">
           <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
@@ -51,8 +64,19 @@
       <el-table-column label="classid" align="center" prop="classid" />
       <el-table-column label="instanceid" align="center" prop="instanceid" />
       <el-table-column label="amount" align="center" prop="amount" />
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+        <template v-slot="scope">
+          <span>{{ parseTime(scope.row.createTime) }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="steamId" align="center" prop="steamId" />
-      <el-table-column label="启用" align="center" prop="status" />
+      <el-table-column label="启用" align="center" prop="status">
+        <template v-slot="scope">
+          <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="scope.row.status" />
+        </template>
+      </el-table-column>
+      <el-table-column label="出售价格单价分" align="center" prop="price" />
+      <el-table-column label="发货状态" align="center" prop="transferStatus" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
@@ -88,7 +112,7 @@ export default {
       showSearch: true,
               // 总条数
         total: 0,
-      // steam用户库存储列表
+      // 用户库存储列表
       list: [],
       // 是否展开，默认全部展开
       isExpandAll: true,
@@ -105,8 +129,11 @@ export default {
         classid: null,
         instanceid: null,
         amount: null,
+        createTime: [],
         steamId: null,
         status: null,
+        price: null,
+        transferStatus: null,
       },
             };
   },
@@ -142,7 +169,7 @@ export default {
     /** 删除按钮操作 */
     async handleDelete(row) {
       const id = row.id;
-      await this.$modal.confirm('是否确认删除steam用户库存储编号为"' + id + '"的数据项?')
+      await this.$modal.confirm('是否确认删除用户库存储编号为"' + id + '"的数据项?')
       try {
        await InvApi.deleteInv(id);
        await this.getList();
@@ -151,11 +178,11 @@ export default {
     },
     /** 导出按钮操作 */
     async handleExport() {
-      await this.$modal.confirm('是否确认导出所有steam用户库存储数据项?');
+      await this.$modal.confirm('是否确认导出所有用户库存储数据项?');
       try {
         this.exportLoading = true;
         const res = await InvApi.exportInvExcel(this.queryParams);
-        this.$download.excel(res, 'steam用户库存储.xls');
+        this.$download.excel(res, '用户库存储.xls');
       } catch {
       } finally {
         this.exportLoading = false;
@@ -163,4 +190,4 @@ export default {
     },
               }
 };
-</script>
+</script>

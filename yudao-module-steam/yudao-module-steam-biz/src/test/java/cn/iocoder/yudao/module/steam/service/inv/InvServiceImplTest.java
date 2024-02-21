@@ -115,8 +115,11 @@ public class InvServiceImplTest extends BaseDbUnitTest {
            o.setClassid(null);
            o.setInstanceid(null);
            o.setAmount(null);
+           o.setCreateTime(null);
            o.setSteamId(null);
            o.setStatus(null);
+           o.setPrice(null);
+           o.setTransferStatus(null);
        });
        invMapper.insert(dbInv);
        // 测试 appid 不匹配
@@ -129,10 +132,16 @@ public class InvServiceImplTest extends BaseDbUnitTest {
        invMapper.insert(cloneIgnoreId(dbInv, o -> o.setInstanceid(null)));
        // 测试 amount 不匹配
        invMapper.insert(cloneIgnoreId(dbInv, o -> o.setAmount(null)));
+       // 测试 createTime 不匹配
+       invMapper.insert(cloneIgnoreId(dbInv, o -> o.setCreateTime(null)));
        // 测试 steamId 不匹配
        invMapper.insert(cloneIgnoreId(dbInv, o -> o.setSteamId(null)));
        // 测试 status 不匹配
        invMapper.insert(cloneIgnoreId(dbInv, o -> o.setStatus(null)));
+       // 测试 price 不匹配
+       invMapper.insert(cloneIgnoreId(dbInv, o -> o.setPrice(null)));
+       // 测试 transferStatus 不匹配
+       invMapper.insert(cloneIgnoreId(dbInv, o -> o.setTransferStatus(null)));
        // 准备参数
        InvPageReqVO reqVO = new InvPageReqVO();
        reqVO.setAppid(null);
@@ -140,8 +149,11 @@ public class InvServiceImplTest extends BaseDbUnitTest {
        reqVO.setClassid(null);
        reqVO.setInstanceid(null);
        reqVO.setAmount(null);
+       reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
        reqVO.setSteamId(null);
        reqVO.setStatus(null);
+       reqVO.setPrice(null);
+       reqVO.setTransferStatus(null);
 
        // 调用
        PageResult<InvDO> pageResult = invService.getInvPage(reqVO);

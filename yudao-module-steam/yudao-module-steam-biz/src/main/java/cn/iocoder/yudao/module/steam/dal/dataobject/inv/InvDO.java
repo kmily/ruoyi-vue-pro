@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
- * steam用户库存储 DO
+ * 用户库存储 DO
  *
  * @author 芋道源码
  */
@@ -53,7 +53,17 @@ public class InvDO extends BaseDO {
     private String steamId;
     /**
      * 启用
+     *
+     * 枚举 {@link TODO infra_boolean_string 对应的类}
      */
-    private String status;
+    private Boolean status;
+    /**
+     * 出售价格单价分
+     */
+    private Integer price;
+    /**
+     * 发货状态
+     */
+    private Integer transferStatus;
 
 }

@@ -23,6 +23,15 @@
                     </el-form-item>
                     <el-form-item label="启用" prop="status">
                       <el-radio-group v-model="formData.status">
+                            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_BOOLEAN_STRING)"
+                                      :key="dict.value" :label="dict.value">{{dict.label}}</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="出售价格单价分" prop="price">
+                      <el-input v-model="formData.price" placeholder="请输入出售价格单价分" />
+                    </el-form-item>
+                    <el-form-item label="发货状态" prop="transferStatus">
+                      <el-radio-group v-model="formData.transferStatus">
                             <el-radio label="1">请选择字典生成</el-radio>
                       </el-radio-group>
                     </el-form-item>
@@ -59,6 +68,8 @@
                             amount: undefined,
                             steamId: undefined,
                             status: undefined,
+                            price: undefined,
+                            transferStatus: undefined,
         },
         // 表单校验
         formRules: {
@@ -77,12 +88,12 @@
           try {
             const res = await InvApi.getInv(id);
             this.formData = res.data;
-            this.title = "修改steam用户库存储";
+            this.title = "修改用户库存储";
           } finally {
             this.formLoading = false;
           }
         }
-        this.title = "新增steam用户库存储";
+        this.title = "新增用户库存储";
               },
       /** 提交按钮 */
       async submitForm() {
@@ -119,9 +130,11 @@
                             amount: undefined,
                             steamId: undefined,
                             status: undefined,
+                            price: undefined,
+                            transferStatus: undefined,
         };
         this.resetForm("formRef");
       }
     }
   };
-</script>
+</script>
