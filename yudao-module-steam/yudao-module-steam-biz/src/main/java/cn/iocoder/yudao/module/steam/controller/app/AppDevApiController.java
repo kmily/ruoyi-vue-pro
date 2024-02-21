@@ -94,7 +94,7 @@ public class AppDevApiController {
     /**
      * 收藏品选择
      */
-    @GetMapping("/drop_list_itemSet")
+    @GetMapping("/drop_list_itemset")
     @PermitAll
     @Operation(summary = "获取收藏品选择下拉信息")
     public CommonResult<AppDropListRespVO> getItemSet() {
