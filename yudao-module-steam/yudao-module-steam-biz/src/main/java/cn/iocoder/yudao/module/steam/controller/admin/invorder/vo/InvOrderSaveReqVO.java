@@ -18,17 +18,6 @@ public class InvOrderSaveReqVO {
     @NotNull(message = "用户编号不能为空")
     private Long userId;
 
-    @Schema(description = "assetid", example = "12103")
-    private String assetid;
-
-    @Schema(description = "classid", requiredMode = Schema.RequiredMode.REQUIRED, example = "24796")
-    @NotEmpty(message = "classid不能为空")
-    private String classid;
-
-    @Schema(description = "instanceid", requiredMode = Schema.RequiredMode.REQUIRED, example = "29854")
-    @NotEmpty(message = "instanceid不能为空")
-    private String instanceid;
-
     @Schema(description = "是否已支付：[0:未支付 1:已经支付过]", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @NotNull(message = "是否已支付：[0:未支付 1:已经支付过]不能为空")
     private Boolean payStatus;
@@ -55,5 +44,12 @@ public class InvOrderSaveReqVO {
     @Schema(description = "价格，单位：分 ", requiredMode = Schema.RequiredMode.REQUIRED, example = "5643")
     @NotNull(message = "价格，单位：分 不能为空")
     private Integer price;
+
+    @Schema(description = "库存表ID参考steam_inv", example = "4408")
+    private Long invId;
+
+    @Schema(description = "购买的steamId", requiredMode = Schema.RequiredMode.REQUIRED, example = "20776")
+    @NotEmpty(message = "购买的steamId不能为空")
+    private String steamId;
 
 }

@@ -23,18 +23,6 @@ public class InvOrderRespVO {
     @ExcelProperty("用户编号")
     private Long userId;
 
-    @Schema(description = "assetid", example = "12103")
-    @ExcelProperty("assetid")
-    private String assetid;
-
-    @Schema(description = "classid", requiredMode = Schema.RequiredMode.REQUIRED, example = "24796")
-    @ExcelProperty("classid")
-    private String classid;
-
-    @Schema(description = "instanceid", requiredMode = Schema.RequiredMode.REQUIRED, example = "29854")
-    @ExcelProperty("instanceid")
-    private String instanceid;
-
     @Schema(description = "是否已支付：[0:未支付 1:已经支付过]", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @ExcelProperty(value = "是否已支付：[0:未支付 1:已经支付过]", converter = DictConvert.class)
     @DictFormat("infra_boolean_string") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
@@ -71,5 +59,13 @@ public class InvOrderRespVO {
     @Schema(description = "价格，单位：分 ", requiredMode = Schema.RequiredMode.REQUIRED, example = "5643")
     @ExcelProperty("价格，单位：分 ")
     private Integer price;
+
+    @Schema(description = "库存表ID参考steam_inv", example = "4408")
+    @ExcelProperty("库存表ID参考steam_inv")
+    private Long invId;
+
+    @Schema(description = "购买的steamId", requiredMode = Schema.RequiredMode.REQUIRED, example = "20776")
+    @ExcelProperty("购买的steamId")
+    private String steamId;
 
 }

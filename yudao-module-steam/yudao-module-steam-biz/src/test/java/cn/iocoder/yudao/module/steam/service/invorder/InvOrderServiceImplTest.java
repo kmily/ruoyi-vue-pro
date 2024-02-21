@@ -111,33 +111,25 @@ public class InvOrderServiceImplTest extends BaseDbUnitTest {
        // mock 数据
        InvOrderDO dbInvOrder = randomPojo(InvOrderDO.class, o -> { // 等会查询到
            o.setUserId(null);
-           o.setAssetid(null);
-           o.setClassid(null);
-           o.setInstanceid(null);
            o.setPayStatus(null);
            o.setPayOrderId(null);
+           o.setSteamId(null);
        });
        invOrderMapper.insert(dbInvOrder);
        // 测试 userId 不匹配
        invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setUserId(null)));
-       // 测试 assetid 不匹配
-       invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setAssetid(null)));
-       // 测试 classid 不匹配
-       invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setClassid(null)));
-       // 测试 instanceid 不匹配
-       invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setInstanceid(null)));
        // 测试 payStatus 不匹配
        invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setPayStatus(null)));
        // 测试 payOrderId 不匹配
        invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setPayOrderId(null)));
+       // 测试 steamId 不匹配
+       invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setSteamId(null)));
        // 准备参数
        InvOrderPageReqVO reqVO = new InvOrderPageReqVO();
        reqVO.setUserId(null);
-       reqVO.setAssetid(null);
-       reqVO.setClassid(null);
-       reqVO.setInstanceid(null);
        reqVO.setPayStatus(null);
        reqVO.setPayOrderId(null);
+       reqVO.setSteamId(null);
 
        // 调用
        PageResult<InvOrderDO> pageResult = invOrderService.getInvOrderPage(reqVO);

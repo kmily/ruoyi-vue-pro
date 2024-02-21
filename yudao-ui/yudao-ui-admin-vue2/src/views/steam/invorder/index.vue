@@ -5,15 +5,6 @@
       <el-form-item label="用户编号" prop="userId">
         <el-input v-model="queryParams.userId" placeholder="请输入用户编号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="assetid" prop="assetid">
-        <el-input v-model="queryParams.assetid" placeholder="请输入assetid" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="classid" prop="classid">
-        <el-input v-model="queryParams.classid" placeholder="请输入classid" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="instanceid" prop="instanceid">
-        <el-input v-model="queryParams.instanceid" placeholder="请输入instanceid" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
       <el-form-item label="是否已支付：[0:未支付 1:已经支付过]" prop="payStatus">
         <el-select v-model="queryParams.payStatus" placeholder="请选择是否已支付：[0:未支付 1:已经支付过]" clearable size="small">
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_BOOLEAN_STRING)"
@@ -22,6 +13,9 @@
       </el-form-item>
       <el-form-item label="支付订单编号" prop="payOrderId">
         <el-input v-model="queryParams.payOrderId" placeholder="请输入支付订单编号" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="购买的steamId" prop="steamId">
+        <el-input v-model="queryParams.steamId" placeholder="请输入购买的steamId" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -45,9 +39,6 @@
             <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
             <el-table-column label="订单编号" align="center" prop="id" />
       <el-table-column label="用户编号" align="center" prop="userId" />
-      <el-table-column label="assetid" align="center" prop="assetid" />
-      <el-table-column label="classid" align="center" prop="classid" />
-      <el-table-column label="instanceid" align="center" prop="instanceid" />
       <el-table-column label="是否已支付：[0:未支付 1:已经支付过]" align="center" prop="payStatus">
         <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="scope.row.payStatus" />
@@ -73,6 +64,8 @@
         </template>
       </el-table-column>
       <el-table-column label="价格，单位：分 " align="center" prop="price" />
+      <el-table-column label="库存表ID参考steam_inv" align="center" prop="invId" />
+      <el-table-column label="购买的steamId" align="center" prop="steamId" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
@@ -121,11 +114,9 @@ export default {
                     pageNo: 1,
             pageSize: 10,
         userId: null,
-        assetid: null,
-        classid: null,
-        instanceid: null,
         payStatus: null,
         payOrderId: null,
+        steamId: null,
       },
             };
   },

@@ -6,15 +6,6 @@
                     <el-form-item label="用户编号" prop="userId">
                       <el-input v-model="formData.userId" placeholder="请输入用户编号" />
                     </el-form-item>
-                    <el-form-item label="assetid" prop="assetid">
-                      <el-input v-model="formData.assetid" placeholder="请输入assetid" />
-                    </el-form-item>
-                    <el-form-item label="classid" prop="classid">
-                      <el-input v-model="formData.classid" placeholder="请输入classid" />
-                    </el-form-item>
-                    <el-form-item label="instanceid" prop="instanceid">
-                      <el-input v-model="formData.instanceid" placeholder="请输入instanceid" />
-                    </el-form-item>
                     <el-form-item label="是否已支付：[0:未支付 1:已经支付过]" prop="payStatus">
                       <el-radio-group v-model="formData.payStatus">
                             <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_BOOLEAN_STRING)"
@@ -41,6 +32,12 @@
                     </el-form-item>
                     <el-form-item label="价格，单位：分 " prop="price">
                       <el-input v-model="formData.price" placeholder="请输入价格，单位：分 " />
+                    </el-form-item>
+                    <el-form-item label="库存表ID参考steam_inv" prop="invId">
+                      <el-input v-model="formData.invId" placeholder="请输入库存表ID参考steam_inv" />
+                    </el-form-item>
+                    <el-form-item label="购买的steamId" prop="steamId">
+                      <el-input v-model="formData.steamId" placeholder="请输入购买的steamId" />
                     </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
@@ -69,9 +66,6 @@
         formData: {
                             id: undefined,
                             userId: undefined,
-                            assetid: undefined,
-                            classid: undefined,
-                            instanceid: undefined,
                             payStatus: undefined,
                             payOrderId: undefined,
                             payChannelCode: undefined,
@@ -80,15 +74,16 @@
                             refundPrice: undefined,
                             refundTime: undefined,
                             price: undefined,
+                            invId: undefined,
+                            steamId: undefined,
         },
         // 表单校验
         formRules: {
                         userId: [{ required: true, message: '用户编号不能为空', trigger: 'blur' }],
-                        classid: [{ required: true, message: 'classid不能为空', trigger: 'blur' }],
-                        instanceid: [{ required: true, message: 'instanceid不能为空', trigger: 'blur' }],
                         payStatus: [{ required: true, message: '是否已支付：[0:未支付 1:已经支付过]不能为空', trigger: 'blur' }],
                         refundPrice: [{ required: true, message: '退款金额，单位：分不能为空', trigger: 'blur' }],
                         price: [{ required: true, message: '价格，单位：分 不能为空', trigger: 'blur' }],
+                        steamId: [{ required: true, message: '购买的steamId不能为空', trigger: 'blur' }],
         },
                         };
     },
@@ -139,9 +134,6 @@
         this.formData = {
                             id: undefined,
                             userId: undefined,
-                            assetid: undefined,
-                            classid: undefined,
-                            instanceid: undefined,
                             payStatus: undefined,
                             payOrderId: undefined,
                             payChannelCode: undefined,
@@ -150,6 +142,8 @@
                             refundPrice: undefined,
                             refundTime: undefined,
                             price: undefined,
+                            invId: undefined,
+                            steamId: undefined,
         };
         this.resetForm("formRef");
       }
