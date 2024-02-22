@@ -232,6 +232,8 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         if(invOrderDO.getUserId().equals(invDO.getUserId()) && invOrderDO.getUserType().equals(invDO.getUserType())){
             throw exception(ErrorCodeConstants.INVORDER_ORDERUSER_EXCEPT);
         }
+        //使用库存的价格进行替换
+        invOrderDO.setPrice(invDO.getPrice());
         //检查是否已经下过单
         List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
                 .eq(InvOrderDO::getInvId, invDO.getId())
