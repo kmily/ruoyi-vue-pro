@@ -15,8 +15,8 @@ public class DevAccountSaveReqVO {
     @Schema(description = "用户ID", example = "19141")
     private Long userId;
 
-    @Schema(description = "api用户名", requiredMode = Schema.RequiredMode.REQUIRED, example = "张三")
-    @NotEmpty(message = "api用户名不能为空")
+//    @Schema(description = "api用户名", requiredMode = Schema.RequiredMode.REQUIRED, example = "张三")
+//    @NotEmpty(message = "api用户名不能为空")
     private String userName;
 
     @Schema(description = "私匙")
