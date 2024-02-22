@@ -195,7 +195,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         CreateOrderResult createOrderResult=new CreateOrderResult();
         // 1.1 获得商品
         InvOrderDO invOrderDO = new InvOrderDO().setInvId(createReqVO.getInvId()).setSteamId(createReqVO.getSteamId())
-                .setPrice(createReqVO.getPrice()).setSteamId(createReqVO.getSteamId())
+                .setPrice(0).setSteamId(createReqVO.getSteamId())
                 .setPayStatus(false).setRefundPrice(0).setUserId(loginUser.getId()).setUserType(loginUser.getUserType());
         validateInvOrderCanCreate(invOrderDO);
         invOrderMapper.insert(invOrderDO);
@@ -204,7 +204,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         Long payOrderId = payOrderApi.createOrder(new PayOrderCreateReqDTO()
                 .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
                 .setMerchantOrderId(invOrderDO.getId().toString()) // 业务的订单编号
-                .setSubject("购买"+createReqVO.getInvId()).setBody("").setPrice(createReqVO.getPrice()) // 价格信息
+                .setSubject("购买"+createReqVO.getInvId()).setBody("").setPrice(invOrderDO.getPrice()) // 价格信息
                 .setExpireTime(addTime(Duration.ofHours(2L)))); // 支付的过期时间
         // 2.2 更新支付单到 demo 订单
         invOrderMapper.updateById(new InvOrderDO().setId(invOrderDO.getId())

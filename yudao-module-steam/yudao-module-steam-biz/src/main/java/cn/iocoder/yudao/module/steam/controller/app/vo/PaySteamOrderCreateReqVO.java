@@ -14,9 +14,9 @@ public class PaySteamOrderCreateReqVO {
     private Long invId;
 
 
-    @Schema(description = "价格不能为空", requiredMode = Schema.RequiredMode.REQUIRED, example = "17682")
-    @NotNull(message = "价格不能为空")
-    private Integer price;
+//    @Schema(description = "价格不能为空", requiredMode = Schema.RequiredMode.REQUIRED, example = "17682")
+//    @NotNull(message = "价格不能为空")
+//    private Integer price;
     @Schema(description = "steamId不能为空", requiredMode = Schema.RequiredMode.REQUIRED, example = "17682")
     @NotNull(message = "steamId不能为空")
     private String steamId;
