@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 
 /**
  * 开放平台用户 DO
@@ -50,8 +52,14 @@ public class DevAccountDO extends BaseDO {
     /**
      * 状态
      *
-     * 枚举 {@link TODO common_status 对应的类}
+     * 枚举 {@link CommonStatusEnum 对应的类}
      */
     private Integer status;
+    /**
+     * 用户类型
+     *
+     * 枚举 {@link UserTypeEnum user_type 对应的类}
+     */
+    private Integer userType;
 
 }

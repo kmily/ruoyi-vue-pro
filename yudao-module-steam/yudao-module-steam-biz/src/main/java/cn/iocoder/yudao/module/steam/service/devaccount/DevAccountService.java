@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.service.devaccount;
 
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.steam.controller.admin.devaccount.vo.DevAccountPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.devaccount.vo.DevAccountSaveReqVO;
@@ -58,5 +59,5 @@ public interface DevAccountService {
      * @return 开放平台用户分页
      */
     Long apply(DevAccountSaveReqVO pageReqVO);
-    DevAccountDO selectByUserName (String userName);
+    DevAccountDO selectByUserName (String userName, UserTypeEnum userType);
 }

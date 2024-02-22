@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-// 创建steam用户库存储
+// 创建用户库存储
 export function createInv(data) {
   return request({
     url: '/steam/inv/create',
@@ -9,7 +9,7 @@ export function createInv(data) {
   })
 }
 
-// 更新steam用户库存储
+// 更新用户库存储
 export function updateInv(data) {
   return request({
     url: '/steam/inv/update',
@@ -18,7 +18,7 @@ export function updateInv(data) {
   })
 }
 
-// 删除steam用户库存储
+// 删除用户库存储
 export function deleteInv(id) {
   return request({
     url: '/steam/inv/delete?id=' + id,
@@ -26,7 +26,7 @@ export function deleteInv(id) {
   })
 }
 
-// 获得steam用户库存储
+// 获得用户库存储
 export function getInv(id) {
   return request({
     url: '/steam/inv/get?id=' + id,
@@ -34,7 +34,7 @@ export function getInv(id) {
   })
 }
 
-// 获得steam用户库存储分页
+// 获得用户库存储分页
 export function getInvPage(params) {
   return request({
     url: '/steam/inv/page',
@@ -42,7 +42,7 @@ export function getInvPage(params) {
     params
   })
 }
-// 导出steam用户库存储 Excel
+// 导出用户库存储 Excel
 export function exportInvExcel(params) {
   return request({
     url: '/steam/inv/export-excel',

@@ -29,7 +29,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.service.inv.InvService;
 
-@Tag(name = "管理后台 - steam用户库存储")
+@Tag(name = "管理后台 - 用户库存储")
 @RestController
 @RequestMapping("/steam/inv")
 @Validated
@@ -39,14 +39,14 @@ public class InvController {
     private InvService invService;
 
     @PostMapping("/create")
-    @Operation(summary = "创建steam用户库存储")
+    @Operation(summary = "创建用户库存储")
     @PreAuthorize("@ss.hasPermission('steam:inv:create')")
-    public CommonResult<Integer> createInv(@Valid @RequestBody InvSaveReqVO createReqVO) {
+    public CommonResult<Long> createInv(@Valid @RequestBody InvSaveReqVO createReqVO) {
         return success(invService.createInv(createReqVO));
     }
 
     @PutMapping("/update")
-    @Operation(summary = "更新steam用户库存储")
+    @Operation(summary = "更新用户库存储")
     @PreAuthorize("@ss.hasPermission('steam:inv:update')")
     public CommonResult<Boolean> updateInv(@Valid @RequestBody InvSaveReqVO updateReqVO) {
         invService.updateInv(updateReqVO);
@@ -54,25 +54,25 @@ public class InvController {
     }
 
     @DeleteMapping("/delete")
-    @Operation(summary = "删除steam用户库存储")
+    @Operation(summary = "删除用户库存储")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('steam:inv:delete')")
-    public CommonResult<Boolean> deleteInv(@RequestParam("id") Integer id) {
+    public CommonResult<Boolean> deleteInv(@RequestParam("id") Long id) {
         invService.deleteInv(id);
         return success(true);
     }
 
     @GetMapping("/get")
-    @Operation(summary = "获得steam用户库存储")
+    @Operation(summary = "获得用户库存储")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('steam:inv:query')")
-    public CommonResult<InvRespVO> getInv(@RequestParam("id") Integer id) {
+    public CommonResult<InvRespVO> getInv(@RequestParam("id") Long id) {
         InvDO inv = invService.getInv(id);
         return success(BeanUtils.toBean(inv, InvRespVO.class));
     }
 
     @GetMapping("/page")
-    @Operation(summary = "获得steam用户库存储分页")
+    @Operation(summary = "获得用户库存储分页")
     @PreAuthorize("@ss.hasPermission('steam:inv:query')")
     public CommonResult<PageResult<InvRespVO>> getInvPage(@Valid InvPageReqVO pageReqVO) {
         PageResult<InvDO> pageResult = invService.getInvPage(pageReqVO);
@@ -80,7 +80,7 @@ public class InvController {
     }
 
     @GetMapping("/export-excel")
-    @Operation(summary = "导出steam用户库存储 Excel")
+    @Operation(summary = "导出用户库存储 Excel")
     @PreAuthorize("@ss.hasPermission('steam:inv:export')")
     @OperateLog(type = EXPORT)
     public void exportInvExcel(@Valid InvPageReqVO pageReqVO,
@@ -88,7 +88,7 @@ public class InvController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<InvDO> list = invService.getInvPage(pageReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "steam用户库存储.xls", "数据", InvRespVO.class,
+        ExcelUtils.write(response, "用户库存储.xls", "数据", InvRespVO.class,
                         BeanUtils.toBean(list, InvRespVO.class));
     }
 

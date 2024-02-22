@@ -44,6 +44,10 @@ public class DevAccountRespVO {
     @ExcelProperty("更新时间")
     private LocalDateTime updateTime;
 
+    @Schema(description = "用户类型", example = "1")
+    @ExcelProperty(value = "用户类型", converter = DictConvert.class)
+    @DictFormat("user_type") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
+    private Integer userType;
 
     /**
      * 私匙

@@ -2,9 +2,6 @@
   <div class="app-container">
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="appid" prop="appid">
-        <el-input v-model="queryParams.appid" placeholder="请输入appid" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
       <el-form-item label="assetid" prop="assetid">
         <el-input v-model="queryParams.assetid" placeholder="请输入assetid" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
@@ -17,13 +14,40 @@
       <el-form-item label="amount" prop="amount">
         <el-input v-model="queryParams.amount" placeholder="请输入amount" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
+      <el-form-item label="创建时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
+      </el-form-item>
       <el-form-item label="steamId" prop="steamId">
         <el-input v-model="queryParams.steamId" placeholder="请输入steamId" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="启用" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择启用" clearable size="small">
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_BOOLEAN_STRING)"
+                       :key="dict.value" :label="dict.label" :value="dict.value"/>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="出售价格单价分" prop="price">
+        <el-input v-model="queryParams.price" placeholder="请输入出售价格单价分" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="发货状态" prop="transferStatus">
+        <el-select v-model="queryParams.transferStatus" placeholder="请选择发货状态" clearable size="small">
           <el-option label="请选择字典生成" value="" />
         </el-select>
+      </el-form-item>
+      <el-form-item label="csgoid" prop="appid">
+        <el-input v-model="queryParams.appid" placeholder="请输入csgoid" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="用户ID" prop="userId">
+        <el-input v-model="queryParams.userId" placeholder="请输入用户ID" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="用户类型" prop="userType">
+        <el-select v-model="queryParams.userType" placeholder="请选择用户类型" clearable size="small">
+          <el-option label="请选择字典生成" value="" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="绑定用户ID" prop="bindUserId">
+        <el-input v-model="queryParams.bindUserId" placeholder="请输入绑定用户ID" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -45,14 +69,28 @@
     </el-row>
 
             <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
-            <el-table-column label="Primary Key" align="center" prop="id" />
-      <el-table-column label="appid" align="center" prop="appid" />
-      <el-table-column label="assetid" align="center" prop="assetid" />
+            <el-table-column label="assetid" align="center" prop="assetid" />
       <el-table-column label="classid" align="center" prop="classid" />
       <el-table-column label="instanceid" align="center" prop="instanceid" />
       <el-table-column label="amount" align="center" prop="amount" />
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+        <template v-slot="scope">
+          <span>{{ parseTime(scope.row.createTime) }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="steamId" align="center" prop="steamId" />
-      <el-table-column label="启用" align="center" prop="status" />
+      <el-table-column label="启用" align="center" prop="status">
+        <template v-slot="scope">
+          <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="scope.row.status" />
+        </template>
+      </el-table-column>
+      <el-table-column label="出售价格单价分" align="center" prop="price" />
+      <el-table-column label="发货状态" align="center" prop="transferStatus" />
+      <el-table-column label="Primary Key" align="center" prop="id" />
+      <el-table-column label="csgoid" align="center" prop="appid" />
+      <el-table-column label="用户ID" align="center" prop="userId" />
+      <el-table-column label="用户类型" align="center" prop="userType" />
+      <el-table-column label="绑定用户ID" align="center" prop="bindUserId" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
@@ -88,7 +126,7 @@ export default {
       showSearch: true,
               // 总条数
         total: 0,
-      // steam用户库存储列表
+      // 用户库存储列表
       list: [],
       // 是否展开，默认全部展开
       isExpandAll: true,
@@ -100,13 +138,19 @@ export default {
       queryParams: {
                     pageNo: 1,
             pageSize: 10,
-        appid: null,
         assetid: null,
         classid: null,
         instanceid: null,
         amount: null,
+        createTime: [],
         steamId: null,
         status: null,
+        price: null,
+        transferStatus: null,
+        appid: null,
+        userId: null,
+        userType: null,
+        bindUserId: null,
       },
             };
   },
@@ -142,7 +186,7 @@ export default {
     /** 删除按钮操作 */
     async handleDelete(row) {
       const id = row.id;
-      await this.$modal.confirm('是否确认删除steam用户库存储编号为"' + id + '"的数据项?')
+      await this.$modal.confirm('是否确认删除用户库存储编号为"' + id + '"的数据项?')
       try {
        await InvApi.deleteInv(id);
        await this.getList();
@@ -151,11 +195,11 @@ export default {
     },
     /** 导出按钮操作 */
     async handleExport() {
-      await this.$modal.confirm('是否确认导出所有steam用户库存储数据项?');
+      await this.$modal.confirm('是否确认导出所有用户库存储数据项?');
       try {
         this.exportLoading = true;
         const res = await InvApi.exportInvExcel(this.queryParams);
-        this.$download.excel(res, 'steam用户库存储.xls');
+        this.$download.excel(res, '用户库存储.xls');
       } catch {
       } finally {
         this.exportLoading = false;
@@ -163,4 +207,4 @@ export default {
     },
               }
 };
-</script>
+</script>

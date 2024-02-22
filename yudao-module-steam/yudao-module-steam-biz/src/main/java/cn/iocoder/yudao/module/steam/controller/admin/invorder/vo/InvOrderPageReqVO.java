@@ -18,19 +18,16 @@ public class InvOrderPageReqVO extends PageParam {
     @Schema(description = "用户编号", example = "32273")
     private Long userId;
 
-    @Schema(description = "assetid", example = "12103")
-    private String assetid;
-
-    @Schema(description = "classid", example = "24796")
-    private String classid;
-
-    @Schema(description = "instanceid", example = "29854")
-    private String instanceid;
-
     @Schema(description = "是否已支付：[0:未支付 1:已经支付过]", example = "2")
     private Boolean payStatus;
 
     @Schema(description = "支付订单编号", example = "27239")
     private Long payOrderId;
+
+    @Schema(description = "购买的steamId", example = "20776")
+    private String steamId;
+
+    @Schema(description = "用户类型", example = "2")
+    private Integer userType;
 
 }

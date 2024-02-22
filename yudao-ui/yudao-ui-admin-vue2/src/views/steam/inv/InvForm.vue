@@ -3,9 +3,6 @@
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="45%" v-dialogDrag append-to-body>
       <el-form ref="formRef" :model="formData" :rules="formRules" v-loading="formLoading" label-width="100px">
-                    <el-form-item label="appid" prop="appid">
-                      <el-input v-model="formData.appid" placeholder="请输入appid" />
-                    </el-form-item>
                     <el-form-item label="assetid" prop="assetid">
                       <el-input v-model="formData.assetid" placeholder="请输入assetid" />
                     </el-form-item>
@@ -23,8 +20,31 @@
                     </el-form-item>
                     <el-form-item label="启用" prop="status">
                       <el-radio-group v-model="formData.status">
+                            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_BOOLEAN_STRING)"
+                                      :key="dict.value" :label="dict.value">{{dict.label}}</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="出售价格单价分" prop="price">
+                      <el-input v-model="formData.price" placeholder="请输入出售价格单价分" />
+                    </el-form-item>
+                    <el-form-item label="发货状态" prop="transferStatus">
+                      <el-radio-group v-model="formData.transferStatus">
                             <el-radio label="1">请选择字典生成</el-radio>
                       </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="csgoid" prop="appid">
+                      <el-input v-model="formData.appid" placeholder="请输入csgoid" />
+                    </el-form-item>
+                    <el-form-item label="用户ID" prop="userId">
+                      <el-input v-model="formData.userId" placeholder="请输入用户ID" />
+                    </el-form-item>
+                    <el-form-item label="用户类型" prop="userType">
+                      <el-select v-model="formData.userType" placeholder="请选择用户类型">
+                            <el-option label="请选择字典生成" value="" />
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item label="绑定用户ID" prop="bindUserId">
+                      <el-input v-model="formData.bindUserId" placeholder="请输入绑定用户ID" />
                     </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
@@ -51,14 +71,20 @@
         formLoading: false,
         // 表单参数
         formData: {
-                            id: undefined,
-                            appid: undefined,
                             assetid: undefined,
                             classid: undefined,
                             instanceid: undefined,
                             amount: undefined,
                             steamId: undefined,
                             status: undefined,
+                            price: undefined,
+                            transferStatus: undefined,
+                            id: undefined,
+                            appid: undefined,
+                            tenantId: undefined,
+                            userId: undefined,
+                            userType: undefined,
+                            bindUserId: undefined,
         },
         // 表单校验
         formRules: {
@@ -77,12 +103,12 @@
           try {
             const res = await InvApi.getInv(id);
             this.formData = res.data;
-            this.title = "修改steam用户库存储";
+            this.title = "修改用户库存储";
           } finally {
             this.formLoading = false;
           }
         }
-        this.title = "新增steam用户库存储";
+        this.title = "新增用户库存储";
               },
       /** 提交按钮 */
       async submitForm() {
@@ -111,17 +137,23 @@
                       /** 表单重置 */
       reset() {
         this.formData = {
-                            id: undefined,
-                            appid: undefined,
                             assetid: undefined,
                             classid: undefined,
                             instanceid: undefined,
                             amount: undefined,
                             steamId: undefined,
                             status: undefined,
+                            price: undefined,
+                            transferStatus: undefined,
+                            id: undefined,
+                            appid: undefined,
+                            tenantId: undefined,
+                            userId: undefined,
+                            userType: undefined,
+                            bindUserId: undefined,
         };
         this.resetForm("formRef");
       }
     }
   };
-</script>
+</script>

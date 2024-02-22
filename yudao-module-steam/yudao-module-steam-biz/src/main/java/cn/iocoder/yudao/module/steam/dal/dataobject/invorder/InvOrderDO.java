@@ -34,18 +34,6 @@ public class InvOrderDO extends BaseDO {
      */
     private Long userId;
     /**
-     * assetid
-     */
-    private String assetid;
-    /**
-     * classid
-     */
-    private String classid;
-    /**
-     * instanceid
-     */
-    private String instanceid;
-    /**
      * 是否已支付：[0:未支付 1:已经支付过]
      *
      * 枚举 {@link TODO infra_boolean_string 对应的类}
@@ -79,5 +67,17 @@ public class InvOrderDO extends BaseDO {
      * 价格，单位：分 
      */
     private Integer price;
+    /**
+     * 库存表ID参考steam_inv
+     */
+    private Long invId;
+    /**
+     * 购买的steamId
+     */
+    private String steamId;
+    /**
+     * 用户类型
+     */
+    private Integer userType;
 
 }

@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.*;
 
 /**
- * steam用户库存储 Mapper
+ * 用户库存储 Mapper
  *
  * @author 芋道源码
  */
@@ -19,13 +19,19 @@ public interface InvMapper extends BaseMapperX<InvDO> {
 
     default PageResult<InvDO> selectPage(InvPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<InvDO>()
-                .eqIfPresent(InvDO::getAppid, reqVO.getAppid())
                 .eqIfPresent(InvDO::getAssetid, reqVO.getAssetid())
                 .eqIfPresent(InvDO::getClassid, reqVO.getClassid())
                 .eqIfPresent(InvDO::getInstanceid, reqVO.getInstanceid())
                 .eqIfPresent(InvDO::getAmount, reqVO.getAmount())
+                .betweenIfPresent(InvDO::getCreateTime, reqVO.getCreateTime())
                 .eqIfPresent(InvDO::getSteamId, reqVO.getSteamId())
                 .eqIfPresent(InvDO::getStatus, reqVO.getStatus())
+                .eqIfPresent(InvDO::getPrice, reqVO.getPrice())
+                .eqIfPresent(InvDO::getTransferStatus, reqVO.getTransferStatus())
+                .eqIfPresent(InvDO::getAppid, reqVO.getAppid())
+                .eqIfPresent(InvDO::getUserId, reqVO.getUserId())
+                .eqIfPresent(InvDO::getUserType, reqVO.getUserType())
+                .eqIfPresent(InvDO::getBindUserId, reqVO.getBindUserId())
                 .orderByDesc(InvDO::getId));
     }
 

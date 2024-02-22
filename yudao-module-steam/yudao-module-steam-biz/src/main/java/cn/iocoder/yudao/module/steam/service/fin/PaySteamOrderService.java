@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageRe
 import cn.iocoder.yudao.module.steam.controller.app.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
+import cn.iocoder.yudao.module.steam.service.steam.CreateWithdrawalResult;
 
 import javax.validation.Valid;
 
@@ -22,7 +23,7 @@ public interface PaySteamOrderService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createWithdrawalOrder(LoginUser loginUser, @Valid PayWithdrawalOrderCreateReqVO createReqVO);
+    CreateWithdrawalResult createWithdrawalOrder(LoginUser loginUser, @Valid PayWithdrawalOrderCreateReqVO createReqVO);
     /**
      * 更新提现订单为已支付
      *
@@ -33,11 +34,11 @@ public interface PaySteamOrderService {
     /**
      * 创建示例订单
      *
-     * @param userId      用户编号
+     * @param loginUser      用户
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createDemoOrder(Long userId, @Valid PaySteamOrderCreateReqVO createReqVO);
+    Long createInvOrder(LoginUser loginUser, @Valid PaySteamOrderCreateReqVO createReqVO);
 
     /**
      * 获得示例订单
@@ -61,7 +62,7 @@ public interface PaySteamOrderService {
      * @param id 编号
      * @param payOrderId 支付订单号
      */
-    void updateDemoOrderPaid(Long id, Long payOrderId);
+    void updateInvOrderPaid(Long id, Long payOrderId);
 
     /**
      * 发起示例订单的退款
@@ -69,7 +70,7 @@ public interface PaySteamOrderService {
      * @param id 编号
      * @param userIp 用户编号
      */
-    void refundDemoOrder(Long id, String userIp);
+    void refundInvOrder(LoginUser loginUser,Long id, String userIp);
 
     /**
      * 更新示例订单为已退款
@@ -77,6 +78,6 @@ public interface PaySteamOrderService {
      * @param id 编号
      * @param payRefundId 退款订单号
      */
-    void updateDemoOrderRefunded(Long id, Long payRefundId);
+    void updateInvOrderRefunded(Long id, Long payRefundId);
 
 }

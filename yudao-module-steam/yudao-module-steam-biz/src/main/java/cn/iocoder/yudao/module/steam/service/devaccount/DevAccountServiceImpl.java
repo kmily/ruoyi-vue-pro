@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.service.devaccount;
 
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -94,10 +95,11 @@ public class DevAccountServiceImpl implements DevAccountService {
 
     }
 
-    public DevAccountDO selectByUserName (String userName) {
+    public DevAccountDO selectByUserName (String userName, UserTypeEnum userTypeEnum) {
         try {
             DevAccountPageReqVO devAccountPageReqVO=new DevAccountPageReqVO();
             devAccountPageReqVO.setUserName(userName);
+            devAccountPageReqVO.setUserType(userTypeEnum.getValue());
             DevAccountDO devAccountDO = devAccountMapper.selectByUserName(devAccountPageReqVO);
             // 返回
             return devAccountDO;

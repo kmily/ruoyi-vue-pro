@@ -16,7 +16,6 @@ import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -90,14 +88,12 @@ public class AppBindUserController {
         return success(1);
     }
     @PostMapping("/steam/list")
-    @Operation(summary = "上传ma文件", description = "上传ma文件")
+    @Operation(summary = "steam绑定列表", description = "上传ma文件")
     @PreAuthenticated
     @OperateLog(logArgs = false) // 上传文件，没有记录操作日志的必要
     public CommonResult<List<BindUserDO>> steamList(){
         return success(steamService.steamList());
     }
-    @Resource
-    private FileService fileService;
 
     @PostMapping("/upload/mafile")
     @Operation(summary = "上传ma文件", description = "上传ma文件")

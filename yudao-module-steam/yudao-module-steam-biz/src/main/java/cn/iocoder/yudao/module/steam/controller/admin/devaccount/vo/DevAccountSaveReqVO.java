@@ -31,4 +31,7 @@ public class DevAccountSaveReqVO {
     @Schema(description = "状态", example = "2")
     private Integer status;
 
+    @Schema(description = "用户类型", example = "1")
+    private Integer userType;
+
 }

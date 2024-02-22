@@ -113,6 +113,7 @@ public class DevAccountServiceImplTest extends BaseDbUnitTest {
            o.setUserName(null);
            o.setSteamId(null);
            o.setStatus(null);
+           o.setUserType(null);
        });
        devAccountMapper.insert(dbDevAccount);
        // 测试 userName 不匹配
@@ -121,11 +122,14 @@ public class DevAccountServiceImplTest extends BaseDbUnitTest {
        devAccountMapper.insert(cloneIgnoreId(dbDevAccount, o -> o.setSteamId(null)));
        // 测试 status 不匹配
        devAccountMapper.insert(cloneIgnoreId(dbDevAccount, o -> o.setStatus(null)));
+       // 测试 userType 不匹配
+       devAccountMapper.insert(cloneIgnoreId(dbDevAccount, o -> o.setUserType(null)));
        // 准备参数
        DevAccountPageReqVO reqVO = new DevAccountPageReqVO();
        reqVO.setUserName(null);
        reqVO.setSteamId(null);
        reqVO.setStatus(null);
+       reqVO.setUserType(null);
 
        // 调用
        PageResult<DevAccountDO> pageResult = devAccountService.getDevAccountPage(reqVO);

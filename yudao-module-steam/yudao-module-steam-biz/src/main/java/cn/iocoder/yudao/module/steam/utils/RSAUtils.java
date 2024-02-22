@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.steam.utils;
 
+import cn.iocoder.yudao.module.steam.controller.app.vo.Test;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import me.chanjar.weixin.common.util.RandomUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ArrayUtils;
@@ -278,11 +280,11 @@ public class RSAUtils {
         // RSA解密
         Cipher cipher = Cipher.getInstance(KEY_ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, priKey);
-        logger.info(privateKey);
-        logger.info("provider: {}", cipher.getProvider().getClass().getName());
+//        logger.info(privateKey);
+//        logger.info("provider: {}", cipher.getProvider().getClass().getName());
         // 64位解码加密后的字符串
         byte[] data = decryptBASE64(encryStr);
-        logger.info(data.length + "");
+//        logger.info(data.length + "");
         // 解密时超过128字节报错。为此采用分段解密的办法来解密
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < data.length; i += MAX_DECRYPT_BLOCK) {
@@ -415,5 +417,25 @@ public class RSAUtils {
         }
         byteArrayOutputStream.close();
         return byteArrayOutputStream.toString();
+    }
+    public static void main(String[] args) throws Exception {
+//        KeyPair keyPair = genKey(RandomUtils.getRandomStr());// 构建密钥
+//        logger.info("私钥format：{}", keyPair.getPrivate().getFormat());
+//        logger.info("公钥format：{}", keyPair.getPublic().getFormat());
+//        logger.info("私钥string：{}", base64ToStr(keyPair.getPrivate().getEncoded()));
+//        logger.info("公钥string：{}", base64ToStr(keyPair.getPublic().getEncoded()));
+//        私钥string：MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCa8Ty3EAUyf9orPLMTv7ryzYtk6F19oTUatLO8OBbfaSVwZI/2PZiS6CQSuCXGOgoSG7Kf7wPPhg2bgWvVGL1JyZI/LBlxcMlLMS3GeX3m8QJxkkt33m89ImPwcoIrTotYJqHMX8ayW+FZ7amhgDU4a0SMNTR3BO1IjNeuhNLA8gSJDwImslb3c5joP9DF3p0wDSxO9qFzHogwwjt9jFWv9ufTzZnanJ7sZfmwt+sFIVUCXmSU4M9gX4OuMLCC6YR6xL0d3q38hqNhjEW3BfNKBeesrRJsSgJkO/ATb8Du1SQt5cLa/3wUkwdfLOoA1lcmTrc6BMm+0NNM40mZvN43AgMBAAECggEAFAlcO6Qjt+sWsH6x/bzOlTWFcDAoXuWo82Io2A88zflP8R/gCgzfHShN+em8YM0CnmLcj5geGwkP22s6IZ2IZPFfKzItvCDEtyeN7tupL2M9WKh9f+vQ4MwAtohoUudeV7DvPXmpPUlqc/Gq/QqSV1Bv1d3PghCuCrLD9XqRsoeldiw1qrz0H/yJ9eIKQNG/oI+g0HaUpjUpOZ6wSDP0h7awgelENcGF2TvBtAkHZbOFCwETM5MSsHSReeN8OPHKakK+KOsBvur1P6N2WJXr0iJayjTmqDzuWpCvB39Sq+lc8dDgs3dC14UF3P3u7a9fXiGpfjjahDy+2W+Yosrb2QKBgQDoNG9oRoTgtsULwgnP2Mn7bCowlLHr0trZ4ooLe6vK2aQdchUybsQP1iZRFmgV8RKFZPTv3z4pB8v2VTxqx5rvY0uDgc+ZKHeUr9LQ6ELUBcL61kiKNrWUE1rCXoarFmDV0fJFMhb6r6NGdg6PxSd/CGBWzFRNfHMG62d92zxglQKBgQCq0e4NW0+J+rQcZ+j5E5+/3yfISH+zCOAL+4RH1/F/CVXlKB+V8Ed9NkeLXoLWiVJrvIVkBBLEsAQxt6cXaYHkcU2Io9je8TePLLQrrSJhkXbDA8WuJPqKi0SCfab1TlllffBVcdAPITe5W8neCRu08PumDtSeyFMDFErjr6fUmwKBgHJnSzBj9hnE0sZdPnpSBAnEm/C9gf9/LmZFL+BCeTyDCFGdoIXtftmSl+RBltygnpBsUiVQpw6OEdZ23kJ5v4MMN+s97Ks3/dqa2dIlbK+Leyocoza9h67B7mhvLAhlCSavvp6K9DlkiZwwlDIPX8s9tEFvgGWA2CdjmeSvPEsVAoGAX+BUbMrDaf58+TSZXrPVBiyKd6+5fROOLSuOo4Rg15y1yVkr4Uxr06uTnHX/mcqZqD6339spbZwdvooGDu35Ke8uRXMxVnCtbn744Urb8UdkETEc0xGOThS870D3ZNgE9SIqssqerN9IF5GdTDJwiq53kEziqfxmG2RYZFNDL+ECgYAXAFq28dWdLROu1ociI5qcEWBC+DrgWEEX+gObQ6NbCHBvI3FIRlIS9SqBFwM9HCJizgEi4LS2TixUPXid3wipzfWVj3TbUIUYfUca2bNv40QJS9ErYB9QapY9tXO3Q8hMGvfO3JT8KhvzYAbGplFmSOFGMLUD3v0CM/1CM8Dm3Q==
+//        公钥string：MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmvE8txAFMn/aKzyzE7+68s2LZOhdfaE1GrSzvDgW32klcGSP9j2YkugkErglxjoKEhuyn+8Dz4YNm4Fr1Ri9ScmSPywZcXDJSzEtxnl95vECcZJLd95vPSJj8HKCK06LWCahzF/GslvhWe2poYA1OGtEjDU0dwTtSIzXroTSwPIEiQ8CJrJW93OY6D/Qxd6dMA0sTvahcx6IMMI7fYxVr/bn082Z2pye7GX5sLfrBSFVAl5klODPYF+DrjCwgumEesS9Hd6t/IajYYxFtwXzSgXnrK0SbEoCZDvwE2/A7tUkLeXC2v98FJMHXyzqANZXJk63OgTJvtDTTONJmbzeNwIDAQAB
+        ObjectMapper objectMapper=new ObjectMapper();
+        Test test=new Test();
+        test.setPassword("123");
+        test.setBindUserId(124);
+//        test.setName("china");
+        String glzaboy = encryptByPublicKey(objectMapper.writeValueAsString(test), "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmvE8txAFMn/aKzyzE7+68s2LZOhdfaE1GrSzvDgW32klcGSP9j2YkugkErglxjoKEhuyn+8Dz4YNm4Fr1Ri9ScmSPywZcXDJSzEtxnl95vECcZJLd95vPSJj8HKCK06LWCahzF/GslvhWe2poYA1OGtEjDU0dwTtSIzXroTSwPIEiQ8CJrJW93OY6D/Qxd6dMA0sTvahcx6IMMI7fYxVr/bn082Z2pye7GX5sLfrBSFVAl5klODPYF+DrjCwgumEesS9Hd6t/IajYYxFtwXzSgXnrK0SbEoCZDvwE2/A7tUkLeXC2v98FJMHXyzqANZXJk63OgTJvtDTTONJmbzeNwIDAQAB");
+        logger.info(glzaboy);
+        String data="MTPFwV5O79zF4MJKg64lrqSSTd+JbmyI5hnvwUZ4elwEQV5ZgHnx/SwwJpXAv6P2D2LPp60ZaR4idyjIswn2eXWWVQwVJP8BlJX8YUs/iRcCRjnDvcTZPbQgFEfahmazF2LGdbKaT2pFtU8Opqor0p98ixq795OBb9IDsW7MvqV3dru6IKPnkJ3vjcOoEgzeKvnSjKBU9aD6d/GVywpepB0OXZ8nbHLnCR9W6tz4f4MUpRycHHolPb7kZY8aobHd3lO99VKpCRRLyJtLztBPxnPbbu7GZsip/s+gOQml5td/zaRtUrydPLoLqq5z/uZvn9pBa2J7B3OwR/rTDOyz/g==";
+        String s = decryptByPrivateKey(data, "MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCa8Ty3EAUyf9orPLMTv7ryzYtk6F19oTUatLO8OBbfaSVwZI/2PZiS6CQSuCXGOgoSG7Kf7wPPhg2bgWvVGL1JyZI/LBlxcMlLMS3GeX3m8QJxkkt33m89ImPwcoIrTotYJqHMX8ayW+FZ7amhgDU4a0SMNTR3BO1IjNeuhNLA8gSJDwImslb3c5joP9DF3p0wDSxO9qFzHogwwjt9jFWv9ufTzZnanJ7sZfmwt+sFIVUCXmSU4M9gX4OuMLCC6YR6xL0d3q38hqNhjEW3BfNKBeesrRJsSgJkO/ATb8Du1SQt5cLa/3wUkwdfLOoA1lcmTrc6BMm+0NNM40mZvN43AgMBAAECggEAFAlcO6Qjt+sWsH6x/bzOlTWFcDAoXuWo82Io2A88zflP8R/gCgzfHShN+em8YM0CnmLcj5geGwkP22s6IZ2IZPFfKzItvCDEtyeN7tupL2M9WKh9f+vQ4MwAtohoUudeV7DvPXmpPUlqc/Gq/QqSV1Bv1d3PghCuCrLD9XqRsoeldiw1qrz0H/yJ9eIKQNG/oI+g0HaUpjUpOZ6wSDP0h7awgelENcGF2TvBtAkHZbOFCwETM5MSsHSReeN8OPHKakK+KOsBvur1P6N2WJXr0iJayjTmqDzuWpCvB39Sq+lc8dDgs3dC14UF3P3u7a9fXiGpfjjahDy+2W+Yosrb2QKBgQDoNG9oRoTgtsULwgnP2Mn7bCowlLHr0trZ4ooLe6vK2aQdchUybsQP1iZRFmgV8RKFZPTv3z4pB8v2VTxqx5rvY0uDgc+ZKHeUr9LQ6ELUBcL61kiKNrWUE1rCXoarFmDV0fJFMhb6r6NGdg6PxSd/CGBWzFRNfHMG62d92zxglQKBgQCq0e4NW0+J+rQcZ+j5E5+/3yfISH+zCOAL+4RH1/F/CVXlKB+V8Ed9NkeLXoLWiVJrvIVkBBLEsAQxt6cXaYHkcU2Io9je8TePLLQrrSJhkXbDA8WuJPqKi0SCfab1TlllffBVcdAPITe5W8neCRu08PumDtSeyFMDFErjr6fUmwKBgHJnSzBj9hnE0sZdPnpSBAnEm/C9gf9/LmZFL+BCeTyDCFGdoIXtftmSl+RBltygnpBsUiVQpw6OEdZ23kJ5v4MMN+s97Ks3/dqa2dIlbK+Leyocoza9h67B7mhvLAhlCSavvp6K9DlkiZwwlDIPX8s9tEFvgGWA2CdjmeSvPEsVAoGAX+BUbMrDaf58+TSZXrPVBiyKd6+5fROOLSuOo4Rg15y1yVkr4Uxr06uTnHX/mcqZqD6339spbZwdvooGDu35Ke8uRXMxVnCtbn744Urb8UdkETEc0xGOThS870D3ZNgE9SIqssqerN9IF5GdTDJwiq53kEziqfxmG2RYZFNDL+ECgYAXAFq28dWdLROu1ociI5qcEWBC+DrgWEEX+gObQ6NbCHBvI3FIRlIS9SqBFwM9HCJizgEi4LS2TixUPXid3wipzfWVj3TbUIUYfUca2bNv40QJS9ErYB9QapY9tXO3Q8hMGvfO3JT8KhvzYAbGplFmSOFGMLUD3v0CM/1CM8Dm3Q==");
+        logger.info(s);
+//        return byteArrayOutputStream.toString();
     }
 }
