@@ -78,6 +78,10 @@ public class DevAccountServiceImpl implements DevAccountService {
     @Override
     public Long apply(DevAccountSaveReqVO createReqVO) {
         try {
+            LoginUser loginUser1 = SecurityFrameworkUtils.getLoginUser();
+            createReqVO.setUserId(loginUser1.getId());
+            createReqVO.setUserType(loginUser1.getUserType());
+
             KeyPair keyPair = RSAUtils.genKey();
             createReqVO.setApiPublicKey(RSAUtils.encryptBASE64(keyPair.getPublic().getEncoded()));
             createReqVO.setApiPrivateKey(RSAUtils.encryptBASE64(keyPair.getPrivate().getEncoded()));
