@@ -28,7 +28,7 @@ public class AppDevAccountController {
 
     @PostMapping("/create")
     @Operation(summary = "创建开放平台用户")
-    @PreAuthorize("@ss.hasPermission('steam:dev-account:create')")
+//    @PreAuthorize("@ss.hasPermission('steam:dev-account:create')")
     public CommonResult<Long> createDevAccount(@Valid @RequestBody DevAccountSaveReqVO createReqVO) {
         return success(devAccountService.apply(createReqVO));
     }
