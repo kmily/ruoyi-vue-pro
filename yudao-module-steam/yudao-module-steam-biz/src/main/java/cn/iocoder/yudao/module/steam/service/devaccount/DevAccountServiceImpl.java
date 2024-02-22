@@ -107,6 +107,15 @@ public class DevAccountServiceImpl implements DevAccountService {
 
     }
 
+    @Override
+    public List<DevAccountDO> accountList(DevAccountSaveReqVO pageReqVO) {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        return devAccountMapper.selectList(new LambdaQueryWrapperX<DevAccountDO>()
+                .eq(DevAccountDO::getUserType,loginUser.getUserType())
+                .eq(DevAccountDO::getUserId,loginUser.getId())
+        );
+    }
+
     public DevAccountDO selectByUserName (String userName, UserTypeEnum userTypeEnum) {
         try {
             DevAccountPageReqVO devAccountPageReqVO=new DevAccountPageReqVO();

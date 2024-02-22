@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.devaccount.vo.DevAccountSa
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 开放平台用户 Service 接口
@@ -59,5 +60,6 @@ public interface DevAccountService {
      * @return 开放平台用户分页
      */
     Long apply(DevAccountSaveReqVO pageReqVO);
+    List<DevAccountDO> accountList();
     DevAccountDO selectByUserName (String userName, UserTypeEnum userType);
 }
