@@ -34,25 +34,25 @@ public class InvPageReqVO extends PageParam {
     @Schema(description = "steamId", example = "24553")
     private String steamId;
 
-    @Schema(description = "启用", example = "1")
-    private Boolean status;
-
     @Schema(description = "出售价格单价分", example = "26052")
     private Integer price;
-
-    @Schema(description = "发货状态", example = "2")
-    private Integer transferStatus;
 
     @Schema(description = "csgoid", example = "6292")
     private Integer appid;
 
-    @Schema(description = "用户ID", example = "187")
-    private Long userId;
-
-    @Schema(description = "用户类型", example = "2")
-    private Integer userType;
-
     @Schema(description = "绑定用户ID", example = "19319")
     private Long bindUserId;
+
+    @Schema(description = "状态", example = "2")
+    private Integer status;
+
+    @Schema(description = "发货状态(0代表未出售，1代表已出售 )", example = "2")
+    private Integer transferStatus;
+
+    @Schema(description = "平台用户ID", example = "20764")
+    private Long userId;
+
+    @Schema(description = "用户类型(前后台用户)", example = "1")
+    private Integer userType;
 
 }

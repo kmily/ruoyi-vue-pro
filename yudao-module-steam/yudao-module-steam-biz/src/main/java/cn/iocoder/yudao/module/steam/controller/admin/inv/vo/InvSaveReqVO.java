@@ -25,14 +25,8 @@ public class InvSaveReqVO {
     @NotEmpty(message = "steamId不能为空")
     private String steamId;
 
-    @Schema(description = "启用", example = "1")
-    private Boolean status;
-
     @Schema(description = "出售价格单价分", example = "26052")
     private Integer price;
-
-    @Schema(description = "发货状态", example = "2")
-    private Integer transferStatus;
 
     @Schema(description = "Primary Key", requiredMode = Schema.RequiredMode.REQUIRED, example = "10811")
     private Long id;
@@ -43,13 +37,19 @@ public class InvSaveReqVO {
     @Schema(description = "租户ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "19819")
     private Long tenantId;
 
-    @Schema(description = "用户ID", example = "187")
-    private Long userId;
-
-    @Schema(description = "用户类型", example = "2")
-    private Integer userType;
-
     @Schema(description = "绑定用户ID", example = "19319")
     private Long bindUserId;
+
+    @Schema(description = "状态", example = "2")
+    private Integer status;
+
+    @Schema(description = "发货状态(0代表未出售，1代表已出售 )", example = "2")
+    private Integer transferStatus;
+
+    @Schema(description = "平台用户ID", example = "20764")
+    private Long userId;
+
+    @Schema(description = "用户类型(前后台用户)", example = "1")
+    private Integer userType;
 
 }

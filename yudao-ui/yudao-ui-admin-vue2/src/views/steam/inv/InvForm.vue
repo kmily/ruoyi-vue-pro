@@ -18,33 +18,36 @@
                     <el-form-item label="steamId" prop="steamId">
                       <el-input v-model="formData.steamId" placeholder="请输入steamId" />
                     </el-form-item>
-                    <el-form-item label="启用" prop="status">
-                      <el-radio-group v-model="formData.status">
-                            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_BOOLEAN_STRING)"
-                                      :key="dict.value" :label="dict.value">{{dict.label}}</el-radio>
-                      </el-radio-group>
-                    </el-form-item>
                     <el-form-item label="出售价格单价分" prop="price">
                       <el-input v-model="formData.price" placeholder="请输入出售价格单价分" />
-                    </el-form-item>
-                    <el-form-item label="发货状态" prop="transferStatus">
-                      <el-radio-group v-model="formData.transferStatus">
-                            <el-radio label="1">请选择字典生成</el-radio>
-                      </el-radio-group>
                     </el-form-item>
                     <el-form-item label="csgoid" prop="appid">
                       <el-input v-model="formData.appid" placeholder="请输入csgoid" />
                     </el-form-item>
-                    <el-form-item label="用户ID" prop="userId">
-                      <el-input v-model="formData.userId" placeholder="请输入用户ID" />
-                    </el-form-item>
-                    <el-form-item label="用户类型" prop="userType">
-                      <el-select v-model="formData.userType" placeholder="请选择用户类型">
-                            <el-option label="请选择字典生成" value="" />
-                      </el-select>
-                    </el-form-item>
                     <el-form-item label="绑定用户ID" prop="bindUserId">
                       <el-input v-model="formData.bindUserId" placeholder="请输入绑定用户ID" />
+                    </el-form-item>
+                    <el-form-item label="状态" prop="status">
+                      <el-radio-group v-model="formData.status">
+                            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
+                                      :key="dict.value" :label="parseInt(dict.value)"
+>{{dict.label}}</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="发货状态(0代表未出售，1代表已出售 )" prop="transferStatus">
+                      <el-radio-group v-model="formData.transferStatus">
+                            <el-radio label="1">请选择字典生成</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="平台用户ID" prop="userId">
+                      <el-input v-model="formData.userId" placeholder="请输入平台用户ID" />
+                    </el-form-item>
+                    <el-form-item label="用户类型(前后台用户)" prop="userType">
+                      <el-radio-group v-model="formData.userType">
+                            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.USER_TYPE)"
+                                      :key="dict.value" :label="parseInt(dict.value)"
+>{{dict.label}}</el-radio>
+                      </el-radio-group>
                     </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
@@ -76,15 +79,15 @@
                             instanceid: undefined,
                             amount: undefined,
                             steamId: undefined,
-                            status: undefined,
                             price: undefined,
-                            transferStatus: undefined,
                             id: undefined,
                             appid: undefined,
                             tenantId: undefined,
+                            bindUserId: undefined,
+                            status: undefined,
+                            transferStatus: undefined,
                             userId: undefined,
                             userType: undefined,
-                            bindUserId: undefined,
         },
         // 表单校验
         formRules: {
@@ -142,15 +145,15 @@
                             instanceid: undefined,
                             amount: undefined,
                             steamId: undefined,
-                            status: undefined,
                             price: undefined,
-                            transferStatus: undefined,
                             id: undefined,
                             appid: undefined,
                             tenantId: undefined,
+                            bindUserId: undefined,
+                            status: undefined,
+                            transferStatus: undefined,
                             userId: undefined,
                             userType: undefined,
-                            bindUserId: undefined,
         };
         this.resetForm("formRef");
       }

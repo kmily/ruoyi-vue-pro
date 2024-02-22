@@ -43,19 +43,9 @@ public class InvDO extends BaseDO {
      */
     private String steamId;
     /**
-     * 启用
-     *
-     * 枚举 {@link TODO infra_boolean_string 对应的类}
-     */
-    private Boolean status;
-    /**
      * 出售价格单价分
      */
     private Integer price;
-    /**
-     * 发货状态
-     */
-    private Integer transferStatus;
     /**
      * Primary Key
      */
@@ -66,16 +56,28 @@ public class InvDO extends BaseDO {
      */
     private Integer appid;
     /**
-     * 用户ID
-     */
-    private Long userId;
-    /**
-     * 用户类型
-     */
-    private Integer userType;
-    /**
      * 绑定用户ID
      */
     private Long bindUserId;
+    /**
+     * 状态
+     *
+     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum  对应的类}
+     */
+    private Integer status;
+    /**
+     * 发货状态(0代表未出售，1代表已出售 )
+     */
+    private Integer transferStatus;
+    /**
+     * 平台用户ID
+     */
+    private Long userId;
+    /**
+     * 用户类型(前后台用户)
+     *
+     * 枚举 {@link TODO user_type 对应的类}
+     */
+    private Integer userType;
 
 }
