@@ -93,7 +93,7 @@ public class SteamService {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         BindUserDO bindUserDO = bindUserMapper.selectById(bindUserId);
         if(Objects.isNull(bindUserDO)){
-            throw new ServiceException(-1,"读取maFile失败，请检查后再试。");
+            throw new ServiceException(-1,"绑定失败，请检查后再试。");
         }
         if(!bindUserDO.getUserId().equals(loginUser.getId())){
             throw new ServiceException(-1,"没有权限操作。");
