@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
+import cn.iocoder.yudao.module.steam.service.steam.CreateWithdrawalResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
@@ -39,11 +40,11 @@ public class AppWalletController {
     @PostMapping("/create/withdrawal")
     @Operation(summary = "创建提现订单")
     @PreAuthenticated
-    public CommonResult<Long> createWithdrawal(@Valid @RequestBody PayWithdrawalOrderCreateReqVO createReqVO) {
+    public CommonResult<CreateWithdrawalResult> createWithdrawal(@Valid @RequestBody PayWithdrawalOrderCreateReqVO createReqVO) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        Long demoOrder = paySteamOrderService.createWithdrawalOrder(loginUser, createReqVO);
+        CreateWithdrawalResult withdrawalOrder = paySteamOrderService.createWithdrawalOrder(loginUser, createReqVO);
         //自动支付
-        return CommonResult.success(demoOrder);
+        return CommonResult.success(withdrawalOrder);
     }
     @PostMapping("/withdrawal/update-paid")
     @Operation(summary = "更新提现订单已支付") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
