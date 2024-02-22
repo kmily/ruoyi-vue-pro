@@ -70,7 +70,7 @@ public class AppBindUserController {
 //    @PreAuthorize("@ss.hasPermi('steam:user:export')")
     @Operation(summary = "steam用户绑定")
     @PreAuthenticated
-    @GetMapping("/openapi/back")
+    @PostMapping("/openapi/back")
     public CommonResult<Integer> openApiBack(HttpServletRequest request) throws Exception {
         OpenApi openApi = new OpenApi();
         openApi.setNs(request.getParameter("openid.ns"));
@@ -87,7 +87,7 @@ public class AppBindUserController {
         int bind = steamService.bind(openApi);
         return success(1);
     }
-    @PostMapping("/steam/list")
+    @GetMapping("/steam/list")
     @Operation(summary = "steam绑定列表", description = "上传ma文件")
     @PreAuthenticated
     @OperateLog(logArgs = false) // 上传文件，没有记录操作日志的必要
