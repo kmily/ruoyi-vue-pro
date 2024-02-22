@@ -116,13 +116,13 @@ public class InvServiceImplTest extends BaseDbUnitTest {
            o.setAmount(null);
            o.setCreateTime(null);
            o.setSteamId(null);
-           o.setStatus(null);
            o.setPrice(null);
-           o.setTransferStatus(null);
            o.setAppid(null);
+           o.setBindUserId(null);
+           o.setStatus(null);
+           o.setTransferStatus(null);
            o.setUserId(null);
            o.setUserType(null);
-           o.setBindUserId(null);
        });
        invMapper.insert(dbInv);
        // 测试 assetid 不匹配
@@ -137,20 +137,20 @@ public class InvServiceImplTest extends BaseDbUnitTest {
        invMapper.insert(cloneIgnoreId(dbInv, o -> o.setCreateTime(null)));
        // 测试 steamId 不匹配
        invMapper.insert(cloneIgnoreId(dbInv, o -> o.setSteamId(null)));
-       // 测试 status 不匹配
-       invMapper.insert(cloneIgnoreId(dbInv, o -> o.setStatus(null)));
        // 测试 price 不匹配
        invMapper.insert(cloneIgnoreId(dbInv, o -> o.setPrice(null)));
-       // 测试 transferStatus 不匹配
-       invMapper.insert(cloneIgnoreId(dbInv, o -> o.setTransferStatus(null)));
        // 测试 appid 不匹配
        invMapper.insert(cloneIgnoreId(dbInv, o -> o.setAppid(null)));
+       // 测试 bindUserId 不匹配
+       invMapper.insert(cloneIgnoreId(dbInv, o -> o.setBindUserId(null)));
+       // 测试 status 不匹配
+       invMapper.insert(cloneIgnoreId(dbInv, o -> o.setStatus(null)));
+       // 测试 transferStatus 不匹配
+       invMapper.insert(cloneIgnoreId(dbInv, o -> o.setTransferStatus(null)));
        // 测试 userId 不匹配
        invMapper.insert(cloneIgnoreId(dbInv, o -> o.setUserId(null)));
        // 测试 userType 不匹配
        invMapper.insert(cloneIgnoreId(dbInv, o -> o.setUserType(null)));
-       // 测试 bindUserId 不匹配
-       invMapper.insert(cloneIgnoreId(dbInv, o -> o.setBindUserId(null)));
        // 准备参数
        InvPageReqVO reqVO = new InvPageReqVO();
        reqVO.setAssetid(null);
@@ -159,13 +159,13 @@ public class InvServiceImplTest extends BaseDbUnitTest {
        reqVO.setAmount(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
        reqVO.setSteamId(null);
-       reqVO.setStatus(null);
        reqVO.setPrice(null);
-       reqVO.setTransferStatus(null);
        reqVO.setAppid(null);
+       reqVO.setBindUserId(null);
+       reqVO.setStatus(null);
+       reqVO.setTransferStatus(null);
        reqVO.setUserId(null);
        reqVO.setUserType(null);
-       reqVO.setBindUserId(null);
 
        // 调用
        PageResult<InvDO> pageResult = invService.getInvPage(reqVO);

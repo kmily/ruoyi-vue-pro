@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
-import cn.iocoder.yudao.module.steam.service.steam.CreateWithdrawalResult;
+import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
@@ -40,9 +40,9 @@ public class AppWalletController {
     @PostMapping("/create/withdrawal")
     @Operation(summary = "创建提现订单")
     @PreAuthenticated
-    public CommonResult<CreateWithdrawalResult> createWithdrawal(@Valid @RequestBody PayWithdrawalOrderCreateReqVO createReqVO) {
+    public CommonResult<CreateOrderResult> createWithdrawal(@Valid @RequestBody PayWithdrawalOrderCreateReqVO createReqVO) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        CreateWithdrawalResult withdrawalOrder = paySteamOrderService.createWithdrawalOrder(loginUser, createReqVO);
+        CreateOrderResult withdrawalOrder = paySteamOrderService.createWithdrawalOrder(loginUser, createReqVO);
         //自动支付
         return CommonResult.success(withdrawalOrder);
     }
@@ -58,10 +58,10 @@ public class AppWalletController {
     @PostMapping("/create/invOrder")
     @Operation(summary = "创建库存订单")
     @PreAuthenticated
-    public CommonResult<Long> createInvOrder(@Valid @RequestBody PaySteamOrderCreateReqVO createReqVO) {
+    public CommonResult<CreateOrderResult> createInvOrder(@Valid @RequestBody PaySteamOrderCreateReqVO createReqVO) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        Long demoOrder = paySteamOrderService.createInvOrder(loginUser, createReqVO);
-        return CommonResult.success(demoOrder);
+        CreateOrderResult invOrder = paySteamOrderService.createInvOrder(loginUser, createReqVO);
+        return CommonResult.success(invOrder);
     }
 
     @PostMapping("/update-paid")

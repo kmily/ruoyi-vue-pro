@@ -13,10 +13,6 @@ import com.alibaba.excel.annotation.*;
 @ExcelIgnoreUnannotated
 public class BindUserRespVO {
 
-    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "25045")
-    @ExcelProperty("ID")
-    private Integer id;
-
     @Schema(description = "steam名称", example = "王五")
     @ExcelProperty("steam名称")
     private String steamName;
@@ -48,5 +44,9 @@ public class BindUserRespVO {
     @Schema(description = "maFile文件")
     @ExcelProperty("maFile文件")
     private String maFile;
+
+    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "32702")
+    @ExcelProperty("ID")
+    private Long id;
 
 }

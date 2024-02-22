@@ -27,14 +27,12 @@ public class AppDevAccountController {
 
     @PostMapping("/create")
     @Operation(summary = "创建开放平台用户")
-//    @PreAuthorize("@ss.hasPermission('steam:dev-account:create')")
     public CommonResult<Long> createDevAccount(@Valid @RequestBody DevAccountSaveReqVO createReqVO) {
         createReqVO.setUserName("open_"+IdUtil.simpleUUID());
         return success(devAccountService.apply(createReqVO));
     }
     @GetMapping("/list")
     @Operation(summary = "开放平台列表")
-//    @PreAuthorize("@ss.hasPermission('steam:dev-account:create')")
     public CommonResult<List<DevAccountDO>> list() {
         return success(devAccountService.accountList());
     }

@@ -26,11 +26,6 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 public class BindUserDO extends BaseDO {
 
     /**
-     * ID
-     */
-    @TableId
-    private Integer id;
-    /**
      * steam名称
      */
     private String steamName;
@@ -68,5 +63,10 @@ public class BindUserDO extends BaseDO {
      * 用户类型
      */
     private Integer userType;
+    /**
+     * ID
+     */
+    @TableId
+    private Long id;
 
 }

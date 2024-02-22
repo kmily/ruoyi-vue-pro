@@ -41,7 +41,7 @@ public class BindUserController {
     @PostMapping("/create")
     @Operation(summary = "创建 steam用户绑定")
     @PreAuthorize("@ss.hasPermission('steam:bind-user:create')")
-    public CommonResult<Integer> createBindUser(@Valid @RequestBody BindUserSaveReqVO createReqVO) {
+    public CommonResult<Long> createBindUser(@Valid @RequestBody BindUserSaveReqVO createReqVO) {
         return success(bindUserService.createBindUser(createReqVO));
     }
 
@@ -57,7 +57,7 @@ public class BindUserController {
     @Operation(summary = "删除 steam用户绑定")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('steam:bind-user:delete')")
-    public CommonResult<Boolean> deleteBindUser(@RequestParam("id") Integer id) {
+    public CommonResult<Boolean> deleteBindUser(@RequestParam("id") Long id) {
         bindUserService.deleteBindUser(id);
         return success(true);
     }
@@ -66,7 +66,7 @@ public class BindUserController {
     @Operation(summary = "获得 steam用户绑定")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('steam:bind-user:query')")
-    public CommonResult<BindUserRespVO> getBindUser(@RequestParam("id") Integer id) {
+    public CommonResult<BindUserRespVO> getBindUser(@RequestParam("id") Long id) {
         BindUserDO bindUser = bindUserService.getBindUser(id);
         return success(BeanUtils.toBean(bindUser, BindUserRespVO.class));
     }

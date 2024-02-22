@@ -44,8 +44,7 @@
     </el-row>
 
             <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
-            <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="steam名称" align="center" prop="steamName" />
+            <el-table-column label="steam名称" align="center" prop="steamName" />
       <el-table-column label="用户ID" align="center" prop="userId" />
       <el-table-column label="SteamId" align="center" prop="steamId" />
       <el-table-column label="交易链接" align="center" prop="tradeUrl" />
@@ -57,6 +56,7 @@
         </template>
       </el-table-column>
       <el-table-column label="maFile文件" align="center" prop="maFile" />
+      <el-table-column label="ID" align="center" prop="id" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"

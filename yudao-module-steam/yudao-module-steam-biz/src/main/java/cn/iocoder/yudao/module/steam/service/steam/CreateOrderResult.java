@@ -5,11 +5,11 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class CreateWithdrawalResult implements Serializable {
+public class CreateOrderResult implements Serializable {
     /**
-     * 提现ID
+     * 业务单据
      */
-    private Long withdrawalId;
+    private Long bizOrderId;
     /**
      * 支付订单ID
      */

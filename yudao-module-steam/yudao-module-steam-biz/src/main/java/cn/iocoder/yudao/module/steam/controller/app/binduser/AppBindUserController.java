@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppBindUserMaFileReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.service.SteamService;
-import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -34,14 +32,17 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RequestMapping("/steam-app/bind-user")
 @Validated
 public class AppBindUserController {
-
-    @Resource
-    private BindUserService bindUserService;
-
-    @Autowired
     private SteamService steamService;
-    @Autowired
     private ConfigService configService;
+    @Autowired
+    public void setSteamService(SteamService steamService) {
+        this.steamService = steamService;
+    }
+
+    @Autowired
+    public void setConfigService(ConfigService configService) {
+        this.configService = configService;
+    }
 
     /**
      * 查询 steam用户绑定列表
@@ -64,7 +65,6 @@ public class AppBindUserController {
     /**
      * 导出 steam用户绑定列表
      */
-//    @PreAuthorize("@ss.hasPermi('steam:user:export')")
     @Operation(summary = "steam用户绑定")
     @PreAuthenticated
     @PostMapping("/openapi/back")
@@ -87,7 +87,7 @@ public class AppBindUserController {
     @GetMapping("/steam/list")
     @Operation(summary = "steam绑定列表", description = "上传ma文件")
     @PreAuthenticated
-    @OperateLog(logArgs = false) // 上传文件，没有记录操作日志的必要
+    @OperateLog(logArgs = false)
     public CommonResult<List<BindUserDO>> steamList(){
         return success(steamService.steamList());
     }
@@ -98,7 +98,6 @@ public class AppBindUserController {
     @OperateLog(logArgs = false) // 上传文件，没有记录操作日志的必要
     public CommonResult<String> uploadFile(AppBindUserMaFileReqVO appBindUserMaFileReqVO) throws Exception {
         MultipartFile file = appBindUserMaFileReqVO.getFile();
-        String path = appBindUserMaFileReqVO.getPassword();
         steamService.bindMaFile(IoUtil.readBytes(file.getInputStream()),appBindUserMaFileReqVO.getPassword(),appBindUserMaFileReqVO.getBindUserId());
         return success("成功");
     }
