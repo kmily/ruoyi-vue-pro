@@ -30,7 +30,7 @@ public class BindUserServiceImpl implements BindUserService {
     private BindUserMapper bindUserMapper;
 
     @Override
-    public Integer createBindUser(BindUserSaveReqVO createReqVO) {
+    public Long createBindUser(BindUserSaveReqVO createReqVO) {
         // 插入
         BindUserDO bindUser = BeanUtils.toBean(createReqVO, BindUserDO.class);
         bindUserMapper.insert(bindUser);
@@ -48,21 +48,21 @@ public class BindUserServiceImpl implements BindUserService {
     }
 
     @Override
-    public void deleteBindUser(Integer id) {
+    public void deleteBindUser(Long id) {
         // 校验存在
         validateBindUserExists(id);
         // 删除
         bindUserMapper.deleteById(id);
     }
 
-    private void validateBindUserExists(Integer id) {
+    private void validateBindUserExists(Long id) {
         if (bindUserMapper.selectById(id) == null) {
             throw exception(BIND_USER_NOT_EXISTS);
         }
     }
 
     @Override
-    public BindUserDO getBindUser(Integer id) {
+    public BindUserDO getBindUser(Long id) {
         return bindUserMapper.selectById(id);
     }
 

@@ -9,9 +9,6 @@ import javax.validation.constraints.*;
 @Data
 public class BindUserSaveReqVO {
 
-    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "25045")
-    private Integer id;
-
     @Schema(description = "steam名称", example = "王五")
     private String steamName;
 
@@ -37,5 +34,8 @@ public class BindUserSaveReqVO {
 
     @Schema(description = "maFile文件")
     private String maFile;
+
+    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "32702")
+    private Long id;
 
 }

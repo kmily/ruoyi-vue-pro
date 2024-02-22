@@ -54,7 +54,6 @@
         formLoading: false,
         // 表单参数
         formData: {
-                            id: undefined,
                             steamName: undefined,
                             userId: undefined,
                             steamId: undefined,
@@ -63,6 +62,7 @@
                             remark: undefined,
                             steamPassword: undefined,
                             maFile: undefined,
+                            id: undefined,
         },
         // 表单校验
         formRules: {
@@ -116,7 +116,6 @@
                       /** 表单重置 */
       reset() {
         this.formData = {
-                            id: undefined,
                             steamName: undefined,
                             userId: undefined,
                             steamId: undefined,
@@ -125,6 +124,7 @@
                             remark: undefined,
                             steamPassword: undefined,
                             maFile: undefined,
+                            id: undefined,
         };
         this.resetForm("formRef");
       }

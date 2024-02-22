@@ -20,7 +20,7 @@ public interface BindUserService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Integer createBindUser(@Valid BindUserSaveReqVO createReqVO);
+    Long createBindUser(@Valid BindUserSaveReqVO createReqVO);
 
     /**
      * 更新 steam用户绑定
@@ -34,7 +34,7 @@ public interface BindUserService {
      *
      * @param id 编号
      */
-    void deleteBindUser(Integer id);
+    void deleteBindUser(Long id);
 
     /**
      * 获得 steam用户绑定
@@ -42,7 +42,7 @@ public interface BindUserService {
      * @param id 编号
      * @return  steam用户绑定
      */
-    BindUserDO getBindUser(Integer id);
+    BindUserDO getBindUser(Long id);
 
     /**
      * 获得 steam用户绑定分页

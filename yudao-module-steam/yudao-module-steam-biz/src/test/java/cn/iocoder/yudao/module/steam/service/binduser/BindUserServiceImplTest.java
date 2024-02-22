@@ -48,7 +48,7 @@ public class BindUserServiceImplTest extends BaseDbUnitTest {
         BindUserSaveReqVO createReqVO = randomPojo(BindUserSaveReqVO.class).setId(null);
 
         // 调用
-        Integer bindUserId = bindUserService.createBindUser(createReqVO);
+        Long bindUserId = bindUserService.createBindUser(createReqVO);
         // 断言
         assertNotNull(bindUserId);
         // 校验记录的属性是否正确
@@ -88,7 +88,7 @@ public class BindUserServiceImplTest extends BaseDbUnitTest {
         BindUserDO dbBindUser = randomPojo(BindUserDO.class);
         bindUserMapper.insert(dbBindUser);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        Integer id = dbBindUser.getId();
+        Long id = dbBindUser.getId();
 
         // 调用
         bindUserService.deleteBindUser(id);
@@ -99,7 +99,7 @@ public class BindUserServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testDeleteBindUser_notExists() {
         // 准备参数
-        Integer id = 1;
+        Long id = randomLongId();
 
         // 调用, 并断言异常
         assertServiceException(() -> bindUserService.deleteBindUser(id), BIND_USER_NOT_EXISTS);
