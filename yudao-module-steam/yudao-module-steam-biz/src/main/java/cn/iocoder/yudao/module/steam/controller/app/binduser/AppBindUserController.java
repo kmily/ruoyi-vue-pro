@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.List;
@@ -96,7 +97,7 @@ public class AppBindUserController {
     @Operation(summary = "上传ma文件", description = "上传ma文件")
     @PreAuthenticated
     @OperateLog(logArgs = false) // 上传文件，没有记录操作日志的必要
-    public CommonResult<String> uploadFile(AppBindUserMaFileReqVO appBindUserMaFileReqVO) throws Exception {
+    public CommonResult<String> uploadFile(@Valid AppBindUserMaFileReqVO appBindUserMaFileReqVO) throws Exception {
         MultipartFile file = appBindUserMaFileReqVO.getFile();
         steamService.bindMaFile(IoUtil.readBytes(file.getInputStream()),appBindUserMaFileReqVO.getPassword(),appBindUserMaFileReqVO.getBindUserId());
         return success("成功");
