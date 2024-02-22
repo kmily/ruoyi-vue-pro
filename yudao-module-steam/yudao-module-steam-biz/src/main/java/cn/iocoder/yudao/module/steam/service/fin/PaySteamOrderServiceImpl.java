@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.steam.service.fin;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
@@ -13,9 +15,11 @@ import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal.WithdrawalDO;
+import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
@@ -28,7 +32,9 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static cn.hutool.core.util.ObjectUtil.notEqual;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -68,6 +74,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     private InvOrderMapper invOrderMapper;
     @Resource
     private WithdrawalMapper withdrawalMapper;
+
+    @Resource
+    private BindUserMapper bindUserMapper;
 
     public PaySteamOrderServiceImpl() {
     }
@@ -185,7 +194,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     public Long createInvOrder(LoginUser loginUser, PaySteamOrderCreateReqVO createReqVO) {
         // 1.1 获得商品
         InvOrderDO invOrderDO = new InvOrderDO().setInvId(createReqVO.getInvId()).setSteamId(createReqVO.getSteamId())
-                .setPrice(createReqVO.getPrice())
+                .setPrice(createReqVO.getPrice()).setSteamId(createReqVO.getSteamId())
                 .setPayStatus(false).setRefundPrice(0).setUserId(loginUser.getId()).setUserType(loginUser.getUserType());
         validateInvOrderCanCreate(invOrderDO);
         invOrderMapper.insert(invOrderDO);
@@ -208,11 +217,26 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         if (invDO == null) {
             throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
         }
-        if(!invOrderDO.getUserId().equals(invDO.getUserId())){
-            throw exception(ErrorCodeConstants.INVORDER_USER_EXCEPT);
+        if(CommonStatusEnum.isDisable(invDO.getStatus())){
+            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
         }
-        if(!invOrderDO.getUserType().equals(invDO.getUserType())){
-            throw exception(ErrorCodeConstants.INVORDER_USER_EXCEPT);
+        if(CommonStatusEnum.isDisable(invDO.getStatus())){
+            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
+        }
+        if(Objects.isNull(invDO.getBindUserId())){
+            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
+        }
+        if(invOrderDO.getUserId().equals(invDO.getUserId()) && invOrderDO.getUserType().equals(invDO.getUserType())){
+            throw exception(ErrorCodeConstants.INVORDER_ORDERUSER_EXCEPT);
+        }
+        //检查是否已经下过单
+        List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
+                .eq(InvOrderDO::getInvId, invDO.getId())
+//                .eq(InvOrderDO::getPayStatus, 1)
+                .isNull(InvOrderDO::getPayRefundId)
+        );
+        if(invOrderDOS.size()>0){
+            throw exception(ErrorCodeConstants.INVORDER_ORDERED_EXCEPT);
         }
         // 校验订单是否支付
         if (invOrderDO.getPrice()<=0) {
@@ -221,6 +245,19 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         // 校验订单是否支付
         if (invOrderDO.getPayStatus()) {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
+        }
+        //检查用户steamID是否正确只检查bindUser
+        Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+                .eq(BindUserDO::getUserId, invOrderDO.getUserId())
+                .eq(BindUserDO::getUserType, invOrderDO.getUserType())
+                .eq(BindUserDO::getSteamId, invOrderDO.getSteamId())
+        ).stream().findFirst();
+        if(!first.isPresent()){
+            throw exception(ErrorCodeConstants.INVORDER_BIND_STEAM_EXCEPT);
+        }
+        BindUserDO bindUserDO = first.get();
+        if(Objects.isNull(bindUserDO.getSteamPassword())){
+            throw exception(ErrorCodeConstants.INVORDER_BIND_STEAM_EXCEPT);
         }
         return invOrderDO;
     }

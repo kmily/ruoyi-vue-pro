@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.steam.controller.app;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.selexterior.vo.SelExteriorPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selitemset.vo.SelItemsetListReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selquality.vo.SelQualityPageReqVO;
@@ -24,8 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
-
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "steam后台 - devApi")
 @RestController

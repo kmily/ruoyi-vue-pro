@@ -76,7 +76,7 @@ public class InvDO extends BaseDO {
     /**
      * 用户类型(前后台用户)
      *
-     * 枚举 {@link TODO user_type 对应的类}
+     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.UserTypeEnum 对应的类}
      */
     private Integer userType;
 
