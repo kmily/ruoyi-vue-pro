@@ -22,6 +22,7 @@ public interface DevAccountMapper extends BaseMapperX<DevAccountDO> {
                 .likeIfPresent(DevAccountDO::getUserName, reqVO.getUserName())
                 .eqIfPresent(DevAccountDO::getSteamId, reqVO.getSteamId())
                 .eqIfPresent(DevAccountDO::getStatus, reqVO.getStatus())
+                .eqIfPresent(DevAccountDO::getUserType, reqVO.getUserType())
                 .orderByDesc(DevAccountDO::getId));
     }
     default DevAccountDO selectByUserName(DevAccountPageReqVO reqVO) {

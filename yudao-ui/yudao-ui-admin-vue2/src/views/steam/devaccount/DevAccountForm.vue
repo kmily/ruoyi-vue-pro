@@ -25,6 +25,12 @@
 >{{dict.label}}</el-radio>
                       </el-radio-group>
                     </el-form-item>
+                    <el-form-item label="用户类型" prop="userType">
+                      <el-select v-model="formData.userType" placeholder="请选择用户类型">
+                            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.USER_TYPE)"
+                                       :key="dict.value" :label="dict.label" :value="parseInt(dict.value)" />
+                      </el-select>
+                    </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm" :disabled="formLoading">确 定</el-button>
@@ -57,6 +63,7 @@
                             apiPublicKey: undefined,
                             steamId: undefined,
                             status: undefined,
+                            userType: undefined,
         },
         // 表单校验
         formRules: {
@@ -116,6 +123,7 @@
                             apiPublicKey: undefined,
                             steamId: undefined,
                             status: undefined,
+                            userType: undefined,
         };
         this.resetForm("formRef");
       }

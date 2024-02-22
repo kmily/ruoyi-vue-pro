@@ -14,6 +14,12 @@
                        :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
+      <el-form-item label="用户类型" prop="userType">
+        <el-select v-model="queryParams.userType" placeholder="请选择用户类型" clearable size="small">
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.USER_TYPE)"
+                       :key="dict.value" :label="dict.label" :value="dict.value"/>
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -51,6 +57,11 @@
       <el-table-column label="更新时间" align="center" prop="updateTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.updateTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="用户类型" align="center" prop="userType">
+        <template v-slot="scope">
+          <dict-tag :type="DICT_TYPE.USER_TYPE" :value="scope.row.userType" />
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -103,6 +114,7 @@ export default {
         userName: null,
         steamId: null,
         status: null,
+        userType: null,
       },
             };
   },
