@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.module.steam.controller.app;
 
+import cn.hutool.extra.spring.SpringUtil;
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.selexterior.vo.SelExteriorPageReqVO;
@@ -8,7 +11,9 @@ import cn.iocoder.yudao.module.steam.controller.admin.selquality.vo.SelQualityPa
 import cn.iocoder.yudao.module.steam.controller.admin.selrarity.vo.SelRarityPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.seltype.vo.SelTypePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppDropListRespVO;
+import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.dal.mysql.seltype.SelWeaponMapper;
+import cn.iocoder.yudao.module.steam.service.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.selexterior.SelExteriorService;
 import cn.iocoder.yudao.module.steam.service.selitemset.SelItemsetService;
@@ -18,20 +23,18 @@ import cn.iocoder.yudao.module.steam.service.seltype.SelTypeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Tag(name = "steam后台 - devApi")
+@Tag(name = "steam后台 - api")
 @RestController
-@RequestMapping("devapi")
+@RequestMapping("api")
 @Validated
-public class AppDevApiController {
+public class AppApiController {
     @Resource
     private SelExteriorService selExteriorService;
     @Resource
@@ -43,10 +46,26 @@ public class AppDevApiController {
     @Resource
     private SelRarityService selRarityService;
     @Resource
+    private OpenApiService openApiService;
+    @Resource
     private SelWeaponMapper selWeaponMapper;
     @Resource
     private SteamService steamService;
 
+
+    /**
+     * 类别选择
+     */
+    @PostMapping("/openapi")
+    @Operation(summary = "")
+    public CommonResult<String> openApi(@RequestBody @Validated OpenApiReqVo openApi) {
+        try {
+            String despatch = openApiService.despatch(openApi);
+            return CommonResult.success(despatch);
+        } catch (ServiceException e) {
+            return CommonResult.error(new ErrorCode(01, "接口出错原因:" + e.getMessage()));
+        }
+    }
 
     /**
      * 类别选择
@@ -137,5 +156,23 @@ public class AppDevApiController {
         exterior.setPageNo(1);
         appDropListRespVO.setExterior(selExteriorService.getSelExteriorPage(exterior).getList());
         return CommonResult.success(appDropListRespVO);
+    }
+
+    @GetMapping("/test")
+
+    public CommonResult<String> test() {
+        TenantUtils.execute(1l,()->{
+            steamService.fetchInventory("76561198316318254","730");
+        });
+
+        return success("test");
+    }
+    /**
+     * 获得自身的代理对象，解决 AOP 生效问题
+     *
+     * @return 自己
+     */
+    private AppApiController getSelf() {
+        return SpringUtil.getBean(getClass());
     }
 }
