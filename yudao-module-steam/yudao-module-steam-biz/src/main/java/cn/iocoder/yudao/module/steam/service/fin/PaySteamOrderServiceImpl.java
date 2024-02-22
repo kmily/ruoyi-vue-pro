@@ -25,7 +25,6 @@ import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
-import cn.iocoder.yudao.module.steam.service.steam.CreateWithdrawalResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -83,8 +82,8 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     }
 
     @Override
-    public CreateWithdrawalResult createWithdrawalOrder(LoginUser loginUser, PayWithdrawalOrderCreateReqVO createReqVO) {
-        CreateWithdrawalResult createWithdrawalResult=new CreateWithdrawalResult();
+    public CreateOrderResult createWithdrawalOrder(LoginUser loginUser, PayWithdrawalOrderCreateReqVO createReqVO) {
+        CreateOrderResult createWithdrawalResult=new CreateOrderResult();
         WithdrawalDO withdrawalDO=new WithdrawalDO().setPayStatus(false)
                 .setPrice(createReqVO.getAmount()).setUserId(loginUser.getId()).setUserType(loginUser.getUserType())
                 .setRefundPrice(0).setWithdrawalInfo(createReqVO.getWithdrawalInfo());
@@ -101,7 +100,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 .setPayOrderId(payOrderId));
         // 返回
         createWithdrawalResult.setPayOrderId(payOrderId);
-        createWithdrawalResult.setWithdrawalId(withdrawalDO.getId());
+        createWithdrawalResult.setBizOrderId(withdrawalDO.getId());
         return createWithdrawalResult;
     }
 

@@ -12,7 +12,6 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
-import cn.iocoder.yudao.module.steam.service.steam.CreateWithdrawalResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
@@ -41,9 +40,9 @@ public class AppWalletController {
     @PostMapping("/create/withdrawal")
     @Operation(summary = "创建提现订单")
     @PreAuthenticated
-    public CommonResult<CreateWithdrawalResult> createWithdrawal(@Valid @RequestBody PayWithdrawalOrderCreateReqVO createReqVO) {
+    public CommonResult<CreateOrderResult> createWithdrawal(@Valid @RequestBody PayWithdrawalOrderCreateReqVO createReqVO) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        CreateWithdrawalResult withdrawalOrder = paySteamOrderService.createWithdrawalOrder(loginUser, createReqVO);
+        CreateOrderResult withdrawalOrder = paySteamOrderService.createWithdrawalOrder(loginUser, createReqVO);
         //自动支付
         return CommonResult.success(withdrawalOrder);
     }
