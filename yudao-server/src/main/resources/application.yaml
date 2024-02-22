@@ -148,7 +148,7 @@ yudao:
   security:
     permit-all_urls:
       - /admin-api/mp/open/** # 微信公众号开放平台，微信回调接口，不需要登录
-      - /app-api/devapi/** # 微信公众号开放平台，微信回调接口，不需要登录
+      - /app-api/api/** # api，不需要登录
   websocket:
     enable: true # websocket的开关
     path: /infra/ws # 路径
@@ -198,6 +198,7 @@ yudao:
       - /ureport/* # UReport 报表，无法携带租户编号
       - /admin-api/mp/open/** # 微信公众号开放平台，微信回调接口，无法携带租户编号
       - /app-api/devapi/** # 各类不需要登录接口
+      - /app-api/api/* # 各类不需要登录接口
       - /admin-api/steam/notify/** # 支付回调通知，不携带租户编号
     ignore-tables:
       - system_tenant
