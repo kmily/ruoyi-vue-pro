@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageRe
 import cn.iocoder.yudao.module.steam.controller.app.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
+import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.CreateWithdrawalResult;
 
 import javax.validation.Valid;
@@ -38,7 +39,7 @@ public interface PaySteamOrderService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createInvOrder(LoginUser loginUser, @Valid PaySteamOrderCreateReqVO createReqVO);
+    CreateOrderResult createInvOrder(LoginUser loginUser, @Valid PaySteamOrderCreateReqVO createReqVO);
 
     /**
      * 获得示例订单

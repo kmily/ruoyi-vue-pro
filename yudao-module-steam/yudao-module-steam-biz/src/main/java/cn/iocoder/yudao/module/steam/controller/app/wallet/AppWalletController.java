@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
+import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.CreateWithdrawalResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -58,10 +59,10 @@ public class AppWalletController {
     @PostMapping("/create/invOrder")
     @Operation(summary = "创建库存订单")
     @PreAuthenticated
-    public CommonResult<Long> createInvOrder(@Valid @RequestBody PaySteamOrderCreateReqVO createReqVO) {
+    public CommonResult<CreateOrderResult> createInvOrder(@Valid @RequestBody PaySteamOrderCreateReqVO createReqVO) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        Long demoOrder = paySteamOrderService.createInvOrder(loginUser, createReqVO);
-        return CommonResult.success(demoOrder);
+        CreateOrderResult invOrder = paySteamOrderService.createInvOrder(loginUser, createReqVO);
+        return CommonResult.success(invOrder);
     }
 
     @PostMapping("/update-paid")

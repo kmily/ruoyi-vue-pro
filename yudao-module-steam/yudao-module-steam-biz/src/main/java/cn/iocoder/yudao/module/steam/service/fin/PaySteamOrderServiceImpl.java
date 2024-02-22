@@ -24,6 +24,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.CreateWithdrawalResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -191,7 +192,8 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         return payOrder;
     }
     @Override
-    public Long createInvOrder(LoginUser loginUser, PaySteamOrderCreateReqVO createReqVO) {
+    public CreateOrderResult createInvOrder(LoginUser loginUser, PaySteamOrderCreateReqVO createReqVO) {
+        CreateOrderResult createOrderResult=new CreateOrderResult();
         // 1.1 获得商品
         InvOrderDO invOrderDO = new InvOrderDO().setInvId(createReqVO.getInvId()).setSteamId(createReqVO.getSteamId())
                 .setPrice(createReqVO.getPrice()).setSteamId(createReqVO.getSteamId())
@@ -209,7 +211,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         invOrderMapper.updateById(new InvOrderDO().setId(invOrderDO.getId())
                 .setPayOrderId(payOrderId));
         // 返回
-        return invOrderDO.getId();
+        createOrderResult.setBizOrderId(invOrderDO.getId());
+        createOrderResult.setPayOrderId(payOrderId);
+        return createOrderResult;
     }
     private InvOrderDO validateInvOrderCanCreate(InvOrderDO invOrderDO) {
         InvDO invDO = invMapper.selectById(invOrderDO.getInvId());
