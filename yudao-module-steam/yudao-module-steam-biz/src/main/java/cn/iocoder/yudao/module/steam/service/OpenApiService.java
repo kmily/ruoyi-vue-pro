@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.steam.service;
 
 import cn.hutool.extra.spring.SpringUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
@@ -69,6 +70,9 @@ public class OpenApiService {
         DevAccountDO devAccountDO = accountService.selectByUserName(openApiReqVo.getUserName(), UserTypeEnum.MEMBER);
         if(Objects.isNull(devAccountDO)){
             throw new ServiceException(new ErrorCode(1,"接口用户不存在，如有问题请联系客服"));
+        }
+        if(CommonStatusEnum.isDisable(devAccountDO.getStatus())){
+            throw new ServiceException(new ErrorCode(1,"接口已禁用"));
         }
 
         Method[] declaredMethods = this.getClass().getDeclaredMethods();
