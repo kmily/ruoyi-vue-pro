@@ -4,10 +4,8 @@ import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
-import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FileUploadReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
-import cn.iocoder.yudao.module.infra.service.file.FileService;
 import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppBindUserMaFileReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.service.SteamService;
@@ -25,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.List;
@@ -50,7 +47,7 @@ public class AppBindUserController {
      * 查询 steam用户绑定列表
      */
     @GetMapping("/openapi")
-    public CommonResult<String> openApi(HttpServletResponse response) throws IOException {
+    public CommonResult<String> openApi() throws IOException {
         ConfigDO configByKey = configService.getConfigByKey("steam.host");
         ConfigDO siteConfig = configService.getConfigByKey("site.host");
         StringBuilder stringBuffer = new StringBuilder();
@@ -71,7 +68,7 @@ public class AppBindUserController {
     @Operation(summary = "steam用户绑定")
     @PreAuthenticated
     @PostMapping("/openapi/back")
-    public CommonResult<Integer> openApiBack(HttpServletRequest request) throws Exception {
+    public CommonResult<Integer> openApiBack(HttpServletRequest request) {
         OpenApi openApi = new OpenApi();
         openApi.setNs(request.getParameter("openid.ns"));
         openApi.setMode(request.getParameter("openid.mode"));
