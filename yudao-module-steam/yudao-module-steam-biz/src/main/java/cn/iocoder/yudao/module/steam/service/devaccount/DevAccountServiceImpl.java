@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.devaccount.vo.DevAccountPageReqVO;
@@ -17,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.security.KeyPair;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants.DEV_ACCOUNT_NOT_EXISTS;
@@ -77,11 +79,17 @@ public class DevAccountServiceImpl implements DevAccountService {
 
     @Override
     public Long apply(DevAccountSaveReqVO createReqVO) {
+
         try {
             LoginUser loginUser1 = SecurityFrameworkUtils.getLoginUser();
             createReqVO.setUserId(loginUser1.getId());
             createReqVO.setUserType(loginUser1.getUserType());
-
+            List<DevAccountDO> devAccountDOS = devAccountMapper.selectList(
+                    new LambdaQueryWrapperX<DevAccountDO>().eq(DevAccountDO::getUserId,loginUser1.getId())
+                            .eq(DevAccountDO::getUserType,loginUser1.getUserType()));
+            if(devAccountDOS.size()>0){
+                throw new ServiceException(-1,"无权限申请");
+            }
             KeyPair keyPair = RSAUtils.genKey();
             createReqVO.setApiPublicKey(RSAUtils.encryptBASE64(keyPair.getPublic().getEncoded()));
             createReqVO.setApiPrivateKey(RSAUtils.encryptBASE64(keyPair.getPrivate().getEncoded()));
