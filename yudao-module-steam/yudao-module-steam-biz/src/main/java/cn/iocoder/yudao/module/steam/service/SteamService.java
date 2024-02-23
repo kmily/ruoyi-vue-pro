@@ -397,6 +397,7 @@ public class SteamService {
             transferMsg.setMsg(e.getMessage());
             invOrderDO.setTransferStatus(-1);
         }
+        invOrderDO.setTransferText(transferMsg);
         invOrderMapper.updateById(invOrderDO);
     }
 
