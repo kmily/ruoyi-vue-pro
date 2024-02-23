@@ -1,20 +1,22 @@
 package cn.iocoder.yudao.module.steam.dal.dataobject.invorder;
 
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.steam.service.steam.TransferMsg;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import lombok.*;
+
+import java.time.LocalDateTime;
 
 /**
  * steam订单 DO
  *
  * @author 芋道源码
  */
-@TableName("steam_inv_order")
+@TableName(value = "steam_inv_order",autoResultMap = true)
 @KeySequence("steam_inv_order_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -73,6 +75,7 @@ public class InvOrderDO extends BaseDO {
     private Long invId;
     /**
      * 用户类型
+     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.UserTypeEnum 对应的类}
      */
     private Integer userType;
     /**
@@ -82,9 +85,11 @@ public class InvOrderDO extends BaseDO {
     /**
      * 发货信息 json
      */
-    private String transferText;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private TransferMsg transferText;
     /**
      * 发货状态
+     * 枚举 {@link cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum  对应的类}
      */
     private Integer transferStatus;
 

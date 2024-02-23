@@ -24,9 +24,11 @@ import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -78,6 +80,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
 
     @Resource
     private BindUserMapper bindUserMapper;
+    @Autowired
+    private SteamService steamService;
+
 
     public PaySteamOrderServiceImpl() {
     }
@@ -300,6 +305,8 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         if (updateCount == 0) {
             throw exception(DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
+        InvOrderDO invOrderDO = invOrderMapper.selectById(id);
+        steamService.tradeAsset(invOrderDO);
     }
 
     /**
