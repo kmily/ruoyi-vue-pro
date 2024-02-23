@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.steam.utils;
 
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiCheckTradeUrlReqVo;
-import cn.iocoder.yudao.module.steam.controller.app.vo.Test;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.chanjar.weixin.common.util.RandomUtils;
 import org.apache.commons.codec.binary.Base64;
