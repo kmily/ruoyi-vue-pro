@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +30,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RestController
 @RequestMapping("/steam-app/bind-user")
 @Validated
+@Slf4j
 public class AppBindUserController {
     private SteamService steamService;
     private ConfigService configService;
@@ -66,29 +68,31 @@ public class AppBindUserController {
     @Operation(summary = "steam用户绑定")
     @PreAuthenticated
     @PostMapping("/openapi/back")
-    public CommonResult<Integer> openApiBack(
-            @RequestParam("openid.ns") String ns,
-            @RequestParam("openid.mode") String mode,
-            @RequestParam("openid.op_endpoint") String opEndpoint ,
-            @RequestParam("openid.claimed_id") String claimedId,
-            @RequestParam("openid.identity") String identity,
-            @RequestParam("openid.return_to") String return_to,
-            @RequestParam("openid.response_nonce") String response_nonce,
-            @RequestParam("openid.assoc_handle") String assoc_handle,
-            @RequestParam("openid.signed") String signed,
-            @RequestParam("openid.sig") String sig
-                                             ) {
-        OpenApi openApi = new OpenApi();
-        openApi.setNs(ns);
-        openApi.setMode(mode);
-        openApi.setOpEndpoint(opEndpoint);
-        openApi.setClaimedId(claimedId);
-        openApi.setIdentity(identity);
-        openApi.setReturnTo(return_to);
-        openApi.setResponseNonce(response_nonce);
-        openApi.setAssocHandle(assoc_handle);
-        openApi.setSigned(signed);
-        openApi.setSig(sig);
+//    public CommonResult<Integer> openApiBack(
+//            @RequestParam("openid.ns") String ns,
+//            @RequestParam("openid.mode") String mode,
+//            @RequestParam("openid.op_endpoint") String opEndpoint ,
+//            @RequestParam("openid.claimed_id") String claimedId,
+//            @RequestParam("openid.identity") String identity,
+//            @RequestParam("openid.return_to") String return_to,
+//            @RequestParam("openid.response_nonce") String response_nonce,
+//            @RequestParam("openid.assoc_handle") String assoc_handle,
+//            @RequestParam("openid.signed") String signed,
+//            @RequestParam("openid.sig") String sig
+//                                             ) {
+        public CommonResult<Integer> openApiBack(OpenApi openApi) {
+            log.info("接入的入参{}",openApi);
+//        OpenApi openApi = new OpenApi();
+//        openApi.setNs(ns);
+//        openApi.setMode(mode);
+//        openApi.setOpEndpoint(opEndpoint);
+//        openApi.setClaimedId(claimedId);
+//        openApi.setIdentity(identity);
+//        openApi.setReturnTo(return_to);
+//        openApi.setResponseNonce(response_nonce);
+//        openApi.setAssocHandle(assoc_handle);
+//        openApi.setSigned(signed);
+//        openApi.setSig(sig);
 
         int bind = steamService.bind(openApi);
         return success(1);
