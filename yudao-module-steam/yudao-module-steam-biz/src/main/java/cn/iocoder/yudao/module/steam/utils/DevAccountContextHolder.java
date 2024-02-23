@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.steam.utils;
 
-import cn.iocoder.yudao.framework.common.enums.DocumentEnum;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import com.alibaba.ttl.TransmittableThreadLocal;
 
@@ -30,8 +30,7 @@ public class DevAccountContextHolder {
     public static DevAccountDO getRequiredDevAccount() {
         DevAccountDO devAccountDO = getDevAccount();
         if (devAccountDO == null) {
-            throw new NullPointerException("TenantContextHolder 不存在租户编号！可参考文档："
-                    + DocumentEnum.TENANT.getUrl());
+            throw new ServiceException(-1,"DevAccountContextHolder 不存在");
         }
         return devAccountDO;
     }

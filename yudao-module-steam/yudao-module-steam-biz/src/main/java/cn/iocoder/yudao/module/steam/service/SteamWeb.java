@@ -186,6 +186,58 @@ public class SteamWeb {
     }
 
     /**
+     * 验证交易链接是否可惊交易,
+     * Steam帐号交易链接检测，只有返回OK的才是能进行正常交易的
+     * 不能检测自己的帐号
+     * @param tradeUrl
+     */
+    public TradeUrlStatus checkTradeUrl(String tradeUrl){
+        if(Objects.isNull(tradeUrl)){
+            return TradeUrlStatus.ERRORURL;
+        }
+        if(!tradeUrl.startsWith("https://steamcommunity.com/tradeoffer/new/")){
+            return TradeUrlStatus.ERRORURL;
+        }
+        URI uri = URI.create(tradeUrl);
+        try {
+            Map<String, String> query = parseQuery(uri.getQuery());
+            if(Objects.isNull(query.get("partner"))){
+                return TradeUrlStatus.ERRORURL;
+            }
+            if(Objects.isNull(query.get("token"))){
+                return TradeUrlStatus.ERRORURL;
+            }
+        } catch (UnsupportedEncodingException e) {
+            return TradeUrlStatus.ERRORURL;
+        }
+        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+        builder.url(tradeUrl).method(HttpUtil.Method.GET);
+        Map<String, String> header = new HashMap<>();
+        header.put("Accept-Language", "zh-CN,zh;q=0.9");
+        builder.headers(header);
+        try{
+            HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 3000, cookieString, "https://steamcommunity.com/dev/apikey"));
+            String html = sent.html();
+
+            if (html.contains("此用户帐户功能受限")) {
+                return TradeUrlStatus.LIMIT;
+            }
+            if (html.contains("选择一个库存以查看您可以交易的物品")) {
+                return TradeUrlStatus.OK;
+            }
+            if (html.contains("库存隐私设置已被设为“私密”，因此无法接受交易报价。")) {
+                return TradeUrlStatus.PRIVATE;
+            }
+            if (html.contains("该交易 URL 不再能用于向")) {
+                return TradeUrlStatus.NotAvailable;
+            }
+        }catch (ServiceException e){
+            return TradeUrlStatus.BUSY;
+        }
+        return TradeUrlStatus.BUSY;
+    }
+
+    /**
      * 计算桌面令牌
      *
      * @param secret secret 桌面共享key
@@ -444,21 +496,22 @@ public class SteamWeb {
 //
 //        String maFileString = "{\"shared_secret\":\"NTDfP+vPKSLS2O8lXKJgdAp5QRI=\",\"serial_number\":\"3438498994078918164\",\"revocation_code\":\"R34847\",\"uri\":\"otpauth://totp/Steam:6wws6f?secret=GUYN6P7LZ4USFUWY54SVZITAOQFHSQIS&issuer=Steam\",\"server_time\":1701078470,\"account_name\":\"6wws6f\",\"token_gid\":\"2fba3858dfc17a80\",\"identity_secret\":\"q4roYdO+Cz/QOSVHB5m7pbYAyCc=\",\"secret_1\":\"m6OeZ+3cuVr/I/kEK2tjqhgbzSs=\",\"status\":1,\"device_id\":\"android:06ad9382-4690-45c1-90e9-2fc31cf803dc\",\"fully_enrolled\":true,\"Session\":{\"SteamID\":76561199392362087,\"AccessToken\":\"eyAidHlwIjogIkpXVCIsICJhbGciOiAiRWREU0EiIH0.eyAiaXNzIjogInI6MEU3Nl8yM0VDNjYwQV9FNDA1MiIsICJzdWIiOiAiNzY1NjExOTkzOTIzNjIwODciLCAiYXVkIjogWyAid2ViIiwgIm1vYmlsZSIgXSwgImV4cCI6IDE3MDczNzI1MjEsICJuYmYiOiAxNjk4NjQ0Mzc5LCAiaWF0IjogMTcwNzI4NDM3OSwgImp0aSI6ICIwRTdCXzIzRUM2NjEwX0RFREQ0IiwgIm9hdCI6IDE3MDcyODQzNzksICJydF9leHAiOiAxNzI1NTcyOTA5LCAicGVyIjogMCwgImlwX3N1YmplY3QiOiAiMTEzLjI1MS45OS4yMTIiLCAiaXBfY29uZmlybWVyIjogIjExMy4yNTEuOTkuMjEyIiB9.MwVd4CC8DZcjENIKU9X4zDrHYauOsBclYEoyvfOsOtxOM8sYkhhwW9PxzjlweFa7_tkpSKrkXw13Quhwp6X3CA\",\"RefreshToken\":\"eyAidHlwIjogIkpXVCIsICJhbGciOiAiRWREU0EiIH0.eyAiaXNzIjogInN0ZWFtIiwgInN1YiI6ICI3NjU2MTE5OTM5MjM2MjA4NyIsICJhdWQiOiBbICJ3ZWIiLCAicmVuZXciLCAiZGVyaXZlIiwgIm1vYmlsZSIgXSwgImV4cCI6IDE3MjU1NzI5MDksICJuYmYiOiAxNjk4NjQ0Mzc5LCAiaWF0IjogMTcwNzI4NDM3OSwgImp0aSI6ICIwRTc2XzIzRUM2NjBBX0U0MDUyIiwgIm9hdCI6IDE3MDcyODQzNzksICJwZXIiOiAxLCAiaXBfc3ViamVjdCI6ICIxMTMuMjUxLjk5LjIxMiIsICJpcF9jb25maXJtZXIiOiAiMTEzLjI1MS45OS4yMTIiIH0.zYwXhy5shkMyjUJ4s42bbKovBSk6LTmo9-JFUHoGRpUKBRqexr9k35olVDezMX3MVIZ8nN5gwnXYLGQ9ayVWAQ\",\"SessionID\":null}}";
 //
-//        SteamWeb steamWeb = new SteamWeb();
+//        SteamWeb steamWeb = new SteamWeb(null);
 //        try {
 //            SteamMaFile steamMaFile = steamWeb.objectMapper.readValue(maFileString, SteamMaFile.class);
 //            steamWeb.login("QFhG9jSs", steamMaFile);
-//            steamWeb.initApiKey();
-//            String tradeUrl = "https://steamcommunity.com/tradeoffer/new/?partner=1440000356&token=5_JGX9AA";
-//            SteamInvDto steamInvDto = new SteamInvDto();
-//            steamInvDto.setAppid(730);
-//            steamInvDto.setContextid("2");
-//            steamInvDto.setAssetid("35681966437");
-//            steamInvDto.setInstanceid("302028390");
-//            steamInvDto.setClassid("4901046679");
-//            steamInvDto.setAmount("1");
-//            SteamTradeOfferResult trade = steamWeb.trade(steamInvDto, tradeUrl);
-//            log.info("将临信息{}", trade);
+//            TradeUrlStatus tradeUrlStatus = steamWeb.checkTradeUrl("https://steamcommunity.com/tradeoffer/new/?partner=66353311&token=EOt4K8X5");
+////            steamWeb.initApiKey();
+////            String tradeUrl = "https://steamcommunity.com/tradeoffer/new/?partner=1440000356&token=5_JGX9AA";
+////            SteamInvDto steamInvDto = new SteamInvDto();
+////            steamInvDto.setAppid(730);
+////            steamInvDto.setContextid("2");
+////            steamInvDto.setAssetid("35681966437");
+////            steamInvDto.setInstanceid("302028390");
+////            steamInvDto.setClassid("4901046679");
+////            steamInvDto.setAmount("1");
+////            SteamTradeOfferResult trade = steamWeb.trade(steamInvDto, tradeUrl);
+//            log.info("将临信息{}", tradeUrlStatus);
 //        } catch (JsonProcessingException e) {
 //            e.printStackTrace();
 //        }

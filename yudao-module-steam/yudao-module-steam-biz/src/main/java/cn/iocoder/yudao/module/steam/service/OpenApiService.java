@@ -5,16 +5,12 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.wallet.AppPayWalletRespVO;
-import cn.iocoder.yudao.module.pay.convert.wallet.PayWalletConvert;
-import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
+import cn.iocoder.yudao.module.steam.controller.app.AppApiController;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.Test;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.service.devaccount.DevAccountService;
-import cn.iocoder.yudao.module.steam.utils.DevAccountContextHolder;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
 import cn.iocoder.yudao.module.steam.utils.RSAUtils;
 import com.alibaba.fastjson.JSON;
@@ -22,7 +18,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.annotation.Resource;
 import javax.crypto.BadPaddingException;
@@ -41,8 +39,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 /**
  * 开放平台接口
@@ -75,8 +71,16 @@ public class OpenApiService {
             throw new ServiceException(new ErrorCode(1,"接口已禁用"));
         }
 
-        Method[] declaredMethods = this.getClass().getDeclaredMethods();
-        List<Method> collect = Arrays.stream(declaredMethods).filter(item -> item.getName().equals(openApiReqVo.getMethod())).collect(Collectors.toList());
+        Method[] declaredMethods = AppApiController.class.getDeclaredMethods();
+//        List<Method> collect = Arrays.stream(declaredMethods).filter(item -> item.getName().equals(openApiReqVo.getMethod())).collect(Collectors.toList());
+        List<Method> collect = Arrays.stream(declaredMethods).filter(item -> {
+            PostMapping postMapping = AnnotationUtils.getAnnotation(item, PostMapping.class);
+            if(Objects.isNull(postMapping)){
+                return false;
+            }
+            return Arrays.stream(postMapping.value()).filter(path->path.equals(openApiReqVo.getMethod())).count()>0;
+
+        }).collect(Collectors.toList());
         if(collect.size()!=1){
             log.error("方法找不到{}", JSON.toJSON(openApiReqVo));
             throw new ServiceException(new ErrorCode(1,"方法找不到"));
@@ -93,7 +97,7 @@ public class OpenApiService {
             Type[] genericParameterTypes = method.getGenericParameterTypes();
             if(genericParameterTypes.length==0){
                 execute = DevAccountUtils.execute(devAccountDO, () -> {
-                    Object invoke = method.invoke(getSelf());
+                    Object invoke = method.invoke(getBean(AppApiController.class));
                     return invoke;
                 });
             }else{
@@ -106,7 +110,7 @@ public class OpenApiService {
 //                throw new ConstraintViolationException(validate);
                 }
                 execute = DevAccountUtils.execute(devAccountDO, () -> {
-                    Object invoke = method.invoke(getSelf(), o);
+                    Object invoke = method.invoke(getBean(AppApiController.class), o);
                     return invoke;
                 });
             }
@@ -128,22 +132,7 @@ public class OpenApiService {
      *
      * @return 自己
      */
-    private OpenApiService getSelf() {
-        return SpringUtil.getBean(getClass());
-    }
-    public String tese(@Valid Test o){
-        return "Hello"+o.getPassword();
-    }
-    @Resource
-    private PayWalletService payWalletService;
-
-    /**
-     * api余额接口
-     * @return
-     */
-    public CommonResult<AppPayWalletRespVO> getPayWallet() {
-        DevAccountDO devAccount = DevAccountContextHolder.getDevAccount();
-        PayWalletDO wallet = payWalletService.getOrCreateWallet(devAccount.getUserId(), devAccount.getUserType());
-        return success(PayWalletConvert.INSTANCE.convert(wallet));
+    private AppApiController getBean(Class<AppApiController> clazz) {
+        return SpringUtil.getBean(clazz);
     }
 }
