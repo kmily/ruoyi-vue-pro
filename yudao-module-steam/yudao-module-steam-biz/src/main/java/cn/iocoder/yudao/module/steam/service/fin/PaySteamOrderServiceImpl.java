@@ -255,7 +255,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw exception(ErrorCodeConstants.INVORDER_ORDERED_EXCEPT);
         }
         // 校验订单是否支付
-        if (Objects.isNull(invOrderDO.getPrice()) && invOrderDO.getPrice()<=0) {
+        if (Objects.isNull(invOrderDO.getPrice()) || invOrderDO.getPrice()<=0) {
             throw exception(ErrorCodeConstants.INVORDER_AMOUNT_EXCEPT);
         }
         // 校验订单是否支付
