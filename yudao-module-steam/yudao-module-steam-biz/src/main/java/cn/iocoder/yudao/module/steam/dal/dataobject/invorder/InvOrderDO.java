@@ -72,12 +72,20 @@ public class InvOrderDO extends BaseDO {
      */
     private Long invId;
     /**
+     * 用户类型
+     */
+    private Integer userType;
+    /**
      * 购买的steamId
      */
     private String steamId;
     /**
-     * 用户类型
+     * 发货信息 json
      */
-    private Integer userType;
+    private String transferText;
+    /**
+     * 发货状态
+     */
+    private Integer transferStatus;
 
 }

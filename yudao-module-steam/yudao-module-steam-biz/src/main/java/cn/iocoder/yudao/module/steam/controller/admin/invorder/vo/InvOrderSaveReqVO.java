@@ -48,11 +48,17 @@ public class InvOrderSaveReqVO {
     @Schema(description = "库存表ID参考steam_inv", example = "4408")
     private Long invId;
 
-    @Schema(description = "购买的steamId", requiredMode = Schema.RequiredMode.REQUIRED, example = "20776")
+    @Schema(description = "用户类型", example = "2")
+    private Integer userType;
+
+    @Schema(description = "购买的steamId", requiredMode = Schema.RequiredMode.REQUIRED, example = "25575")
     @NotEmpty(message = "购买的steamId不能为空")
     private String steamId;
 
-    @Schema(description = "用户类型", example = "2")
-    private Integer userType;
+    @Schema(description = "发货信息 json")
+    private String transferText;
+
+    @Schema(description = "发货状态", example = "2")
+    private Integer transferStatus;
 
 }

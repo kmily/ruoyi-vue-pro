@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.invdesc.vo.InvDescPageReqV
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
@@ -23,6 +24,7 @@ import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -343,6 +345,16 @@ public class SteamService {
             }
         }
         return json;
+    }
+
+    /**
+     * 发货
+     * @param invOrderDO
+     */
+    @Async
+    public void tradeAsset(InvOrderDO invOrderDO){
+        InvDO invDO = invMapper.selectById(invOrderDO.getInvId());
+
     }
 
 

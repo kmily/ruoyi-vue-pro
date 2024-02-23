@@ -24,10 +24,16 @@ public class InvOrderPageReqVO extends PageParam {
     @Schema(description = "支付订单编号", example = "27239")
     private Long payOrderId;
 
-    @Schema(description = "购买的steamId", example = "20776")
-    private String steamId;
-
     @Schema(description = "用户类型", example = "2")
     private Integer userType;
+
+    @Schema(description = "购买的steamId", example = "25575")
+    private String steamId;
+
+    @Schema(description = "发货信息 json")
+    private String transferText;
+
+    @Schema(description = "发货状态", example = "2")
+    private Integer transferStatus;
 
 }
