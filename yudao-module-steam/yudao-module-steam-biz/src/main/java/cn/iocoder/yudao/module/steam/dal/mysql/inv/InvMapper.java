@@ -19,19 +19,19 @@ public interface InvMapper extends BaseMapperX<InvDO> {
 
     default PageResult<InvDO> selectPage(InvPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<InvDO>()
-                .eqIfPresent(InvDO::getAssetid, reqVO.getAssetid())
                 .eqIfPresent(InvDO::getClassid, reqVO.getClassid())
                 .eqIfPresent(InvDO::getInstanceid, reqVO.getInstanceid())
                 .eqIfPresent(InvDO::getAmount, reqVO.getAmount())
                 .betweenIfPresent(InvDO::getCreateTime, reqVO.getCreateTime())
                 .eqIfPresent(InvDO::getSteamId, reqVO.getSteamId())
-                .eqIfPresent(InvDO::getPrice, reqVO.getPrice())
                 .eqIfPresent(InvDO::getAppid, reqVO.getAppid())
                 .eqIfPresent(InvDO::getBindUserId, reqVO.getBindUserId())
                 .eqIfPresent(InvDO::getStatus, reqVO.getStatus())
                 .eqIfPresent(InvDO::getTransferStatus, reqVO.getTransferStatus())
                 .eqIfPresent(InvDO::getUserId, reqVO.getUserId())
                 .eqIfPresent(InvDO::getUserType, reqVO.getUserType())
+                .eqIfPresent(InvDO::getAssetid, reqVO.getAssetid())
+                .eqIfPresent(InvDO::getPrice, reqVO.getPrice())
                 .orderByDesc(InvDO::getId));
     }
 

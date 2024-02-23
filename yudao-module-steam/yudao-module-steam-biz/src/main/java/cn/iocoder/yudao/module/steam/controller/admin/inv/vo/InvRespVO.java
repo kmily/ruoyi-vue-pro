@@ -15,10 +15,6 @@ import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 @ExcelIgnoreUnannotated
 public class InvRespVO {
 
-    @Schema(description = "assetid", example = "7883")
-    @ExcelProperty("assetid")
-    private String assetid;
-
     @Schema(description = "classid", example = "31967")
     @ExcelProperty("classid")
     private String classid;
@@ -38,10 +34,6 @@ public class InvRespVO {
     @Schema(description = "steamId", requiredMode = Schema.RequiredMode.REQUIRED, example = "24553")
     @ExcelProperty("steamId")
     private String steamId;
-
-    @Schema(description = "出售价格单价分", example = "26052")
-    @ExcelProperty("出售价格单价分")
-    private Integer price;
 
     @Schema(description = "Primary Key", requiredMode = Schema.RequiredMode.REQUIRED, example = "10811")
     @ExcelProperty("Primary Key")
@@ -72,5 +64,17 @@ public class InvRespVO {
     @ExcelProperty(value = "用户类型(前后台用户)", converter = DictConvert.class)
     @DictFormat("user_type") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
     private Integer userType;
+
+    @Schema(description = "资产id(饰品唯一)", example = "27001")
+    @ExcelProperty("资产id(饰品唯一)")
+    private String assetid;
+
+    @Schema(description = "出售价格单价分", example = "27655")
+    @ExcelProperty("出售价格单价分")
+    private Long price;
+
+    @Schema(description = "contextid", example = "31061")
+    @ExcelProperty("contextid")
+    private String contextid;
 
 }

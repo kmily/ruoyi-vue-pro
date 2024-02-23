@@ -9,9 +9,6 @@ import javax.validation.constraints.*;
 @Data
 public class InvSaveReqVO {
 
-    @Schema(description = "assetid", example = "7883")
-    private String assetid;
-
     @Schema(description = "classid", example = "31967")
     private String classid;
 
@@ -24,9 +21,6 @@ public class InvSaveReqVO {
     @Schema(description = "steamId", requiredMode = Schema.RequiredMode.REQUIRED, example = "24553")
     @NotEmpty(message = "steamId不能为空")
     private String steamId;
-
-    @Schema(description = "出售价格单价分", example = "26052")
-    private Integer price;
 
     @Schema(description = "Primary Key", requiredMode = Schema.RequiredMode.REQUIRED, example = "10811")
     private Long id;
@@ -51,5 +45,14 @@ public class InvSaveReqVO {
 
     @Schema(description = "用户类型(前后台用户)", example = "1")
     private Integer userType;
+
+    @Schema(description = "资产id(饰品唯一)", example = "27001")
+    private String assetid;
+
+    @Schema(description = "出售价格单价分", example = "27655")
+    private Long price;
+
+    @Schema(description = "contextid", example = "31061")
+    private String contextid;
 
 }

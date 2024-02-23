@@ -3,9 +3,6 @@
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="45%" v-dialogDrag append-to-body>
       <el-form ref="formRef" :model="formData" :rules="formRules" v-loading="formLoading" label-width="100px">
-                    <el-form-item label="assetid" prop="assetid">
-                      <el-input v-model="formData.assetid" placeholder="请输入assetid" />
-                    </el-form-item>
                     <el-form-item label="classid" prop="classid">
                       <el-input v-model="formData.classid" placeholder="请输入classid" />
                     </el-form-item>
@@ -17,9 +14,6 @@
                     </el-form-item>
                     <el-form-item label="steamId" prop="steamId">
                       <el-input v-model="formData.steamId" placeholder="请输入steamId" />
-                    </el-form-item>
-                    <el-form-item label="出售价格单价分" prop="price">
-                      <el-input v-model="formData.price" placeholder="请输入出售价格单价分" />
                     </el-form-item>
                     <el-form-item label="csgoid" prop="appid">
                       <el-input v-model="formData.appid" placeholder="请输入csgoid" />
@@ -49,6 +43,15 @@
 >{{dict.label}}</el-radio>
                       </el-radio-group>
                     </el-form-item>
+                    <el-form-item label="资产id(饰品唯一)" prop="assetid">
+                      <el-input v-model="formData.assetid" placeholder="请输入资产id(饰品唯一)" />
+                    </el-form-item>
+                    <el-form-item label="出售价格单价分" prop="price">
+                      <el-input v-model="formData.price" placeholder="请输入出售价格单价分" />
+                    </el-form-item>
+                    <el-form-item label="contextid" prop="contextid">
+                      <el-input v-model="formData.contextid" placeholder="请输入contextid" />
+                    </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm" :disabled="formLoading">确 定</el-button>
@@ -74,12 +77,10 @@
         formLoading: false,
         // 表单参数
         formData: {
-                            assetid: undefined,
                             classid: undefined,
                             instanceid: undefined,
                             amount: undefined,
                             steamId: undefined,
-                            price: undefined,
                             id: undefined,
                             appid: undefined,
                             tenantId: undefined,
@@ -88,6 +89,9 @@
                             transferStatus: undefined,
                             userId: undefined,
                             userType: undefined,
+                            assetid: undefined,
+                            price: undefined,
+                            contextid: undefined,
         },
         // 表单校验
         formRules: {
@@ -140,12 +144,10 @@
                       /** 表单重置 */
       reset() {
         this.formData = {
-                            assetid: undefined,
                             classid: undefined,
                             instanceid: undefined,
                             amount: undefined,
                             steamId: undefined,
-                            price: undefined,
                             id: undefined,
                             appid: undefined,
                             tenantId: undefined,
@@ -154,6 +156,9 @@
                             transferStatus: undefined,
                             userId: undefined,
                             userType: undefined,
+                            assetid: undefined,
+                            price: undefined,
+                            contextid: undefined,
         };
         this.resetForm("formRef");
       }

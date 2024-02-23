@@ -2,9 +2,6 @@
   <div class="app-container">
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="assetid" prop="assetid">
-        <el-input v-model="queryParams.assetid" placeholder="请输入assetid" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
       <el-form-item label="classid" prop="classid">
         <el-input v-model="queryParams.classid" placeholder="请输入classid" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
@@ -20,9 +17,6 @@
       </el-form-item>
       <el-form-item label="steamId" prop="steamId">
         <el-input v-model="queryParams.steamId" placeholder="请输入steamId" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="出售价格单价分" prop="price">
-        <el-input v-model="queryParams.price" placeholder="请输入出售价格单价分" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="csgoid" prop="appid">
         <el-input v-model="queryParams.appid" placeholder="请输入csgoid" clearable @keyup.enter.native="handleQuery"/>
@@ -50,6 +44,12 @@
                        :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
+      <el-form-item label="资产id(饰品唯一)" prop="assetid">
+        <el-input v-model="queryParams.assetid" placeholder="请输入资产id(饰品唯一)" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="出售价格单价分" prop="price">
+        <el-input v-model="queryParams.price" placeholder="请输入出售价格单价分" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -70,8 +70,7 @@
     </el-row>
 
             <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
-            <el-table-column label="assetid" align="center" prop="assetid" />
-      <el-table-column label="classid" align="center" prop="classid" />
+            <el-table-column label="classid" align="center" prop="classid" />
       <el-table-column label="instanceid" align="center" prop="instanceid" />
       <el-table-column label="amount" align="center" prop="amount" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
@@ -80,7 +79,6 @@
         </template>
       </el-table-column>
       <el-table-column label="steamId" align="center" prop="steamId" />
-      <el-table-column label="出售价格单价分" align="center" prop="price" />
       <el-table-column label="Primary Key" align="center" prop="id" />
       <el-table-column label="csgoid" align="center" prop="appid" />
       <el-table-column label="绑定用户ID" align="center" prop="bindUserId" />
@@ -96,6 +94,9 @@
           <dict-tag :type="DICT_TYPE.USER_TYPE" :value="scope.row.userType" />
         </template>
       </el-table-column>
+      <el-table-column label="资产id(饰品唯一)" align="center" prop="assetid" />
+      <el-table-column label="出售价格单价分" align="center" prop="price" />
+      <el-table-column label="contextid" align="center" prop="contextid" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
@@ -143,19 +144,19 @@ export default {
       queryParams: {
                     pageNo: 1,
             pageSize: 10,
-        assetid: null,
         classid: null,
         instanceid: null,
         amount: null,
         createTime: [],
         steamId: null,
-        price: null,
         appid: null,
         bindUserId: null,
         status: null,
         transferStatus: null,
         userId: null,
         userType: null,
+        assetid: null,
+        price: null,
       },
             };
   },
