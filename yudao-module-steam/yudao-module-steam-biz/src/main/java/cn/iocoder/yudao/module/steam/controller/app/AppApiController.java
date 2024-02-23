@@ -88,7 +88,7 @@ public class AppApiController {
      * @return
      */
     @PostMapping("/checkTradeUrl")
-    @Operation(summary = "查询余额")
+    @Operation(summary = "检查交易链接")
     public CommonResult<TradeUrlStatus> checkTradeUrl(ApiCheckTradeUrlReqVo apiCheckTradeUrlVo) {
         DevAccountDO devAccount = DevAccountContextHolder.getRequiredDevAccount();
         Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()

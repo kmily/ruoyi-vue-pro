@@ -175,18 +175,19 @@ public class SteamService {
      * @param appId
      * @return
      */
-    public InventoryDto fetchInventory(String steamId, String appId){
+    public InventoryDto fetchInventory(String appId,Integer bindUserId){
+        BindUserDO bindUserDO = bindUserMapper.selectById(bindUserId);
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.method(HttpUtil.Method.GET).url("https://steamcommunity.com/inventory/:steamId/:app/2?l=schinese&count=1000");
         Map<String,String> pathVar=new HashMap<>();
-        pathVar.put("steamId",steamId);
+        pathVar.put("steamId",bindUserDO.getSteamId());
         pathVar.put("app",appId);
         builder.pathVar(pathVar);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         InventoryDto json = sent.json(InventoryDto.class);
         for (InventoryDto.AssetsDTO item:json.getAssets()) {
             InvPageReqVO steamInv=new InvPageReqVO();
-            steamInv.setSteamId(steamId);
+            steamInv.setSteamId(bindUserDO.getSteamId());
             steamInv.setAppid(item.getAppid());
             steamInv.setAssetid(item.getAssetid());
             PageResult<InvDO> invDOPageResult = invMapper.selectPage(steamInv);
@@ -200,7 +201,10 @@ public class SteamService {
                 invMapper.updateById(steamInv1);
             }else{
                 InvDO steamInv1=new InvDO();
-                steamInv1.setSteamId(steamId);
+                steamInv1.setSteamId(bindUserDO.getSteamId());
+                steamInv1.setBindUserId(bindUserDO.getId());
+                steamInv1.setUserId(bindUserDO.getUserId());
+                steamInv1.setUserType(bindUserDO.getUserType());
                 steamInv1.setAppid(item.getAppid());
                 steamInv1.setAssetid(item.getAssetid());
                 steamInv1.setInstanceid(item.getInstanceid());
@@ -226,7 +230,7 @@ public class SteamService {
             if(invDescDOS.size()>0){
                 Optional<InvDescDO> first = invDescDOS.stream().findFirst();
                 InvDescDO invDescDO = first.get();
-                invDescDO.setSteamId(steamId);
+                invDescDO.setSteamId(bindUserDO.getSteamId());
                 invDescDO.setAppid(item.getAppid());
                 invDescDO.setClassid(item.getClassid());
                 invDescDO.setInstanceid(item.getInstanceid());
@@ -282,7 +286,7 @@ public class SteamService {
                 invDescMapper.updateById(invDescDO);
             }else{
                 InvDescDO invDescDO=new InvDescDO();
-                invDescDO.setSteamId(steamId);
+                invDescDO.setSteamId(bindUserDO.getSteamId());
                 invDescDO.setAppid(item.getAppid());
                 invDescDO.setClassid(item.getClassid());
                 invDescDO.setInstanceid(item.getInstanceid());
