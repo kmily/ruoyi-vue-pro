@@ -68,34 +68,10 @@ public class AppBindUserController {
     @Operation(summary = "steam用户绑定")
     @PreAuthenticated
     @PostMapping("/openapi/back")
-//    public CommonResult<Integer> openApiBack(
-//            @RequestParam("openid.ns") String ns,
-//            @RequestParam("openid.mode") String mode,
-//            @RequestParam("openid.op_endpoint") String opEndpoint ,
-//            @RequestParam("openid.claimed_id") String claimedId,
-//            @RequestParam("openid.identity") String identity,
-//            @RequestParam("openid.return_to") String return_to,
-//            @RequestParam("openid.response_nonce") String response_nonce,
-//            @RequestParam("openid.assoc_handle") String assoc_handle,
-//            @RequestParam("openid.signed") String signed,
-//            @RequestParam("openid.sig") String sig
-//                                             ) {
-        public CommonResult<Integer> openApiBack(OpenApi openApi) {
+        public CommonResult<Integer> openApiBack(@RequestBody @Validated OpenApi openApi) {
             log.info("接入的入参{}",openApi);
-//        OpenApi openApi = new OpenApi();
-//        openApi.setNs(ns);
-//        openApi.setMode(mode);
-//        openApi.setOpEndpoint(opEndpoint);
-//        openApi.setClaimedId(claimedId);
-//        openApi.setIdentity(identity);
-//        openApi.setReturnTo(return_to);
-//        openApi.setResponseNonce(response_nonce);
-//        openApi.setAssocHandle(assoc_handle);
-//        openApi.setSigned(signed);
-//        openApi.setSig(sig);
-
         int bind = steamService.bind(openApi);
-        return success(1);
+        return success(bind);
     }
     @GetMapping("/steam/list")
     @Operation(summary = "steam绑定列表", description = "上传ma文件")
