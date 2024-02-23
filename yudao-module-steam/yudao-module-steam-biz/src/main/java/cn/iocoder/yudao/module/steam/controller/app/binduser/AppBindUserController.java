@@ -14,10 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -69,18 +66,29 @@ public class AppBindUserController {
     @Operation(summary = "steam用户绑定")
     @PreAuthenticated
     @PostMapping("/openapi/back")
-    public CommonResult<Integer> openApiBack(HttpServletRequest request) {
+    public CommonResult<Integer> openApiBack(
+            @RequestParam("openid.ns") String ns,
+            @RequestParam("openid.mode") String mode,
+            @RequestParam("openid.op_endpoint") String opEndpoint ,
+            @RequestParam("openid.claimed_id") String claimedId,
+            @RequestParam("openid.identity") String identity,
+            @RequestParam("openid.return_to") String return_to,
+            @RequestParam("openid.response_nonce") String response_nonce,
+            @RequestParam("openid.assoc_handle") String assoc_handle,
+            @RequestParam("openid.signed") String signed,
+            @RequestParam("openid.sig") String sig
+                                             ) {
         OpenApi openApi = new OpenApi();
-        openApi.setNs(request.getParameter("openid.ns"));
-        openApi.setMode(request.getParameter("openid.mode"));
-        openApi.setOpEndpoint(request.getParameter("openid.op_endpoint"));
-        openApi.setClaimedId(request.getParameter("openid.claimed_id"));
-        openApi.setIdentity(request.getParameter("openid.identity"));
-        openApi.setReturnTo(request.getParameter("openid.return_to"));
-        openApi.setResponseNonce(request.getParameter("openid.response_nonce"));
-        openApi.setAssocHandle(request.getParameter("openid.assoc_handle"));
-        openApi.setSigned(request.getParameter("openid.signed"));
-        openApi.setSig(request.getParameter("openid.sig"));
+        openApi.setNs(ns);
+        openApi.setMode(mode);
+        openApi.setOpEndpoint(opEndpoint);
+        openApi.setClaimedId(claimedId);
+        openApi.setIdentity(identity);
+        openApi.setReturnTo(return_to);
+        openApi.setResponseNonce(response_nonce);
+        openApi.setAssocHandle(assoc_handle);
+        openApi.setSigned(signed);
+        openApi.setSig(sig);
 
         int bind = steamService.bind(openApi);
         return success(1);
