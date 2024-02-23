@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
+import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
 import cn.iocoder.yudao.module.steam.service.steam.SteamMaFile;
@@ -171,7 +172,6 @@ public class SteamService {
 
     /**
      *  获取steam库存信息 跟新库存表
-     * @param steamId
      * @param appId
      * @return
      */
@@ -210,6 +210,7 @@ public class SteamService {
                 steamInv1.setInstanceid(item.getInstanceid());
                 steamInv1.setAmount(item.getAmount());
                 steamInv1.setClassid(item.getClassid());
+                steamInv1.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
                 invMapper.insert(steamInv1);
             }
         }
