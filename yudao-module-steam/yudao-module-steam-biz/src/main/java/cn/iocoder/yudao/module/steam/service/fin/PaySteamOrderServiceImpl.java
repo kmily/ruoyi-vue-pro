@@ -376,6 +376,10 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         // 2.3 更新退款单到 demo 订单
         invOrderMapper.updateById(new InvOrderDO().setId(id)
                 .setPayRefundId(payRefundId).setRefundPrice(invOrderDO.getPrice()));
+        //释放库存
+        InvDO invDO = invMapper.selectById(invOrderDO.getInvId());
+        invDO.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
+        invMapper.updateById(invDO);
     }
 
     private InvOrderDO validateInvOrderCanRefund(Long id,LoginUser loginUser) {
