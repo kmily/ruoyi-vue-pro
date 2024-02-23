@@ -214,6 +214,7 @@ public class SteamService {
                 steamInv1.setAmount(item.getAmount());
                 steamInv1.setClassid(item.getClassid());
                 steamInv1.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
+                steamInv1.setContextid(item.getContextid());
                 invMapper.insert(steamInv1);
             }
         }
@@ -352,7 +353,7 @@ public class SteamService {
      * 发货
      * @param invOrderDO
      */
-    @Async
+//    @Async
     public void tradeAsset(InvOrderDO invOrderDO){
         InvDO invDO = invMapper.selectById(invOrderDO.getInvId());
         TransferMsg transferMsg=new TransferMsg();
@@ -386,6 +387,7 @@ public class SteamService {
             steamInvDto.setAmount(invDO.getAmount());
             steamInvDto.setAssetid(invDO.getAssetid());
             steamInvDto.setClassid(invDO.getClassid());
+            steamInvDto.setContextid(invDO.getContextid());
             steamInvDto.setInstanceid(invDO.getInstanceid());
             steamInvDto.setAppid(invDO.getAppid());
             SteamTradeOfferResult trade = steamWeb.trade(steamInvDto, tradeUrl);
