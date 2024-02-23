@@ -14,11 +14,19 @@
       <el-form-item label="支付订单编号" prop="payOrderId">
         <el-input v-model="queryParams.payOrderId" placeholder="请输入支付订单编号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
+      <el-form-item label="用户类型" prop="userType">
+        <el-select v-model="queryParams.userType" placeholder="请选择用户类型" clearable size="small">
+          <el-option label="请选择字典生成" value="" />
+        </el-select>
+      </el-form-item>
       <el-form-item label="购买的steamId" prop="steamId">
         <el-input v-model="queryParams.steamId" placeholder="请输入购买的steamId" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="用户类型" prop="userType">
-        <el-select v-model="queryParams.userType" placeholder="请选择用户类型" clearable size="small">
+      <el-form-item label="发货信息 json" prop="transferText">
+        <el-input v-model="queryParams.transferText" placeholder="请输入发货信息 json" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="发货状态" prop="transferStatus">
+        <el-select v-model="queryParams.transferStatus" placeholder="请选择发货状态" clearable size="small">
           <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
@@ -70,8 +78,10 @@
       </el-table-column>
       <el-table-column label="价格，单位：分 " align="center" prop="price" />
       <el-table-column label="库存表ID参考steam_inv" align="center" prop="invId" />
-      <el-table-column label="购买的steamId" align="center" prop="steamId" />
       <el-table-column label="用户类型" align="center" prop="userType" />
+      <el-table-column label="购买的steamId" align="center" prop="steamId" />
+      <el-table-column label="发货信息 json" align="center" prop="transferText" />
+      <el-table-column label="发货状态" align="center" prop="transferStatus" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
@@ -122,8 +132,10 @@ export default {
         userId: null,
         payStatus: null,
         payOrderId: null,
-        steamId: null,
         userType: null,
+        steamId: null,
+        transferText: null,
+        transferStatus: null,
       },
             };
   },

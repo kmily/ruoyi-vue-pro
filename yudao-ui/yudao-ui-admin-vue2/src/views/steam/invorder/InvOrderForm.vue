@@ -36,13 +36,21 @@
                     <el-form-item label="库存表ID参考steam_inv" prop="invId">
                       <el-input v-model="formData.invId" placeholder="请输入库存表ID参考steam_inv" />
                     </el-form-item>
-                    <el-form-item label="购买的steamId" prop="steamId">
-                      <el-input v-model="formData.steamId" placeholder="请输入购买的steamId" />
-                    </el-form-item>
                     <el-form-item label="用户类型" prop="userType">
                       <el-select v-model="formData.userType" placeholder="请选择用户类型">
                             <el-option label="请选择字典生成" value="" />
                       </el-select>
+                    </el-form-item>
+                    <el-form-item label="购买的steamId" prop="steamId">
+                      <el-input v-model="formData.steamId" placeholder="请输入购买的steamId" />
+                    </el-form-item>
+                    <el-form-item label="发货信息 json" prop="transferText">
+                      <el-input v-model="formData.transferText" placeholder="请输入发货信息 json" />
+                    </el-form-item>
+                    <el-form-item label="发货状态" prop="transferStatus">
+                      <el-radio-group v-model="formData.transferStatus">
+                            <el-radio label="1">请选择字典生成</el-radio>
+                      </el-radio-group>
                     </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
@@ -80,8 +88,10 @@
                             refundTime: undefined,
                             price: undefined,
                             invId: undefined,
-                            steamId: undefined,
                             userType: undefined,
+                            steamId: undefined,
+                            transferText: undefined,
+                            transferStatus: undefined,
         },
         // 表单校验
         formRules: {
@@ -149,8 +159,10 @@
                             refundTime: undefined,
                             price: undefined,
                             invId: undefined,
-                            steamId: undefined,
                             userType: undefined,
+                            steamId: undefined,
+                            transferText: undefined,
+                            transferStatus: undefined,
         };
         this.resetForm("formRef");
       }

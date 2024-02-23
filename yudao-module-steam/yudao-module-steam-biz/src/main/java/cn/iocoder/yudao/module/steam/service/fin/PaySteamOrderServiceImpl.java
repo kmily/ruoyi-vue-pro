@@ -24,8 +24,11 @@ import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
+import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -77,6 +80,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
 
     @Resource
     private BindUserMapper bindUserMapper;
+    @Autowired
+    private SteamService steamService;
+
 
     public PaySteamOrderServiceImpl() {
     }
@@ -209,6 +215,10 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         // 2.2 更新支付单到 demo 订单
         invOrderMapper.updateById(new InvOrderDO().setId(invOrderDO.getId())
                 .setPayOrderId(payOrderId));
+        //更新库存的标识
+        InvDO invDO = invMapper.selectById(createReqVO.getInvId());
+        invDO.setTransferStatus(InvTransferStatusEnum.INORDER.getStatus());
+        invMapper.updateById(invDO);
         // 返回
         createOrderResult.setBizOrderId(invOrderDO.getId());
         createOrderResult.setPayOrderId(payOrderId);
@@ -232,8 +242,14 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         if(invOrderDO.getUserId().equals(invDO.getUserId()) && invOrderDO.getUserType().equals(invDO.getUserType())){
             throw exception(ErrorCodeConstants.INVORDER_ORDERUSER_EXCEPT);
         }
+        //库存状态为没有订单
+        if(!InvTransferStatusEnum.INIT.getStatus().equals(invDO.getTransferStatus())){
+            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
+        }
         //使用库存的价格进行替换
         invOrderDO.setPrice(invDO.getPrice());
+
+
         //检查是否已经下过单
         List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
                 .eq(InvOrderDO::getInvId, invDO.getId())
@@ -244,7 +260,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw exception(ErrorCodeConstants.INVORDER_ORDERED_EXCEPT);
         }
         // 校验订单是否支付
-        if (invOrderDO.getPrice()<=0) {
+        if (Objects.isNull(invOrderDO.getPrice()) || invOrderDO.getPrice()<=0) {
             throw exception(ErrorCodeConstants.INVORDER_AMOUNT_EXCEPT);
         }
         // 校验订单是否支付
@@ -289,6 +305,8 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         if (updateCount == 0) {
             throw exception(DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
+        InvOrderDO invOrderDO = invOrderMapper.selectById(id);
+        steamService.tradeAsset(invOrderDO);
     }
 
     /**
@@ -365,6 +383,10 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         // 2.3 更新退款单到 demo 订单
         invOrderMapper.updateById(new InvOrderDO().setId(id)
                 .setPayRefundId(payRefundId).setRefundPrice(invOrderDO.getPrice()));
+        //释放库存
+        InvDO invDO = invMapper.selectById(invOrderDO.getInvId());
+        invDO.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
+        invMapper.updateById(invDO);
     }
 
     private InvOrderDO validateInvOrderCanRefund(Long id,LoginUser loginUser) {

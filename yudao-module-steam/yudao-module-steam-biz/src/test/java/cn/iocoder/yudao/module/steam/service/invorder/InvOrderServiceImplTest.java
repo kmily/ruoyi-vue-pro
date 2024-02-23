@@ -113,8 +113,10 @@ public class InvOrderServiceImplTest extends BaseDbUnitTest {
            o.setUserId(null);
            o.setPayStatus(null);
            o.setPayOrderId(null);
-           o.setSteamId(null);
            o.setUserType(null);
+           o.setSteamId(null);
+           o.setTransferText(null);
+           o.setTransferStatus(null);
        });
        invOrderMapper.insert(dbInvOrder);
        // 测试 userId 不匹配
@@ -123,17 +125,23 @@ public class InvOrderServiceImplTest extends BaseDbUnitTest {
        invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setPayStatus(null)));
        // 测试 payOrderId 不匹配
        invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setPayOrderId(null)));
-       // 测试 steamId 不匹配
-       invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setSteamId(null)));
        // 测试 userType 不匹配
        invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setUserType(null)));
+       // 测试 steamId 不匹配
+       invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setSteamId(null)));
+       // 测试 transferText 不匹配
+       invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setTransferText(null)));
+       // 测试 transferStatus 不匹配
+       invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setTransferStatus(null)));
        // 准备参数
        InvOrderPageReqVO reqVO = new InvOrderPageReqVO();
        reqVO.setUserId(null);
        reqVO.setPayStatus(null);
        reqVO.setPayOrderId(null);
-       reqVO.setSteamId(null);
        reqVO.setUserType(null);
+       reqVO.setSteamId(null);
+       reqVO.setTransferText(null);
+       reqVO.setTransferStatus(null);
 
        // 调用
        PageResult<InvOrderDO> pageResult = invOrderService.getInvOrderPage(reqVO);

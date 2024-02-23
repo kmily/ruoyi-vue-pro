@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.service;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -12,16 +13,17 @@ import cn.iocoder.yudao.module.steam.controller.admin.invdesc.vo.InvDescPageReqV
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
-import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
-import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
-import cn.iocoder.yudao.module.steam.service.steam.SteamMaFile;
+import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
+import cn.iocoder.yudao.module.steam.service.steam.*;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -51,6 +53,8 @@ public class SteamService {
     private BindUserMapper bindUserMapper;
     @Autowired
     private ObjectMapper objectMapper;
+    @Resource
+    private InvOrderMapper invOrderMapper;
 
     /**
      * 帐号绑定
@@ -171,22 +175,22 @@ public class SteamService {
 
     /**
      *  获取steam库存信息 跟新库存表
-     * @param steamId
      * @param appId
      * @return
      */
-    public InventoryDto fetchInventory(String steamId, String appId){
+    public InventoryDto fetchInventory(String appId,Integer bindUserId){
+        BindUserDO bindUserDO = bindUserMapper.selectById(bindUserId);
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.method(HttpUtil.Method.GET).url("https://steamcommunity.com/inventory/:steamId/:app/2?l=schinese&count=1000");
         Map<String,String> pathVar=new HashMap<>();
-        pathVar.put("steamId",steamId);
+        pathVar.put("steamId",bindUserDO.getSteamId());
         pathVar.put("app",appId);
         builder.pathVar(pathVar);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         InventoryDto json = sent.json(InventoryDto.class);
         for (InventoryDto.AssetsDTO item:json.getAssets()) {
             InvPageReqVO steamInv=new InvPageReqVO();
-            steamInv.setSteamId(steamId);
+            steamInv.setSteamId(bindUserDO.getSteamId());
             steamInv.setAppid(item.getAppid());
             steamInv.setAssetid(item.getAssetid());
             PageResult<InvDO> invDOPageResult = invMapper.selectPage(steamInv);
@@ -200,12 +204,16 @@ public class SteamService {
                 invMapper.updateById(steamInv1);
             }else{
                 InvDO steamInv1=new InvDO();
-                steamInv1.setSteamId(steamId);
+                steamInv1.setSteamId(bindUserDO.getSteamId());
+                steamInv1.setBindUserId(bindUserDO.getId());
+                steamInv1.setUserId(bindUserDO.getUserId());
+                steamInv1.setUserType(bindUserDO.getUserType());
                 steamInv1.setAppid(item.getAppid());
                 steamInv1.setAssetid(item.getAssetid());
                 steamInv1.setInstanceid(item.getInstanceid());
                 steamInv1.setAmount(item.getAmount());
                 steamInv1.setClassid(item.getClassid());
+                steamInv1.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
                 invMapper.insert(steamInv1);
             }
         }
@@ -226,7 +234,7 @@ public class SteamService {
             if(invDescDOS.size()>0){
                 Optional<InvDescDO> first = invDescDOS.stream().findFirst();
                 InvDescDO invDescDO = first.get();
-                invDescDO.setSteamId(steamId);
+                invDescDO.setSteamId(bindUserDO.getSteamId());
                 invDescDO.setAppid(item.getAppid());
                 invDescDO.setClassid(item.getClassid());
                 invDescDO.setInstanceid(item.getInstanceid());
@@ -282,7 +290,7 @@ public class SteamService {
                 invDescMapper.updateById(invDescDO);
             }else{
                 InvDescDO invDescDO=new InvDescDO();
-                invDescDO.setSteamId(steamId);
+                invDescDO.setSteamId(bindUserDO.getSteamId());
                 invDescDO.setAppid(item.getAppid());
                 invDescDO.setClassid(item.getClassid());
                 invDescDO.setInstanceid(item.getInstanceid());
@@ -338,6 +346,59 @@ public class SteamService {
             }
         }
         return json;
+    }
+
+    /**
+     * 发货
+     * @param invOrderDO
+     */
+    @Async
+    public void tradeAsset(InvOrderDO invOrderDO){
+        InvDO invDO = invMapper.selectById(invOrderDO.getInvId());
+        TransferMsg transferMsg=new TransferMsg();
+        try{
+            if (CommonStatusEnum.isDisable(invDO.getStatus())) {
+                throw new ServiceException(-1,"库存已经更新无法进行发货。");
+            }
+            Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+                    .eq(BindUserDO::getUserId, invOrderDO.getUserId())
+                    .eq(BindUserDO::getUserType, invOrderDO.getUserType())
+                    .eq(BindUserDO::getSteamId, invOrderDO.getSteamId())
+            ).stream().findFirst();
+            if(!first.isPresent()){
+                throw new ServiceException(-1,"收货方绑定关系失败无法发货。");
+            }
+            BindUserDO bindUserDO = first.get();
+            //收货方tradeUrl
+            String tradeUrl = bindUserDO.getTradeUrl();
+//        SteamWeb steamWeb=new SteamWeb(configService);
+//        steamWeb.login(bindUserDO.getSteamPassword(),bindUserDO.getMaFile());
+//        steamWeb.initTradeUrl();
+//        if(!steamWeb.getTreadUrl().isPresent()){
+//
+//        }
+//        steamWeb.checkTradeUrl(steamWeb.getTreadUrl().get());
+            BindUserDO bindUserDO1 = bindUserMapper.selectById(invDO.getBindUserId());
+            //发货
+            SteamWeb steamWeb=new SteamWeb(configService);
+            steamWeb.login(bindUserDO1.getSteamPassword(),bindUserDO1.getMaFile());
+            SteamInvDto steamInvDto=new SteamInvDto();
+            steamInvDto.setAmount(invDO.getAmount());
+            steamInvDto.setAssetid(invDO.getAssetid());
+            steamInvDto.setClassid(invDO.getClassid());
+            steamInvDto.setInstanceid(invDO.getInstanceid());
+            steamInvDto.setAppid(invDO.getAppid());
+            SteamTradeOfferResult trade = steamWeb.trade(steamInvDto, tradeUrl);
+            log.info("发货信息{}",trade);
+            transferMsg.setTradeofferid(trade.getTradeofferid());
+            invOrderDO.setTransferStatus(0);
+        }catch (ServiceException  e){
+            log.error("发送失败原因{}",e.getMessage());
+            transferMsg.setMsg(e.getMessage());
+            invOrderDO.setTransferStatus(-1);
+        }
+        invOrderDO.setTransferText(transferMsg);
+        invOrderMapper.updateById(invOrderDO);
     }
 
 
