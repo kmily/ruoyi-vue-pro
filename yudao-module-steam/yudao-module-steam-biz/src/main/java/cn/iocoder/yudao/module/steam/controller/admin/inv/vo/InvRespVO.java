@@ -69,12 +69,12 @@ public class InvRespVO {
     @ExcelProperty("资产id(饰品唯一)")
     private String assetid;
 
-    @Schema(description = "出售价格单价分", example = "27655")
-    @ExcelProperty("出售价格单价分")
-    private Long price;
-
     @Schema(description = "contextid", example = "31061")
     @ExcelProperty("contextid")
     private String contextid;
+
+    @Schema(description = "出售价格单价分", example = "3557")
+    @ExcelProperty("出售价格单价分")
+    private Integer price;
 
 }

@@ -76,12 +76,12 @@ public class InvDO extends BaseDO {
      */
     private String assetid;
     /**
-     * 出售价格单价分
-     */
-    private Long price;
-    /**
      * contextid
      */
     private String contextid;
+    /**
+     * 出售价格单价分
+     */
+    private Integer price;
 
 }

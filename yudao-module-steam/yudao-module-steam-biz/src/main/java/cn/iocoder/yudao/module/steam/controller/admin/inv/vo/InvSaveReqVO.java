@@ -49,10 +49,10 @@ public class InvSaveReqVO {
     @Schema(description = "资产id(饰品唯一)", example = "27001")
     private String assetid;
 
-    @Schema(description = "出售价格单价分", example = "27655")
-    private Long price;
-
     @Schema(description = "contextid", example = "31061")
     private String contextid;
+
+    @Schema(description = "出售价格单价分", example = "3557")
+    private Integer price;
 
 }

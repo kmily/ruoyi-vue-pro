@@ -95,8 +95,8 @@
         </template>
       </el-table-column>
       <el-table-column label="资产id(饰品唯一)" align="center" prop="assetid" />
-      <el-table-column label="出售价格单价分" align="center" prop="price" />
       <el-table-column label="contextid" align="center" prop="contextid" />
+      <el-table-column label="出售价格单价分" align="center" prop="price" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"

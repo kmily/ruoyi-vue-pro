@@ -46,11 +46,11 @@
                     <el-form-item label="资产id(饰品唯一)" prop="assetid">
                       <el-input v-model="formData.assetid" placeholder="请输入资产id(饰品唯一)" />
                     </el-form-item>
-                    <el-form-item label="出售价格单价分" prop="price">
-                      <el-input v-model="formData.price" placeholder="请输入出售价格单价分" />
-                    </el-form-item>
                     <el-form-item label="contextid" prop="contextid">
                       <el-input v-model="formData.contextid" placeholder="请输入contextid" />
+                    </el-form-item>
+                    <el-form-item label="出售价格单价分" prop="price">
+                      <el-input v-model="formData.price" placeholder="请输入出售价格单价分" />
                     </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
@@ -90,8 +90,8 @@
                             userId: undefined,
                             userType: undefined,
                             assetid: undefined,
-                            price: undefined,
                             contextid: undefined,
+                            price: undefined,
         },
         // 表单校验
         formRules: {
@@ -157,8 +157,8 @@
                             userId: undefined,
                             userType: undefined,
                             assetid: undefined,
-                            price: undefined,
                             contextid: undefined,
+                            price: undefined,
         };
         this.resetForm("formRef");
       }
