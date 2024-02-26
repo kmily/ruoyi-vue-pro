@@ -394,13 +394,18 @@ public class SteamService {
             log.info("发货信息{}",trade);
             transferMsg.setTradeofferid(trade.getTradeofferid());
             invOrderDO.setTransferStatus(0);
+            invOrderDO.setTransferStatus(InvTransferStatusEnum.TransferFINISH.getStatus());
+            invDO.setTransferStatus(InvTransferStatusEnum.TransferFINISH.getStatus());
         }catch (ServiceException  e){
             log.error("发送失败原因{}",e.getMessage());
             transferMsg.setMsg(e.getMessage());
             invOrderDO.setTransferStatus(-1);
+            invOrderDO.setTransferStatus(InvTransferStatusEnum.TransferERROR.getStatus());
+            invDO.setTransferStatus(InvTransferStatusEnum.TransferERROR.getStatus());
         }
         invOrderDO.setTransferText(transferMsg);
         invOrderMapper.updateById(invOrderDO);
+        invMapper.updateById(invDO);
     }
 
 

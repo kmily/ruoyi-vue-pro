@@ -8,7 +8,9 @@ import lombok.Getter;
 public enum InvTransferStatusEnum {
 
     INIT(0, "进库存"),
-    INORDER(1, "关闭");
+    INORDER(1, "订单中"),
+    TransferFINISH(2, "发货完成"),
+    TransferERROR(10,"发货失败");
     /**
      * 状态值
      */
