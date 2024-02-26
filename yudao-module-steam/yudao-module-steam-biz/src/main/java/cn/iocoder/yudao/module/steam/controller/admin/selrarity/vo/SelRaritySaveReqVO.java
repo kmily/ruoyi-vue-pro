@@ -13,13 +13,14 @@ public class SelRaritySaveReqVO {
     private Long id;
 
     @Schema(description = "中文名称", example = "赵六")
+    @NotEmpty(message = "中文不能为空")
     private String localizedTagName;
 
     @Schema(description = "英文名称", example = "王五")
+    @NotEmpty(message = "英文不能为空")
     private String internalName;
 
     @Schema(description = "色彩", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "色彩不能为空")
     private String color;
 
 }
