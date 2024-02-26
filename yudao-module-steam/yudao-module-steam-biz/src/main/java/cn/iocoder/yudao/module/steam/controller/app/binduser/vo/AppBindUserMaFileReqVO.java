@@ -26,8 +26,8 @@ public class AppBindUserMaFileReqVO extends PageParam {
     @Schema(description = "steam密码", example = "123456")
     @NotNull(message = "steam密码不能为空")
     private String password;
-//    @Schema(description = "bindUserId", example = "123456")
-//    @NotNull(message = "bindUserId不能为空")
-//    private Integer bindUserId;
+    @Schema(description = "bindUserId", example = "123456")
+    @NotNull(message = "bindUserId不能为空")
+    private Integer bindUserId;
 
 }
