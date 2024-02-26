@@ -43,7 +43,10 @@
                             color: undefined,
         },
         // 表单校验
-        formRules: {},
+        formRules: {
+          internalName: [{ required: true, message: '英文名不能为空', trigger: 'blur' }],
+          localizedTagName: [{ required: true, message: '中文不能为空', trigger: 'blur' }],
+        },
                         };
     },
     methods: {
