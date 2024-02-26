@@ -10,26 +10,26 @@
           <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
-      <el-form-item label="是否已支付[0未支付，1支付]" prop="payStatus">
+      <el-form-item label="已支付" prop="payStatus">
         <el-select v-model="queryParams.payStatus" placeholder="请选择是否已支付[0未支付，1支付]" clearable size="small">
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_BOOLEAN_STRING)"
                        :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="支付订单编号" prop="payOrderId">
+      <el-form-item label="支付编号" prop="payOrderId">
         <el-input v-model="queryParams.payOrderId" placeholder="请输入支付订单编号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="支付成功的支付渠道" prop="payChannelCode">
+      <el-form-item label="支付渠道" prop="payChannelCode">
         <el-input v-model="queryParams.payChannelCode" placeholder="请输入支付成功的支付渠道" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="订单支付时间" prop="payTime">
+      <el-form-item label="支付时间" prop="payTime">
         <el-date-picker v-model="queryParams.payTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
                         range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
-      <el-form-item label="退款订单编号" prop="payRefundId">
+      <el-form-item label="退款编号" prop="payRefundId">
         <el-input v-model="queryParams.payRefundId" placeholder="请输入退款订单编号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="退款金额，单位分" prop="refundPrice">
+      <el-form-item label="退款金额(分)" prop="refundPrice">
         <el-input v-model="queryParams.refundPrice" placeholder="请输入退款金额，单位分" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="退款时间" prop="refundTime">
@@ -52,10 +52,6 @@
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="openForm(undefined)"
-                   v-hasPermi="['steam:withdrawal:create']">新增</el-button>
-      </el-col>
-      <el-col :span="1.5">
         <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
                    v-hasPermi="['steam:withdrawal:export']">导出</el-button>
       </el-col>
@@ -66,20 +62,20 @@
             <el-table-column label="编号" align="center" prop="id" />
       <el-table-column label="用户ID" align="center" prop="userId" />
       <el-table-column label="用户类型" align="center" prop="userType" />
-      <el-table-column label="是否已支付[0未支付，1支付]" align="center" prop="payStatus">
+      <el-table-column label="已支付" align="center" prop="payStatus">
         <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="scope.row.payStatus" />
         </template>
       </el-table-column>
-      <el-table-column label="支付订单编号" align="center" prop="payOrderId" />
-      <el-table-column label="支付成功的支付渠道" align="center" prop="payChannelCode" />
-      <el-table-column label="订单支付时间" align="center" prop="payTime" width="180">
+      <el-table-column label="支付编号" align="center" prop="payOrderId" />
+      <el-table-column label="支付渠道" align="center" prop="payChannelCode" />
+      <el-table-column label="支付时间" align="center" prop="payTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.payTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="退款订单编号" align="center" prop="payRefundId" />
-      <el-table-column label="退款金额，单位分" align="center" prop="refundPrice" />
+      <el-table-column label="退款编号" align="center" prop="payRefundId" />
+      <el-table-column label="退款金额(分)" align="center" prop="refundPrice" />
       <el-table-column label="退款时间" align="center" prop="refundTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.refundTime) }}</span>
@@ -91,14 +87,12 @@
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template v-slot="scope">
-          <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
-                     v-hasPermi="['steam:withdrawal:update']">修改</el-button>
-          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
-                     v-hasPermi="['steam:withdrawal:delete']">删除</el-button>
-        </template>
-      </el-table-column>
+<!--      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">-->
+<!--        <template v-slot="scope">-->
+<!--          <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"-->
+<!--                     v-hasPermi="['steam:withdrawal:update']">修改</el-button>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
     </el-table>
     <!-- 分页组件 -->
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
