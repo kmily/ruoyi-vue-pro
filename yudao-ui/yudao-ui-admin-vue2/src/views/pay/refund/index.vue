@@ -283,7 +283,7 @@ export default {
     },
     /** 详情按钮操作 */
     handleQueryDetails(row) {
-      this.refundDetail = {};
+      this.refundDetail = {}
       getRefund(row.id).then(response => {
         this.refundDetail = response.data;
         this.open = true;
