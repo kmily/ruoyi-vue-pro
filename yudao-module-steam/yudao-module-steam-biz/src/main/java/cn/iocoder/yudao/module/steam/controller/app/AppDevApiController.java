@@ -41,8 +41,6 @@ public class AppDevApiController {
     private SelRarityService selRarityService;
     @Resource
     private SelWeaponMapper selWeaponMapper;
-    @Resource
-    private SteamService steamService;
 
 
     /**
