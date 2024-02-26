@@ -36,5 +36,9 @@ public interface ErrorCodeConstants {
     ErrorCode INV_NOT_EXISTS = new ErrorCode(1_100_008_02, "steam用户库存储不存在");
     // ========== steam订单
     ErrorCode INV_ORDER_NOT_EXISTS = new ErrorCode(1_100_009_01, "steam订单不存在");
+	
+	// 饰品在售预览
+	ErrorCode INV_PREVIEW_NOT_EXISTS = new ErrorCode(1_100_010_01, "饰品在售预览不存在");
+
 
 }
