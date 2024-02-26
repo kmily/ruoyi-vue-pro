@@ -43,9 +43,7 @@
                             color: undefined,
         },
         // 表单校验
-        formRules: {
-                        color: [{ required: true, message: '色彩不能为空', trigger: 'blur' }],
-        },
+        formRules: {},
                         };
     },
     methods: {
@@ -102,4 +100,4 @@
       }
     }
   };
-</script>
+</script>
