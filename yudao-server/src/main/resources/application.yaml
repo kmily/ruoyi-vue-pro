@@ -7,7 +7,7 @@ spring:
 
   main:
     allow-circular-references: true # 允许循环依赖，因为项目是三层架构，无法避免这个情况。
-
+    allow-bean-definition-overriding: true # 配置中启用 beans 覆盖机制 
   # Servlet 配置
   servlet:
     # 文件上传相关配置项
