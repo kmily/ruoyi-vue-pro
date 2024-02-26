@@ -2,7 +2,7 @@
   <div class="app-container">
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item style="text-wrap: 'nowrap';" label="steam名称" prop="steamName">
+      <el-form-item label="steam名" prop="steamName">
         <el-input v-model="queryParams.steamName" placeholder="请输入steam名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="用户ID" prop="userId">
@@ -32,7 +32,7 @@
 
             <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
             <el-table-column label="ID" align="center" prop="id" />
-            <el-table-column label="steam名称" align="center" prop="steamName" />
+            <el-table-column label="steam名" align="center" prop="steamName" />
       <el-table-column label="用户ID" align="center" prop="userId" />
       <el-table-column label="SteamId" align="center" prop="steamId" />
       <el-table-column label="交易链接" align="center" prop="tradeUrl" />

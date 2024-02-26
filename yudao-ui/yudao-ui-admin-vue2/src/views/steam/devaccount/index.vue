@@ -2,11 +2,8 @@
   <div class="app-container">
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="api用户名" prop="userName">
+      <el-form-item label="api名" prop="userName">
         <el-input v-model="queryParams.userName" placeholder="请输入api用户名" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="steam用户 ID" prop="steamId">
-        <el-input v-model="queryParams.steamId" placeholder="请输入steam用户 ID" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择状态" clearable size="small">
@@ -29,10 +26,6 @@
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="openForm(undefined)"
-                   v-hasPermi="['steam:dev-account:create']">新增</el-button>
-      </el-col>
-      <el-col :span="1.5">
         <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
                    v-hasPermi="['steam:dev-account:export']">导出</el-button>
       </el-col>
@@ -40,10 +33,9 @@
     </el-row>
 
             <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
-            <el-table-column label="编号" align="center" prop="id" />
+            <el-table-column label="ID" align="center" prop="id" />
       <el-table-column label="用户ID" align="center" prop="userId" />
-      <el-table-column label="api用户名" align="center" prop="userName" />
-      <el-table-column label="steam用户 ID" align="center" prop="steamId" />
+      <el-table-column label="api名" align="center" prop="userName" />
       <el-table-column label="状态" align="center" prop="status">
         <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
@@ -68,8 +60,6 @@
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
                      v-hasPermi="['steam:dev-account:update']">修改</el-button>
-          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
-                     v-hasPermi="['steam:dev-account:delete']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
