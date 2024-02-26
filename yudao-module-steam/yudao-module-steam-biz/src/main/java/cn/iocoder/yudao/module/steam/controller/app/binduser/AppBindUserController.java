@@ -87,7 +87,7 @@ public class AppBindUserController {
     @OperateLog(logArgs = false) // 上传文件，没有记录操作日志的必要
     public CommonResult<String> uploadFile(@Valid AppBindUserMaFileReqVO appBindUserMaFileReqVO) throws Exception {
         MultipartFile file = appBindUserMaFileReqVO.getFile();
-        steamService.bindMaFile(IoUtil.readBytes(file.getInputStream()),appBindUserMaFileReqVO.getPassword());
+        steamService.bindMaFile(IoUtil.readBytes(file.getInputStream()),appBindUserMaFileReqVO.getPassword(),appBindUserMaFileReqVO.getBindUserId());
         return success("成功");
     }
 
