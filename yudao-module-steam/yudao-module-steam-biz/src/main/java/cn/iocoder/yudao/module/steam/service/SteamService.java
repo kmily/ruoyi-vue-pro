@@ -93,18 +93,7 @@ public class SteamService {
         }
         return bindUserDOS;
     }
-    public void bindMaFile(byte[] maFileJsonByte,String password,Integer bindUserId){
-        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        BindUserDO bindUserDO = bindUserMapper.selectById(bindUserId);
-        if(Objects.isNull(bindUserDO)){
-            throw new ServiceException(-1,"绑定失败，请检查后再试。");
-        }
-        if(!bindUserDO.getUserId().equals(loginUser.getId())){
-            throw new ServiceException(-1,"没有权限操作。");
-        }
-        if(!bindUserDO.getUserType().equals(loginUser.getUserType())){
-            throw new ServiceException(-1,"没有权限操作。");
-        }
+    public void bindMaFile(byte[] maFileJsonByte,String password){
         SteamMaFile steamMaFile = null;
         try {
             steamMaFile = objectMapper.readValue(maFileJsonByte, SteamMaFile.class);
@@ -112,6 +101,27 @@ public class SteamService {
             log.error("读取maFile失败{}",e);
             throw new ServiceException(-1,"读取maFile失败，请检查后再试。");
         }
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+                .eq(BindUserDO::getSteamId, steamMaFile.getAccountName())
+                .eq(BindUserDO::getUserId, loginUser.getId())
+                .eq(BindUserDO::getUserType, loginUser.getUserType())
+        ).stream().findFirst();
+        if(!first.isPresent()){
+            throw new ServiceException(-1,"绑定失败，请检查后再试。");
+        }
+        BindUserDO bindUserDO = first.get();
+//        BindUserDO bindUserDO = bindUserMapper.selectById(bindUserId);
+        if(Objects.isNull(bindUserDO)){
+            throw new ServiceException(-1,"绑定失败，请检查后再试。");
+        }
+//        if(!bindUserDO.getUserId().equals(loginUser.getId())){
+//            throw new ServiceException(-1,"没有权限操作。");
+//        }
+//        if(!bindUserDO.getUserType().equals(loginUser.getUserType())){
+//            throw new ServiceException(-1,"没有权限操作。");
+//        }
+
         SteamWeb steamWeb=new SteamWeb(configService);
         steamWeb.login(password,steamMaFile);
         steamWeb.initTradeUrl();
