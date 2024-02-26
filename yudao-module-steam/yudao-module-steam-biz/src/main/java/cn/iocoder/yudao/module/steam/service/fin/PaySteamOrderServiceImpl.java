@@ -17,10 +17,12 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal.WithdrawalDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
@@ -82,6 +84,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     private BindUserMapper bindUserMapper;
     @Autowired
     private SteamService steamService;
+
+    @Resource
+    private InvDescMapper invDescMapper;
 
 
     public PaySteamOrderServiceImpl() {
@@ -242,6 +247,20 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         if(invOrderDO.getUserId().equals(invDO.getUserId()) && invOrderDO.getUserType().equals(invDO.getUserType())){
             throw exception(ErrorCodeConstants.INVORDER_ORDERUSER_EXCEPT);
         }
+        //检查是否可交易
+        Optional<InvDescDO> first1 = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+                .eq(InvDescDO::getClassid, invDO.getClassid())
+                .eq(InvDescDO::getInstanceid, invDO.getInstanceid())
+                .eq(InvDescDO::getAppid, invDO.getAppid())
+        ).stream().findFirst();
+        if(!first1.isPresent()){
+            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
+        }
+        InvDescDO invDescDO = first1.get();
+        if(invDescDO.getTradable().intValue()!=1){
+            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
+        }
+
         //库存状态为没有订单
         if(!InvTransferStatusEnum.INIT.getStatus().equals(invDO.getTransferStatus())){
             throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
