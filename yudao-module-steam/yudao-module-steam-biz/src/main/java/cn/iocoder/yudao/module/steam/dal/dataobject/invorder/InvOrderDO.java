@@ -1,15 +1,15 @@
 package cn.iocoder.yudao.module.steam.dal.dataobject.invorder;
 
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.steam.service.steam.TransferMsg;
-import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
-
+import java.util.*;
 import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+import com.baomidou.mybatisplus.annotation.*;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
  * steam订单 DO
@@ -89,8 +89,13 @@ public class InvOrderDO extends BaseDO {
     private TransferMsg transferText;
     /**
      * 发货状态
-     * 枚举 {@link cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum  对应的类}
      */
     private Integer transferStatus;
+    /**
+     * 订单支付状态
+     *
+     * 枚举 {@link cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum 对应的类}
+     */
+    private Integer payOrderStatus;
 
 }

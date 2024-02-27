@@ -117,6 +117,7 @@ public class InvOrderServiceImplTest extends BaseDbUnitTest {
            o.setSteamId(null);
            o.setTransferText(null);
            o.setTransferStatus(null);
+           o.setPayOrderStatus(null);
        });
        invOrderMapper.insert(dbInvOrder);
        // 测试 userId 不匹配
@@ -133,6 +134,8 @@ public class InvOrderServiceImplTest extends BaseDbUnitTest {
        invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setTransferText(null)));
        // 测试 transferStatus 不匹配
        invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setTransferStatus(null)));
+       // 测试 payOrderStatus 不匹配
+       invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setPayOrderStatus(null)));
        // 准备参数
        InvOrderPageReqVO reqVO = new InvOrderPageReqVO();
        reqVO.setUserId(null);
@@ -142,6 +145,7 @@ public class InvOrderServiceImplTest extends BaseDbUnitTest {
        reqVO.setSteamId(null);
        reqVO.setTransferText(null);
        reqVO.setTransferStatus(null);
+       reqVO.setPayOrderStatus(null);
 
        // 调用
        PageResult<InvOrderDO> pageResult = invOrderService.getInvOrderPage(reqVO);

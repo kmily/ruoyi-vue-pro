@@ -29,6 +29,7 @@ import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
+import cn.iocoder.yudao.module.steam.service.steam.TransferMsg;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -207,6 +208,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         // 1.1 获得商品
         InvOrderDO invOrderDO = new InvOrderDO().setInvId(createReqVO.getInvId()).setSteamId(createReqVO.getSteamId())
                 .setPrice(0).setSteamId(createReqVO.getSteamId())
+                .setPayOrderStatus(PayOrderStatusEnum.WAITING.getStatus())
                 .setPayStatus(false).setRefundPrice(0).setUserId(loginUser.getId()).setUserType(loginUser.getUserType());
         validateInvOrderCanCreate(invOrderDO);
         invOrderMapper.insert(invOrderDO);
@@ -303,7 +305,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     }
 
     @Override
-    public InvOrderDO getDemoOrder(Long id) {
+    public InvOrderDO getInvOrder(Long id) {
         return invOrderMapper.selectById(id);
     }
 
@@ -320,6 +322,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         // 更新 PayDemoOrderDO 状态为已支付
         int updateCount = invOrderMapper.updateByIdAndPayed(id, false,
                 new InvOrderDO().setPayStatus(true).setPayTime(LocalDateTime.now())
+                        .setPayOrderStatus(payOrder.getStatus())
                         .setPayChannelCode(payOrder.getChannelCode()));
         if (updateCount == 0) {
             throw exception(DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
@@ -428,6 +431,11 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         if (invOrderDO.getPayRefundId() != null) {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUNDED);
         }
+        //检查是否已发货
+        TransferMsg transferText = invOrderDO.getTransferText();
+        if(Objects.isNull(transferText) && Objects.isNull(transferText.getTradeofferid())){
+            throw exception(ErrorCodeConstants.INVORDER_ORDER_TRANSFER_ALERY);
+        }
         return invOrderDO;
     }
 
@@ -437,7 +445,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         PayRefundRespDTO payRefund = validateInvOrderCanRefunded(id, payRefundId);
         // 2.2 更新退款单到 demo 订单
         invOrderMapper.updateById(new InvOrderDO().setId(id)
-                .setRefundTime(payRefund.getSuccessTime()));
+                .setRefundTime(payRefund.getSuccessTime()).setPayOrderStatus(PayOrderStatusEnum.REFUND.getStatus()));
     }
 
     private PayRefundRespDTO validateInvOrderCanRefunded(Long id, Long payRefundId) {
