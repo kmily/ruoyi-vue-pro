@@ -85,9 +85,9 @@ public class AppWalletController {
         return success(true);
     }
     @PostMapping("/invOrder/refundOrder")
-    @Operation(summary = "更新示例订单为已支付") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
-    @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
+    @Operation(summary = "订单") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
     @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
+    @PreAuthenticated
     public CommonResult<Boolean> refundInvOrder(@RequestParam("id") Long id) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         paySteamOrderService.refundInvOrder(loginUser,id, ServletUtils.getClientIP());

@@ -420,7 +420,7 @@ public class SteamService {
     public Integer autoCloseInvOrder(){
         List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
                 .eq(InvOrderDO::getPayStatus, false)
-                .eq(InvOrderDO::getPayOrderStatus, PayOrderStatusEnum.WAITING.getStatus())
+                .neIfPresent(InvOrderDO::getPayOrderStatus, PayOrderStatusEnum.WAITING.getStatus())
         );
         log.info("invorder{}",invOrderDOS);
         Integer integer=0;

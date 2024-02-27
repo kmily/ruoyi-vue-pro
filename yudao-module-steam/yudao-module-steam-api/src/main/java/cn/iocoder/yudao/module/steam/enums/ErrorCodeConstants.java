@@ -55,7 +55,7 @@ public interface ErrorCodeConstants {
     ErrorCode INVORDER_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR = new ErrorCode(1_007_900_002, "更新支付状态失败，支付单编号不匹配");
     ErrorCode INVORDER_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_STATUS_NOT_SUCCESS = new ErrorCode(1_007_900_003, "示例订单更新支付状态失败，支付单状态不是【支付成功】状态");
     ErrorCode INVORDER_ORDER_UPDATE_PAID_FAIL_PAY_PRICE_NOT_MATCH = new ErrorCode(1_007_900_004, "更新支付状态失败，支付单金额不匹配");
-
+    ErrorCode INVORDER_ORDER_TRANSFER_ALERY = new ErrorCode(1_007_900_006, "已发货不支持退货");
 
     ErrorCode INVORDER_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR = new ErrorCode(1_007_900_009, "发起退款失败，退款单编号不匹配");
     ErrorCode INVORDER_ORDER_REFUND_FAIL_REFUND_NOT_FOUND = new ErrorCode(1_007_900_007, "发起退款失败，退款订单不存在");
