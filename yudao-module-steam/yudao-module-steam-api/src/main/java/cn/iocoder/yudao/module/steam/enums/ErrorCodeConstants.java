@@ -62,4 +62,7 @@ public interface ErrorCodeConstants {
     ErrorCode INVORDER_ORDER_REFUND_FAIL_REFUND_PRICE_NOT_MATCH = new ErrorCode(1_007_900_010, "发起退款失败，退款单金额不匹配");
     ErrorCode INVORDER_ORDER_REFUND_FAIL_REFUND_NOT_SUCCESS = new ErrorCode(1_007_900_008, "发起退款失败，退款订单未退款成功");
 
+    // 饰品在售预览
+    ErrorCode INV_PREVIEW_NOT_EXISTS = new ErrorCode(1_100_010_01, "饰品在售预览不存在");
+
 }
