@@ -2,15 +2,10 @@ package cn.iocoder.yudao.module.steam.job.fin;
 
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
-import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
-import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 
 /**
  * 库存订单超时自动关闭相关数据表
