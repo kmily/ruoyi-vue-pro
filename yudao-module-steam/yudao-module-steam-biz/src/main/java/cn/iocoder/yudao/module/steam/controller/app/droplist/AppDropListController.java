@@ -145,11 +145,11 @@ public class AppDropListController {
 
     @GetMapping("/search")
     @Operation(summary = "饰品在售预览")
-    public CommonResult<PageResult<InvPreviewRespVO>> getPreview(){
-        InvPreviewPageReqVO preview = new InvPreviewPageReqVO();
-        preview.setPageSize(200);
-        preview.setPageNo(1);
-        PageResult<InvPreviewDO> invPreviewPage = invPreviewService.getInvPreviewPage(preview);
+    public CommonResult<PageResult<InvPreviewRespVO>> getPreview(@RequestBody @Valid InvPreviewPageReqVO invPreviewPageReqVO){
+        if(invPreviewPageReqVO.getPageSize()<0 || invPreviewPageReqVO.getPageSize()>200){
+            invPreviewPageReqVO.setPageSize(200);
+        }
+        PageResult<InvPreviewDO> invPreviewPage = invPreviewService.getInvPreviewPage(invPreviewPageReqVO);
         return success(BeanUtils.toBean(invPreviewPage, InvPreviewRespVO.class));
     }
 }
