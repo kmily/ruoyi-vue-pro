@@ -44,7 +44,8 @@
         },
         // 表单校验
         formRules: {
-                        color: [{ required: true, message: '色彩不能为空', trigger: 'blur' }],
+          internalName: [{ required: true, message: '英文名不能为空', trigger: 'blur' }],
+          localizedTagName: [{ required: true, message: '中文不能为空', trigger: 'blur' }],
         },
                         };
     },
@@ -102,4 +103,4 @@
       }
     }
   };
-</script>
+</script>

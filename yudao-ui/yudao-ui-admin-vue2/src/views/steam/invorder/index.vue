@@ -5,13 +5,13 @@
       <el-form-item label="用户编号" prop="userId">
         <el-input v-model="queryParams.userId" placeholder="请输入用户编号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="是否已支付：[0:未支付 1:已经支付过]" prop="payStatus">
+      <el-form-item label="已支付" prop="payStatus">
         <el-select v-model="queryParams.payStatus" placeholder="请选择是否已支付：[0:未支付 1:已经支付过]" clearable size="small">
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_BOOLEAN_STRING)"
                        :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="支付订单编号" prop="payOrderId">
+      <el-form-item label="订单编号" prop="payOrderId">
         <el-input v-model="queryParams.payOrderId" placeholder="请输入支付订单编号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="用户类型" prop="userType">
@@ -21,9 +21,6 @@
       </el-form-item>
       <el-form-item label="购买的steamId" prop="steamId">
         <el-input v-model="queryParams.steamId" placeholder="请输入购买的steamId" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="发货信息 json" prop="transferText">
-        <el-input v-model="queryParams.transferText" placeholder="请输入发货信息 json" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="发货状态" prop="transferStatus">
         <el-select v-model="queryParams.transferStatus" placeholder="请选择发货状态" clearable size="small">
@@ -39,10 +36,6 @@
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="openForm(undefined)"
-                   v-hasPermi="['steam:inv-order:create']">新增</el-button>
-      </el-col>
-      <el-col :span="1.5">
         <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
                    v-hasPermi="['steam:inv-order:export']">导出</el-button>
       </el-col>
@@ -52,20 +45,20 @@
             <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
             <el-table-column label="订单编号" align="center" prop="id" />
       <el-table-column label="用户编号" align="center" prop="userId" />
-      <el-table-column label="是否已支付：[0:未支付 1:已经支付过]" align="center" prop="payStatus">
+      <el-table-column label="已支付" align="center" prop="payStatus">
         <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="scope.row.payStatus" />
         </template>
       </el-table-column>
-      <el-table-column label="支付订单编号" align="center" prop="payOrderId" />
-      <el-table-column label="支付成功的支付渠道" align="center" prop="payChannelCode" />
+      <el-table-column label="订单编号" align="center" prop="payOrderId" />
+      <el-table-column label="支付渠道" align="center" prop="payChannelCode" />
       <el-table-column label="订单支付时间" align="center" prop="payTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.payTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="退款订单编号" align="center" prop="payRefundId" />
-      <el-table-column label="退款金额，单位：分" align="center" prop="refundPrice" />
+      <el-table-column label="退款金额(分)" align="center" prop="refundPrice" />
       <el-table-column label="退款时间" align="center" prop="refundTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.refundTime) }}</span>
@@ -76,20 +69,20 @@
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="价格，单位：分 " align="center" prop="price" />
-      <el-table-column label="库存表ID参考steam_inv" align="center" prop="invId" />
+      <el-table-column label="价格(分)" align="center" prop="price" />
+      <el-table-column label="库存ID" align="center" prop="invId" />
       <el-table-column label="用户类型" align="center" prop="userType" />
       <el-table-column label="购买的steamId" align="center" prop="steamId" />
-      <el-table-column label="发货信息 json" align="center" prop="transferText" />
+      <el-table-column label="发货信息" align="center" prop="transferText" />
       <el-table-column label="发货状态" align="center" prop="transferStatus" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template v-slot="scope">
-          <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
-                     v-hasPermi="['steam:inv-order:update']">修改</el-button>
-          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
-                     v-hasPermi="['steam:inv-order:delete']">删除</el-button>
-        </template>
-      </el-table-column>
+<!--      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">-->
+<!--        <template v-slot="scope">-->
+<!--          <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"-->
+<!--                     v-hasPermi="['steam:inv-order:update']">修改</el-button>-->
+<!--          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"-->
+<!--                     v-hasPermi="['steam:inv-order:delete']">删除</el-button>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
     </el-table>
     <!-- 分页组件 -->
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"

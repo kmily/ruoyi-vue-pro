@@ -1,8 +1,8 @@
 <template>
   <div class="app-container">
-    <doc-alert title="支付宝支付接入" url="https://doc.iocoder.cn/pay/alipay-pay-demo/" />
-    <doc-alert title="微信公众号支付接入" url="https://doc.iocoder.cn/pay/wx-pub-pay-demo/" />
-    <doc-alert title="微信小程序支付接入" url="https://doc.iocoder.cn/pay/wx-lite-pay-demo/" />
+<!--    <doc-alert title="支付宝支付接入" url="https://doc.iocoder.cn/pay/alipay-pay-demo/" />-->
+<!--    <doc-alert title="微信公众号支付接入" url="https://doc.iocoder.cn/pay/wx-pub-pay-demo/" />-->
+<!--    <doc-alert title="微信小程序支付接入" url="https://doc.iocoder.cn/pay/wx-lite-pay-demo/" />-->
 
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="120px">
@@ -111,7 +111,14 @@
         </template>
       </el-table-column>
       <el-table-column label="商品标题" align="center" prop="subject" width="180" :show-overflow-tooltip="true"/>
-      <el-table-column label="操作" align="center" fixed="right" class-name="small-padding fixed-width">
+      <el-table-column label="操" align="center" fixed="right" class-name="small-padding fixed-width">
+        <template v-slot="scope">
+          <el-button v-show="scope.row.status != '10' && scope.row.appName == '会员钱包'" size="mini" type="text" @click="handleRecharge(scope.row)"
+                     v-hasPermi="['pay:order:query']">确认充值
+          </el-button>
+        </template>
+      </el-table-column>
+      <el-table-column label="作" align="center" fixed="right" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-search" @click="handleDetail(scope.row)"
                      v-hasPermi="['pay:order:query']">查看详情
@@ -267,6 +274,10 @@ export default {
     resetQuery() {
       this.resetForm("queryForm");
       this.handleQuery();
+    },
+    /** 充值按钮操作 */
+    handleRecharge(row) {
+      window.open("//" + window.location.host + "/pay/cashier?id=" + row.id, "_blank");
     },
     /** 详情按钮操作 */
     handleDetail(row) {

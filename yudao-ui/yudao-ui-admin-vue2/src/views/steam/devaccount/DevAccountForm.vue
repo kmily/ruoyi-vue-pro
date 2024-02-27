@@ -15,9 +15,6 @@
                     <el-form-item label="公匙" prop="apiPublicKey">
                       <el-input v-model="formData.apiPublicKey" type="textarea" placeholder="请输入内容" />
                     </el-form-item>
-                    <el-form-item label="steam用户 ID" prop="steamId">
-                      <el-input v-model="formData.steamId" placeholder="请输入steam用户 ID" />
-                    </el-form-item>
                     <el-form-item label="状态" prop="status">
                       <el-radio-group v-model="formData.status">
                             <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
