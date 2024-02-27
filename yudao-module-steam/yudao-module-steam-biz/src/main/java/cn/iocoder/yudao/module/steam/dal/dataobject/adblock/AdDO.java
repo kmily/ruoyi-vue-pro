@@ -46,7 +46,7 @@ public class AdDO extends BaseDO {
     /**
      * 是否启用
      *
-     * 枚举 {@link TODO common_status 对应的类}
+     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum 对应的类}
      */
     private Integer status;
     /**

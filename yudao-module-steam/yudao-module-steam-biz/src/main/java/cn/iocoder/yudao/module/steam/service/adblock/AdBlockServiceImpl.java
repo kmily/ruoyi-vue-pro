@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.steam.service.adblock;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -92,6 +94,14 @@ public class AdBlockServiceImpl implements AdBlockService {
     @Override
     public List<AdDO> getAdListByBlockId(Long blockId) {
         return adMapper.selectListByBlockId(blockId);
+    }
+
+    @Override
+    public List<AdDO> getEnableAdListByBlockId(Long blockId) {
+        return adMapper.selectList(new LambdaQueryWrapperX<AdDO>()
+                .eq(AdDO::getBlockId,blockId)
+                .eqIfPresent(AdDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
+        );
     }
 
     private void createAdList(Long blockId, List<AdDO> list) {

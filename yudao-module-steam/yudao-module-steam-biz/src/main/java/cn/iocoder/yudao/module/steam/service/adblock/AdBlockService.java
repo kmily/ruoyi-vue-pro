@@ -62,5 +62,12 @@ public interface AdBlockService {
      * @return 广告列表
      */
     List<AdDO> getAdListByBlockId(Long blockId);
+    /**
+     * 获得广告列表
+     *
+     * @param blockId adID
+     * @return 广告列表
+     */
+    List<AdDO> getEnableAdListByBlockId(Long blockId);
 
 }

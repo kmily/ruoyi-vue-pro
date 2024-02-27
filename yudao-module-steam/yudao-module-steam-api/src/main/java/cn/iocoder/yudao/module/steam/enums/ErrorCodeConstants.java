@@ -65,4 +65,8 @@ public interface ErrorCodeConstants {
     // 饰品在售预览
     ErrorCode INV_PREVIEW_NOT_EXISTS = new ErrorCode(1_100_010_01, "饰品在售预览不存在");
 
+    // ========== 广告位 TODO 补充编号 ==========
+    ErrorCode AD_BLOCK_NOT_EXISTS = new ErrorCode(1_100_011_01, "广告位不存在");
+
+
 }
