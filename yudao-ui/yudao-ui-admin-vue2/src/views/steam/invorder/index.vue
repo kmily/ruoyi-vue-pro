@@ -27,6 +27,12 @@
           <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
+      <el-form-item label="订单支付状态" prop="payOrderStatus">
+        <el-select v-model="queryParams.payOrderStatus" placeholder="请选择订单支付状态" clearable size="small">
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.PAY_ORDER_STATUS)"
+                       :key="dict.value" :label="dict.label" :value="dict.value"/>
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -75,6 +81,11 @@
       <el-table-column label="购买的steamId" align="center" prop="steamId" />
       <el-table-column label="发货信息" align="center" prop="transferText" />
       <el-table-column label="发货状态" align="center" prop="transferStatus" />
+      <el-table-column label="订单支付状态" align="center" prop="payOrderStatus">
+        <template v-slot="scope">
+          <dict-tag :type="DICT_TYPE.PAY_ORDER_STATUS" :value="scope.row.payOrderStatus" />
+        </template>
+      </el-table-column>
 <!--      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">-->
 <!--        <template v-slot="scope">-->
 <!--          <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"-->
@@ -129,6 +140,7 @@ export default {
         steamId: null,
         transferText: null,
         transferStatus: null,
+        payOrderStatus: null,
       },
             };
   },

@@ -8,6 +8,9 @@ import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
+import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
+import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
+import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.invdesc.vo.InvDescPageReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
@@ -23,7 +26,6 @@ import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -55,6 +57,9 @@ public class SteamService {
     private ObjectMapper objectMapper;
     @Resource
     private InvOrderMapper invOrderMapper;
+
+    @Autowired
+    private PayOrderService payOrderService;
 
     /**
      * 帐号绑定
@@ -406,6 +411,34 @@ public class SteamService {
         invOrderDO.setTransferText(transferMsg);
         invOrderMapper.updateById(invOrderDO);
         invMapper.updateById(invDO);
+    }
+
+    /**
+     * 订单超时关闭时自动同步数据
+     * @return
+     */
+    public Integer autoCloseInvOrder(){
+        List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
+                .eq(InvOrderDO::getPayStatus, false)
+                .eq(InvOrderDO::getPayOrderStatus, PayOrderStatusEnum.WAITING.getStatus())
+        );
+        log.info("invorder{}",invOrderDOS);
+        Integer integer=0;
+        for (InvOrderDO invOrderDO:invOrderDOS) {
+            PayOrderDO order = payOrderService.getOrder(invOrderDO.getPayOrderId());
+            if (PayOrderStatusEnum.isClosed(order.getStatus())) {
+                integer++;
+                invOrderDO.setPayStatus(false);
+                invOrderDO.setTransferStatus(InvTransferStatusEnum.INIT.ordinal());
+                invOrderDO.setPayOrderStatus(order.getStatus());
+                invOrderMapper.updateById(invOrderDO);
+                //释放库存
+                InvDO invDO = invMapper.selectById(invOrderDO.getInvId());
+                invDO.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
+                invMapper.updateById(invDO);
+            }
+        }
+        return integer;
     }
 
 

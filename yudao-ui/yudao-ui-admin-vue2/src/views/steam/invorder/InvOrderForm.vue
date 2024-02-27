@@ -52,6 +52,13 @@
                             <el-radio label="1">请选择字典生成</el-radio>
                       </el-radio-group>
                     </el-form-item>
+                    <el-form-item label="订单支付状态" prop="payOrderStatus">
+                      <el-radio-group v-model="formData.payOrderStatus">
+                            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.PAY_ORDER_STATUS)"
+                                      :key="dict.value" :label="parseInt(dict.value)"
+>{{dict.label}}</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm" :disabled="formLoading">确 定</el-button>
@@ -92,6 +99,7 @@
                             steamId: undefined,
                             transferText: undefined,
                             transferStatus: undefined,
+                            payOrderStatus: undefined,
         },
         // 表单校验
         formRules: {
@@ -163,6 +171,7 @@
                             steamId: undefined,
                             transferText: undefined,
                             transferStatus: undefined,
+                            payOrderStatus: undefined,
         };
         this.resetForm("formRef");
       }
