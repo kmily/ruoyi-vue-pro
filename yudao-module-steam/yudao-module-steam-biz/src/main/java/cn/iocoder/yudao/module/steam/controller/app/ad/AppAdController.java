@@ -7,10 +7,7 @@ import cn.iocoder.yudao.module.steam.service.adblock.AdBlockService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -28,7 +25,7 @@ public class AppAdController {
     @Resource
     private AdBlockService adBlockService;
 
-    @GetMapping("/getAd")
+    @PostMapping("/getAd")
     @Operation(summary = "饰品在售预览")
     public CommonResult<List<AdDO>> getAd(@RequestBody @Valid AdBlockReqVO adBlockReqVO){
         List<AdDO> enableAdListByBlockId = adBlockService.getEnableAdListByBlockId(adBlockReqVO.getBlockId());
