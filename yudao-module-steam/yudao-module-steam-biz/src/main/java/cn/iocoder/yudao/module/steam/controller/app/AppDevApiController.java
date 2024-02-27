@@ -1,14 +1,20 @@
 package cn.iocoder.yudao.module.steam.controller.app;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewRespVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selexterior.vo.SelExteriorPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selitemset.vo.SelItemsetListReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selquality.vo.SelQualityPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selrarity.vo.SelRarityPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.seltype.vo.SelTypePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppDropListRespVO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.seltype.SelWeaponMapper;
-import cn.iocoder.yudao.module.steam.service.SteamService;
+import cn.iocoder.yudao.module.steam.service.AllInventoryService;
+import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewService;
 import cn.iocoder.yudao.module.steam.service.selexterior.SelExteriorService;
 import cn.iocoder.yudao.module.steam.service.selitemset.SelItemsetService;
 import cn.iocoder.yudao.module.steam.service.selquality.SelQualityService;
@@ -23,6 +29,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Tag(name = "steam后台 - devApi")
 @RestController
@@ -41,6 +50,12 @@ public class AppDevApiController {
     private SelRarityService selRarityService;
     @Resource
     private SelWeaponMapper selWeaponMapper;
+
+    @Resource
+    private AllInventoryService allInventoryService;
+
+    @Resource
+    private InvPreviewService invPreviewService;
 
 
     /**
@@ -133,4 +148,29 @@ public class AppDevApiController {
         appDropListRespVO.setExterior(selExteriorService.getSelExteriorPage(exterior).getList());
         return CommonResult.success(appDropListRespVO);
     }
+
+//    // TODO
+//    @GetMapping("/drop_list_chooses")
+//    @PermitAll
+//    @Operation(summary = "在售卖商品多条件查询")
+//    public CommonResult<AppDropListRespVO> getExterior1() {
+//        AppDropListRespVO appDropListRespVO = new AppDropListRespVO();
+//        SelExteriorPageReqVO exterior = new SelExteriorPageReqVO();
+//        exterior.setPageSize(200);
+//        exterior.setPageNo(1);
+//        appDropListRespVO.setExterior(selExteriorService.getSelExteriorPage(exterior).getList());
+//        return CommonResult.success(appDropListRespVO);
+//    }
+
+    @GetMapping("/drop_list_index")
+    @PermitAll
+    @Operation(summary = "获取首页信息")
+    public CommonResult<List<InvPreviewDO>> getIndexValue() {
+        InvPreviewPageReqVO page = new InvPreviewPageReqVO();
+        page.setPageSize(20);
+        page.setPageNo(1);
+        List<InvPreviewDO> select = invPreviewService.getInvPreviewPage(page).getList();
+        return CommonResult.success(select);
+    }
+
 }
