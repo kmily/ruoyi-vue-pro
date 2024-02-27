@@ -61,4 +61,7 @@ public class InvOrderSaveReqVO {
     @Schema(description = "发货状态", example = "2")
     private Integer transferStatus;
 
+    @Schema(description = "订单支付状态", example = "1")
+    private Integer payOrderStatus;
+
 }

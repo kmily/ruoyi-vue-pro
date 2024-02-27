@@ -80,4 +80,9 @@ public class InvOrderRespVO {
     @ExcelProperty("发货状态")
     private Integer transferStatus;
 
+    @Schema(description = "订单支付状态", example = "1")
+    @ExcelProperty(value = "订单支付状态", converter = DictConvert.class)
+    @DictFormat("pay_order_status") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
+    private Integer payOrderStatus;
+
 }
