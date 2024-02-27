@@ -366,6 +366,12 @@ public class SteamService {
             if (CommonStatusEnum.isDisable(invDO.getStatus())) {
                 throw new ServiceException(-1,"库存已经更新无法进行发货。");
             }
+            if (PayOrderStatusEnum.isClosed(invDO.getStatus())) {
+                throw new ServiceException(-1,"已关闭无法进行发货。");
+            }
+            if (PayOrderStatusEnum.REFUND.getStatus().equals(invDO.getStatus())) {
+                throw new ServiceException(-1,"已退款无法进行发货。");
+            }
             Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                     .eq(BindUserDO::getUserId, invOrderDO.getUserId())
                     .eq(BindUserDO::getUserType, invOrderDO.getUserType())
