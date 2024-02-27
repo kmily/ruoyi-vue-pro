@@ -52,13 +52,13 @@ public class InvDO extends BaseDO {
      */
     private Long bindUserId;
     /**
-     * 状态
+     * 库存状态 1代表库存正常，0代表该条库存关闭
      *
      * 枚举 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum 对应的类}
      */
     private Integer status;
     /**
-     * 发货状态(0代表未出售，1代表已出售 )
+     * 发货状态(0代表未出售，1代表出售中 )
      */
     private Integer transferStatus;
     /**
