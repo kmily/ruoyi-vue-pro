@@ -46,7 +46,7 @@ public interface PaySteamOrderService {
      * @param id 编号
      * @return 示例订单
      */
-    InvOrderDO getDemoOrder(Long id);
+    InvOrderDO getInvOrder(Long id);
 
     /**
      * 获得示例订单分页

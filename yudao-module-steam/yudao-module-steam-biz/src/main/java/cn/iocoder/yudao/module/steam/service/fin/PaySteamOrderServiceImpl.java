@@ -305,7 +305,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     }
 
     @Override
-    public InvOrderDO getDemoOrder(Long id) {
+    public InvOrderDO getInvOrder(Long id) {
         return invOrderMapper.selectById(id);
     }
 
