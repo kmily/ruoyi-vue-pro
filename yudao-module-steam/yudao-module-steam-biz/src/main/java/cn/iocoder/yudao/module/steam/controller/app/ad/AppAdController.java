@@ -10,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class AppAdController {
 
     @PostMapping("/getAd")
     @Operation(summary = "饰品在售预览")
+    @PermitAll
     public CommonResult<List<AdDO>> getAd(@RequestBody @Valid AdBlockReqVO adBlockReqVO){
         List<AdDO> enableAdListByBlockId = adBlockService.getEnableAdListByBlockId(adBlockReqVO.getBlockId());
         return success(enableAdListByBlockId);
