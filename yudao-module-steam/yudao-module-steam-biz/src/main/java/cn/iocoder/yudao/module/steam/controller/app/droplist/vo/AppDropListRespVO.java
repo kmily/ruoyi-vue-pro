@@ -5,7 +5,6 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.selitemset.SelItemsetDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selquality.SelQualityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selrarity.SelRarityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.seltype.SelTypeDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.seltype.SelWeaponDO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -40,7 +39,6 @@ public class AppDropListRespVO {
     // 武器选择
     @Schema(description = "武器选择")
     List<cn.iocoder.yudao.module.steam.dal.dataobject.seltype.SelWeaponDO> weapon;
-
 
 
 }

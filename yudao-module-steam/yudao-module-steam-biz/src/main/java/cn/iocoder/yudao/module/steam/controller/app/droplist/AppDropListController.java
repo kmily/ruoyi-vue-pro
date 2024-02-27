@@ -1,12 +1,19 @@
 package cn.iocoder.yudao.module.steam.controller.app.droplist;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewRespVO;
+import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewSaveReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selexterior.vo.SelExteriorPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selitemset.vo.SelItemsetListReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selquality.vo.SelQualityPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selrarity.vo.SelRarityPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.seltype.vo.SelTypePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppDropListRespVO;
+import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.PreviewRespVO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
+import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewService;
 import cn.iocoder.yudao.module.steam.service.selexterior.SelExteriorService;
 import cn.iocoder.yudao.module.steam.service.selitemset.SelItemsetService;
 import cn.iocoder.yudao.module.steam.service.selquality.SelQualityService;
@@ -16,10 +23,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
 @Tag(name = "获取下拉选择信息")
 @RestController
@@ -37,6 +48,8 @@ public class AppDropListController {
     private SelTypeService selTypeService;
     @Resource
     private SelRarityService selRarityService;
+    @Resource
+    private InvPreviewService invPreviewService;
 
     /**
      * 类别选择
@@ -122,9 +135,49 @@ public class AppDropListController {
         return CommonResult.success(appDropListRespVO);
     }
 
+    @GetMapping("/search")
+    @Operation(summary = "饰品在售预览")
+    public PageResult<InvPreviewRespVO> getPreview(){
+        InvPreviewPageReqVO preview = new InvPreviewPageReqVO();
+        preview.setPageSize(200);
+        preview.setPageNo(1);
+        Object invPreviewPage = invPreviewService.getInvPreviewPage(preview);
+        return (PageResult<InvPreviewRespVO>) invPreviewPage;
+    }
 
 
 
+
+
+
+    /*@
+    GetMapping("/search")
+    @Operation(summary = "饰品在售预览")
+    public PageResult<PreviewRespVO> getPreview(@Valid @RequestBody InvPreviewSaveReqVO previewReqVO) {
+        InvPreviewPageReqVO preview = new InvPreviewPageReqVO();
+        preview.setPageSize(200);
+        preview.setPageNo(1);
+        PageResult<InvPreviewDO> invPreviewPage = invPreviewService.getInvPreviewPage(preview);
+
+        List<InvPreviewDO> invPreviewList = invPreviewPage.getList();
+        List<PreviewRespVO> previewRespList = new ArrayList<>();
+        for (InvPreviewDO invPreview : invPreviewList) {
+            PreviewRespVO previewResp = new PreviewRespVO();
+            // 设置PreviewRespVO的属性值
+            // previewResp.setXxx(invPreview.getXxx);
+            // 将invPreview转换为PreviewRespVO，并设置相应的属性值
+
+            previewRespList.add(previewResp);
+        }
+
+        PageResult<PreviewRespVO> previewRespPage = new PageResult<>();
+        previewRespPage.setList(previewRespList);
+        previewRespPage.setTotal(invPreviewPage.getTotal());
+        previewRespPage.setPageNo(invPreviewPage.getPageNo(200));
+        previewRespPage.setPageSize(invPreviewPage.getPageSize(1));
+
+        return previewRespPage;
+    }*/
 
 
 }
