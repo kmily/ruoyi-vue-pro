@@ -1,7 +1,12 @@
 package cn.iocoder.yudao.module.steam.controller.app.droplist;
 
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.transaction.AppPayWalletTransactionPageReqVO;
+import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.transaction.AppPayWalletTransactionRespVO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewRespVO;
 import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewSaveReqVO;
@@ -31,6 +36,9 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "获取下拉选择信息")
 @RestController
@@ -137,11 +145,11 @@ public class AppDropListController {
 
     @GetMapping("/search")
     @Operation(summary = "饰品在售预览")
-    public PageResult<InvPreviewRespVO> getPreview(){
+    public CommonResult<PageResult<InvPreviewRespVO>> getPreview(){
         InvPreviewPageReqVO preview = new InvPreviewPageReqVO();
         preview.setPageSize(200);
         preview.setPageNo(1);
-        Object invPreviewPage = invPreviewService.getInvPreviewPage(preview);
-        return (PageResult<InvPreviewRespVO>) invPreviewPage;
+        PageResult<InvPreviewDO> invPreviewPage = invPreviewService.getInvPreviewPage(preview);
+        return success(BeanUtils.toBean(invPreviewPage, InvPreviewRespVO.class));
     }
 }
