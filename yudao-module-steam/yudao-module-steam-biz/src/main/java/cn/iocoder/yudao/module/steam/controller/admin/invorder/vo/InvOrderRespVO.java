@@ -60,10 +60,6 @@ public class InvOrderRespVO {
     @ExcelProperty("价格，单位：分 ")
     private Integer price;
 
-    @Schema(description = "库存表ID参考steam_inv", example = "4408")
-    @ExcelProperty("库存表ID参考steam_inv")
-    private Long invId;
-
     @Schema(description = "用户类型", example = "2")
     @ExcelProperty("用户类型")
     private Integer userType;
@@ -84,5 +80,9 @@ public class InvOrderRespVO {
     @ExcelProperty(value = "订单支付状态", converter = DictConvert.class)
     @DictFormat("pay_order_status") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
     private Integer payOrderStatus;
+
+    @Schema(description = "库存表ID参考steam_sell", example = "8828")
+    @ExcelProperty("库存表ID参考steam_sell")
+    private Long sellId;
 
 }

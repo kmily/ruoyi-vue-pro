@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.module.steam.controller.app.InventorySearch;
 
-//import cn.iocoder.yudao.module.steam.service.SteamInvService;
+
 import cn.iocoder.yudao.module.steam.service.SteamInvService;
-import cn.iocoder.yudao.module.steam.service.SteamService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,9 +25,8 @@ public class AppInventorySearchController {
 
     // 查询库存
     @GetMapping("/search")
-    public void search(Long id) {
+    public void search(@RequestParam("id") Long id) {
         log.info("查询库存");
-        // 用户主动获取已绑定的 steam 账号的库存
         steamInvService.fetchInventory(id,"730");
     }
 

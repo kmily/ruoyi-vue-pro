@@ -70,10 +70,6 @@ public class InvOrderDO extends BaseDO {
      */
     private Integer price;
     /**
-     * 库存表ID参考steam_inv
-     */
-    private Long invId;
-    /**
      * 用户类型
      * 枚举 {@link cn.iocoder.yudao.framework.common.enums.UserTypeEnum 对应的类}
      */
@@ -97,5 +93,9 @@ public class InvOrderDO extends BaseDO {
      * 枚举 {@link cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum 对应的类}
      */
     private Integer payOrderStatus;
+    /**
+     * 库存表ID参考steam_sell
+     */
+    private Long sellId;
 
 }

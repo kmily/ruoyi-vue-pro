@@ -11,15 +11,19 @@
                        :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="订单编号" prop="payOrderId">
+      <el-form-item label="支付订单编号" prop="payOrderId">
         <el-input v-model="queryParams.payOrderId" placeholder="请输入支付订单编号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="用户类型" prop="userType">
         <el-select v-model="queryParams.userType" placeholder="请选择用户类型" clearable size="small">
           <el-option label="请选择字典生成" value="" />
         </el-select>
+        <el-select v-model="queryParams.userType" placeholder="请选择用户类型" clearable size="small">
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.USER_TYPE)"
+                     :key="dict.value" :label="dict.label" :value="dict.value"/>
+        </el-select>
       </el-form-item>
-      <el-form-item label="购买的steamId" prop="steamId">
+      <el-form-item label="购买steamId" prop="steamId">
         <el-input v-model="queryParams.steamId" placeholder="请输入购买的steamId" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="发货状态" prop="transferStatus">
@@ -32,6 +36,9 @@
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.PAY_ORDER_STATUS)"
                        :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
+      </el-form-item>
+      <el-form-item label="库存表ID参考steam_sell" prop="sellId">
+        <el-input v-model="queryParams.sellId" placeholder="请输入库存表ID参考steam_sell" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -76,8 +83,11 @@
         </template>
       </el-table-column>
       <el-table-column label="价格(分)" align="center" prop="price" />
-      <el-table-column label="库存ID" align="center" prop="invId" />
-      <el-table-column label="用户类型" align="center" prop="userType" />
+      <el-table-column label="用户类型" align="center" prop="userType" >
+              <template v-slot="scope">
+                <dict-tag :type="DICT_TYPE.USER_TYPE" :value="scope.row.userType" />
+              </template>
+      </el-table-column>
       <el-table-column label="购买的steamId" align="center" prop="steamId" />
       <el-table-column label="发货信息" align="center" prop="transferText" />
       <el-table-column label="发货状态" align="center" prop="transferStatus" />
@@ -86,6 +96,7 @@
           <dict-tag :type="DICT_TYPE.PAY_ORDER_STATUS" :value="scope.row.payOrderStatus" />
         </template>
       </el-table-column>
+      <el-table-column label="库存表ID" align="center" prop="sellId" />
 <!--      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">-->
 <!--        <template v-slot="scope">-->
 <!--          <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"-->
@@ -141,6 +152,7 @@ export default {
         transferText: null,
         transferStatus: null,
         payOrderStatus: null,
+        sellId: null,
       },
             };
   },

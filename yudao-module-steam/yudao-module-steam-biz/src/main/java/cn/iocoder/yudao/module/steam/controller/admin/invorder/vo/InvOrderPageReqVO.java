@@ -39,4 +39,7 @@ public class InvOrderPageReqVO extends PageParam {
     @Schema(description = "订单支付状态", example = "1")
     private Integer payOrderStatus;
 
+    @Schema(description = "库存表ID参考steam_sell", example = "8828")
+    private Long sellId;
+
 }

@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.steam.service.fin;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
@@ -12,18 +11,17 @@ import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
-import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal.WithdrawalDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.service.SteamService;
@@ -73,8 +71,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     @Resource
     private PayRefundApi payRefundApi;
 
+
     @Resource
-    private InvMapper invMapper;
+    private SellingMapper sellingMapper;
 
     @Resource
     private InvOrderMapper invOrderMapper;
@@ -205,8 +204,10 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     @Override
     public CreateOrderResult createInvOrder(LoginUser loginUser, PaySteamOrderCreateReqVO createReqVO) {
         CreateOrderResult createOrderResult=new CreateOrderResult();
+        SellingDO sellingDO = sellingMapper.selectById(createReqVO.getSellId());
+        InvDescDO invDescDO = invDescMapper.selectById(sellingDO.getInvDescId());
         // 1.1 获得商品
-        InvOrderDO invOrderDO = new InvOrderDO().setInvId(createReqVO.getInvId()).setSteamId(createReqVO.getSteamId())
+        InvOrderDO invOrderDO = new InvOrderDO().setSellId(createReqVO.getSellId()).setSteamId(createReqVO.getSteamId())
                 .setPrice(0).setSteamId(createReqVO.getSteamId())
                 .setPayOrderStatus(PayOrderStatusEnum.WAITING.getStatus())
                 .setPayStatus(false).setRefundPrice(0).setUserId(loginUser.getId()).setUserType(loginUser.getUserType());
@@ -217,43 +218,42 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         Long payOrderId = payOrderApi.createOrder(new PayOrderCreateReqDTO()
                 .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
                 .setMerchantOrderId(invOrderDO.getId().toString()) // 业务的订单编号
-                .setSubject("购买"+createReqVO.getInvId()).setBody("").setPrice(invOrderDO.getPrice()) // 价格信息
+                .setSubject("购买"+invDescDO.getMarketName()).setBody("出售编号："+sellingDO.getId()).setPrice(invOrderDO.getPrice()) // 价格信息
                 .setExpireTime(addTime(Duration.ofHours(2L)))); // 支付的过期时间
         // 2.2 更新支付单到 demo 订单
         invOrderMapper.updateById(new InvOrderDO().setId(invOrderDO.getId())
                 .setPayOrderId(payOrderId));
         //更新库存的标识
-        InvDO invDO = invMapper.selectById(createReqVO.getInvId());
-        invDO.setTransferStatus(InvTransferStatusEnum.INORDER.getStatus());
-        invMapper.updateById(invDO);
+        sellingDO.setTransferStatus(InvTransferStatusEnum.INORDER.getStatus());
+        sellingMapper.updateById(sellingDO);
         // 返回
         createOrderResult.setBizOrderId(invOrderDO.getId());
         createOrderResult.setPayOrderId(payOrderId);
         return createOrderResult;
     }
     private InvOrderDO validateInvOrderCanCreate(InvOrderDO invOrderDO) {
-        InvDO invDO = invMapper.selectById(invOrderDO.getInvId());
+        SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
 //        //校验订单是否存在
-        if (invDO == null) {
+        if (sellingDO == null) {
             throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
         }
-        if(CommonStatusEnum.isDisable(invDO.getStatus())){
+        if(CommonStatusEnum.isDisable(sellingDO.getStatus())){
             throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
         }
-        if(CommonStatusEnum.isDisable(invDO.getStatus())){
+        if(CommonStatusEnum.isDisable(sellingDO.getStatus())){
             throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
         }
-        if(Objects.isNull(invDO.getBindUserId())){
+        if(Objects.isNull(sellingDO.getBindUserId())){
             throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
         }
-        if(invOrderDO.getUserId().equals(invDO.getUserId()) && invOrderDO.getUserType().equals(invDO.getUserType())){
+        if(invOrderDO.getUserId().equals(sellingDO.getUserId()) && invOrderDO.getUserType().equals(sellingDO.getUserType())){
             throw exception(ErrorCodeConstants.INVORDER_ORDERUSER_EXCEPT);
         }
         //检查是否可交易
         Optional<InvDescDO> first1 = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
-                .eq(InvDescDO::getClassid, invDO.getClassid())
-                .eq(InvDescDO::getInstanceid, invDO.getInstanceid())
-                .eq(InvDescDO::getAppid, invDO.getAppid())
+                .eq(InvDescDO::getClassid, sellingDO.getClassid())
+                .eq(InvDescDO::getInstanceid, sellingDO.getInstanceid())
+                .eq(InvDescDO::getAppid, sellingDO.getAppid())
         ).stream().findFirst();
         if(!first1.isPresent()){
             throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
@@ -264,16 +264,16 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         }
 
         //库存状态为没有订单
-        if(!InvTransferStatusEnum.INIT.getStatus().equals(invDO.getTransferStatus())){
+        if(!InvTransferStatusEnum.INIT.getStatus().equals(sellingDO.getTransferStatus())){
             throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
         }
         //使用库存的价格进行替换
-        invOrderDO.setPrice(invDO.getPrice());
+        invOrderDO.setPrice(sellingDO.getPrice());
 
 
         //检查是否已经下过单
         List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
-                .eq(InvOrderDO::getInvId, invDO.getId())
+                .eq(InvOrderDO::getSellId, sellingDO.getId())
 //                .eq(InvOrderDO::getPayStatus, 1)
                 .isNull(InvOrderDO::getPayRefundId)
         );
@@ -307,11 +307,6 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     @Override
     public InvOrderDO getInvOrder(Long id) {
         return invOrderMapper.selectById(id);
-    }
-
-    @Override
-    public PageResult<InvOrderDO> getDemoOrderPage(InvOrderPageReqVO pageReqVO) {
-        return invOrderMapper.selectPage(pageReqVO);
     }
 
     @Override
@@ -406,9 +401,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         invOrderMapper.updateById(new InvOrderDO().setId(id)
                 .setPayRefundId(payRefundId).setRefundPrice(invOrderDO.getPrice()));
         //释放库存
-        InvDO invDO = invMapper.selectById(invOrderDO.getInvId());
-        invDO.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
-        invMapper.updateById(invDO);
+        SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
+        sellingDO.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
+        sellingMapper.updateById(sellingDO);
     }
 
     private InvOrderDO validateInvOrderCanRefund(Long id,LoginUser loginUser) {

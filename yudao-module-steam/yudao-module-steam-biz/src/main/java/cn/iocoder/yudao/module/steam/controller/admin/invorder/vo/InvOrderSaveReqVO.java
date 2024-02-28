@@ -45,9 +45,6 @@ public class InvOrderSaveReqVO {
     @NotNull(message = "价格，单位：分 不能为空")
     private Integer price;
 
-    @Schema(description = "库存表ID参考steam_inv", example = "4408")
-    private Long invId;
-
     @Schema(description = "用户类型", example = "2")
     private Integer userType;
 
@@ -63,5 +60,8 @@ public class InvOrderSaveReqVO {
 
     @Schema(description = "订单支付状态", example = "1")
     private Integer payOrderStatus;
+
+    @Schema(description = "库存表ID参考steam_sell", example = "8828")
+    private Long sellId;
 
 }
