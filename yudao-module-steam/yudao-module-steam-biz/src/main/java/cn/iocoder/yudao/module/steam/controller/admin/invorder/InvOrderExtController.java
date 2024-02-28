@@ -47,7 +47,7 @@ public class InvOrderExtController {
     @PreAuthorize("@ss.hasPermission('steam:inv-order:refund')")
     public CommonResult<Boolean> refundInvOrder(@Valid @RequestBody InvOrderExtReqVo invOrderExtReqVo) {
         InvOrderDO invOrder = paySteamOrderService.getInvOrder(invOrderExtReqVo.getId());
-        if(!Objects.nonNull(invOrder)){
+        if(Objects.nonNull(invOrder)){
             LoginUser loginUser=new LoginUser();
             loginUser.setId(invOrder.getUserId());
             loginUser.setUserType(invOrder.getUserType());
