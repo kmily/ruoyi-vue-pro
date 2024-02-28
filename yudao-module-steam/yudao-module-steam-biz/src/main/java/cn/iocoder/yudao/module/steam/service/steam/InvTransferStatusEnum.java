@@ -7,9 +7,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum InvTransferStatusEnum {
 
-    INIT(0, "进库存"),
-    INORDER(1, "订单中"),
-    TransferFINISH(2, "发货完成"),
+    INIT(0, "未出售"),
+    SELL(1, "出售中"),
+    INORDER(2, "下单"),
+    TransferFINISH(3, "发货完成"),
     TransferERROR(10,"发货失败");
     /**
      * 状态值
