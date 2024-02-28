@@ -33,9 +33,6 @@
                     <el-form-item label="价格，单位：分 " prop="price">
                       <el-input v-model="formData.price" placeholder="请输入价格，单位：分 " />
                     </el-form-item>
-                    <el-form-item label="库存表ID参考steam_inv" prop="invId">
-                      <el-input v-model="formData.invId" placeholder="请输入库存表ID参考steam_inv" />
-                    </el-form-item>
                     <el-form-item label="用户类型" prop="userType">
                       <el-select v-model="formData.userType" placeholder="请选择用户类型">
                             <el-option label="请选择字典生成" value="" />
@@ -58,6 +55,9 @@
                                       :key="dict.value" :label="parseInt(dict.value)"
 >{{dict.label}}</el-radio>
                       </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="库存表ID参考steam_sell" prop="sellId">
+                      <el-input v-model="formData.sellId" placeholder="请输入库存表ID参考steam_sell" />
                     </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
@@ -94,12 +94,12 @@
                             refundPrice: undefined,
                             refundTime: undefined,
                             price: undefined,
-                            invId: undefined,
                             userType: undefined,
                             steamId: undefined,
                             transferText: undefined,
                             transferStatus: undefined,
                             payOrderStatus: undefined,
+                            sellId: undefined,
         },
         // 表单校验
         formRules: {
@@ -166,12 +166,12 @@
                             refundPrice: undefined,
                             refundTime: undefined,
                             price: undefined,
-                            invId: undefined,
                             userType: undefined,
                             steamId: undefined,
                             transferText: undefined,
                             transferStatus: undefined,
                             payOrderStatus: undefined,
+                            sellId: undefined,
         };
         this.resetForm("formRef");
       }
