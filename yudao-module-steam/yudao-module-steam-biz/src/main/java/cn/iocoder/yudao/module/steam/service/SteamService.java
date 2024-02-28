@@ -251,12 +251,12 @@ public class SteamService {
             if (PayOrderStatusEnum.isClosed(order.getStatus())) {
                 integer++;
                 invOrderDO.setPayStatus(false);
-                invOrderDO.setTransferStatus(InvTransferStatusEnum.INIT.ordinal());
+                invOrderDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
                 invOrderDO.setPayOrderStatus(order.getStatus());
                 invOrderMapper.updateById(invOrderDO);
                 //释放库存
                 SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
-                sellingDO.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
+                sellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
                 sellingMapper.updateById(sellingDO);
             }
         }
