@@ -51,41 +51,40 @@ public class SellingExtService {
      */
     public SellingDO getInvPage(InvPageReqVo invPageReqVos) {
         InvDO invDO = invMapper.selectById(invPageReqVos.getId());
-        invDO.setPrice(invPageReqVos.getPrice());
-        invMapper.updateById(invDO);
-        Optional<InvDescDO> invDescDO = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
-                .eq(InvDescDO::getClassid, invDO.getClassid())
-                .eq(InvDescDO::getInstanceid, invDO.getInstanceid())).stream().findFirst();
-        if(!invDescDO.isPresent()){
-            throw new ServiceException(-1, "exists");
+        if (invDO.getTransferStatus() != 0) {
+            throw new ServiceException(-1, "商品已上架");
+        } else {
+            invDO.setPrice(invPageReqVos.getPrice());
+            invDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
+            invMapper.updateById(invDO);
+            Optional<InvDescDO> invDescDO = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+                    .eq(InvDescDO::getClassid, invDO.getClassid())
+                    .eq(InvDescDO::getInstanceid, invDO.getInstanceid())).stream().findFirst();
+            if (!invDescDO.isPresent()) {
+                throw new ServiceException(-1, "exists");
+            }
+            Long l = sellingMapper.selectCount(new LambdaQueryWrapperX<SellingDO>()
+                    .eq(SellingDO::getId, invPageReqVos.getId())
+            );
+            if (l > 0) {
+                throw new ServiceException(-1, "exists");
+            }
+            SellingDO sellingDO = new SellingDO();
+            sellingDO.setAppid(invDO.getAppid());
+            sellingDO.setAssetid(invDO.getAssetid());
+            sellingDO.setClassid(invDO.getClassid());
+            sellingDO.setInstanceid(invDO.getInstanceid());
+            sellingDO.setAmount(invDO.getAmount());
+            sellingDO.setSteamId(invDO.getSteamId());
+            sellingDO.setUserId(invDO.getUserId());
+            sellingDO.setUserType(invDO.getUserType());
+            sellingDO.setBindUserId(invDO.getBindUserId());
+            sellingDO.setContextid(invDO.getContextid());
+            sellingDO.setInvDescId(invDescDO.get().getId());
+            sellingDO.setPrice(invPageReqVos.getPrice());
+            sellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
+            sellingMapper.insert(sellingDO);
+            return sellingDO;
         }
-
-        //exists
-        Long l = sellingMapper.selectCount(new LambdaQueryWrapperX<SellingDO>()
-                .eq(SellingDO::getId, invPageReqVos.getId())
-        );
-        if (l > 0) {
-            throw new ServiceException(-1, "exists");
-        }
-
-        SellingDO sellingDO = new SellingDO();
-        //set
-//        SellingDO selling = sellingService.getSelling(invPageReqVos.getId());
-        sellingDO.setAppid(invDO.getAppid());
-        sellingDO.setAssetid(invDO.getAssetid());
-        sellingDO.setClassid(invDO.getClassid());
-        sellingDO.setInstanceid(invDO.getInstanceid());
-        sellingDO.setAmount(invDO.getAmount());
-        sellingDO.setSteamId(invDO.getSteamId());
-        sellingDO.setUserId(invDO.getUserId());
-        sellingDO.setUserType(invDO.getUserType());
-        sellingDO.setBindUserId(invDO.getBindUserId());
-        sellingDO.setContextid(invDO.getContextid());
-        sellingDO.setInvDescId(invDescDO.get().getId());
-        sellingDO.setPrice(invPageReqVos.getPrice());
-        sellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
-        sellingMapper.insert(sellingDO);
-        return sellingDO;
     }
-
 }
