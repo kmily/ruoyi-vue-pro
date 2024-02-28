@@ -12,7 +12,9 @@ import cn.iocoder.yudao.module.steam.controller.admin.selrarity.vo.SelRarityPage
 import cn.iocoder.yudao.module.steam.controller.admin.seltype.vo.SelTypePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppDropListRespVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
+import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
+import cn.iocoder.yudao.module.steam.service.inv.InvService;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewService;
 import cn.iocoder.yudao.module.steam.service.selexterior.SelExteriorService;
 import cn.iocoder.yudao.module.steam.service.selitemset.SelItemsetService;
@@ -30,8 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -56,6 +56,13 @@ public class AppDropListController {
     private InvPreviewService invPreviewService;
     @Resource
     private SellingService sellingService;
+    @Resource
+    private InvService invService;
+    @Resource
+    private SellingMapper sellingMapper;
+    @Resource
+    private InvMapper invMapper;
+
 
     /**
      * 类别选择
@@ -154,5 +161,6 @@ public class AppDropListController {
         PageResult<InvPreviewDO> view = invPreviewService.getInvPreviewPage(invPreviewPageReqVO);
         return success(BeanUtils.toBean(view, InvPreviewRespVO.class));
     }
+
 
 }
