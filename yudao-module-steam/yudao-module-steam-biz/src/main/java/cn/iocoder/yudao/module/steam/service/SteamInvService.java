@@ -219,6 +219,7 @@ public class SteamInvService {
         steamInvInsert.setBindUserId(id);
         steamInvInsert.setUserId(userId);
         steamInvInsert.setUserType(1);
+        steamInvInsert.setContextid(item.getContextid());
         return steamInvInsert;
     }
 
