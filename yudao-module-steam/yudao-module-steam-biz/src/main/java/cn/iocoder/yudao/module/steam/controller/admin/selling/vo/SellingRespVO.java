@@ -53,10 +53,6 @@ public class SellingRespVO {
     @ExcelProperty("出售价格单价分")
     private Integer price;
 
-    @Schema(description = "发货状态(0代表未出售，1代表出售中 )", example = "2")
-    @ExcelProperty("发货状态(0代表未出售，1代表出售中 )")
-    private Integer transferStatus;
-
     @Schema(description = "平台用户ID", example = "12743")
     @ExcelProperty("平台用户ID")
     private Long userId;
@@ -72,5 +68,13 @@ public class SellingRespVO {
     @Schema(description = "contextid", example = "12276")
     @ExcelProperty("contextid")
     private String contextid;
+
+    @Schema(description = "inv_desc_id", example = "3271")
+    @ExcelProperty("inv_desc_id")
+    private Long invDescId;
+
+    @Schema(description = "发货状态(0代表未出售，1代表出售中，2代表已出售 )", example = "1")
+    @ExcelProperty("发货状态(0代表未出售，1代表出售中，2代表已出售 )")
+    private Integer transferStatus;
 
 }

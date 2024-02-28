@@ -32,9 +32,6 @@
       <el-form-item label="出售价格单价分" prop="price">
         <el-input v-model="queryParams.price" placeholder="请输入出售价格单价分" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="发货状态(0代表未出售，1代表出售中 )" prop="transferStatus">
-        <el-input v-model="queryParams.transferStatus" placeholder="请输入发货状态(0代表未出售，1代表出售中 )" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
       <el-form-item label="平台用户ID" prop="userId">
         <el-input v-model="queryParams.userId" placeholder="请输入平台用户ID" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
@@ -46,6 +43,14 @@
       </el-form-item>
       <el-form-item label="contextid" prop="contextid">
         <el-input v-model="queryParams.contextid" placeholder="请输入contextid" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="inv_desc_id" prop="invDescId">
+        <el-input v-model="queryParams.invDescId" placeholder="请输入inv_desc_id" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="发货状态(0代表未出售，1代表出售中，2代表已出售 )" prop="transferStatus">
+        <el-select v-model="queryParams.transferStatus" placeholder="请选择发货状态(0代表未出售，1代表出售中，2代表已出售 )" clearable size="small">
+          <el-option label="请选择字典生成" value="" />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -81,11 +86,12 @@
       <el-table-column label="steamId" align="center" prop="steamId" />
       <el-table-column label="状态" align="center" prop="status" />
       <el-table-column label="出售价格单价分" align="center" prop="price" />
-      <el-table-column label="发货状态(0代表未出售，1代表出售中 )" align="center" prop="transferStatus" />
       <el-table-column label="平台用户ID" align="center" prop="userId" />
       <el-table-column label="用户类型(前后台用户)" align="center" prop="userType" />
       <el-table-column label="绑定用户ID" align="center" prop="bindUserId" />
       <el-table-column label="contextid" align="center" prop="contextid" />
+      <el-table-column label="inv_desc_id" align="center" prop="invDescId" />
+      <el-table-column label="发货状态(0代表未出售，1代表出售中，2代表已出售 )" align="center" prop="transferStatus" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
@@ -142,11 +148,12 @@ export default {
         steamId: null,
         status: null,
         price: null,
-        transferStatus: null,
         userId: null,
         userType: null,
         bindUserId: null,
         contextid: null,
+        invDescId: null,
+        transferStatus: null,
       },
             };
   },
@@ -203,4 +210,4 @@ export default {
     },
               }
 };
-</script>
+</script>

@@ -60,10 +60,6 @@ public class SellingDO extends BaseDO {
      */
     private Integer price;
     /**
-     * 发货状态(0代表未出售，1代表出售中 )
-     */
-    private Integer transferStatus;
-    /**
      * 平台用户ID
      */
     private Long userId;
@@ -79,5 +75,13 @@ public class SellingDO extends BaseDO {
      * contextid
      */
     private String contextid;
+    /**
+     * inv_desc_id
+     */
+    private Long invDescId;
+    /**
+     * 发货状态(0代表未出售，1代表出售中，2代表已出售 )
+     */
+    private Integer transferStatus;
 
 }

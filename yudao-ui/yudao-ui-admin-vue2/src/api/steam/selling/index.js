@@ -50,4 +50,4 @@ export function exportSellingExcel(params) {
     params,
     responseType: 'blob'
   })
-}
+}

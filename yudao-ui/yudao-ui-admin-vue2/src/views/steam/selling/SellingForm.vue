@@ -29,9 +29,6 @@
                     <el-form-item label="出售价格单价分" prop="price">
                       <el-input v-model="formData.price" placeholder="请输入出售价格单价分" />
                     </el-form-item>
-                    <el-form-item label="发货状态(0代表未出售，1代表出售中 )" prop="transferStatus">
-                      <el-input v-model="formData.transferStatus" placeholder="请输入发货状态(0代表未出售，1代表出售中 )" />
-                    </el-form-item>
                     <el-form-item label="平台用户ID" prop="userId">
                       <el-input v-model="formData.userId" placeholder="请输入平台用户ID" />
                     </el-form-item>
@@ -43,6 +40,14 @@
                     </el-form-item>
                     <el-form-item label="contextid" prop="contextid">
                       <el-input v-model="formData.contextid" placeholder="请输入contextid" />
+                    </el-form-item>
+                    <el-form-item label="inv_desc_id" prop="invDescId">
+                      <el-input v-model="formData.invDescId" placeholder="请输入inv_desc_id" />
+                    </el-form-item>
+                    <el-form-item label="发货状态(0代表未出售，1代表出售中，2代表已出售 )" prop="transferStatus">
+                      <el-radio-group v-model="formData.transferStatus">
+                            <el-radio label="1">请选择字典生成</el-radio>
+                      </el-radio-group>
                     </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
@@ -78,11 +83,12 @@
                             steamId: undefined,
                             status: undefined,
                             price: undefined,
-                            transferStatus: undefined,
                             userId: undefined,
                             userType: undefined,
                             bindUserId: undefined,
                             contextid: undefined,
+                            invDescId: undefined,
+                            transferStatus: undefined,
         },
         // 表单校验
         formRules: {
@@ -144,11 +150,12 @@
                             steamId: undefined,
                             status: undefined,
                             price: undefined,
-                            transferStatus: undefined,
                             userId: undefined,
                             userType: undefined,
                             bindUserId: undefined,
                             contextid: undefined,
+                            invDescId: undefined,
+                            transferStatus: undefined,
         };
         this.resetForm("formRef");
       }

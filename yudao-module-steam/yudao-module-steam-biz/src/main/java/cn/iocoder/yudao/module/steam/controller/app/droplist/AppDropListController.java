@@ -118,9 +118,7 @@ public class AppDropListController {
         type_weapon.setPageSize(200);
         type_weapon.setPageNo(1);
 //        appDropListRespVO.setWeapon(selTypeService.getSelWeaponPage(type_weapon,typeId).getList());
-
         return CommonResult.success(appDropListRespVO);
-
     }
 
     /**
@@ -142,12 +140,7 @@ public class AppDropListController {
     @Operation(summary = "饰品在售预览")
     public CommonResult<PageResult<InvPreviewRespVO>> getPreview(@Valid InvPreviewPageReqVO invPreviewPageReqVO){
         invPreviewPageReqVO.setPageSize(20);
-/*
-        invPreviewPageReqVO.setPageNo(invPreviewPageReqVO.getPageNum());
-*/
-
         PageResult<InvPreviewDO> invPreviewPage = invPreviewService.getInvPreviewPage(invPreviewPageReqVO);
-
         return success(BeanUtils.toBean(invPreviewPage, InvPreviewRespVO.class));
     }
 

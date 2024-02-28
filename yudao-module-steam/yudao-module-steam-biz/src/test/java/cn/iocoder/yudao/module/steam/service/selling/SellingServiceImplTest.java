@@ -119,11 +119,12 @@ public class SellingServiceImplTest extends BaseDbUnitTest {
            o.setSteamId(null);
            o.setStatus(null);
            o.setPrice(null);
-           o.setTransferStatus(null);
            o.setUserId(null);
            o.setUserType(null);
            o.setBindUserId(null);
            o.setContextid(null);
+           o.setInvDescId(null);
+           o.setTransferStatus(null);
        });
        sellingMapper.insert(dbSelling);
        // 测试 appid 不匹配
@@ -144,8 +145,6 @@ public class SellingServiceImplTest extends BaseDbUnitTest {
        sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setStatus(null)));
        // 测试 price 不匹配
        sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setPrice(null)));
-       // 测试 transferStatus 不匹配
-       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setTransferStatus(null)));
        // 测试 userId 不匹配
        sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setUserId(null)));
        // 测试 userType 不匹配
@@ -154,6 +153,10 @@ public class SellingServiceImplTest extends BaseDbUnitTest {
        sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setBindUserId(null)));
        // 测试 contextid 不匹配
        sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setContextid(null)));
+       // 测试 invDescId 不匹配
+       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setInvDescId(null)));
+       // 测试 transferStatus 不匹配
+       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setTransferStatus(null)));
        // 准备参数
        SellingPageReqVO reqVO = new SellingPageReqVO();
        reqVO.setAppid(null);
@@ -165,11 +168,12 @@ public class SellingServiceImplTest extends BaseDbUnitTest {
        reqVO.setSteamId(null);
        reqVO.setStatus(null);
        reqVO.setPrice(null);
-       reqVO.setTransferStatus(null);
        reqVO.setUserId(null);
        reqVO.setUserType(null);
        reqVO.setBindUserId(null);
        reqVO.setContextid(null);
+       reqVO.setInvDescId(null);
+       reqVO.setTransferStatus(null);
 
        // 调用
        PageResult<SellingDO> pageResult = sellingService.getSellingPage(reqVO);

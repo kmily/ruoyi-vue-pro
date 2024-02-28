@@ -28,11 +28,12 @@ public interface SellingMapper extends BaseMapperX<SellingDO> {
                 .eqIfPresent(SellingDO::getSteamId, reqVO.getSteamId())
                 .eqIfPresent(SellingDO::getStatus, reqVO.getStatus())
                 .eqIfPresent(SellingDO::getPrice, reqVO.getPrice())
-                .eqIfPresent(SellingDO::getTransferStatus, reqVO.getTransferStatus())
                 .eqIfPresent(SellingDO::getUserId, reqVO.getUserId())
                 .eqIfPresent(SellingDO::getUserType, reqVO.getUserType())
                 .eqIfPresent(SellingDO::getBindUserId, reqVO.getBindUserId())
                 .eqIfPresent(SellingDO::getContextid, reqVO.getContextid())
+                .eqIfPresent(SellingDO::getInvDescId, reqVO.getInvDescId())
+                .eqIfPresent(SellingDO::getTransferStatus, reqVO.getTransferStatus())
                 .orderByDesc(SellingDO::getId));
     }
 

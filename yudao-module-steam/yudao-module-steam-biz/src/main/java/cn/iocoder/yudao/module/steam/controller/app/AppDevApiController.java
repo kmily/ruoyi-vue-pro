@@ -1,16 +1,13 @@
 package cn.iocoder.yudao.module.steam.controller.app;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewPageReqVO;
-import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewRespVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selexterior.vo.SelExteriorPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selitemset.vo.SelItemsetListReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selquality.vo.SelQualityPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selrarity.vo.SelRarityPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.seltype.vo.SelTypePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppDropListRespVO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.seltype.SelWeaponMapper;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewService;
@@ -28,9 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Tag(name = "steam后台 - devApi")
 @RestController

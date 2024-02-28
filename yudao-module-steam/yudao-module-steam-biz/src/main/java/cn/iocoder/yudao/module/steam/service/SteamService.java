@@ -179,7 +179,7 @@ public class SteamService {
     }
 
     /**
-     *  获取steam库存信息 跟新库存表
+     *  获取steam库存信息 更新库存表
      * @param appId
      * @return
      */
@@ -193,6 +193,7 @@ public class SteamService {
         builder.pathVar(pathVar);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         InventoryDto json = sent.json(InventoryDto.class);
+        // 插入、更新库存
         for (InventoryDto.AssetsDTO item:json.getAssets()) {
             InvPageReqVO steamInv=new InvPageReqVO();
             steamInv.setSteamId(bindUserDO.getSteamId());

@@ -43,9 +43,6 @@ public class SellingPageReqVO extends PageParam {
     @Schema(description = "出售价格单价分", example = "30804")
     private Integer price;
 
-    @Schema(description = "发货状态(0代表未出售，1代表出售中 )", example = "2")
-    private Integer transferStatus;
-
     @Schema(description = "平台用户ID", example = "12743")
     private Long userId;
 
@@ -57,5 +54,11 @@ public class SellingPageReqVO extends PageParam {
 
     @Schema(description = "contextid", example = "12276")
     private String contextid;
+
+    @Schema(description = "inv_desc_id", example = "3271")
+    private Long invDescId;
+
+    @Schema(description = "发货状态(0代表未出售，1代表出售中，2代表已出售 )", example = "1")
+    private Integer transferStatus;
 
 }
