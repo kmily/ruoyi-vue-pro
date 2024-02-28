@@ -264,7 +264,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         }
 
         //库存状态为没有订单
-        if(!InvTransferStatusEnum.INIT.getStatus().equals(sellingDO.getTransferStatus())){
+        if(!InvTransferStatusEnum.SELL.getStatus().equals(sellingDO.getTransferStatus())){
             throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
         }
         //使用库存的价格进行替换
@@ -402,7 +402,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 .setPayRefundId(payRefundId).setRefundPrice(invOrderDO.getPrice()));
         //释放库存
         SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
-        sellingDO.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
+        sellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
         sellingMapper.updateById(sellingDO);
     }
 
