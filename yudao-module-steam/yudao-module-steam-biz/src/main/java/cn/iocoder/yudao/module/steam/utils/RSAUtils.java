@@ -439,7 +439,7 @@ public class RSAUtils {
         logger.info(s);
 
         PaySteamOrderCreateReqVO paySteamOrderCreateReqVO=new PaySteamOrderCreateReqVO();
-        paySteamOrderCreateReqVO.setInvId(110l);
+        paySteamOrderCreateReqVO.setSellId(110l);
         paySteamOrderCreateReqVO.setSteamId("76561199400266084");
 //        test.setBindUserId(124);
 //        test.setName("china");
