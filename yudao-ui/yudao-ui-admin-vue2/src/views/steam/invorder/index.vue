@@ -89,7 +89,16 @@
               </template>
       </el-table-column>
       <el-table-column label="购买的steamId" align="center" prop="steamId" />
-      <el-table-column label="发货信息" align="center" prop="transferText" />
+      <el-table-column label="发货信息" align="center">
+        <template v-slot="scope">
+          {{scope.row.transferText.tradeofferid}}
+        </template>
+      </el-table-column>
+              <el-table-column label="发货错误信息" align="center">
+                <template v-slot="scope">
+                  {{scope.row.transferText.msg}}
+                </template>
+              </el-table-column>
       <el-table-column label="发货状态" align="center" prop="transferStatus" />
       <el-table-column label="订单支付状态" align="center" prop="payOrderStatus">
         <template v-slot="scope">
@@ -97,14 +106,14 @@
         </template>
       </el-table-column>
       <el-table-column label="库存表ID" align="center" prop="sellId" />
-<!--      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">-->
-<!--        <template v-slot="scope">-->
-<!--          <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"-->
-<!--                     v-hasPermi="['steam:inv-order:update']">修改</el-button>-->
-<!--          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"-->
-<!--                     v-hasPermi="['steam:inv-order:delete']">删除</el-button>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+        <template v-slot="scope">
+          <el-button v-if="scope.row.payStatus && !scope.row.transferText.tradeofferid" size="mini" type="text" @click="refundOrder(scope.row.id)"
+                     v-hasPermi="['steam:inv-order:update']">退款</el-button>
+          <el-button v-if="scope.row.payStatus && !scope.row.transferText.tradeofferid" size="mini" type="text" @click="tradeAsset(scope.row.id)"
+                     v-hasPermi="['steam:inv-order:delete']">人工发货</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <!-- 分页组件 -->
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
@@ -117,6 +126,7 @@
 <script>
 import * as InvOrderApi from '@/api/steam/invorder';
 import InvOrderForm from './InvOrderForm.vue';
+import {refundOrder, tradeAsset} from "@/api/steam/invorder";
 export default {
   name: "InvOrder",
   components: {
@@ -160,6 +170,8 @@ export default {
     this.getList();
   },
   methods: {
+    refundOrder,
+    tradeAsset,
     /** 查询列表 */
     async getList() {
       try {
