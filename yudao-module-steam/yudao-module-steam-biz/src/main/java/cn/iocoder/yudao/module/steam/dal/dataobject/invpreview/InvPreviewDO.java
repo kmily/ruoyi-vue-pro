@@ -22,6 +22,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 @AllArgsConstructor
 public class InvPreviewDO extends BaseDO {
 
+
     /**
      * 主键
      */
@@ -111,5 +112,34 @@ public class InvPreviewDO extends BaseDO {
      * 参考价
      */
     private String referencePrice;
+    /**
+     * 类别选择
+     */
+    private String selQuality;
+    /**
+     * 收藏品选择
+     */
+    private String selItemset;
+    /**
+     * 武器选择
+     */
+    private String selWeapon;
+    /**
+     * 外观选择
+     */
+    private String selExterior;
+    /**
+     * 品质选择
+     */
+    private String selRarity;
+    /**
+     * 类型选择
+     */
+    private String selType;
+    /**
+     * 是否存在库存
+     */
+    private Boolean existInv;
+
 
 }

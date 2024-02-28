@@ -99,4 +99,35 @@ public class InvPreviewRespVO {
     @ExcelProperty("参考价")
     private String referencePrice;
 
+    @Schema(description = "类别选择")
+    @ExcelProperty("类别选择")
+    private String selQuality;
+
+    @Schema(description = "收藏品选择")
+    @ExcelProperty("收藏品选择")
+    private String selItemset;
+
+    @Schema(description = "武器选择")
+    @ExcelProperty("武器选择")
+    private String selWeapon;
+
+    @Schema(description = "外观选择")
+    @ExcelProperty("外观选择")
+    private String selExterior;
+
+    @Schema(description = "品质选择")
+    @ExcelProperty("品质选择")
+    private String selRarity;
+
+    @Schema(description = "类型选择", example = "1")
+    @ExcelProperty("类型选择")
+    private String selType;
+
+    @Schema(description = "是否存在库存", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("是否存在库存")
+    private Boolean existInv;
+
+    @Schema(description = "页码")
+    private int pageNum;
+
 }

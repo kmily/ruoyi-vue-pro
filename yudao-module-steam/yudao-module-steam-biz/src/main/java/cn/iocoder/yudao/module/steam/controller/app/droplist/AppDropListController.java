@@ -1,22 +1,16 @@
 package cn.iocoder.yudao.module.steam.controller.app.droplist;
 
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.transaction.AppPayWalletTransactionPageReqVO;
-import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.transaction.AppPayWalletTransactionRespVO;
-import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewRespVO;
-import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewSaveReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selexterior.vo.SelExteriorPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selitemset.vo.SelItemsetListReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selquality.vo.SelQualityPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selrarity.vo.SelRarityPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.seltype.vo.SelTypePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppDropListRespVO;
-import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.PreviewRespVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewService;
 import cn.iocoder.yudao.module.steam.service.selexterior.SelExteriorService;
@@ -26,9 +20,9 @@ import cn.iocoder.yudao.module.steam.service.selrarity.SelRarityService;
 import cn.iocoder.yudao.module.steam.service.seltype.SelTypeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,11 +32,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "获取下拉选择信息")
 @RestController
 @RequestMapping("steam-app/drop_list")
+@Slf4j
 @Validated
 public class AppDropListController {
 
@@ -143,13 +137,20 @@ public class AppDropListController {
         return CommonResult.success(appDropListRespVO);
     }
 
+
     @GetMapping("/search")
     @Operation(summary = "饰品在售预览")
-    public CommonResult<PageResult<InvPreviewRespVO>> getPreview(@RequestBody @Valid InvPreviewPageReqVO invPreviewPageReqVO){
-        if(invPreviewPageReqVO.getPageSize()<0 || invPreviewPageReqVO.getPageSize()>200){
-            invPreviewPageReqVO.setPageSize(200);
-        }
+    public CommonResult<PageResult<InvPreviewRespVO>> getPreview(@Valid InvPreviewPageReqVO invPreviewPageReqVO){
+        invPreviewPageReqVO.setPageSize(20);
+/*
+        invPreviewPageReqVO.setPageNo(invPreviewPageReqVO.getPageNum());
+*/
+
         PageResult<InvPreviewDO> invPreviewPage = invPreviewService.getInvPreviewPage(invPreviewPageReqVO);
+
         return success(BeanUtils.toBean(invPreviewPage, InvPreviewRespVO.class));
     }
+
+
+
 }

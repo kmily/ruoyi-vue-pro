@@ -40,6 +40,13 @@ public interface InvPreviewMapper extends BaseMapperX<InvPreviewDO> {
                 .eqIfPresent(InvPreviewDO::getAutoPrice, reqVO.getAutoPrice())
                 .eqIfPresent(InvPreviewDO::getAutoQuantity, reqVO.getAutoQuantity())
                 .eqIfPresent(InvPreviewDO::getReferencePrice, reqVO.getReferencePrice())
+                .eqIfPresent(InvPreviewDO::getSelQuality, reqVO.getSelQuality())
+                .eqIfPresent(InvPreviewDO::getSelItemset, reqVO.getSelItemset())
+                .eqIfPresent(InvPreviewDO::getSelWeapon, reqVO.getSelWeapon())
+                .eqIfPresent(InvPreviewDO::getSelExterior, reqVO.getSelExterior())
+                .eqIfPresent(InvPreviewDO::getSelRarity, reqVO.getSelRarity())
+                .eqIfPresent(InvPreviewDO::getSelType, reqVO.getSelType())
+                .eqIfPresent(InvPreviewDO::getExistInv, reqVO.getExistInv())
                 .orderByDesc(InvPreviewDO::getId));
     }
 

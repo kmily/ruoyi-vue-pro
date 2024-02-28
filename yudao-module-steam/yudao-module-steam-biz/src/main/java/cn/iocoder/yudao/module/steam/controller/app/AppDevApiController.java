@@ -13,7 +13,6 @@ import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppDropListRespV
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.seltype.SelWeaponMapper;
-import cn.iocoder.yudao.module.steam.service.AllInventoryService;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewService;
 import cn.iocoder.yudao.module.steam.service.selexterior.SelExteriorService;
 import cn.iocoder.yudao.module.steam.service.selitemset.SelItemsetService;
@@ -50,9 +49,6 @@ public class AppDevApiController {
     private SelRarityService selRarityService;
     @Resource
     private SelWeaponMapper selWeaponMapper;
-
-    @Resource
-    private AllInventoryService allInventoryService;
 
     @Resource
     private InvPreviewService invPreviewService;

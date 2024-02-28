@@ -66,6 +66,29 @@
                     <el-form-item label="参考价" prop="referencePrice">
                       <el-input v-model="formData.referencePrice" placeholder="请输入参考价" />
                     </el-form-item>
+                    <el-form-item label="类别选择" prop="selQuality">
+                      <el-input v-model="formData.selQuality" placeholder="请输入类别选择" />
+                    </el-form-item>
+                    <el-form-item label="收藏品选择" prop="selItemset">
+                      <el-input v-model="formData.selItemset" placeholder="请输入收藏品选择" />
+                    </el-form-item>
+                    <el-form-item label="武器选择" prop="selWeapon">
+                      <el-input v-model="formData.selWeapon" placeholder="请输入武器选择" />
+                    </el-form-item>
+                    <el-form-item label="外观选择" prop="selExterior">
+                      <el-input v-model="formData.selExterior" placeholder="请输入外观选择" />
+                    </el-form-item>
+                    <el-form-item label="品质选择" prop="selRarity">
+                      <el-input v-model="formData.selRarity" placeholder="请输入品质选择" />
+                    </el-form-item>
+                    <el-form-item label="类型选择" prop="selType">
+                      <el-input v-model="formData.selType" placeholder="请输入类型选择" />
+                    </el-form-item>
+                    <el-form-item label="是否存在库存" prop="existInv">
+                      <el-radio-group v-model="formData.existInv">
+                            <el-radio label="1">请选择字典生成</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm" :disabled="formLoading">确 定</el-button>
@@ -113,10 +136,18 @@
                             autoPrice: undefined,
                             autoQuantity: undefined,
                             referencePrice: undefined,
+                            selQuality: undefined,
+                            selItemset: undefined,
+                            selWeapon: undefined,
+                            selExterior: undefined,
+                            selRarity: undefined,
+                            selType: undefined,
+                            existInv: undefined,
         },
         // 表单校验
         formRules: {
                         itemId: [{ required: true, message: 'item_id不能为空', trigger: 'blur' }],
+                        existInv: [{ required: true, message: '是否存在库存不能为空', trigger: 'blur' }],
         },
                         };
     },
@@ -187,6 +218,13 @@
                             autoPrice: undefined,
                             autoQuantity: undefined,
                             referencePrice: undefined,
+                            selQuality: undefined,
+                            selItemset: undefined,
+                            selWeapon: undefined,
+                            selExterior: undefined,
+                            selRarity: undefined,
+                            selType: undefined,
+                            existInv: undefined,
         };
         this.resetForm("formRef");
       }
