@@ -12,9 +12,11 @@ import cn.iocoder.yudao.module.steam.controller.admin.selrarity.vo.SelRarityPage
 import cn.iocoder.yudao.module.steam.controller.admin.seltype.vo.SelTypePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppDropListRespVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewService;
 import cn.iocoder.yudao.module.steam.service.selexterior.SelExteriorService;
 import cn.iocoder.yudao.module.steam.service.selitemset.SelItemsetService;
+import cn.iocoder.yudao.module.steam.service.selling.SellingService;
 import cn.iocoder.yudao.module.steam.service.selquality.SelQualityService;
 import cn.iocoder.yudao.module.steam.service.selrarity.SelRarityService;
 import cn.iocoder.yudao.module.steam.service.seltype.SelTypeService;
@@ -52,6 +54,8 @@ public class AppDropListController {
     private SelRarityService selRarityService;
     @Resource
     private InvPreviewService invPreviewService;
+    @Resource
+    private SellingService sellingService;
 
     /**
      * 类别选择
@@ -144,6 +148,11 @@ public class AppDropListController {
         return success(BeanUtils.toBean(invPreviewPage, InvPreviewRespVO.class));
     }
 
-
+    @GetMapping("/search/view")
+    @Operation(summary = "商品详细信息")
+    public CommonResult<PageResult<InvPreviewRespVO>> getSearchView(@Valid InvPreviewPageReqVO invPreviewPageReqVO) {
+        PageResult<InvPreviewDO> view = invPreviewService.getInvPreviewPage(invPreviewPageReqVO);
+        return success(BeanUtils.toBean(view, InvPreviewRespVO.class));
+    }
 
 }

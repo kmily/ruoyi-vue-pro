@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.steam.service.fin;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
@@ -12,17 +11,14 @@ import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
-import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal.WithdrawalDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
@@ -75,8 +71,6 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     @Resource
     private PayRefundApi payRefundApi;
 
-    @Resource
-    private InvMapper invMapper;
 
     @Resource
     private SellingMapper sellingMapper;
@@ -210,6 +204,8 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     @Override
     public CreateOrderResult createInvOrder(LoginUser loginUser, PaySteamOrderCreateReqVO createReqVO) {
         CreateOrderResult createOrderResult=new CreateOrderResult();
+        SellingDO sellingDO = sellingMapper.selectById(createReqVO.getSellId());
+        InvDescDO invDescDO = invDescMapper.selectById(sellingDO.getInvDescId());
         // 1.1 获得商品
         InvOrderDO invOrderDO = new InvOrderDO().setSellId(createReqVO.getSellId()).setSteamId(createReqVO.getSteamId())
                 .setPrice(0).setSteamId(createReqVO.getSteamId())
@@ -222,13 +218,12 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         Long payOrderId = payOrderApi.createOrder(new PayOrderCreateReqDTO()
                 .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
                 .setMerchantOrderId(invOrderDO.getId().toString()) // 业务的订单编号
-                .setSubject("购买"+createReqVO.getSellId()).setBody("").setPrice(invOrderDO.getPrice()) // 价格信息
+                .setSubject("购买"+invDescDO.getMarketName()).setBody("出售编号："+sellingDO.getId()).setPrice(invOrderDO.getPrice()) // 价格信息
                 .setExpireTime(addTime(Duration.ofHours(2L)))); // 支付的过期时间
         // 2.2 更新支付单到 demo 订单
         invOrderMapper.updateById(new InvOrderDO().setId(invOrderDO.getId())
                 .setPayOrderId(payOrderId));
         //更新库存的标识
-        SellingDO sellingDO = sellingMapper.selectById(createReqVO.getSellId());
         sellingDO.setTransferStatus(InvTransferStatusEnum.INORDER.getStatus());
         sellingMapper.updateById(sellingDO);
         // 返回
@@ -312,11 +307,6 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     @Override
     public InvOrderDO getInvOrder(Long id) {
         return invOrderMapper.selectById(id);
-    }
-
-    @Override
-    public PageResult<InvOrderDO> getDemoOrderPage(InvOrderPageReqVO pageReqVO) {
-        return invOrderMapper.selectPage(pageReqVO);
     }
 
     @Override
