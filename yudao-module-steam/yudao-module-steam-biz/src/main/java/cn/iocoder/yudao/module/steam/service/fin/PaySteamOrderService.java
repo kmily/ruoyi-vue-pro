@@ -48,13 +48,6 @@ public interface PaySteamOrderService {
      */
     InvOrderDO getInvOrder(Long id);
 
-    /**
-     * 获得示例订单分页
-     *
-     * @param pageReqVO 分页查询
-     * @return 示例订单分页
-     */
-    PageResult<InvOrderDO> getDemoOrderPage(InvOrderPageReqVO pageReqVO);
 
     /**
      * 更新示例订单为已支付
