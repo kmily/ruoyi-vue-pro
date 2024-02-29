@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderListReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
@@ -70,12 +71,12 @@ public class AppWalletController {
     @PostMapping("/list/invOrder")
     @Operation(summary = "库存订单列表")
     @PreAuthenticated
-    public CommonResult<PageResult<InvOrderDO>> listInvOrder(@Valid @RequestBody InvOrderPageReqVO invOrderPageReqVO) {
+    public CommonResult<PageResult<InvOrderResp>> listInvOrder(@Valid @RequestBody InvOrderPageReqVO invOrderPageReqVO) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         invOrderPageReqVO.setUserId(loginUser.getId());
         invOrderPageReqVO.setUserType(loginUser.getUserType());
-        PageResult<InvOrderDO> invPageOrder = paySteamOrderService.getInvPageOrder(invOrderPageReqVO);
-        return CommonResult.success(invPageOrder);
+        PageResult<InvOrderResp> invOrderPageOrder = paySteamOrderService.getInvOrderPageOrder(invOrderPageReqVO);
+        return CommonResult.success(invOrderPageOrder);
     }
     @PostMapping("/update-paid")
     @Operation(summary = "更新示例订单为已支付") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
