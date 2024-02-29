@@ -35,7 +35,8 @@
                     </el-form-item>
                     <el-form-item label="用户类型" prop="userType">
                       <el-select v-model="formData.userType" placeholder="请选择用户类型">
-                            <el-option label="请选择字典生成" value="" />
+                            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.USER_TYPE)"
+                                       :key="dict.value" :label="dict.label" :value="parseInt(dict.value)" />
                       </el-select>
                     </el-form-item>
                     <el-form-item label="购买的steamId" prop="steamId">
@@ -64,6 +65,18 @@
                     </el-form-item>
                     <el-form-item label="库存表ID" prop="invId">
                       <el-input v-model="formData.invId" placeholder="请输入库存表ID" />
+                    </el-form-item>
+                    <el-form-item label="卖家用户类型" prop="sellUserType">
+                      <el-select v-model="formData.sellUserType" placeholder="请选择卖家用户类型">
+                            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.USER_TYPE)"
+                                       :key="dict.value" :label="dict.label" :value="parseInt(dict.value)" />
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item label="卖家ID" prop="sellUserId">
+                      <el-input v-model="formData.sellUserId" placeholder="请输入卖家ID" />
+                    </el-form-item>
+                    <el-form-item label="卖家金额状态" prop="sellCashStatus">
+                      <el-input v-model="formData.sellCashStatus" placeholder="请输入卖家金额状态" />
                     </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
@@ -108,6 +121,9 @@
                             sellId: undefined,
                             invDescId: undefined,
                             invId: undefined,
+                            sellUserType: undefined,
+                            sellUserId: undefined,
+                            sellCashStatus: undefined,
         },
         // 表单校验
         formRules: {
@@ -182,6 +198,9 @@
                             sellId: undefined,
                             invDescId: undefined,
                             invId: undefined,
+                            sellUserType: undefined,
+                            sellUserId: undefined,
+                            sellCashStatus: undefined,
         };
         this.resetForm("formRef");
       }
