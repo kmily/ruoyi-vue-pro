@@ -168,7 +168,7 @@ public class AppDropListController {
     }
 
     @GetMapping("/search/viewSell")
-    @Operation(summary = "商品详细信息")
+    @Operation(summary = "商品在售列表")
     public CommonResult<PageResult<SellingRespVO>> getSellView(@Valid SellingPageReqVO sellingPageReqVO) {
         PageResult<SellingDO> viewSell = sellingService.getSellingPage(sellingPageReqVO);
         return success(BeanUtils.toBean(viewSell, SellingRespVO.class));
