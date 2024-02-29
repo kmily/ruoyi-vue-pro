@@ -110,9 +110,9 @@
       <el-table-column label="库存表ID" align="center" prop="invId" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
-          <el-button style="color: red" v-if="scope.row.payStatus && !scope.row.transferText.tradeofferid" size="mini" type="text" @click="refundOrder(scope.row.id)"
+          <el-button style="color: red" v-if="scope.row.payOrderStatus != 20 && scope.row.payStatus && !scope.row.transferText.tradeofferid" size="mini" type="text" @click="refundOrder(scope.row.id)"
                      v-hasPermi="['steam:inv-order:update']">退款</el-button>
-          <el-button v-if="scope.row.payStatus && !scope.row.transferText.tradeofferid" size="mini" type="text" @click="tradeAsset(scope.row.id)"
+          <el-button v-if="scope.row.payOrderStatus != 20 && scope.row.payStatus && !scope.row.transferText.tradeofferid" size="mini" type="text" @click="tradeAsset(scope.row.id)"
                      v-hasPermi="['steam:inv-order:delete']">人工发货</el-button>
         </template>
       </el-table-column>
