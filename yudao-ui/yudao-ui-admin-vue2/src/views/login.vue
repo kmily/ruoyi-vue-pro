@@ -140,8 +140,8 @@ export default {
       mobileCodeTimer: 0,
       loginForm: {
         loginType: "uname",
-        username: "admin",
-        password: "admin123",
+        username: "",
+        password: "",
         captchaVerification: "",
         mobile: "",
         mobileCode: "",
@@ -225,8 +225,6 @@ export default {
       this.$refs.verify.show()
     },
     getCookie() {
-      const username = getUsername();
-      const password = getPassword();
       const rememberMe = getRememberMe();
       const tenantName = getTenantName();
       this.loginForm = {
