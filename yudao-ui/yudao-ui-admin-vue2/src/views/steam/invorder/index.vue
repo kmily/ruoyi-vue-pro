@@ -105,7 +105,9 @@
           <dict-tag :type="DICT_TYPE.PAY_ORDER_STATUS" :value="scope.row.payOrderStatus" />
         </template>
       </el-table-column>
-      <el-table-column label="库存表ID" align="center" prop="sellId" />
+      <el-table-column label="库存表ID参考steam_sell" align="center" prop="sellId" />
+      <el-table-column label="商品描述ID" align="center" prop="invDescId" />
+      <el-table-column label="库存表ID" align="center" prop="invId" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button style="color: red" v-if="scope.row.payStatus && !scope.row.transferText.tradeofferid" size="mini" type="text" @click="refundOrder(scope.row.id)"

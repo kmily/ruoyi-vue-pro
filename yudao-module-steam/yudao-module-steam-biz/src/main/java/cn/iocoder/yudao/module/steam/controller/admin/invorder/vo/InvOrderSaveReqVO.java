@@ -64,4 +64,10 @@ public class InvOrderSaveReqVO {
     @Schema(description = "库存表ID参考steam_sell", example = "8828")
     private Long sellId;
 
+    @Schema(description = "商品描述ID", example = "3266")
+    private Long invDescId;
+
+    @Schema(description = "库存表ID", example = "2078")
+    private Long invId;
+
 }

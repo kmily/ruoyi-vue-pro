@@ -59,6 +59,12 @@
                     <el-form-item label="库存表ID参考steam_sell" prop="sellId">
                       <el-input v-model="formData.sellId" placeholder="请输入库存表ID参考steam_sell" />
                     </el-form-item>
+                    <el-form-item label="商品描述ID" prop="invDescId">
+                      <el-input v-model="formData.invDescId" placeholder="请输入商品描述ID" />
+                    </el-form-item>
+                    <el-form-item label="库存表ID" prop="invId">
+                      <el-input v-model="formData.invId" placeholder="请输入库存表ID" />
+                    </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm" :disabled="formLoading">确 定</el-button>
@@ -100,6 +106,8 @@
                             transferStatus: undefined,
                             payOrderStatus: undefined,
                             sellId: undefined,
+                            invDescId: undefined,
+                            invId: undefined,
         },
         // 表单校验
         formRules: {
@@ -172,6 +180,8 @@
                             transferStatus: undefined,
                             payOrderStatus: undefined,
                             sellId: undefined,
+                            invDescId: undefined,
+                            invId: undefined,
         };
         this.resetForm("formRef");
       }
