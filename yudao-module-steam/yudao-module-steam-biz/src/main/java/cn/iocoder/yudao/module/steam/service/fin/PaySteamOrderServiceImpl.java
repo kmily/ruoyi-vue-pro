@@ -318,16 +318,17 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     public PageResult<InvOrderResp> getInvOrderPageOrder(InvOrderPageReqVO invOrderPageReqVO) {
 
         PageResult<InvOrderDO> invOrderDOPageResult = invOrderMapper.selectPage(invOrderPageReqVO);
-        List<Long> collect = invOrderDOPageResult.getList().stream().map(InvOrderDO::getInvDescId).collect(Collectors.toList());
-        Map<Long, InvDescDO> collect1 = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
-                .in(InvDescDO::getId, collect)).stream().collect(Collectors.toMap(InvDescDO::getId, o -> o, (n1, n2) -> n1));
         List<InvOrderResp> ret=new ArrayList<>();
-
-        for(InvOrderDO item:invOrderDOPageResult.getList()){
-            InvOrderResp invOrderResp=new InvOrderResp();
-            invOrderResp.setInvOrderDO(item);
-            invOrderResp.setInvDescDO(collect1.get(item.getInvDescId()));
-            ret.add(invOrderResp);
+        if(invOrderDOPageResult.getTotal()>0){
+            List<Long> collect = invOrderDOPageResult.getList().stream().map(InvOrderDO::getInvDescId).collect(Collectors.toList());
+            Map<Long, InvDescDO> collect1 = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+                    .in(InvDescDO::getId, collect)).stream().collect(Collectors.toMap(InvDescDO::getId, o -> o, (n1, n2) -> n1));
+            for(InvOrderDO item:invOrderDOPageResult.getList()){
+                InvOrderResp invOrderResp=new InvOrderResp();
+                invOrderResp.setInvOrderDO(item);
+                invOrderResp.setInvDescDO(collect1.get(item.getInvDescId()));
+                ret.add(invOrderResp);
+            }
         }
 
         return new PageResult<InvOrderResp>(ret,invOrderDOPageResult.getTotal());
