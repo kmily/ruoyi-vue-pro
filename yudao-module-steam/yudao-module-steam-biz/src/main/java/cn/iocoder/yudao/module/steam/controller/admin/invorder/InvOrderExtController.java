@@ -65,7 +65,7 @@ public class InvOrderExtController {
         InvOrderDO invOrder = paySteamOrderService.getInvOrder(invOrderExtReqVo.getId());
         PayOrderDO order = payOrderService.getOrder(invOrder.getPayOrderId());
         if(!PayOrderStatusEnum.isSuccess(order.getStatus())){
-            return error(new ErrorCode(-1,"订单支付"));
+            return error(new ErrorCode(-1,"订单没有支付"));
         }
         steamService.tradeAsset(invOrder);
         return success(true);

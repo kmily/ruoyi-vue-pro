@@ -97,5 +97,13 @@ public class InvOrderDO extends BaseDO {
      * 库存表ID参考steam_sell
      */
     private Long sellId;
+    /**
+     * 商品描述ID
+     */
+    private Long invDescId;
+    /**
+     * 库存表ID
+     */
+    private Long invId;
 
 }

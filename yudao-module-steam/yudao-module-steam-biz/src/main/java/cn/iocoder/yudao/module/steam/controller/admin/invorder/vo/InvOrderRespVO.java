@@ -86,4 +86,12 @@ public class InvOrderRespVO {
     @ExcelProperty("库存表ID参考steam_sell")
     private Long sellId;
 
+    @Schema(description = "商品描述ID", example = "3266")
+    @ExcelProperty("商品描述ID")
+    private Long invDescId;
+
+    @Schema(description = "库存表ID", example = "2078")
+    @ExcelProperty("库存表ID")
+    private Long invId;
+
 }

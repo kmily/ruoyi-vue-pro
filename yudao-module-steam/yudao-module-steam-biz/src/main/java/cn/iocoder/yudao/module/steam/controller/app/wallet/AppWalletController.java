@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.steam.controller.app.wallet;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
@@ -8,8 +9,12 @@ import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
-import cn.iocoder.yudao.module.steam.controller.app.vo.PaySteamOrderCreateReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderListReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
+import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import io.swagger.v3.oas.annotations.Operation;
@@ -63,7 +68,16 @@ public class AppWalletController {
         CreateOrderResult invOrder = paySteamOrderService.createInvOrder(loginUser, createReqVO);
         return CommonResult.success(invOrder);
     }
-
+    @PostMapping("/list/invOrder")
+    @Operation(summary = "库存订单列表")
+    @PreAuthenticated
+    public CommonResult<PageResult<InvOrderResp>> listInvOrder(@Valid @RequestBody InvOrderPageReqVO invOrderPageReqVO) {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        invOrderPageReqVO.setUserId(loginUser.getId());
+        invOrderPageReqVO.setUserType(loginUser.getUserType());
+        PageResult<InvOrderResp> invOrderPageOrder = paySteamOrderService.getInvOrderPageOrder(invOrderPageReqVO);
+        return CommonResult.success(invOrderPageOrder);
+    }
     @PostMapping("/update-paid")
     @Operation(summary = "更新示例订单为已支付") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
     @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现

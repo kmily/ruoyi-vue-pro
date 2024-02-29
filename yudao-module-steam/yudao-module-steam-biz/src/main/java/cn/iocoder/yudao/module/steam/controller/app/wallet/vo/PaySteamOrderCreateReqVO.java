@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.steam.controller.app.vo;
+package cn.iocoder.yudao.module.steam.controller.app.wallet.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

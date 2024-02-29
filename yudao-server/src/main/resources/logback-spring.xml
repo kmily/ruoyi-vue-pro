@@ -72,5 +72,7 @@
             <appender-ref ref="GRPC"/>
         </root>
     </springProfile>
-
+    <logger name="cn.iocoder.yudao.module.steam"  level="ALL" additivity="false" >
+        <appender-ref ref="STDOUT"/>
+    </logger>
 </configuration>
