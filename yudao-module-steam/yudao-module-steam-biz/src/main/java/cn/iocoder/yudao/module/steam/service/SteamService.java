@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.service;
 
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -140,7 +141,8 @@ public class SteamService {
         bindUserDO.setTradeUrl(steamWeb.getTreadUrl().get());
         bindUserDO.setSteamName(steamMaFile.getAccountName());
         bindUserMapper.updateById(bindUserDO);
-        firstGetInv(bindUserDO.getSteamId());
+        SteamService bean = SpringUtil.getBean(this.getClass());
+        bean.firstGetInv(bindUserDO.getSteamId());
     }
 
 
@@ -194,7 +196,7 @@ public class SteamService {
                 invDescDO.setInstanceid(item.getInstanceid());
                 invDescDO.setCurrency(item.getCurrency());
                 invDescDO.setBackgroundColor(item.getBackgroundColor());
-                invDescDO.setIconUrl(item.getIconUrl());
+                invDescDO.setIconUrl("https://community.steamstatic.com/economy/image/"+item.getIconUrl());
                 invDescDO.setIconUrlLarge(item.getIconUrlLarge());
                 invDescDO.setDescriptions(item.getDescriptions());
                 invDescDO.setTradable(item.getTradable());

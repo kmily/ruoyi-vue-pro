@@ -16,20 +16,12 @@
       </el-form-item>
       <el-form-item label="用户类型" prop="userType">
         <el-select v-model="queryParams.userType" placeholder="请选择用户类型" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
-        </el-select>
-        <el-select v-model="queryParams.userType" placeholder="请选择用户类型" clearable size="small">
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.USER_TYPE)"
-                     :key="dict.value" :label="dict.label" :value="dict.value"/>
+                       :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="购买steamId" prop="steamId">
         <el-input v-model="queryParams.steamId" placeholder="请输入购买的steamId" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="发货状态" prop="transferStatus">
-        <el-select v-model="queryParams.transferStatus" placeholder="请选择发货状态" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
-        </el-select>
       </el-form-item>
       <el-form-item label="订单支付状态" prop="payOrderStatus">
         <el-select v-model="queryParams.payOrderStatus" placeholder="请选择订单支付状态" clearable size="small">
@@ -37,8 +29,17 @@
                        :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="库存表ID参考steam_sell" prop="sellId">
+      <el-form-item label="sellID" prop="sellId">
         <el-input v-model="queryParams.sellId" placeholder="请输入库存表ID参考steam_sell" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="卖家用户类型" prop="sellUserType">
+        <el-select v-model="queryParams.sellUserType" placeholder="请选择卖家用户类型" clearable size="small">
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.USER_TYPE)"
+                       :key="dict.value" :label="dict.label" :value="dict.value"/>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="卖家ID" prop="sellUserId">
+        <el-input v-model="queryParams.sellUserId" placeholder="请输入卖家ID" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -108,6 +109,13 @@
       <el-table-column label="库存表ID参考steam_sell" align="center" prop="sellId" />
       <el-table-column label="商品描述ID" align="center" prop="invDescId" />
       <el-table-column label="库存表ID" align="center" prop="invId" />
+      <el-table-column label="卖家用户类型" align="center" prop="sellUserType">
+        <template v-slot="scope">
+          <dict-tag :type="DICT_TYPE.USER_TYPE" :value="scope.row.sellUserType" />
+        </template>
+      </el-table-column>
+      <el-table-column label="卖家ID" align="center" prop="sellUserId" />
+      <el-table-column label="卖家金额状态" align="center" prop="sellCashStatus" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button style="color: red" v-if="scope.row.payOrderStatus != 20 && scope.row.payStatus && !scope.row.transferText.tradeofferid" size="mini" type="text" @click="refundOrderClick(scope.row.id)"
@@ -128,7 +136,6 @@
 <script>
 import * as InvOrderApi from '@/api/steam/invorder';
 import InvOrderForm from './InvOrderForm.vue';
-import {refundOrder, tradeAsset} from "@/api/steam/invorder";
 export default {
   name: "InvOrder",
   components: {
@@ -165,6 +172,9 @@ export default {
         transferStatus: null,
         payOrderStatus: null,
         sellId: null,
+        sellUserType: null,
+        sellUserId: null,
+        sellCashStatus: null,
       },
             };
   },
@@ -172,12 +182,6 @@ export default {
     this.getList();
   },
   methods: {
-    tradeAssetClick(id) {
-      InvOrderApi.tradeAsset(id).then(response => {this.$modal.msgSuccess("已发起请求");this.getList()});
-    },
-    refundOrderClick(id) {
-      InvOrderApi.refundOrder(id).then(response => {this.$modal.msgSuccess("已退款");this.getList()});
-    },
     /** 查询列表 */
     async getList() {
       try {
