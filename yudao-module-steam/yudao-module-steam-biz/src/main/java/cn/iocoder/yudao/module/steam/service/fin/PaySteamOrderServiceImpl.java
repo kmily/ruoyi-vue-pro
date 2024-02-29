@@ -13,7 +13,6 @@ import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
-import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderListReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
@@ -30,6 +29,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
+import cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.TransferMsg;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +42,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static cn.hutool.core.util.ObjectUtil.notEqual;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -214,7 +213,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         InvOrderDO invOrderDO = new InvOrderDO().setSellId(createReqVO.getSellId()).setSteamId(createReqVO.getSteamId())
                 .setPrice(0).setSteamId(createReqVO.getSteamId())
                 .setPayOrderStatus(PayOrderStatusEnum.WAITING.getStatus())
-                .setTransferText(new TransferMsg()).setInvDescId(sellingDO.getInvDescId())
+                .setTransferText(new TransferMsg()).setInvDescId(sellingDO.getInvDescId()).setInvId(sellingDO.getInvId())
+                //专家信息
+                .setSellCashStatus(InvSellCashStatusEnum.INIT.getStatus()).setSellUserId(sellingDO.getUserId()).setSellUserType(sellingDO.getUserType())
                 .setPayStatus(false).setRefundPrice(0).setUserId(loginUser.getId()).setUserType(loginUser.getUserType());
         validateInvOrderCanCreate(invOrderDO);
         invOrderMapper.insert(invOrderDO);

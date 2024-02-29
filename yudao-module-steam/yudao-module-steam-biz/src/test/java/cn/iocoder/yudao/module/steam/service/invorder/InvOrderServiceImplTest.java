@@ -119,6 +119,9 @@ public class InvOrderServiceImplTest extends BaseDbUnitTest {
            o.setTransferStatus(null);
            o.setPayOrderStatus(null);
            o.setSellId(null);
+           o.setSellUserType(null);
+           o.setSellUserId(null);
+           o.setSellCashStatus(null);
        });
        invOrderMapper.insert(dbInvOrder);
        // 测试 userId 不匹配
@@ -139,6 +142,12 @@ public class InvOrderServiceImplTest extends BaseDbUnitTest {
        invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setPayOrderStatus(null)));
        // 测试 sellId 不匹配
        invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setSellId(null)));
+       // 测试 sellUserType 不匹配
+       invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setSellUserType(null)));
+       // 测试 sellUserId 不匹配
+       invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setSellUserId(null)));
+       // 测试 sellCashStatus 不匹配
+       invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setSellCashStatus(null)));
        // 准备参数
        InvOrderPageReqVO reqVO = new InvOrderPageReqVO();
        reqVO.setUserId(null);
@@ -150,6 +159,9 @@ public class InvOrderServiceImplTest extends BaseDbUnitTest {
        reqVO.setTransferStatus(null);
        reqVO.setPayOrderStatus(null);
        reqVO.setSellId(null);
+       reqVO.setSellUserType(null);
+       reqVO.setSellUserId(null);
+       reqVO.setSellCashStatus(null);
 
        // 调用
        PageResult<InvOrderDO> pageResult = invOrderService.getInvOrderPage(reqVO);

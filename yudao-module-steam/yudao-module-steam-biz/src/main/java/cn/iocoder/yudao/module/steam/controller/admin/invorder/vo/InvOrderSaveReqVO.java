@@ -70,4 +70,13 @@ public class InvOrderSaveReqVO {
     @Schema(description = "库存表ID", example = "2078")
     private Long invId;
 
+    @Schema(description = "卖家用户类型", example = "2")
+    private Integer sellUserType;
+
+    @Schema(description = "卖家ID", example = "27846")
+    private Long sellUserId;
+
+    @Schema(description = "卖家金额状态", example = "2")
+    private Integer sellCashStatus;
+
 }
