@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.steam.service.fin;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
@@ -11,7 +12,9 @@ import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
-import cn.iocoder.yudao.module.steam.controller.app.vo.PaySteamOrderCreateReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderListReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
@@ -308,6 +311,12 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     @Override
     public InvOrderDO getInvOrder(Long id) {
         return invOrderMapper.selectById(id);
+    }
+
+    @Override
+    public PageResult<InvOrderDO> getInvPageOrder(InvOrderPageReqVO invOrderPageReqVO) {
+        PageResult<InvOrderDO> invOrderDOPageResult = invOrderMapper.selectPage(invOrderPageReqVO);
+        return invOrderDOPageResult;
     }
 
     @Override
