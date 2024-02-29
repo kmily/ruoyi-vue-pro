@@ -28,6 +28,9 @@ public interface InvOrderMapper extends BaseMapperX<InvOrderDO> {
                 .eqIfPresent(InvOrderDO::getTransferStatus, reqVO.getTransferStatus())
                 .eqIfPresent(InvOrderDO::getPayOrderStatus, reqVO.getPayOrderStatus())
                 .eqIfPresent(InvOrderDO::getSellId, reqVO.getSellId())
+                .eqIfPresent(InvOrderDO::getSellUserType, reqVO.getSellUserType())
+                .eqIfPresent(InvOrderDO::getSellUserId, reqVO.getSellUserId())
+                .eqIfPresent(InvOrderDO::getSellCashStatus, reqVO.getSellCashStatus())
                 .orderByDesc(InvOrderDO::getId));
     }
     default int updateByIdAndPayed(Long id, boolean wherePayed, InvOrderDO updateObj) {

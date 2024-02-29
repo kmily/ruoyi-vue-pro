@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.steam.controller.admin.invorder.vo;
 
-import cn.iocoder.yudao.module.steam.service.steam.TransferMsg;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
@@ -62,7 +61,8 @@ public class InvOrderRespVO {
     private Integer price;
 
     @Schema(description = "用户类型", example = "2")
-    @ExcelProperty("用户类型")
+    @ExcelProperty(value = "用户类型", converter = DictConvert.class)
+    @DictFormat("user_type") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
     private Integer userType;
 
     @Schema(description = "购买的steamId", requiredMode = Schema.RequiredMode.REQUIRED, example = "25575")
@@ -70,8 +70,8 @@ public class InvOrderRespVO {
     private String steamId;
 
     @Schema(description = "发货信息 json")
-//    @ExcelProperty("发货信息 json")
-    private TransferMsg transferText;
+    @ExcelProperty("发货信息 json")
+    private String transferText;
 
     @Schema(description = "发货状态", example = "2")
     @ExcelProperty("发货状态")
@@ -93,5 +93,18 @@ public class InvOrderRespVO {
     @Schema(description = "库存表ID", example = "2078")
     @ExcelProperty("库存表ID")
     private Long invId;
+
+    @Schema(description = "卖家用户类型", example = "2")
+    @ExcelProperty(value = "卖家用户类型", converter = DictConvert.class)
+    @DictFormat("user_type") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
+    private Integer sellUserType;
+
+    @Schema(description = "卖家ID", example = "27846")
+    @ExcelProperty("卖家ID")
+    private Long sellUserId;
+
+    @Schema(description = "卖家金额状态", example = "2")
+    @ExcelProperty("卖家金额状态")
+    private Integer sellCashStatus;
 
 }

@@ -105,5 +105,19 @@ public class InvOrderDO extends BaseDO {
      * 库存表ID
      */
     private Long invId;
+    /**
+     * 卖家用户类型
+     *
+     * 枚举 {@link TODO user_type 对应的类}
+     */
+    private Integer sellUserType;
+    /**
+     * 卖家ID
+     */
+    private Long sellUserId;
+    /**
+     * 卖家金额状态
+     */
+    private Integer sellCashStatus;
 
 }
