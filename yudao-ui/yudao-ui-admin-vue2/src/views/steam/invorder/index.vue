@@ -99,7 +99,7 @@
                   {{scope.row.transferText.msg}}
                 </template>
               </el-table-column>
-      <el-table-column label="发货状态" align="center" prop="transferStatus" />
+<!--      <el-table-column label="发货状态" align="center" prop="transferStatus" />-->
       <el-table-column label="订单支付状态" align="center" prop="payOrderStatus">
         <template v-slot="scope">
           <dict-tag :type="DICT_TYPE.PAY_ORDER_STATUS" :value="scope.row.payOrderStatus" />
@@ -108,7 +108,7 @@
       <el-table-column label="库存表ID" align="center" prop="sellId" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
-          <el-button v-if="scope.row.payStatus && !scope.row.transferText.tradeofferid" size="mini" type="text" @click="refundOrder(scope.row.id)"
+          <el-button style="color: red" v-if="scope.row.payStatus && !scope.row.transferText.tradeofferid" size="mini" type="text" @click="refundOrder(scope.row.id)"
                      v-hasPermi="['steam:inv-order:update']">退款</el-button>
           <el-button v-if="scope.row.payStatus && !scope.row.transferText.tradeofferid" size="mini" type="text" @click="tradeAsset(scope.row.id)"
                      v-hasPermi="['steam:inv-order:delete']">人工发货</el-button>
