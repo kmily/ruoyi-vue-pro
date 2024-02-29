@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.controller.admin.invorder.vo;
 
+import cn.iocoder.yudao.module.steam.service.steam.TransferMsg;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
@@ -69,8 +70,8 @@ public class InvOrderRespVO {
     private String steamId;
 
     @Schema(description = "发货信息 json")
-    @ExcelProperty("发货信息 json")
-    private String transferText;
+//    @ExcelProperty("发货信息 json")
+    private TransferMsg transferText;
 
     @Schema(description = "发货状态", example = "2")
     @ExcelProperty("发货状态")

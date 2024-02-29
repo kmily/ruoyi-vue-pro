@@ -50,4 +50,24 @@ export function exportInvOrderExcel(params) {
     params,
     responseType: 'blob'
   })
-}
+}
+
+export function refundOrder(id) {
+  return request({
+    url: '/steam/inv-orderExt/invOrder/refundOrder',
+    method: 'post',
+    data: {
+      id: id
+    }
+  })
+}
+
+export function tradeAsset(id) {
+  return request({
+    url: '/steam/inv-orderExt/invOrder/tradeAsset',
+    method: 'post',
+    data: {
+      id: id
+    }
+  })
+}
