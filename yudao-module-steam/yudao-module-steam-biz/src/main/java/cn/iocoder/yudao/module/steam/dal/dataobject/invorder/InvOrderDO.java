@@ -108,7 +108,7 @@ public class InvOrderDO extends BaseDO {
     /**
      * 卖家用户类型
      *
-     * 枚举 {@link TODO user_type 对应的类}
+     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.UserTypeEnum 对应的类}
      */
     private Integer sellUserType;
     /**
@@ -117,6 +117,7 @@ public class InvOrderDO extends BaseDO {
     private Long sellUserId;
     /**
      * 卖家金额状态
+     * 枚举 {@link cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum 对应的类}
      */
     private Integer sellCashStatus;
 
