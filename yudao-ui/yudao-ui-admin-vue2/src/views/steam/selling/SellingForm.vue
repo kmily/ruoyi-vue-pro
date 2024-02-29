@@ -49,6 +49,9 @@
                             <el-radio label="1">请选择字典生成</el-radio>
                       </el-radio-group>
                     </el-form-item>
+                    <el-form-item label="库存表id" prop="invId">
+                      <el-input v-model="formData.invId" placeholder="请输入库存表id" />
+                    </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm" :disabled="formLoading">确 定</el-button>
@@ -89,6 +92,7 @@
                             contextid: undefined,
                             invDescId: undefined,
                             transferStatus: undefined,
+                            invId: undefined,
         },
         // 表单校验
         formRules: {
@@ -156,6 +160,7 @@
                             contextid: undefined,
                             invDescId: undefined,
                             transferStatus: undefined,
+                            invId: undefined,
         };
         this.resetForm("formRef");
       }

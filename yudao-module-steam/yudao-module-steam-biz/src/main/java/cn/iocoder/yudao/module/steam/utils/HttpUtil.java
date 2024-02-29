@@ -105,7 +105,7 @@ public class HttpUtil {
     public static OkHttpClient getClient(boolean retry, int timeOut) {
         OKHTTP_BUILD.writeTimeout(timeOut, TimeUnit.SECONDS);
         OKHTTP_BUILD.readTimeout(timeOut, TimeUnit.SECONDS);
-        OKHTTP_BUILD.connectTimeout(3, TimeUnit.SECONDS);
+        OKHTTP_BUILD.connectTimeout(timeOut, TimeUnit.SECONDS);
         OKHTTP_BUILD.retryOnConnectionFailure(retry);
         OKHTTP_BUILD.hostnameVerifier(getHostnameVerifier());
         OKHTTP_BUILD.sslSocketFactory(getSSLSocketFactory(), getTrustManager());

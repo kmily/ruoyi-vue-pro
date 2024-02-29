@@ -34,6 +34,7 @@ public interface SellingMapper extends BaseMapperX<SellingDO> {
                 .eqIfPresent(SellingDO::getContextid, reqVO.getContextid())
                 .eqIfPresent(SellingDO::getInvDescId, reqVO.getInvDescId())
                 .eqIfPresent(SellingDO::getTransferStatus, reqVO.getTransferStatus())
+                .eqIfPresent(SellingDO::getInvId, reqVO.getInvId())
                 .orderByDesc(SellingDO::getId));
     }
 

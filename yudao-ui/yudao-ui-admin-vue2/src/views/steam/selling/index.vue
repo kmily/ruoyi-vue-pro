@@ -52,6 +52,9 @@
           <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
+      <el-form-item label="库存表id" prop="invId">
+        <el-input v-model="queryParams.invId" placeholder="请输入库存表id" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -92,6 +95,7 @@
       <el-table-column label="contextid" align="center" prop="contextid" />
       <el-table-column label="inv_desc_id" align="center" prop="invDescId" />
       <el-table-column label="发货状态(0代表未出售，1代表出售中，2代表已出售 )" align="center" prop="transferStatus" />
+      <el-table-column label="库存表id" align="center" prop="invId" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
@@ -154,6 +158,7 @@ export default {
         contextid: null,
         invDescId: null,
         transferStatus: null,
+        invId: null,
       },
             };
   },

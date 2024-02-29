@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewPa
 import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewRespVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selexterior.vo.SelExteriorPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selitemset.vo.SelItemsetListReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selquality.vo.SelQualityPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selrarity.vo.SelRarityPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.seltype.vo.SelTypePageReqVO;
@@ -119,7 +120,7 @@ public class AppDropListController {
     }
 
     /**
-     * 武器选择  TODO
+     * 武器选择
      */
     @GetMapping("/weapon")
     @Operation(summary = "获取武器选择下拉信息")
@@ -147,6 +148,7 @@ public class AppDropListController {
     }
 
 
+    // TODO 在售商品预览改查询 steam_selling 表 ！！！ 当前查询 steam_inv_preview 表
     @GetMapping("/search")
     @Operation(summary = "饰品在售预览")
     public CommonResult<PageResult<InvPreviewRespVO>> getPreview(@Valid InvPreviewPageReqVO invPreviewPageReqVO){

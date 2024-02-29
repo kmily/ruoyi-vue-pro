@@ -125,6 +125,7 @@ public class SellingServiceImplTest extends BaseDbUnitTest {
            o.setContextid(null);
            o.setInvDescId(null);
            o.setTransferStatus(null);
+           o.setInvId(null);
        });
        sellingMapper.insert(dbSelling);
        // 测试 appid 不匹配
@@ -157,6 +158,8 @@ public class SellingServiceImplTest extends BaseDbUnitTest {
        sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setInvDescId(null)));
        // 测试 transferStatus 不匹配
        sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setTransferStatus(null)));
+       // 测试 invId 不匹配
+       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setInvId(null)));
        // 准备参数
        SellingPageReqVO reqVO = new SellingPageReqVO();
        reqVO.setAppid(null);
@@ -174,6 +177,7 @@ public class SellingServiceImplTest extends BaseDbUnitTest {
        reqVO.setContextid(null);
        reqVO.setInvDescId(null);
        reqVO.setTransferStatus(null);
+       reqVO.setInvId(null);
 
        // 调用
        PageResult<SellingDO> pageResult = sellingService.getSellingPage(reqVO);

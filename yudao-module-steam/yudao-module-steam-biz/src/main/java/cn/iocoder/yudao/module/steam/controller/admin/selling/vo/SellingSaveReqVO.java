@@ -55,4 +55,7 @@ public class SellingSaveReqVO {
     @Schema(description = "发货状态(0代表未出售，1代表出售中，2代表已出售 )", example = "1")
     private Integer transferStatus;
 
+    @Schema(description = "库存表id", example = "23726")
+    private Long invId;
+
 }

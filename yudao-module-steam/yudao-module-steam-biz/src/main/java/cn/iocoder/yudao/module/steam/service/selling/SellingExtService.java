@@ -37,8 +37,6 @@ public class SellingExtService {
     private SellingMapper sellingMapper;
     @Resource
     private InvMapper invMapper;
-    @Autowired
-    private SellingService sellingService;
     @Resource
     private InvDescMapper invDescMapper;
 

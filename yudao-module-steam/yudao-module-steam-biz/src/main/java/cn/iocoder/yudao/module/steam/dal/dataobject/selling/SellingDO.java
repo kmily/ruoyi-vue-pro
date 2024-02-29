@@ -53,7 +53,6 @@ public class SellingDO extends BaseDO {
     private String steamId;
     /**
      * 状态
-     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum 对应的类}
      */
     private Integer status;
     /**
@@ -66,7 +65,6 @@ public class SellingDO extends BaseDO {
     private Long userId;
     /**
      * 用户类型(前后台用户)
-     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.UserTypeEnum 对应的类}
      */
     private Integer userType;
     /**
@@ -83,8 +81,11 @@ public class SellingDO extends BaseDO {
     private Long invDescId;
     /**
      * 发货状态(0代表未出售，1代表出售中，2代表已出售 )
-     * 枚举 {@link cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum 对应的类}
      */
     private Integer transferStatus;
+    /**
+     * 库存表id
+     */
+    private Long invId;
 
 }
