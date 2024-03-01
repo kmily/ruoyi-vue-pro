@@ -84,7 +84,7 @@ public class RSAUtils {
      * @return
      * @throws Exception
      */
-    public static String signByPrivateKey(byte[] data, String privateKey) throws Exception {
+    public static String signByPrivateKey(byte[] data, String privateKey) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException {
         logger.info("用私钥对信息进行数字签名");
         byte[] keyBytes = decryptBASE64(privateKey);
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
@@ -121,7 +121,7 @@ public class RSAUtils {
     }
 
     // TODO rsa 2 对比是否更优
-    public static boolean verifyByPublicKey(byte[] data, String publicKey, String sign) throws Exception {
+    public static boolean verifyByPublicKey(byte[] data, String publicKey, String sign) throws InvalidKeySpecException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         byte[] keyBytes = decryptBASE64(publicKey);
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);

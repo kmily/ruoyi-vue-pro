@@ -4,6 +4,10 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import com.alibaba.ttl.TransmittableThreadLocal;
 
+/**
+ * 废弃，不再使用
+ */
+@Deprecated
 public class DevAccountContextHolder {
 
     /**

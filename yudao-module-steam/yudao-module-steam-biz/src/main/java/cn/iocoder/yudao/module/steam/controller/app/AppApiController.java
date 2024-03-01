@@ -23,7 +23,9 @@ import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiCheckTradeUrlReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.OpenYoupinApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
@@ -35,6 +37,7 @@ import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.TradeUrlStatus;
 import cn.iocoder.yudao.module.steam.utils.DevAccountContextHolder;
+import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
 import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,7 +49,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -56,9 +61,14 @@ import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getCli
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserType;
 
+/**
+ * 兼容有品的开放平台接口
+ * 地址基准
+ * https://gw-openapi.youpin898.com/open/
+ */
 @Tag(name = "用户APP - 开放平台")
 @RestController
-@RequestMapping("api")
+@RequestMapping("openapi")
 @Validated
 public class AppApiController {
     @Resource
@@ -97,18 +107,24 @@ public class AppApiController {
             return CommonResult.error(new ErrorCode(-1, "接口出错原因:" + e.getMessage()));
         }
     }
-
     /**
      * api余额接口
      * @return
      */
-    @PostMapping("/getPayWallet")
-    @Operation(summary = "查询余额")
-
-    public CommonResult<AppPayWalletRespVO> getPayWallet() {
-        DevAccountDO devAccount = DevAccountContextHolder.getRequiredDevAccount();
-        PayWalletDO wallet = payWalletService.getOrCreateWallet(devAccount.getUserId(), devAccount.getUserType());
-        return success(PayWalletConvert.INSTANCE.convert(wallet));
+    @PostMapping("v1/api/getAssetsInfo")
+    @Operation(summary = "余额查询")
+    @PermitAll
+    public ApiResult<PayWalletDO> getPayWallet(@RequestBody  OpenYoupinApiReqVo<Serializable> openYoupinApiReqVo) {
+        try {
+            ApiResult<PayWalletDO> execute = DevAccountUtils.tenantExecute(1l, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openYoupinApiReqVo);
+                PayWalletDO wallet = payWalletService.getOrCreateWallet(devAccount.getUserId(), devAccount.getUserType());
+                return ApiResult.success(wallet);
+            });
+            return execute;
+        } catch (ServiceException e) {
+            return ApiResult.error(e.getCode(),  e.getMessage(),PayWalletDO.class);
+        }
     }
     /**
      * api余额接口
