@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.steam.service;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
@@ -20,7 +21,6 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 /**
@@ -38,7 +38,18 @@ public class SteamInvService {
     private InvDescMapper invDescMapper;
     @Resource
     private BindUserMapper bindUserMapper;
-    public InventoryDto fetchInventory(Long id, String appId){
+
+    // 用户获得库存
+    public InvDO AfterInventory(Long id, Long appid){
+        BindUserDO bindUserDO = bindUserMapper.selectById(id);
+        if (bindUserDO == null){
+            throw new ServiceException(-1,"用户id错误，未查询到该用户的steam账户");
+        }
+        String steamid =  bindUserDO.getSteamId();
+        List<InvDO> invDOS = invMapper.selectList().stream().filter(o -> o.getSteamId().equals(steamid)).collect(Collectors.toList());
+        return (InvDO) invDOS;
+    }
+    public InventoryDto FistGetInventory(Long id, String appId){
         // 用户第一次登录查询库存  根据用户ID查找绑定的Steam账号ID
         BindUserDO bindUserDO = bindUserMapper.selectById(id);
         if (bindUserDO == null){
@@ -53,24 +64,27 @@ public class SteamInvService {
         pathVar.put("steamId",bindUserDO.getSteamId());
         pathVar.put("app",appId);
         builder.pathVar(pathVar);
-        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
+        Map<String, String> header = new HashMap<>();
+        header.put("Connection", "close");
+        builder.headers(header);
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(),HttpUtil.getClient(true,30000));
         InventoryDto json = sent.json(InventoryDto.class);
         for (InventoryDto.AssetsDTO item:json.getAssets()) {
             // steamid 和 绑定平台用户id 联合查询当前用户steam_inv的所有库存信息
             Long userId = bindUserDO.getUserId();
             InvPageReqVO steamInv= new InvPageReqVO();
             steamInv.setSteamId(bindUserDO.getSteamId());
+            // invDOPageResult: 当前用户steam_inv的所有库存信息
             PageResult<InvDO> invDOPageResult = invMapper.selectPage(steamInv);;
             if (invDOPageResult.getTotal() > 0){
-                // 更新库存 TODO
-                InvDO steamInvUpdate = InvUpdate(invDOPageResult, item);
+                // 更新库存 TODO 删除 steam_selling 和 steam_inv 表中的信息
+                InvDO steamInvUpdate = InvUpdate(invDOPageResult, item, bindUserDO.getSteamId());
                 invMapper.updateById(steamInvUpdate);
             } else {
                 // 插入库存
                 String steamId = bindUserDO.getSteamId();
                 InvDO steamInvInsert = getInvDO(item,userId,steamId,id);
                 invMapper.insert(steamInvInsert);
-
             }
         }
         List<InventoryDto.DescriptionsDTOX> descriptions = json.getDescriptions();
@@ -255,7 +269,7 @@ public class SteamInvService {
      */
     @NotNull
     // TODO 如果出现更新库存后用户不能登录情况，检查steamInvUpdate.setStatus(1);
-    private static InvDO InvUpdate(PageResult<InvDO> invDOPageResult, InventoryDto.AssetsDTO item) {
+    private static InvDO InvUpdate(PageResult<InvDO> invDOPageResult, InventoryDto.AssetsDTO item,String steamid) {
         InvDO steamInvUpdate = new InvDO();
         // 获取所有在售商品
         List<InvDO> collect = invDOPageResult
@@ -270,6 +284,12 @@ public class SteamInvService {
                 steamInvUpdate.setStatus(1);
             }
         }
+
+        // invDOPageResult: 本地库存信息  item: steam接口返回的库存信息
+
+
+        // 查询本地 steam_inv 表中的库存
+        // 对比本地库存和线上库存，如果本地库存中存在线上库存中不存在的，则将本地库存状态改为 1
         return steamInvUpdate;
     }
 
