@@ -78,7 +78,7 @@ public class SteamInvService {
             PageResult<InvDO> invDOPageResult = invMapper.selectPage(steamInv);;
             if (invDOPageResult.getTotal() > 0){
                 // 更新库存 TODO 删除 steam_selling 和 steam_inv 表中的信息
-                InvDO steamInvUpdate = InvUpdate(invDOPageResult, item, bindUserDO.getSteamId());
+                InvDO steamInvUpdate = InvUpdate(invDOPageResult, item);
                 invMapper.updateById(steamInvUpdate);
             } else {
                 // 插入库存
@@ -237,27 +237,27 @@ public class SteamInvService {
         return steamInvInsert;
     }
 
-//    /**
-//     *   更新库存
-//     * @return steamInvUpdate
-//     */
-//    @NotNull
-//    private static InvDO InvUpdate(PageResult<InvDO> invDOPageResult, InventoryDto.AssetsDTO item) {
-//        Optional<InvDO> first = invDOPageResult
-//                .getList()
-//                .stream().filter(o -> o.getStatus().equals(1))
-//                .findFirst();
-//        InvDO steamInvUpdate;
-//        if (first.isPresent()) {
-//            steamInvUpdate = first.get();
-//            steamInvUpdate.setAmount(item.getAmount());
-//            steamInvUpdate.setClassid(item.getClassid());
-//            steamInvUpdate.setInstanceid(item.getInstanceid());
-//        } else {
-//            throw new ServiceException(-1, "库存更新失败");
-//        }
-//        return steamInvUpdate;
-//    }
+    /**
+     *   更新库存
+     * @return steamInvUpdate
+     */
+    @NotNull
+    private static InvDO InvUpdate(PageResult<InvDO> invDOPageResult, InventoryDto.AssetsDTO item) {
+        Optional<InvDO> first = invDOPageResult
+                .getList()
+                .stream().filter(o -> o.getStatus().equals(1))
+                .findFirst();
+        InvDO steamInvUpdate;
+        if (first.isPresent()) {
+            steamInvUpdate = first.get();
+            steamInvUpdate.setAmount(item.getAmount());
+            steamInvUpdate.setClassid(item.getClassid());
+            steamInvUpdate.setInstanceid(item.getInstanceid());
+        } else {
+            throw new ServiceException(-1, "库存更新失败");
+        }
+        return steamInvUpdate;
+    }
 
     /**
      * @Discription 更新库存
@@ -266,32 +266,24 @@ public class SteamInvService {
      * 3.查询steam接口中的库存数据
      * 4.对比表中在售商品数据是否在steam接口中存在
      * 5.如果存在，不做改变，如果不存在，则将steam_inv表中在售商品状态改为 1
+     *   TODO   接口优化，更新接口需要大量优化：遍历严重影响接口性能
      */
-    @NotNull
-    // TODO 如果出现更新库存后用户不能登录情况，检查steamInvUpdate.setStatus(1);
-    private static InvDO InvUpdate(PageResult<InvDO> invDOPageResult, InventoryDto.AssetsDTO item,String steamid) {
-        InvDO steamInvUpdate = new InvDO();
-        // 获取所有在售商品
-        List<InvDO> collect = invDOPageResult
-                .getList()
-                .stream()
-                .filter(o -> o.getTransferStatus() == 1 && o.getPrice()!= null)
-                .collect(Collectors.toList());
-        // 遍历在售商品 判断是否在库存中
-        for (InvDO invDO : collect) {
-            if ( !(invDO.getAssetid().contains(item.getAssetid()))){
-                steamInvUpdate.setTransferStatus(2);
-                steamInvUpdate.setStatus(1);
-            }
-        }
-
-        // invDOPageResult: 本地库存信息  item: steam接口返回的库存信息
-
-
-        // 查询本地 steam_inv 表中的库存
-        // 对比本地库存和线上库存，如果本地库存中存在线上库存中不存在的，则将本地库存状态改为 1
-        return steamInvUpdate;
-    }
+//    @NotNull
+//    private static InvDO InvUpdate1(PageResult<InvDO> invDOPageResult, InventoryDto.AssetsDTO item) {
+//        InvDO steamInvUpdate = new InvDO();
+//        // invDOPageResult: 本地库存信息
+//        List<InvDO> list = invDOPageResult.getList();
+//        // 对比本地库存和线上库存，如果本地库存中存在线上库存中不存在的，则将本地库存状态改为 1
+//        for(InvDO invDO: list){
+//            if(invDO.getClassid().equals(item.getClassid()) && invDO.getInstanceid().equals(item.getInstanceid())){
+//                LocalDateTime currentTime = LocalDateTime.now();
+//                steamInvUpdate.setUpdateTime(currentTime);
+//            } else {
+//                steamInvUpdate.setStatus(2);
+//            }
+//        }
+//        return steamInvUpdate;
+//    }
 
 }
 
