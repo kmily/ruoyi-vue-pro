@@ -143,7 +143,7 @@ public class AppDropListController {
     @GetMapping("/search")
     @Operation(summary = "饰品在售预览")
     public  CommonResult<PageResult<SellingRespVO>> getPreview(SellingPageReqVO sellingReqVo){
-        sellingReqVo.setPageSize(20);
+        sellingReqVo.setPageSize(200);
         PageResult<SellingDO> preview = sellingService.getSellingPage(sellingReqVo);
         return success(BeanUtils.toBean(preview, SellingRespVO.class));
     }
