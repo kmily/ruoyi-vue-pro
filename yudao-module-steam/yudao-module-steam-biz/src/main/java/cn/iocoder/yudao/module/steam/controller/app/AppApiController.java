@@ -104,6 +104,36 @@ public class AppApiController {
         }
     }
     /**
+     * 检查交易链接
+     * @return
+     */
+    @PostMapping("v1/api/checkTradeUrl")
+    @Operation(summary = "检查交易链接")
+    @PermitAll
+    public ApiResult<TradeUrlStatus> checkTradeUrl(@RequestBody  OpenYoupinApiReqVo<ApiCheckTradeUrlReqVo> openYoupinApiReqVo) {
+        try {
+            ApiResult<TradeUrlStatus> execute = DevAccountUtils.tenantExecute(1l, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openYoupinApiReqVo);
+                Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+                        .eq(BindUserDO::getUserId, devAccount.getUserId())
+                        .ne(BindUserDO::getTradeUrl,openYoupinApiReqVo.getData().getTradeUrl())
+                        .eq(BindUserDO::getUserType, devAccount.getUserType())).stream().findFirst();
+                if(!first.isPresent()){
+                    throw new ServiceException(-1,"没有检测机器人");
+                }
+                BindUserDO bindUserDO = first.get();
+                SteamWeb steamWeb=new SteamWeb(configService);
+                steamWeb.login(bindUserDO.getSteamPassword(),bindUserDO.getMaFile());
+                steamWeb.initTradeUrl();
+                TradeUrlStatus tradeUrlStatus = steamWeb.checkTradeUrl(openYoupinApiReqVo.getData().getTradeUrl());
+                return ApiResult.success(tradeUrlStatus);
+            });
+            return execute;
+        } catch (ServiceException e) {
+            return ApiResult.error(e.getCode(),  e.getMessage(),TradeUrlStatus.class);
+        }
+    }
+    /**
      * api余额接口
      * @return
      */
