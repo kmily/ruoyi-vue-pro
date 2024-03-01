@@ -67,12 +67,11 @@ public class AppInventorySearchController {
                 .filter(o -> o.getSteamId().equals(invPageReqVO.getSteamId()))
                 .collect(Collectors.toList());
         assert loginUser != null;
-        if((loginUser.getId()).equals(collect.get(0).getUserId())){
-                invPageReqVO.setUserId(loginUser.getId());
-        } else {
-                throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
+        if(!(loginUser.getId()).equals(collect.get(0).getUserId())){
+            throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
         }
-        return success(invService.getInvPage(invPageReqVO));
+        PageResult<InvDO> invPage = invService.getInvPage(invPageReqVO);
+        return success(invPage);
     }
 
 //
