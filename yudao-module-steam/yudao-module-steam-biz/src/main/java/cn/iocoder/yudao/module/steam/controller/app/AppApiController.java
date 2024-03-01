@@ -22,10 +22,7 @@ import cn.iocoder.yudao.module.pay.framework.pay.core.WalletPayClient;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
-import cn.iocoder.yudao.module.steam.controller.app.vo.ApiCheckTradeUrlReqVo;
-import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
-import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
-import cn.iocoder.yudao.module.steam.controller.app.vo.OpenYoupinApiReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.*;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
@@ -52,6 +49,7 @@ import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -114,16 +112,19 @@ public class AppApiController {
     @PostMapping("v1/api/getAssetsInfo")
     @Operation(summary = "余额查询")
     @PermitAll
-    public ApiResult<PayWalletDO> getPayWallet(@RequestBody  OpenYoupinApiReqVo<Serializable> openYoupinApiReqVo) {
+    public ApiResult<ApiPayWalletRespVO> getPayWallet(@RequestBody  OpenYoupinApiReqVo<Serializable> openYoupinApiReqVo) {
         try {
-            ApiResult<PayWalletDO> execute = DevAccountUtils.tenantExecute(1l, () -> {
+            ApiResult<ApiPayWalletRespVO> execute = DevAccountUtils.tenantExecute(1l, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openYoupinApiReqVo);
                 PayWalletDO wallet = payWalletService.getOrCreateWallet(devAccount.getUserId(), devAccount.getUserType());
-                return ApiResult.success(wallet);
+                ApiPayWalletRespVO apiPayWalletRespVO=new ApiPayWalletRespVO();
+                apiPayWalletRespVO.setAmount(new BigDecimal(wallet.getBalance().toString()).divide(new BigDecimal("100"),2,BigDecimal.ROUND_HALF_UP));
+                apiPayWalletRespVO.setUserId(devAccount.getUserId().intValue());
+                return ApiResult.success(apiPayWalletRespVO);
             });
             return execute;
         } catch (ServiceException e) {
-            return ApiResult.error(e.getCode(),  e.getMessage(),PayWalletDO.class);
+            return ApiResult.error(e.getCode(),  e.getMessage(),ApiPayWalletRespVO.class);
         }
     }
     /**
