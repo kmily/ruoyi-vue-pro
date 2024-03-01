@@ -139,6 +139,10 @@ public class PayWalletServiceImpl implements  PayWalletService {
                 updateCounts = walletMapper.updateWhenRechargeRefund(payWallet.getId(), price);
                 break;
             }
+            case STEAM_PAY: {
+                updateCounts = walletMapper.updateWhenConsumption(payWallet.getId(), price);
+                break;
+            }
             default: {
                 // TODO 其它类型待实现
                 throw new UnsupportedOperationException("待实现");
@@ -171,6 +175,10 @@ public class PayWalletServiceImpl implements  PayWalletService {
                 break;
             }
             case RECHARGE: { // 充值更新
+                walletMapper.updateWhenRecharge(payWallet.getId(), price);
+                break;
+            }
+            case STEAM_CASH:{//steam收款
                 walletMapper.updateWhenRecharge(payWallet.getId(), price);
                 break;
             }

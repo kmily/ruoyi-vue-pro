@@ -182,6 +182,12 @@ export default {
     this.getList();
   },
   methods: {
+    tradeAssetClick(id) {
+      InvOrderApi.tradeAsset(id).then(response => {this.$modal.msgSuccess("已发起请求");this.getList()});
+    },
+    refundOrderClick(id) {
+      InvOrderApi.refundOrder(id).then(response => {this.$modal.msgSuccess("已退款");this.getList()});
+    },
     /** 查询列表 */
     async getList() {
       try {

@@ -47,7 +47,7 @@ public interface ErrorCodeConstants {
     ErrorCode INVORDER_AMOUNT_EXCEPT = new ErrorCode(1_100_011_03, "金额不正确");
     ErrorCode INVORDER_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID = new ErrorCode(1_100_011_04, "订单不是【未支付】状态");
 
-
+    ErrorCode INVORDER_ORDER_CASHED_CANNOTREFUND = new ErrorCode(1_100_011_04, "款项已打款给买家，不能退款");
     ErrorCode INVORDER_ORDER_NOT_FOUND = new ErrorCode(1_007_900_000, "订单不存在");
     ErrorCode INVORDER_ORDER_REFUND_USER_ERROR = new ErrorCode(1_007_900_005, "发起退款失败，只有订单发起人才能退款");
     ErrorCode INVORDER_ORDER_REFUND_FAIL_NOT_PAID = new ErrorCode(1_007_900_005, "发起退款失败，订单未支付");

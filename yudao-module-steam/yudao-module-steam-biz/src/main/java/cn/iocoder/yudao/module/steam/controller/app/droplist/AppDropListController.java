@@ -8,14 +8,13 @@ import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewRe
 import cn.iocoder.yudao.module.steam.controller.admin.selexterior.vo.SelExteriorPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selitemset.vo.SelItemsetListReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingRespVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selquality.vo.SelQualityPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selrarity.vo.SelRarityPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.seltype.vo.SelTypePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppDropListRespVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
-import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
-import cn.iocoder.yudao.module.steam.service.inv.InvService;
+import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewService;
 import cn.iocoder.yudao.module.steam.service.selexterior.SelExteriorService;
 import cn.iocoder.yudao.module.steam.service.selitemset.SelItemsetService;
@@ -57,12 +56,6 @@ public class AppDropListController {
     private InvPreviewService invPreviewService;
     @Resource
     private SellingService sellingService;
-    @Resource
-    private InvService invService;
-    @Resource
-    private SellingMapper sellingMapper;
-    @Resource
-    private InvMapper invMapper;
 
 
     /**
@@ -147,14 +140,12 @@ public class AppDropListController {
         return CommonResult.success(appDropListRespVO);
     }
 
-
-    // TODO 在售商品预览改查询 steam_selling 表 ！！！ 当前查询 steam_inv_preview 表
     @GetMapping("/search")
     @Operation(summary = "饰品在售预览")
-    public CommonResult<PageResult<InvPreviewRespVO>> getPreview(@Valid InvPreviewPageReqVO invPreviewPageReqVO){
-        invPreviewPageReqVO.setPageSize(20);
-        PageResult<InvPreviewDO> invPreviewPage = invPreviewService.getInvPreviewPage(invPreviewPageReqVO);
-        return success(BeanUtils.toBean(invPreviewPage, InvPreviewRespVO.class));
+    public  CommonResult<PageResult<SellingRespVO>> getPreview(SellingPageReqVO sellingReqVo){
+        sellingReqVo.setPageSize(200);
+        PageResult<SellingDO> preview = sellingService.getSellingPage(sellingReqVo);
+        return success(BeanUtils.toBean(preview, SellingRespVO.class));
     }
 
     @GetMapping("/search/view")
@@ -162,6 +153,13 @@ public class AppDropListController {
     public CommonResult<PageResult<InvPreviewRespVO>> getSearchView(@Valid InvPreviewPageReqVO invPreviewPageReqVO) {
         PageResult<InvPreviewDO> view = invPreviewService.getInvPreviewPage(invPreviewPageReqVO);
         return success(BeanUtils.toBean(view, InvPreviewRespVO.class));
+    }
+
+    @GetMapping("/search/viewSell")
+    @Operation(summary = "在售商品列表")
+    public CommonResult<PageResult<SellingRespVO>> getSellView(@Valid SellingPageReqVO sellingPageReqVO) {
+        PageResult<SellingDO> viewSell = sellingService.getSellingPage(sellingPageReqVO);
+        return success(BeanUtils.toBean(viewSell, SellingRespVO.class));
     }
 
 

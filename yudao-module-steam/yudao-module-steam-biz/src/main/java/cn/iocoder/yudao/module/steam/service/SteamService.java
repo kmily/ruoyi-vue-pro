@@ -373,7 +373,7 @@ public class SteamService {
      * 发货
      * @param invOrderDO
      */
-//    @Async
+    @Async
     public void tradeAsset(InvOrderDO invOrderDO){
         SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
         TransferMsg transferMsg=new TransferMsg();

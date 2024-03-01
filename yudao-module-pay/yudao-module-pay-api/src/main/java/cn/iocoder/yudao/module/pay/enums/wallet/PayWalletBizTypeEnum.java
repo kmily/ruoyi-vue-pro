@@ -18,7 +18,9 @@ public enum PayWalletBizTypeEnum implements IntArrayValuable {
     RECHARGE(1, "充值"),
     RECHARGE_REFUND(2, "充值退款"),
     PAYMENT(3, "支付"),
-    PAYMENT_REFUND(4, "支付退款");
+    PAYMENT_REFUND(4, "支付退款"),
+    STEAM_PAY(100,"steam交易支付"),
+    STEAM_CASH(101,"steam交易收款");
 
     // TODO 后续增加
 
