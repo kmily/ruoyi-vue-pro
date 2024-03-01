@@ -26,6 +26,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.steam.*;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -140,9 +141,17 @@ public class SteamService {
         bindUserDO.setMaFile(steamMaFile);
         bindUserDO.setTradeUrl(steamWeb.getTreadUrl().get());
         bindUserDO.setSteamName(steamMaFile.getAccountName());
+        // 用户修改了密码，需要重新绑定ma文件
+        InvPageReqVO invPageReqVO = new InvPageReqVO();
+        invPageReqVO.setSteamId(bindUserDO.getSteamId());
+        invPageReqVO.setUserId(bindUserDO.getUserId());
+        if((invMapper.selectPage(invPageReqVO)) != null){
+            invMapper.delete(new QueryWrapper<InvDO>().eq("steam_id",bindUserDO.getSteamId()).eq("user_id",bindUserDO.getUserId()));
+        }
         bindUserMapper.updateById(bindUserDO);
         SteamService bean = SpringUtil.getBean(this.getClass());
         bean.firstGetInv(bindUserDO.getSteamId());
+
     }
 
 
@@ -301,6 +310,11 @@ public class SteamService {
                 invDescMapper.insert(invDescDO);
             }
         }
+    }
+
+    @Async
+    public void updateInv(String steamId) {
+
     }
 
     /**
