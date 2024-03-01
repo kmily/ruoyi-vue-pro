@@ -10,8 +10,11 @@ import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
+import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
+import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
@@ -35,6 +38,7 @@ import cn.iocoder.yudao.module.steam.service.steam.TransferMsg;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -90,6 +94,8 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
 
     @Resource
     private InvDescMapper invDescMapper;
+    @Autowired
+    private PayWalletService payWalletService;
 
 
     public PaySteamOrderServiceImpl() {
@@ -336,6 +342,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateInvOrderPaid(Long id, Long payOrderId) {
         // 校验并获得支付订单（可支付）
         PayOrderRespDTO payOrder = validateInvOrderCanPaid(id, payOrderId);
@@ -349,7 +356,18 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw exception(DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
         InvOrderDO invOrderDO = invOrderMapper.selectById(id);
-        steamService.tradeAsset(invOrderDO);
+        //获取专家钱包并进行打款
+        PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(invOrderDO.getSellUserId(), invOrderDO.getSellUserType());
+        payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(invOrderDO.getId()),
+                PayWalletBizTypeEnum.STEAM_CASH, invOrderDO.getPrice());
+        invOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
+        invOrderMapper.updateById(invOrderDO);
+        try{
+            steamService.tradeAsset(invOrderDO);
+        }catch (Exception e){
+            log.info("发货异常{}",e);
+        }
+
     }
 
     /**
@@ -367,6 +385,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         InvOrderDO invOrderDO = invOrderMapper.selectById(id);
         if (invOrderDO == null) {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_NOT_FOUND);
+        }
+        if(invOrderDO.getSellCashStatus().equals(InvSellCashStatusEnum.CASHED.getStatus())){
+            throw exception(ErrorCodeConstants.INVORDER_ORDER_CASHED_CANNOTREFUND);
         }
         // 1.2 校验订单未支付
         if (invOrderDO.getPayStatus()) {
@@ -437,6 +458,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         InvOrderDO invOrderDO = invOrderMapper.selectById(id);
         if (invOrderDO == null) {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_NOT_FOUND);
+        }
+        if(invOrderDO.getSellCashStatus().equals(InvSellCashStatusEnum.CASHED.getStatus())){
+            throw exception(ErrorCodeConstants.INVORDER_ORDER_CASHED_CANNOTREFUND);
         }
         if(!invOrderDO.getUserId().equals(loginUser.getId())){
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_USER_ERROR);
