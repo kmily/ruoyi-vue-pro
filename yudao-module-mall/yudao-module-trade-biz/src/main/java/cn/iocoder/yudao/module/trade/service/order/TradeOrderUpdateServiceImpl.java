@@ -13,6 +13,8 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.module.member.api.address.MemberAddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.MemberAddressRespDTO;
+import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
@@ -96,7 +98,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private DeliveryExpressService deliveryExpressService;
     @Resource
     private TradeMessageService tradeMessageService;
-
+    @Resource
+    private MemberUserApi memberUserApi;
     @Resource
     private PayOrderApi payOrderApi;
     @Resource
@@ -121,7 +124,12 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         TradePriceCalculateRespBO calculateRespBO = calculatePrice(userId, settlementReqVO);
 
         // 3. 拼接返回
-        return TradeOrderConvert.INSTANCE.convert(calculateRespBO, address);
+        AppTradeOrderSettlementRespVO vo = TradeOrderConvert.INSTANCE.convert(calculateRespBO, address);
+        MemberUserRespDTO user = memberUserApi.getUser(userId);
+        if (user.getPoint() != null && user.getPoint() > 0) {
+            vo.setTotalPoint(user.getPoint());
+        }
+        return vo;
     }
 
     /**
