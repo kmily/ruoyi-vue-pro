@@ -1,28 +1,25 @@
 package cn.iocoder.yudao.module.steam.controller.app;
 
-import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
-import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
-import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitRespVO;
 import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitReqVO;
 import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitRespVO;
-import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.wallet.AppPayWalletRespVO;
 import cn.iocoder.yudao.module.pay.convert.order.PayOrderConvert;
-import cn.iocoder.yudao.module.pay.convert.wallet.PayWalletConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.framework.pay.core.WalletPayClient;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
-import cn.iocoder.yudao.module.steam.controller.app.vo.*;
+import cn.iocoder.yudao.module.steam.controller.app.vo.ApiCheckTradeUrlReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.ApiPayWalletRespVO;
+import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
+import cn.iocoder.yudao.module.steam.controller.app.vo.OpenYoupinApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
@@ -56,8 +53,6 @@ import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
-import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
-import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserType;
 
 /**
  * 兼容有品的开放平台接口
@@ -85,26 +80,7 @@ public class AppApiController {
     private PaySteamOrderService paySteamOrderService;
     @Resource
     private PayOrderService payOrderService;
-    /**
-     * 类别选择
-     */
-    @PostMapping("/openapi")
-    @Operation(summary = "")
-    public CommonResult<String> openApi(@RequestBody @Validated OpenApiReqVo openApi) {
-        try {
-            CommonResult<String> execute = TenantUtils.execute(1l, () -> {
-                try {
-                    String dispatch = openApiService.dispatch(openApi);
-                    return CommonResult.success(dispatch);
-                } catch (ServiceException e) {
-                    return CommonResult.error(new ErrorCode(-1, "出错:" + e.getMessage()));
-                }
-            });
-            return execute;
-        } catch (ServiceException e) {
-            return CommonResult.error(new ErrorCode(-1, "接口出错原因:" + e.getMessage()));
-        }
-    }
+
     /**
      * api余额接口
      * @return
@@ -112,7 +88,7 @@ public class AppApiController {
     @PostMapping("v1/api/getAssetsInfo")
     @Operation(summary = "余额查询")
     @PermitAll
-    public ApiResult<ApiPayWalletRespVO> getPayWallet(@RequestBody  OpenYoupinApiReqVo<Serializable> openYoupinApiReqVo) {
+    public ApiResult<ApiPayWalletRespVO> getAssetsInfo(@RequestBody  OpenYoupinApiReqVo<Serializable> openYoupinApiReqVo) {
         try {
             ApiResult<ApiPayWalletRespVO> execute = DevAccountUtils.tenantExecute(1l, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openYoupinApiReqVo);
