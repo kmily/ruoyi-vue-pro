@@ -79,18 +79,16 @@ public class DevAccountServiceImpl implements DevAccountService {
 
     @Override
     public String apply(DevAccountSaveReqVO createReqVO) {
-
+        LoginUser loginUser1 = SecurityFrameworkUtils.getLoginUser();
+        createReqVO.setUserId(loginUser1.getId());
+        createReqVO.setUserType(loginUser1.getUserType());
+        List<DevAccountDO> devAccountDOS = devAccountMapper.selectList(
+                new LambdaQueryWrapperX<DevAccountDO>().eq(DevAccountDO::getUserId,loginUser1.getId())
+                        .eq(DevAccountDO::getUserType,loginUser1.getUserType()));
+        if(devAccountDOS.size()>0){
+            throw new ServiceException(-1,"不能重复申请");
+        }
         try {
-            LoginUser loginUser1 = SecurityFrameworkUtils.getLoginUser();
-            createReqVO.setUserId(loginUser1.getId());
-            createReqVO.setUserType(loginUser1.getUserType());
-            List<DevAccountDO> devAccountDOS = devAccountMapper.selectList(
-                    new LambdaQueryWrapperX<DevAccountDO>().eq(DevAccountDO::getUserId,loginUser1.getId())
-                            .eq(DevAccountDO::getUserType,loginUser1.getUserType()));
-            if(devAccountDOS.size()>0){
-                throw new ServiceException(-1,"无权限申请");
-            }
-
             createReqVO.setApiPublicKey(createReqVO.getApiPublicKey());
             // 插入
             LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
@@ -101,9 +99,8 @@ public class DevAccountServiceImpl implements DevAccountService {
             // 返回
             return devAccount.getId().toString();
         } catch (Exception e) {
-            throw new ServiceException(new ErrorCode(01,"申请权限失败"));
+            throw new ServiceException(new ErrorCode(01,"申请失败，请稍后重试"));
         }
-
     }
 
     @Override
