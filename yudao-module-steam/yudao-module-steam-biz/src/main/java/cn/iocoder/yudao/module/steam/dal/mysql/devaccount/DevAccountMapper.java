@@ -26,4 +26,10 @@ public interface DevAccountMapper extends BaseMapperX<DevAccountDO> {
                 .orderByDesc(DevAccountDO::getId));
     }
 
+    default DevAccountDO selectByUserName(DevAccountPageReqVO reqVO) {
+        return selectOne(new LambdaQueryWrapperX<DevAccountDO>()
+                .eq(DevAccountDO::getUserName, reqVO.getUserName())
+                .eq(DevAccountDO::getUserType, reqVO.getUserType()));
+    }
 }
+

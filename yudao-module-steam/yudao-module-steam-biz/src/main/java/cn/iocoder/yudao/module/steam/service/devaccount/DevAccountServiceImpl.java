@@ -1,9 +1,15 @@
 package cn.iocoder.yudao.module.steam.service.devaccount;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.security.KeyPair;
 import java.util.*;
 import cn.iocoder.yudao.module.steam.controller.admin.devaccount.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
@@ -72,24 +78,55 @@ public class DevAccountServiceImpl implements DevAccountService {
     }
 
     @Override
-    public String apply(DevAccountSaveReqVO pageReqVO) {
+    public String apply(DevAccountSaveReqVO createReqVO) {
 
-//        pageReqVO.setApiPublicKey(pageReqVO.getApiPublicKey());
-/*        if (pageReqVO.getApiPublicKey() =){
+        try {
+            LoginUser loginUser1 = SecurityFrameworkUtils.getLoginUser();
+            createReqVO.setUserId(loginUser1.getId());
+            createReqVO.setUserType(loginUser1.getUserType());
+            List<DevAccountDO> devAccountDOS = devAccountMapper.selectList(
+                    new LambdaQueryWrapperX<DevAccountDO>().eq(DevAccountDO::getUserId,loginUser1.getId())
+                            .eq(DevAccountDO::getUserType,loginUser1.getUserType()));
+            if(devAccountDOS.size()>0){
+                throw new ServiceException(-1,"无权限申请");
+            }
 
-        }*/
+            createReqVO.getApiPublicKey();
+            // 插入
+            LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+            createReqVO.setUserId(loginUser.getId());
+            createReqVO.setStatus(0);
+            DevAccountDO devAccount = BeanUtils.toBean(createReqVO, DevAccountDO.class);
+            devAccountMapper.insert(devAccount);
+            // 返回
+            return devAccount.getId().toString();
+        } catch (Exception e) {
+            throw new ServiceException(new ErrorCode(01,"申请权限失败"));
+        }
 
-        return pageReqVO.getApiPublicKey();
     }
 
     @Override
     public List<DevAccountDO> accountList() {
-        return null;
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        return devAccountMapper.selectList(new LambdaQueryWrapperX<DevAccountDO>()
+                .eq(DevAccountDO::getUserType,loginUser.getUserType())
+                .eq(DevAccountDO::getUserId,loginUser.getId())
+        );
     }
 
-    @Override
-    public DevAccountDO selectByUserName(String userName, UserTypeEnum userType) {
-        return null;
+    public DevAccountDO selectByUserName (String userName, UserTypeEnum userTypeEnum) {
+        try {
+            DevAccountPageReqVO devAccountPageReqVO=new DevAccountPageReqVO();
+            devAccountPageReqVO.setUserName(userName);
+            devAccountPageReqVO.setUserType(userTypeEnum.getValue());
+            DevAccountDO devAccountDO = devAccountMapper.selectByUserName(devAccountPageReqVO);
+            // 返回
+            return devAccountDO;
+        } catch (Exception e) {
+            throw new ServiceException(new ErrorCode(01,"申请权限失败"));
+        }
+
     }
 
 }
