@@ -70,5 +70,8 @@ public interface ErrorCodeConstants {
     // ========== 广告位 TODO 补充编号 ==========
     ErrorCode AD_BLOCK_NOT_EXISTS = new ErrorCode(1_100_011_01, "广告位不存在");
 
+    // ========== steam订单 TODO 补充编号 ==========
+    ErrorCode YOUYOU_ORDER_NOT_EXISTS = new ErrorCode(1_100_012_01, "steam订单不存在");
+
 
 }
