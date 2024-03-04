@@ -68,6 +68,17 @@
       <el-form-item label="实际商品ID" prop="realCommodityId">
         <el-input v-model="queryParams.realCommodityId" placeholder="请输入实际商品ID" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
+      <el-form-item label="有品订单号" prop="uuOrderNo">
+        <el-input v-model="queryParams.uuOrderNo" placeholder="请输入有品订单号" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="有品商户订单号" prop="uuMerchantOrderNo">
+        <el-input v-model="queryParams.uuMerchantOrderNo" placeholder="请输入有品商户订单号" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="交易状态 0,成功；2,失败。" prop="uuOrderStatus">
+        <el-select v-model="queryParams.uuOrderStatus" placeholder="请选择交易状态 0,成功；2,失败。" clearable size="small">
+          <el-option label="请选择字典生成" value="" />
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -122,6 +133,9 @@
       <el-table-column label="商品ID" align="center" prop="commodityId" />
       <el-table-column label="购买最高价,单价元" align="center" prop="purchasePrice" />
       <el-table-column label="实际商品ID" align="center" prop="realCommodityId" />
+      <el-table-column label="有品订单号" align="center" prop="uuOrderNo" />
+      <el-table-column label="有品商户订单号" align="center" prop="uuMerchantOrderNo" />
+      <el-table-column label="交易状态 0,成功；2,失败。" align="center" prop="uuOrderStatus" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
@@ -188,6 +202,9 @@ export default {
         commodityId: null,
         purchasePrice: null,
         realCommodityId: null,
+        uuOrderNo: null,
+        uuMerchantOrderNo: null,
+        uuOrderStatus: null,
       },
             };
   },
