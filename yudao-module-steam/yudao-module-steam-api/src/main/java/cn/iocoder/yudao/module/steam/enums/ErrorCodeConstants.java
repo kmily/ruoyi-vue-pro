@@ -61,7 +61,12 @@ public interface ErrorCodeConstants {
     ErrorCode INVORDER_ORDER_REFUND_FAIL_REFUND_NOT_FOUND = new ErrorCode(1_007_900_007, "发起退款失败，退款订单不存在");
     ErrorCode INVORDER_ORDER_REFUND_FAIL_REFUND_PRICE_NOT_MATCH = new ErrorCode(1_007_900_010, "发起退款失败，退款单金额不匹配");
     ErrorCode INVORDER_ORDER_REFUND_FAIL_REFUND_NOT_SUCCESS = new ErrorCode(1_007_900_008, "发起退款失败，退款订单未退款成功");
-
+    //UU订单
+    ErrorCode UU_GOODS_ERR = new ErrorCode(1_008_001_01, "商品ID或模板ID或模板hashname,不能为空");
+    ErrorCode UU_GOODS_NOT_FOUND = new ErrorCode(1_100_011_02, "库存不存在");
+    ErrorCode UU_GOODS_ORDERED_EXCEPT = new ErrorCode(1_100_011_01, "此库存已经存在有效订单");
+    ErrorCode UU_GOODS_AMOUNT_EXCEPT = new ErrorCode(1_100_011_03, "金额不正确");
+    ErrorCode UU_GOODS_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID = new ErrorCode(1_100_011_04, "订单不是【未支付】状态");
     // 饰品在售预览
     ErrorCode INV_PREVIEW_NOT_EXISTS = new ErrorCode(1_100_010_01, "饰品在售预览不存在");
 

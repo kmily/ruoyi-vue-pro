@@ -1,12 +1,9 @@
 package cn.iocoder.yudao.module.steam.service.fin;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateReqVo;
-import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 
 import javax.validation.Valid;
@@ -47,14 +44,15 @@ public interface YouYouOrderService {
      * @param id 编号
      * @return 示例订单
      */
-    InvOrderDO getInvOrder(Long id);
+    YouyouOrderDO getInvOrder(Long id);
 
     /**
      * 获得示例订单列表
-     * @param invOrderPageReqVO
+     * @param youyouOrderPageReqVO
      * @return
      */
-    PageResult<InvOrderResp> getInvOrderPageOrder(InvOrderPageReqVO invOrderPageReqVO);
+//    PageResult<YouyouOrderDO> getInvOrderPageOrder(YouyouOrderPageReqVO youyouOrderPageReqVO);
+    /**
     /**
      * 更新示例订单为已支付
      *

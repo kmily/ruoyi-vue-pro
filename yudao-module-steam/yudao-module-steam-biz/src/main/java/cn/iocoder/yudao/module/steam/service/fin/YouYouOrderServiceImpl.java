@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.steam.service.fin;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
@@ -15,29 +14,19 @@ import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
-import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateReqVo;
-import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
-import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal.WithdrawalDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.youyougoodslist.YouyouGoodslistDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
-import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.youyougoodslist.YouyouGoodslistMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
-import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum;
-import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
-import cn.iocoder.yudao.module.steam.service.steam.TransferMsg;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,8 +37,8 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Objects;
 
 import static cn.hutool.core.util.ObjectUtil.notEqual;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -75,6 +64,7 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
      */
     private static final Long PAY_APP_ID = 11L;
     private static final Long PAY_WITHDRAWAL_APP_ID = 12L;
+    private static final Long UU_CASH_ACCOUNT_ID = 250L;//UU收款账号ID
 
 
     @Resource
@@ -83,27 +73,24 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
     private PayRefundApi payRefundApi;
 
 
-    @Resource
-    private SellingMapper sellingMapper;
 
     @Resource
     private InvOrderMapper invOrderMapper;
     @Resource
     private WithdrawalMapper withdrawalMapper;
 
-    @Resource
-    private BindUserMapper bindUserMapper;
-    @Autowired
-    private SteamService steamService;
 
-    @Resource
-    private InvDescMapper invDescMapper;
-    @Autowired
+
     private PayWalletService payWalletService;
+    @Autowired
+    public void setPayWalletService(PayWalletService payWalletService) {
+        this.payWalletService = payWalletService;
+    }
 
     @Resource
     private YouyouOrderMapper youyouOrderMapper;
-
+    @Resource
+    private YouyouGoodslistMapper youyouGoodslistMapper;
 
     public YouYouOrderServiceImpl() {
     }
@@ -230,6 +217,7 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
                 .setCommodityId(createReqVO.getCommodityId()).setCommodityHashName(createReqVO.getCommodityHashName()).setCommodityTemplateId(createReqVO.getCommodityTemplateId())
                 .setPurchasePrice(createReqVO.getPurchasePrice())
                 .setPayAmount(bigDecimal.multiply(new BigDecimal("100")).intValue())
+                .setSellCashStatus(InvSellCashStatusEnum.INIT.getStatus()).setSellUserId(UU_CASH_ACCOUNT_ID).setSellUserType(UserTypeEnum.MEMBER.getValue())
                 .setPayStatus(false).setRefundPrice(0);
         validateInvOrderCanCreate(youyouOrderDO);
         youyouOrderMapper.insert(youyouOrderDO);
@@ -251,12 +239,23 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
         return createOrderResult;
     }
     private YouyouOrderDO validateInvOrderCanCreate(YouyouOrderDO youyouOrderDO) {
-        //todo check
+        if(Objects.isNull(youyouOrderDO.getCommodityHashName()) || Objects.isNull(youyouOrderDO.getCommodityTemplateId())|| Objects.isNull(youyouOrderDO.getCommodityId())){
+            throw exception(ErrorCodeConstants.UU_GOODS_ERR);
+        }
+        if(Objects.isNull(youyouOrderDO.getCommodityId())){//指定ID购买
+            //todo 查询出一个商品并获取商品ID
+            youyouOrderDO.setRealCommodityId("1");
+        }else{
+            youyouOrderDO.setRealCommodityId(youyouOrderDO.getCommodityId());
+        }
+        YouyouGoodslistDO youyouGoodslistDO = youyouGoodslistMapper.selectById(youyouOrderDO.getRealCommodityId());
+
+
 //        SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
 ////        //校验订单是否存在
-//        if (sellingDO == null) {
-//            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
-//        }
+        if (youyouGoodslistDO == null) {
+            throw exception(ErrorCodeConstants.UU_GOODS_NOT_FOUND);
+        }
 //        if(CommonStatusEnum.isDisable(sellingDO.getStatus())){
 //            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
 //        }
@@ -288,26 +287,27 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
 //            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
 //        }
 //        //使用库存的价格进行替换
-//        invOrderDO.setPrice(sellingDO.getPrice());
+        BigDecimal bigDecimal = new BigDecimal(youyouGoodslistDO.getCommodityPrice());
+        youyouOrderDO.setPayAmount(bigDecimal.multiply(new BigDecimal("100")).intValue());
 //
 //
 //        //检查是否已经下过单
-//        List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
-//                        .eq(InvOrderDO::getSellId, sellingDO.getId())
-////                .eq(InvOrderDO::getPayStatus, 1)
-//                        .isNull(InvOrderDO::getPayRefundId)
-//        );
-//        if(invOrderDOS.size()>0){
-//            throw exception(ErrorCodeConstants.INVORDER_ORDERED_EXCEPT);
-//        }
-//        // 校验订单是否支付
-//        if (Objects.isNull(invOrderDO.getPrice()) || invOrderDO.getPrice()<=0) {
-//            throw exception(ErrorCodeConstants.INVORDER_AMOUNT_EXCEPT);
-//        }
-//        // 校验订单是否支付
-//        if (invOrderDO.getPayStatus()) {
-//            throw exception(ErrorCodeConstants.INVORDER_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
-//        }
+        List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
+                        .eq(YouyouOrderDO::getRealCommodityId, youyouOrderDO.getRealCommodityId())
+//                .eq(InvOrderDO::getPayStatus, 1)
+                        .isNull(YouyouOrderDO::getPayRefundId)
+        );
+        if(youyouOrderDOS.size()>0){
+            throw exception(ErrorCodeConstants.UU_GOODS_ORDERED_EXCEPT);
+        }
+        // 校验订单是否支付
+        if (Objects.isNull(youyouOrderDO.getPayAmount()) || youyouOrderDO.getPayAmount()<=0) {
+            throw exception(ErrorCodeConstants.UU_GOODS_AMOUNT_EXCEPT);
+        }
+        // 校验订单是否支付
+        if (youyouOrderDO.getPayStatus()) {
+            throw exception(ErrorCodeConstants.UU_GOODS_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
+        }
 //        //检查用户steamID是否正确只检查bindUser
 //        Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
 //                .eq(BindUserDO::getUserId, invOrderDO.getUserId())
@@ -323,136 +323,30 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
 //        }
         return youyouOrderDO;
     }
-
-    public CreateOrderResult createInvOrder(LoginUser loginUser, PaySteamOrderCreateReqVO createReqVO) {
-        CreateOrderResult createOrderResult=new CreateOrderResult();
-        SellingDO sellingDO = sellingMapper.selectById(createReqVO.getSellId());
-        InvDescDO invDescDO = invDescMapper.selectById(sellingDO.getInvDescId());
-        // 1.1 获得商品
-        InvOrderDO invOrderDO = new InvOrderDO().setSellId(createReqVO.getSellId()).setSteamId(createReqVO.getSteamId())
-                .setPrice(0).setSteamId(createReqVO.getSteamId())
-                .setPayOrderStatus(PayOrderStatusEnum.WAITING.getStatus())
-                .setTransferText(new TransferMsg()).setInvDescId(sellingDO.getInvDescId()).setInvId(sellingDO.getInvId())
-                //专家信息
-                .setSellCashStatus(InvSellCashStatusEnum.INIT.getStatus()).setSellUserId(sellingDO.getUserId()).setSellUserType(sellingDO.getUserType())
-                .setPayStatus(false).setRefundPrice(0).setUserId(loginUser.getId()).setUserType(loginUser.getUserType());
-        validateInvOrderCanCreate(invOrderDO);
-        invOrderMapper.insert(invOrderDO);
-
-        // 2.1 创建支付单
-        Long payOrderId = payOrderApi.createOrder(new PayOrderCreateReqDTO()
-                .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
-                .setMerchantOrderId(invOrderDO.getId().toString()) // 业务的订单编号
-                .setSubject("购买"+invDescDO.getMarketName()).setBody("出售编号："+sellingDO.getId()).setPrice(invOrderDO.getPrice()) // 价格信息
-                .setExpireTime(addTime(Duration.ofHours(2L)))); // 支付的过期时间
-        // 2.2 更新支付单到 demo 订单
-        invOrderMapper.updateById(new InvOrderDO().setId(invOrderDO.getId())
-                .setPayOrderId(payOrderId));
-        //更新库存的标识
-        sellingDO.setTransferStatus(InvTransferStatusEnum.INORDER.getStatus());
-        sellingMapper.updateById(sellingDO);
-        // 返回
-        createOrderResult.setBizOrderId(invOrderDO.getId());
-        createOrderResult.setPayOrderId(payOrderId);
-        return createOrderResult;
-    }
-    private InvOrderDO validateInvOrderCanCreate(InvOrderDO invOrderDO) {
-        SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
-//        //校验订单是否存在
-        if (sellingDO == null) {
-            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
-        }
-        if(CommonStatusEnum.isDisable(sellingDO.getStatus())){
-            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
-        }
-        if(CommonStatusEnum.isDisable(sellingDO.getStatus())){
-            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
-        }
-        if(Objects.isNull(sellingDO.getBindUserId())){
-            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
-        }
-        if(invOrderDO.getUserId().equals(sellingDO.getUserId()) && invOrderDO.getUserType().equals(sellingDO.getUserType())){
-            throw exception(ErrorCodeConstants.INVORDER_ORDERUSER_EXCEPT);
-        }
-        //检查是否可交易
-        Optional<InvDescDO> first1 = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
-                .eq(InvDescDO::getClassid, sellingDO.getClassid())
-                .eq(InvDescDO::getInstanceid, sellingDO.getInstanceid())
-                .eq(InvDescDO::getAppid, sellingDO.getAppid())
-        ).stream().findFirst();
-        if(!first1.isPresent()){
-            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
-        }
-        InvDescDO invDescDO = first1.get();
-        if(invDescDO.getTradable().intValue()!=1){
-            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
-        }
-
-        //库存状态为没有订单
-        if(!InvTransferStatusEnum.SELL.getStatus().equals(sellingDO.getTransferStatus())){
-            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
-        }
-        //使用库存的价格进行替换
-        invOrderDO.setPrice(sellingDO.getPrice());
-
-
-        //检查是否已经下过单
-        List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
-                .eq(InvOrderDO::getSellId, sellingDO.getId())
-//                .eq(InvOrderDO::getPayStatus, 1)
-                .isNull(InvOrderDO::getPayRefundId)
-        );
-        if(invOrderDOS.size()>0){
-            throw exception(ErrorCodeConstants.INVORDER_ORDERED_EXCEPT);
-        }
-        // 校验订单是否支付
-        if (Objects.isNull(invOrderDO.getPrice()) || invOrderDO.getPrice()<=0) {
-            throw exception(ErrorCodeConstants.INVORDER_AMOUNT_EXCEPT);
-        }
-        // 校验订单是否支付
-        if (invOrderDO.getPayStatus()) {
-            throw exception(ErrorCodeConstants.INVORDER_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
-        }
-        //检查用户steamID是否正确只检查bindUser
-        Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
-                .eq(BindUserDO::getUserId, invOrderDO.getUserId())
-                .eq(BindUserDO::getUserType, invOrderDO.getUserType())
-                .eq(BindUserDO::getSteamId, invOrderDO.getSteamId())
-        ).stream().findFirst();
-        if(!first.isPresent()){
-            throw exception(ErrorCodeConstants.INVORDER_BIND_STEAM_EXCEPT);
-        }
-        BindUserDO bindUserDO = first.get();
-        if(Objects.isNull(bindUserDO.getSteamPassword())){
-            throw exception(ErrorCodeConstants.INVORDER_BIND_STEAM_EXCEPT);
-        }
-        return invOrderDO;
-    }
-
     @Override
-    public InvOrderDO getInvOrder(Long id) {
-        return invOrderMapper.selectById(id);
+    public YouyouOrderDO getInvOrder(Long id) {
+        return youyouOrderMapper.selectById(id);
     }
 
-    @Override
-    public PageResult<InvOrderResp> getInvOrderPageOrder(InvOrderPageReqVO invOrderPageReqVO) {
-
-        PageResult<InvOrderDO> invOrderDOPageResult = invOrderMapper.selectPage(invOrderPageReqVO);
-        List<InvOrderResp> ret=new ArrayList<>();
-        if(invOrderDOPageResult.getTotal()>0){
-            List<Long> collect = invOrderDOPageResult.getList().stream().map(InvOrderDO::getInvDescId).collect(Collectors.toList());
-            Map<Long, InvDescDO> collect1 = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
-                    .in(InvDescDO::getId, collect)).stream().collect(Collectors.toMap(InvDescDO::getId, o -> o, (n1, n2) -> n1));
-            for(InvOrderDO item:invOrderDOPageResult.getList()){
-                InvOrderResp invOrderResp=new InvOrderResp();
-                invOrderResp.setInvOrderDO(item);
-                invOrderResp.setInvDescDO(collect1.get(item.getInvDescId()));
-                ret.add(invOrderResp);
-            }
-        }
-
-        return new PageResult<InvOrderResp>(ret,invOrderDOPageResult.getTotal());
-    }
+//    @Override
+//    public PageResult<YouyouOrderDO> getInvOrderPageOrder(YouyouOrderPageReqVO invOrderPageReqVO) {
+//
+//        PageResult<YouyouOrderDO> invOrderDOPageResult = youyouOrderMapper.selectPage(invOrderPageReqVO);
+//        List<YouyouOrderDO> ret=new ArrayList<>();
+//        if(invOrderDOPageResult.getTotal()>0){
+//            List<Long> collect = invOrderDOPageResult.getList().stream().map(InvOrderDO::getInvDescId).collect(Collectors.toList());
+//            Map<Long, InvDescDO> collect1 = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+//                    .in(InvDescDO::getId, collect)).stream().collect(Collectors.toMap(InvDescDO::getId, o -> o, (n1, n2) -> n1));
+//            for(InvOrderDO item:invOrderDOPageResult.getList()){
+//                InvOrderResp invOrderResp=new InvOrderResp();
+//                invOrderResp.setInvOrderDO(item);
+//                invOrderResp.setInvDescDO(collect1.get(item.getInvDescId()));
+//                ret.add(invOrderResp);
+//            }
+//        }
+//
+//        return new PageResult<YouyouOrderDO>(ret,invOrderDOPageResult.getTotal());
+//    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -461,25 +355,26 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
         PayOrderRespDTO payOrder = validateInvOrderCanPaid(id, payOrderId);
 
         // 更新 PayDemoOrderDO 状态为已支付
-        int updateCount = invOrderMapper.updateByIdAndPayed(id, false,
-                new InvOrderDO().setPayStatus(true).setPayTime(LocalDateTime.now())
+        int updateCount = youyouOrderMapper.updateByIdAndPayed(id, false,
+                new YouyouOrderDO().setPayStatus(true).setPayTime(LocalDateTime.now())
                         .setPayOrderStatus(payOrder.getStatus())
                         .setPayChannelCode(payOrder.getChannelCode()));
         if (updateCount == 0) {
-            throw exception(DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
+            throw exception(ErrorCodeConstants.UU_GOODS_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
-        InvOrderDO invOrderDO = invOrderMapper.selectById(id);
+        YouyouOrderDO youyouOrderDO = youyouOrderMapper.selectById(id);
         //获取专家钱包并进行打款
-        PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(invOrderDO.getSellUserId(), invOrderDO.getSellUserType());
-        payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(invOrderDO.getId()),
-                PayWalletBizTypeEnum.STEAM_CASH, invOrderDO.getPrice());
-        invOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
-        invOrderMapper.updateById(invOrderDO);
-        try{
-            steamService.tradeAsset(invOrderDO);
-        }catch (Exception e){
-            log.info("发货异常{}",e);
-        }
+        PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(youyouOrderDO.getSellUserId(), youyouOrderDO.getSellUserType());
+        payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(youyouOrderDO.getId()),
+                PayWalletBizTypeEnum.STEAM_CASH, youyouOrderDO.getPayAmount());
+        youyouOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
+        youyouOrderMapper.updateById(youyouOrderDO);
+        //todo 发货
+//        try{
+//            steamService.tradeAsset(invOrderDO);
+//        }catch (Exception e){
+//            log.info("发货异常{}",e);
+//        }
 
     }
 
@@ -495,23 +390,23 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
      */
     private PayOrderRespDTO validateInvOrderCanPaid(Long id, Long payOrderId) {
         // 1.1 校验订单是否存在
-        InvOrderDO invOrderDO = invOrderMapper.selectById(id);
-        if (invOrderDO == null) {
+        YouyouOrderDO youyouOrderDO = youyouOrderMapper.selectById(id);
+        if (youyouOrderDO == null) {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_NOT_FOUND);
         }
-        if(invOrderDO.getSellCashStatus().equals(InvSellCashStatusEnum.CASHED.getStatus())){
+        if(youyouOrderDO.getSellCashStatus().equals(InvSellCashStatusEnum.CASHED.getStatus())){
             throw exception(ErrorCodeConstants.INVORDER_ORDER_CASHED_CANNOTREFUND);
         }
         // 1.2 校验订单未支付
-        if (invOrderDO.getPayStatus()) {
+        if (youyouOrderDO.getPayStatus()) {
             log.error("[validateDemoOrderCanPaid][order({}) 不处于待支付状态，请进行处理！order 数据是：{}]",
-                    id, toJsonString(invOrderDO));
+                    id, toJsonString(youyouOrderDO));
             throw exception(ErrorCodeConstants.INVORDER_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
         // 1.3 校验支付订单匹配
-        if (notEqual(invOrderDO.getPayOrderId(), payOrderId)) { // 支付单号
+        if (notEqual(youyouOrderDO.getPayOrderId(), payOrderId)) { // 支付单号
             log.error("[validateDemoOrderCanPaid][order({}) 支付单不匹配({})，请进行处理！order 数据是：{}]",
-                    id, payOrderId, toJsonString(invOrderDO));
+                    id, payOrderId, toJsonString(youyouOrderDO));
             throw exception(ErrorCodeConstants.INVORDER_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR);
         }
 
@@ -528,9 +423,9 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_STATUS_NOT_SUCCESS);
         }
         // 2.3 校验支付金额一致
-        if (notEqual(payOrder.getPrice(), invOrderDO.getPrice())) {
+        if (notEqual(payOrder.getPrice(), youyouOrderDO.getPayAmount())) {
             log.error("[validateDemoOrderCanPaid][order({}) payOrder({}) 支付金额不匹配，请进行处理！order 数据是：{}，payOrder 数据是：{}]",
-                    id, payOrderId, toJsonString(invOrderDO), toJsonString(payOrder));
+                    id, payOrderId, toJsonString(youyouOrderDO), toJsonString(payOrder));
             throw exception(ErrorCodeConstants.INVORDER_ORDER_UPDATE_PAID_FAIL_PAY_PRICE_NOT_MATCH);
         }
         // 2.4 校验支付订单匹配（二次）
@@ -545,56 +440,57 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
     @Override
     public void refundInvOrder(LoginUser loginUser,Long id, String userIp) {
         // 1. 校验订单是否可以退款
-        InvOrderDO invOrderDO = validateInvOrderCanRefund(id,loginUser);
+        YouyouOrderDO youyouOrderDO = validateInvOrderCanRefund(id,loginUser);
 
         // 2.1 生成退款单号
         // 一般来说，用户发起退款的时候，都会单独插入一个售后维权表，然后使用该表的 id 作为 refundId
         // 这里我们是个简单的 demo，所以没有售后维权表，直接使用订单 id + "-refund" 来演示
-        String refundId = invOrderDO.getId() + "-refund";
+        String refundId = youyouOrderDO.getId() + "-refund";
         // 2.2 创建退款单
         Long payRefundId = payRefundApi.createRefund(new PayRefundCreateReqDTO()
                 .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
-                .setMerchantOrderId(String.valueOf(invOrderDO.getId())) // 支付单号
+                .setMerchantOrderId(String.valueOf(youyouOrderDO.getId())) // 支付单号
                 .setMerchantRefundId(refundId)
-                .setReason("想退钱").setPrice(invOrderDO.getPrice()));// 价格信息
+                .setReason("想退钱").setPrice(youyouOrderDO.getPayAmount()));// 价格信息
         // 2.3 更新退款单到 demo 订单
         invOrderMapper.updateById(new InvOrderDO().setId(id)
-                .setPayRefundId(payRefundId).setRefundPrice(invOrderDO.getPrice()));
+                .setPayRefundId(payRefundId).setRefundPrice(youyouOrderDO.getPayAmount()));
         //释放库存
-        SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
-        sellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
-        sellingMapper.updateById(sellingDO);
+//        todo
+//        YouyouGoodslistDO youyouGoodslistDO = youyouGoodslistMapper.selectById(youyouOrderDO.getRealCommodityId());
+////        youyouGoodslistDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
+//        youyouGoodslistMapper.updateById(youyouGoodslistDO);
     }
 
-    private InvOrderDO validateInvOrderCanRefund(Long id,LoginUser loginUser) {
+    private YouyouOrderDO validateInvOrderCanRefund(Long id,LoginUser loginUser) {
         // 校验订单是否存在
-        InvOrderDO invOrderDO = invOrderMapper.selectById(id);
-        if (invOrderDO == null) {
+        YouyouOrderDO youyouOrderDO = youyouOrderMapper.selectById(id);
+        if (youyouOrderDO == null) {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_NOT_FOUND);
         }
-        if(invOrderDO.getSellCashStatus().equals(InvSellCashStatusEnum.CASHED.getStatus())){
+        if(youyouOrderDO.getSellCashStatus().equals(InvSellCashStatusEnum.CASHED.getStatus())){
             throw exception(ErrorCodeConstants.INVORDER_ORDER_CASHED_CANNOTREFUND);
         }
-        if(!invOrderDO.getUserId().equals(loginUser.getId())){
+        if(!youyouOrderDO.getUserId().equals(loginUser.getId())){
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_USER_ERROR);
         }
-        if(!invOrderDO.getUserType().equals(loginUser.getUserType())){
+        if(!youyouOrderDO.getUserType().equals(loginUser.getUserType())){
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_USER_ERROR);
         }
         // 校验订单是否支付
-        if (!invOrderDO.getPayStatus()) {
+        if (!youyouOrderDO.getPayStatus()) {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_NOT_PAID);
         }
         // 校验订单是否已退款
-        if (invOrderDO.getPayRefundId() != null) {
+        if (youyouOrderDO.getPayRefundId() != null) {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUNDED);
         }
         //检查是否已发货
-        TransferMsg transferText = invOrderDO.getTransferText();
-        if(Objects.isNull(transferText) && Objects.isNull(transferText.getTradeofferid())){
-            throw exception(ErrorCodeConstants.INVORDER_ORDER_TRANSFER_ALERY);
-        }
-        return invOrderDO;
+//        TransferMsg transferText = invOrderDO.getTransferText();
+//        if(Objects.isNull(transferText) && Objects.isNull(transferText.getTradeofferid())){
+//            throw exception(ErrorCodeConstants.INVORDER_ORDER_TRANSFER_ALERY);
+//        }
+        return youyouOrderDO;
     }
 
     @Override
@@ -608,14 +504,14 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
 
     private PayRefundRespDTO validateInvOrderCanRefunded(Long id, Long payRefundId) {
         // 1.1 校验示例订单
-        InvOrderDO invOrderDO = invOrderMapper.selectById(id);
-        if (invOrderDO == null) {
+        YouyouOrderDO youyouOrderDO = youyouOrderMapper.selectById(id);
+        if (youyouOrderDO == null) {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_NOT_FOUND);
         }
         // 1.2 校验退款订单匹配
-        if (Objects.equals(invOrderDO.getPayRefundId(), payRefundId)) {
+        if (Objects.equals(youyouOrderDO.getPayRefundId(), payRefundId)) {
             log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！order 数据是：{}]",
-                    id, payRefundId, toJsonString(invOrderDO));
+                    id, payRefundId, toJsonString(youyouOrderDO));
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
         }
 
@@ -629,9 +525,9 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_NOT_SUCCESS);
         }
         // 2.3 校验退款金额一致
-        if (notEqual(payRefund.getRefundPrice(), invOrderDO.getPrice())) {
+        if (notEqual(payRefund.getRefundPrice(), youyouOrderDO.getPayAmount())) {
             log.error("[validateDemoOrderCanRefunded][order({}) payRefund({}) 退款金额不匹配，请进行处理！order 数据是：{}，payRefund 数据是：{}]",
-                    id, payRefundId, toJsonString(invOrderDO), toJsonString(payRefund));
+                    id, payRefundId, toJsonString(youyouOrderDO), toJsonString(payRefund));
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_PRICE_NOT_MATCH);
         }
         // 2.4 校验退款订单匹配（二次）
