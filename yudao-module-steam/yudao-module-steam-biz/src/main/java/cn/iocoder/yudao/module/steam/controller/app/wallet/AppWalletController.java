@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreat
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
+import cn.iocoder.yudao.module.steam.service.fin.YouYouOrderService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,6 +37,9 @@ public class AppWalletController {
 
     @Resource
     private PaySteamOrderService paySteamOrderService;
+
+    @Resource
+    private YouYouOrderService youYouOrderService;
 
     /**
      * 创建提现订单
@@ -78,6 +82,29 @@ public class AppWalletController {
         PageResult<InvOrderResp> invOrderPageOrder = paySteamOrderService.getInvOrderPageOrder(invOrderPageReqVO);
         return CommonResult.success(invOrderPageOrder);
     }
+    //youping
+
+    @PostMapping("/uu/update-paid")
+    @Operation(summary = "更新示例订单为已支付") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
+    @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
+    @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
+    public CommonResult<Boolean> updateOrderPaid(@RequestBody PayOrderNotifyReqDTO notifyReqDTO) {
+        youYouOrderService.updateInvOrderPaid(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
+                notifyReqDTO.getPayOrderId());
+        return success(true);
+    }
+
+
+    @PostMapping("/uu/update-refunded")
+    @Operation(summary = "更新示例订单为已退款") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
+    @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
+    @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
+    public CommonResult<Boolean> updateUUOrderRefunded(@RequestBody PayRefundNotifyReqDTO notifyReqDTO) {
+        youYouOrderService.updateInvOrderRefunded(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
+                notifyReqDTO.getPayRefundId());
+        return success(true);
+    }
+    //有品结束
     @PostMapping("/update-paid")
     @Operation(summary = "更新示例订单为已支付") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
     @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
