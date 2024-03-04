@@ -17,6 +17,9 @@ import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.*;
+import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByIdRespVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByTemplateRespVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiCheckTradeUrlReSpVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiPayWalletRespVO;
@@ -25,9 +28,11 @@ import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreat
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
+import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.service.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
+import cn.iocoder.yudao.module.steam.service.fin.YouYouOrderService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.TradeUrlStatus;
 import cn.iocoder.yudao.module.steam.utils.DevAccountContextHolder;
@@ -82,6 +87,9 @@ public class AppApiController {
     @Resource
     private PayOrderService payOrderService;
 
+    @Autowired
+    private YouYouOrderService youYouOrderService;
+
     /**
      * api余额接口
      * @return
@@ -89,10 +97,10 @@ public class AppApiController {
     @PostMapping("v1/api/getAssetsInfo")
     @Operation(summary = "余额查询")
     @PermitAll
-    public ApiResult<ApiPayWalletRespVO> getAssetsInfo(@RequestBody  OpenYoupinApiReqVo<Serializable> openYoupinApiReqVo) {
+    public ApiResult<ApiPayWalletRespVO> getAssetsInfo(@RequestBody  OpenYoupinApiReqVo<Serializable> openApiReqVo) {
         try {
             ApiResult<ApiPayWalletRespVO> execute = DevAccountUtils.tenantExecute(1l, () -> {
-                DevAccountDO devAccount = openApiService.apiCheck(openYoupinApiReqVo);
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 PayWalletDO wallet = payWalletService.getOrCreateWallet(devAccount.getUserId(), devAccount.getUserType());
                 ApiPayWalletRespVO apiPayWalletRespVO=new ApiPayWalletRespVO();
                 apiPayWalletRespVO.setAmount(new BigDecimal(wallet.getBalance().toString()).divide(new BigDecimal("100"),2,BigDecimal.ROUND_HALF_UP));
@@ -111,13 +119,13 @@ public class AppApiController {
     @PostMapping("v1/api/checkTradeUrl")
     @Operation(summary = "验证交易链接")
     @PermitAll
-    public ApiResult<ApiCheckTradeUrlReSpVo> checkTradeUrl(@RequestBody  OpenYoupinApiReqVo<ApiCheckTradeUrlReqVo> openYoupinApiReqVo) {
+    public ApiResult<ApiCheckTradeUrlReSpVo> checkTradeUrl(@RequestBody  OpenYoupinApiReqVo<ApiCheckTradeUrlReqVo> openApiReqVo) {
         try {
             ApiResult<ApiCheckTradeUrlReSpVo> execute = DevAccountUtils.tenantExecute(1l, () -> {
-                DevAccountDO devAccount = openApiService.apiCheck(openYoupinApiReqVo);
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                         .eq(BindUserDO::getUserId, devAccount.getUserId())
-                        .ne(BindUserDO::getTradeUrl,openYoupinApiReqVo.getData().getTradeLinks())
+                        .ne(BindUserDO::getTradeUrl,openApiReqVo.getData().getTradeLinks())
                         .eq(BindUserDO::getUserType, devAccount.getUserType())).stream().findFirst();
                 if(!first.isPresent()){
                     throw new ServiceException(-1,"没有检测机器人");
@@ -126,9 +134,9 @@ public class AppApiController {
                 SteamWeb steamWeb=new SteamWeb(configService);
                 steamWeb.login(bindUserDO.getSteamPassword(),bindUserDO.getMaFile());
                 steamWeb.initTradeUrl();
-                TradeUrlStatus tradeUrlStatus = steamWeb.checkTradeUrl(openYoupinApiReqVo.getData().getTradeLinks());
+                TradeUrlStatus tradeUrlStatus = steamWeb.checkTradeUrl(openApiReqVo.getData().getTradeLinks());
                 SteamWeb steamWeb1=new SteamWeb(configService);
-                URI uri = URI.create(openYoupinApiReqVo.getData().getTradeLinks());
+                URI uri = URI.create(openApiReqVo.getData().getTradeLinks());
                 String query = uri.getQuery();
                 Map<String, String> stringStringMap = steamWeb1.parseQuery(query);
                 String partner = steamWeb1.toCommunityID(stringStringMap.get("partner"));
@@ -144,7 +152,76 @@ public class AppApiController {
             return ApiResult.error(e.getCode(),  e.getMessage(),ApiCheckTradeUrlReSpVo.class);
         }
     }
+    /**
+     * 指定商品购买
+     * @return
+     */
+    @PostMapping("v1/api/byGoodsIdCreateOrder")
+    @Operation(summary = "指定商品购买")
+    @PermitAll
+    public ApiResult<CreateByIdRespVo> byGoodsIdCreateOrder(@RequestBody  OpenYoupinApiReqVo<CreateReqVo> openApiReqVo) {
+        try {
+            ApiResult<CreateByIdRespVo> execute = DevAccountUtils.tenantExecute(1l, () -> {
+                if(Objects.isNull(openApiReqVo.getData().getCommodityHashName()) || Objects.isNull(openApiReqVo.getData().getCommodityTemplateId())){
+                    throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
+                }
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1l);
+                CreateOrderResult invOrder = youYouOrderService.createInvOrder(loginUser, openApiReqVo.getData());
 
+
+//                Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+//                        .eq(BindUserDO::getUserId, devAccount.getUserId())
+//                        .ne(BindUserDO::getTradeUrl,openApiReqVo.getData().getTradeLinks())
+//                        .eq(BindUserDO::getUserType, devAccount.getUserType())).stream().findFirst();
+//                if(!first.isPresent()){
+//                    throw new ServiceException(-1,"没有检测机器人");
+//                }
+//                BindUserDO bindUserDO = first.get();
+//                SteamWeb steamWeb=new SteamWeb(configService);
+//                steamWeb.login(bindUserDO.getSteamPassword(),bindUserDO.getMaFile());
+//                steamWeb.initTradeUrl();
+//                TradeUrlStatus tradeUrlStatus = steamWeb.checkTradeUrl(openApiReqVo.getData().getTradeLinks());
+//                SteamWeb steamWeb1=new SteamWeb(configService);
+//                URI uri = URI.create(openApiReqVo.getData().getTradeLinks());
+//                String query = uri.getQuery();
+//                Map<String, String> stringStringMap = steamWeb1.parseQuery(query);
+//                String partner = steamWeb1.toCommunityID(stringStringMap.get("partner"));
+//
+//                ApiCheckTradeUrlReSpVo tradeUrlReSpVo=new ApiCheckTradeUrlReSpVo();
+//                tradeUrlReSpVo.setSteamId(partner);
+//                tradeUrlReSpVo.setMsg(tradeUrlStatus.getMessage());
+//                tradeUrlReSpVo.setStatus(tradeUrlStatus.getStatus());
+                return ApiResult.success(null);
+            });
+            return execute;
+        } catch (ServiceException e) {
+            return ApiResult.error(e.getCode(),  e.getMessage(),CreateByIdRespVo.class);
+        }
+    }
+    /**
+     * 指定模板购买
+     * @return
+     */
+    @PostMapping("v1/api/byTemplateCreateOrder")
+    @Operation(summary = "指定模板购买")
+    @PermitAll
+    public ApiResult<CreateByTemplateRespVo> byTemplateCreateOrder(@RequestBody  OpenYoupinApiReqVo<CreateReqVo> openApiReqVo) {
+        try {
+            ApiResult<CreateByTemplateRespVo> execute = DevAccountUtils.tenantExecute(1l, () -> {
+                if(Objects.isNull(openApiReqVo.getData().getCommodityId())){
+                    throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
+                }
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1l);
+                youYouOrderService.createInvOrder(loginUser,openApiReqVo.getData());
+                return ApiResult.success(null);
+            });
+            return execute;
+        } catch (ServiceException e) {
+            return ApiResult.error(e.getCode(),  e.getMessage(),CreateByTemplateRespVo.class);
+        }
+    }
     @PostMapping("/createInvOrder")
     @Operation(summary = "创建库存订单")
     public CommonResult<AppPayOrderSubmitRespVO> createInvOrder(@Valid @RequestBody PaySteamOrderCreateReqVO createReqVO) {
