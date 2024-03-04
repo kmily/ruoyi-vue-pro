@@ -99,7 +99,7 @@ public class YouyouGoodslistServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testDeleteYouyouGoodslist_notExists() {
         // 准备参数
-        Integer id = randomIntegerId();
+        Integer id = 1;
 
         // 调用, 并断言异常
         assertServiceException(() -> youyouGoodslistService.deleteYouyouGoodslist(id), YOUYOU_GOODSLIST_NOT_EXISTS);

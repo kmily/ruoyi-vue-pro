@@ -248,7 +248,7 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
         return youyouOrderDO;
     }
     private YouyouOrderDO validateInvOrderCanCreate(YouyouOrderDO youyouOrderDO) {
-        if(Objects.isNull(youyouOrderDO.getCommodityHashName()) || Objects.isNull(youyouOrderDO.getCommodityTemplateId())|| Objects.isNull(youyouOrderDO.getCommodityId())){
+        if(Objects.isNull(youyouOrderDO.getCommodityHashName()) && Objects.isNull(youyouOrderDO.getCommodityTemplateId()) && Objects.isNull(youyouOrderDO.getCommodityId())){
             throw exception(ErrorCodeConstants.UU_GOODS_ERR);
         }
         if(Objects.isNull(youyouOrderDO.getCommodityId())){//指定ID购买
