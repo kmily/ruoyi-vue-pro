@@ -52,7 +52,17 @@ import java.util.stream.Collectors;
 public class OpenApiService<T extends Serializable> {
     @Resource
     private DevAccountService accountService;
+    private Validator validator;
+
+    @Autowired
+    public void setValidator(Validator validator) {
+        this.validator = validator;
+    }
     public DevAccountDO apiCheck(OpenYoupinApiReqVo<T> openApiReqVo) {
+        Set<ConstraintViolation<OpenYoupinApiReqVo<T>>> validate = validator.validate(openApiReqVo);
+        if(!validate.isEmpty()){
+            throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
+        }
         DevAccountDO devAccountDO = accountService.selectByUserName(openApiReqVo.getAppKey(), UserTypeEnum.MEMBER);
         if(Objects.isNull(devAccountDO)){
             throw new ServiceException(OpenApiCode.ID_ERROR);
