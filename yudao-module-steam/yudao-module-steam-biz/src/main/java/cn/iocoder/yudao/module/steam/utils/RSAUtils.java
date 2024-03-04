@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.steam.utils;
 
-import cn.iocoder.yudao.module.steam.controller.app.vo.ApiCheckTradeUrlReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.chanjar.weixin.common.util.RandomUtils;
