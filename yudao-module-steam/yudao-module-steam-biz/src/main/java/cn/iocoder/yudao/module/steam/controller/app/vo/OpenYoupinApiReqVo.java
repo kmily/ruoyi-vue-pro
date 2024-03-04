@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.ToString;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
@@ -22,6 +23,7 @@ public class OpenYoupinApiReqVo<T extends Serializable> {
     @NotNull(message = "API输入参数签名结果不能为空")
     private String sign;
     @JsonUnwrapped
+    @Valid
     private T data;
 }
 

@@ -52,18 +52,6 @@ import java.util.stream.Collectors;
 public class OpenApiService<T extends Serializable> {
     @Resource
     private DevAccountService accountService;
-
-    private ObjectMapper objectMapper;
-    private Validator validator;
-
-    @Autowired
-    public void setValidator(Validator validator) {
-        this.validator = validator;
-    }
-    @Autowired
-    public void setObjectMapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
     public DevAccountDO apiCheck(OpenYoupinApiReqVo<T> openApiReqVo) {
         DevAccountDO devAccountDO = accountService.selectByUserName(openApiReqVo.getAppKey(), UserTypeEnum.MEMBER);
         if(Objects.isNull(devAccountDO)){

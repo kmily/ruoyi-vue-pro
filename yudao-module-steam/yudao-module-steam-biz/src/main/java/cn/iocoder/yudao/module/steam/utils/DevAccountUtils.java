@@ -18,6 +18,7 @@ public class DevAccountUtils {
      * @param devAccountDO 租户编号
      * @param runnable 逻辑
      */
+    @Deprecated
     public static void execute(DevAccountDO devAccountDO, Runnable runnable) {
         try {
             DevAccountContextHolder.setDevAccount(devAccountDO);
@@ -37,6 +38,7 @@ public class DevAccountUtils {
      * @param devAccountDO 租户编号
      * @param callable 逻辑
      */
+    @Deprecated
     public static <V> V execute(DevAccountDO devAccountDO, Callable<V> callable) {
         try {
             DevAccountContextHolder.setDevAccount(devAccountDO);
