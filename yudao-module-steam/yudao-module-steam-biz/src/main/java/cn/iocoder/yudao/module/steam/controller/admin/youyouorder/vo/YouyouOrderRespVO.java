@@ -103,4 +103,16 @@ public class YouyouOrderRespVO {
     @ExcelProperty("实际商品ID")
     private String realCommodityId;
 
+    @Schema(description = "有品订单号")
+    @ExcelProperty("有品订单号")
+    private String uuOrderNo;
+
+    @Schema(description = "有品商户订单号")
+    @ExcelProperty("有品商户订单号")
+    private String uuMerchantOrderNo;
+
+    @Schema(description = "交易状态 0,成功；2,失败。", example = "2")
+    @ExcelProperty("交易状态 0,成功；2,失败。")
+    private Integer uuOrderStatus;
+
 }

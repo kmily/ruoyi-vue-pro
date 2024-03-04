@@ -38,6 +38,9 @@ public interface YouyouOrderMapper extends BaseMapperX<YouyouOrderDO> {
                 .eqIfPresent(YouyouOrderDO::getCommodityId, reqVO.getCommodityId())
                 .eqIfPresent(YouyouOrderDO::getPurchasePrice, reqVO.getPurchasePrice())
                 .eqIfPresent(YouyouOrderDO::getRealCommodityId, reqVO.getRealCommodityId())
+                .eqIfPresent(YouyouOrderDO::getUuOrderNo, reqVO.getUuOrderNo())
+                .eqIfPresent(YouyouOrderDO::getUuMerchantOrderNo, reqVO.getUuMerchantOrderNo())
+                .eqIfPresent(YouyouOrderDO::getUuOrderStatus, reqVO.getUuOrderStatus())
                 .orderByDesc(YouyouOrderDO::getId));
     }
 

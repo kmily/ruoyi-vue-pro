@@ -129,6 +129,9 @@ public class YouyouOrderServiceImplTest extends BaseDbUnitTest {
            o.setCommodityId(null);
            o.setPurchasePrice(null);
            o.setRealCommodityId(null);
+           o.setUuOrderNo(null);
+           o.setUuMerchantOrderNo(null);
+           o.setUuOrderStatus(null);
        });
        youyouOrderMapper.insert(dbYouyouOrder);
        // 测试 payStatus 不匹配
@@ -169,6 +172,12 @@ public class YouyouOrderServiceImplTest extends BaseDbUnitTest {
        youyouOrderMapper.insert(cloneIgnoreId(dbYouyouOrder, o -> o.setPurchasePrice(null)));
        // 测试 realCommodityId 不匹配
        youyouOrderMapper.insert(cloneIgnoreId(dbYouyouOrder, o -> o.setRealCommodityId(null)));
+       // 测试 uuOrderNo 不匹配
+       youyouOrderMapper.insert(cloneIgnoreId(dbYouyouOrder, o -> o.setUuOrderNo(null)));
+       // 测试 uuMerchantOrderNo 不匹配
+       youyouOrderMapper.insert(cloneIgnoreId(dbYouyouOrder, o -> o.setUuMerchantOrderNo(null)));
+       // 测试 uuOrderStatus 不匹配
+       youyouOrderMapper.insert(cloneIgnoreId(dbYouyouOrder, o -> o.setUuOrderStatus(null)));
        // 准备参数
        YouyouOrderPageReqVO reqVO = new YouyouOrderPageReqVO();
        reqVO.setPayStatus(null);
@@ -190,6 +199,9 @@ public class YouyouOrderServiceImplTest extends BaseDbUnitTest {
        reqVO.setCommodityId(null);
        reqVO.setPurchasePrice(null);
        reqVO.setRealCommodityId(null);
+       reqVO.setUuOrderNo(null);
+       reqVO.setUuMerchantOrderNo(null);
+       reqVO.setUuOrderStatus(null);
 
        // 调用
        PageResult<YouyouOrderDO> pageResult = youyouOrderService.getYouyouOrderPage(reqVO);

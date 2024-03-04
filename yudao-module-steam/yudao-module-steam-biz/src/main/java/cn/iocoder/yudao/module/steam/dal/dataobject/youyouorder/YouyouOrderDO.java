@@ -123,5 +123,17 @@ public class YouyouOrderDO extends BaseDO {
      * 极速发货购买模式0：优先购买极速发货；1：只购买极速发货
      */
     private Integer fastShipping;
+    /**
+     * 有品订单号
+     */
+    private String uuOrderNo;
+    /**
+     * 有品商户订单号
+     */
+    private String uuMerchantOrderNo;
+    /**
+     * 交易状态 0,成功；2,失败。
+     */
+    private Integer uuOrderStatus;
 
 }

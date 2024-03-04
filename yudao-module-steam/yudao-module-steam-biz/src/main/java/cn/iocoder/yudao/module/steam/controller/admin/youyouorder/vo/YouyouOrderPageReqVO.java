@@ -75,4 +75,13 @@ public class YouyouOrderPageReqVO extends PageParam {
     @Schema(description = "实际商品ID", example = "11462")
     private String realCommodityId;
 
+    @Schema(description = "有品订单号")
+    private String uuOrderNo;
+
+    @Schema(description = "有品商户订单号")
+    private String uuMerchantOrderNo;
+
+    @Schema(description = "交易状态 0,成功；2,失败。", example = "2")
+    private Integer uuOrderStatus;
+
 }
