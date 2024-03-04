@@ -33,7 +33,8 @@
       </el-form-item>
       <el-form-item label="用户类型" prop="userType">
         <el-select v-model="queryParams.userType" placeholder="请选择用户类型" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.USER_TYPE)"
+                       :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="发货信息 json" prop="transferText">
@@ -79,6 +80,20 @@
           <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
+      <el-form-item label="收款状态" prop="sellCashStatus">
+        <el-select v-model="queryParams.sellCashStatus" placeholder="请选择收款状态" clearable size="small">
+          <el-option label="请选择字典生成" value="" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="卖家用户ID" prop="sellUserId">
+        <el-input v-model="queryParams.sellUserId" placeholder="请输入卖家用户ID" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="卖家用户类型" prop="sellUserType">
+        <el-select v-model="queryParams.sellUserType" placeholder="请选择卖家用户类型" clearable size="small">
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.USER_TYPE)"
+                       :key="dict.value" :label="dict.label" :value="dict.value"/>
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -122,7 +137,11 @@
         </template>
       </el-table-column>
       <el-table-column label="用户编号" align="center" prop="userId" />
-      <el-table-column label="用户类型" align="center" prop="userType" />
+      <el-table-column label="用户类型" align="center" prop="userType">
+        <template v-slot="scope">
+          <dict-tag :type="DICT_TYPE.USER_TYPE" :value="scope.row.userType" />
+        </template>
+      </el-table-column>
       <el-table-column label="发货信息 json" align="center" prop="transferText" />
       <el-table-column label="发货状态" align="center" prop="transferStatus" />
       <el-table-column label="商户订单号" align="center" prop="merchantOrderNo" />
@@ -136,6 +155,13 @@
       <el-table-column label="有品订单号" align="center" prop="uuOrderNo" />
       <el-table-column label="有品商户订单号" align="center" prop="uuMerchantOrderNo" />
       <el-table-column label="交易状态 0,成功；2,失败。" align="center" prop="uuOrderStatus" />
+      <el-table-column label="收款状态" align="center" prop="sellCashStatus" />
+      <el-table-column label="卖家用户ID" align="center" prop="sellUserId" />
+      <el-table-column label="卖家用户类型" align="center" prop="sellUserType">
+        <template v-slot="scope">
+          <dict-tag :type="DICT_TYPE.USER_TYPE" :value="scope.row.sellUserType" />
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
@@ -205,6 +231,9 @@ export default {
         uuOrderNo: null,
         uuMerchantOrderNo: null,
         uuOrderStatus: null,
+        sellCashStatus: null,
+        sellUserId: null,
+        sellUserType: null,
       },
             };
   },
@@ -261,4 +290,4 @@ export default {
     },
               }
 };
-</script>
+</script>

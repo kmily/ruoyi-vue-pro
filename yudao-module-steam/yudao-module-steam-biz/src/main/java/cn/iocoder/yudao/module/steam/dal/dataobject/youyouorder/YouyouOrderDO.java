@@ -67,6 +67,8 @@ public class YouyouOrderDO extends BaseDO {
     private Long userId;
     /**
      * 用户类型
+     *
+     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.UserTypeEnum 对应的类}
      */
     private Integer userType;
     /**
@@ -80,7 +82,7 @@ public class YouyouOrderDO extends BaseDO {
     /**
      * 订单支付状态
      *
-     * 枚举 {@link TODO pay_order_status 对应的类}
+     * 枚举 {@link cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum 对应的类}
      */
     private Integer payOrderStatus;
     /**
@@ -135,5 +137,19 @@ public class YouyouOrderDO extends BaseDO {
      * 交易状态 0,成功；2,失败。
      */
     private Integer uuOrderStatus;
+    /**
+     * 收款状态
+     */
+    private Integer sellCashStatus;
+    /**
+     * 卖家用户ID
+     */
+    private Long sellUserId;
+    /**
+     * 卖家用户类型
+     *
+     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.UserTypeEnum 对应的类}
+     */
+    private Integer sellUserType;
 
 }
