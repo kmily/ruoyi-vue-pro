@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * 指定商品购买入参
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CreateByIdReqVo {
+public class CreateReqVo implements Serializable {
 
     /**
      * 商户订单号
@@ -23,6 +25,16 @@ public class CreateByIdReqVo {
     @JsonProperty("tradeLinks")
     private String tradeLinks;
     /**
+     * 商品模版ID
+     */
+    @JsonProperty("commodityTemplateId")
+    private String commodityTemplateId;
+    /**
+     * 模板hashname
+     */
+    @JsonProperty("commodityHashName")
+    private String commodityHashName;
+    /**
      * 商品ID
      * 不可为0
      */
@@ -34,5 +46,11 @@ public class CreateByIdReqVo {
      */
     @JsonProperty("purchasePrice")
     private String purchasePrice;
+    /**
+     * 极速发货购买模式
+     * 0：优先购买极速发货；1：只购买极速发货
+     */
+    @JsonProperty("fastShipping")
+    private Integer fastShipping;
 
 }

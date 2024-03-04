@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
@@ -24,11 +25,13 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal.WithdrawalDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
@@ -42,6 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -96,6 +100,9 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
     private InvDescMapper invDescMapper;
     @Autowired
     private PayWalletService payWalletService;
+
+    @Resource
+    private YouyouOrderMapper youyouOrderMapper;
 
 
     public YouYouOrderServiceImpl() {
@@ -210,7 +217,113 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
         }
         return payOrder;
     }
+
     @Override
+    public CreateOrderResult createInvOrder(LoginUser loginUser, CreateReqVo createReqVO) {
+        CreateOrderResult createOrderResult=new CreateOrderResult();
+        BigDecimal bigDecimal = new BigDecimal(createReqVO.getPurchasePrice());
+        YouyouOrderDO youyouOrderDO=new YouyouOrderDO()
+                .setUserId(loginUser.getId()).setUserType(loginUser.getUserType())
+                .setPayOrderStatus(PayOrderStatusEnum.WAITING.getStatus())
+                .setMerchantOrderNo(createReqVO.getMerchantOrderNo())
+                .setTradeLinks(createReqVO.getTradeLinks())
+                .setCommodityId(createReqVO.getCommodityId()).setCommodityHashName(createReqVO.getCommodityHashName()).setCommodityTemplateId(createReqVO.getCommodityTemplateId())
+                .setPurchasePrice(createReqVO.getPurchasePrice())
+                .setPayAmount(bigDecimal.multiply(new BigDecimal("100")).intValue())
+                .setPayStatus(false).setRefundPrice(0);
+        validateInvOrderCanCreate(youyouOrderDO);
+        youyouOrderMapper.insert(youyouOrderDO);
+//        // 2.1 创建支付单
+        Long payOrderId = payOrderApi.createOrder(new PayOrderCreateReqDTO()
+                .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
+                .setMerchantOrderId(youyouOrderDO.getId().toString()) // 业务的订单编号
+                .setSubject("购买").setBody("出售编号："+createReqVO.getCommodityId()).setPrice(youyouOrderDO.getPayAmount()) // 价格信息
+                .setExpireTime(addTime(Duration.ofHours(2L)))); // 支付的过期时间
+//        // 2.2 更新支付单到 demo 订单
+        youyouOrderMapper.updateById(new YouyouOrderDO().setId(youyouOrderDO.getId())
+                .setPayOrderId(payOrderId));
+//        //更新库存的标识
+//        sellingDO.setTransferStatus(InvTransferStatusEnum.INORDER.getStatus());
+//        sellingMapper.updateById(sellingDO);
+//        // 返回
+        createOrderResult.setBizOrderId(youyouOrderDO.getId());
+        createOrderResult.setPayOrderId(payOrderId);
+        return createOrderResult;
+    }
+    private YouyouOrderDO validateInvOrderCanCreate(YouyouOrderDO youyouOrderDO) {
+        //todo check
+//        SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
+////        //校验订单是否存在
+//        if (sellingDO == null) {
+//            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
+//        }
+//        if(CommonStatusEnum.isDisable(sellingDO.getStatus())){
+//            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
+//        }
+//        if(CommonStatusEnum.isDisable(sellingDO.getStatus())){
+//            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
+//        }
+//        if(Objects.isNull(sellingDO.getBindUserId())){
+//            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
+//        }
+//        if(invOrderDO.getUserId().equals(sellingDO.getUserId()) && invOrderDO.getUserType().equals(sellingDO.getUserType())){
+//            throw exception(ErrorCodeConstants.INVORDER_ORDERUSER_EXCEPT);
+//        }
+//        //检查是否可交易
+//        Optional<InvDescDO> first1 = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+//                .eq(InvDescDO::getClassid, sellingDO.getClassid())
+//                .eq(InvDescDO::getInstanceid, sellingDO.getInstanceid())
+//                .eq(InvDescDO::getAppid, sellingDO.getAppid())
+//        ).stream().findFirst();
+//        if(!first1.isPresent()){
+//            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
+//        }
+//        InvDescDO invDescDO = first1.get();
+//        if(invDescDO.getTradable().intValue()!=1){
+//            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
+//        }
+//
+//        //库存状态为没有订单
+//        if(!InvTransferStatusEnum.SELL.getStatus().equals(sellingDO.getTransferStatus())){
+//            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
+//        }
+//        //使用库存的价格进行替换
+//        invOrderDO.setPrice(sellingDO.getPrice());
+//
+//
+//        //检查是否已经下过单
+//        List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
+//                        .eq(InvOrderDO::getSellId, sellingDO.getId())
+////                .eq(InvOrderDO::getPayStatus, 1)
+//                        .isNull(InvOrderDO::getPayRefundId)
+//        );
+//        if(invOrderDOS.size()>0){
+//            throw exception(ErrorCodeConstants.INVORDER_ORDERED_EXCEPT);
+//        }
+//        // 校验订单是否支付
+//        if (Objects.isNull(invOrderDO.getPrice()) || invOrderDO.getPrice()<=0) {
+//            throw exception(ErrorCodeConstants.INVORDER_AMOUNT_EXCEPT);
+//        }
+//        // 校验订单是否支付
+//        if (invOrderDO.getPayStatus()) {
+//            throw exception(ErrorCodeConstants.INVORDER_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
+//        }
+//        //检查用户steamID是否正确只检查bindUser
+//        Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+//                .eq(BindUserDO::getUserId, invOrderDO.getUserId())
+//                .eq(BindUserDO::getUserType, invOrderDO.getUserType())
+//                .eq(BindUserDO::getSteamId, invOrderDO.getSteamId())
+//        ).stream().findFirst();
+//        if(!first.isPresent()){
+//            throw exception(ErrorCodeConstants.INVORDER_BIND_STEAM_EXCEPT);
+//        }
+//        BindUserDO bindUserDO = first.get();
+//        if(Objects.isNull(bindUserDO.getSteamPassword())){
+//            throw exception(ErrorCodeConstants.INVORDER_BIND_STEAM_EXCEPT);
+//        }
+        return youyouOrderDO;
+    }
+
     public CreateOrderResult createInvOrder(LoginUser loginUser, PaySteamOrderCreateReqVO createReqVO) {
         CreateOrderResult createOrderResult=new CreateOrderResult();
         SellingDO sellingDO = sellingMapper.selectById(createReqVO.getSellId());
