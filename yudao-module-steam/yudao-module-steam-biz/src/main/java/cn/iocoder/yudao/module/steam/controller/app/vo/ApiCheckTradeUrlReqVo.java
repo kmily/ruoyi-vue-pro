@@ -10,5 +10,5 @@ import java.io.Serializable;
 public class ApiCheckTradeUrlReqVo implements Serializable {
     @Schema(description = "交易链接", example = "https://steamcommunity.com/tradeoffer/new/?partner=111&token=222")
     @NotNull(message = "交易链接不能为空")
-    private String tradeUrl;
+    private String tradeLinks;
 }

@@ -429,7 +429,7 @@ public class RSAUtils {
 //        公钥string：MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmvE8txAFMn/aKzyzE7+68s2LZOhdfaE1GrSzvDgW32klcGSP9j2YkugkErglxjoKEhuyn+8Dz4YNm4Fr1Ri9ScmSPywZcXDJSzEtxnl95vECcZJLd95vPSJj8HKCK06LWCahzF/GslvhWe2poYA1OGtEjDU0dwTtSIzXroTSwPIEiQ8CJrJW93OY6D/Qxd6dMA0sTvahcx6IMMI7fYxVr/bn082Z2pye7GX5sLfrBSFVAl5klODPYF+DrjCwgumEesS9Hd6t/IajYYxFtwXzSgXnrK0SbEoCZDvwE2/A7tUkLeXC2v98FJMHXyzqANZXJk63OgTJvtDTTONJmbzeNwIDAQAB
         ObjectMapper objectMapper=new ObjectMapper();
         ApiCheckTradeUrlReqVo test=new ApiCheckTradeUrlReqVo();
-        test.setTradeUrl("https://steamcommunity.com/tradeoffer/new/?partner=66353311&token=EOt4K8X5");
+        test.setTradeLinks("https://steamcommunity.com/tradeoffer/new/?partner=66353311&token=EOt4K8X5");
 //        test.setBindUserId(124);
 //        test.setName("china");
         String glzaboy = encryptByPublicKey(objectMapper.writeValueAsString(test), "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmvE8txAFMn/aKzyzE7+68s2LZOhdfaE1GrSzvDgW32klcGSP9j2YkugkErglxjoKEhuyn+8Dz4YNm4Fr1Ri9ScmSPywZcXDJSzEtxnl95vECcZJLd95vPSJj8HKCK06LWCahzF/GslvhWe2poYA1OGtEjDU0dwTtSIzXroTSwPIEiQ8CJrJW93OY6D/Qxd6dMA0sTvahcx6IMMI7fYxVr/bn082Z2pye7GX5sLfrBSFVAl5klODPYF+DrjCwgumEesS9Hd6t/IajYYxFtwXzSgXnrK0SbEoCZDvwE2/A7tUkLeXC2v98FJMHXyzqANZXJk63OgTJvtDTTONJmbzeNwIDAQAB");
