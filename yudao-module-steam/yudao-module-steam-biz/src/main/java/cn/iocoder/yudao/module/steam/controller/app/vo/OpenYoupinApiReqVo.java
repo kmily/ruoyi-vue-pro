@@ -27,11 +27,5 @@ public class OpenYoupinApiReqVo<T extends Serializable> {
     private T data;
 
 
-    // lgm
-    @Schema(description = "templateId 和 hashName 二选一必传递，同时传入以templateId为准，如传入不可为0，不可为空")
-//    @NotNull(message = "API输入参数签名结果不能为空")
-    private String templateId;
-    @Schema(description = "templateId 和 hashName 二选一必传递，同时传入以templateId为准，如传入不可为0，不可为空")
-    private String templateHashName;
 }
 
