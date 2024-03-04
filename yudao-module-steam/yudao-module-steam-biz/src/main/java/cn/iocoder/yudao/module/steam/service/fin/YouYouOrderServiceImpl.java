@@ -402,7 +402,7 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
      * @return
      */
     private YouPingOrder uploadYY(YouyouOrderDO youyouOrderDO){
-        ConfigDO configApiKey = configService.getConfigByKey("uu.apiKey");
+        ConfigDO configApiKey = configService.getConfigByKey("uu.appKey");
         ConfigDO configByKey = configService.getConfigByKey("uu.key1");
         ConfigDO configByKey2 = configService.getConfigByKey("uu.key2");
         ConfigDO configByKey3 = configService.getConfigByKey("uu.key3");
