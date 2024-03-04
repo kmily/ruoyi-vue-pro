@@ -1,8 +1,11 @@
 package cn.iocoder.yudao.module.steam.service.fin;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
+import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
@@ -15,6 +18,7 @@ import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
+import cn.iocoder.yudao.module.steam.controller.app.vo.OpenYoupinApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
@@ -26,8 +30,11 @@ import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyougoodslist.YouyouGoodslistMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.steam.service.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum;
+import cn.iocoder.yudao.module.steam.service.steam.YouPingOrder;
+import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,8 +43,10 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -86,6 +95,9 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
     private InvOrderMapper invOrderMapper;
     @Resource
     private WithdrawalMapper withdrawalMapper;
+
+    @Resource
+    private ConfigService configService;
 
 
 
@@ -372,19 +384,55 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
             throw exception(ErrorCodeConstants.UU_GOODS_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
         YouyouOrderDO youyouOrderDO = youyouOrderMapper.selectById(id);
-        //获取专家钱包并进行打款
-        PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(youyouOrderDO.getSellUserId(), youyouOrderDO.getSellUserType());
-        payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(youyouOrderDO.getId()),
-                PayWalletBizTypeEnum.STEAM_CASH, youyouOrderDO.getPayAmount());
-        youyouOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
-        youyouOrderMapper.updateById(youyouOrderDO);
-        //todo 发货
-//        try{
-//            steamService.tradeAsset(invOrderDO);
-//        }catch (Exception e){
-//            log.info("发货异常{}",e);
-//        }
+        YouPingOrder youPingOrder = uploadYY(youyouOrderDO);
+        if(youPingOrder.getCode().intValue()==0){
+            //获取专家钱包并进行打款
+            PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(youyouOrderDO.getSellUserId(), youyouOrderDO.getSellUserType());
+            payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(youyouOrderDO.getId()),
+                    PayWalletBizTypeEnum.STEAM_CASH, youyouOrderDO.getPayAmount());
+            youyouOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
+            youyouOrderMapper.updateById(youyouOrderDO);
+        }
+        throw new ServiceException(-1,"发货失败");
+    }
 
+    /**
+     * 上传订单到有品
+     * @param youyouOrderDO
+     * @return
+     */
+    private YouPingOrder uploadYY(YouyouOrderDO youyouOrderDO){
+        ConfigDO configApiKey = configService.getConfigByKey("uu.apiKey");
+        ConfigDO configByKey = configService.getConfigByKey("uu.key1");
+        ConfigDO configByKey2 = configService.getConfigByKey("uu.key2");
+        ConfigDO configByKey3 = configService.getConfigByKey("uu.key3");
+        ConfigDO configByKey4 = configService.getConfigByKey("uu.key4");
+        String key=configByKey.getValue()+configByKey2.getValue()+configByKey3.getValue()+configByKey4.getValue();
+        OpenYoupinApiReqVo<CreateReqVo> openYoupinApiReqVo=new OpenYoupinApiReqVo<>();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        openYoupinApiReqVo.setTimestamp(simpleDateFormat.format(new Date()));
+        openYoupinApiReqVo.setAppKey(configApiKey.getValue());
+        CreateReqVo createReqVo = new CreateReqVo();
+        createReqVo.setMerchantOrderNo("YY"+youyouOrderDO.getMerchantOrderNo());
+        createReqVo.setTradeLinks(youyouOrderDO.getTradeLinks());
+        createReqVo.setCommodityId(youyouOrderDO.getCommodityId());
+        createReqVo.setCommodityHashName(youyouOrderDO.getCommodityHashName());
+        createReqVo.setPurchasePrice(youyouOrderDO.getPurchasePrice());
+        createReqVo.setFastShipping(youyouOrderDO.getFastShipping());
+        createReqVo.setCommodityId(youyouOrderDO.getCommodityId());
+        openYoupinApiReqVo.setData(createReqVo);
+        OpenApiService.sign(openYoupinApiReqVo,key);
+
+        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+        if(Objects.nonNull(openYoupinApiReqVo.getData().getCommodityId())){
+            builder.url("https://gw-openapi.youpin898.com/open/v1/api/byGoodsIdCreateOrder");
+
+        }
+        builder.method(HttpUtil.Method.JSON);
+        builder.postObject(openYoupinApiReqVo);
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
+        YouPingOrder json = sent.json(YouPingOrder.class);
+        return json;
     }
 
     /**
