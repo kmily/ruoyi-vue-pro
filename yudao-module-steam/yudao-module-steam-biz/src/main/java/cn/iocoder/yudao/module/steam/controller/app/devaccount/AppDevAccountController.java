@@ -27,7 +27,7 @@ public class AppDevAccountController {
 
     @PostMapping("/create")
     @Operation(summary = "创建开放平台用户")
-    public CommonResult<Long> createDevAccount(@Valid DevAccountSaveReqVO createReqVO) {
+    public CommonResult<String> createDevAccount(@Valid DevAccountSaveReqVO createReqVO) {
         createReqVO.setUserName("open_"+IdUtil.simpleUUID());
         return success(devAccountService.apply(createReqVO));
     }
