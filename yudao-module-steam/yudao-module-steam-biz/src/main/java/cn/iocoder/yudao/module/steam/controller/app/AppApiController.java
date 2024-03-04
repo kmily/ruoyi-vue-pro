@@ -27,6 +27,7 @@ import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.service.OpenApiService;
@@ -167,32 +168,13 @@ public class AppApiController {
                 }
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1l);
-                CreateOrderResult invOrder = youYouOrderService.createInvOrder(loginUser, openApiReqVo.getData());
+                YouyouOrderDO invOrder = youYouOrderService.createInvOrder(loginUser, openApiReqVo.getData());
 
-
-//                Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
-//                        .eq(BindUserDO::getUserId, devAccount.getUserId())
-//                        .ne(BindUserDO::getTradeUrl,openApiReqVo.getData().getTradeLinks())
-//                        .eq(BindUserDO::getUserType, devAccount.getUserType())).stream().findFirst();
-//                if(!first.isPresent()){
-//                    throw new ServiceException(-1,"没有检测机器人");
-//                }
-//                BindUserDO bindUserDO = first.get();
-//                SteamWeb steamWeb=new SteamWeb(configService);
-//                steamWeb.login(bindUserDO.getSteamPassword(),bindUserDO.getMaFile());
-//                steamWeb.initTradeUrl();
-//                TradeUrlStatus tradeUrlStatus = steamWeb.checkTradeUrl(openApiReqVo.getData().getTradeLinks());
-//                SteamWeb steamWeb1=new SteamWeb(configService);
-//                URI uri = URI.create(openApiReqVo.getData().getTradeLinks());
-//                String query = uri.getQuery();
-//                Map<String, String> stringStringMap = steamWeb1.parseQuery(query);
-//                String partner = steamWeb1.toCommunityID(stringStringMap.get("partner"));
-//
-//                ApiCheckTradeUrlReSpVo tradeUrlReSpVo=new ApiCheckTradeUrlReSpVo();
-//                tradeUrlReSpVo.setSteamId(partner);
-//                tradeUrlReSpVo.setMsg(tradeUrlStatus.getMessage());
-//                tradeUrlReSpVo.setStatus(tradeUrlStatus.getStatus());
-                return ApiResult.success(null);
+                CreateByIdRespVo ret=new CreateByIdRespVo();
+                ret.setPayAmount(Double.valueOf(invOrder.getPayAmount()/100));
+                ret.setOrderNo(invOrder.getOrderNo());
+                ret.setMerchantOrderNo(invOrder.getMerchantOrderNo());
+                return ApiResult.success(ret);
             });
             return execute;
         } catch (ServiceException e) {
@@ -214,43 +196,47 @@ public class AppApiController {
                 }
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1l);
-                youYouOrderService.createInvOrder(loginUser,openApiReqVo.getData());
-                return ApiResult.success(null);
+                YouyouOrderDO invOrder = youYouOrderService.createInvOrder(loginUser, openApiReqVo.getData());
+                CreateByTemplateRespVo ret=new CreateByTemplateRespVo();
+                ret.setPayAmount(Double.valueOf(invOrder.getPayAmount()/100));
+                ret.setOrderNo(invOrder.getOrderNo());
+                ret.setMerchantOrderNo(invOrder.getMerchantOrderNo());
+                return ApiResult.success(ret);
             });
             return execute;
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(),  e.getMessage(),CreateByTemplateRespVo.class);
         }
     }
-    @PostMapping("/createInvOrder")
-    @Operation(summary = "创建库存订单")
-    public CommonResult<AppPayOrderSubmitRespVO> createInvOrder(@Valid @RequestBody PaySteamOrderCreateReqVO createReqVO) {
-        DevAccountDO devAccount = DevAccountContextHolder.getRequiredDevAccount();
-        LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1l);
-        CreateOrderResult invOrder = paySteamOrderService.createInvOrder(loginUser, createReqVO);
-
-        //付款
-        AppPayOrderSubmitReqVO reqVO=new AppPayOrderSubmitReqVO();
-        reqVO.setChannelCode(PayChannelEnum.WALLET.getCode());
-        reqVO.setId(invOrder.getPayOrderId());
-        if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
-            Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
-                    Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
-            channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(devAccount.getUserId()));
-            channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(devAccount.getUserType()));
-            reqVO.setChannelExtras(channelExtras);
-        }
-        // 2. 提交支付
-        PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, getClientIP());
-        return success(PayOrderConvert.INSTANCE.convert3(respVO));
-    }
-    @PostMapping("/list/invOrder")
-    @Operation(summary = "库存订单列表")
-    public CommonResult<PageResult<InvOrderResp>> listInvOrder(@Valid @RequestBody InvOrderPageReqVO invOrderPageReqVO) {
-        DevAccountDO devAccount = DevAccountContextHolder.getRequiredDevAccount();
-        invOrderPageReqVO.setUserId(devAccount.getId());
-        invOrderPageReqVO.setUserType(devAccount.getUserType());
-        PageResult<InvOrderResp> invOrderPageOrder = paySteamOrderService.getInvOrderPageOrder(invOrderPageReqVO);
-        return CommonResult.success(invOrderPageOrder);
-    }
+//    @PostMapping("/createInvOrder")
+//    @Operation(summary = "创建库存订单")
+//    public CommonResult<AppPayOrderSubmitRespVO> createInvOrder(@Valid @RequestBody PaySteamOrderCreateReqVO createReqVO) {
+//        DevAccountDO devAccount = DevAccountContextHolder.getRequiredDevAccount();
+//        LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1l);
+//        CreateOrderResult invOrder = paySteamOrderService.createInvOrder(loginUser, createReqVO);
+//
+//        //付款
+//        AppPayOrderSubmitReqVO reqVO=new AppPayOrderSubmitReqVO();
+//        reqVO.setChannelCode(PayChannelEnum.WALLET.getCode());
+//        reqVO.setId(invOrder.getPayOrderId());
+//        if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
+//            Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
+//                    Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
+//            channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(devAccount.getUserId()));
+//            channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(devAccount.getUserType()));
+//            reqVO.setChannelExtras(channelExtras);
+//        }
+//        // 2. 提交支付
+//        PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, getClientIP());
+//        return success(PayOrderConvert.INSTANCE.convert3(respVO));
+//    }
+//    @PostMapping("/list/invOrder")
+//    @Operation(summary = "库存订单列表")
+//    public CommonResult<PageResult<InvOrderResp>> listInvOrder(@Valid @RequestBody InvOrderPageReqVO invOrderPageReqVO) {
+//        DevAccountDO devAccount = DevAccountContextHolder.getRequiredDevAccount();
+//        invOrderPageReqVO.setUserId(devAccount.getId());
+//        invOrderPageReqVO.setUserType(devAccount.getUserType());
+//        PageResult<InvOrderResp> invOrderPageOrder = paySteamOrderService.getInvOrderPageOrder(invOrderPageReqVO);
+//        return CommonResult.success(invOrderPageOrder);
+//    }
 }

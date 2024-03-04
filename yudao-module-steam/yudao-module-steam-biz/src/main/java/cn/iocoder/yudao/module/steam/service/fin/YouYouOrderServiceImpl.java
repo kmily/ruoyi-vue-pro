@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
+import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
@@ -65,6 +66,13 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
     private static final Long PAY_APP_ID = 11L;
     private static final Long PAY_WITHDRAWAL_APP_ID = 12L;
     private static final Long UU_CASH_ACCOUNT_ID = 250L;//UU收款账号ID
+    /**
+     * 支付单流水的 no 前缀
+     */
+    private static final String PAY_NO_PREFIX = "YY";
+
+    @Resource
+    private PayNoRedisDAO noRedisDAO;
 
 
     @Resource
@@ -206,10 +214,11 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
     }
 
     @Override
-    public CreateOrderResult createInvOrder(LoginUser loginUser, CreateReqVo createReqVO) {
-        CreateOrderResult createOrderResult=new CreateOrderResult();
+    public YouyouOrderDO createInvOrder(LoginUser loginUser, CreateReqVo createReqVO) {
+//        CreateOrderResult createOrderResult=new CreateOrderResult();
         BigDecimal bigDecimal = new BigDecimal(createReqVO.getPurchasePrice());
         YouyouOrderDO youyouOrderDO=new YouyouOrderDO()
+                .setOrderNo(noRedisDAO.generate(PAY_NO_PREFIX))
                 .setUserId(loginUser.getId()).setUserType(loginUser.getUserType())
                 .setPayOrderStatus(PayOrderStatusEnum.WAITING.getStatus())
                 .setMerchantOrderNo(createReqVO.getMerchantOrderNo())
@@ -234,9 +243,9 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
 //        sellingDO.setTransferStatus(InvTransferStatusEnum.INORDER.getStatus());
 //        sellingMapper.updateById(sellingDO);
 //        // 返回
-        createOrderResult.setBizOrderId(youyouOrderDO.getId());
-        createOrderResult.setPayOrderId(payOrderId);
-        return createOrderResult;
+//        createOrderResult.setBizOrderId(youyouOrderDO.getId());
+//        createOrderResult.setPayOrderId(payOrderId);
+        return youyouOrderDO;
     }
     private YouyouOrderDO validateInvOrderCanCreate(YouyouOrderDO youyouOrderDO) {
         if(Objects.isNull(youyouOrderDO.getCommodityHashName()) || Objects.isNull(youyouOrderDO.getCommodityTemplateId())|| Objects.isNull(youyouOrderDO.getCommodityId())){

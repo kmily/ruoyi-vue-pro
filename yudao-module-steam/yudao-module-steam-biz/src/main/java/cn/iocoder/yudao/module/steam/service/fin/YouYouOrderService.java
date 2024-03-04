@@ -36,7 +36,7 @@ public interface YouYouOrderService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    CreateOrderResult createInvOrder(LoginUser loginUser, @Valid CreateReqVo createReqVO);
+    YouyouOrderDO createInvOrder(LoginUser loginUser, @Valid CreateReqVo createReqVO);
 
     /**
      * 获得示例订单
