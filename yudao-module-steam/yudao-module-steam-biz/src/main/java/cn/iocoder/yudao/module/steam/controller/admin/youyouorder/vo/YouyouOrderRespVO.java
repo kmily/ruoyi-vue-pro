@@ -60,7 +60,8 @@ public class YouyouOrderRespVO {
     private Long userId;
 
     @Schema(description = "用户类型", example = "1")
-    @ExcelProperty("用户类型")
+    @ExcelProperty(value = "用户类型", converter = DictConvert.class)
+    @DictFormat("user_type") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
     private Integer userType;
 
     @Schema(description = "发货信息 json")
@@ -114,5 +115,18 @@ public class YouyouOrderRespVO {
     @Schema(description = "交易状态 0,成功；2,失败。", example = "2")
     @ExcelProperty("交易状态 0,成功；2,失败。")
     private Integer uuOrderStatus;
+
+    @Schema(description = "收款状态", example = "1")
+    @ExcelProperty("收款状态")
+    private Integer sellCashStatus;
+
+    @Schema(description = "卖家用户ID", example = "23929")
+    @ExcelProperty("卖家用户ID")
+    private Long sellUserId;
+
+    @Schema(description = "卖家用户类型", example = "2")
+    @ExcelProperty(value = "卖家用户类型", converter = DictConvert.class)
+    @DictFormat("user_type") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
+    private Integer sellUserType;
 
 }

@@ -84,4 +84,13 @@ public class YouyouOrderPageReqVO extends PageParam {
     @Schema(description = "交易状态 0,成功；2,失败。", example = "2")
     private Integer uuOrderStatus;
 
+    @Schema(description = "收款状态", example = "1")
+    private Integer sellCashStatus;
+
+    @Schema(description = "卖家用户ID", example = "23929")
+    private Long sellUserId;
+
+    @Schema(description = "卖家用户类型", example = "2")
+    private Integer sellUserType;
+
 }

@@ -34,7 +34,8 @@
                     </el-form-item>
                     <el-form-item label="用户类型" prop="userType">
                       <el-select v-model="formData.userType" placeholder="请选择用户类型">
-                            <el-option label="请选择字典生成" value="" />
+                            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.USER_TYPE)"
+                                       :key="dict.value" :label="dict.label" :value="parseInt(dict.value)" />
                       </el-select>
                     </el-form-item>
                     <el-form-item label="发货信息 json" prop="transferText">
@@ -93,6 +94,20 @@
                             <el-radio label="1">请选择字典生成</el-radio>
                       </el-radio-group>
                     </el-form-item>
+                    <el-form-item label="收款状态" prop="sellCashStatus">
+                      <el-radio-group v-model="formData.sellCashStatus">
+                            <el-radio label="1">请选择字典生成</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="卖家用户ID" prop="sellUserId">
+                      <el-input v-model="formData.sellUserId" placeholder="请输入卖家用户ID" />
+                    </el-form-item>
+                    <el-form-item label="卖家用户类型" prop="sellUserType">
+                      <el-select v-model="formData.sellUserType" placeholder="请选择卖家用户类型">
+                            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.USER_TYPE)"
+                                       :key="dict.value" :label="dict.label" :value="parseInt(dict.value)" />
+                      </el-select>
+                    </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm" :disabled="formLoading">确 定</el-button>
@@ -145,6 +160,9 @@
                             uuOrderNo: undefined,
                             uuMerchantOrderNo: undefined,
                             uuOrderStatus: undefined,
+                            sellCashStatus: undefined,
+                            sellUserId: undefined,
+                            sellUserType: undefined,
         },
         // 表单校验
         formRules: {
@@ -227,6 +245,9 @@
                             uuOrderNo: undefined,
                             uuMerchantOrderNo: undefined,
                             uuOrderStatus: undefined,
+                            sellCashStatus: undefined,
+                            sellUserId: undefined,
+                            sellUserType: undefined,
         };
         this.resetForm("formRef");
       }
