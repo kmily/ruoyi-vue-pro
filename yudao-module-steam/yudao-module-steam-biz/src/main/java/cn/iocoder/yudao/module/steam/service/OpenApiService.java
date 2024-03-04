@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.steam.service;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
-import cn.iocoder.yudao.module.steam.controller.app.vo.ApiCheckTradeUrlReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenYoupinApiReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
