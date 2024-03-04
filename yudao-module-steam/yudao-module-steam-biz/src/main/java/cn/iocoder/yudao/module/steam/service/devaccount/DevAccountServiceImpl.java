@@ -91,7 +91,7 @@ public class DevAccountServiceImpl implements DevAccountService {
                 throw new ServiceException(-1,"无权限申请");
             }
 
-            createReqVO.getApiPublicKey();
+            createReqVO.setApiPublicKey(createReqVO.getApiPublicKey());
             // 插入
             LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
             createReqVO.setUserId(loginUser.getId());

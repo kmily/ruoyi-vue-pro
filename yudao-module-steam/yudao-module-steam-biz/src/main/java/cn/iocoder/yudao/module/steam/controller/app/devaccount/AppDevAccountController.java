@@ -35,6 +35,7 @@ public class AppDevAccountController {
     @GetMapping("/list")
     @Operation(summary = "开放平台列表")
     public CommonResult<List<DevAccountDO>> list() {
+
         return success(devAccountService.accountList());
     }
 }
