@@ -144,29 +144,6 @@ public class AppApiController {
             return ApiResult.error(e.getCode(),  e.getMessage(),ApiCheckTradeUrlReSpVo.class);
         }
     }
-    /**
-     * api余额接口
-     * @return
-     */
-    @PostMapping("/checkTradeUrl")
-    @Operation(summary = "检查交易链接")
-    public CommonResult<TradeUrlStatus> checkTradeUrl(ApiCheckTradeUrlReqVo apiCheckTradeUrlVo) {
-        DevAccountDO devAccount = DevAccountContextHolder.getRequiredDevAccount();
-        Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
-                .eq(BindUserDO::getUserId, devAccount.getUserId())
-                .ne(BindUserDO::getTradeUrl,apiCheckTradeUrlVo.getTradeLinks())
-                .eq(BindUserDO::getUserType, devAccount.getUserType())).stream().findFirst();
-        if(!first.isPresent()){
-            return success(TradeUrlStatus.NOBOT);
-//            return error(-1,"你帐号下没有有效帐号无法检测,请先完成绑定");
-        }
-        BindUserDO bindUserDO = first.get();
-        SteamWeb steamWeb=new SteamWeb(configService);
-        steamWeb.login(bindUserDO.getSteamPassword(),bindUserDO.getMaFile());
-        steamWeb.initTradeUrl();
-        TradeUrlStatus tradeUrlStatus = steamWeb.checkTradeUrl(apiCheckTradeUrlVo.getTradeLinks());
-        return success(tradeUrlStatus);
-    }
 
     @PostMapping("/createInvOrder")
     @Operation(summary = "创建库存订单")
