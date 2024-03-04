@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.steam.controller.admin.devaccount.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import java.util.*;
-import javax.validation.constraints.*;
+
+import javax.validation.constraints.NotEmpty;
 
 @Schema(description = "管理后台 - 开放平台用户新增/修改 Request VO")
 @Data
@@ -15,14 +15,11 @@ public class DevAccountSaveReqVO {
     @Schema(description = "用户ID", example = "19141")
     private Long userId;
 
-//    @Schema(description = "api用户名", requiredMode = Schema.RequiredMode.REQUIRED, example = "张三")
-//    @NotEmpty(message = "api用户名不能为空")
+    @Schema(description = "api用户名", requiredMode = Schema.RequiredMode.REQUIRED, example = "张三")
     private String userName;
 
-    @Schema(description = "私匙")
-    private String apiPrivateKey;
-
     @Schema(description = "公匙")
+    @NotEmpty(message = "公钥不能为空")
     private String apiPublicKey;
 
     @Schema(description = "steam用户 ID", example = "29689")

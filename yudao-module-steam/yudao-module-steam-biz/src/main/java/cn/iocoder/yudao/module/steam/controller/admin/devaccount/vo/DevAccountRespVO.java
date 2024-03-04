@@ -49,13 +49,4 @@ public class DevAccountRespVO {
     @DictFormat("user_type") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
     private Integer userType;
 
-    /**
-     * 私匙
-     */
-    private String apiPrivateKey;
-    /**
-     * 公匙
-     */
-    private String apiPublicKey;
-
 }

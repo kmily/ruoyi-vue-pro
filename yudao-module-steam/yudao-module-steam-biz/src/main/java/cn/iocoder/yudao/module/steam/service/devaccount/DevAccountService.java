@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.steam.service.devaccount;
 
+
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.steam.controller.admin.devaccount.vo.DevAccountPageReqVO;
-import cn.iocoder.yudao.module.steam.controller.admin.devaccount.vo.DevAccountSaveReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.devaccount.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -53,13 +53,9 @@ public interface DevAccountService {
      * @return 开放平台用户分页
      */
     PageResult<DevAccountDO> getDevAccountPage(DevAccountPageReqVO pageReqVO);
-    /**
-     * 前台用户申请开放平台权限
-     *
-     * @param pageReqVO 分页查询
-     * @return 开放平台用户分页
-     */
+
     Long apply(DevAccountSaveReqVO pageReqVO);
     List<DevAccountDO> accountList();
     DevAccountDO selectByUserName (String userName, UserTypeEnum userType);
+
 }
