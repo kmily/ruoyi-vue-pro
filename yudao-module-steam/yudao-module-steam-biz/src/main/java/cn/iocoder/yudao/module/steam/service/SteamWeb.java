@@ -483,7 +483,7 @@ public class SteamWeb {
         MobileConfList json = sent.json(MobileConfList.class);
         return json.getConf();
     }
-    private Map<String, String> parseQuery(String query) throws UnsupportedEncodingException {
+    public Map<String, String> parseQuery(String query) throws UnsupportedEncodingException {
         Map<String, String> ret = new HashMap<>();
         String[] split = query.split("&");
         for (int i = 0; i < split.length; i++) {

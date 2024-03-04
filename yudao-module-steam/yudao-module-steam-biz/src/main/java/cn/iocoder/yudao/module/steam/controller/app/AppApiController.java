@@ -16,10 +16,7 @@ import cn.iocoder.yudao.module.pay.framework.pay.core.WalletPayClient;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
-import cn.iocoder.yudao.module.steam.controller.app.vo.ApiCheckTradeUrlReqVo;
-import cn.iocoder.yudao.module.steam.controller.app.vo.ApiPayWalletRespVO;
-import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
-import cn.iocoder.yudao.module.steam.controller.app.vo.OpenYoupinApiReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.*;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
@@ -47,6 +44,7 @@ import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.net.URI;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -108,15 +106,15 @@ public class AppApiController {
      * @return
      */
     @PostMapping("v1/api/checkTradeUrl")
-    @Operation(summary = "检查交易链接")
+    @Operation(summary = "验证交易链接")
     @PermitAll
-    public ApiResult<TradeUrlStatus> checkTradeUrl(@RequestBody  OpenYoupinApiReqVo<ApiCheckTradeUrlReqVo> openYoupinApiReqVo) {
+    public ApiResult<ApiCheckTradeUrlReSpVo> checkTradeUrl(@RequestBody  OpenYoupinApiReqVo<ApiCheckTradeUrlReqVo> openYoupinApiReqVo) {
         try {
-            ApiResult<TradeUrlStatus> execute = DevAccountUtils.tenantExecute(1l, () -> {
+            ApiResult<ApiCheckTradeUrlReSpVo> execute = DevAccountUtils.tenantExecute(1l, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openYoupinApiReqVo);
                 Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                         .eq(BindUserDO::getUserId, devAccount.getUserId())
-                        .ne(BindUserDO::getTradeUrl,openYoupinApiReqVo.getData().getTradeUrl())
+                        .ne(BindUserDO::getTradeUrl,openYoupinApiReqVo.getData().getTradeLinks())
                         .eq(BindUserDO::getUserType, devAccount.getUserType())).stream().findFirst();
                 if(!first.isPresent()){
                     throw new ServiceException(-1,"没有检测机器人");
@@ -125,12 +123,22 @@ public class AppApiController {
                 SteamWeb steamWeb=new SteamWeb(configService);
                 steamWeb.login(bindUserDO.getSteamPassword(),bindUserDO.getMaFile());
                 steamWeb.initTradeUrl();
-                TradeUrlStatus tradeUrlStatus = steamWeb.checkTradeUrl(openYoupinApiReqVo.getData().getTradeUrl());
-                return ApiResult.success(tradeUrlStatus);
+                TradeUrlStatus tradeUrlStatus = steamWeb.checkTradeUrl(openYoupinApiReqVo.getData().getTradeLinks());
+                SteamWeb steamWeb1=new SteamWeb(configService);
+                URI uri = URI.create(openYoupinApiReqVo.getData().getTradeLinks());
+                String query = uri.getQuery();
+                Map<String, String> stringStringMap = steamWeb1.parseQuery(query);
+                String partner = steamWeb1.toCommunityID(stringStringMap.get("partner"));
+
+                ApiCheckTradeUrlReSpVo tradeUrlReSpVo=new ApiCheckTradeUrlReSpVo();
+                tradeUrlReSpVo.setSteamId(partner);
+                tradeUrlReSpVo.setMsg(tradeUrlStatus.getMessage());
+                tradeUrlReSpVo.setStatus(tradeUrlStatus.getStatus());
+                return ApiResult.success(tradeUrlReSpVo);
             });
             return execute;
         } catch (ServiceException e) {
-            return ApiResult.error(e.getCode(),  e.getMessage(),TradeUrlStatus.class);
+            return ApiResult.error(e.getCode(),  e.getMessage(),ApiCheckTradeUrlReSpVo.class);
         }
     }
     /**
@@ -143,7 +151,7 @@ public class AppApiController {
         DevAccountDO devAccount = DevAccountContextHolder.getRequiredDevAccount();
         Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                 .eq(BindUserDO::getUserId, devAccount.getUserId())
-                .ne(BindUserDO::getTradeUrl,apiCheckTradeUrlVo.getTradeUrl())
+                .ne(BindUserDO::getTradeUrl,apiCheckTradeUrlVo.getTradeLinks())
                 .eq(BindUserDO::getUserType, devAccount.getUserType())).stream().findFirst();
         if(!first.isPresent()){
             return success(TradeUrlStatus.NOBOT);
@@ -153,7 +161,7 @@ public class AppApiController {
         SteamWeb steamWeb=new SteamWeb(configService);
         steamWeb.login(bindUserDO.getSteamPassword(),bindUserDO.getMaFile());
         steamWeb.initTradeUrl();
-        TradeUrlStatus tradeUrlStatus = steamWeb.checkTradeUrl(apiCheckTradeUrlVo.getTradeUrl());
+        TradeUrlStatus tradeUrlStatus = steamWeb.checkTradeUrl(apiCheckTradeUrlVo.getTradeLinks());
         return success(tradeUrlStatus);
     }
 
