@@ -3,8 +3,10 @@ package cn.iocoder.yudao.module.steam.service.steam;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class YouPingOrder {
+public class YouPingOrder implements Serializable {
 
     @JsonProperty("code")
     private Integer code;

@@ -96,8 +96,9 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
     @Resource
     private WithdrawalMapper withdrawalMapper;
 
+
     @Resource
-    private ConfigService configService;
+    private OpenApiService openApiService;
 
 
 
@@ -402,16 +403,7 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
      * @return
      */
     private YouPingOrder uploadYY(YouyouOrderDO youyouOrderDO){
-        ConfigDO configApiKey = configService.getConfigByKey("uu.appKey");
-        ConfigDO configByKey = configService.getConfigByKey("uu.key1");
-        ConfigDO configByKey2 = configService.getConfigByKey("uu.key2");
-        ConfigDO configByKey3 = configService.getConfigByKey("uu.key3");
-        ConfigDO configByKey4 = configService.getConfigByKey("uu.key4");
-        String key=configByKey.getValue()+configByKey2.getValue()+configByKey3.getValue()+configByKey4.getValue();
         OpenYoupinApiReqVo<CreateReqVo> openYoupinApiReqVo=new OpenYoupinApiReqVo<>();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        openYoupinApiReqVo.setTimestamp(simpleDateFormat.format(new Date()));
-        openYoupinApiReqVo.setAppKey(configApiKey.getValue());
         CreateReqVo createReqVo = new CreateReqVo();
         createReqVo.setMerchantOrderNo("YY"+youyouOrderDO.getMerchantOrderNo());
         createReqVo.setTradeLinks(youyouOrderDO.getTradeLinks());
@@ -421,18 +413,8 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
         createReqVo.setFastShipping(youyouOrderDO.getFastShipping());
         createReqVo.setCommodityId(youyouOrderDO.getCommodityId());
         openYoupinApiReqVo.setData(createReqVo);
-        OpenApiService.sign(openYoupinApiReqVo,key);
-
-        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-        if(Objects.nonNull(openYoupinApiReqVo.getData().getCommodityId())){
-            builder.url("https://gw-openapi.youpin898.com/open/v1/api/byGoodsIdCreateOrder");
-
-        }
-        builder.method(HttpUtil.Method.JSON);
-        builder.postObject(openYoupinApiReqVo);
-        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
-        YouPingOrder json = sent.json(YouPingOrder.class);
-        return json;
+        YouPingOrder youPingOrder = openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/byGoodsIdCreateOrder", openYoupinApiReqVo, YouPingOrder.class);
+        return youPingOrder;
     }
 
     /**
