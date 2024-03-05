@@ -302,7 +302,19 @@ public class HttpUtil {
                 return builder.get();
         }
     }
-
+    /**
+     * 调用steam接口
+     * @param proxyRequestVo
+     * @return
+     */
+    public static ProxyResponseVo sentToSteamByProxy(ProxyRequestVo proxyRequestVo) {
+        HttpRequest.HttpRequestBuilder builder = HttpRequest.builder();
+        builder.url("http://8.217.234.84/proxy/endpoint");
+        builder.method(Method.JSON);
+        builder.postObject(proxyRequestVo);
+        HttpResponse sent = sent(builder.build(), getClient(true, 1000));
+        return sent.json(ProxyResponseVo.class);
+    }
     public static HttpResponse sent(HttpRequest httpRequest) {
         return sent(httpRequest, getClient());
     }
@@ -448,6 +460,30 @@ public class HttpUtil {
          * 如果空则默认为 application/octet-stream
          */
         private String contentType;
+    }
+
+    @Data
+    @Builder
+    public static class ProxyResponseVo {
+        String html;
+        Integer status;
+        Map<String,String> cookies;
+        Map<String,List<String>> headers;
+    }
+    @Data
+    @Builder
+    public static class ProxyRequestVo {
+        private String url;
+        private Map<String, String> query;
+        private Map<String, String> pathVar;
+        private Map<String, String> form;
+        /**
+         * json格式
+         * 原来的是Object
+         */
+        private String postObject;
+        private Map<String, String> headers;
+        private String cookieString;
     }
 
 }
