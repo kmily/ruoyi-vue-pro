@@ -20,7 +20,6 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.OpenYoupinApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal.WithdrawalDO;
 
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
@@ -66,7 +65,7 @@ import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 @Service
 @Validated
 @Slf4j
-public class YouYouOrderServiceImpl implements YouYouOrderService {
+public class UUOrderServiceImpl implements UUOrderService {
 
     /**
      * 接入的实力应用编号
@@ -117,7 +116,7 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
     @Resource
     private SteamService steamService;
 
-    public YouYouOrderServiceImpl() {
+    public UUOrderServiceImpl() {
     }
 
     @Override

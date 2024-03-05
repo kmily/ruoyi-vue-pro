@@ -23,7 +23,7 @@ import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.service.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
-import cn.iocoder.yudao.module.steam.service.fin.YouYouOrderService;
+import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
 import cn.iocoder.yudao.module.steam.service.steam.TradeUrlStatus;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -72,7 +72,7 @@ public class AppApiController {
     private PayOrderService payOrderService;
 
     @Autowired
-    private YouYouOrderService youYouOrderService;
+    private UUOrderService youYouOrderService;
 
     /**
      * api余额接口
