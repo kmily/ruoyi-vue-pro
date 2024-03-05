@@ -13,7 +13,7 @@ import javax.validation.Valid;
  *
  * @author 芋道源码
  */
-public interface YouYouOrderService {
+public interface UUOrderService {
     /**
      * 创建提现订单
      *
