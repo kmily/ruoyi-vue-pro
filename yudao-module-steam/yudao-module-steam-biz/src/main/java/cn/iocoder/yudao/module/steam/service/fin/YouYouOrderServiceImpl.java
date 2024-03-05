@@ -4,8 +4,6 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
-import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
@@ -33,8 +31,8 @@ import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.service.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum;
+import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.YouPingOrder;
-import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,10 +41,8 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -228,7 +224,6 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
 
     @Override
     public YouyouOrderDO createInvOrder(LoginUser loginUser, CreateReqVo createReqVO) {
-//        CreateOrderResult createOrderResult=new CreateOrderResult();
         BigDecimal bigDecimal = new BigDecimal(createReqVO.getPurchasePrice());
         YouyouOrderDO youyouOrderDO=new YouyouOrderDO()
                 .setOrderNo(noRedisDAO.generate(PAY_NO_PREFIX))
@@ -305,13 +300,17 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
 //        }
 //
 //        //库存状态为没有订单
-//        if(!InvTransferStatusEnum.SELL.getStatus().equals(sellingDO.getTransferStatus())){
-//            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
-//        }
+        if(!InvTransferStatusEnum.SELL.getStatus().equals(youyouGoodslistDO.getTransferStatus())){
+            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
+        }
 //        //使用库存的价格进行替换
         BigDecimal bigDecimal = new BigDecimal(youyouGoodslistDO.getCommodityPrice());
         youyouOrderDO.setPayAmount(bigDecimal.multiply(new BigDecimal("100")).intValue());
-//
+        //判断用户钱包是否有足够的钱
+        PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(youyouOrderDO.getUserId(), youyouOrderDO.getUserType());
+        if(Objects.isNull(orCreateWallet)){
+            throw exception(ErrorCodeConstants.UU_WALLET_NO_MONEY);
+        }
 //
 //        //检查是否已经下过单
         List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
@@ -376,7 +375,7 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
         // 校验并获得支付订单（可支付）
         PayOrderRespDTO payOrder = validateInvOrderCanPaid(id, payOrderId);
 
-        // 更新 PayDemoOrderDO 状态为已支付
+        // 更新 状态为已支付
         int updateCount = youyouOrderMapper.updateByIdAndPayed(id, false,
                 new YouyouOrderDO().setPayStatus(true).setPayTime(LocalDateTime.now())
                         .setPayOrderStatus(payOrder.getStatus())
@@ -393,8 +392,9 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
                     PayWalletBizTypeEnum.STEAM_CASH, youyouOrderDO.getPayAmount());
             youyouOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
             youyouOrderMapper.updateById(youyouOrderDO);
+        }else{
+            throw new ServiceException(-1,"发货失败原因"+youPingOrder.getMsg());
         }
-        throw new ServiceException(-1,"发货失败");
     }
 
     /**
@@ -403,7 +403,7 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
      * @return
      */
     private YouPingOrder uploadYY(YouyouOrderDO youyouOrderDO){
-        OpenYoupinApiReqVo<CreateReqVo> openYoupinApiReqVo=new OpenYoupinApiReqVo<>();
+        OpenYoupinApiReqVo<CreateReqVo> openApiReqVo=new OpenYoupinApiReqVo<>();
         CreateReqVo createReqVo = new CreateReqVo();
         createReqVo.setMerchantOrderNo("YY"+youyouOrderDO.getMerchantOrderNo());
         createReqVo.setTradeLinks(youyouOrderDO.getTradeLinks());
@@ -412,8 +412,8 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
         createReqVo.setPurchasePrice(youyouOrderDO.getPurchasePrice());
         createReqVo.setFastShipping(youyouOrderDO.getFastShipping());
         createReqVo.setCommodityId(youyouOrderDO.getCommodityId());
-        openYoupinApiReqVo.setData(createReqVo);
-        YouPingOrder youPingOrder = openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/byGoodsIdCreateOrder", openYoupinApiReqVo, YouPingOrder.class);
+        openApiReqVo.setData(createReqVo);
+        YouPingOrder youPingOrder = openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/byGoodsIdCreateOrder", openApiReqVo, YouPingOrder.class);
         return youPingOrder;
     }
 
