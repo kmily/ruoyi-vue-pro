@@ -333,11 +333,11 @@ public class UUOrderServiceImpl implements UUOrderService {
 //        }
 //
 //        //库存状态为没有订单
-        if(!InvTransferStatusEnum.SELL.getStatus().equals(youyouGoodslistDO.getTransferStatus())){
+        if(!InvTransferStatusEnum.SELL.getStatus().equals(youyouCommodityDO.getTransferStatus())){
             throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
         }
 //        //使用库存的价格进行替换
-        BigDecimal bigDecimal = new BigDecimal(youyouGoodslistDO.getCommodityPrice());
+        BigDecimal bigDecimal = new BigDecimal(youyouCommodityDO.getCommodityPrice());
         youyouOrderDO.setPayAmount(bigDecimal.multiply(new BigDecimal("100")).intValue());
         //判断用户钱包是否有足够的钱
         PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(youyouOrderDO.getUserId(), youyouOrderDO.getUserType());
@@ -523,15 +523,14 @@ public class UUOrderServiceImpl implements UUOrderService {
                 .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
                 .setMerchantOrderId(String.valueOf(youyouOrderDO.getId())) // 支付单号
                 .setMerchantRefundId(refundId)
-                .setReason("想退钱").setPrice(youyouOrderDO.getPayAmount()));// 价格信息
+                .setReason("用户不想要了主动退单").setPrice(youyouOrderDO.getPayAmount()));// 价格信息
         // 2.3 更新退款单到 demo 订单
         invOrderMapper.updateById(new InvOrderDO().setId(id)
                 .setPayRefundId(payRefundId).setRefundPrice(youyouOrderDO.getPayAmount()));
         //释放库存
-//        todo
-//        YouyouGoodslistDO youyouGoodslistDO = youyouGoodslistMapper.selectById(youyouOrderDO.getRealCommodityId());
-////        youyouGoodslistDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
-//        youyouGoodslistMapper.updateById(youyouGoodslistDO);
+        YouyouCommodityDO youyouCommodityDO = youyouCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
+        youyouCommodityDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
+        youyouCommodityMapper.updateById(youyouCommodityDO);
     }
 
     private YouyouOrderDO validateInvOrderCanRefund(Long id,LoginUser loginUser) {
