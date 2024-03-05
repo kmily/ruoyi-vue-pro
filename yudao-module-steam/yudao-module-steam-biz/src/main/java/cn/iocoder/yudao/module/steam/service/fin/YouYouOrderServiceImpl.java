@@ -22,10 +22,12 @@ import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrder
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal.WithdrawalDO;
+
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
+
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoucommodity.YouyouCommodityMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
@@ -109,6 +111,7 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
 
     @Resource
     private YouyouOrderMapper youyouOrderMapper;
+
     @Resource
     private YouyouCommodityMapper youyouCommodityMapper;
     @Resource
@@ -280,12 +283,13 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
         if(Objects.isNull(youyouOrderDO.getRealCommodityId())){
             throw exception(OpenApiCode.ERR_5214);
         }
-        YouyouCommodityDO youyouCommodityDO = youyouCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
+        // TODO 如果数据出错  请检查此处 mapper 是否正确
+        YouyouCommodityDO youyouGoodslistDO = youyouCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
 
 
 //        SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
 ////        //校验订单是否存在
-        if (youyouCommodityDO == null) {
+        if (youyouGoodslistDO == null) {
             throw exception(ErrorCodeConstants.UU_GOODS_NOT_FOUND);
         }
 //        if(CommonStatusEnum.isDisable(sellingDO.getStatus())){
@@ -315,11 +319,11 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
 //        }
 //
 //        //库存状态为没有订单
-        if(!InvTransferStatusEnum.SELL.getStatus().equals(youyouCommodityDO.getTransferStatus())){
+        if(!InvTransferStatusEnum.SELL.getStatus().equals(youyouGoodslistDO.getTransferStatus())){
             throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
         }
 //        //使用库存的价格进行替换
-        BigDecimal bigDecimal = new BigDecimal(youyouCommodityDO.getCommodityPrice());
+        BigDecimal bigDecimal = new BigDecimal(youyouGoodslistDO.getCommodityPrice());
         youyouOrderDO.setPayAmount(bigDecimal.multiply(new BigDecimal("100")).intValue());
         //判断用户钱包是否有足够的钱
         PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(youyouOrderDO.getUserId(), youyouOrderDO.getUserType());
