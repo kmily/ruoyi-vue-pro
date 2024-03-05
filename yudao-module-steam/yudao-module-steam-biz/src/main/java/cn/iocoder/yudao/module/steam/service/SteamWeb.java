@@ -98,22 +98,32 @@ public class SteamWeb {
         steamMaFile = maFile;
         //steam登录代理
         ConfigDO configByKey = configService.getConfigByKey("steam.proxy");
-        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+        HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
         builder.url(configByKey.getValue()+"login");
-//        builder.url("http://127.0.0.1:25852/login");
-        builder.method(HttpUtil.Method.FORM);
+//        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+//        builder.url(configByKey.getValue()+"login");
+////        builder.url("http://127.0.0.1:25852/login");
+//        builder.method(HttpUtil.Method.FORM);
         HashMap<String, String> stringStringHashMap = new HashMap<>();
         stringStringHashMap.put("username", steamMaFile.getAccountName());
         stringStringHashMap.put("password", passwd);
         stringStringHashMap.put("token_code", steamMaFile.getSharedSecret());
         builder.form(stringStringHashMap);
-        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 30000, null, null));
-        SteamCookie json = sent.json(SteamCookie.class);
-        if (json.getCode() != 0) {
-            log.error("Steam通讯失败{}", json);
-            throw new ServiceException(-1, "Steam通讯失败" + json.getMsg());
+        try{
+            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
+            if(Objects.nonNull(proxyResponseVo.getStatus()) && proxyResponseVo.getStatus()==200){
+                SteamCookie steamCookie = objectMapper.readValue(proxyResponseVo.getHtml(), SteamCookie.class);
+                if (steamCookie.getCode() != 0) {
+                    log.error("Steam通讯失败{}", steamCookie);
+                    throw new ServiceException(-1, "Steam通讯失败" + steamCookie.getMsg());
+                }
+                cookieString = steamCookie.getData().getCookie();
+            }else{
+                throw new ServiceException(-1,"Steam通讯失败");
+            }
+        }catch (Exception e){
+            throw new ServiceException(-1,"Steam通讯失败");
         }
-        cookieString = json.getData().getCookie();
         initApiKey();
     }
 
