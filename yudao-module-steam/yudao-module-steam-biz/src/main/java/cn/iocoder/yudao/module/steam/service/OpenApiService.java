@@ -67,11 +67,11 @@ public class OpenApiService {
 
     /**
      * 有品请求公共实现类
-     * @param url
-     * @param openYoupinApiReqVo
-     * @param classic
-     * @param <T>
-     * @param <E>
+     * @param url 接口地址
+     * @param openYoupinApiReqVo 有品传入参数，只需要管data
+     * @param classic 返回数据格式
+     * @param <T> 入参类型
+     * @param <E> 出参类型
      * @return
      */
     public <T extends Serializable,E extends Serializable> E requestUU(String url,OpenYoupinApiReqVo<T> openYoupinApiReqVo,Class<E> classic){
