@@ -23,8 +23,13 @@ public interface YouyouCommodityMapper extends BaseMapperX<YouyouCommodityDO> {
                 .eqIfPresent(YouyouCommodityDO::getTemplateId, reqVO.getTemplateId())
                 .likeIfPresent(YouyouCommodityDO::getCommodityName, reqVO.getCommodityName())
                 .eqIfPresent(YouyouCommodityDO::getCommodityPrice, reqVO.getCommodityPrice())
-                .eqIfPresent(YouyouCommodityDO::getTransferStatus, reqVO.getTransferStatus())
                 .betweenIfPresent(YouyouCommodityDO::getCreateTime, reqVO.getCreateTime())
+                .eqIfPresent(YouyouCommodityDO::getCommodityStickers, reqVO.getCommodityStickers())
+                .eqIfPresent(YouyouCommodityDO::getCommodityDoppler, reqVO.getCommodityDoppler())
+                .eqIfPresent(YouyouCommodityDO::getCommodityFade, reqVO.getCommodityFade())
+                .eqIfPresent(YouyouCommodityDO::getCommodityHardened, reqVO.getCommodityHardened())
+                .eqIfPresent(YouyouCommodityDO::getTransferStatus, reqVO.getTransferStatus())
+                .eqIfPresent(YouyouCommodityDO::getStatus, reqVO.getStatus())
                 .orderByDesc(YouyouCommodityDO::getId));
     }
 

@@ -51,58 +51,22 @@ public class YouyouCommoditySaveReqVO {
     @Schema(description = "是否多普勒：0否1是")
     private Integer templateisDoppler;
 
-    @Schema(description = "印花Id", example = "22554")
-    private Integer commodityStickersStickerId;
+    @Schema(description = "印花")
+    private String commodityStickers;
 
-    @Schema(description = "插槽编号")
-    private Integer commodityStickersRawIndex;
+    @Schema(description = "多普勒属性")
+    private String commodityDoppler;
 
-    @Schema(description = "印花名称", example = "张三")
-    private String commodityStickersName;
+    @Schema(description = "渐变色属性")
+    private String commodityFade;
 
-    @Schema(description = "唯一名称", example = "芋艿")
-    private String commodityStickersHashName;
-
-    @Schema(description = "材料")
-    private String commodityStickersMaterial;
-
-    @Schema(description = "图片链接地址", example = "https://www.iocoder.cn")
-    private String commodityStickersImgUrl;
-
-    @Schema(description = "印花价格(单位元)", example = "1452")
-    private String commodityStickersPrice;
-
-    @Schema(description = "磨损值")
-    private String commodityStickersAbrade;
-
-    @Schema(description = "多普勒属性分类名称")
-    private String commodityDopplerTitle;
-
-    @Schema(description = "多普勒属性分类缩写")
-    private String commodityDopplerAbbrTitle;
-
-    @Schema(description = "多普勒属性显示颜色")
-    private String commodityDopplerColor;
-
-    @Schema(description = "渐变色属性属性名称")
-    private String commodityFadeTitle;
-
-    @Schema(description = "渐变色属性对应数值")
-    private String commodityFadeNumerialValue;
-
-    @Schema(description = "渐变色属性显示颜色")
-    private String commodityFadeColor;
-
-    @Schema(description = "表面淬火属性分类名称")
-    private String commodityHardenedTitle;
-
-    @Schema(description = "表面淬火属性分类缩写")
-    private String commodityHardenedAbbrTitle;
-
-    @Schema(description = "表面淬火属性显示颜色")
-    private String commodityHardenedColor;
+    @Schema(description = "表面淬火属性")
+    private String commodityHardened;
 
     @Schema(description = "发货状态", example = "2")
-    private String transferStatus;
+    private Integer transferStatus;
+
+    @Schema(description = "悠悠商品是否有效0开启1关闭", example = "1")
+    private Integer status;
 
 }

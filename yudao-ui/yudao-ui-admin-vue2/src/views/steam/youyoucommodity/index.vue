@@ -14,14 +14,31 @@
       <el-form-item label="商品价格（单位元）" prop="commodityPrice">
         <el-input v-model="queryParams.commodityPrice" placeholder="请输入商品价格（单位元）" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
+      <el-form-item label="创建时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
+      </el-form-item>
+      <el-form-item label="印花" prop="commodityStickers">
+        <el-input v-model="queryParams.commodityStickers" placeholder="请输入印花" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="多普勒属性" prop="commodityDoppler">
+        <el-input v-model="queryParams.commodityDoppler" placeholder="请输入多普勒属性" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="渐变色属性" prop="commodityFade">
+        <el-input v-model="queryParams.commodityFade" placeholder="请输入渐变色属性" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="表面淬火属性" prop="commodityHardened">
+        <el-input v-model="queryParams.commodityHardened" placeholder="请输入表面淬火属性" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
       <el-form-item label="发货状态" prop="transferStatus">
         <el-select v-model="queryParams.transferStatus" placeholder="请选择发货状态" clearable size="small">
           <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
-      <el-form-item label="创建时间" prop="createTime">
-        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
-                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
+      <el-form-item label="悠悠商品是否有效0开启1关闭" prop="status">
+        <el-select v-model="queryParams.status" placeholder="请选择悠悠商品是否有效0开启1关闭" clearable size="small">
+          <el-option label="请选择字典生成" value="" />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -57,29 +74,17 @@
       <el-table-column label="是否渐变色：0否1是" align="center" prop="templateisFade" />
       <el-table-column label="Integer	是否表面淬火：0否1是" align="center" prop="templateisHardened" />
       <el-table-column label="是否多普勒：0否1是" align="center" prop="templateisDoppler" />
-      <el-table-column label="印花Id" align="center" prop="commodityStickersStickerId" />
-      <el-table-column label="插槽编号" align="center" prop="commodityStickersRawIndex" />
-      <el-table-column label="印花名称" align="center" prop="commodityStickersName" />
-      <el-table-column label="唯一名称" align="center" prop="commodityStickersHashName" />
-      <el-table-column label="材料" align="center" prop="commodityStickersMaterial" />
-      <el-table-column label="图片链接地址" align="center" prop="commodityStickersImgUrl" />
-      <el-table-column label="印花价格(单位元)" align="center" prop="commodityStickersPrice" />
-      <el-table-column label="磨损值" align="center" prop="commodityStickersAbrade" />
-      <el-table-column label="多普勒属性分类名称" align="center" prop="commodityDopplerTitle" />
-      <el-table-column label="多普勒属性分类缩写" align="center" prop="commodityDopplerAbbrTitle" />
-      <el-table-column label="多普勒属性显示颜色" align="center" prop="commodityDopplerColor" />
-      <el-table-column label="渐变色属性属性名称" align="center" prop="commodityFadeTitle" />
-      <el-table-column label="渐变色属性对应数值" align="center" prop="commodityFadeNumerialValue" />
-      <el-table-column label="渐变色属性显示颜色" align="center" prop="commodityFadeColor" />
-      <el-table-column label="表面淬火属性分类名称" align="center" prop="commodityHardenedTitle" />
-      <el-table-column label="表面淬火属性分类缩写" align="center" prop="commodityHardenedAbbrTitle" />
-      <el-table-column label="表面淬火属性显示颜色" align="center" prop="commodityHardenedColor" />
-      <el-table-column label="发货状态" align="center" prop="transferStatus" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="印花" align="center" prop="commodityStickers" />
+      <el-table-column label="多普勒属性" align="center" prop="commodityDoppler" />
+      <el-table-column label="渐变色属性" align="center" prop="commodityFade" />
+      <el-table-column label="表面淬火属性" align="center" prop="commodityHardened" />
+      <el-table-column label="发货状态" align="center" prop="transferStatus" />
+      <el-table-column label="悠悠商品是否有效0开启1关闭" align="center" prop="status" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
@@ -131,8 +136,13 @@ export default {
         templateId: null,
         commodityName: null,
         commodityPrice: null,
-        transferStatus: null,
         createTime: [],
+        commodityStickers: null,
+        commodityDoppler: null,
+        commodityFade: null,
+        commodityHardened: null,
+        transferStatus: null,
+        status: null,
       },
             };
   },

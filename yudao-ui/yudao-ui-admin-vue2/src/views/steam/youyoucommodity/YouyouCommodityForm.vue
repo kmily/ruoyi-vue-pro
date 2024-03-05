@@ -42,59 +42,25 @@
                     <el-form-item label="是否多普勒：0否1是" prop="templateisDoppler">
                       <el-input v-model="formData.templateisDoppler" placeholder="请输入是否多普勒：0否1是" />
                     </el-form-item>
-                    <el-form-item label="印花Id" prop="commodityStickersStickerId">
-                      <el-input v-model="formData.commodityStickersStickerId" placeholder="请输入印花Id" />
+                    <el-form-item label="印花" prop="commodityStickers">
+                      <el-input v-model="formData.commodityStickers" placeholder="请输入印花" />
                     </el-form-item>
-                    <el-form-item label="插槽编号" prop="commodityStickersRawIndex">
-                      <el-input v-model="formData.commodityStickersRawIndex" placeholder="请输入插槽编号" />
+                    <el-form-item label="多普勒属性" prop="commodityDoppler">
+                      <el-input v-model="formData.commodityDoppler" placeholder="请输入多普勒属性" />
                     </el-form-item>
-                    <el-form-item label="印花名称" prop="commodityStickersName">
-                      <el-input v-model="formData.commodityStickersName" placeholder="请输入印花名称" />
+                    <el-form-item label="渐变色属性" prop="commodityFade">
+                      <el-input v-model="formData.commodityFade" placeholder="请输入渐变色属性" />
                     </el-form-item>
-                    <el-form-item label="唯一名称" prop="commodityStickersHashName">
-                      <el-input v-model="formData.commodityStickersHashName" placeholder="请输入唯一名称" />
-                    </el-form-item>
-                    <el-form-item label="材料" prop="commodityStickersMaterial">
-                      <el-input v-model="formData.commodityStickersMaterial" placeholder="请输入材料" />
-                    </el-form-item>
-                    <el-form-item label="图片链接地址" prop="commodityStickersImgUrl">
-                      <el-input v-model="formData.commodityStickersImgUrl" placeholder="请输入图片链接地址" />
-                    </el-form-item>
-                    <el-form-item label="印花价格(单位元)" prop="commodityStickersPrice">
-                      <el-input v-model="formData.commodityStickersPrice" placeholder="请输入印花价格(单位元)" />
-                    </el-form-item>
-                    <el-form-item label="磨损值" prop="commodityStickersAbrade">
-                      <el-input v-model="formData.commodityStickersAbrade" placeholder="请输入磨损值" />
-                    </el-form-item>
-                    <el-form-item label="多普勒属性分类名称" prop="commodityDopplerTitle">
-                      <el-input v-model="formData.commodityDopplerTitle" placeholder="请输入多普勒属性分类名称" />
-                    </el-form-item>
-                    <el-form-item label="多普勒属性分类缩写" prop="commodityDopplerAbbrTitle">
-                      <el-input v-model="formData.commodityDopplerAbbrTitle" placeholder="请输入多普勒属性分类缩写" />
-                    </el-form-item>
-                    <el-form-item label="多普勒属性显示颜色" prop="commodityDopplerColor">
-                      <el-input v-model="formData.commodityDopplerColor" placeholder="请输入多普勒属性显示颜色" />
-                    </el-form-item>
-                    <el-form-item label="渐变色属性属性名称" prop="commodityFadeTitle">
-                      <el-input v-model="formData.commodityFadeTitle" placeholder="请输入渐变色属性属性名称" />
-                    </el-form-item>
-                    <el-form-item label="渐变色属性对应数值" prop="commodityFadeNumerialValue">
-                      <el-input v-model="formData.commodityFadeNumerialValue" placeholder="请输入渐变色属性对应数值" />
-                    </el-form-item>
-                    <el-form-item label="渐变色属性显示颜色" prop="commodityFadeColor">
-                      <el-input v-model="formData.commodityFadeColor" placeholder="请输入渐变色属性显示颜色" />
-                    </el-form-item>
-                    <el-form-item label="表面淬火属性分类名称" prop="commodityHardenedTitle">
-                      <el-input v-model="formData.commodityHardenedTitle" placeholder="请输入表面淬火属性分类名称" />
-                    </el-form-item>
-                    <el-form-item label="表面淬火属性分类缩写" prop="commodityHardenedAbbrTitle">
-                      <el-input v-model="formData.commodityHardenedAbbrTitle" placeholder="请输入表面淬火属性分类缩写" />
-                    </el-form-item>
-                    <el-form-item label="表面淬火属性显示颜色" prop="commodityHardenedColor">
-                      <el-input v-model="formData.commodityHardenedColor" placeholder="请输入表面淬火属性显示颜色" />
+                    <el-form-item label="表面淬火属性" prop="commodityHardened">
+                      <el-input v-model="formData.commodityHardened" placeholder="请输入表面淬火属性" />
                     </el-form-item>
                     <el-form-item label="发货状态" prop="transferStatus">
                       <el-radio-group v-model="formData.transferStatus">
+                            <el-radio label="1">请选择字典生成</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="悠悠商品是否有效0开启1关闭" prop="status">
+                      <el-radio-group v-model="formData.status">
                             <el-radio label="1">请选择字典生成</el-radio>
                       </el-radio-group>
                     </el-form-item>
@@ -137,24 +103,12 @@
                             templateisFade: undefined,
                             templateisHardened: undefined,
                             templateisDoppler: undefined,
-                            commodityStickersStickerId: undefined,
-                            commodityStickersRawIndex: undefined,
-                            commodityStickersName: undefined,
-                            commodityStickersHashName: undefined,
-                            commodityStickersMaterial: undefined,
-                            commodityStickersImgUrl: undefined,
-                            commodityStickersPrice: undefined,
-                            commodityStickersAbrade: undefined,
-                            commodityDopplerTitle: undefined,
-                            commodityDopplerAbbrTitle: undefined,
-                            commodityDopplerColor: undefined,
-                            commodityFadeTitle: undefined,
-                            commodityFadeNumerialValue: undefined,
-                            commodityFadeColor: undefined,
-                            commodityHardenedTitle: undefined,
-                            commodityHardenedAbbrTitle: undefined,
-                            commodityHardenedColor: undefined,
+                            commodityStickers: undefined,
+                            commodityDoppler: undefined,
+                            commodityFade: undefined,
+                            commodityHardened: undefined,
                             transferStatus: undefined,
+                            status: undefined,
         },
         // 表单校验
         formRules: {
@@ -220,24 +174,12 @@
                             templateisFade: undefined,
                             templateisHardened: undefined,
                             templateisDoppler: undefined,
-                            commodityStickersStickerId: undefined,
-                            commodityStickersRawIndex: undefined,
-                            commodityStickersName: undefined,
-                            commodityStickersHashName: undefined,
-                            commodityStickersMaterial: undefined,
-                            commodityStickersImgUrl: undefined,
-                            commodityStickersPrice: undefined,
-                            commodityStickersAbrade: undefined,
-                            commodityDopplerTitle: undefined,
-                            commodityDopplerAbbrTitle: undefined,
-                            commodityDopplerColor: undefined,
-                            commodityFadeTitle: undefined,
-                            commodityFadeNumerialValue: undefined,
-                            commodityFadeColor: undefined,
-                            commodityHardenedTitle: undefined,
-                            commodityHardenedAbbrTitle: undefined,
-                            commodityHardenedColor: undefined,
+                            commodityStickers: undefined,
+                            commodityDoppler: undefined,
+                            commodityFade: undefined,
+                            commodityHardened: undefined,
                             transferStatus: undefined,
+                            status: undefined,
         };
         this.resetForm("formRef");
       }

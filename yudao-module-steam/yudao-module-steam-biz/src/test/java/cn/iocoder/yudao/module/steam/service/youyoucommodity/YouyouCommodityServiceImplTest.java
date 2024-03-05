@@ -114,8 +114,13 @@ public class YouyouCommodityServiceImplTest extends BaseDbUnitTest {
            o.setTemplateId(null);
            o.setCommodityName(null);
            o.setCommodityPrice(null);
-           o.setTransferStatus(null);
            o.setCreateTime(null);
+           o.setCommodityStickers(null);
+           o.setCommodityDoppler(null);
+           o.setCommodityFade(null);
+           o.setCommodityHardened(null);
+           o.setTransferStatus(null);
+           o.setStatus(null);
        });
        youyouCommodityMapper.insert(dbYouyouCommodity);
        // 测试 id 不匹配
@@ -126,18 +131,33 @@ public class YouyouCommodityServiceImplTest extends BaseDbUnitTest {
        youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityName(null)));
        // 测试 commodityPrice 不匹配
        youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityPrice(null)));
-       // 测试 transferStatus 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setTransferStatus(null)));
        // 测试 createTime 不匹配
        youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCreateTime(null)));
+       // 测试 commodityStickers 不匹配
+       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityStickers(null)));
+       // 测试 commodityDoppler 不匹配
+       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityDoppler(null)));
+       // 测试 commodityFade 不匹配
+       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityFade(null)));
+       // 测试 commodityHardened 不匹配
+       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityHardened(null)));
+       // 测试 transferStatus 不匹配
+       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setTransferStatus(null)));
+       // 测试 status 不匹配
+       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setStatus(null)));
        // 准备参数
        YouyouCommodityPageReqVO reqVO = new YouyouCommodityPageReqVO();
        reqVO.setId(null);
        reqVO.setTemplateId(null);
        reqVO.setCommodityName(null);
        reqVO.setCommodityPrice(null);
-       reqVO.setTransferStatus(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
+       reqVO.setCommodityStickers(null);
+       reqVO.setCommodityDoppler(null);
+       reqVO.setCommodityFade(null);
+       reqVO.setCommodityHardened(null);
+       reqVO.setTransferStatus(null);
+       reqVO.setStatus(null);
 
        // 调用
        PageResult<YouyouCommodityDO> pageResult = youyouCommodityService.getYouyouCommodityPage(reqVO);

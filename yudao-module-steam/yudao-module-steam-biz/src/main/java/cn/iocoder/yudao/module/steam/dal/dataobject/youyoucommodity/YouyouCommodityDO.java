@@ -80,77 +80,28 @@ public class YouyouCommodityDO extends BaseDO {
      */
     private Integer templateisDoppler;
     /**
-     * 印花Id
+     * 印花
      */
-    private Integer commodityStickersStickerId;
+    private String commodityStickers;
     /**
-     * 插槽编号
+     * 多普勒属性
      */
-    private Integer commodityStickersRawIndex;
+    private String commodityDoppler;
     /**
-     * 印花名称
+     * 渐变色属性
      */
-    private String commodityStickersName;
+    private String commodityFade;
     /**
-     * 唯一名称
+     * 表面淬火属性
      */
-    private String commodityStickersHashName;
-    /**
-     * 材料
-     */
-    private String commodityStickersMaterial;
-    /**
-     * 图片链接地址
-     */
-    private String commodityStickersImgUrl;
-    /**
-     * 印花价格(单位元)
-     */
-    private String commodityStickersPrice;
-    /**
-     * 磨损值
-     */
-    private String commodityStickersAbrade;
-    /**
-     * 多普勒属性分类名称
-     */
-    private String commodityDopplerTitle;
-    /**
-     * 多普勒属性分类缩写
-     */
-    private String commodityDopplerAbbrTitle;
-    /**
-     * 多普勒属性显示颜色
-     */
-    private String commodityDopplerColor;
-    /**
-     * 渐变色属性属性名称
-     */
-    private String commodityFadeTitle;
-    /**
-     * 渐变色属性对应数值
-     */
-    private String commodityFadeNumerialValue;
-    /**
-     * 渐变色属性显示颜色
-     */
-    private String commodityFadeColor;
-    /**
-     * 表面淬火属性分类名称
-     */
-    private String commodityHardenedTitle;
-    /**
-     * 表面淬火属性分类缩写
-     */
-    private String commodityHardenedAbbrTitle;
-    /**
-     * 表面淬火属性显示颜色
-     */
-    private String commodityHardenedColor;
+    private String commodityHardened;
     /**
      * 发货状态
-     * 枚举 {@link cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum 对应的类}
      */
     private Integer transferStatus;
+    /**
+     * 悠悠商品是否有效0开启1关闭
+     */
+    private Integer status;
 
 }

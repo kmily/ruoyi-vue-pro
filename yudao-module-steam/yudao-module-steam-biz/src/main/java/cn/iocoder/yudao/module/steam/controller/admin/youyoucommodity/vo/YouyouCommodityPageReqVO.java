@@ -27,11 +27,26 @@ public class YouyouCommodityPageReqVO extends PageParam {
     @Schema(description = "商品价格（单位元）", example = "13598")
     private String commodityPrice;
 
-    @Schema(description = "发货状态", example = "2")
-    private String transferStatus;
-
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
+
+    @Schema(description = "印花")
+    private String commodityStickers;
+
+    @Schema(description = "多普勒属性")
+    private String commodityDoppler;
+
+    @Schema(description = "渐变色属性")
+    private String commodityFade;
+
+    @Schema(description = "表面淬火属性")
+    private String commodityHardened;
+
+    @Schema(description = "发货状态", example = "2")
+    private Integer transferStatus;
+
+    @Schema(description = "悠悠商品是否有效0开启1关闭", example = "1")
+    private Integer status;
 
 }
