@@ -82,12 +82,12 @@
           try {
             const res = await YouyouTemplateApi.getYouyouTemplate(id);
             this.formData = res.data;
-            this.title = "修改悠悠商品数据";
+            this.title = "修改悠悠商品模板";
           } finally {
             this.formLoading = false;
           }
         }
-        this.title = "新增悠悠商品数据";
+        this.title = "新增悠悠商品模板";
               },
       /** 提交按钮 */
       async submitForm() {

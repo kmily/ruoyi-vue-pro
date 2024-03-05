@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
- * 悠悠商品数据 DO
+ * 悠悠商品模板 DO
  *
  * @author 管理员
  */

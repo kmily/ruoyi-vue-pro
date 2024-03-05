@@ -29,7 +29,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
 import cn.iocoder.yudao.module.steam.service.youyoutemplate.YouyouTemplateService;
 
-@Tag(name = "管理后台 - 悠悠商品数据")
+@Tag(name = "管理后台 - 悠悠商品模板")
 @RestController
 @RequestMapping("/steam/youyou-template")
 @Validated
@@ -39,14 +39,14 @@ public class YouyouTemplateController {
     private YouyouTemplateService youyouTemplateService;
 
     @PostMapping("/create")
-    @Operation(summary = "创建悠悠商品数据")
+    @Operation(summary = "创建悠悠商品模板")
     @PreAuthorize("@ss.hasPermission('steam:youyou-template:create')")
     public CommonResult<Integer> createYouyouTemplate(@Valid @RequestBody YouyouTemplateSaveReqVO createReqVO) {
         return success(youyouTemplateService.createYouyouTemplate(createReqVO));
     }
 
     @PutMapping("/update")
-    @Operation(summary = "更新悠悠商品数据")
+    @Operation(summary = "更新悠悠商品模板")
     @PreAuthorize("@ss.hasPermission('steam:youyou-template:update')")
     public CommonResult<Boolean> updateYouyouTemplate(@Valid @RequestBody YouyouTemplateSaveReqVO updateReqVO) {
         youyouTemplateService.updateYouyouTemplate(updateReqVO);
@@ -54,7 +54,7 @@ public class YouyouTemplateController {
     }
 
     @DeleteMapping("/delete")
-    @Operation(summary = "删除悠悠商品数据")
+    @Operation(summary = "删除悠悠商品模板")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('steam:youyou-template:delete')")
     public CommonResult<Boolean> deleteYouyouTemplate(@RequestParam("id") Integer id) {
@@ -63,7 +63,7 @@ public class YouyouTemplateController {
     }
 
     @GetMapping("/get")
-    @Operation(summary = "获得悠悠商品数据")
+    @Operation(summary = "获得悠悠商品模板")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('steam:youyou-template:query')")
     public CommonResult<YouyouTemplateRespVO> getYouyouTemplate(@RequestParam("id") Integer id) {
@@ -72,7 +72,7 @@ public class YouyouTemplateController {
     }
 
     @GetMapping("/page")
-    @Operation(summary = "获得悠悠商品数据分页")
+    @Operation(summary = "获得悠悠商品模板分页")
     @PreAuthorize("@ss.hasPermission('steam:youyou-template:query')")
     public CommonResult<PageResult<YouyouTemplateRespVO>> getYouyouTemplatePage(@Valid YouyouTemplatePageReqVO pageReqVO) {
         PageResult<YouyouTemplateDO> pageResult = youyouTemplateService.getYouyouTemplatePage(pageReqVO);
@@ -80,7 +80,7 @@ public class YouyouTemplateController {
     }
 
     @GetMapping("/export-excel")
-    @Operation(summary = "导出悠悠商品数据 Excel")
+    @Operation(summary = "导出悠悠商品模板 Excel")
     @PreAuthorize("@ss.hasPermission('steam:youyou-template:export')")
     @OperateLog(type = EXPORT)
     public void exportYouyouTemplateExcel(@Valid YouyouTemplatePageReqVO pageReqVO,
@@ -88,7 +88,7 @@ public class YouyouTemplateController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<YouyouTemplateDO> list = youyouTemplateService.getYouyouTemplatePage(pageReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "悠悠商品数据.xls", "数据", YouyouTemplateRespVO.class,
+        ExcelUtils.write(response, "悠悠商品模板.xls", "数据", YouyouTemplateRespVO.class,
                         BeanUtils.toBean(list, YouyouTemplateRespVO.class));
     }
 

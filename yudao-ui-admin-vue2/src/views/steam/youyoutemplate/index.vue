@@ -103,7 +103,7 @@ export default {
       showSearch: true,
               // 总条数
         total: 0,
-      // 悠悠商品数据列表
+      // 悠悠商品模板列表
       list: [],
       // 是否展开，默认全部展开
       isExpandAll: true,
@@ -160,7 +160,7 @@ export default {
     /** 删除按钮操作 */
     async handleDelete(row) {
       const id = row.id;
-      await this.$modal.confirm('是否确认删除悠悠商品数据编号为"' + id + '"的数据项?')
+      await this.$modal.confirm('是否确认删除悠悠商品模板编号为"' + id + '"的数据项?')
       try {
        await YouyouTemplateApi.deleteYouyouTemplate(id);
        await this.getList();
@@ -169,11 +169,11 @@ export default {
     },
     /** 导出按钮操作 */
     async handleExport() {
-      await this.$modal.confirm('是否确认导出所有悠悠商品数据数据项?');
+      await this.$modal.confirm('是否确认导出所有悠悠商品模板数据项?');
       try {
         this.exportLoading = true;
         const res = await YouyouTemplateApi.exportYouyouTemplateExcel(this.queryParams);
-        this.$download.excel(res, '悠悠商品数据.xls');
+        this.$download.excel(res, '悠悠商品模板.xls');
       } catch {
       } finally {
         this.exportLoading = false;

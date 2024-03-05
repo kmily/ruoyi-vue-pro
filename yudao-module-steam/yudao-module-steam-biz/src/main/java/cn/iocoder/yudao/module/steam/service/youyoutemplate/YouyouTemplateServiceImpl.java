@@ -18,7 +18,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants.*;
 
 /**
- * 悠悠商品数据 Service 实现类
+ * 悠悠商品模板 Service 实现类
  *
  * @author 管理员
  */

@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.*;
 
 /**
- * 悠悠商品数据 Mapper
+ * 悠悠商品模板 Mapper
  *
  * @author 管理员
  */

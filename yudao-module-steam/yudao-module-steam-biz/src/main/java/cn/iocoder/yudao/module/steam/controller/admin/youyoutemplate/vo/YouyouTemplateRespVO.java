@@ -8,7 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import com.alibaba.excel.annotation.*;
 
-@Schema(description = "管理后台 - 悠悠商品数据 Response VO")
+@Schema(description = "管理后台 - 悠悠商品模板 Response VO")
 @Data
 @ExcelIgnoreUnannotated
 public class YouyouTemplateRespVO {
