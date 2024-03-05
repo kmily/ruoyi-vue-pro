@@ -99,7 +99,7 @@ public class YouyouTemplateServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testDeleteYouyouTemplate_notExists() {
         // 准备参数
-        Integer id = randomIntegerId();
+        Integer id = 1;
 
         // 调用, 并断言异常
         assertServiceException(() -> youyouTemplateService.deleteYouyouTemplate(id), YOUYOU_TEMPLATE_NOT_EXISTS);
