@@ -131,35 +131,47 @@ public class SteamWeb {
      * 初始化apikey session browserid等数据为必调接口
      */
     private void initApiKey() {
-        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-        builder.url("https://steamcommunity.com/dev/apikey");
-        builder.method(HttpUtil.Method.GET);
+        HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder1 = HttpUtil.ProxyRequestVo.builder();
+        builder1.url("https://steamcommunity.com/dev/apikey");
         Map<String, String> header = new HashMap<>();
         header.put("Accept-Language", "zh-CN,zh;q=0.9");
-        builder.headers(header);
-        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 3000, cookieString, "https://steamcommunity.com/dev/apikey"));
+        builder1.headers(header);
+        builder1.cookieString(cookieString);
+        HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder1.build());
+        if(Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus()!=200){
+            throw new ServiceException(-1, "apiKey失败");
+        }
+
+//        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+//        builder.url("https://steamcommunity.com/dev/apikey");
+//        builder.method(HttpUtil.Method.GET);
+//        Map<String, String> header = new HashMap<>();
+//        header.put("Accept-Language", "zh-CN,zh;q=0.9");
+//        builder.headers(header);
+//        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 3000, cookieString, "https://steamcommunity.com/dev/apikey"));
         Pattern pattern = Pattern.compile("密钥: (.*?)<"); // 正则表达式匹配API密钥
-        Matcher matcher = pattern.matcher(sent.html());
+        Matcher matcher = pattern.matcher(proxyResponseVo.getHtml());
         if (matcher.find()) {
             webApiKey = Optional.of(matcher.group(1));
         }
         Pattern pattern2 = Pattern.compile("https://steamcommunity.com/profiles/(\\d+)/");
-        Matcher matcher2 = pattern2.matcher(sent.html());
+        Matcher matcher2 = pattern2.matcher(proxyResponseVo.getHtml());
         if (matcher2.find()) {
             steamId = Optional.of(matcher2.group(1));
         }
         //set browserid
-        Optional<Cookie> browserOptional = sent.getCookies().stream().filter(item -> item.name().equals("browserid")).findFirst();
-        if (browserOptional.isPresent()) {
-            browserid = Optional.of(browserOptional.get().value());
-            cookieString += ";browserid=" + browserid.get();
+        Map<String, String> cookies = proxyResponseVo.getCookies();
+        String browserid = cookies.get("browserid");
+        if (Objects.isNull(browserid)) {
+            this.browserid = Optional.of(browserid);
+            cookieString += ";browserid=" + this.browserid.get();
         } else {
             throw new ServiceException(-1, "获取浏览器ID失败");
         }
-        Optional<Cookie> sessionOptional = sent.getCookies().stream().filter(item -> item.name().equals("sessionid")).findFirst();
-        if (sessionOptional.isPresent()) {
-            sessionId = Optional.of(sessionOptional.get().value());
-            cookieString += ";sessionid=" + sessionId.get();
+        String sessionid = cookies.get("sessionid");
+        if (Objects.isNull(sessionid)) {
+            sessionId = Optional.of(sessionid);
+            cookieString += ";sessionid=" + sessionid;
         } else {
             throw new ServiceException(-1, "获取sesionID失败");
         }
