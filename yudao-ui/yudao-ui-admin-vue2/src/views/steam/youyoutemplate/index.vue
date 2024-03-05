@@ -30,6 +30,9 @@
         <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
                         range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
+      <el-form-item label="模板ID" prop="templateId">
+        <el-input v-model="queryParams.templateId" placeholder="请输入模板ID" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -50,8 +53,7 @@
     </el-row>
 
             <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
-            <el-table-column label="模板编号" align="center" prop="id" />
-      <el-table-column label="武器全称" align="center" prop="name" />
+            <el-table-column label="武器全称" align="center" prop="name" />
       <el-table-column label="武器英文全称" align="center" prop="hashName" />
       <el-table-column label="类型编号" align="center" prop="typeId" />
       <el-table-column label="类型名称" align="center" prop="typeName" />
@@ -64,6 +66,8 @@
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="主键ID" align="center" prop="id" />
+      <el-table-column label="模板ID" align="center" prop="templateId" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
@@ -99,7 +103,7 @@ export default {
       showSearch: true,
               // 总条数
         total: 0,
-      // 悠悠商品数据列表
+      // 悠悠商品模板列表
       list: [],
       // 是否展开，默认全部展开
       isExpandAll: true,
@@ -120,6 +124,7 @@ export default {
         weaponName: null,
         weaponHashName: null,
         createTime: [],
+        templateId: null,
       },
             };
   },
@@ -155,7 +160,7 @@ export default {
     /** 删除按钮操作 */
     async handleDelete(row) {
       const id = row.id;
-      await this.$modal.confirm('是否确认删除悠悠商品数据编号为"' + id + '"的数据项?')
+      await this.$modal.confirm('是否确认删除悠悠商品模板编号为"' + id + '"的数据项?')
       try {
        await YouyouTemplateApi.deleteYouyouTemplate(id);
        await this.getList();
@@ -164,11 +169,11 @@ export default {
     },
     /** 导出按钮操作 */
     async handleExport() {
-      await this.$modal.confirm('是否确认导出所有悠悠商品数据数据项?');
+      await this.$modal.confirm('是否确认导出所有悠悠商品模板数据项?');
       try {
         this.exportLoading = true;
         const res = await YouyouTemplateApi.exportYouyouTemplateExcel(this.queryParams);
-        this.$download.excel(res, '悠悠商品数据.xls');
+        this.$download.excel(res, '悠悠商品模板.xls');
       } catch {
       } finally {
         this.exportLoading = false;
@@ -176,4 +181,4 @@ export default {
     },
               }
 };
-</script>
+</script>

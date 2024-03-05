@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-// 创建悠悠商品数据
+// 创建悠悠商品模板
 export function createYouyouTemplate(data) {
   return request({
     url: '/steam/youyou-template/create',
@@ -9,7 +9,7 @@ export function createYouyouTemplate(data) {
   })
 }
 
-// 更新悠悠商品数据
+// 更新悠悠商品模板
 export function updateYouyouTemplate(data) {
   return request({
     url: '/steam/youyou-template/update',
@@ -18,7 +18,7 @@ export function updateYouyouTemplate(data) {
   })
 }
 
-// 删除悠悠商品数据
+// 删除悠悠商品模板
 export function deleteYouyouTemplate(id) {
   return request({
     url: '/steam/youyou-template/delete?id=' + id,
@@ -26,7 +26,7 @@ export function deleteYouyouTemplate(id) {
   })
 }
 
-// 获得悠悠商品数据
+// 获得悠悠商品模板
 export function getYouyouTemplate(id) {
   return request({
     url: '/steam/youyou-template/get?id=' + id,
@@ -34,7 +34,7 @@ export function getYouyouTemplate(id) {
   })
 }
 
-// 获得悠悠商品数据分页
+// 获得悠悠商品模板分页
 export function getYouyouTemplatePage(params) {
   return request({
     url: '/steam/youyou-template/page',
@@ -42,7 +42,7 @@ export function getYouyouTemplatePage(params) {
     params
   })
 }
-// 导出悠悠商品数据 Excel
+// 导出悠悠商品模板 Excel
 export function exportYouyouTemplateExcel(params) {
   return request({
     url: '/steam/youyou-template/export-excel',
@@ -50,4 +50,4 @@ export function exportYouyouTemplateExcel(params) {
     params,
     responseType: 'blob'
   })
-}
+}

@@ -27,6 +27,9 @@
                     <el-form-item label="武器英文名称" prop="weaponHashName">
                       <el-input v-model="formData.weaponHashName" placeholder="请输入武器英文名称" />
                     </el-form-item>
+                    <el-form-item label="模板ID" prop="templateId">
+                      <el-input v-model="formData.templateId" placeholder="请输入模板ID" />
+                    </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm" :disabled="formLoading">确 定</el-button>
@@ -52,7 +55,6 @@
         formLoading: false,
         // 表单参数
         formData: {
-                            id: undefined,
                             name: undefined,
                             hashName: undefined,
                             typeId: undefined,
@@ -61,6 +63,8 @@
                             weaponId: undefined,
                             weaponName: undefined,
                             weaponHashName: undefined,
+                            id: undefined,
+                            templateId: undefined,
         },
         // 表单校验
         formRules: {
@@ -78,12 +82,12 @@
           try {
             const res = await YouyouTemplateApi.getYouyouTemplate(id);
             this.formData = res.data;
-            this.title = "修改悠悠商品数据";
+            this.title = "修改悠悠商品模板";
           } finally {
             this.formLoading = false;
           }
         }
-        this.title = "新增悠悠商品数据";
+        this.title = "新增悠悠商品模板";
               },
       /** 提交按钮 */
       async submitForm() {
@@ -112,7 +116,6 @@
                       /** 表单重置 */
       reset() {
         this.formData = {
-                            id: undefined,
                             name: undefined,
                             hashName: undefined,
                             typeId: undefined,
@@ -121,9 +124,11 @@
                             weaponId: undefined,
                             weaponName: undefined,
                             weaponHashName: undefined,
+                            id: undefined,
+                            templateId: undefined,
         };
         this.resetForm("formRef");
       }
     }
   };
-</script>
+</script>
