@@ -114,33 +114,6 @@ public class YouyouCommodityServiceImplTest extends BaseDbUnitTest {
            o.setTemplateId(null);
            o.setCommodityName(null);
            o.setCommodityPrice(null);
-           o.setCommodityAbrade(null);
-           o.setCommodityPaintSeed(null);
-           o.setCommodityPaintIndex(null);
-           o.setCommodityHaveNameTag(null);
-           o.setCommodityHaveBuzhang(null);
-           o.setCommodityHaveSticker(null);
-           o.setShippingMode(null);
-           o.setTemplateisFade(null);
-           o.setTemplateisHardened(null);
-           o.setTemplateisDoppler(null);
-           o.setCommodityStickersStickerId(null);
-           o.setCommodityStickersRawIndex(null);
-           o.setCommodityStickersName(null);
-           o.setCommodityStickersHashName(null);
-           o.setCommodityStickersMaterial(null);
-           o.setCommodityStickersImgUrl(null);
-           o.setCommodityStickersPrice(null);
-           o.setCommodityStickersAbrade(null);
-           o.setCommodityDopplerTitle(null);
-           o.setCommodityDopplerAbbrTitle(null);
-           o.setCommodityDopplerColor(null);
-           o.setCommodityFadeTitle(null);
-           o.setCommodityFadeNumerialValue(null);
-           o.setCommodityFadeColor(null);
-           o.setCommodityHardenedTitle(null);
-           o.setCommodityHardenedAbbrTitle(null);
-           o.setCommodityHardenedColor(null);
            o.setTransferStatus(null);
            o.setCreateTime(null);
        });
@@ -153,60 +126,6 @@ public class YouyouCommodityServiceImplTest extends BaseDbUnitTest {
        youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityName(null)));
        // 测试 commodityPrice 不匹配
        youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityPrice(null)));
-       // 测试 commodityAbrade 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityAbrade(null)));
-       // 测试 commodityPaintSeed 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityPaintSeed(null)));
-       // 测试 commodityPaintIndex 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityPaintIndex(null)));
-       // 测试 commodityHaveNameTag 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityHaveNameTag(null)));
-       // 测试 commodityHaveBuzhang 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityHaveBuzhang(null)));
-       // 测试 commodityHaveSticker 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityHaveSticker(null)));
-       // 测试 shippingMode 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setShippingMode(null)));
-       // 测试 templateisFade 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setTemplateisFade(null)));
-       // 测试 templateisHardened 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setTemplateisHardened(null)));
-       // 测试 templateisDoppler 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setTemplateisDoppler(null)));
-       // 测试 commodityStickersStickerId 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityStickersStickerId(null)));
-       // 测试 commodityStickersRawIndex 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityStickersRawIndex(null)));
-       // 测试 commodityStickersName 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityStickersName(null)));
-       // 测试 commodityStickersHashName 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityStickersHashName(null)));
-       // 测试 commodityStickersMaterial 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityStickersMaterial(null)));
-       // 测试 commodityStickersImgUrl 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityStickersImgUrl(null)));
-       // 测试 commodityStickersPrice 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityStickersPrice(null)));
-       // 测试 commodityStickersAbrade 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityStickersAbrade(null)));
-       // 测试 commodityDopplerTitle 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityDopplerTitle(null)));
-       // 测试 commodityDopplerAbbrTitle 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityDopplerAbbrTitle(null)));
-       // 测试 commodityDopplerColor 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityDopplerColor(null)));
-       // 测试 commodityFadeTitle 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityFadeTitle(null)));
-       // 测试 commodityFadeNumerialValue 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityFadeNumerialValue(null)));
-       // 测试 commodityFadeColor 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityFadeColor(null)));
-       // 测试 commodityHardenedTitle 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityHardenedTitle(null)));
-       // 测试 commodityHardenedAbbrTitle 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityHardenedAbbrTitle(null)));
-       // 测试 commodityHardenedColor 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityHardenedColor(null)));
        // 测试 transferStatus 不匹配
        youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setTransferStatus(null)));
        // 测试 createTime 不匹配
@@ -217,33 +136,6 @@ public class YouyouCommodityServiceImplTest extends BaseDbUnitTest {
        reqVO.setTemplateId(null);
        reqVO.setCommodityName(null);
        reqVO.setCommodityPrice(null);
-       reqVO.setCommodityAbrade(null);
-       reqVO.setCommodityPaintSeed(null);
-       reqVO.setCommodityPaintIndex(null);
-       reqVO.setCommodityHaveNameTag(null);
-       reqVO.setCommodityHaveBuzhang(null);
-       reqVO.setCommodityHaveSticker(null);
-       reqVO.setShippingMode(null);
-       reqVO.setTemplateisFade(null);
-       reqVO.setTemplateisHardened(null);
-       reqVO.setTemplateisDoppler(null);
-       reqVO.setCommodityStickersStickerId(null);
-       reqVO.setCommodityStickersRawIndex(null);
-       reqVO.setCommodityStickersName(null);
-       reqVO.setCommodityStickersHashName(null);
-       reqVO.setCommodityStickersMaterial(null);
-       reqVO.setCommodityStickersImgUrl(null);
-       reqVO.setCommodityStickersPrice(null);
-       reqVO.setCommodityStickersAbrade(null);
-       reqVO.setCommodityDopplerTitle(null);
-       reqVO.setCommodityDopplerAbbrTitle(null);
-       reqVO.setCommodityDopplerColor(null);
-       reqVO.setCommodityFadeTitle(null);
-       reqVO.setCommodityFadeNumerialValue(null);
-       reqVO.setCommodityFadeColor(null);
-       reqVO.setCommodityHardenedTitle(null);
-       reqVO.setCommodityHardenedAbbrTitle(null);
-       reqVO.setCommodityHardenedColor(null);
        reqVO.setTransferStatus(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 

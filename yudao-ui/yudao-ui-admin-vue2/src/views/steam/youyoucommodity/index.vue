@@ -14,87 +14,6 @@
       <el-form-item label="商品价格（单位元）" prop="commodityPrice">
         <el-input v-model="queryParams.commodityPrice" placeholder="请输入商品价格（单位元）" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="商品磨损度" prop="commodityAbrade">
-        <el-input v-model="queryParams.commodityAbrade" placeholder="请输入商品磨损度" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="图案模板" prop="commodityPaintSeed">
-        <el-input v-model="queryParams.commodityPaintSeed" placeholder="请输入图案模板" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="皮肤编号" prop="commodityPaintIndex">
-        <el-input v-model="queryParams.commodityPaintIndex" placeholder="请输入皮肤编号" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="是否有名称标签：0否1是" prop="commodityHaveNameTag">
-        <el-input v-model="queryParams.commodityHaveNameTag" placeholder="请输入是否有名称标签：0否1是" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="是否有布章：0否1是" prop="commodityHaveBuzhang">
-        <el-input v-model="queryParams.commodityHaveBuzhang" placeholder="请输入是否有布章：0否1是" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="是否有印花：0否1是" prop="commodityHaveSticker">
-        <el-input v-model="queryParams.commodityHaveSticker" placeholder="请输入是否有印花：0否1是" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="发货模式：0,卖家直发；1,极速发货" prop="shippingMode">
-        <el-input v-model="queryParams.shippingMode" placeholder="请输入发货模式：0,卖家直发；1,极速发货" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="是否渐变色：0否1是" prop="templateisFade">
-        <el-input v-model="queryParams.templateisFade" placeholder="请输入是否渐变色：0否1是" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="Integer	是否表面淬火：0否1是" prop="templateisHardened">
-        <el-input v-model="queryParams.templateisHardened" placeholder="请输入Integer	是否表面淬火：0否1是" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="是否多普勒：0否1是" prop="templateisDoppler">
-        <el-input v-model="queryParams.templateisDoppler" placeholder="请输入是否多普勒：0否1是" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="印花Id" prop="commodityStickersStickerId">
-        <el-input v-model="queryParams.commodityStickersStickerId" placeholder="请输入印花Id" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="插槽编号" prop="commodityStickersRawIndex">
-        <el-input v-model="queryParams.commodityStickersRawIndex" placeholder="请输入插槽编号" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="印花名称" prop="commodityStickersName">
-        <el-input v-model="queryParams.commodityStickersName" placeholder="请输入印花名称" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="唯一名称" prop="commodityStickersHashName">
-        <el-input v-model="queryParams.commodityStickersHashName" placeholder="请输入唯一名称" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="材料" prop="commodityStickersMaterial">
-        <el-input v-model="queryParams.commodityStickersMaterial" placeholder="请输入材料" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="图片链接地址" prop="commodityStickersImgUrl">
-        <el-input v-model="queryParams.commodityStickersImgUrl" placeholder="请输入图片链接地址" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="印花价格(单位元)" prop="commodityStickersPrice">
-        <el-input v-model="queryParams.commodityStickersPrice" placeholder="请输入印花价格(单位元)" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="磨损值" prop="commodityStickersAbrade">
-        <el-input v-model="queryParams.commodityStickersAbrade" placeholder="请输入磨损值" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="多普勒属性分类名称" prop="commodityDopplerTitle">
-        <el-input v-model="queryParams.commodityDopplerTitle" placeholder="请输入多普勒属性分类名称" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="多普勒属性分类缩写" prop="commodityDopplerAbbrTitle">
-        <el-input v-model="queryParams.commodityDopplerAbbrTitle" placeholder="请输入多普勒属性分类缩写" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="多普勒属性显示颜色" prop="commodityDopplerColor">
-        <el-input v-model="queryParams.commodityDopplerColor" placeholder="请输入多普勒属性显示颜色" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="渐变色属性属性名称" prop="commodityFadeTitle">
-        <el-input v-model="queryParams.commodityFadeTitle" placeholder="请输入渐变色属性属性名称" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="渐变色属性对应数值" prop="commodityFadeNumerialValue">
-        <el-input v-model="queryParams.commodityFadeNumerialValue" placeholder="请输入渐变色属性对应数值" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="渐变色属性显示颜色" prop="commodityFadeColor">
-        <el-input v-model="queryParams.commodityFadeColor" placeholder="请输入渐变色属性显示颜色" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="表面淬火属性分类名称" prop="commodityHardenedTitle">
-        <el-input v-model="queryParams.commodityHardenedTitle" placeholder="请输入表面淬火属性分类名称" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="表面淬火属性分类缩写" prop="commodityHardenedAbbrTitle">
-        <el-input v-model="queryParams.commodityHardenedAbbrTitle" placeholder="请输入表面淬火属性分类缩写" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="表面淬火属性显示颜色" prop="commodityHardenedColor">
-        <el-input v-model="queryParams.commodityHardenedColor" placeholder="请输入表面淬火属性显示颜色" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
       <el-form-item label="发货状态" prop="transferStatus">
         <el-select v-model="queryParams.transferStatus" placeholder="请选择发货状态" clearable size="small">
           <el-option label="请选择字典生成" value="" />
@@ -212,33 +131,6 @@ export default {
         templateId: null,
         commodityName: null,
         commodityPrice: null,
-        commodityAbrade: null,
-        commodityPaintSeed: null,
-        commodityPaintIndex: null,
-        commodityHaveNameTag: null,
-        commodityHaveBuzhang: null,
-        commodityHaveSticker: null,
-        shippingMode: null,
-        templateisFade: null,
-        templateisHardened: null,
-        templateisDoppler: null,
-        commodityStickersStickerId: null,
-        commodityStickersRawIndex: null,
-        commodityStickersName: null,
-        commodityStickersHashName: null,
-        commodityStickersMaterial: null,
-        commodityStickersImgUrl: null,
-        commodityStickersPrice: null,
-        commodityStickersAbrade: null,
-        commodityDopplerTitle: null,
-        commodityDopplerAbbrTitle: null,
-        commodityDopplerColor: null,
-        commodityFadeTitle: null,
-        commodityFadeNumerialValue: null,
-        commodityFadeColor: null,
-        commodityHardenedTitle: null,
-        commodityHardenedAbbrTitle: null,
-        commodityHardenedColor: null,
         transferStatus: null,
         createTime: [],
       },
