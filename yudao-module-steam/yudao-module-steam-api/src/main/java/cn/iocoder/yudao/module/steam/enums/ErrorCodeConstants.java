@@ -78,8 +78,9 @@ public interface ErrorCodeConstants {
     ErrorCode YOUYOU_TEMPLATE_NOT_EXISTS = new ErrorCode(1_300_010_01, "悠悠商品数据不存在");
     // ========== steam订单 TODO 补充编号 ==========
     ErrorCode YOUYOU_ORDER_NOT_EXISTS = new ErrorCode(1_100_012_01, "steam订单不存在");
-    // ========== 查询商品列 TODO 补充编号 ==========
-    ErrorCode YOUYOU_GOODSLIST_NOT_EXISTS = new ErrorCode(1_300_010_02, "查询商品列不存在");
+
+    // ========== 悠悠商品列表 TODO 补充编号 ==========
+    ErrorCode YOUYOU_COMMODITY_NOT_EXISTS = new ErrorCode(1_300_010_02, "悠悠商品列表不存在");
 
 
 }
