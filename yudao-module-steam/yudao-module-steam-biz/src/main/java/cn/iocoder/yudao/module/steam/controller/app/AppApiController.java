@@ -72,7 +72,7 @@ public class AppApiController {
     private PayOrderService payOrderService;
 
     @Autowired
-    private UUOrderService youYouOrderService;
+    private UUOrderService uUOrderService;
 
     /**
      * api余额接口
@@ -151,7 +151,7 @@ public class AppApiController {
                 }
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1l);
-                YouyouOrderDO invOrder = youYouOrderService.createInvOrder(loginUser, openApiReqVo.getData());
+                YouyouOrderDO invOrder = uUOrderService.createInvOrder(loginUser, openApiReqVo.getData());
 
                 CreateByIdRespVo ret=new CreateByIdRespVo();
                 ret.setPayAmount(Double.valueOf(invOrder.getPayAmount()/100));
@@ -179,7 +179,7 @@ public class AppApiController {
                 }
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1l);
-                YouyouOrderDO invOrder = youYouOrderService.createInvOrder(loginUser, openApiReqVo.getData());
+                YouyouOrderDO invOrder = uUOrderService.createInvOrder(loginUser, openApiReqVo.getData());
                 CreateByTemplateRespVo ret=new CreateByTemplateRespVo();
                 ret.setPayAmount(Double.valueOf(invOrder.getPayAmount()/100));
                 ret.setOrderNo(invOrder.getOrderNo());
