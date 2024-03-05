@@ -187,18 +187,30 @@ public class SteamWeb {
         if (!steamId.isPresent()) {
             throw new ServiceException(-1, "初始化steam失败，请重新登录");
         }
-        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-        builder.url("https://steamcommunity.com/profiles/:steamId/tradeoffers/privacy");
-        builder.method(HttpUtil.Method.GET);
+        HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder1 = HttpUtil.ProxyRequestVo.builder();
+        builder1.url("https://steamcommunity.com/profiles/:steamId/tradeoffers/privacy").cookieString(cookieString);
         Map<String, String> header = new HashMap<>();
         header.put("Accept-Language", "zh-CN,zh;q=0.9");
-        builder.headers(header);
+        builder1.headers(header);
         Map<String, String> pathVar = new HashMap<>();
         pathVar.put("steamId", steamId.get());
-        builder.pathVar(pathVar);
-        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 3000, cookieString, "https://steamcommunity.com/dev/apikey"));
+        builder1.pathVar(pathVar);
+        HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder1.build());
+        if(Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus()!=200){
+            throw new ServiceException(-1, "初始化steam失败");
+        }
+//        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+//        builder.url("https://steamcommunity.com/profiles/:steamId/tradeoffers/privacy");
+//        builder.method(HttpUtil.Method.GET);
+//        Map<String, String> header = new HashMap<>();
+//        header.put("Accept-Language", "zh-CN,zh;q=0.9");
+//        builder.headers(header);
+//        Map<String, String> pathVar = new HashMap<>();
+//        pathVar.put("steamId", steamId.get());
+//        builder.pathVar(pathVar);
+//        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 3000, cookieString, "https://steamcommunity.com/dev/apikey"));
         Pattern pattern = Pattern.compile("value=\"(.*?)\"");
-        Matcher matcher = pattern.matcher(sent.html());
+        Matcher matcher = pattern.matcher(proxyResponseVo.getHtml());
         if (matcher.find()) {
             treadUrl = Optional.of(matcher.group(1));
         } else {
@@ -232,14 +244,31 @@ public class SteamWeb {
         } catch (UnsupportedEncodingException e) {
             return TradeUrlStatus.ERRORURL;
         }
-        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-        builder.url(tradeUrl).method(HttpUtil.Method.GET);
-        Map<String, String> header = new HashMap<>();
-        header.put("Accept-Language", "zh-CN,zh;q=0.9");
-        builder.headers(header);
+//        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+//        builder.url(tradeUrl).method(HttpUtil.Method.GET);
+//        Map<String, String> header = new HashMap<>();
+//        header.put("Accept-Language", "zh-CN,zh;q=0.9");
+//        builder.headers(header);
         try{
-            HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 3000, cookieString, "https://steamcommunity.com/dev/apikey"));
-            String html = sent.html();
+            HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder1 = HttpUtil.ProxyRequestVo.builder();
+            builder1.url(tradeUrl).cookieString(cookieString);
+            Map<String, String> header = new HashMap<>();
+            header.put("Accept-Language", "zh-CN,zh;q=0.9");
+            builder1.headers(header);
+            Map<String, String> pathVar = new HashMap<>();
+            pathVar.put("steamId", steamId.get());
+            builder1.pathVar(pathVar);
+            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder1.build());
+            if(Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus()!=200){
+                throw new ServiceException(-1, "初始化steam失败");
+            }
+
+
+
+
+
+//            HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 3000, cookieString, "https://steamcommunity.com/dev/apikey"));
+            String html = proxyResponseVo.getHtml();
 
             if (html.contains("此用户帐户功能受限")) {
                 return TradeUrlStatus.LIMIT;
