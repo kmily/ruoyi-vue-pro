@@ -19,11 +19,13 @@ import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenYoupinApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal.WithdrawalDO;
 
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
+import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 
@@ -115,6 +117,10 @@ public class UUOrderServiceImpl implements UUOrderService {
     private YouyouCommodityMapper youyouCommodityMapper;
     @Resource
     private SteamService steamService;
+
+
+    @Resource
+    private BindUserMapper bindUserMapper;
 
     public UUOrderServiceImpl() {
     }
@@ -262,12 +268,21 @@ public class UUOrderServiceImpl implements UUOrderService {
         return youyouOrderDO;
     }
     private YouyouOrderDO validateInvOrderCanCreate(YouyouOrderDO youyouOrderDO) {
+        //检测交易链接
         try{
             steamService.checkTradeUrlFormat(youyouOrderDO.getTradeLinks());
         }catch (ServiceException e){
             throw exception(OpenApiCode.ERR_5408);
         }
-
+        //检测交易链接是否是自己
+        Long aLong = bindUserMapper.selectCount(new LambdaQueryWrapperX<BindUserDO>()
+                .eq(BindUserDO::getUserId, youyouOrderDO.getUserId())
+                .eqIfPresent(BindUserDO::getUserType, youyouOrderDO.getUserType())
+                .eqIfPresent(BindUserDO::getTradeUrl, youyouOrderDO.getTradeLinks())
+        );
+        if(aLong>0){
+            throw exception(OpenApiCode.ERR_5407);
+        }
         if(Objects.isNull(youyouOrderDO.getCommodityHashName()) && Objects.isNull(youyouOrderDO.getCommodityTemplateId()) && Objects.isNull(youyouOrderDO.getCommodityId())){
             throw exception(ErrorCodeConstants.UU_GOODS_ERR);
         }
