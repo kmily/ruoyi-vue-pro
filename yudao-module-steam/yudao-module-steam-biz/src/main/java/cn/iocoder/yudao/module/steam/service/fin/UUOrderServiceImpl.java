@@ -298,12 +298,12 @@ public class UUOrderServiceImpl implements UUOrderService {
             throw exception(OpenApiCode.ERR_5214);
         }
         // TODO 如果数据出错  请检查此处 mapper 是否正确
-        YouyouCommodityDO youyouGoodslistDO = youyouCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
+        YouyouCommodityDO youyouCommodityDO = youyouCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
 
 
 //        SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
-////        //校验订单是否存在
-        if (youyouGoodslistDO == null) {
+        //校验商品是否存在
+        if (Objects.isNull(youyouCommodityDO)) {
             throw exception(ErrorCodeConstants.UU_GOODS_NOT_FOUND);
         }
 //        if(CommonStatusEnum.isDisable(sellingDO.getStatus())){
