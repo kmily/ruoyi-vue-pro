@@ -557,10 +557,9 @@ public class UUOrderServiceImpl implements UUOrderService {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUNDED);
         }
         //检查是否已发货
-//        TransferMsg transferText = invOrderDO.getTransferText();
-//        if(Objects.isNull(transferText) && Objects.isNull(transferText.getTradeofferid())){
-//            throw exception(ErrorCodeConstants.INVORDER_ORDER_TRANSFER_ALERY);
-//        }
+        if(InvSellCashStatusEnum.CASHED.getStatus().equals(youyouOrderDO.getSellCashStatus())){
+            throw exception(ErrorCodeConstants.INVORDER_ORDER_TRANSFER_ALERY);
+        }
         return youyouOrderDO;
     }
 
