@@ -67,6 +67,7 @@ public interface ErrorCodeConstants {
     ErrorCode UU_GOODS_ORDERED_EXCEPT = new ErrorCode(1_100_011_01, "此库存已经存在有效订单");
     ErrorCode UU_GOODS_AMOUNT_EXCEPT = new ErrorCode(1_100_011_03, "金额不正确");
     ErrorCode UU_GOODS_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID = new ErrorCode(1_100_011_04, "订单不是【未支付】状态");
+    ErrorCode UU_WALLET_NO_MONEY = new ErrorCode(1_100_011_04, "用户钱包余额不足");
     // 饰品在售预览
     ErrorCode INV_PREVIEW_NOT_EXISTS = new ErrorCode(1_100_010_01, "饰品在售预览不存在");
 
