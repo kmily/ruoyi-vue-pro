@@ -21,11 +21,11 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal.WithdrawalDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.youyougoodslist.YouyouGoodslistDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.youyougoodslist.YouyouGoodslistMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.youyoucommodity.YouyouCommodityMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.service.OpenApiService;
@@ -107,7 +107,7 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
     @Resource
     private YouyouOrderMapper youyouOrderMapper;
     @Resource
-    private YouyouGoodslistMapper youyouGoodslistMapper;
+    private YouyouCommodityMapper youyouCommodityMapper;
 
     public YouYouOrderServiceImpl() {
     }
@@ -265,12 +265,12 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
         }else{
             youyouOrderDO.setRealCommodityId(youyouOrderDO.getCommodityId());
         }
-        YouyouGoodslistDO youyouGoodslistDO = youyouGoodslistMapper.selectById(youyouOrderDO.getRealCommodityId());
+        YouyouCommodityDO youyouCommodityDO = youyouCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
 
 
 //        SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
 ////        //校验订单是否存在
-        if (youyouGoodslistDO == null) {
+        if (youyouCommodityDO == null) {
             throw exception(ErrorCodeConstants.UU_GOODS_NOT_FOUND);
         }
 //        if(CommonStatusEnum.isDisable(sellingDO.getStatus())){
@@ -300,11 +300,11 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
 //        }
 //
 //        //库存状态为没有订单
-        if(!InvTransferStatusEnum.SELL.getStatus().equals(youyouGoodslistDO.getTransferStatus())){
+        if(!InvTransferStatusEnum.SELL.getStatus().equals(youyouCommodityDO.getTransferStatus())){
             throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
         }
 //        //使用库存的价格进行替换
-        BigDecimal bigDecimal = new BigDecimal(youyouGoodslistDO.getCommodityPrice());
+        BigDecimal bigDecimal = new BigDecimal(youyouCommodityDO.getCommodityPrice());
         youyouOrderDO.setPayAmount(bigDecimal.multiply(new BigDecimal("100")).intValue());
         //判断用户钱包是否有足够的钱
         PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(youyouOrderDO.getUserId(), youyouOrderDO.getUserType());
