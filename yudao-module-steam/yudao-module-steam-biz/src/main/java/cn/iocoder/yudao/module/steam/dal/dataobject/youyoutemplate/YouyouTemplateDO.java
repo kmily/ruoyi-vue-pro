@@ -23,11 +23,6 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 public class YouyouTemplateDO extends BaseDO {
 
     /**
-     * 模板编号
-     */
-    @TableId
-    private Integer id;
-    /**
      * 武器全称
      */
     private String name;
@@ -59,5 +54,14 @@ public class YouyouTemplateDO extends BaseDO {
      * 武器英文名称
      */
     private String weaponHashName;
+    /**
+     * 主键ID
+     */
+    @TableId
+    private Integer id;
+    /**
+     * 模板ID
+     */
+    private Integer templateId;
 
 }

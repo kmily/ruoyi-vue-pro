@@ -99,14 +99,10 @@ public class YouyouTemplateServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testDeleteYouyouTemplate_notExists() {
         // 准备参数
-        Integer id = randomIntegerId();
+        Integer id = 1;
 
         // 调用, 并断言异常
         assertServiceException(() -> youyouTemplateService.deleteYouyouTemplate(id), YOUYOU_TEMPLATE_NOT_EXISTS);
-    }
-
-    private Integer randomIntegerId() {
-        return null;
     }
 
     @Test
@@ -123,6 +119,7 @@ public class YouyouTemplateServiceImplTest extends BaseDbUnitTest {
            o.setWeaponName(null);
            o.setWeaponHashName(null);
            o.setCreateTime(null);
+           o.setTemplateId(null);
        });
        youyouTemplateMapper.insert(dbYouyouTemplate);
        // 测试 name 不匹配
@@ -143,6 +140,8 @@ public class YouyouTemplateServiceImplTest extends BaseDbUnitTest {
        youyouTemplateMapper.insert(cloneIgnoreId(dbYouyouTemplate, o -> o.setWeaponHashName(null)));
        // 测试 createTime 不匹配
        youyouTemplateMapper.insert(cloneIgnoreId(dbYouyouTemplate, o -> o.setCreateTime(null)));
+       // 测试 templateId 不匹配
+       youyouTemplateMapper.insert(cloneIgnoreId(dbYouyouTemplate, o -> o.setTemplateId(null)));
        // 准备参数
        YouyouTemplatePageReqVO reqVO = new YouyouTemplatePageReqVO();
        reqVO.setName(null);
@@ -154,6 +153,7 @@ public class YouyouTemplateServiceImplTest extends BaseDbUnitTest {
        reqVO.setWeaponName(null);
        reqVO.setWeaponHashName(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
+       reqVO.setTemplateId(null);
 
        // 调用
        PageResult<YouyouTemplateDO> pageResult = youyouTemplateService.getYouyouTemplatePage(reqVO);

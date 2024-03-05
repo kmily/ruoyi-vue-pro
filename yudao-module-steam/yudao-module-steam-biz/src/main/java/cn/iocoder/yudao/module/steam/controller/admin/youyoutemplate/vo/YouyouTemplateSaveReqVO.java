@@ -9,9 +9,6 @@ import javax.validation.constraints.*;
 @Data
 public class YouyouTemplateSaveReqVO {
 
-    @Schema(description = "模板编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "43455")
-    private Integer id;
-
     @Schema(description = "武器全称", example = "印花 | Hello 法玛斯")
     private String name;
 
@@ -35,5 +32,11 @@ public class YouyouTemplateSaveReqVO {
 
     @Schema(description = "武器英文名称", example = "crate_sticker_pack_recoil_lootlist")
     private String weaponHashName;
+
+    @Schema(description = "主键ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "11138")
+    private Integer id;
+
+    @Schema(description = "模板ID", example = "1110")
+    private Integer templateId;
 
 }

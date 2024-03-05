@@ -28,6 +28,7 @@ public interface YouyouTemplateMapper extends BaseMapperX<YouyouTemplateDO> {
                 .likeIfPresent(YouyouTemplateDO::getWeaponName, reqVO.getWeaponName())
                 .likeIfPresent(YouyouTemplateDO::getWeaponHashName, reqVO.getWeaponHashName())
                 .betweenIfPresent(YouyouTemplateDO::getCreateTime, reqVO.getCreateTime())
+                .eqIfPresent(YouyouTemplateDO::getTemplateId, reqVO.getTemplateId())
                 .orderByDesc(YouyouTemplateDO::getId));
     }
 

@@ -13,10 +13,6 @@ import com.alibaba.excel.annotation.*;
 @ExcelIgnoreUnannotated
 public class YouyouTemplateRespVO {
 
-    @Schema(description = "模板编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "43455")
-    @ExcelProperty("模板编号")
-    private Integer id;
-
     @Schema(description = "武器全称", example = "印花 | Hello 法玛斯")
     @ExcelProperty("武器全称")
     private String name;
@@ -52,5 +48,13 @@ public class YouyouTemplateRespVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
+
+    @Schema(description = "主键ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "11138")
+    @ExcelProperty("主键ID")
+    private Integer id;
+
+    @Schema(description = "模板ID", example = "1110")
+    @ExcelProperty("模板ID")
+    private Integer templateId;
 
 }
