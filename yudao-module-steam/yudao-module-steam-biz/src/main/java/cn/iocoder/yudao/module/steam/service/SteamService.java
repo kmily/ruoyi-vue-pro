@@ -347,9 +347,10 @@ public class SteamService {
     public boolean verifyOpenApi(OpenApi openApi) {
         try{
             ConfigDO configByKey = configService.getConfigByKey("steam.host");
-            HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-            builder.url(configByKey.getValue() + "/openid/login");
-            builder.method(HttpUtil.Method.FORM);
+
+//            HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+//            builder.url(configByKey.getValue() + "/openid/login");
+//            builder.method(HttpUtil.Method.FORM);
             Map<String,String> post=new HashMap<>();
             post.put("openid.ns",openApi.getNs());
             post.put("openid.mode","check_authentication");
@@ -361,13 +362,21 @@ public class SteamService {
             post.put("openid.assoc_handle",openApi.getAssocHandle());
             post.put("openid.signed",openApi.getSigned());
             post.put("openid.sig",openApi.getSig());
+//            builder.form(post);
+            HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
+            builder.url(configByKey.getValue() + "/openid/login");
             builder.form(post);
-            HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
-            String html = sent.html();
-            if(html.contains("is_valid:true")){
-                return true;
+
+            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
+            if(Objects.isNull(proxyResponseVo.getStatus()) && proxyResponseVo.getStatus()==200){
+                String html = proxyResponseVo.getHtml();
+                if(html.contains("is_valid:true")){
+                    return true;
+                }else{
+                    throw new ServiceException(-1,"Steam openid 数据不正确");
+                }
             }else{
-                throw new ServiceException(-1,"Steam openid 数据不正确");
+                throw new ServiceException(-1,"Steam openid 接口验证异常");
             }
         }catch (Exception e){
             throw new ServiceException(-1,"Steam openid 接口验证异常");
