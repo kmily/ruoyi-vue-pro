@@ -81,6 +81,7 @@ public class SellingDO extends BaseDO {
     private Long invDescId;
     /**
      * 发货状态(0代表未出售，1代表出售中，2代表已出售 )
+     * 枚举 {@link cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum 对应的类}
      */
     private Integer transferStatus;
     /**

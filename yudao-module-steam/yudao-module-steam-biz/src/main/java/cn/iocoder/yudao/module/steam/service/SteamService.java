@@ -37,6 +37,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -485,5 +486,35 @@ public class SteamService {
         return integer;
     }
 
+    /**
+     * 检测交易链接格式要求格式合法
+     * @param tradeUrl
+     * @return
+     */
+    public Boolean checkTradeUrlFormat(String tradeUrl) {
+        if(Objects.isNull(tradeUrl)){
+            throw new ServiceException(-1,"交易链接不合法");
+        }
+        SteamWeb steamWeb=new SteamWeb(configService);
+        URI uri = URI.create(tradeUrl);
+        String query = uri.getQuery();
+
+        try {
+            if(!tradeUrl.startsWith("https://steamcommunity.com/tradeoffer/new/")){
+                throw new ServiceException(-1,"交易链接不合法");
+            }
+            Map<String, String> query1 = steamWeb.parseQuery(query);
+            if(Objects.isNull(query1.get("partner"))){
+                throw new ServiceException(-1,"交易链接不合法");
+            }
+            if(Objects.isNull(query1.get("token"))){
+                throw new ServiceException(-1,"交易链接不合法");
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            throw new ServiceException(-1,"交易链接不合法");
+        }
+        return true;
+    }
 
 }

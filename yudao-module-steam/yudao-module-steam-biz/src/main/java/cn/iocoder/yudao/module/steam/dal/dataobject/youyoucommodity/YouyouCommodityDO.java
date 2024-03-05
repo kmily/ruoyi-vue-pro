@@ -149,7 +149,8 @@ public class YouyouCommodityDO extends BaseDO {
     private String commodityHardenedColor;
     /**
      * 发货状态
+     * 枚举 {@link cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum 对应的类}
      */
-    private String transferStatus;
+    private Integer transferStatus;
 
 }

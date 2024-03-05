@@ -20,6 +20,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.OpenYoupinApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal.WithdrawalDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
@@ -28,7 +29,9 @@ import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoucommodity.YouyouCommodityMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.service.OpenApiService;
+import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
@@ -108,6 +111,8 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
     private YouyouOrderMapper youyouOrderMapper;
     @Resource
     private YouyouCommodityMapper youyouCommodityMapper;
+    @Resource
+    private SteamService steamService;
 
     public YouYouOrderServiceImpl() {
     }
@@ -224,6 +229,7 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
 
     @Override
     public YouyouOrderDO createInvOrder(LoginUser loginUser, CreateReqVo createReqVO) {
+
         BigDecimal bigDecimal = new BigDecimal(createReqVO.getPurchasePrice());
         YouyouOrderDO youyouOrderDO=new YouyouOrderDO()
                 .setOrderNo(noRedisDAO.generate(PAY_NO_PREFIX))
@@ -247,23 +253,32 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
 //        // 2.2 更新支付单到 demo 订单
         youyouOrderMapper.updateById(new YouyouOrderDO().setId(youyouOrderDO.getId())
                 .setPayOrderId(payOrderId));
+        YouyouCommodityDO youyouCommodityDO = youyouCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
 //        //更新库存的标识
-//        sellingDO.setTransferStatus(InvTransferStatusEnum.INORDER.getStatus());
-//        sellingMapper.updateById(sellingDO);
-//        // 返回
-//        createOrderResult.setBizOrderId(youyouOrderDO.getId());
-//        createOrderResult.setPayOrderId(payOrderId);
+        youyouCommodityDO.setTransferStatus(InvTransferStatusEnum.INORDER.getStatus());
+        youyouCommodityMapper.updateById(youyouCommodityDO);
         return youyouOrderDO;
     }
     private YouyouOrderDO validateInvOrderCanCreate(YouyouOrderDO youyouOrderDO) {
+        try{
+            steamService.checkTradeUrlFormat(youyouOrderDO.getTradeLinks());
+        }catch (ServiceException e){
+            throw exception(OpenApiCode.ERR_5408);
+        }
+
         if(Objects.isNull(youyouOrderDO.getCommodityHashName()) && Objects.isNull(youyouOrderDO.getCommodityTemplateId()) && Objects.isNull(youyouOrderDO.getCommodityId())){
             throw exception(ErrorCodeConstants.UU_GOODS_ERR);
         }
+        youyouOrderDO.setRealCommodityId(youyouOrderDO.getCommodityId());
+
         if(Objects.isNull(youyouOrderDO.getCommodityId())){//指定ID购买
             //todo 查询出一个商品并获取商品ID
             youyouOrderDO.setRealCommodityId("1");
-        }else{
-            youyouOrderDO.setRealCommodityId(youyouOrderDO.getCommodityId());
+            //查询不到则返回
+            throw exception(OpenApiCode.ERR_5213);
+        }
+        if(Objects.isNull(youyouOrderDO.getRealCommodityId())){
+            throw exception(OpenApiCode.ERR_5214);
         }
         YouyouCommodityDO youyouCommodityDO = youyouCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
 
@@ -308,8 +323,8 @@ public class YouYouOrderServiceImpl implements YouYouOrderService {
         youyouOrderDO.setPayAmount(bigDecimal.multiply(new BigDecimal("100")).intValue());
         //判断用户钱包是否有足够的钱
         PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(youyouOrderDO.getUserId(), youyouOrderDO.getUserType());
-        if(Objects.isNull(orCreateWallet)){
-            throw exception(ErrorCodeConstants.UU_WALLET_NO_MONEY);
+        if(Objects.isNull(orCreateWallet) || orCreateWallet.getBalance()<youyouOrderDO.getPayAmount()){
+            throw exception(OpenApiCode.ERR_5212);
         }
 //
 //        //检查是否已经下过单

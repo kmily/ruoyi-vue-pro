@@ -85,6 +85,7 @@ public class InvOrderDO extends BaseDO {
     private TransferMsg transferText;
     /**
      * 发货状态
+     * 枚举 {@link cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum 对应的类}
      */
     private Integer transferStatus;
     /**
