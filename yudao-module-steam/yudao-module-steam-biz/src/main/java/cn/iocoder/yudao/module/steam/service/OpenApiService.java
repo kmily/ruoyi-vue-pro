@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
-import cn.iocoder.yudao.module.steam.controller.app.vo.OpenYoupinApiReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.service.devaccount.DevAccountService;
@@ -47,8 +47,8 @@ public class OpenApiService {
     public void setValidator(Validator validator) {
         this.validator = validator;
     }
-    public <T extends Serializable> DevAccountDO apiCheck(OpenYoupinApiReqVo<T> openApiReqVo) {
-        Set<ConstraintViolation<OpenYoupinApiReqVo<T>>> validate = validator.validate(openApiReqVo);
+    public <T extends Serializable> DevAccountDO apiCheck(OpenApiReqVo<T> openApiReqVo) {
+        Set<ConstraintViolation<OpenApiReqVo<T>>> validate = validator.validate(openApiReqVo);
         if(!validate.isEmpty()){
             throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
         }
@@ -72,7 +72,7 @@ public class OpenApiService {
      * @param <E> 出参类型
      * @return
      */
-    public <T extends Serializable,E extends Serializable> E requestUU(String url,OpenYoupinApiReqVo<T> openYoupinApiReqVo,Class<E> classic){
+    public <T extends Serializable,E extends Serializable> E requestUU(String url, OpenApiReqVo<T> openYoupinApiReqVo, Class<E> classic){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         ConfigDO configApiKey = configService.getConfigByKey("uu.appKey");
         ConfigDO configByKey = configService.getConfigByKey("uu.key1");
@@ -98,7 +98,7 @@ public class OpenApiService {
      * @param <T>
      * @throws Exception
      */
-    public <T extends Serializable> void checkSign(OpenYoupinApiReqVo<T> openYoupinApiReqVo,String pubKey) {
+    public <T extends Serializable> void checkSign(OpenApiReqVo<T> openYoupinApiReqVo, String pubKey) {
         try{
             //时间检测
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -154,7 +154,7 @@ public class OpenApiService {
      * @param <T>
      * @throws Exception
      */
-    public <T extends Serializable> void sign(OpenYoupinApiReqVo<T> openYoupinApiReqVo,String priKey) {
+    public <T extends Serializable> void sign(OpenApiReqVo<T> openYoupinApiReqVo, String priKey) {
         try{
             Map<String, Object> params = new HashMap<>();
             params.put("timestamp",openYoupinApiReqVo.getTimestamp());

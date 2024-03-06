@@ -7,8 +7,6 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
-import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
-import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitRespVO;
 import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitReqVO;
 import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitRespVO;
@@ -19,7 +17,7 @@ import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
-import cn.iocoder.yudao.module.steam.controller.app.vo.OpenYoupinApiReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByIdRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByTemplateRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateReqVo;
@@ -32,8 +30,6 @@ import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
@@ -44,7 +40,6 @@ import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderServiceImpl;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
-import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.TradeUrlStatus;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
 import com.google.common.collect.Maps;
@@ -111,7 +106,7 @@ public class AppApiController {
     @PostMapping("v1/api/getAssetsInfo")
     @Operation(summary = "余额查询")
     @PermitAll
-    public ApiResult<ApiPayWalletRespVO> getAssetsInfo(@RequestBody  OpenYoupinApiReqVo<Serializable> openApiReqVo) {
+    public ApiResult<ApiPayWalletRespVO> getAssetsInfo(@RequestBody OpenApiReqVo<Serializable> openApiReqVo) {
         try {
             ApiResult<ApiPayWalletRespVO> execute = DevAccountUtils.tenantExecute(1l, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
@@ -133,7 +128,7 @@ public class AppApiController {
     @PostMapping("v1/api/checkTradeUrl")
     @Operation(summary = "验证交易链接")
     @PermitAll
-    public ApiResult<ApiCheckTradeUrlReSpVo> checkTradeUrl(@RequestBody  OpenYoupinApiReqVo<ApiCheckTradeUrlReqVo> openApiReqVo) {
+    public ApiResult<ApiCheckTradeUrlReSpVo> checkTradeUrl(@RequestBody OpenApiReqVo<ApiCheckTradeUrlReqVo> openApiReqVo) {
         try {
             ApiResult<ApiCheckTradeUrlReSpVo> execute = DevAccountUtils.tenantExecute(1l, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
@@ -173,7 +168,7 @@ public class AppApiController {
     @PostMapping("v1/api/byGoodsIdCreateOrder")
     @Operation(summary = "指定商品购买")
     @PermitAll
-    public ApiResult<CreateByIdRespVo> byGoodsIdCreateOrder(@RequestBody  OpenYoupinApiReqVo<CreateReqVo> openApiReqVo) {
+    public ApiResult<CreateByIdRespVo> byGoodsIdCreateOrder(@RequestBody OpenApiReqVo<CreateReqVo> openApiReqVo) {
         try {
             ApiResult<CreateByIdRespVo> execute = DevAccountUtils.tenantExecute(1l, () -> {
                 if(Objects.isNull(openApiReqVo.getData().getCommodityHashName()) || Objects.isNull(openApiReqVo.getData().getCommodityTemplateId())){
@@ -201,7 +196,7 @@ public class AppApiController {
     @PostMapping("v1/api/byTemplateCreateOrder")
     @Operation(summary = "指定模板购买")
     @PermitAll
-    public ApiResult<CreateByTemplateRespVo> byTemplateCreateOrder(@RequestBody  OpenYoupinApiReqVo<CreateReqVo> openApiReqVo) {
+    public ApiResult<CreateByTemplateRespVo> byTemplateCreateOrder(@RequestBody OpenApiReqVo<CreateReqVo> openApiReqVo) {
         try {
             ApiResult<CreateByTemplateRespVo> execute = DevAccountUtils.tenantExecute(1l, () -> {
                 if(Objects.isNull(openApiReqVo.getData().getCommodityId())){
@@ -224,7 +219,7 @@ public class AppApiController {
     @Operation(summary = "创建库存订单")
     @PostMapping("v1/api/io661/createInvOrder")
     @PermitAll
-    public ApiResult<AppPayOrderSubmitRespVO> createInvOrder(@RequestBody OpenYoupinApiReqVo<PaySteamOrderCreateReqVO> openApiReqVo) {
+    public ApiResult<AppPayOrderSubmitRespVO> createInvOrder(@RequestBody OpenApiReqVo<PaySteamOrderCreateReqVO> openApiReqVo) {
         try {
             ApiResult<AppPayOrderSubmitRespVO> execute = DevAccountUtils.tenantExecute(1l, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
@@ -257,7 +252,7 @@ public class AppApiController {
     @Operation(summary = "库存订单列表")
     @PostMapping("v1/api/io661/listInvOrder")
     @PermitAll
-    public ApiResult<PageResult> listInvOrder(@RequestBody OpenYoupinApiReqVo<InvOrderPageReqVO> openApiReqVo) {
+    public ApiResult<PageResult> listInvOrder(@RequestBody OpenApiReqVo<InvOrderPageReqVO> openApiReqVo) {
         try {
             ApiResult<PageResult> execute = DevAccountUtils.tenantExecute(1l, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
@@ -281,7 +276,7 @@ public class AppApiController {
     @PostMapping("v1/api/orderCancel")
     @Operation(summary = "买家取消订单")
     @PermitAll
-    public ApiResult<CreateOrderCancel> orderCancel(@RequestBody OpenYoupinApiReqVo<CreateReqOrder> openApiReqVo) {
+    public ApiResult<CreateOrderCancel> orderCancel(@RequestBody OpenApiReqVo<CreateReqOrder> openApiReqVo) {
         try {
             ApiResult<CreateOrderCancel> execute = DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
@@ -312,14 +307,14 @@ public class AppApiController {
     @PostMapping("v1/api/orderStatus")
     @Operation(summary = "查询订单状态")
     @PermitAll
-    public ApiResult<String> orderStatus(@RequestBody OpenYoupinApiReqVo<CreateReqVo> openApiReqVo) {
+    public ApiResult<String> orderStatus(@RequestBody OpenApiReqVo<CreateReqVo> openApiReqVo) {
         // TODO
         return ApiResult.success("");
     }
     @PostMapping("v1/api/orderInfo")
     @Operation(summary = "查询订单详情")
     @PermitAll
-    public ApiResult<String> orderInfo(@RequestBody OpenYoupinApiReqVo<CreateReqVo> openApiReqVo) {
+    public ApiResult<String> orderInfo(@RequestBody OpenApiReqVo<CreateReqVo> openApiReqVo) {
         // TODO
         return ApiResult.success("");
     }

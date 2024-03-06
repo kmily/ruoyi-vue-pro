@@ -16,7 +16,7 @@ import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
-import cn.iocoder.yudao.module.steam.controller.app.vo.OpenYoupinApiReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
@@ -436,7 +436,7 @@ public class UUOrderServiceImpl implements UUOrderService {
      * @return
      */
     private YouPingOrder uploadYY(YouyouOrderDO youyouOrderDO){
-        OpenYoupinApiReqVo<CreateReqVo> openApiReqVo=new OpenYoupinApiReqVo<>();
+        OpenApiReqVo<CreateReqVo> openApiReqVo=new OpenApiReqVo<>();
         CreateReqVo createReqVo = new CreateReqVo();
         createReqVo.setMerchantOrderNo("YY"+youyouOrderDO.getMerchantOrderNo());
         createReqVo.setTradeLinks(youyouOrderDO.getTradeLinks());

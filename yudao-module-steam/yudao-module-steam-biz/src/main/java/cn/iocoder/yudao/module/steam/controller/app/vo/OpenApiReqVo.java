@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Schema(description = "开发平台 -  开发平台接口")
 @Data
 @ToString(callSuper = true)
-public class OpenYoupinApiReqVo<T extends Serializable> {
+public class OpenApiReqVo<T extends Serializable> {
     @Schema(description = "分配给大客户的AppKey", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "分配给大客户的AppKey")
     private String appKey;
