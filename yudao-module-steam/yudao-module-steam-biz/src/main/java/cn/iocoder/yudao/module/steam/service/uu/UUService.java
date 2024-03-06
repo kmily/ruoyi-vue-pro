@@ -43,14 +43,19 @@ public class UUService {
      * @return
      */
     public ApiResult<ApiPayWalletRespVO> getAssetsInfo() {
-        ApiResult<ApiPayWalletRespVO> apiPayWalletRespVOApiResult = openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/getAssetsInfo", new OpenApiReqVo<Serializable>(), ApiPayWalletRespVO.class);
-        return apiPayWalletRespVOApiResult;
+        return openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/getAssetsInfo", new OpenApiReqVo<>(), ApiPayWalletRespVO.class);
     }
     /**
      * 验证交易链接
      * https://www.yuque.com/yyyoupin/ckahux/gy03nhuvbkg62odk
-     * 1：正常交易 2:交易链接格式错误 3:请稍后重试 4:账号交易权限被封禁，无法交易 5:该交易链接已不再可用 6:该账户库存私密无法交易 7:该账号个人资料私密无法交易
-     * @return
+     * 1：正常交易
+     * 2:交易链接格式错误
+     * 3:请稍后重试
+     * 4:账号交易权限被封禁，无法交易
+     * 5:该交易链接已不再可用
+     * 6:该账户库存私密无法交易
+     * 7:该账号个人资料私密无法交易
+     * @return 返回状态和说明
      */
     public ApiResult<ApiCheckTradeUrlReSpVo> checkTradeUrl(ApiCheckTradeUrlReqVo reqVo) {
         return openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/checkTradeUrl",new OpenApiReqVo<ApiCheckTradeUrlReqVo>().setData(reqVo), ApiCheckTradeUrlReSpVo.class);
