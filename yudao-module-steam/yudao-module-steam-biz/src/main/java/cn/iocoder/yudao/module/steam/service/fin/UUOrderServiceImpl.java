@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.steam.service.fin;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
@@ -19,12 +20,10 @@ import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal.WithdrawalDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoucommodity.UUCommodityMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
@@ -35,7 +34,6 @@ import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.YouPingOrder;
-import cn.iocoder.yudao.module.steam.service.uu.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.uu.UUService;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
@@ -43,7 +41,6 @@ import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -95,13 +92,9 @@ public class UUOrderServiceImpl implements UUOrderService {
 
 
     @Resource
-    private InvOrderMapper invOrderMapper;
-    @Resource
     private WithdrawalMapper withdrawalMapper;
 
 
-    @Resource
-    private OpenApiService openApiService;
 
     @Resource
     private UUService uuService;
@@ -429,11 +422,11 @@ public class UUOrderServiceImpl implements UUOrderService {
 //    }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+//    @Transactional(rollbackFor = Exception.class)
     public void updateInvOrderPaid(Long id, Long payOrderId) {
-        // 校验并获得支付订单（可支付）
+        // 校验并获得支付订单（可支付
+        YouyouOrderDO youyouOrderDO = youyouOrderMapper.selectById(id);
         PayOrderRespDTO payOrder = validateInvOrderCanPaid(id, payOrderId);
-
         // 更新 状态为已支付
         int updateCount = youyouOrderMapper.updateByIdAndPayed(id, false,
                 new YouyouOrderDO().setPayStatus(true).setPayTime(LocalDateTime.now())
@@ -442,17 +435,28 @@ public class UUOrderServiceImpl implements UUOrderService {
         if (updateCount == 0) {
             throw exception(ErrorCodeConstants.UU_GOODS_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
-        YouyouOrderDO youyouOrderDO = youyouOrderMapper.selectById(id);
-        YouPingOrder youPingOrder = uploadYY(youyouOrderDO);
-        if(youPingOrder.getCode().intValue()==0){
-            //获取专家钱包并进行打款
-            PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(youyouOrderDO.getSellUserId(), youyouOrderDO.getSellUserType());
-            payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(youyouOrderDO.getId()),
-                    PayWalletBizTypeEnum.STEAM_CASH, youyouOrderDO.getPayAmount());
-            youyouOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
-            youyouOrderMapper.updateById(youyouOrderDO);
-        }else{
-            throw new ServiceException(-1,"发货失败原因"+youPingOrder.getMsg());
+        try{
+            YouPingOrder youPingOrder = uploadYY(youyouOrderDO);
+            if(youPingOrder.getCode().intValue()==0){
+                //获取专家钱包并进行打款
+                PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(youyouOrderDO.getSellUserId(), youyouOrderDO.getSellUserType());
+                payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(youyouOrderDO.getId()),
+                        PayWalletBizTypeEnum.STEAM_CASH, youyouOrderDO.getPayAmount());
+                youyouOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
+                youyouOrderMapper.updateById(youyouOrderDO);
+            }else{
+                throw new ServiceException(-1,"发货失败原因"+youPingOrder.getMsg());
+            }
+
+
+        }catch (ServiceException e){
+            log.error("发货失败，自动退款单号{}",youyouOrderDO);
+            if(Objects.nonNull(youyouOrderDO)){
+                LoginUser loginUser=new LoginUser();
+                loginUser.setId(youyouOrderDO.getUserId());
+                loginUser.setUserType(youyouOrderDO.getUserType());
+                refundInvOrder(loginUser,youyouOrderDO.getId(), ServletUtils.getClientIP());
+            }
         }
     }
 
@@ -550,7 +554,7 @@ public class UUOrderServiceImpl implements UUOrderService {
                 .setMerchantRefundId(refundId)
                 .setReason("用户不想要了主动退单").setPrice(youyouOrderDO.getPayAmount()));// 价格信息
         // 2.3 更新退款单到 demo 订单
-        invOrderMapper.updateById(new InvOrderDO().setId(id)
+        youyouOrderMapper.updateById(new YouyouOrderDO().setId(id)
                 .setPayRefundId(payRefundId).setRefundPrice(youyouOrderDO.getPayAmount()));
         //释放库存
         YouyouCommodityDO youyouCommodityDO = UUCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
@@ -593,7 +597,7 @@ public class UUOrderServiceImpl implements UUOrderService {
         // 1. 校验并获得退款订单（可退款）
         PayRefundRespDTO payRefund = validateInvOrderCanRefunded(id, payRefundId);
         // 2.2 更新退款单到 demo 订单
-        invOrderMapper.updateById(new InvOrderDO().setId(id)
+        youyouOrderMapper.updateById(new YouyouOrderDO().setId(id)
                 .setRefundTime(payRefund.getSuccessTime()).setPayOrderStatus(PayOrderStatusEnum.REFUND.getStatus()));
     }
 
