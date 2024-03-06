@@ -463,7 +463,6 @@ public class HttpUtil {
     }
 
     @Data
-    @Builder
     public static class ProxyResponseVo {
         String html;
         Integer status;

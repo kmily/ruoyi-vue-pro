@@ -76,18 +76,6 @@ public class SteamWeb {
         this.configService = configService;
     }
 
-    public static OkHttpClient getClient(boolean retry, int timeOut, String cookies, String url) {
-        OkHttpClient.Builder OKHTTP_BUILD = new OkHttpClient.Builder();
-        OKHTTP_BUILD.writeTimeout(timeOut, TimeUnit.SECONDS);
-        OKHTTP_BUILD.readTimeout(timeOut, TimeUnit.SECONDS);
-        OKHTTP_BUILD.connectTimeout(3, TimeUnit.SECONDS);
-        OKHTTP_BUILD.retryOnConnectionFailure(retry);
-        OKHTTP_BUILD.hostnameVerifier(HttpUtil.getHostnameVerifier());
-        OKHTTP_BUILD.sslSocketFactory(HttpUtil.getSSLSocketFactory(), HttpUtil.getTrustManager());
-        OKHTTP_BUILD.cookieJar(new SteamCustomCookieJar(cookies, url));
-        return OKHTTP_BUILD.build();
-    }
-
     /**
      * 登录steam网站
      *
@@ -131,24 +119,16 @@ public class SteamWeb {
      * 初始化apikey session browserid等数据为必调接口
      */
     private void initApiKey() {
-        HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder1 = HttpUtil.ProxyRequestVo.builder();
-        builder1.url("https://steamcommunity.com/dev/apikey");
+        HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
+        builder.url("https://steamcommunity.com/dev/apikey");
         Map<String, String> header = new HashMap<>();
         header.put("Accept-Language", "zh-CN,zh;q=0.9");
-        builder1.headers(header);
-        builder1.cookieString(cookieString);
-        HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder1.build());
+        builder.headers(header);
+        builder.cookieString(cookieString);
+        HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
         if(Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus()!=200){
             throw new ServiceException(-1, "apiKey失败");
         }
-
-//        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-//        builder.url("https://steamcommunity.com/dev/apikey");
-//        builder.method(HttpUtil.Method.GET);
-//        Map<String, String> header = new HashMap<>();
-//        header.put("Accept-Language", "zh-CN,zh;q=0.9");
-//        builder.headers(header);
-//        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 3000, cookieString, "https://steamcommunity.com/dev/apikey"));
         Pattern pattern = Pattern.compile("密钥: (.*?)<"); // 正则表达式匹配API密钥
         Matcher matcher = pattern.matcher(proxyResponseVo.getHtml());
         if (matcher.find()) {
@@ -162,14 +142,14 @@ public class SteamWeb {
         //set browserid
         Map<String, String> cookies = proxyResponseVo.getCookies();
         String browserid = cookies.get("browserid");
-        if (Objects.isNull(browserid)) {
+        if (Objects.nonNull(browserid)) {
             this.browserid = Optional.of(browserid);
             cookieString += ";browserid=" + this.browserid.get();
         } else {
             throw new ServiceException(-1, "获取浏览器ID失败");
         }
         String sessionid = cookies.get("sessionid");
-        if (Objects.isNull(sessionid)) {
+        if (Objects.nonNull(sessionid)) {
             sessionId = Optional.of(sessionid);
             cookieString += ";sessionid=" + sessionid;
         } else {
@@ -187,28 +167,18 @@ public class SteamWeb {
         if (!steamId.isPresent()) {
             throw new ServiceException(-1, "初始化steam失败，请重新登录");
         }
-        HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder1 = HttpUtil.ProxyRequestVo.builder();
-        builder1.url("https://steamcommunity.com/profiles/:steamId/tradeoffers/privacy").cookieString(cookieString);
+        HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
+        builder.url("https://steamcommunity.com/profiles/:steamId/tradeoffers/privacy").cookieString(cookieString);
         Map<String, String> header = new HashMap<>();
         header.put("Accept-Language", "zh-CN,zh;q=0.9");
-        builder1.headers(header);
+        builder.headers(header);
         Map<String, String> pathVar = new HashMap<>();
         pathVar.put("steamId", steamId.get());
-        builder1.pathVar(pathVar);
-        HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder1.build());
+        builder.pathVar(pathVar);
+        HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
         if(Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus()!=200){
             throw new ServiceException(-1, "初始化steam失败");
         }
-//        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-//        builder.url("https://steamcommunity.com/profiles/:steamId/tradeoffers/privacy");
-//        builder.method(HttpUtil.Method.GET);
-//        Map<String, String> header = new HashMap<>();
-//        header.put("Accept-Language", "zh-CN,zh;q=0.9");
-//        builder.headers(header);
-//        Map<String, String> pathVar = new HashMap<>();
-//        pathVar.put("steamId", steamId.get());
-//        builder.pathVar(pathVar);
-//        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 3000, cookieString, "https://steamcommunity.com/dev/apikey"));
         Pattern pattern = Pattern.compile("value=\"(.*?)\"");
         Matcher matcher = pattern.matcher(proxyResponseVo.getHtml());
         if (matcher.find()) {
@@ -244,30 +214,19 @@ public class SteamWeb {
         } catch (UnsupportedEncodingException e) {
             return TradeUrlStatus.ERRORURL;
         }
-//        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-//        builder.url(tradeUrl).method(HttpUtil.Method.GET);
-//        Map<String, String> header = new HashMap<>();
-//        header.put("Accept-Language", "zh-CN,zh;q=0.9");
-//        builder.headers(header);
         try{
-            HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder1 = HttpUtil.ProxyRequestVo.builder();
-            builder1.url(tradeUrl).cookieString(cookieString);
+            HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
+            builder.url(tradeUrl).cookieString(cookieString);
             Map<String, String> header = new HashMap<>();
             header.put("Accept-Language", "zh-CN,zh;q=0.9");
-            builder1.headers(header);
+            builder.headers(header);
             Map<String, String> pathVar = new HashMap<>();
             pathVar.put("steamId", steamId.get());
-            builder1.pathVar(pathVar);
-            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder1.build());
+            builder.pathVar(pathVar);
+            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
             if(Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus()!=200){
                 throw new ServiceException(-1, "初始化steam失败");
             }
-
-
-
-
-
-//            HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 3000, cookieString, "https://steamcommunity.com/dev/apikey"));
             String html = proxyResponseVo.getHtml();
 
             if (html.contains("此用户帐户功能受限")) {
@@ -359,9 +318,8 @@ public class SteamWeb {
             log.info(query);
             Map<String, String> stringStringMap = parseQuery(query);
             log.info(String.valueOf(stringStringMap));
-            HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-            builder.url("https://steamcommunity.com/tradeoffer/new/send");
-            builder.method(HttpUtil.Method.FORM);
+            HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
+            builder.url("https://steamcommunity.com/tradeoffer/new/send").cookieString(cookieString);
             Map<String, String> post = new HashMap<>();
             post.put("sessionid", sessionId.get());
             post.put("serverid", "1");
@@ -393,10 +351,13 @@ public class SteamWeb {
             header.put("Accept-Language", "zh-CN,zh;q=0.9");
             header.put("Referer", tradeUrl);
             builder.headers(header);
-            log.info("发送到对方服务器数据{}", objectMapper.writeValueAsString(post));
-            HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 3000, "browserid=" + browserid.get() + "; strTradeLastInventoryContext=730_2; " + cookieString, "https://steamcommunity.com/dev/apikey"));
-            log.info("交易结果{}", sent.html());
-            SteamTradeOfferResult json = sent.json(SteamTradeOfferResult.class);
+            log.info("发送到对方服务器数据{}", objectMapper.writeValueAsString(builder.build()));
+            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
+            log.info("交易结果{}", proxyResponseVo);
+            if(Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus()!=200){
+                throw new ServiceException(-1, "交易失败");
+            }
+            SteamTradeOfferResult json = objectMapper.readValue(proxyResponseVo.getHtml(), SteamTradeOfferResult.class);
             Optional<MobileConfList.ConfDTO> confDTO = confirmOfferList(json.getTradeofferid());
             if (confDTO.isPresent()) {
 //                confirmOffer(confDTO.get(), ConfirmAction.CANCEL);
@@ -454,9 +415,11 @@ public class SteamWeb {
     }
 
     public SteamResult confirmOffer(MobileConfList.ConfDTO confDTO, ConfirmAction confirmAction) {
-        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-        builder.url("https://steamcommunity.com/mobileconf/ajaxop");
-        builder.method(HttpUtil.Method.GET);
+        HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
+        builder.url("https://steamcommunity.com/mobileconf/ajaxop").cookieString(cookieString);
+        Map<String, String> header = new HashMap<>();
+        header.put("Accept-Language", "zh-CN,zh;q=0.9");
+        builder.headers(header);
         Map<String, String> query = new HashMap<>();
         query.put("op", confirmAction.getCode());
         query.put("cid", confDTO.getId());
@@ -486,11 +449,19 @@ public class SteamWeb {
             e.printStackTrace();
         }
         builder.query(query);
-        Map<String, String> header = new HashMap<>();
-        header.put("Accept-Language", "zh-CN,zh;q=0.9");
-        builder.headers(header);
-        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 1000, cookieString, "https://steamcommunity.com/mobileconf/getlist"));
-        SteamResult json = sent.json(SteamResult.class);
+        HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
+        if(Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus()!=200){
+            throw new ServiceException(-1, "确认订单失败");
+        }
+
+        SteamResult json = null;
+        try {
+            json = objectMapper.readValue(proxyResponseVo.getHtml(), SteamResult.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            log.error("确认订单失败原因{}",e.getMessage());
+            throw new ServiceException(-1, "确认订单失败2");
+        }
         return json;
     }
 
@@ -509,9 +480,8 @@ public class SteamWeb {
      * @return
      */
     public List<MobileConfList.ConfDTO> confirmOfferList() {
-        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-        builder.url("https://steamcommunity.com/mobileconf/getlist");
-        builder.method(HttpUtil.Method.GET);
+        HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
+        builder.url("https://steamcommunity.com/mobileconf/getlist").cookieString(cookieString);
         Map<String, String> query = new HashMap<>();
         query.put("p", steamMaFile.getDeviceId());
         query.put("a", steamId.get());
@@ -530,8 +500,20 @@ public class SteamWeb {
         Map<String, String> header = new HashMap<>();
         header.put("Accept-Language", "zh-CN,zh;q=0.9");
         builder.headers(header);
-        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(), getClient(true, 1000, cookieString, "https://steamcommunity.com/mobileconf/getlist"));
-        MobileConfList json = sent.json(MobileConfList.class);
+        MobileConfList json = null;
+        try {
+            log.info("发送到对方服务器数据{}", objectMapper.writeValueAsString(builder.build()));
+            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
+            log.info("交易结果{}", proxyResponseVo);
+            if(Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus()!=200){
+                throw new ServiceException(-1, "交易失败");
+            }
+            json = objectMapper.readValue(proxyResponseVo.getHtml(), MobileConfList.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            log.error("交易失败服务器返回内容不可识别{}",builder.build());
+            throw new ServiceException(-1, "交易失败服务器返回内容不可识别");
+        }
         return json.getConf();
     }
     public Map<String, String> parseQuery(String query) throws UnsupportedEncodingException {
