@@ -2,10 +2,17 @@ package cn.iocoder.yudao.module.steam.controller.app;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
+import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitRespVO;
+import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitReqVO;
+import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitRespVO;
+import cn.iocoder.yudao.module.pay.convert.order.PayOrderConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
+import cn.iocoder.yudao.module.pay.framework.pay.core.WalletPayClient;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
@@ -18,6 +25,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiCheckTradeUrlReSp
 import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiPayWalletRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
+import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
@@ -27,8 +35,10 @@ import cn.iocoder.yudao.module.steam.service.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
+import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.TradeUrlStatus;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
+import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -194,28 +204,39 @@ public class AppApiController {
             return ApiResult.error(e.getCode(),  e.getMessage(),CreateByTemplateRespVo.class);
         }
     }
-//    @PostMapping("/createInvOrder")
-//    @Operation(summary = "创建库存订单")
-//    public CommonResult<AppPayOrderSubmitRespVO> createInvOrder(@Valid @RequestBody PaySteamOrderCreateReqVO createReqVO) {
-//        DevAccountDO devAccount = DevAccountContextHolder.getRequiredDevAccount();
-//        LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1l);
-//        CreateOrderResult invOrder = paySteamOrderService.createInvOrder(loginUser, createReqVO);
-//
-//        //付款
-//        AppPayOrderSubmitReqVO reqVO=new AppPayOrderSubmitReqVO();
-//        reqVO.setChannelCode(PayChannelEnum.WALLET.getCode());
-//        reqVO.setId(invOrder.getPayOrderId());
-//        if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
-//            Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
-//                    Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
-//            channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(devAccount.getUserId()));
-//            channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(devAccount.getUserType()));
-//            reqVO.setChannelExtras(channelExtras);
-//        }
-//        // 2. 提交支付
-//        PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, getClientIP());
-//        return success(PayOrderConvert.INSTANCE.convert3(respVO));
-//    }
+    @Operation(summary = "创建库存订单")
+    @PostMapping("v1/api/io661/createInvOrder")
+    @PermitAll
+    public ApiResult<AppPayOrderSubmitRespVO> createInvOrder(@RequestBody OpenYoupinApiReqVo<PaySteamOrderCreateReqVO> openApiReqVo) {
+        try {
+            ApiResult<AppPayOrderSubmitRespVO> execute = DevAccountUtils.tenantExecute(1l, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+
+
+                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1l);
+                CreateOrderResult invOrder = paySteamOrderService.createInvOrder(loginUser, openApiReqVo.getData());
+
+                //付款
+                AppPayOrderSubmitReqVO reqVO=new AppPayOrderSubmitReqVO();
+                reqVO.setChannelCode(PayChannelEnum.WALLET.getCode());
+                reqVO.setId(invOrder.getPayOrderId());
+                if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
+                    Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
+                            Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
+                    channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(devAccount.getUserId()));
+                    channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(devAccount.getUserType()));
+                    reqVO.setChannelExtras(channelExtras);
+                }
+                // 2. 提交支付
+                PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, ServletUtils.getClientIP());
+                return ApiResult.success(PayOrderConvert.INSTANCE.convert3(respVO));
+            });
+            return execute;
+        } catch (ServiceException e) {
+            return ApiResult.error(e.getCode(),  e.getMessage(),AppPayOrderSubmitRespVO.class);
+        }
+
+    }
     @Operation(summary = "库存订单列表")
     @PostMapping("v1/api/io661/listInvOrder")
     @PermitAll
