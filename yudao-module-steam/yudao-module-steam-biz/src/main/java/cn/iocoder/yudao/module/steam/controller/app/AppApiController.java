@@ -7,6 +7,8 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
+import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
+import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitRespVO;
 import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitReqVO;
 import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitRespVO;
@@ -30,6 +32,8 @@ import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
@@ -38,7 +42,9 @@ import cn.iocoder.yudao.module.steam.service.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
+import cn.iocoder.yudao.module.steam.service.fin.UUOrderServiceImpl;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
+import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.TradeUrlStatus;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
 import com.google.common.collect.Maps;
@@ -60,6 +66,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+
+import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 
 /**
  * 兼容有品的开放平台接口
@@ -86,6 +94,8 @@ public class AppApiController {
     @Resource
     private YouyouOrderMapper youyouOrderMapper;
 
+    @Resource
+    private UUOrderServiceImpl uuOrderServiceImpl;
     @Resource
     private PaySteamOrderService paySteamOrderService;
     @Resource
@@ -281,12 +291,12 @@ public class AppApiController {
                         .eq(YouyouOrderDO::getUserId, devAccount.getUserId()));
 
                 CreateOrderCancel ret = new CreateOrderCancel();
-                if(youyouOrderDOS.size() == 0){
+                if (youyouOrderDOS.isEmpty()) {
                     ret.setResult(3);
                     return ApiResult.success(ret, "取消失败，没有找到该订单");
-                }else{
-                    // TODO 取消订单
-//                    youyouOrderMapper.updateById(youyouOrderDOS.get(0).set);
+                } else {
+                    LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1l);
+                    uuOrderServiceImpl.refundInvOrder(loginUser, youyouOrderDOS.get(0).getId(), getClientIP());
                     ret.setResult(1);
                     return ApiResult.success(ret, "取消成功");
                 }
@@ -297,6 +307,8 @@ public class AppApiController {
             return ApiResult.error(e.getCode(), e.getMessage(), CreateOrderCancel.class);
         }
     }
+
+
     @PostMapping("v1/api/orderStatus")
     @Operation(summary = "查询订单状态")
     @PermitAll
