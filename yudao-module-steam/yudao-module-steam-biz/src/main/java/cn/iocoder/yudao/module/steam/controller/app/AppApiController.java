@@ -27,7 +27,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.order.CreateReqOrderCance
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.CreateReqOrderStatus;
 import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiCheckTradeUrlReSpVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiCheckTradeUrlReqVo;
-import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiPayWalletRespVO;
+import cn.iocoder.yudao.module.steam.service.uu.vo.ApiPayWalletRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
