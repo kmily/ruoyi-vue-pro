@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.steam.controller.app.vo.user;
+package cn.iocoder.yudao.module.steam.service.uu.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
