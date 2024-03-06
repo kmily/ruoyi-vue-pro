@@ -44,19 +44,18 @@ public class UUService {
         return openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/checkTradeUrl",new OpenApiReqVo<ApiCheckTradeUrlReqVo>().setData(reqVo), ApiCheckTradeUrlReSpVo.class);
     }
 
-//    /**
-//     * 指定模板购买
-//     * @return
-//     */
-//    public YouPingOrder byTemplateCreateOrder(CreateCommodityOrderReqVo reqVo) {
-//        return openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/byTemplateCreateOrder",new OpenApiReqVo<CreateCommodityOrderReqVo>().setData(reqVo), YouPingOrder.class);
-//    }
+    /**
+     * 指定模板购买
+     * @return
+     */
+    public ApiResult<YouPingOrder> byTemplateCreateOrder(CreateCommodityOrderReqVo reqVo) {
+        return openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/byTemplateCreateOrder",new OpenApiReqVo<CreateCommodityOrderReqVo>().setData(reqVo), YouPingOrder.class);
+    }
     /**
      * 指定商品购买ID
      * @return
      */
-    public YouPingOrder byGoodsIdCreateOrder(CreateCommodityOrderReqVo reqVo) {
-        return null;
-//        return openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/byGoodsIdCreateOrder",new OpenApiReqVo<CreateCommodityOrderReqVo>().setData(reqVo), YouPingOrder.class);
+    public ApiResult<YouPingOrder> byGoodsIdCreateOrder(CreateCommodityOrderReqVo reqVo) {
+        return openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/byGoodsIdCreateOrder",new OpenApiReqVo<CreateCommodityOrderReqVo>().setData(reqVo), YouPingOrder.class);
     }
 }

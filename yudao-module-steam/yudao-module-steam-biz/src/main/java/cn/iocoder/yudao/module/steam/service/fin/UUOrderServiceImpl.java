@@ -469,8 +469,8 @@ public class UUOrderServiceImpl implements UUOrderService {
         createReqVo.setPurchasePrice(youyouOrderDO.getPurchasePrice());
         createReqVo.setFastShipping(youyouOrderDO.getFastShipping());
         createReqVo.setCommodityId(youyouOrderDO.getCommodityId());
-        YouPingOrder youPingOrder = uuService.byGoodsIdCreateOrder(createReqVo);
-        return youPingOrder;
+        ApiResult<YouPingOrder> youPingOrderApiResult = uuService.byGoodsIdCreateOrder(createReqVo);
+        return youPingOrderApiResult.getData();
     }
 
     /**
