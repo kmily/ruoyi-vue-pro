@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.steam.controller.app;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -26,6 +27,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiDetailDataQueryAp
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoudetails.YouyouDetailsDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoudetails.YouyouDetailsMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.steam.service.uu.UUNotifyService;
 import cn.iocoder.yudao.module.steam.service.uu.UUService;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.CreateOrderCancel;
@@ -50,6 +52,7 @@ import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderServiceImpl;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.TradeUrlStatus;
+import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
@@ -74,6 +77,7 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.util.*;
 
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
@@ -118,7 +122,20 @@ public class AppApiController {
     private UUOrderService uUOrderService;
     @Resource
     private UUService uuService;
+    @Resource
+    private UUNotifyService uuNotifyService;
+    @PostMapping("/uu/notify")
+    @Operation(summary = "订单") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
+    @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
+    @PermitAll
+    public CommonResult<Boolean> uuNotify(@RequestBody NotifyReq notifyReq) {
+        DevAccountUtils.tenantExecute(1L,()->{
+            uuNotifyService.notify(notifyReq);
+            return null;
+        });
 
+        return success(true);
+    }
     /**
      * api余额接口
      * @return
