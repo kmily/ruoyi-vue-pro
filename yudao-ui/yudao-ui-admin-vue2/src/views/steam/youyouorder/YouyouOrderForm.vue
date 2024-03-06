@@ -83,17 +83,6 @@
                     <el-form-item label="极速发货购买模式0：优先购买极速发货；1：只购买极速发货" prop="fastShipping">
                       <el-input v-model="formData.fastShipping" placeholder="请输入极速发货购买模式0：优先购买极速发货；1：只购买极速发货" />
                     </el-form-item>
-                    <el-form-item label="有品订单号" prop="uuOrderNo">
-                      <el-input v-model="formData.uuOrderNo" placeholder="请输入有品订单号" />
-                    </el-form-item>
-                    <el-form-item label="有品商户订单号" prop="uuMerchantOrderNo">
-                      <el-input v-model="formData.uuMerchantOrderNo" placeholder="请输入有品商户订单号" />
-                    </el-form-item>
-                    <el-form-item label="交易状态 0,成功；2,失败。" prop="uuOrderStatus">
-                      <el-radio-group v-model="formData.uuOrderStatus">
-                            <el-radio label="1">请选择字典生成</el-radio>
-                      </el-radio-group>
-                    </el-form-item>
                     <el-form-item label="收款状态" prop="sellCashStatus">
                       <el-radio-group v-model="formData.sellCashStatus">
                             <el-radio label="1">请选择字典生成</el-radio>
@@ -157,9 +146,6 @@
                             purchasePrice: undefined,
                             realCommodityId: undefined,
                             fastShipping: undefined,
-                            uuOrderNo: undefined,
-                            uuMerchantOrderNo: undefined,
-                            uuOrderStatus: undefined,
                             sellCashStatus: undefined,
                             sellUserId: undefined,
                             sellUserType: undefined,
@@ -242,9 +228,6 @@
                             purchasePrice: undefined,
                             realCommodityId: undefined,
                             fastShipping: undefined,
-                            uuOrderNo: undefined,
-                            uuMerchantOrderNo: undefined,
-                            uuOrderStatus: undefined,
                             sellCashStatus: undefined,
                             sellUserId: undefined,
                             sellUserType: undefined,

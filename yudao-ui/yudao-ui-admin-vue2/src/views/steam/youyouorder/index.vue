@@ -75,11 +75,6 @@
       <el-form-item label="有品商户订单号" prop="uuMerchantOrderNo">
         <el-input v-model="queryParams.uuMerchantOrderNo" placeholder="请输入有品商户订单号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="交易状态 0,成功；2,失败。" prop="uuOrderStatus">
-        <el-select v-model="queryParams.uuOrderStatus" placeholder="请选择交易状态 0,成功；2,失败。" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
-        </el-select>
-      </el-form-item>
       <el-form-item label="收款状态" prop="sellCashStatus">
         <el-select v-model="queryParams.sellCashStatus" placeholder="请选择收款状态" clearable size="small">
           <el-option label="请选择字典生成" value="" />
@@ -230,7 +225,6 @@ export default {
         realCommodityId: null,
         uuOrderNo: null,
         uuMerchantOrderNo: null,
-        uuOrderStatus: null,
         sellCashStatus: null,
         sellUserId: null,
         sellUserType: null,
