@@ -29,7 +29,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 
-import cn.iocoder.yudao.module.steam.dal.mysql.youyoucommodity.YouyouCommodityMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.youyoucommodity.UUCommodityMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
@@ -114,7 +114,7 @@ public class UUOrderServiceImpl implements UUOrderService {
     private YouyouOrderMapper youyouOrderMapper;
 
     @Resource
-    private YouyouCommodityMapper youyouCommodityMapper;
+    private UUCommodityMapper UUCommodityMapper;
     @Resource
     private SteamService steamService;
 
@@ -261,10 +261,10 @@ public class UUOrderServiceImpl implements UUOrderService {
 //        // 2.2 更新支付单到 demo 订单
         youyouOrderMapper.updateById(new YouyouOrderDO().setId(youyouOrderDO.getId())
                 .setPayOrderId(payOrderId));
-        YouyouCommodityDO youyouCommodityDO = youyouCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
+        YouyouCommodityDO youyouCommodityDO = UUCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
 //        //更新库存的标识
         youyouCommodityDO.setTransferStatus(InvTransferStatusEnum.INORDER.getStatus());
-        youyouCommodityMapper.updateById(youyouCommodityDO);
+        UUCommodityMapper.updateById(youyouCommodityDO);
         return youyouOrderDO;
     }
     private YouyouOrderDO validateInvOrderCanCreate(YouyouOrderDO youyouOrderDO) {
@@ -298,7 +298,7 @@ public class UUOrderServiceImpl implements UUOrderService {
             throw exception(OpenApiCode.ERR_5214);
         }
         // TODO 如果数据出错  请检查此处 mapper 是否正确
-        YouyouCommodityDO youyouCommodityDO = youyouCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
+        YouyouCommodityDO youyouCommodityDO = UUCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
 
 
 //        SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
@@ -528,9 +528,9 @@ public class UUOrderServiceImpl implements UUOrderService {
         invOrderMapper.updateById(new InvOrderDO().setId(id)
                 .setPayRefundId(payRefundId).setRefundPrice(youyouOrderDO.getPayAmount()));
         //释放库存
-        YouyouCommodityDO youyouCommodityDO = youyouCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
+        YouyouCommodityDO youyouCommodityDO = UUCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
         youyouCommodityDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
-        youyouCommodityMapper.updateById(youyouCommodityDO);
+        UUCommodityMapper.updateById(youyouCommodityDO);
     }
 
     private YouyouOrderDO validateInvOrderCanRefund(Long id,LoginUser loginUser) {

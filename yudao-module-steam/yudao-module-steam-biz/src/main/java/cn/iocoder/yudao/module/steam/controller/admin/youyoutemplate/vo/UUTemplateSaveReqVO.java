@@ -2,12 +2,10 @@ package cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import java.util.*;
-import javax.validation.constraints.*;
 
 @Schema(description = "管理后台 - 悠悠商品模板新增/修改 Request VO")
 @Data
-public class YouyouTemplateSaveReqVO {
+public class UUTemplateSaveReqVO {
 
     @Schema(description = "武器全称", example = "印花 | Hello 法玛斯")
     private String name;
