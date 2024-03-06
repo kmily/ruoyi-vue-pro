@@ -42,6 +42,7 @@ import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
 import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyVo;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -650,5 +651,26 @@ public class UUOrderServiceImpl implements UUOrderService {
         String callBackInfo = notifyReq.getCallBackInfo();
         NotifyVo notifyVo = JacksonUtils.readValue(callBackInfo, NotifyVo.class);
         log.info("回调接收的数据{}",notifyVo);
+        List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(new LambdaQueryWrapper<YouyouOrderDO>()
+                .eq(YouyouOrderDO::getUuOrderNo, notifyVo.getOrderNo()));
+        if (!youyouOrderDOS.isEmpty()) {
+            YouyouOrderDO youyouOrderDO = youyouOrderDOS.get(0);
+            youyouOrderMapper.updateById(new YouyouOrderDO().setId(youyouOrderDO.getId())
+                    .setUuOrderType(notifyVo.getOrderType())
+                    .setUuOrderSubType(notifyVo.getOrderSubType())
+                    .setUuShippingMode(notifyVo.getShippingMode())
+                    .setUuTradeOfferId(notifyVo.getTradeOfferId())
+                    .setUuTradeOfferLinks(notifyVo.getTradeOfferLinks())
+                    .setUuBuyerUserId(notifyVo.getBuyerUserId())
+                    .setUuOrderStatus(notifyVo.getOrderStatus())
+                    .setUuOrderSubType(notifyVo.getOrderSubType())
+                    .setUuFailCode(notifyVo.getFailCode())
+                    .setUuFailReason(notifyVo.getFailReason())
+                    .setUuMerchantOrderNo(notifyVo.getMerchantOrderNo())
+                    .setUuNotifyType(notifyVo.getNotifyType())
+                    .setUuNotifyDesc(notifyVo.getNotifyDesc())
+            );
+        }
+
     }
 }
