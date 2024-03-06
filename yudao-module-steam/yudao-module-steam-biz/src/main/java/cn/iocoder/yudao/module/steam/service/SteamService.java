@@ -380,6 +380,7 @@ public class SteamService {
                 throw new ServiceException(-1,"Steam openid 接口验证异常");
             }
         }catch (Exception e){
+            log.error("解析出错原因{}",e);
             throw new ServiceException(-1,"Steam openid 接口验证异常");
         }
     }
