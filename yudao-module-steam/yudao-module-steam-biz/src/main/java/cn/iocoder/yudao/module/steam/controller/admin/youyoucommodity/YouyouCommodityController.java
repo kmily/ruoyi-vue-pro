@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
 
-import javax.validation.constraints.*;
 import javax.validation.*;
 import javax.servlet.http.*;
 import java.util.*;
@@ -66,17 +65,17 @@ public class YouyouCommodityController {
     @Operation(summary = "获得悠悠商品列表")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('steam:youyou-commodity:query')")
-    public CommonResult<YouyouCommodityRespVO> getYouyouCommodity(@RequestParam("id") Integer id) {
+    public CommonResult<UUCommodityRespVO> getYouyouCommodity(@RequestParam("id") Integer id) {
         YouyouCommodityDO youyouCommodity = youyouCommodityService.getYouyouCommodity(id);
-        return success(BeanUtils.toBean(youyouCommodity, YouyouCommodityRespVO.class));
+        return success(BeanUtils.toBean(youyouCommodity, UUCommodityRespVO.class));
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得悠悠商品列表分页")
     @PreAuthorize("@ss.hasPermission('steam:youyou-commodity:query')")
-    public CommonResult<PageResult<YouyouCommodityRespVO>> getYouyouCommodityPage(@Valid YouyouCommodityPageReqVO pageReqVO) {
+    public CommonResult<PageResult<UUCommodityRespVO>> getYouyouCommodityPage(@Valid YouyouCommodityPageReqVO pageReqVO) {
         PageResult<YouyouCommodityDO> pageResult = youyouCommodityService.getYouyouCommodityPage(pageReqVO);
-        return success(BeanUtils.toBean(pageResult, YouyouCommodityRespVO.class));
+        return success(BeanUtils.toBean(pageResult, UUCommodityRespVO.class));
     }
 
     @GetMapping("/export-excel")
@@ -88,8 +87,8 @@ public class YouyouCommodityController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<YouyouCommodityDO> list = youyouCommodityService.getYouyouCommodityPage(pageReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "悠悠商品列表.xls", "数据", YouyouCommodityRespVO.class,
-                        BeanUtils.toBean(list, YouyouCommodityRespVO.class));
+        ExcelUtils.write(response, "悠悠商品列表.xls", "数据", UUCommodityRespVO.class,
+                        BeanUtils.toBean(list, UUCommodityRespVO.class));
     }
 
 }

@@ -52,6 +52,7 @@ import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.devaccount.DevAccountService;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
+import cn.iocoder.yudao.module.steam.service.fin.UUOrderServiceImpl;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.TradeUrlStatus;
 import cn.iocoder.yudao.module.steam.service.youyoudetails.YouyouDetailsService;
@@ -83,6 +84,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URI;
+import java.util.*;
+
+import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import java.time.ZoneOffset;
 import java.util.*;
 
@@ -132,6 +136,8 @@ public class AppApiController {
     private YouyouOrderMapper youyouOrderMapper;
 
     @Resource
+    private UUOrderServiceImpl uuOrderServiceImpl;
+    @Resource
     private PaySteamOrderService paySteamOrderService;
     @Resource
     private PayOrderService payOrderService;
@@ -154,7 +160,7 @@ public class AppApiController {
     @PostMapping("v1/api/getAssetsInfo")
     @Operation(summary = "余额查询")
     @PermitAll
-    public ApiResult<ApiPayWalletRespVO> getAssetsInfo(@RequestBody OpenYoupinApiReqVo<Serializable> openApiReqVo) {
+    public ApiResult<ApiPayWalletRespVO> getAssetsInfo(@RequestBody  OpenYoupinApiReqVo<Serializable> openApiReqVo) {
         try {
             ApiResult<ApiPayWalletRespVO> execute = DevAccountUtils.tenantExecute(1l, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
@@ -418,7 +424,7 @@ public class AppApiController {
     @PostMapping("v1/api/orderCancel")
     @Operation(summary = "买家取消订单")
     @PermitAll
-    public ApiResult<CreateOrderCancel> orderCancel(@RequestBody OpenYoupinApiReqVo<CreateReqOrder> openApiReqVo) {
+    public ApiResult<CreateOrderCancel> orderCancel(@RequestBody OpenApiReqVo<CreateReqOrderCancel> openApiReqVo) {
         try {
             ApiResult<CreateOrderCancel> execute = DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
@@ -428,12 +434,12 @@ public class AppApiController {
                         .eq(YouyouOrderDO::getUserId, devAccount.getUserId()));
 
                 CreateOrderCancel ret = new CreateOrderCancel();
-                if (youyouOrderDOS.size() == 0) {
+                if (youyouOrderDOS.isEmpty()) {
                     ret.setResult(3);
                     return ApiResult.success(ret, "取消失败，没有找到该订单");
                 } else {
-                    // TODO 取消订单
-//                    youyouOrderMapper.updateById(youyouOrderDOS.get(0).set);
+                    LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1l);
+                    uuOrderServiceImpl.refundInvOrder(loginUser, youyouOrderDOS.get(0).getId(), getClientIP());
                     ret.setResult(1);
                     return ApiResult.success(ret, "取消成功");
                 }
@@ -444,19 +450,39 @@ public class AppApiController {
             return ApiResult.error(e.getCode(), e.getMessage(), CreateOrderCancel.class);
         }
     }
-
+    
     @PostMapping("v1/api/orderStatus")
     @Operation(summary = "查询订单状态")
     @PermitAll
-    public ApiResult<String> orderStatus(@RequestBody OpenYoupinApiReqVo<CreateReqVo> openApiReqVo) {
-        // TODO
-        return ApiResult.success("");
+    public ApiResult<CreateOrderStatus> orderStatus(@RequestBody OpenApiReqVo<CreateReqOrderStatus> openApiReqVo) {
+        try {
+            ApiResult<CreateOrderStatus> execute = DevAccountUtils.tenantExecute(1L, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+
+                List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
+                        .eq(YouyouOrderDO::getOrderNo, openApiReqVo.getData().getOrderNo())
+                        .eq(YouyouOrderDO::getUserId, devAccount.getUserId()));
+
+                CreateOrderStatus ret = new CreateOrderStatus();
+                // TODO 根据数据库信息返回详细内容
+                if (youyouOrderDOS.isEmpty()) {
+                    return ApiResult.success(ret, "商户订单号参数错误");
+                } else if (false) {
+                    return ApiResult.success(ret, "多种错误类型判断");
+                } else {
+                    return ApiResult.success(ret, "成功");
+                }
+            });
+            return execute;
+        } catch (ServiceException e) {
+            return ApiResult.error(e.getCode(), e.getMessage(), CreateOrderStatus.class);
+        }
     }
 
     @PostMapping("v1/api/orderInfo")
     @Operation(summary = "查询订单详情")
     @PermitAll
-    public ApiResult<String> orderInfo(@RequestBody OpenYoupinApiReqVo<CreateReqVo> openApiReqVo) {
+    public ApiResult<String> orderInfo(@RequestBody OpenApiReqVo<CreateCommodityOrderReqVo> openApiReqVo) {
         // TODO
         return ApiResult.success("");
     }

@@ -1,12 +1,13 @@
-package cn.iocoder.yudao.module.steam.controller.app.vo.user;
+package cn.iocoder.yudao.module.steam.service.uu.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Data
-public class ApiPayWalletRespVO {
+public class ApiPayWalletRespVO implements Serializable {
     @Schema(description = "金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     private BigDecimal amount;
 

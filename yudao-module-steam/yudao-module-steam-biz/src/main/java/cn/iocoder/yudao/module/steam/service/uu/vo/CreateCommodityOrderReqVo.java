@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.steam.controller.app.vo.buy;
+package cn.iocoder.yudao.module.steam.service.uu.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CreateReqVo implements Serializable {
+public class CreateCommodityOrderReqVo implements Serializable {
 
     /**
      * 商户订单号

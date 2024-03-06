@@ -369,7 +369,8 @@ public class SteamService {
             builder.form(post);
 
             HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
-            if(Objects.isNull(proxyResponseVo.getStatus()) && proxyResponseVo.getStatus()==200){
+            log.error("steam返回{}",proxyResponseVo);
+            if(Objects.nonNull(proxyResponseVo.getStatus()) && proxyResponseVo.getStatus()==200){
                 String html = proxyResponseVo.getHtml();
                 if(html.contains("is_valid:true")){
                     return true;
@@ -380,7 +381,8 @@ public class SteamService {
                 throw new ServiceException(-1,"Steam openid 接口验证异常");
             }
         }catch (Exception e){
-            throw new ServiceException(-1,"Steam openid 接口验证异常");
+            log.error("解析出错原因{}",e);
+            throw new ServiceException(-1,"Steam openid1 接口验证异常");
         }
     }
 

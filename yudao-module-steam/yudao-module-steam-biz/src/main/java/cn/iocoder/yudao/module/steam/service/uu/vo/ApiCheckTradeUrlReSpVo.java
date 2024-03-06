@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.steam.controller.app.vo.user;
+package cn.iocoder.yudao.module.steam.service.uu.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -7,11 +7,6 @@ import java.io.Serializable;
 
 @Data
 public class ApiCheckTradeUrlReSpVo implements Serializable {
-    /**
-     * 交易链接账户steam ID
-     */
-    @Schema(description = "交易链接账户steam ID", example = "https://steamcommunity.com/tradeoffer/new/?partner=111&token=222")
-    private String steamId;
     /**
      * 状态
      * 1，2，3，4，5，6，7

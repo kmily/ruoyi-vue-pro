@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.steam.service.youyoucommodity;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import javax.annotation.Resource;
 
@@ -10,23 +9,17 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 
 import cn.iocoder.yudao.module.steam.controller.admin.youyoucommodity.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
-import cn.iocoder.yudao.module.steam.dal.mysql.youyoucommodity.YouyouCommodityMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.youyoucommodity.UUCommodityMapper;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
-import javax.annotation.Resource;
 import org.springframework.context.annotation.Import;
-import java.util.*;
-import java.time.LocalDateTime;
 
-import static cn.hutool.core.util.RandomUtil.*;
 import static cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
  * {@link YouyouCommodityServiceImpl} 的单元测试类
@@ -40,7 +33,7 @@ public class YouyouCommodityServiceImplTest extends BaseDbUnitTest {
     private YouyouCommodityServiceImpl youyouCommodityService;
 
     @Resource
-    private YouyouCommodityMapper youyouCommodityMapper;
+    private UUCommodityMapper UUCommodityMapper;
 
     @Test
     public void testCreateYouyouCommodity_success() {
@@ -52,7 +45,7 @@ public class YouyouCommodityServiceImplTest extends BaseDbUnitTest {
         // 断言
         assertNotNull(youyouCommodityId);
         // 校验记录的属性是否正确
-        YouyouCommodityDO youyouCommodity = youyouCommodityMapper.selectById(youyouCommodityId);
+        YouyouCommodityDO youyouCommodity = UUCommodityMapper.selectById(youyouCommodityId);
         assertPojoEquals(createReqVO, youyouCommodity, "id");
     }
 
@@ -60,7 +53,7 @@ public class YouyouCommodityServiceImplTest extends BaseDbUnitTest {
     public void testUpdateYouyouCommodity_success() {
         // mock 数据
         YouyouCommodityDO dbYouyouCommodity = randomPojo(YouyouCommodityDO.class);
-        youyouCommodityMapper.insert(dbYouyouCommodity);// @Sql: 先插入出一条存在的数据
+        UUCommodityMapper.insert(dbYouyouCommodity);// @Sql: 先插入出一条存在的数据
         // 准备参数
         YouyouCommoditySaveReqVO updateReqVO = randomPojo(YouyouCommoditySaveReqVO.class, o -> {
             o.setId(dbYouyouCommodity.getId()); // 设置更新的 ID
@@ -69,7 +62,7 @@ public class YouyouCommodityServiceImplTest extends BaseDbUnitTest {
         // 调用
         youyouCommodityService.updateYouyouCommodity(updateReqVO);
         // 校验是否更新正确
-        YouyouCommodityDO youyouCommodity = youyouCommodityMapper.selectById(updateReqVO.getId()); // 获取最新的
+        YouyouCommodityDO youyouCommodity = UUCommodityMapper.selectById(updateReqVO.getId()); // 获取最新的
         assertPojoEquals(updateReqVO, youyouCommodity);
     }
 
@@ -86,14 +79,14 @@ public class YouyouCommodityServiceImplTest extends BaseDbUnitTest {
     public void testDeleteYouyouCommodity_success() {
         // mock 数据
         YouyouCommodityDO dbYouyouCommodity = randomPojo(YouyouCommodityDO.class);
-        youyouCommodityMapper.insert(dbYouyouCommodity);// @Sql: 先插入出一条存在的数据
+        UUCommodityMapper.insert(dbYouyouCommodity);// @Sql: 先插入出一条存在的数据
         // 准备参数
         Integer id = dbYouyouCommodity.getId();
 
         // 调用
         youyouCommodityService.deleteYouyouCommodity(id);
        // 校验数据不存在了
-       assertNull(youyouCommodityMapper.selectById(id));
+       assertNull(UUCommodityMapper.selectById(id));
     }
 
     @Test
@@ -122,29 +115,29 @@ public class YouyouCommodityServiceImplTest extends BaseDbUnitTest {
            o.setTransferStatus(null);
            o.setStatus(null);
        });
-       youyouCommodityMapper.insert(dbYouyouCommodity);
+       UUCommodityMapper.insert(dbYouyouCommodity);
        // 测试 id 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setId(null)));
+       UUCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setId(null)));
        // 测试 templateId 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setTemplateId(null)));
+       UUCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setTemplateId(null)));
        // 测试 commodityName 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityName(null)));
+       UUCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityName(null)));
        // 测试 commodityPrice 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityPrice(null)));
+       UUCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityPrice(null)));
        // 测试 createTime 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCreateTime(null)));
+       UUCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCreateTime(null)));
        // 测试 commodityStickers 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityStickers(null)));
+       UUCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityStickers(null)));
        // 测试 commodityDoppler 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityDoppler(null)));
+       UUCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityDoppler(null)));
        // 测试 commodityFade 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityFade(null)));
+       UUCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityFade(null)));
        // 测试 commodityHardened 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityHardened(null)));
+       UUCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setCommodityHardened(null)));
        // 测试 transferStatus 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setTransferStatus(null)));
+       UUCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setTransferStatus(null)));
        // 测试 status 不匹配
-       youyouCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setStatus(null)));
+       UUCommodityMapper.insert(cloneIgnoreId(dbYouyouCommodity, o -> o.setStatus(null)));
        // 准备参数
        YouyouCommodityPageReqVO reqVO = new YouyouCommodityPageReqVO();
        reqVO.setId(null);

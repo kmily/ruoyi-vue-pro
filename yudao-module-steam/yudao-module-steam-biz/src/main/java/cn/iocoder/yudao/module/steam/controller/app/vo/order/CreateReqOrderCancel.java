@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CreateReqOrder implements Serializable {
+public class CreateReqOrderCancel implements Serializable {
     /**
      * 订单号
      */

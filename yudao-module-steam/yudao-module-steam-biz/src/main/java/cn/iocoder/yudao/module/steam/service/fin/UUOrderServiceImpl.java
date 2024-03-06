@@ -16,29 +16,30 @@ import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
-import cn.iocoder.yudao.module.steam.controller.app.vo.OpenYoupinApiReqVo;
-import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal.WithdrawalDO;
-
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
-
-import cn.iocoder.yudao.module.steam.dal.mysql.youyoucommodity.YouyouCommodityMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.youyoucommodity.UUCommodityMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
-import cn.iocoder.yudao.module.steam.service.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.YouPingOrder;
+import cn.iocoder.yudao.module.steam.service.uu.OpenApiService;
+import cn.iocoder.yudao.module.steam.service.uu.UUService;
+import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
+import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
+import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -102,6 +103,9 @@ public class UUOrderServiceImpl implements UUOrderService {
     @Resource
     private OpenApiService openApiService;
 
+    @Resource
+    private UUService uuService;
+
 
 
     private PayWalletService payWalletService;
@@ -114,7 +118,7 @@ public class UUOrderServiceImpl implements UUOrderService {
     private YouyouOrderMapper youyouOrderMapper;
 
     @Resource
-    private YouyouCommodityMapper youyouCommodityMapper;
+    private UUCommodityMapper UUCommodityMapper;
     @Resource
     private SteamService steamService;
 
@@ -236,7 +240,7 @@ public class UUOrderServiceImpl implements UUOrderService {
     }
 
     @Override
-    public YouyouOrderDO createInvOrder(LoginUser loginUser, CreateReqVo createReqVO) {
+    public YouyouOrderDO createInvOrder(LoginUser loginUser, CreateCommodityOrderReqVo createReqVO) {
 
         BigDecimal bigDecimal = new BigDecimal(createReqVO.getPurchasePrice());
         YouyouOrderDO youyouOrderDO=new YouyouOrderDO()
@@ -261,16 +265,37 @@ public class UUOrderServiceImpl implements UUOrderService {
 //        // 2.2 更新支付单到 demo 订单
         youyouOrderMapper.updateById(new YouyouOrderDO().setId(youyouOrderDO.getId())
                 .setPayOrderId(payOrderId));
-        YouyouCommodityDO youyouCommodityDO = youyouCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
+        YouyouCommodityDO youyouCommodityDO = UUCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
 //        //更新库存的标识
         youyouCommodityDO.setTransferStatus(InvTransferStatusEnum.INORDER.getStatus());
-        youyouCommodityMapper.updateById(youyouCommodityDO);
+        UUCommodityMapper.updateById(youyouCommodityDO);
         return youyouOrderDO;
     }
     private YouyouOrderDO validateInvOrderCanCreate(YouyouOrderDO youyouOrderDO) {
         //检测交易链接
         try{
-            steamService.checkTradeUrlFormat(youyouOrderDO.getTradeLinks());
+            ApiResult<ApiCheckTradeUrlReSpVo> apiCheckTradeUrlReSpVoApiResult = uuService.checkTradeUrl(new ApiCheckTradeUrlReqVo().setTradeLinks(youyouOrderDO.getTradeLinks()));
+            if(apiCheckTradeUrlReSpVoApiResult.getCode()!=0){
+                throw exception(OpenApiCode.CONCAT_ADMIN);
+            }
+            switch (apiCheckTradeUrlReSpVoApiResult.getData().getStatus()){
+                case 1://1：正常交易   6:该账户库存私密无法交易 7:该账号个人资料私密无法交易
+                    break;
+                case 2://2:交易链接格式错误
+                    throw exception(OpenApiCode.ERR_5408);
+                case 3://3:请稍后重试
+                    throw exception(OpenApiCode.ERR_5402);
+                case 4://4:账号交易权限被封禁，无法交易
+                    throw exception(OpenApiCode.ERR_5406);
+                case 5://5:该交易链接已不再可用
+                    throw exception(OpenApiCode.ERR_5405);
+                case 6:// 6:该账户库存私密无法交易
+                    throw exception(OpenApiCode.ERR_5403);
+                case 7://7:该账号个人资料私密无法交易
+                    throw exception(OpenApiCode.ERR_5403);
+                default:
+                    throw exception(OpenApiCode.CONCAT_ADMIN);
+            }
         }catch (ServiceException e){
             throw exception(OpenApiCode.ERR_5408);
         }
@@ -298,7 +323,7 @@ public class UUOrderServiceImpl implements UUOrderService {
             throw exception(OpenApiCode.ERR_5214);
         }
         // TODO 如果数据出错  请检查此处 mapper 是否正确
-        YouyouCommodityDO youyouCommodityDO = youyouCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
+        YouyouCommodityDO youyouCommodityDO = UUCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
 
 
 //        SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
@@ -436,8 +461,7 @@ public class UUOrderServiceImpl implements UUOrderService {
      * @return
      */
     private YouPingOrder uploadYY(YouyouOrderDO youyouOrderDO){
-        OpenYoupinApiReqVo<CreateReqVo> openApiReqVo=new OpenYoupinApiReqVo<>();
-        CreateReqVo createReqVo = new CreateReqVo();
+        CreateCommodityOrderReqVo createReqVo = new CreateCommodityOrderReqVo();
         createReqVo.setMerchantOrderNo("YY"+youyouOrderDO.getMerchantOrderNo());
         createReqVo.setTradeLinks(youyouOrderDO.getTradeLinks());
         createReqVo.setCommodityId(youyouOrderDO.getCommodityId());
@@ -445,9 +469,8 @@ public class UUOrderServiceImpl implements UUOrderService {
         createReqVo.setPurchasePrice(youyouOrderDO.getPurchasePrice());
         createReqVo.setFastShipping(youyouOrderDO.getFastShipping());
         createReqVo.setCommodityId(youyouOrderDO.getCommodityId());
-        openApiReqVo.setData(createReqVo);
-        YouPingOrder youPingOrder = openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/byGoodsIdCreateOrder", openApiReqVo, YouPingOrder.class);
-        return youPingOrder;
+        ApiResult<YouPingOrder> youPingOrderApiResult = uuService.byGoodsIdCreateOrder(createReqVo);
+        return youPingOrderApiResult.getData();
     }
 
     /**
@@ -528,9 +551,9 @@ public class UUOrderServiceImpl implements UUOrderService {
         invOrderMapper.updateById(new InvOrderDO().setId(id)
                 .setPayRefundId(payRefundId).setRefundPrice(youyouOrderDO.getPayAmount()));
         //释放库存
-        YouyouCommodityDO youyouCommodityDO = youyouCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
+        YouyouCommodityDO youyouCommodityDO = UUCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
         youyouCommodityDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
-        youyouCommodityMapper.updateById(youyouCommodityDO);
+        UUCommodityMapper.updateById(youyouCommodityDO);
     }
 
     private YouyouOrderDO validateInvOrderCanRefund(Long id,LoginUser loginUser) {
