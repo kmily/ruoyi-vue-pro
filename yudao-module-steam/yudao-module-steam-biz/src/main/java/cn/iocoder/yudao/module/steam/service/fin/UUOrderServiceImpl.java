@@ -38,6 +38,7 @@ import cn.iocoder.yudao.module.steam.service.uu.UUService;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
+import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -451,12 +452,15 @@ public class UUOrderServiceImpl implements UUOrderService {
 
         }catch (ServiceException e){
             log.error("发货失败，自动退款单号{}",youyouOrderDO);
-            if(Objects.nonNull(youyouOrderDO)){
-                LoginUser loginUser=new LoginUser();
-                loginUser.setId(youyouOrderDO.getUserId());
-                loginUser.setUserType(youyouOrderDO.getUserType());
-                refundInvOrder(loginUser,youyouOrderDO.getId(), ServletUtils.getClientIP());
-            }
+            DevAccountUtils.tenantExecute(1l,()->{
+                if(Objects.nonNull(youyouOrderDO)){
+                    LoginUser loginUser=new LoginUser();
+                    loginUser.setId(youyouOrderDO.getUserId());
+                    loginUser.setUserType(youyouOrderDO.getUserType());
+                    refundInvOrder(loginUser,youyouOrderDO.getId(), ServletUtils.getClientIP());
+                }
+                return "";
+            });
         }
     }
 
