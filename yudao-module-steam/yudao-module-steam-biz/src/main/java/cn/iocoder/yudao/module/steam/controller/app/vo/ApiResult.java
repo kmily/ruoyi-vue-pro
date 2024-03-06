@@ -20,11 +20,14 @@ public class ApiResult<T> extends CommonResult<T> {
         result.setMsg(message);
         return result;
     }
-    public static <T> ApiResult<T> success(T data) {
+    public static <T> ApiResult<T> success(T data,String msg) {
         ApiResult<T> result = new ApiResult<>();
         result.setCode(GlobalErrorCodeConstants.SUCCESS.getCode());
-        result.setMsg("");
+        result.setMsg(msg);
         result.setData(data);
         return result;
+    }
+    public static <T> ApiResult<T> success(T data) {
+        return success(data,"");
     }
 }
