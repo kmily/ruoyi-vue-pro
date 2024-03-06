@@ -37,7 +37,7 @@ public class AppWalletController {
     private PaySteamOrderService paySteamOrderService;
 
     @Resource
-    private UUOrderService youYouOrderService;
+    private UUOrderService uUOrderService;
 
     /**
      * 创建提现订单
@@ -87,7 +87,7 @@ public class AppWalletController {
     @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
     @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
     public CommonResult<Boolean> updateOrderPaid(@RequestBody PayOrderNotifyReqDTO notifyReqDTO) {
-        youYouOrderService.updateInvOrderPaid(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
+        uUOrderService.updateInvOrderPaid(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
                 notifyReqDTO.getPayOrderId());
         return success(true);
     }
@@ -98,7 +98,7 @@ public class AppWalletController {
     @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
     @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
     public CommonResult<Boolean> updateUUOrderRefunded(@RequestBody PayRefundNotifyReqDTO notifyReqDTO) {
-        youYouOrderService.updateInvOrderRefunded(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
+        uUOrderService.updateInvOrderRefunded(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
                 notifyReqDTO.getPayRefundId());
         return success(true);
     }
