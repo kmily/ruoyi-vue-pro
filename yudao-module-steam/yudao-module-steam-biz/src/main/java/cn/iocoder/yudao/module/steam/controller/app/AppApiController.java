@@ -2,10 +2,17 @@ package cn.iocoder.yudao.module.steam.controller.app;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
+import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitRespVO;
+import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitReqVO;
+import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitRespVO;
+import cn.iocoder.yudao.module.pay.convert.order.PayOrderConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
+import cn.iocoder.yudao.module.pay.framework.pay.core.WalletPayClient;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
@@ -14,21 +21,27 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.OpenYoupinApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByIdRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByTemplateRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.CreateOrderCancel;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.CreateReqOrder;
 import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiCheckTradeUrlReSpVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiPayWalletRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
+import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.service.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
+import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.TradeUrlStatus;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
+import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +56,7 @@ import javax.annotation.security.PermitAll;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -68,6 +82,9 @@ public class AppApiController {
 
     @Resource
     private BindUserMapper bindUserMapper;
+
+    @Resource
+    private YouyouOrderMapper youyouOrderMapper;
 
     @Resource
     private PaySteamOrderService paySteamOrderService;
@@ -194,28 +211,39 @@ public class AppApiController {
             return ApiResult.error(e.getCode(),  e.getMessage(),CreateByTemplateRespVo.class);
         }
     }
-//    @PostMapping("/createInvOrder")
-//    @Operation(summary = "创建库存订单")
-//    public CommonResult<AppPayOrderSubmitRespVO> createInvOrder(@Valid @RequestBody PaySteamOrderCreateReqVO createReqVO) {
-//        DevAccountDO devAccount = DevAccountContextHolder.getRequiredDevAccount();
-//        LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1l);
-//        CreateOrderResult invOrder = paySteamOrderService.createInvOrder(loginUser, createReqVO);
-//
-//        //付款
-//        AppPayOrderSubmitReqVO reqVO=new AppPayOrderSubmitReqVO();
-//        reqVO.setChannelCode(PayChannelEnum.WALLET.getCode());
-//        reqVO.setId(invOrder.getPayOrderId());
-//        if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
-//            Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
-//                    Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
-//            channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(devAccount.getUserId()));
-//            channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(devAccount.getUserType()));
-//            reqVO.setChannelExtras(channelExtras);
-//        }
-//        // 2. 提交支付
-//        PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, getClientIP());
-//        return success(PayOrderConvert.INSTANCE.convert3(respVO));
-//    }
+    @Operation(summary = "创建库存订单")
+    @PostMapping("v1/api/io661/createInvOrder")
+    @PermitAll
+    public ApiResult<AppPayOrderSubmitRespVO> createInvOrder(@RequestBody OpenYoupinApiReqVo<PaySteamOrderCreateReqVO> openApiReqVo) {
+        try {
+            ApiResult<AppPayOrderSubmitRespVO> execute = DevAccountUtils.tenantExecute(1l, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+
+
+                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1l);
+                CreateOrderResult invOrder = paySteamOrderService.createInvOrder(loginUser, openApiReqVo.getData());
+
+                //付款
+                AppPayOrderSubmitReqVO reqVO=new AppPayOrderSubmitReqVO();
+                reqVO.setChannelCode(PayChannelEnum.WALLET.getCode());
+                reqVO.setId(invOrder.getPayOrderId());
+                if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
+                    Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
+                            Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
+                    channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(devAccount.getUserId()));
+                    channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(devAccount.getUserType()));
+                    reqVO.setChannelExtras(channelExtras);
+                }
+                // 2. 提交支付
+                PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, ServletUtils.getClientIP());
+                return ApiResult.success(PayOrderConvert.INSTANCE.convert3(respVO));
+            });
+            return execute;
+        } catch (ServiceException e) {
+            return ApiResult.error(e.getCode(),  e.getMessage(),AppPayOrderSubmitRespVO.class);
+        }
+
+    }
     @Operation(summary = "库存订单列表")
     @PostMapping("v1/api/io661/listInvOrder")
     @PermitAll
@@ -235,5 +263,52 @@ public class AppApiController {
 
             return ApiResult.error(e.getCode(),  e.getMessage(),PageResult.class);
         }
+    }
+
+    /**
+     * 买家订单相关接口
+     */
+    @PostMapping("v1/api/orderCancel")
+    @Operation(summary = "买家取消订单")
+    @PermitAll
+    public ApiResult<CreateOrderCancel> orderCancel(@RequestBody OpenYoupinApiReqVo<CreateReqOrder> openApiReqVo) {
+        try {
+            ApiResult<CreateOrderCancel> execute = DevAccountUtils.tenantExecute(1L, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+
+                List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
+                        .eq(YouyouOrderDO::getOrderNo, openApiReqVo.getData().getOrderNo())
+                        .eq(YouyouOrderDO::getUserId, devAccount.getUserId()));
+
+                CreateOrderCancel ret = new CreateOrderCancel();
+                if(youyouOrderDOS.size() == 0){
+                    ret.setResult(3);
+                    return ApiResult.success(ret, "取消失败，没有找到该订单");
+                }else{
+                    // TODO 取消订单
+//                    youyouOrderMapper.updateById(youyouOrderDOS.get(0).set);
+                    ret.setResult(1);
+                    return ApiResult.success(ret, "取消成功");
+                }
+                // TODO 文档有个处理中(2)的状态，我感觉应该是用不上
+            });
+            return execute;
+        } catch (ServiceException e) {
+            return ApiResult.error(e.getCode(), e.getMessage(), CreateOrderCancel.class);
+        }
+    }
+    @PostMapping("v1/api/orderStatus")
+    @Operation(summary = "查询订单状态")
+    @PermitAll
+    public ApiResult<String> orderStatus(@RequestBody OpenYoupinApiReqVo<CreateReqVo> openApiReqVo) {
+        // TODO
+        return ApiResult.success("");
+    }
+    @PostMapping("v1/api/orderInfo")
+    @Operation(summary = "查询订单详情")
+    @PermitAll
+    public ApiResult<String> orderInfo(@RequestBody OpenYoupinApiReqVo<CreateReqVo> openApiReqVo) {
+        // TODO
+        return ApiResult.success("");
     }
 }
