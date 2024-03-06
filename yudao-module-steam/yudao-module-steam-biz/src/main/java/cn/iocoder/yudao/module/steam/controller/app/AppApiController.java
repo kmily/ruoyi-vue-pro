@@ -21,6 +21,8 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.OpenYoupinApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByIdRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByTemplateRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.CreateOrderCancel;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.CreateReqOrder;
 import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiCheckTradeUrlReSpVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiPayWalletRespVO;
@@ -30,6 +32,7 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.service.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
@@ -53,6 +56,7 @@ import javax.annotation.security.PermitAll;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -78,6 +82,9 @@ public class AppApiController {
 
     @Resource
     private BindUserMapper bindUserMapper;
+
+    @Resource
+    private YouyouOrderMapper youyouOrderMapper;
 
     @Resource
     private PaySteamOrderService paySteamOrderService;
@@ -256,5 +263,52 @@ public class AppApiController {
 
             return ApiResult.error(e.getCode(),  e.getMessage(),PageResult.class);
         }
+    }
+
+    /**
+     * 买家订单相关接口
+     */
+    @PostMapping("v1/api/orderCancel")
+    @Operation(summary = "买家取消订单")
+    @PermitAll
+    public ApiResult<CreateOrderCancel> orderCancel(@RequestBody OpenYoupinApiReqVo<CreateReqOrder> openApiReqVo) {
+        try {
+            ApiResult<CreateOrderCancel> execute = DevAccountUtils.tenantExecute(1L, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+
+                List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
+                        .eq(YouyouOrderDO::getOrderNo, openApiReqVo.getData().getOrderNo())
+                        .eq(YouyouOrderDO::getUserId, devAccount.getUserId()));
+
+                CreateOrderCancel ret = new CreateOrderCancel();
+                if(youyouOrderDOS.size() == 0){
+                    ret.setResult(3);
+                    return ApiResult.success(ret, "取消失败，没有找到该订单");
+                }else{
+                    // TODO 取消订单
+//                    youyouOrderMapper.updateById(youyouOrderDOS.get(0).set);
+                    ret.setResult(1);
+                    return ApiResult.success(ret, "取消成功");
+                }
+                // TODO 文档有个处理中(2)的状态，我感觉应该是用不上
+            });
+            return execute;
+        } catch (ServiceException e) {
+            return ApiResult.error(e.getCode(), e.getMessage(), CreateOrderCancel.class);
+        }
+    }
+    @PostMapping("v1/api/orderStatus")
+    @Operation(summary = "查询订单状态")
+    @PermitAll
+    public ApiResult<String> orderStatus(@RequestBody OpenYoupinApiReqVo<CreateReqVo> openApiReqVo) {
+        // TODO
+        return ApiResult.success("");
+    }
+    @PostMapping("v1/api/orderInfo")
+    @Operation(summary = "查询订单详情")
+    @PermitAll
+    public ApiResult<String> orderInfo(@RequestBody OpenYoupinApiReqVo<CreateReqVo> openApiReqVo) {
+        // TODO
+        return ApiResult.success("");
     }
 }
