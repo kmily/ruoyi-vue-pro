@@ -16,30 +16,30 @@ import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
-import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
-import cn.iocoder.yudao.module.steam.service.uu.UUService;
-import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal.WithdrawalDO;
-
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
-
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoucommodity.UUCommodityMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
-import cn.iocoder.yudao.module.steam.service.uu.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.YouPingOrder;
+import cn.iocoder.yudao.module.steam.service.uu.OpenApiService;
+import cn.iocoder.yudao.module.steam.service.uu.UUService;
+import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
+import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
+import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -274,7 +274,28 @@ public class UUOrderServiceImpl implements UUOrderService {
     private YouyouOrderDO validateInvOrderCanCreate(YouyouOrderDO youyouOrderDO) {
         //检测交易链接
         try{
-            steamService.checkTradeUrlFormat(youyouOrderDO.getTradeLinks());
+            ApiResult<ApiCheckTradeUrlReSpVo> apiCheckTradeUrlReSpVoApiResult = uuService.checkTradeUrl(new ApiCheckTradeUrlReqVo().setTradeLinks(youyouOrderDO.getTradeLinks()));
+            if(apiCheckTradeUrlReSpVoApiResult.getCode()!=0){
+                throw exception(OpenApiCode.CONCAT_ADMIN);
+            }
+            switch (apiCheckTradeUrlReSpVoApiResult.getData().getStatus()){
+                case 1://1：正常交易   6:该账户库存私密无法交易 7:该账号个人资料私密无法交易
+                    break;
+                case 2://2:交易链接格式错误
+                    throw exception(OpenApiCode.ERR_5408);
+                case 3://3:请稍后重试
+                    throw exception(OpenApiCode.ERR_5402);
+                case 4://4:账号交易权限被封禁，无法交易
+                    throw exception(OpenApiCode.ERR_5406);
+                case 5://5:该交易链接已不再可用
+                    throw exception(OpenApiCode.ERR_5405);
+                case 6:// 6:该账户库存私密无法交易
+                    throw exception(OpenApiCode.ERR_5403);
+                case 7://7:该账号个人资料私密无法交易
+                    throw exception(OpenApiCode.ERR_5403);
+                default:
+                    throw exception(OpenApiCode.CONCAT_ADMIN);
+            }
         }catch (ServiceException e){
             throw exception(OpenApiCode.ERR_5408);
         }

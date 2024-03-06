@@ -20,6 +20,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByIdRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByTemplateRespVo;
+import cn.iocoder.yudao.module.steam.service.uu.UUService;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.CreateOrderCancel;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.CreateOrderStatus;
@@ -97,6 +98,8 @@ public class AppApiController {
 
     @Autowired
     private UUOrderService uUOrderService;
+    @Resource
+    private UUService uuService;
 
     /**
      * api余额接口
@@ -116,6 +119,20 @@ public class AppApiController {
                 return ApiResult.success(apiPayWalletRespVO);
             });
             return execute;
+        } catch (ServiceException e) {
+            return ApiResult.error(e.getCode(),  e.getMessage(),ApiPayWalletRespVO.class);
+        }
+    }
+    /**
+     * api余额接口
+     * @return
+     */
+    @PostMapping("v1/api/uugetAssetsInfo")
+    @Operation(summary = "余额查询")
+    @PermitAll
+    public ApiResult<ApiPayWalletRespVO> uugetAssetsInfo(@RequestBody OpenApiReqVo<Serializable> openApiReqVo) {
+        try {
+            return uuService.getAssetsInfo();
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(),  e.getMessage(),ApiPayWalletRespVO.class);
         }
@@ -162,7 +179,7 @@ public class AppApiController {
                 String partner = steamWeb1.toCommunityID(stringStringMap.get("partner"));
 
                 ApiCheckTradeUrlReSpVo tradeUrlReSpVo=new ApiCheckTradeUrlReSpVo();
-                tradeUrlReSpVo.setSteamId(partner);
+//                tradeUrlReSpVo.setSteamId(partner);
                 tradeUrlReSpVo.setMsg(tradeUrlStatus.getMessage());
                 tradeUrlReSpVo.setStatus(tradeUrlStatus.getStatus());
                 return ApiResult.success(tradeUrlReSpVo);
