@@ -151,5 +151,49 @@ public class YouyouOrderDO extends BaseDO {
      * 枚举 {@link cn.iocoder.yudao.framework.common.enums.UserTypeEnum 对应的类}
      */
     private Integer sellUserType;
+    /**
+     * 预留字段
+     */
+    private Integer uuOrderType;
+    /**
+     * 预留字段
+     */
+    private Integer uuOrderSubType;
+    /**
+     * 订单小状态。
+     */
+    private Integer uuOrderSubStatus;
+    /**
+     * 发货模式：0,卖家直发；1,极速发货
+     */
+    private Integer uuShippingMode;
+    /**
+     * 报价ID
+     */
+    private Long uuTradeOfferId;
+    /**
+     * 报价链接
+     */
+    private String uuTradeOfferLinks;
+    /**
+     * 购买用户编号。
+     */
+    private Integer uuBuyerUserId;
+    /**
+     * 订单失败原因提示信息。
+     */
+    private String uuFailReason;
+    /**
+     * 订单失败原因编号。
+     */
+    private Integer uuFailCode;
+    /**
+     * 通知类型(1:等待发货，2:等待收货，3:购买成功，4:订单取消)。
+     */
+    private Integer uuNotifyType;
+    /**
+     * 通知类型描述(等待发货，等待收货，购买成功，订单取消)。
+     */
+    private String uuNotifyDesc;
 
 }
