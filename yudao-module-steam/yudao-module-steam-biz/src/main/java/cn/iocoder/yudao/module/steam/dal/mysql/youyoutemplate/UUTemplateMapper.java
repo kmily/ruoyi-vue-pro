@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.steam.dal.mysql.youyoutemplate;
 
-import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
@@ -15,7 +13,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.*;
  * @author 管理员
  */
 @Mapper
-public interface YouyouTemplateMapper extends BaseMapperX<YouyouTemplateDO> {
+public interface UUTemplateMapper extends BaseMapperX<YouyouTemplateDO> {
 
     default PageResult<YouyouTemplateDO> selectPage(YouyouTemplatePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<YouyouTemplateDO>()

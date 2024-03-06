@@ -1,18 +1,16 @@
 package cn.iocoder.yudao.module.steam.service.youyoutemplate;
 
-import java.util.*;
 import javax.validation.*;
 import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 
 /**
  * 悠悠商品模板 Service 接口
  *
  * @author 管理员
  */
-public interface YouyouTemplateService {
+public interface UUTemplateService {
 
     /**
      * 创建悠悠商品模板
@@ -20,14 +18,14 @@ public interface YouyouTemplateService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Integer createYouyouTemplate(@Valid YouyouTemplateSaveReqVO createReqVO);
+    Integer createYouyouTemplate(@Valid UUTemplateSaveReqVO createReqVO);
 
     /**
      * 更新悠悠商品模板
      *
      * @param updateReqVO 更新信息
      */
-    void updateYouyouTemplate(@Valid YouyouTemplateSaveReqVO updateReqVO);
+    void updateYouyouTemplate(@Valid UUTemplateSaveReqVO updateReqVO);
 
     /**
      * 删除悠悠商品模板

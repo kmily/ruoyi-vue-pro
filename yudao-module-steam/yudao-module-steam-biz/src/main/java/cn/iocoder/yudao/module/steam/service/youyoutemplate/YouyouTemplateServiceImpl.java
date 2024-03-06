@@ -3,16 +3,13 @@ package cn.iocoder.yudao.module.steam.service.youyoutemplate;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
 import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 
-import cn.iocoder.yudao.module.steam.dal.mysql.youyoutemplate.YouyouTemplateMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.youyoutemplate.UUTemplateMapper;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants.*;
@@ -24,27 +21,27 @@ import static cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants.*;
  */
 @Service
 @Validated
-public class YouyouTemplateServiceImpl implements YouyouTemplateService {
+public class YouyouTemplateServiceImpl implements UUTemplateService {
 
     @Resource
-    private YouyouTemplateMapper youyouTemplateMapper;
+    private UUTemplateMapper UUTemplateMapper;
 
     @Override
-    public Integer createYouyouTemplate(YouyouTemplateSaveReqVO createReqVO) {
+    public Integer createYouyouTemplate(UUTemplateSaveReqVO createReqVO) {
         // 插入
         YouyouTemplateDO youyouTemplate = BeanUtils.toBean(createReqVO, YouyouTemplateDO.class);
-        youyouTemplateMapper.insert(youyouTemplate);
+        UUTemplateMapper.insert(youyouTemplate);
         // 返回
         return youyouTemplate.getId();
     }
 
     @Override
-    public void updateYouyouTemplate(YouyouTemplateSaveReqVO updateReqVO) {
+    public void updateYouyouTemplate(UUTemplateSaveReqVO updateReqVO) {
         // 校验存在
         validateYouyouTemplateExists(updateReqVO.getId());
         // 更新
         YouyouTemplateDO updateObj = BeanUtils.toBean(updateReqVO, YouyouTemplateDO.class);
-        youyouTemplateMapper.updateById(updateObj);
+        UUTemplateMapper.updateById(updateObj);
     }
 
     @Override
@@ -52,23 +49,23 @@ public class YouyouTemplateServiceImpl implements YouyouTemplateService {
         // 校验存在
         validateYouyouTemplateExists(id);
         // 删除
-        youyouTemplateMapper.deleteById(id);
+        UUTemplateMapper.deleteById(id);
     }
 
     private void validateYouyouTemplateExists(Integer id) {
-        if (youyouTemplateMapper.selectById(id) == null) {
+        if (UUTemplateMapper.selectById(id) == null) {
             throw exception(YOUYOU_TEMPLATE_NOT_EXISTS);
         }
     }
 
     @Override
     public YouyouTemplateDO getYouyouTemplate(Integer id) {
-        return youyouTemplateMapper.selectById(id);
+        return UUTemplateMapper.selectById(id);
     }
 
     @Override
     public PageResult<YouyouTemplateDO> getYouyouTemplatePage(YouyouTemplatePageReqVO pageReqVO) {
-        return youyouTemplateMapper.selectPage(pageReqVO);
+        return UUTemplateMapper.selectPage(pageReqVO);
     }
 
 }
