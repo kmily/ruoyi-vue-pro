@@ -3,8 +3,10 @@ package cn.iocoder.yudao.module.steam.service.uu;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
+import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
@@ -12,6 +14,8 @@ import cn.iocoder.yudao.module.steam.service.devaccount.DevAccountService;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import cn.iocoder.yudao.module.steam.utils.RSAUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,6 +46,9 @@ public class OpenApiService {
 
     @Resource
     private ConfigService configService;
+
+    @Resource
+    private ObjectMapper objectMapper;
 
     @Autowired
     public void setValidator(Validator validator) {
@@ -91,7 +98,7 @@ public class OpenApiService {
      * @param <E> 出参类型
      * @return
      */
-    public <T extends Serializable,E extends Serializable> E requestUU(String url, OpenApiReqVo<T> openApiReqVo, Class<E> classic){
+    public <T extends Serializable,E extends Serializable> ApiResult<E> requestUU(String url, OpenApiReqVo<T> openApiReqVo, Class<E> classic){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         ConfigDO configApiKey = configService.getConfigByKey("uu.appKey");
         ConfigDO configByKey = configService.getConfigByKey("uu.key1");
@@ -107,8 +114,15 @@ public class OpenApiService {
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(openApiReqVo);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
-        E json = sent.json(classic);
-        return json;
+        ApiResult json1 = sent.json(ApiResult.class);
+        Object data = json1.getData();
+        try {
+            E e1 = objectMapper.readValue(objectMapper.writeValueAsString(data), classic);
+            return ApiResult.success(e1);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            throw new ServiceException(-1,"格式转换出错");
+        }
     }
     /**
      * 参数签名兼容有品
