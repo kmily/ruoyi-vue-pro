@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.steam.controller.app;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
+import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenYoupinApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByIdRespVo;
@@ -15,6 +17,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiCheckTradeUrlReSpVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiPayWalletRespVO;
+import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
@@ -213,13 +216,24 @@ public class AppApiController {
 //        PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, getClientIP());
 //        return success(PayOrderConvert.INSTANCE.convert3(respVO));
 //    }
-//    @PostMapping("/list/invOrder")
-//    @Operation(summary = "库存订单列表")
-//    public CommonResult<PageResult<InvOrderResp>> listInvOrder(@Valid @RequestBody InvOrderPageReqVO invOrderPageReqVO) {
-//        DevAccountDO devAccount = DevAccountContextHolder.getRequiredDevAccount();
-//        invOrderPageReqVO.setUserId(devAccount.getId());
-//        invOrderPageReqVO.setUserType(devAccount.getUserType());
-//        PageResult<InvOrderResp> invOrderPageOrder = paySteamOrderService.getInvOrderPageOrder(invOrderPageReqVO);
-//        return CommonResult.success(invOrderPageOrder);
-//    }
+    @Operation(summary = "库存订单列表")
+    @PostMapping("v1/api/io661/listInvOrder")
+    @PermitAll
+    public ApiResult<PageResult> listInvOrder(@RequestBody OpenYoupinApiReqVo<InvOrderPageReqVO> openApiReqVo) {
+        try {
+            ApiResult<PageResult> execute = DevAccountUtils.tenantExecute(1l, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+                InvOrderPageReqVO data = openApiReqVo.getData();
+                data.setUserId(devAccount.getId());
+                data.setUserType(devAccount.getUserType());
+                PageResult<InvOrderResp> invOrderPageOrder = paySteamOrderService.getInvOrderPageOrder(data);
+
+                return ApiResult.success(invOrderPageOrder);
+            });
+            return execute;
+        } catch (ServiceException e) {
+
+            return ApiResult.error(e.getCode(),  e.getMessage(),PageResult.class);
+        }
+    }
 }
