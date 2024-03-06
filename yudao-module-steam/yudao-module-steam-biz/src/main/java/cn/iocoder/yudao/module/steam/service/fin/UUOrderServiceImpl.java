@@ -262,6 +262,7 @@ public class UUOrderServiceImpl implements UUOrderService {
                 .setMerchantOrderId(youyouOrderDO.getId().toString()) // 业务的订单编号
                 .setSubject("购买").setBody("出售编号："+createReqVO.getCommodityId()).setPrice(youyouOrderDO.getPayAmount()) // 价格信息
                 .setExpireTime(addTime(Duration.ofHours(2L)))); // 支付的过期时间
+        youyouOrderDO.setPayOrderId(payOrderId);
 //        // 2.2 更新支付单到 demo 订单
         youyouOrderMapper.updateById(new YouyouOrderDO().setId(youyouOrderDO.getId())
                 .setPayOrderId(payOrderId));
@@ -470,6 +471,7 @@ public class UUOrderServiceImpl implements UUOrderService {
         createReqVo.setFastShipping(youyouOrderDO.getFastShipping());
         createReqVo.setCommodityId(youyouOrderDO.getCommodityId());
         ApiResult<YouPingOrder> youPingOrderApiResult = uuService.byGoodsIdCreateOrder(createReqVo);
+        uuService.checkResponse(youPingOrderApiResult);
         return youPingOrderApiResult.getData();
     }
 

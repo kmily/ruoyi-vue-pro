@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.service.uu;
 
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
@@ -24,6 +25,17 @@ public class UUService {
     @Autowired
     public void setOpenApiService(OpenApiService openApiService) {
         this.openApiService = openApiService;
+    }
+
+    /**
+     * 有品接口检测
+     * @param apiResult
+     * @param <T>
+     */
+    public <T extends Serializable> void checkResponse(ApiResult<T> apiResult){
+        if(apiResult.getCode()!=0){
+            throw new ServiceException(apiResult.getCode(),apiResult.getMsg());
+        }
     }
 
     /**

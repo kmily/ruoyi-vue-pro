@@ -117,8 +117,13 @@ public class OpenApiService {
         ApiResult json1 = sent.json(ApiResult.class);
         Object data = json1.getData();
         try {
+            ApiResult<E> apiResult=new ApiResult<>();
             E e1 = objectMapper.readValue(objectMapper.writeValueAsString(data), classic);
-            return ApiResult.success(e1);
+            apiResult.setData(e1);
+            apiResult.setMsg(json1.getMsg());
+            apiResult.setTimestamp(json1.getTimestamp());
+            apiResult.setCode(json1.getCode());
+            return apiResult;
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             throw new ServiceException(-1,"格式转换出错");

@@ -162,7 +162,7 @@ public class AppApiController {
     @PostMapping("v1/api/sign")
     @Operation(summary = "余额查询")
     @PermitAll
-    public   OpenApiReqVo<ApiCheckTradeUrlReqVo> sign(@RequestBody OpenApiReqVo<ApiCheckTradeUrlReqVo> openApiReqVo) {
+    public   OpenApiReqVo<CreateCommodityOrderReqVo> sign(@RequestBody OpenApiReqVo<CreateCommodityOrderReqVo> openApiReqVo) {
         return DevAccountUtils.tenantExecute(1l, () -> {
             return openApiService.requestUUSign(openApiReqVo);
         });
@@ -251,6 +251,24 @@ public class AppApiController {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1l);
                 YouyouOrderDO invOrder = uUOrderService.createInvOrder(loginUser, openApiReqVo.getData());
+
+
+                //付款
+                AppPayOrderSubmitReqVO reqVO=new AppPayOrderSubmitReqVO();
+                reqVO.setChannelCode(PayChannelEnum.WALLET.getCode());
+                reqVO.setId(invOrder.getPayOrderId());
+                if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
+                    Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
+                            Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
+                    channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(devAccount.getUserId()));
+                    channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(devAccount.getUserType()));
+                    reqVO.setChannelExtras(channelExtras);
+                }
+                // 2. 提交支付
+                PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, ServletUtils.getClientIP());
+//                return ApiResult.success(PayOrderConvert.INSTANCE.convert3(respVO));
+
+
                 CreateByTemplateRespVo ret=new CreateByTemplateRespVo();
                 ret.setPayAmount(Double.valueOf(invOrder.getPayAmount()/100));
                 ret.setOrderNo(invOrder.getOrderNo());
