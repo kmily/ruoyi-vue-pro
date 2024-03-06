@@ -1,12 +1,9 @@
-package cn.iocoder.yudao.module.steam.controller.app.vo.goods;
+package cn.iocoder.yudao.module.steam.controller.app.vo.UUTemplate;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -15,7 +12,7 @@ import java.io.Serializable;
 @Schema(description = "开发平台 -  开发平台接口")
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ApiGoodsRespVo implements Serializable {
+public class ApiUUCommodityRespVo implements Serializable {
 
     @Schema(description = "商品模版ID", example = "14652")
     private String templateId;
