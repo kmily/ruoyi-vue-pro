@@ -81,6 +81,9 @@ public interface ErrorCodeConstants {
 
     // ========== 悠悠商品列表 TODO 补充编号 ==========
     ErrorCode YOUYOU_COMMODITY_NOT_EXISTS = new ErrorCode(1_300_010_02, "悠悠商品列表不存在");
+    // ========== 悠悠商品列表 TODO 补充编号 ==========
+    ErrorCode YOUYOU_DETAILS_NOT_EXISTS = new ErrorCode(1_400_010_01, "请求明细不存在");
+
 
 
 }
