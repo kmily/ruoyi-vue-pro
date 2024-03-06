@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
+import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
 
 import javax.validation.Valid;
 
@@ -76,5 +77,7 @@ public interface UUOrderService {
      * @param payRefundId 退款订单号
      */
     void updateInvOrderRefunded(Long id, Long payRefundId);
+
+    void processNotify(NotifyReq notifyReq);
 
 }

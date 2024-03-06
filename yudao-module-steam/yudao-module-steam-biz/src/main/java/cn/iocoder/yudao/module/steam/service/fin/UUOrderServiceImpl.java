@@ -38,7 +38,10 @@ import cn.iocoder.yudao.module.steam.service.uu.UUService;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
+import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
+import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyVo;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
+import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -642,4 +645,10 @@ public class UUOrderServiceImpl implements UUOrderService {
         return payRefund;
     }
 
+    @Override
+    public void processNotify(NotifyReq notifyReq) {
+        String callBackInfo = notifyReq.getCallBackInfo();
+        NotifyVo notifyVo = JacksonUtils.readValue(callBackInfo, NotifyVo.class);
+        log.info("回调接收的数据{}",notifyVo);
+    }
 }
