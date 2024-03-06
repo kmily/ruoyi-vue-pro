@@ -76,18 +76,6 @@ public class SteamWeb {
         this.configService = configService;
     }
 
-    public static OkHttpClient getClient(boolean retry, int timeOut, String cookies, String url) {
-        OkHttpClient.Builder OKHTTP_BUILD = new OkHttpClient.Builder();
-        OKHTTP_BUILD.writeTimeout(timeOut, TimeUnit.SECONDS);
-        OKHTTP_BUILD.readTimeout(timeOut, TimeUnit.SECONDS);
-        OKHTTP_BUILD.connectTimeout(3, TimeUnit.SECONDS);
-        OKHTTP_BUILD.retryOnConnectionFailure(retry);
-        OKHTTP_BUILD.hostnameVerifier(HttpUtil.getHostnameVerifier());
-        OKHTTP_BUILD.sslSocketFactory(HttpUtil.getSSLSocketFactory(), HttpUtil.getTrustManager());
-        OKHTTP_BUILD.cookieJar(new SteamCustomCookieJar(cookies, url));
-        return OKHTTP_BUILD.build();
-    }
-
     /**
      * 登录steam网站
      *
