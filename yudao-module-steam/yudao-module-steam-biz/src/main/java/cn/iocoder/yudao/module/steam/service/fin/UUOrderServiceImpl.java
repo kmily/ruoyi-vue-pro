@@ -17,7 +17,8 @@ import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
-import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateReqVo;
+import cn.iocoder.yudao.module.steam.service.uu.UUService;
+import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
@@ -101,6 +102,9 @@ public class UUOrderServiceImpl implements UUOrderService {
 
     @Resource
     private OpenApiService openApiService;
+
+    @Resource
+    private UUService uuService;
 
 
 
@@ -236,7 +240,7 @@ public class UUOrderServiceImpl implements UUOrderService {
     }
 
     @Override
-    public YouyouOrderDO createInvOrder(LoginUser loginUser, CreateReqVo createReqVO) {
+    public YouyouOrderDO createInvOrder(LoginUser loginUser, CreateCommodityOrderReqVo createReqVO) {
 
         BigDecimal bigDecimal = new BigDecimal(createReqVO.getPurchasePrice());
         YouyouOrderDO youyouOrderDO=new YouyouOrderDO()
@@ -436,8 +440,7 @@ public class UUOrderServiceImpl implements UUOrderService {
      * @return
      */
     private YouPingOrder uploadYY(YouyouOrderDO youyouOrderDO){
-        OpenApiReqVo<CreateReqVo> openApiReqVo=new OpenApiReqVo<>();
-        CreateReqVo createReqVo = new CreateReqVo();
+        CreateCommodityOrderReqVo createReqVo = new CreateCommodityOrderReqVo();
         createReqVo.setMerchantOrderNo("YY"+youyouOrderDO.getMerchantOrderNo());
         createReqVo.setTradeLinks(youyouOrderDO.getTradeLinks());
         createReqVo.setCommodityId(youyouOrderDO.getCommodityId());
@@ -445,8 +448,7 @@ public class UUOrderServiceImpl implements UUOrderService {
         createReqVo.setPurchasePrice(youyouOrderDO.getPurchasePrice());
         createReqVo.setFastShipping(youyouOrderDO.getFastShipping());
         createReqVo.setCommodityId(youyouOrderDO.getCommodityId());
-        openApiReqVo.setData(createReqVo);
-        YouPingOrder youPingOrder = openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/byGoodsIdCreateOrder", openApiReqVo, YouPingOrder.class);
+        YouPingOrder youPingOrder = uuService.byGoodsIdCreateOrder(createReqVo);
         return youPingOrder;
     }
 

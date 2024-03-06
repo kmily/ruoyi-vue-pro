@@ -20,7 +20,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByIdRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByTemplateRespVo;
-import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateReqVo;
+import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.CreateOrderCancel;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.CreateOrderStatus;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.CreateReqOrderCancel;
@@ -59,10 +59,7 @@ import javax.annotation.security.PermitAll;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 
@@ -124,6 +121,18 @@ public class AppApiController {
         }
     }
     /**
+     * api余额接口
+     * @return
+     */
+    @PostMapping("v1/api/sign")
+    @Operation(summary = "余额查询")
+    @PermitAll
+    public   OpenApiReqVo<ApiCheckTradeUrlReqVo> sign(@RequestBody OpenApiReqVo<ApiCheckTradeUrlReqVo> openApiReqVo) {
+        return DevAccountUtils.tenantExecute(1l, () -> {
+            return openApiService.requestUUSign(openApiReqVo);
+        });
+    }
+    /**
      * 检查交易链接
      * @return
      */
@@ -170,7 +179,7 @@ public class AppApiController {
     @PostMapping("v1/api/byGoodsIdCreateOrder")
     @Operation(summary = "指定商品购买")
     @PermitAll
-    public ApiResult<CreateByIdRespVo> byGoodsIdCreateOrder(@RequestBody OpenApiReqVo<CreateReqVo> openApiReqVo) {
+    public ApiResult<CreateByIdRespVo> byGoodsIdCreateOrder(@RequestBody OpenApiReqVo<CreateCommodityOrderReqVo> openApiReqVo) {
         try {
             ApiResult<CreateByIdRespVo> execute = DevAccountUtils.tenantExecute(1l, () -> {
                 if(Objects.isNull(openApiReqVo.getData().getCommodityHashName()) || Objects.isNull(openApiReqVo.getData().getCommodityTemplateId())){
@@ -198,7 +207,7 @@ public class AppApiController {
     @PostMapping("v1/api/byTemplateCreateOrder")
     @Operation(summary = "指定模板购买")
     @PermitAll
-    public ApiResult<CreateByTemplateRespVo> byTemplateCreateOrder(@RequestBody OpenApiReqVo<CreateReqVo> openApiReqVo) {
+    public ApiResult<CreateByTemplateRespVo> byTemplateCreateOrder(@RequestBody OpenApiReqVo<CreateCommodityOrderReqVo> openApiReqVo) {
         try {
             ApiResult<CreateByTemplateRespVo> execute = DevAccountUtils.tenantExecute(1l, () -> {
                 if(Objects.isNull(openApiReqVo.getData().getCommodityId())){
@@ -337,7 +346,7 @@ public class AppApiController {
     @PostMapping("v1/api/orderInfo")
     @Operation(summary = "查询订单详情")
     @PermitAll
-    public ApiResult<String> orderInfo(@RequestBody OpenApiReqVo<CreateReqVo> openApiReqVo) {
+    public ApiResult<String> orderInfo(@RequestBody OpenApiReqVo<CreateCommodityOrderReqVo> openApiReqVo) {
         // TODO
         return ApiResult.success("");
     }

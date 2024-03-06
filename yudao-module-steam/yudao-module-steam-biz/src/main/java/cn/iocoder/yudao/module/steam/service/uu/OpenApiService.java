@@ -62,7 +62,26 @@ public class OpenApiService {
         checkSign(openApiReqVo,devAccountDO.getApiPublicKey());
         return devAccountDO;
     }
-
+    /**
+     * 有品请求公共实现类
+     * @param url 接口地址
+     * @param openApiReqVo 有品传入参数，只需要管data
+     * @param <T> 入参类型
+     * @return
+     */
+    public <T extends Serializable> OpenApiReqVo<T> requestUUSign(OpenApiReqVo<T> openApiReqVo){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        ConfigDO configApiKey = configService.getConfigByKey("uu.appKey");
+        ConfigDO configByKey = configService.getConfigByKey("uu.key1");
+        ConfigDO configByKey2 = configService.getConfigByKey("uu.key2");
+        ConfigDO configByKey3 = configService.getConfigByKey("uu.key3");
+        ConfigDO configByKey4 = configService.getConfigByKey("uu.key4");
+        String key=configByKey.getValue()+configByKey2.getValue()+configByKey3.getValue()+configByKey4.getValue();
+        openApiReqVo.setTimestamp(simpleDateFormat.format(new Date()));
+        openApiReqVo.setAppKey(configApiKey.getValue());
+        sign(openApiReqVo,key);
+        return openApiReqVo;
+    }
     /**
      * 有品请求公共实现类
      * @param url 接口地址

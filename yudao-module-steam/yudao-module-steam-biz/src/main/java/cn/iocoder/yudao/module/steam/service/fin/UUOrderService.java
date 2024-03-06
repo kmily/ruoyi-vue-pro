@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.steam.service.fin;
 
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateReqVo;
+import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
@@ -36,7 +36,7 @@ public interface UUOrderService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    YouyouOrderDO createInvOrder(LoginUser loginUser, @Valid CreateReqVo createReqVO);
+    YouyouOrderDO createInvOrder(LoginUser loginUser, @Valid CreateCommodityOrderReqVo createReqVO);
 
     /**
      * 获得示例订单
