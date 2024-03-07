@@ -29,13 +29,13 @@ public class OrderInfoResp {
     @JsonProperty("fromSystem")
     private Integer fromSystem;
     @JsonProperty("buyerUserId")
-    private Integer buyerUserId;
+    private Long buyerUserId;
     @JsonProperty("buyerUserName")
     private String buyerUserName;
     @JsonProperty("buyerUserIcon")
     private String buyerUserIcon;
     @JsonProperty("sellerUserId")
-    private Integer sellerUserId;
+    private Long sellerUserId;
     @JsonProperty("sellerUserName")
     private String sellerUserName;
     @JsonProperty("createOrderTime")
@@ -136,6 +136,8 @@ public class OrderInfoResp {
         private Integer haveClothSeal;
         @JsonProperty("isDoppler")
         private Integer isDoppler;
+        @JsonProperty("dopplerColor")
+        private String dopplerColor;
         @JsonProperty("isFade")
         private Integer isFade;
         @JsonProperty("isHardened")

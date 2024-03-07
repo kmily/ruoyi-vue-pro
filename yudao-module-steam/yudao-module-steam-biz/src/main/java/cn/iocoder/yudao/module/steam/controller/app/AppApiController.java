@@ -33,7 +33,6 @@ import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoudetails.YouyouDetailsDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
@@ -56,7 +55,6 @@ import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiPayWalletRespVO;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
-import cn.iocoder.yudao.module.steam.service.youyoucommodity.YouyouCommodityService;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
@@ -130,12 +128,6 @@ public class AppApiController {
     @Autowired
     public void setuUOrderService(UUOrderService uUOrderService) {
         this.uUOrderService = uUOrderService;
-    }
-
-    private YouyouCommodityService youyouCommodityService;
-    @Autowired
-    public void setYouyouCommodityService(YouyouCommodityService youyouCommodityService) {
-        this.youyouCommodityService = youyouCommodityService;
     }
 
     @Resource
@@ -554,27 +546,7 @@ public class AppApiController {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
                 YouyouOrderDO uuOrder = uUOrderService.getUUOrder(loginUser, openApiReqVo.getData());
-                YouyouCommodityDO youyouCommodity = youyouCommodityService.getYouyouCommodity(Integer.valueOf(uuOrder.getRealCommodityId()));
-
-
-
-                OrderInfoResp ret = new OrderInfoResp();
-//                ret.setOrderNumber(uuOrder.getOrderNo());
-//                ret.setShippingMode(uuOrder.getShippingMode());
-//                ret.setTradeOfferId(uuOrder.getUuTradeOfferId());
-//                ret.setTradeOfferLinks(uuOrder.getUuTradeOfferLinks());
-//                ret.setBigStatus(uuOrder.getUuOrderStatus());
-//                if(Objects.nonNull(ret.getBigStatus())){
-//                    ret.setBigStatusMsg(UUOrderStatus.valueOf(ret.getBigStatus()).getMsg());
-//                }
-//                ret.setSmallStatus(uuOrder.getUuOrderSubStatus());
-//                if(Objects.nonNull(ret.getSmallStatus())){
-//                    ret.setSmallStatusMsg(UUOrderSubStatus.valueOf(ret.getSmallStatus()).getMsg());
-//                }
-//                ret.setFailCode(uuOrder.getUuFailCode());
-//                ret.setFailReason(uuOrder.getUuFailReason());
-//                ret.setTradeOfferLinks(uuOrder.getUuTradeOfferLinks());
-                return ApiResult.success(ret);
+                return ApiResult.success(uUOrderService.orderInfo(uuOrder));
             });
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(), e.getMessage(), OrderInfoResp.class);
