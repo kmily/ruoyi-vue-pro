@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.steam.service;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
@@ -14,6 +13,8 @@ import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -39,17 +40,23 @@ public class SteamInvService {
     @Resource
     private BindUserMapper bindUserMapper;
 
-    // 用户获得库存
-    public InvDO AfterInventory(Long id, Long appid){
-        BindUserDO bindUserDO = bindUserMapper.selectById(id);
-        if (bindUserDO == null){
-            throw new ServiceException(-1,"用户id错误，未查询到该用户的steam账户");
-        }
-        String steamid =  bindUserDO.getSteamId();
-        List<InvDO> invDOS = invMapper.selectList().stream().filter(o -> o.getSteamId().equals(steamid)).collect(Collectors.toList());
-        return (InvDO) invDOS;
-    }
-    public InventoryDto FistGetInventory(Long id, String appId){
+    @Resource
+    private ObjectMapper objectMapper;
+
+
+//    // 用户获得库存
+//    public InvDO AfterInventory(Long id, Long appid){
+//        BindUserDO bindUserDO = bindUserMapper.selectById(id);
+//        if (bindUserDO == null){
+//            throw new ServiceException(-1,"用户id错误，未查询到该用户的steam账户");
+//        }
+//        String steamid =  bindUserDO.getSteamId();
+//        List<InvDO> invDOS = invMapper.selectList().stream().filter(o -> o.getSteamId().equals(steamid)).collect(Collectors.toList());
+//        return (InvDO) invDOS;
+//    }
+
+    // 从steam线上获取库存
+    public InventoryDto FistGetInventory(Long id, String appId) throws JsonProcessingException {
         // 用户第一次登录查询库存  根据用户ID查找绑定的Steam账号ID
         BindUserDO bindUserDO = bindUserMapper.selectById(id);
         if (bindUserDO == null){
@@ -58,17 +65,22 @@ public class SteamInvService {
         if (bindUserDO.getSteamPassword() == null){
             throw new ServiceException(-1,"用户未设置Steam密码,原因：未上传ma文件");
         }
-        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-        builder.method(HttpUtil.Method.GET).url("https://steamcommunity.com/inventory/:steamId/:app/2?l=schinese&count=1000");
+        HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
+        builder.url("https://steamcommunity.com/inventory/:steamId/:app/2?l=schinese&count=1000");
+        Map<String, String> header = new HashMap<>();
+        header.put("Accept-Language", "zh-CN,zh;q=0.9");
+        builder.headers(header);
         Map<String,String> pathVar=new HashMap<>();
         pathVar.put("steamId",bindUserDO.getSteamId());
         pathVar.put("app",appId);
         builder.pathVar(pathVar);
-        Map<String, String> header = new HashMap<>();
-        header.put("Connection", "close");
-        builder.headers(header);
-        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(),HttpUtil.getClient(true,30000));
-        InventoryDto json = sent.json(InventoryDto.class);
+        HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
+        if(Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus()!=200){
+            throw new ServiceException(-1, "初始化steam失败");
+        }
+        InventoryDto json = objectMapper.readValue(proxyResponseVo.getHtml(), InventoryDto.class);
+
+//        InventoryDto json = sent.json(InventoryDto.class);
         for (InventoryDto.AssetsDTO item:json.getAssets()) {
             // steamid 和 绑定平台用户id 联合查询当前用户steam_inv的所有库存信息
             Long userId = bindUserDO.getUserId();
@@ -79,7 +91,7 @@ public class SteamInvService {
             if (invDOPageResult.getTotal() > 0){
                 // 更新库存 TODO 删除 steam_selling 和 steam_inv 表中的信息
                 InvDO steamInvUpdate = InvUpdate(invDOPageResult, item);
-                invMapper.updateById(steamInvUpdate);
+                invMapper.insert(steamInvUpdate);
             } else {
                 // 插入库存
                 String steamId = bindUserDO.getSteamId();
@@ -240,21 +252,32 @@ public class SteamInvService {
     /**
      *   更新库存
      * @return steamInvUpdate
+     * invDOPageResult 库存信息
+     * InventoryDto.AssetsDTO item 线上steam信息
      */
     @NotNull
     private static InvDO InvUpdate(PageResult<InvDO> invDOPageResult, InventoryDto.AssetsDTO item) {
-        Optional<InvDO> first = invDOPageResult
-                .getList()
-                .stream().filter(o -> o.getStatus().equals(1))
-                .findFirst();
-        InvDO steamInvUpdate;
-        if (first.isPresent()) {
-            steamInvUpdate = first.get();
-            steamInvUpdate.setAmount(item.getAmount());
-            steamInvUpdate.setClassid(item.getClassid());
-            steamInvUpdate.setInstanceid(item.getInstanceid());
-        } else {
-            throw new ServiceException(-1, "库存更新失败");
+        log.info("{}",item);
+        log.info("{}",invDOPageResult);
+        List<InvDO> invList = new ArrayList<>(invDOPageResult.getList());
+        InvDO steamInvUpdate = new InvDO();
+
+        // 线上steam库存中存在，本地不存在
+        for(InvDO inv : invList){
+            if(!inv.getAssetid().contains(item.getAssetid())){
+                steamInvUpdate.setSteamId(inv.getSteamId());
+                steamInvUpdate.setAppid(item.getAppid());
+                steamInvUpdate.setAssetid(item.getAssetid());
+                steamInvUpdate.setClassid(item.getClassid());
+                steamInvUpdate.setInstanceid(item.getInstanceid());
+                steamInvUpdate.setAmount(item.getAmount());
+                // 第一次入库，所有道具均为未起售状态 0
+                steamInvUpdate.setTransferStatus(0);
+                steamInvUpdate.setBindUserId(inv.getId());
+                steamInvUpdate.setUserId(inv.getUserId());
+                steamInvUpdate.setUserType(1);
+                steamInvUpdate.setContextid(item.getContextid());
+            }
         }
         return steamInvUpdate;
     }

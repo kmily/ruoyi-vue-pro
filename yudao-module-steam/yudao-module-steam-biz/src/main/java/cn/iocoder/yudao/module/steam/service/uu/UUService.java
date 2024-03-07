@@ -1,9 +1,13 @@
 package cn.iocoder.yudao.module.steam.service.uu;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.module.steam.controller.admin.youyoucommodity.vo.YouyouCommodityPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTemplateRespVO;
 import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTemplatedownloadRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiCommodityReSpVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodityVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUTemplate.ApiUUCommodityRespVo;
 import cn.iocoder.yudao.module.steam.service.steam.YouPingOrder;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
@@ -70,6 +74,7 @@ public class UUService {
     public ApiResult<YouPingOrder> byTemplateCreateOrder(CreateCommodityOrderReqVo reqVo) {
         return openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/byTemplateCreateOrder",new OpenApiReqVo<CreateCommodityOrderReqVo>().setData(reqVo), YouPingOrder.class);
     }
+
     /**
      * 指定商品购买ID
      * @return
@@ -78,8 +83,20 @@ public class UUService {
         return openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/byGoodsIdCreateOrder",new OpenApiReqVo<CreateCommodityOrderReqVo>().setData(reqVo), YouPingOrder.class);
     }
 
+    /**
+     * 商品模板ID下载
+     * @return
+     */
     public ApiResult<YouyouTemplatedownloadRespVO> getTemplateId(){
         return openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/templateQuery",new OpenApiReqVo<>(), YouyouTemplatedownloadRespVO.class);
+    }
+
+    /**
+     * 商品模板ID下载
+     * @return
+     */
+    public ApiResult<YouyouTemplatedownloadRespVO> getCommodityList(YouyouTemplateRespVO reqVo){
+        return openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/goodsQuery",new OpenApiReqVo<YouyouTemplateRespVO>().setData(reqVo), YouyouTemplatedownloadRespVO.class);
     }
 
 }
