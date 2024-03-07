@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.steam.controller.app;
 
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
@@ -23,35 +25,35 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByIdRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByTemplateRespVo;
-import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiDetailDataQueryApllyReqVo;
-import cn.iocoder.yudao.module.steam.dal.dataobject.youyoudetails.YouyouDetailsDO;
-import cn.iocoder.yudao.module.steam.dal.mysql.youyoudetails.YouyouDetailsMapper;
-import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
-import cn.iocoder.yudao.module.steam.service.uu.UUNotifyService;
-import cn.iocoder.yudao.module.steam.service.uu.UUService;
-import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.CreateOrderCancel;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.CreateOrderStatus;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.CreateReqOrderCancel;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.CreateReqOrderStatus;
-import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
-import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
-import cn.iocoder.yudao.module.steam.service.uu.vo.ApiPayWalletRespVO;
+import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiDetailDataQueryApllyReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.youyoudetails.YouyouDetailsDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.youyoudetails.YouyouDetailsMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
+import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
-import cn.iocoder.yudao.module.steam.service.uu.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderServiceImpl;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.TradeUrlStatus;
+import cn.iocoder.yudao.module.steam.service.uu.OpenApiService;
+import cn.iocoder.yudao.module.steam.service.uu.UUNotifyService;
+import cn.iocoder.yudao.module.steam.service.uu.UUService;
+import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
+import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
+import cn.iocoder.yudao.module.steam.service.uu.vo.ApiPayWalletRespVO;
+import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
 import com.alibaba.fastjson.JSON;
@@ -77,7 +79,6 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.util.*;
 
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
@@ -128,13 +129,19 @@ public class AppApiController {
     @Operation(summary = "订单") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
     @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
     @PermitAll
-    public CommonResult<Boolean> uuNotify(@RequestBody NotifyReq notifyReq) {
+    public CommonResult<Map<String,Object>> uuNotify(@RequestBody NotifyReq notifyReq) {
         DevAccountUtils.tenantExecute(1L,()->{
             uuNotifyService.notify(notifyReq);
             return null;
         });
-
-        return success(true);
+        CommonResult<Map<String,Object>> ret=new CommonResult<>();
+        ret.setCode(200);
+        ret.setMsg("成功");
+        ret.setData(MapUtils.convertMap(Arrays.asList(
+                new KeyValue<>("messageNo",notifyReq.getMessageNo()),
+                new KeyValue<>("flag",true)
+        )));
+        return ret;
     }
     /**
      * api余额接口
