@@ -386,6 +386,20 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         if (invOrderDO == null) {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_NOT_FOUND);
         }
+        //检测库存状态
+        SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
+        if (sellingDO == null) {
+            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
+        }
+        if(CommonStatusEnum.isDisable(sellingDO.getStatus())){
+            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
+        }
+        if(CommonStatusEnum.isDisable(sellingDO.getStatus())){
+            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
+        }
+        if(Objects.isNull(sellingDO.getBindUserId())){
+            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
+        }
         if(invOrderDO.getSellCashStatus().equals(InvSellCashStatusEnum.CASHED.getStatus())){
             throw exception(ErrorCodeConstants.INVORDER_ORDER_CASHED_CANNOTREFUND);
         }
