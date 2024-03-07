@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.steam.service.fin;
 
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
+import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
+import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
 
 import javax.validation.Valid;
 
@@ -39,12 +41,13 @@ public interface UUOrderService {
     YouyouOrderDO createInvOrder(LoginUser loginUser, @Valid CreateCommodityOrderReqVo createReqVO);
 
     /**
-     * 获得示例订单
-     *
-     * @param id 编号
+     * 获得订单详情
+     * 订单是以买家身份进行查询
+     * @param loginUser 订单用户
+     * @param queryOrderReqVo 订单号
      * @return 示例订单
      */
-    YouyouOrderDO getInvOrder(Long id);
+    YouyouOrderDO getUUOrder(LoginUser loginUser, QueryOrderReqVo queryOrderReqVo);
 
     /**
      * 获得示例订单列表
@@ -76,5 +79,7 @@ public interface UUOrderService {
      * @param payRefundId 退款订单号
      */
     void updateInvOrderRefunded(Long id, Long payRefundId);
+
+    void processNotify(NotifyReq notifyReq);
 
 }

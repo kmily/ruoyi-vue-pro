@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal.WithdrawalDO;
@@ -38,7 +39,11 @@ import cn.iocoder.yudao.module.steam.service.uu.UUService;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
+import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
+import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyVo;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
+import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -397,12 +402,29 @@ public class UUOrderServiceImpl implements UUOrderService {
 //        }
         return youyouOrderDO;
     }
-    @Override
-    public YouyouOrderDO getInvOrder(Long id) {
-        return youyouOrderMapper.selectById(id);
-    }
 
-//    @Override
+    @Override
+    public YouyouOrderDO getUUOrder(LoginUser loginUser, QueryOrderReqVo queryOrderReqVo) {
+        LambdaQueryWrapperX<YouyouOrderDO> uuOrderDOLambdaQueryWrapperX = new LambdaQueryWrapperX<YouyouOrderDO>()
+                .eqIfPresent(YouyouOrderDO::getUserId, loginUser.getId())
+                .eqIfPresent(YouyouOrderDO::getUserType, loginUser.getUserType());
+        if(Objects.nonNull(queryOrderReqVo.getOrderNo())){
+            uuOrderDOLambdaQueryWrapperX.eqIfPresent(YouyouOrderDO::getOrderNo, queryOrderReqVo.getOrderNo());
+        }else{
+            if(Objects.isNull(queryOrderReqVo.getMerchantNo())){
+                throw exception(OpenApiCode.JACKSON_EXCEPTION);
+            }else{
+                uuOrderDOLambdaQueryWrapperX.eqIfPresent(YouyouOrderDO::getMerchantOrderNo, queryOrderReqVo.getMerchantNo());
+            }
+        }
+        List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(uuOrderDOLambdaQueryWrapperX);
+        if(youyouOrderDOS.isEmpty()){
+            throw exception(OpenApiCode.JACKSON_EXCEPTION);
+        }else{
+            return youyouOrderDOS.get(0);
+        }
+    }
+    //    @Override
 //    public PageResult<YouyouOrderDO> getInvOrderPageOrder(YouyouOrderPageReqVO invOrderPageReqVO) {
 //
 //        PageResult<YouyouOrderDO> invOrderDOPageResult = youyouOrderMapper.selectPage(invOrderPageReqVO);
@@ -642,4 +664,31 @@ public class UUOrderServiceImpl implements UUOrderService {
         return payRefund;
     }
 
+    @Override
+    public void processNotify(NotifyReq notifyReq) {
+        String callBackInfo = notifyReq.getCallBackInfo();
+        NotifyVo notifyVo = JacksonUtils.readValue(callBackInfo, NotifyVo.class);
+        log.info("回调接收的数据{}",notifyVo);
+        List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(new LambdaQueryWrapper<YouyouOrderDO>()
+                .eq(YouyouOrderDO::getUuOrderNo, notifyVo.getOrderNo()));
+        if (!youyouOrderDOS.isEmpty()) {
+            YouyouOrderDO youyouOrderDO = youyouOrderDOS.get(0);
+            youyouOrderMapper.updateById(new YouyouOrderDO().setId(youyouOrderDO.getId())
+                    .setUuOrderType(notifyVo.getOrderType())
+                    .setUuOrderSubType(notifyVo.getOrderSubType())
+                    .setUuShippingMode(notifyVo.getShippingMode())
+                    .setUuTradeOfferId(notifyVo.getTradeOfferId())
+                    .setUuTradeOfferLinks(notifyVo.getTradeOfferLinks())
+                    .setUuBuyerUserId(notifyVo.getBuyerUserId())
+                    .setUuOrderStatus(notifyVo.getOrderStatus())
+                    .setUuOrderSubType(notifyVo.getOrderSubType())
+                    .setUuFailCode(notifyVo.getFailCode())
+                    .setUuFailReason(notifyVo.getFailReason())
+                    .setUuMerchantOrderNo(notifyVo.getMerchantOrderNo())
+                    .setUuNotifyType(notifyVo.getNotifyType())
+                    .setUuNotifyDesc(notifyVo.getNotifyDesc())
+            );
+        }
+
+    }
 }

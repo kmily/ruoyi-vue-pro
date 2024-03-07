@@ -1,13 +1,15 @@
 package cn.iocoder.yudao.module.steam.service.uu;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTemplatedownloadRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
-import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUTemplate.ApiUUCommodityRespVo;
 import cn.iocoder.yudao.module.steam.service.steam.YouPingOrder;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiPayWalletRespVO;
+import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +28,6 @@ public class UUService {
     public void setOpenApiService(OpenApiService openApiService) {
         this.openApiService = openApiService;
     }
-
     /**
      * 有品接口检测
      * @param apiResult
@@ -43,7 +44,8 @@ public class UUService {
      * @return
      */
     public ApiResult<ApiPayWalletRespVO> getAssetsInfo() {
-        return openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/getAssetsInfo", new OpenApiReqVo<>(), ApiPayWalletRespVO.class);
+        ApiResult<ApiPayWalletRespVO> apiPayWalletRespVOApiResult = openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/getAssetsInfo", new OpenApiReqVo<Serializable>(), ApiPayWalletRespVO.class);
+        return apiPayWalletRespVOApiResult;
     }
     /**
      * 验证交易链接
@@ -75,4 +77,9 @@ public class UUService {
     public ApiResult<YouPingOrder> byGoodsIdCreateOrder(CreateCommodityOrderReqVo reqVo) {
         return openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/byGoodsIdCreateOrder",new OpenApiReqVo<CreateCommodityOrderReqVo>().setData(reqVo), YouPingOrder.class);
     }
+
+    public ApiResult<YouyouTemplatedownloadRespVO> getTemplateId(){
+        return openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/templateQuery",new OpenApiReqVo<>(), YouyouTemplatedownloadRespVO.class);
+    }
+
 }

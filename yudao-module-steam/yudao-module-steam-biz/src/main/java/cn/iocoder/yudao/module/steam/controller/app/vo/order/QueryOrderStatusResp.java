@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CreateOrderStatus {
+public class QueryOrderStatusResp {
     /**
      * 订单编号
      */

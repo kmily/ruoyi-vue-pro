@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+
+import java.io.Serializable;
 import java.util.*;
 import java.util.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -11,7 +13,7 @@ import com.alibaba.excel.annotation.*;
 @Schema(description = "管理后台 - 悠悠商品模板 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class YouyouTemplateRespVO {
+public class YouyouTemplateRespVO implements Serializable {
 
     @Schema(description = "武器全称", example = "印花 | Hello 法玛斯")
     @ExcelProperty("武器全称")

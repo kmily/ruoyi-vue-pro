@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.steam.service.uu;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
@@ -71,10 +70,9 @@ public class OpenApiService {
     }
     /**
      * 有品请求公共实现类
-     * @param url 接口地址
      * @param openApiReqVo 有品传入参数，只需要管data
      * @param <T> 入参类型
-     * @return
+     * @return 签名后的json对象
      */
     public <T extends Serializable> OpenApiReqVo<T> requestUUSign(OpenApiReqVo<T> openApiReqVo){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -96,33 +94,25 @@ public class OpenApiService {
      * @param classic 返回数据格式
      * @param <T> 入参类型
      * @param <E> 出参类型
-     * @return
+     * @return UU数据结果
      */
     public <T extends Serializable,E extends Serializable> ApiResult<E> requestUU(String url, OpenApiReqVo<T> openApiReqVo, Class<E> classic){
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        ConfigDO configApiKey = configService.getConfigByKey("uu.appKey");
-        ConfigDO configByKey = configService.getConfigByKey("uu.key1");
-        ConfigDO configByKey2 = configService.getConfigByKey("uu.key2");
-        ConfigDO configByKey3 = configService.getConfigByKey("uu.key3");
-        ConfigDO configByKey4 = configService.getConfigByKey("uu.key4");
-        String key=configByKey.getValue()+configByKey2.getValue()+configByKey3.getValue()+configByKey4.getValue();
-        openApiReqVo.setTimestamp(simpleDateFormat.format(new Date()));
-        openApiReqVo.setAppKey(configApiKey.getValue());
-        sign(openApiReqVo,key);
+
+        OpenApiReqVo<T> tOpenApiReqVo = requestUUSign(openApiReqVo);
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url(url);
         builder.method(HttpUtil.Method.JSON);
-        builder.postObject(openApiReqVo);
+        builder.postObject(tOpenApiReqVo);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
-        ApiResult json1 = sent.json(ApiResult.class);
-        Object data = json1.getData();
+        ApiResult json = sent.json(ApiResult.class);
+        Object data = json.getData();
         try {
             ApiResult<E> apiResult=new ApiResult<>();
             E e1 = objectMapper.readValue(objectMapper.writeValueAsString(data), classic);
             apiResult.setData(e1);
-            apiResult.setMsg(json1.getMsg());
-            apiResult.setTimestamp(json1.getTimestamp());
-            apiResult.setCode(json1.getCode());
+            apiResult.setMsg(json.getMsg());
+            apiResult.setTimestamp(json.getTimestamp());
+            apiResult.setCode(json.getCode());
             return apiResult;
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -131,10 +121,10 @@ public class OpenApiService {
     }
     /**
      * 参数签名兼容有品
-     * @param openApiReqVo
-     * @param pubKey
-     * @param <T>
-     * @throws Exception
+     * 出现错误时会抛出异常
+     * @param openApiReqVo 入参
+     * @param pubKey 公钥
+     * @param <T> 入参类型
      */
     public <T extends Serializable> void checkSign(OpenApiReqVo<T> openApiReqVo, String pubKey) {
         try{
@@ -145,8 +135,6 @@ public class OpenApiService {
             if(l>600){
                 throw new ServiceException(OpenApiCode.CHECK_SIGN_ERROR);
             }
-
-
             Map<String, Object> params = new HashMap<>();
             params.put("timestamp",openApiReqVo.getTimestamp());
             params.put("appKey",openApiReqVo.getAppKey());
@@ -173,26 +161,23 @@ public class OpenApiService {
             }
             //采用私钥签名
             boolean b = RSAUtils.verifyByPublicKey(stringBuilder.toString().getBytes(), pubKey, openApiReqVo.getSign());
+            log.info("签名比较结果{}",b);
             if(!b){
                 throw new ServiceException(OpenApiCode.CHECK_SIGN_ERROR);
             }
-            log.info("解密结果{}",b);
-        }catch (InvalidKeySpecException | IllegalAccessException | InvalidKeyException | SignatureException | NoSuchAlgorithmException e) {
+        }catch (InvalidKeySpecException | IllegalAccessException | InvalidKeyException | SignatureException | NoSuchAlgorithmException | ParseException e) {
             e.printStackTrace();
-            throw new ServiceException(OpenApiCode.CHECK_SIGN_ERROR);
-        } catch (ParseException e) {
-            e.printStackTrace();
+            log.error("解密出错原因{}",e.getMessage());
             throw new ServiceException(OpenApiCode.CHECK_SIGN_ERROR);
         }
     }
     /**
      * 参数签名兼容有品
-     * @param openApiReqVo
-     * @param priKey
-     * @param <T>
-     * @throws Exception
+     * @param openApiReqVo 入参
+     * @param priKey 私钥
+     * @param <T> 入参类型
      */
-    public <T extends Serializable> void sign(OpenApiReqVo<T> openApiReqVo, String priKey) {
+    private  <T extends Serializable> void sign(OpenApiReqVo<T> openApiReqVo, String priKey) {
         try{
             Map<String, Object> params = new HashMap<>();
             params.put("timestamp",openApiReqVo.getTimestamp());

@@ -131,7 +131,6 @@ public class YouyouOrderServiceImplTest extends BaseDbUnitTest {
            o.setRealCommodityId(null);
            o.setUuOrderNo(null);
            o.setUuMerchantOrderNo(null);
-           o.setUuOrderStatus(null);
            o.setSellCashStatus(null);
            o.setSellUserId(null);
            o.setSellUserType(null);
@@ -179,8 +178,6 @@ public class YouyouOrderServiceImplTest extends BaseDbUnitTest {
        youyouOrderMapper.insert(cloneIgnoreId(dbYouyouOrder, o -> o.setUuOrderNo(null)));
        // 测试 uuMerchantOrderNo 不匹配
        youyouOrderMapper.insert(cloneIgnoreId(dbYouyouOrder, o -> o.setUuMerchantOrderNo(null)));
-       // 测试 uuOrderStatus 不匹配
-       youyouOrderMapper.insert(cloneIgnoreId(dbYouyouOrder, o -> o.setUuOrderStatus(null)));
        // 测试 sellCashStatus 不匹配
        youyouOrderMapper.insert(cloneIgnoreId(dbYouyouOrder, o -> o.setSellCashStatus(null)));
        // 测试 sellUserId 不匹配
@@ -210,7 +207,6 @@ public class YouyouOrderServiceImplTest extends BaseDbUnitTest {
        reqVO.setRealCommodityId(null);
        reqVO.setUuOrderNo(null);
        reqVO.setUuMerchantOrderNo(null);
-       reqVO.setUuOrderStatus(null);
        reqVO.setSellCashStatus(null);
        reqVO.setSellUserId(null);
        reqVO.setSellUserType(null);
