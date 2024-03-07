@@ -134,6 +134,12 @@ public class AppApiController {
     private UUService uuService;
     @Resource
     private UUNotifyService uuNotifyService;
+
+    /**
+     * UU订单服务器回调
+     * @param notifyReq
+     * @return
+     */
     @PostMapping("/uu/notify")
     @Operation(summary = "订单") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
     @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
@@ -177,10 +183,10 @@ public class AppApiController {
      * api余额接口
      * @return
      */
-    @PostMapping("v1/api/uugetAssetsInfo")
-    @Operation(summary = "余额查询")
+    @PostMapping("v1/api/uuGetAssetsInfo")
+    @Operation(summary = "查询UU余额查询,此接口线上需要删除")
     @PermitAll
-    public ApiResult<ApiPayWalletRespVO> uugetAssetsInfo(@RequestBody OpenApiReqVo<Serializable> openApiReqVo) {
+    public ApiResult<ApiPayWalletRespVO> uuGetAssetsInfo(@RequestBody OpenApiReqVo<Serializable> openApiReqVo) {
         try {
             return uuService.getAssetsInfo();
         } catch (ServiceException e) {
