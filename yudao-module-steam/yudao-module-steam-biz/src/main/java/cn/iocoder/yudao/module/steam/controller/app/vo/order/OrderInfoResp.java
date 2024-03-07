@@ -38,6 +38,8 @@ public class OrderInfoResp {
     private Long sellerUserId;
     @JsonProperty("sellerUserName")
     private String sellerUserName;
+    @JsonProperty("sellerUserIcon")
+    private String sellerUserIcon;
     @JsonProperty("createOrderTime")
     private Long createOrderTime;
     @JsonProperty("finishOrderTime")

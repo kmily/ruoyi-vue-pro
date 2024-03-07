@@ -6,17 +6,22 @@ import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
+import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTemplatePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
@@ -55,12 +60,16 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.temporal.TemporalField;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -141,6 +150,16 @@ public class UUOrderServiceImpl implements UUOrderService {
 
     @Resource
     private BindUserMapper bindUserMapper;
+
+    /**
+     * 方法只要用于查询，
+     * 操作请走API
+     */
+    @Resource
+    private PayOrderService payOrderService;
+
+    @Resource
+    private MemberUserApi memberUserApi;
 
     public UUOrderServiceImpl() {
     }
@@ -446,6 +465,12 @@ public class UUOrderServiceImpl implements UUOrderService {
     public OrderInfoResp orderInfo(YouyouOrderDO uuOrder) {
         YouyouCommodityDO youyouCommodity = youyouCommodityService.getYouyouCommodity(Integer.valueOf(uuOrder.getRealCommodityId()));
         Optional<YouyouTemplateDO> first = uuTemplateService.getYouyouTemplatePage(new YouyouTemplatePageReqVO().setTemplateId(youyouCommodity.getTemplateId())).getList().stream().findFirst();
+        PayOrderDO payOrder = payOrderService.getOrder(uuOrder.getPayOrderId());
+        //买家
+        MemberUserRespDTO buyUser = memberUserApi.getUser(uuOrder.getUserId());
+        //卖家
+        MemberUserRespDTO sellUser = memberUserApi.getUser(uuOrder.getSellUserId());
+
         YouyouTemplateDO youyouTemplateDO;
         if(first.isPresent()){
             youyouTemplateDO = first.get();
@@ -455,6 +480,15 @@ public class UUOrderServiceImpl implements UUOrderService {
 
         OrderInfoResp ret = new OrderInfoResp();
         ret.setOrderNo(uuOrder.getOrderNo());
+        ret.setCreateOrderTime(uuOrder.getCreateTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
+        if(Objects.nonNull(uuOrder.getPayTime())){
+            ret.setPaySuccessTime(uuOrder.getPayTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
+        }
+        if(Objects.nonNull(payOrder)){
+            ret.setPayEndTime(payOrder.getExpireTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
+        }
+
+
         ret.setTradeUrl(uuOrder.getTradeLinks());
         ret.setOrderStatus(uuOrder.getUuOrderStatus());
         if(Objects.nonNull(ret.getOrderStatus())){
@@ -465,7 +499,22 @@ public class UUOrderServiceImpl implements UUOrderService {
             ret.setOrderSubStatusName(UUOrderSubStatus.valueOf(ret.getOrderSubStatus()).getMsg());
         }
         ret.setBuyerUserId(uuOrder.getUserId());
+        ret.setBuyerUserName(buyUser.getNickname());
+        if(StringUtils.hasText(buyUser.getAvatar())){
+            ret.setBuyerUserIcon(buyUser.getAvatar());
+        }else{
+            ret.setBuyerUserIcon("https://img.zcool.cn/community/01a3865ab91314a8012062e3c38ff6.png@1280w_1l_2o_100sh.png");
+        }
+
+
+
         ret.setSellerUserId(uuOrder.getSellUserId());
+        ret.setSellerUserName(sellUser.getNickname());
+        if(StringUtils.hasText(sellUser.getAvatar())){
+            ret.setSellerUserIcon(sellUser.getAvatar());
+        }else{
+            ret.setSellerUserIcon("https://img.zcool.cn/community/01a3865ab91314a8012062e3c38ff6.png@1280w_1l_2o_100sh.png");
+        }
         OrderInfoResp.ProductDetailDTO productDetailDTO = new OrderInfoResp.ProductDetailDTO();
         productDetailDTO.setCommodityId(youyouCommodity.getId());
         productDetailDTO.setCommodityName(youyouCommodity.getCommodityName());
@@ -518,6 +567,7 @@ public class UUOrderServiceImpl implements UUOrderService {
         ret.setProductDetail(productDetailDTO);
         if(Objects.nonNull(uuOrder.getRefundPrice())){
             ret.setReturnAmount(new BigDecimal(uuOrder.getRefundPrice()).divide(new BigDecimal("100")).toString());
+            ret.setCancelOrderTime(uuOrder.getRefundTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
         }
         return ret;
     }
