@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.service;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -8,9 +9,12 @@ import cn.iocoder.yudao.module.steam.controller.admin.invdesc.vo.InvDescPageReqV
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
+import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,6 +26,10 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static cn.iocoder.yudao.framework.common.enums.CommonStatusEnum.DISABLE;
+import static cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum.INORDER;
+import static cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum.OFFSHELF;
 
 
 /**
@@ -43,6 +51,8 @@ public class SteamInvService {
     @Resource
     private ObjectMapper objectMapper;
 
+    @Resource
+    private SellingMapper sellingMapper;
 
 //    // 用户获得库存
 //    public InvDO AfterInventory(Long id, Long appid){
@@ -80,7 +90,6 @@ public class SteamInvService {
         }
         InventoryDto json = objectMapper.readValue(proxyResponseVo.getHtml(), InventoryDto.class);
 
-//        InventoryDto json = sent.json(InventoryDto.class);
         for (InventoryDto.AssetsDTO item:json.getAssets()) {
             // steamid 和 绑定平台用户id 联合查询当前用户steam_inv的所有库存信息
             Long userId = bindUserDO.getUserId();
@@ -90,7 +99,18 @@ public class SteamInvService {
             PageResult<InvDO> invDOPageResult = invMapper.selectPage(steamInv);;
             if (invDOPageResult.getTotal() > 0){
                 // 更新库存 TODO 删除 steam_selling 和 steam_inv 表中的信息
-                InvDO steamInvUpdate = InvUpdate(invDOPageResult, item);
+                ArrayList<InventoryDto.AssetsDTO> invCollect = new ArrayList<>(json.getAssets());
+                for (InvDO invDO : invDOPageResult.getList()){
+                    if(!invCollect.contains(invDO)){
+                        SellingDO updateDo = new SellingDO();
+                        // 默认0有效 1失效
+                        updateDo.setStatus(CommonStatusEnum.DISABLE.getStatus());
+                        updateDo.setId(invDO.getId());
+                        sellingMapper.updateById(updateDo);
+                        invMapper.deleteById(invDO.getId());
+                    }
+                }
+                InvDO steamInvUpdate = InvUpdate(invDOPageResult,item);
                 invMapper.insert(steamInvUpdate);
             } else {
                 // 插入库存
@@ -262,7 +282,7 @@ public class SteamInvService {
         List<InvDO> invList = new ArrayList<>(invDOPageResult.getList());
         InvDO steamInvUpdate = new InvDO();
 
-        // 线上steam库存中存在，本地不存在
+        // 线上steam库存中存在，本地不存在,插入本地库
         for(InvDO inv : invList){
             if(!inv.getAssetid().contains(item.getAssetid())){
                 steamInvUpdate.setSteamId(inv.getSteamId());
@@ -272,7 +292,7 @@ public class SteamInvService {
                 steamInvUpdate.setInstanceid(item.getInstanceid());
                 steamInvUpdate.setAmount(item.getAmount());
                 // 第一次入库，所有道具均为未起售状态 0
-                steamInvUpdate.setTransferStatus(0);
+                steamInvUpdate.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
                 steamInvUpdate.setBindUserId(inv.getId());
                 steamInvUpdate.setUserId(inv.getUserId());
                 steamInvUpdate.setUserType(1);
