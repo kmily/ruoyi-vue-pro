@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal.WithdrawalDO;
@@ -401,12 +402,29 @@ public class UUOrderServiceImpl implements UUOrderService {
 //        }
         return youyouOrderDO;
     }
-    @Override
-    public YouyouOrderDO getInvOrder(Long id) {
-        return youyouOrderMapper.selectById(id);
-    }
 
-//    @Override
+    @Override
+    public YouyouOrderDO getUUOrder(LoginUser loginUser, QueryOrderReqVo queryOrderReqVo) {
+        LambdaQueryWrapperX<YouyouOrderDO> uuOrderDOLambdaQueryWrapperX = new LambdaQueryWrapperX<YouyouOrderDO>()
+                .eqIfPresent(YouyouOrderDO::getUserId, loginUser.getId())
+                .eqIfPresent(YouyouOrderDO::getUserType, loginUser.getUserType());
+        if(Objects.nonNull(queryOrderReqVo.getOrderNo())){
+            uuOrderDOLambdaQueryWrapperX.eqIfPresent(YouyouOrderDO::getOrderNo, queryOrderReqVo.getOrderNo());
+        }else{
+            if(Objects.isNull(queryOrderReqVo.getMerchantNo())){
+                throw exception(OpenApiCode.JACKSON_EXCEPTION);
+            }else{
+                uuOrderDOLambdaQueryWrapperX.eqIfPresent(YouyouOrderDO::getMerchantOrderNo, queryOrderReqVo.getMerchantNo());
+            }
+        }
+        List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(uuOrderDOLambdaQueryWrapperX);
+        if(youyouOrderDOS.isEmpty()){
+            throw exception(OpenApiCode.JACKSON_EXCEPTION);
+        }else{
+            return youyouOrderDOS.get(0);
+        }
+    }
+    //    @Override
 //    public PageResult<YouyouOrderDO> getInvOrderPageOrder(YouyouOrderPageReqVO invOrderPageReqVO) {
 //
 //        PageResult<YouyouOrderDO> invOrderDOPageResult = youyouOrderMapper.selectPage(invOrderPageReqVO);

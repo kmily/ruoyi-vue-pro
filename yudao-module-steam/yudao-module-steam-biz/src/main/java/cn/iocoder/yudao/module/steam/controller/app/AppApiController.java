@@ -26,9 +26,9 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByIdRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByTemplateRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.CreateOrderCancel;
-import cn.iocoder.yudao.module.steam.controller.app.vo.order.CreateOrderStatus;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderStatusResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.CreateReqOrderCancel;
-import cn.iocoder.yudao.module.steam.controller.app.vo.order.CreateReqOrderStatus;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiDetailDataQueryApllyReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
@@ -41,10 +41,11 @@ import cn.iocoder.yudao.module.steam.dal.mysql.youyoudetails.YouyouDetailsMapper
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
+import cn.iocoder.yudao.module.steam.enums.UUOrderStatus;
+import cn.iocoder.yudao.module.steam.enums.UUOrderSubStatus;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
-import cn.iocoder.yudao.module.steam.service.fin.UUOrderServiceImpl;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.TradeUrlStatus;
 import cn.iocoder.yudao.module.steam.service.uu.OpenApiService;
@@ -116,8 +117,6 @@ public class AppApiController {
     @Resource
     private YouyouDetailsMapper youyouDetailsMapper;
 
-    @Resource
-    private UUOrderServiceImpl uuOrderServiceImpl;
     @Resource
     private PaySteamOrderService paySteamOrderService;
     @Resource
@@ -200,7 +199,7 @@ public class AppApiController {
     @PostMapping("v1/api/sign")
     @Operation(summary = "余额查询")
     @PermitAll
-    public   OpenApiReqVo<CreateCommodityOrderReqVo> sign(@RequestBody OpenApiReqVo<CreateCommodityOrderReqVo> openApiReqVo) {
+    public   OpenApiReqVo<QueryOrderReqVo> sign(@RequestBody OpenApiReqVo<QueryOrderReqVo> openApiReqVo) {
         return DevAccountUtils.tenantExecute(1L, () -> openApiService.requestUUSign(openApiReqVo));
     }
     /**
@@ -319,7 +318,7 @@ public class AppApiController {
     @PermitAll
     public ApiResult<AppPayOrderSubmitRespVO> createInvOrder(@RequestBody OpenApiReqVo<PaySteamOrderCreateReqVO> openApiReqVo) {
         try {
-            ApiResult<AppPayOrderSubmitRespVO> execute = DevAccountUtils.tenantExecute(1L, () -> {
+            return DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
 
 
@@ -341,7 +340,6 @@ public class AppApiController {
                 PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, ServletUtils.getClientIP());
                 return ApiResult.success(PayOrderConvert.INSTANCE.convert3(respVO));
             });
-            return execute;
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(),  e.getMessage(),AppPayOrderSubmitRespVO.class);
         }
@@ -475,7 +473,7 @@ public class AppApiController {
                     return ApiResult.success(ret, "取消失败，没有找到该订单");
                 } else {
                     LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
-                    uuOrderServiceImpl.refundInvOrder(loginUser, youyouOrderDOS.get(0).getId(), getClientIP());
+                    uUOrderService.refundInvOrder(loginUser, youyouOrderDOS.get(0).getId(), getClientIP());
                     ret.setResult(1);
                     return ApiResult.success(ret, "取消成功");
                 }
@@ -490,27 +488,33 @@ public class AppApiController {
     @PostMapping("v1/api/orderStatus")
     @Operation(summary = "查询订单状态")
     @PermitAll
-    public ApiResult<CreateOrderStatus> orderStatus(@RequestBody OpenApiReqVo<CreateReqOrderStatus> openApiReqVo) {
+    public ApiResult<QueryOrderStatusResp> orderStatus(@RequestBody OpenApiReqVo<QueryOrderReqVo> openApiReqVo) {
         try {
             return DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
+                YouyouOrderDO uuOrder = uUOrderService.getUUOrder(loginUser, openApiReqVo.getData());
 
-                List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
-                        .eq(YouyouOrderDO::getOrderNo, openApiReqVo.getData().getOrderNo())
-                        .eq(YouyouOrderDO::getUserId, devAccount.getUserId()));
-
-                CreateOrderStatus ret = new CreateOrderStatus();
-                // TODO 根据数据库信息返回详细内容
-                if (youyouOrderDOS.isEmpty()) {
-                    return ApiResult.success(ret, "商户订单号参数错误");
-                } else if (false) {
-                    return ApiResult.success(ret, "多种错误类型判断");
-                } else {
-                    return ApiResult.success(ret, "成功");
+                QueryOrderStatusResp ret = new QueryOrderStatusResp();
+                ret.setOrderNumber(uuOrder.getOrderNo());
+                ret.setShippingMode(uuOrder.getShippingMode());
+                ret.setTradeOfferId(uuOrder.getUuTradeOfferId());
+                ret.setTradeOfferLinks(uuOrder.getUuTradeOfferLinks());
+                ret.setBigStatus(uuOrder.getUuOrderStatus());
+                if(Objects.nonNull(ret.getBigStatus())){
+                    ret.setBigStatusMsg(UUOrderStatus.valueOf(ret.getBigStatus()).getMsg());
                 }
+                ret.setSmallStatus(uuOrder.getUuOrderSubStatus());
+                if(Objects.nonNull(ret.getSmallStatus())){
+                    ret.setSmallStatusMsg(UUOrderSubStatus.valueOf(ret.getSmallStatus()).getMsg());
+                }
+                ret.setFailCode(uuOrder.getUuFailCode());
+                ret.setFailReason(uuOrder.getUuFailReason());
+                ret.setTradeOfferLinks(uuOrder.getUuTradeOfferLinks());
+                return ApiResult.success(ret);
             });
         } catch (ServiceException e) {
-            return ApiResult.error(e.getCode(), e.getMessage(), CreateOrderStatus.class);
+            return ApiResult.error(e.getCode(), e.getMessage(), QueryOrderStatusResp.class);
         }
     }
 
