@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitRespVO;
 import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitReqVO;
@@ -23,9 +24,11 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByIdRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByTemplateRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiDetailDataQueryApllyReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiDetailDataQueryResultReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoudetails.YouyouDetailsDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoudetails.YouyouDetailsMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.steam.service.devaccount.DevAccountService;
 import cn.iocoder.yudao.module.steam.service.uu.UUService;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.CreateOrderCancel;
@@ -50,11 +53,15 @@ import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderServiceImpl;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.TradeUrlStatus;
+import cn.iocoder.yudao.module.steam.service.youyoudetails.YouyouDetailsService;
+import cn.iocoder.yudao.module.steam.service.youyouorder.YouyouOrderService;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -66,12 +73,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
+import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.URI;
+import java.net.URL;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
@@ -86,6 +96,7 @@ import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.E
 @RestController
 @RequestMapping("openapi")
 @Validated
+@Slf4j
 public class AppApiController {
     @Resource
     private OpenApiService openApiService;
@@ -106,21 +117,30 @@ public class AppApiController {
     private PayWalletMapper payWalletMapper;
     @Resource
     private YouyouDetailsMapper youyouDetailsMapper;
-
     @Resource
     private UUOrderServiceImpl uuOrderServiceImpl;
     @Resource
     private PaySteamOrderService paySteamOrderService;
     @Resource
     private PayOrderService payOrderService;
+    @Resource
+    private YouyouOrderService youyouOrderService;
+
+    @Resource
+    private YouyouDetailsService youyouDetailsService;
 
     @Autowired
     private UUOrderService uUOrderService;
     @Resource
     private UUService uuService;
 
+    @Resource
+    private FileApi fileApi;
+
+
     /**
      * api余额接口
+     *
      * @return
      */
     @PostMapping("v1/api/getAssetsInfo")
@@ -131,18 +151,20 @@ public class AppApiController {
             ApiResult<ApiPayWalletRespVO> execute = DevAccountUtils.tenantExecute(1l, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 PayWalletDO wallet = payWalletService.getOrCreateWallet(devAccount.getUserId(), devAccount.getUserType());
-                ApiPayWalletRespVO apiPayWalletRespVO=new ApiPayWalletRespVO();
-                apiPayWalletRespVO.setAmount(new BigDecimal(wallet.getBalance().toString()).divide(new BigDecimal("100"),2,BigDecimal.ROUND_HALF_UP));
+                ApiPayWalletRespVO apiPayWalletRespVO = new ApiPayWalletRespVO();
+                apiPayWalletRespVO.setAmount(new BigDecimal(wallet.getBalance().toString()).divide(new BigDecimal("100"), 2, BigDecimal.ROUND_HALF_UP));
                 apiPayWalletRespVO.setUserId(devAccount.getUserId().intValue());
                 return ApiResult.success(apiPayWalletRespVO);
             });
             return execute;
         } catch (ServiceException e) {
-            return ApiResult.error(e.getCode(),  e.getMessage(),ApiPayWalletRespVO.class);
+            return ApiResult.error(e.getCode(), e.getMessage(), ApiPayWalletRespVO.class);
         }
     }
+
     /**
      * api余额接口
+     *
      * @return
      */
     @PostMapping("v1/api/uugetAssetsInfo")
@@ -152,23 +174,27 @@ public class AppApiController {
         try {
             return uuService.getAssetsInfo();
         } catch (ServiceException e) {
-            return ApiResult.error(e.getCode(),  e.getMessage(),ApiPayWalletRespVO.class);
+            return ApiResult.error(e.getCode(), e.getMessage(), ApiPayWalletRespVO.class);
         }
     }
+
     /**
      * api余额接口
+     *
      * @return
      */
     @PostMapping("v1/api/sign")
     @Operation(summary = "余额查询")
     @PermitAll
-    public   OpenApiReqVo<CreateCommodityOrderReqVo> sign(@RequestBody OpenApiReqVo<CreateCommodityOrderReqVo> openApiReqVo) {
+    public OpenApiReqVo<CreateCommodityOrderReqVo> sign(@RequestBody OpenApiReqVo<CreateCommodityOrderReqVo> openApiReqVo) {
         return DevAccountUtils.tenantExecute(1l, () -> {
             return openApiService.requestUUSign(openApiReqVo);
         });
     }
+
     /**
      * 检查交易链接
+     *
      * @return
      */
     @PostMapping("v1/api/checkTradeUrl")
@@ -180,23 +206,23 @@ public class AppApiController {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                         .eq(BindUserDO::getUserId, devAccount.getUserId())
-                        .ne(BindUserDO::getTradeUrl,openApiReqVo.getData().getTradeLinks())
+                        .ne(BindUserDO::getTradeUrl, openApiReqVo.getData().getTradeLinks())
                         .eq(BindUserDO::getUserType, devAccount.getUserType())).stream().findFirst();
-                if(!first.isPresent()){
-                    throw new ServiceException(-1,"没有检测机器人");
+                if (!first.isPresent()) {
+                    throw new ServiceException(-1, "没有检测机器人");
                 }
                 BindUserDO bindUserDO = first.get();
-                SteamWeb steamWeb=new SteamWeb(configService);
-                steamWeb.login(bindUserDO.getSteamPassword(),bindUserDO.getMaFile());
+                SteamWeb steamWeb = new SteamWeb(configService);
+                steamWeb.login(bindUserDO.getSteamPassword(), bindUserDO.getMaFile());
                 steamWeb.initTradeUrl();
                 TradeUrlStatus tradeUrlStatus = steamWeb.checkTradeUrl(openApiReqVo.getData().getTradeLinks());
-                SteamWeb steamWeb1=new SteamWeb(configService);
+                SteamWeb steamWeb1 = new SteamWeb(configService);
                 URI uri = URI.create(openApiReqVo.getData().getTradeLinks());
                 String query = uri.getQuery();
                 Map<String, String> stringStringMap = steamWeb1.parseQuery(query);
                 String partner = steamWeb1.toCommunityID(stringStringMap.get("partner"));
 
-                ApiCheckTradeUrlReSpVo tradeUrlReSpVo=new ApiCheckTradeUrlReSpVo();
+                ApiCheckTradeUrlReSpVo tradeUrlReSpVo = new ApiCheckTradeUrlReSpVo();
 //                tradeUrlReSpVo.setSteamId(partner);
                 tradeUrlReSpVo.setMsg(tradeUrlStatus.getMessage());
                 tradeUrlReSpVo.setStatus(tradeUrlStatus.getStatus());
@@ -204,11 +230,13 @@ public class AppApiController {
             });
             return execute;
         } catch (ServiceException e) {
-            return ApiResult.error(e.getCode(),  e.getMessage(),ApiCheckTradeUrlReSpVo.class);
+            return ApiResult.error(e.getCode(), e.getMessage(), ApiCheckTradeUrlReSpVo.class);
         }
     }
+
     /**
      * 指定商品购买
+     *
      * @return
      */
     @PostMapping("v1/api/byGoodsIdCreateOrder")
@@ -217,26 +245,28 @@ public class AppApiController {
     public ApiResult<CreateByIdRespVo> byGoodsIdCreateOrder(@RequestBody OpenApiReqVo<CreateCommodityOrderReqVo> openApiReqVo) {
         try {
             ApiResult<CreateByIdRespVo> execute = DevAccountUtils.tenantExecute(1l, () -> {
-                if(Objects.isNull(openApiReqVo.getData().getCommodityHashName()) || Objects.isNull(openApiReqVo.getData().getCommodityTemplateId())){
+                if (Objects.isNull(openApiReqVo.getData().getCommodityHashName()) || Objects.isNull(openApiReqVo.getData().getCommodityTemplateId())) {
                     throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
                 }
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1l);
                 YouyouOrderDO invOrder = uUOrderService.createInvOrder(loginUser, openApiReqVo.getData());
 
-                CreateByIdRespVo ret=new CreateByIdRespVo();
-                ret.setPayAmount(Double.valueOf(invOrder.getPayAmount()/100));
+                CreateByIdRespVo ret = new CreateByIdRespVo();
+                ret.setPayAmount(Double.valueOf(invOrder.getPayAmount() / 100));
                 ret.setOrderNo(invOrder.getOrderNo());
                 ret.setMerchantOrderNo(invOrder.getMerchantOrderNo());
                 return ApiResult.success(ret);
             });
             return execute;
         } catch (ServiceException e) {
-            return ApiResult.error(e.getCode(),  e.getMessage(),CreateByIdRespVo.class);
+            return ApiResult.error(e.getCode(), e.getMessage(), CreateByIdRespVo.class);
         }
     }
+
     /**
      * 指定模板购买
+     *
      * @return
      */
     @PostMapping("v1/api/byTemplateCreateOrder")
@@ -245,7 +275,7 @@ public class AppApiController {
     public ApiResult<CreateByTemplateRespVo> byTemplateCreateOrder(@RequestBody OpenApiReqVo<CreateCommodityOrderReqVo> openApiReqVo) {
         try {
             ApiResult<CreateByTemplateRespVo> execute = DevAccountUtils.tenantExecute(1l, () -> {
-                if(Objects.isNull(openApiReqVo.getData().getCommodityId())){
+                if (Objects.isNull(openApiReqVo.getData().getCommodityId())) {
                     throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
                 }
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
@@ -254,7 +284,7 @@ public class AppApiController {
 
 
                 //付款
-                AppPayOrderSubmitReqVO reqVO=new AppPayOrderSubmitReqVO();
+                AppPayOrderSubmitReqVO reqVO = new AppPayOrderSubmitReqVO();
                 reqVO.setChannelCode(PayChannelEnum.WALLET.getCode());
                 reqVO.setId(invOrder.getPayOrderId());
                 if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
@@ -269,17 +299,18 @@ public class AppApiController {
 //                return ApiResult.success(PayOrderConvert.INSTANCE.convert3(respVO));
 
 
-                CreateByTemplateRespVo ret=new CreateByTemplateRespVo();
-                ret.setPayAmount(Double.valueOf(invOrder.getPayAmount()/100));
+                CreateByTemplateRespVo ret = new CreateByTemplateRespVo();
+                ret.setPayAmount(Double.valueOf(invOrder.getPayAmount() / 100));
                 ret.setOrderNo(invOrder.getOrderNo());
                 ret.setMerchantOrderNo(invOrder.getMerchantOrderNo());
                 return ApiResult.success(ret);
             });
             return execute;
         } catch (ServiceException e) {
-            return ApiResult.error(e.getCode(),  e.getMessage(),CreateByTemplateRespVo.class);
+            return ApiResult.error(e.getCode(), e.getMessage(), CreateByTemplateRespVo.class);
         }
     }
+
     @Operation(summary = "创建库存订单")
     @PostMapping("v1/api/io661/createInvOrder")
     @PermitAll
@@ -293,7 +324,7 @@ public class AppApiController {
                 CreateOrderResult invOrder = paySteamOrderService.createInvOrder(loginUser, openApiReqVo.getData());
 
                 //付款
-                AppPayOrderSubmitReqVO reqVO=new AppPayOrderSubmitReqVO();
+                AppPayOrderSubmitReqVO reqVO = new AppPayOrderSubmitReqVO();
                 reqVO.setChannelCode(PayChannelEnum.WALLET.getCode());
                 reqVO.setId(invOrder.getPayOrderId());
                 if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
@@ -309,10 +340,11 @@ public class AppApiController {
             });
             return execute;
         } catch (ServiceException e) {
-            return ApiResult.error(e.getCode(),  e.getMessage(),AppPayOrderSubmitRespVO.class);
+            return ApiResult.error(e.getCode(), e.getMessage(), AppPayOrderSubmitRespVO.class);
         }
 
     }
+
     @Operation(summary = "库存订单列表")
     @PostMapping("v1/api/io661/listInvOrder")
     @PermitAll
@@ -330,7 +362,7 @@ public class AppApiController {
             return execute;
         } catch (ServiceException e) {
 
-            return ApiResult.error(e.getCode(),  e.getMessage(),PageResult.class);
+            return ApiResult.error(e.getCode(), e.getMessage(), PageResult.class);
         }
     }
 
@@ -348,17 +380,18 @@ public class AppApiController {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 List<YouyouDetailsDO> detailsDOS = youyouDetailsMapper.selectList(new LambdaQueryWrapperX<YouyouDetailsDO>()
                         .eq(YouyouDetailsDO::getAppkey, devAccount.getUserName()));
-
                 Long userId = devAccount.getUserId();
                 if (detailsDOS.isEmpty()) {
                     return ApiResult.error(404, "没有数据", String.class);
                 }
-
                 String fileName = RandomStringUtils.random(32,
                         new char[]{'a', 'b', 'c', 'd', 'e', 'f', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'});
                 Integer dataType = openApiReqVo.getData().getDataType();
                 jusDataType(userId, fileName + ".txt", dataType);
-
+                YouyouDetailsDO youyouDetailsDO = new YouyouDetailsDO();
+                youyouDetailsDO.setApplyCode(fileName);
+                youyouDetailsDO.setDataType(openApiReqVo.getData().getDataType());
+                youyouDetailsMapper.updateBatch(youyouDetailsDO);
                 return ApiResult.success(fileName, "成功");
             });
             return execute;
@@ -367,7 +400,7 @@ public class AppApiController {
         }
     }
 
-
+    //TODO  异步优化到其他层
     @Async
     @OperateLog(type = EXPORT)
     protected void jusDataType(Long userId, String fileName, Integer dataType) {
@@ -389,36 +422,52 @@ public class AppApiController {
                 default:
                     throw new ServiceException(ErrorCodeConstants.YOUYOU_DETAILS_NOT_EXISTS);
             }
-            File file = new File("C:\\Users\\WINDOWS\\Desktop\\orderList\\" + fileName);
-            if (!file.exists()) {file.createNewFile();}
+            File file = new File("" + fileName);
+
+            if (!file.exists()) {
+                file.createNewFile();
+            }
             FileWriter writer = new FileWriter(file);
             writer.write(result);
             writer.flush();
             writer.close();
+            byte[] byte1 = result.getBytes();
+            fileApi.createFile(fileName, "", byte1);
+            YouyouDetailsDO youyouDetailsDO = new YouyouDetailsDO();
+            youyouDetailsDO.setData(fileApi.createFile(fileName, "", byte1));
+            youyouDetailsMapper.updateBatch(youyouDetailsDO);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-/*    @PostMapping("v1/api/detailDataQueryResult")
+
+    /**
+     * 查询明细结果
+     *
+     * @return
+     */
+    @PostMapping("v1/api/detailDataQueryResult")
     @Operation(summary = "查询明细结果")
     @PermitAll
-    public ApiResult<String> detailDataQueryResult(@RequestBody OpenYoupinApiReqVo<ApiDetailDataQueryApllyReqVo> openApiReqVo) {
+    public ApiResult<String> detailDataQueryResult(@RequestBody OpenApiReqVo<ApiDetailDataQueryResultReqVo> openApiReqVo) {
         try {
             ApiResult<String> execute = DevAccountUtils.tenantExecute(1l, () -> {
-                if (Objects.isNull(openApiReqVo.getData().getDataType())) {
-                    throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
-                }
+                String applycode = openApiReqVo.getData().getApplyCode();
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
-                YouyouOrderDO youyouOrderDO = new YouyouOrderDO().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setOrderNo(String.valueOf(1L));
-                YouyouOrderDO youyouOrderDO1 = youyouOrderService.getYouyouOrder();
-                return ApiResult.success("123");
+                List<YouyouDetailsDO> detailsDOS = youyouDetailsMapper.selectList(new LambdaQueryWrapperX<YouyouDetailsDO>()
+                        .eq(YouyouDetailsDO::getAppkey, devAccount.getUserName()));
+                String url1 = detailsDOS.get(0).getData();
+                if (applycode == null) {
+                    return ApiResult.error(404, "没有数据", String.class);
+                }
+                return ApiResult.success((url1), "成功");
             });
             return execute;
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(), e.getMessage(), String.class);
         }
-    }*/
+    }
 
 
     /**
