@@ -46,29 +46,29 @@ public class ApiUUTemplateController {
 
     @PostMapping("/template_insert")
     @Operation(summary = "插入UU商品平台")
-public void youyouTemplate() throws IOException {
-    ApiResult<YouyouTemplatedownloadRespVO> templateId = uuService.getTemplateId();
-//    String url="https://youpin-commodity.oss-cn-shenzhen.aliyuncs.com/youpin/commodity_template/20240306204216_ac4c6a1.txt?Expires=1709733036&OSSAccessKeyId=LTAI5tEdUtG2NHxwgB6Kpnao&Signature=2FkonptvMGmqWC%2BkPLMs3JEsk6U%3D";
-    HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-    builder.method(HttpUtil.Method.GET).url(templateId.getData().getData());
-//    builder.method(HttpUtil.Method.GET).url(url);
-    HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(),HttpUtil.getClient());
-    ArrayList json = sent.json(ArrayList.class);
-    List<ApiUUTemplateVO> templateVOS = new ArrayList<>();
-    for (Object item:json){
-        ApiUUTemplateVO apiUUTemplateVO = objectMapper.readValue(objectMapper.writeValueAsString(item), ApiUUTemplateVO.class);
-        templateVOS.add(apiUUTemplateVO);
-    }
-    for(ApiUUTemplateVO item:templateVOS){
-        YouyouTemplateDO templateDO = new YouyouTemplateDO();
-        templateDO.setTemplateId(item.getId());
-        templateDO.setName(item.getName());
-        templateDO.setHashName(item.getHashName());
-        templateDO.setTypeId(item.getTypeId());
-        templateDO.setTypeHashName(item.getTypeHashName());
-        templateDO.setWeaponId(item.getWeaponId());
-        templateDO.setWeaponName(item.getWeaponName());
-        uuTemplateMapper.insert(templateDO);
+    public void youyouTemplate() throws IOException {
+        ApiResult<YouyouTemplatedownloadRespVO> templateId = uuService.getTemplateId();
+    //    String url="https://youpin-commodity.oss-cn-shenzhen.aliyuncs.com/youpin/commodity_template/20240306204216_ac4c6a1.txt?Expires=1709733036&OSSAccessKeyId=LTAI5tEdUtG2NHxwgB6Kpnao&Signature=2FkonptvMGmqWC%2BkPLMs3JEsk6U%3D";
+        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+        builder.method(HttpUtil.Method.GET).url(templateId.getData().getData());
+    //    builder.method(HttpUtil.Method.GET).url(url);
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(),HttpUtil.getClient());
+        ArrayList json = sent.json(ArrayList.class);
+        List<ApiUUTemplateVO> templateVOS = new ArrayList<>();
+        for (Object item:json){
+            ApiUUTemplateVO apiUUTemplateVO = objectMapper.readValue(objectMapper.writeValueAsString(item), ApiUUTemplateVO.class);
+            templateVOS.add(apiUUTemplateVO);
         }
-    }
+        for(ApiUUTemplateVO item:templateVOS){
+            YouyouTemplateDO templateDO = new YouyouTemplateDO();
+            templateDO.setTemplateId(item.getId());
+            templateDO.setName(item.getName());
+            templateDO.setHashName(item.getHashName());
+            templateDO.setTypeId(item.getTypeId());
+            templateDO.setTypeHashName(item.getTypeHashName());
+            templateDO.setWeaponId(item.getWeaponId());
+            templateDO.setWeaponName(item.getWeaponName());
+            uuTemplateMapper.insert(templateDO);
+            }
+        }
 }
