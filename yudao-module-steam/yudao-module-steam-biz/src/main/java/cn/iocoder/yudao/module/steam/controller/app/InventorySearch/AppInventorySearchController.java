@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.service.SteamInvService;
 import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.inv.InvService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -74,30 +75,11 @@ public class AppInventorySearchController {
         return success(invPage);
     }
 
-//
-//    /**
-//     * 用户手动查询自己的 steam_inv 库存（从线上获取数据）
-//     * @param invPageReqVO steamid
-//     * @return
-//     */
-//    @GetMapping("/after_SearchFromSteam")
-//    @Operation(summary = "查询数据库的库存数据")
-//    public CommonResult<PageResult<InvDO>> SearchFromSteam(@Valid InvPageReqVO invPageReqVO) {
-//        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-//        List<BindUserDO> collect = bindUserMapper.selectList()
-//                .stream()
-//                .filter(o -> o.getSteamId().equals(invPageReqVO.getSteamId()))
-//                .collect(Collectors.toList());
-//        assert loginUser != null;
-//        if((loginUser.getId()).equals(collect.get(0).getUserId())){
-//            invPageReqVO.setUserId(loginUser.getId());
-//        } else {
-//            throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
-//        }
-//
-//        return success(invService.getInvPage(invPageReqVO));
-//    }
 
-
+    //
+    @GetMapping("/after_SearchFromSteam")
+    @Operation(summary = "查询数据库的库存数据")
+    public void SearchFromSteam() throws JsonProcessingException {
+        steamInvService.FistGetInventory(32L,"730");}
 }
 
