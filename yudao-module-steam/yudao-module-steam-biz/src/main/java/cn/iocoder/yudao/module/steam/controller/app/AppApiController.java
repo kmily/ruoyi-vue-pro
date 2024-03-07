@@ -76,6 +76,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URI;
 import java.util.*;
 
@@ -98,8 +99,11 @@ public class AppApiController {
     @Resource
     private PayWalletService payWalletService;
 
-    @Autowired
     private ConfigService configService;
+    @Autowired
+    public void setConfigService(ConfigService configService) {
+        this.configService = configService;
+    }
 
     @Resource
     private BindUserMapper bindUserMapper;
@@ -119,8 +123,13 @@ public class AppApiController {
     @Resource
     private PayOrderService payOrderService;
 
-    @Autowired
     private UUOrderService uUOrderService;
+
+    @Autowired
+    public void setuUOrderService(UUOrderService uUOrderService) {
+        this.uUOrderService = uUOrderService;
+    }
+
     @Resource
     private UUService uuService;
     @Resource
@@ -152,15 +161,14 @@ public class AppApiController {
     @PermitAll
     public ApiResult<ApiPayWalletRespVO> getAssetsInfo(@RequestBody OpenApiReqVo<Serializable> openApiReqVo) {
         try {
-            ApiResult<ApiPayWalletRespVO> execute = DevAccountUtils.tenantExecute(1l, () -> {
+            return DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 PayWalletDO wallet = payWalletService.getOrCreateWallet(devAccount.getUserId(), devAccount.getUserType());
                 ApiPayWalletRespVO apiPayWalletRespVO=new ApiPayWalletRespVO();
-                apiPayWalletRespVO.setAmount(new BigDecimal(wallet.getBalance().toString()).divide(new BigDecimal("100"),2,BigDecimal.ROUND_HALF_UP));
+                apiPayWalletRespVO.setAmount(new BigDecimal(wallet.getBalance().toString()).divide(new BigDecimal("100"),2, RoundingMode.HALF_UP));
                 apiPayWalletRespVO.setUserId(devAccount.getUserId().intValue());
                 return ApiResult.success(apiPayWalletRespVO);
             });
-            return execute;
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(),  e.getMessage(),ApiPayWalletRespVO.class);
         }
@@ -187,9 +195,7 @@ public class AppApiController {
     @Operation(summary = "余额查询")
     @PermitAll
     public   OpenApiReqVo<CreateCommodityOrderReqVo> sign(@RequestBody OpenApiReqVo<CreateCommodityOrderReqVo> openApiReqVo) {
-        return DevAccountUtils.tenantExecute(1l, () -> {
-            return openApiService.requestUUSign(openApiReqVo);
-        });
+        return DevAccountUtils.tenantExecute(1L, () -> openApiService.requestUUSign(openApiReqVo));
     }
     /**
      * 检查交易链接
@@ -200,7 +206,7 @@ public class AppApiController {
     @PermitAll
     public ApiResult<ApiCheckTradeUrlReSpVo> checkTradeUrl(@RequestBody OpenApiReqVo<ApiCheckTradeUrlReqVo> openApiReqVo) {
         try {
-            ApiResult<ApiCheckTradeUrlReSpVo> execute = DevAccountUtils.tenantExecute(1l, () -> {
+            return DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                         .eq(BindUserDO::getUserId, devAccount.getUserId())
@@ -226,7 +232,6 @@ public class AppApiController {
                 tradeUrlReSpVo.setStatus(tradeUrlStatus.getStatus());
                 return ApiResult.success(tradeUrlReSpVo);
             });
-            return execute;
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(),  e.getMessage(),ApiCheckTradeUrlReSpVo.class);
         }
@@ -240,12 +245,12 @@ public class AppApiController {
     @PermitAll
     public ApiResult<CreateByIdRespVo> byGoodsIdCreateOrder(@RequestBody OpenApiReqVo<CreateCommodityOrderReqVo> openApiReqVo) {
         try {
-            ApiResult<CreateByIdRespVo> execute = DevAccountUtils.tenantExecute(1l, () -> {
+            return DevAccountUtils.tenantExecute(1L, () -> {
                 if(Objects.isNull(openApiReqVo.getData().getCommodityHashName()) || Objects.isNull(openApiReqVo.getData().getCommodityTemplateId())){
                     throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
                 }
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
-                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1l);
+                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
                 YouyouOrderDO invOrder = uUOrderService.createInvOrder(loginUser, openApiReqVo.getData());
 
                 CreateByIdRespVo ret=new CreateByIdRespVo();
@@ -254,7 +259,6 @@ public class AppApiController {
                 ret.setMerchantOrderNo(invOrder.getMerchantOrderNo());
                 return ApiResult.success(ret);
             });
-            return execute;
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(),  e.getMessage(),CreateByIdRespVo.class);
         }
@@ -268,12 +272,12 @@ public class AppApiController {
     @PermitAll
     public ApiResult<CreateByTemplateRespVo> byTemplateCreateOrder(@RequestBody OpenApiReqVo<CreateCommodityOrderReqVo> openApiReqVo) {
         try {
-            ApiResult<CreateByTemplateRespVo> execute = DevAccountUtils.tenantExecute(1l, () -> {
+            ApiResult<CreateByTemplateRespVo> execute = DevAccountUtils.tenantExecute(1L, () -> {
                 if(Objects.isNull(openApiReqVo.getData().getCommodityId())){
                     throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
                 }
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
-                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1l);
+                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
                 YouyouOrderDO invOrder = uUOrderService.createInvOrder(loginUser, openApiReqVo.getData());
 
 
@@ -309,11 +313,11 @@ public class AppApiController {
     @PermitAll
     public ApiResult<AppPayOrderSubmitRespVO> createInvOrder(@RequestBody OpenApiReqVo<PaySteamOrderCreateReqVO> openApiReqVo) {
         try {
-            ApiResult<AppPayOrderSubmitRespVO> execute = DevAccountUtils.tenantExecute(1l, () -> {
+            ApiResult<AppPayOrderSubmitRespVO> execute = DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
 
 
-                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1l);
+                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
                 CreateOrderResult invOrder = paySteamOrderService.createInvOrder(loginUser, openApiReqVo.getData());
 
                 //付款
@@ -342,7 +346,7 @@ public class AppApiController {
     @PermitAll
     public ApiResult<PageResult> listInvOrder(@RequestBody OpenApiReqVo<InvOrderPageReqVO> openApiReqVo) {
         try {
-            ApiResult<PageResult> execute = DevAccountUtils.tenantExecute(1l, () -> {
+            return DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 InvOrderPageReqVO data = openApiReqVo.getData();
                 data.setUserId(devAccount.getId());
@@ -351,7 +355,6 @@ public class AppApiController {
 
                 return ApiResult.success(invOrderPageOrder);
             });
-            return execute;
         } catch (ServiceException e) {
 
             return ApiResult.error(e.getCode(),  e.getMessage(),PageResult.class);
@@ -368,7 +371,7 @@ public class AppApiController {
     @PermitAll
     public ApiResult<String> detailDataQueryAplly(@RequestBody OpenApiReqVo<ApiDetailDataQueryApllyReqVo> openApiReqVo) {
         try {
-            ApiResult<String> execute = DevAccountUtils.tenantExecute(1l, () -> {
+            ApiResult<String> execute = DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 List<YouyouDetailsDO> detailsDOS = youyouDetailsMapper.selectList(new LambdaQueryWrapperX<YouyouDetailsDO>()
                         .eq(YouyouDetailsDO::getAppkey, devAccount.getUserName()));
@@ -453,7 +456,7 @@ public class AppApiController {
     @PermitAll
     public ApiResult<CreateOrderCancel> orderCancel(@RequestBody OpenApiReqVo<CreateReqOrderCancel> openApiReqVo) {
         try {
-            ApiResult<CreateOrderCancel> execute = DevAccountUtils.tenantExecute(1L, () -> {
+            return DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
 
                 List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
@@ -465,14 +468,13 @@ public class AppApiController {
                     ret.setResult(3);
                     return ApiResult.success(ret, "取消失败，没有找到该订单");
                 } else {
-                    LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1l);
+                    LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
                     uuOrderServiceImpl.refundInvOrder(loginUser, youyouOrderDOS.get(0).getId(), getClientIP());
                     ret.setResult(1);
                     return ApiResult.success(ret, "取消成功");
                 }
                 // TODO 文档有个处理中(2)的状态，我感觉应该是用不上
             });
-            return execute;
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(), e.getMessage(), CreateOrderCancel.class);
         }
@@ -484,7 +486,7 @@ public class AppApiController {
     @PermitAll
     public ApiResult<CreateOrderStatus> orderStatus(@RequestBody OpenApiReqVo<CreateReqOrderStatus> openApiReqVo) {
         try {
-            ApiResult<CreateOrderStatus> execute = DevAccountUtils.tenantExecute(1L, () -> {
+            return DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
 
                 List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
@@ -501,7 +503,6 @@ public class AppApiController {
                     return ApiResult.success(ret, "成功");
                 }
             });
-            return execute;
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(), e.getMessage(), CreateOrderStatus.class);
         }
