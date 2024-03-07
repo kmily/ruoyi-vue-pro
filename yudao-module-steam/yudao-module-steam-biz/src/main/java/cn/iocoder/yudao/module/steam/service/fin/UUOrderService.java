@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.steam.service.fin;
 
 import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
@@ -48,7 +49,7 @@ public interface UUOrderService {
      * @return 示例订单
      */
     YouyouOrderDO getUUOrder(LoginUser loginUser, QueryOrderReqVo queryOrderReqVo);
-
+    OrderInfoResp orderInfo(YouyouOrderDO youyouOrderDO);
     /**
      * 获得示例订单列表
      * @param youyouOrderPageReqVO

@@ -4,32 +4,43 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
+import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
+import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTemplatePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal.WithdrawalDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoucommodity.UUCommodityMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
+import cn.iocoder.yudao.module.steam.enums.UUOrderStatus;
+import cn.iocoder.yudao.module.steam.enums.UUOrderSubStatus;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum;
@@ -41,20 +52,27 @@ import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
 import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyVo;
+import cn.iocoder.yudao.module.steam.service.youyoucommodity.YouyouCommodityService;
+import cn.iocoder.yudao.module.steam.service.youyoutemplate.UUTemplateService;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.temporal.TemporalField;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static cn.hutool.core.util.ObjectUtil.notEqual;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -121,9 +139,27 @@ public class UUOrderServiceImpl implements UUOrderService {
     @Resource
     private SteamService steamService;
 
+    @Resource
+    private UUTemplateService uuTemplateService;
+
+    private YouyouCommodityService youyouCommodityService;
+    @Autowired
+    public void setYouyouCommodityService(YouyouCommodityService youyouCommodityService) {
+        this.youyouCommodityService = youyouCommodityService;
+    }
 
     @Resource
     private BindUserMapper bindUserMapper;
+
+    /**
+     * 方法只要用于查询，
+     * 操作请走API
+     */
+    @Resource
+    private PayOrderService payOrderService;
+
+    @Resource
+    private MemberUserApi memberUserApi;
 
     public UUOrderServiceImpl() {
     }
@@ -423,6 +459,117 @@ public class UUOrderServiceImpl implements UUOrderService {
         }else{
             return youyouOrderDOS.get(0);
         }
+    }
+
+    @Override
+    public OrderInfoResp orderInfo(YouyouOrderDO uuOrder) {
+        YouyouCommodityDO youyouCommodity = youyouCommodityService.getYouyouCommodity(Integer.valueOf(uuOrder.getRealCommodityId()));
+        Optional<YouyouTemplateDO> first = uuTemplateService.getYouyouTemplatePage(new YouyouTemplatePageReqVO().setTemplateId(youyouCommodity.getTemplateId())).getList().stream().findFirst();
+        PayOrderDO payOrder = payOrderService.getOrder(uuOrder.getPayOrderId());
+        //买家
+        MemberUserRespDTO buyUser = memberUserApi.getUser(uuOrder.getUserId());
+        //卖家
+        MemberUserRespDTO sellUser = memberUserApi.getUser(uuOrder.getSellUserId());
+
+        YouyouTemplateDO youyouTemplateDO;
+        if(first.isPresent()){
+            youyouTemplateDO = first.get();
+        }else{
+            throw new ServiceException(OpenApiCode.CONCAT_ADMIN);
+        }
+
+        OrderInfoResp ret = new OrderInfoResp();
+        ret.setOrderNo(uuOrder.getOrderNo());
+        ret.setCreateOrderTime(uuOrder.getCreateTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
+        if(Objects.nonNull(uuOrder.getPayTime())){
+            ret.setPaySuccessTime(uuOrder.getPayTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
+        }
+        if(Objects.nonNull(payOrder)){
+            ret.setPayEndTime(payOrder.getExpireTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
+        }
+
+
+        ret.setTradeUrl(uuOrder.getTradeLinks());
+        ret.setOrderStatus(uuOrder.getUuOrderStatus());
+        if(Objects.nonNull(ret.getOrderStatus())){
+            ret.setOrderStatusName(UUOrderStatus.valueOf(ret.getOrderStatus()).getMsg());
+        }
+        ret.setOrderSubStatus(uuOrder.getUuOrderSubStatus());
+        if(Objects.nonNull(ret.getOrderSubStatus())){
+            ret.setOrderSubStatusName(UUOrderSubStatus.valueOf(ret.getOrderSubStatus()).getMsg());
+        }
+        ret.setBuyerUserId(uuOrder.getUserId());
+        ret.setBuyerUserName(buyUser.getNickname());
+        if(StringUtils.hasText(buyUser.getAvatar())){
+            ret.setBuyerUserIcon(buyUser.getAvatar());
+        }else{
+            ret.setBuyerUserIcon("https://img.zcool.cn/community/01a3865ab91314a8012062e3c38ff6.png@1280w_1l_2o_100sh.png");
+        }
+
+
+
+        ret.setSellerUserId(uuOrder.getSellUserId());
+        ret.setSellerUserName(sellUser.getNickname());
+        if(StringUtils.hasText(sellUser.getAvatar())){
+            ret.setSellerUserIcon(sellUser.getAvatar());
+        }else{
+            ret.setSellerUserIcon("https://img.zcool.cn/community/01a3865ab91314a8012062e3c38ff6.png@1280w_1l_2o_100sh.png");
+        }
+        OrderInfoResp.ProductDetailDTO productDetailDTO = new OrderInfoResp.ProductDetailDTO();
+        productDetailDTO.setCommodityId(youyouCommodity.getId());
+        productDetailDTO.setCommodityName(youyouCommodity.getCommodityName());
+        productDetailDTO.setCommodityHashName(youyouTemplateDO.getHashName());
+        productDetailDTO.setCommodityTemplateId(youyouCommodity.getTemplateId());
+        productDetailDTO.setAbrade(youyouCommodity.getCommodityAbrade());
+        productDetailDTO.setPrice(new BigDecimal(youyouCommodity.getCommodityPrice()).multiply(new BigDecimal("100")).intValue());
+//                productDetailDTO.setNum(new BigDecimal(youyouCommodity.get()).multiply(new BigDecimal("100")).intValue());
+        productDetailDTO.setPaintIndex(youyouCommodity.getCommodityPaintIndex());
+        productDetailDTO.setPaintSeed(youyouCommodity.getCommodityPaintSeed());
+        productDetailDTO.setHaveNameTag(youyouCommodity.getCommodityHaveNameTag());
+//                productDetailDTO.setNameTag(youyouCommodity.getn());
+        productDetailDTO.setHaveClothSeal(youyouCommodity.getCommodityHaveBuzhang());
+//                productDetailDTO.setDopplerColor(youyouCommodity.getd());
+//                productDetailDTO.setd(youyouCommodity.get());
+        productDetailDTO.setHaveSticker(String.valueOf(youyouCommodity.getCommodityHaveSticker()));
+
+        productDetailDTO.setTypeId(youyouTemplateDO.getTypeId());
+        productDetailDTO.setTypeHashName(youyouTemplateDO.getTypeHashName());
+//                productDetailDTO.setRarityName(youyouTemplateDO.get());
+
+        productDetailDTO.setTypeId(youyouTemplateDO.getTypeId());
+        productDetailDTO.setTypeHashName(youyouTemplateDO.getTypeHashName());
+        productDetailDTO.setTypeName(youyouTemplateDO.getTypeName());
+        productDetailDTO.setWeaponName(youyouTemplateDO.getWeaponName());
+        productDetailDTO.setWeaponId(youyouTemplateDO.getWeaponId());
+        productDetailDTO.setWeaponHashName(youyouTemplateDO.getWeaponHashName());
+        productDetailDTO.setCommodityAbrade(youyouCommodity.getCommodityAbrade());
+
+        ret.setCommodityAmount(youyouCommodity.getCommodityPrice());
+        if(Objects.nonNull(uuOrder.getPayAmount())){
+            ret.setPaymentAmount(new BigDecimal(uuOrder.getPayAmount()).divide(new BigDecimal("100")).toString());
+        }
+        if(Objects.nonNull(uuOrder.getPayChannelCode())){
+            switch (PayChannelEnum.getByCode(uuOrder.getPayChannelCode())){
+                case WALLET:
+                    ret.setPayMethod(100);
+                    break;
+                case ALIPAY_PC:
+                case ALIPAY_WAP:
+                case ALIPAY_APP:
+                case ALIPAY_QR:
+                case ALIPAY_BAR:
+                    ret.setPayMethod(200);
+                    break;
+                default:
+            }
+
+        }
+        ret.setProductDetail(productDetailDTO);
+        if(Objects.nonNull(uuOrder.getRefundPrice())){
+            ret.setReturnAmount(new BigDecimal(uuOrder.getRefundPrice()).divide(new BigDecimal("100")).toString());
+            ret.setCancelOrderTime(uuOrder.getRefundTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
+        }
+        return ret;
     }
     //    @Override
 //    public PageResult<YouyouOrderDO> getInvOrderPageOrder(YouyouOrderPageReqVO invOrderPageReqVO) {

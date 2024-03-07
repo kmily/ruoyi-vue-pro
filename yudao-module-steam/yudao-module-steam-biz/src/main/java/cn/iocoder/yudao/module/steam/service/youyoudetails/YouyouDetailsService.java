@@ -52,5 +52,4 @@ public interface YouyouDetailsService {
      * @return 用户查询明细分页
      */
     PageResult<YouyouDetailsDO> getYouyouDetailsPage(YouyouDetailsPageReqVO pageReqVO);
-
 }
