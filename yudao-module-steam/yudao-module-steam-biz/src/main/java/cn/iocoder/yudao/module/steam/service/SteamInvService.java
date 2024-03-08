@@ -316,14 +316,18 @@ public class SteamInvService {
             map.put(invDescDO.getId(),invDescDO);
         }
         List<AppInvPageReqVO> appInvPageReqVO =  new ArrayList<>();
-        if(map.isEmpty()){
-            throw new ServiceException(-1,"没有库存详情为空");
-        }
+
         for(InvDO invDO : invPage.getList()){
             AppInvPageReqVO appInvPageReqVO1 = new AppInvPageReqVO();
-            appInvPageReqVO1.setIconUrl(map.get(invDO.getInvDescId()).getIconUrl());
-            appInvPageReqVO1.setMarketName(map.get(invDO.getInvDescId()).getMarketName());
-            appInvPageReqVO.add(appInvPageReqVO1);
+            if(map.isEmpty()){
+                appInvPageReqVO1.setMarketName(null);
+                appInvPageReqVO1.setMarketName(null);
+            }else {
+                appInvPageReqVO1.setIconUrl(map.get(invDO.getInvDescId()).getIconUrl());
+                appInvPageReqVO1.setMarketName(map.get(invDO.getInvDescId()).getMarketName());
+                appInvPageReqVO.add(appInvPageReqVO1);
+            }
+
         }
         return appInvPageReqVO;
 
