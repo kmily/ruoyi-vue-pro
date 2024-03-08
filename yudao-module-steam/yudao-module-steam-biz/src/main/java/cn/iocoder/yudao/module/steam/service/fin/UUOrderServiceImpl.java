@@ -25,6 +25,8 @@ import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTemplatePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelResp;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
@@ -626,7 +628,9 @@ public class UUOrderServiceImpl implements UUOrderService {
                     LoginUser loginUser=new LoginUser();
                     loginUser.setId(youyouOrderDO.getUserId());
                     loginUser.setUserType(youyouOrderDO.getUserType());
-                    refundInvOrder(loginUser,youyouOrderDO.getId(), ServletUtils.getClientIP());
+                    OrderCancelVo orderCancelVo=new OrderCancelVo();
+                    orderCancelVo.setOrderNo(youyouOrderDO.getOrderNo());
+                    refundInvOrder(loginUser,orderCancelVo, ServletUtils.getClientIP());
                 }
                 return "";
             });
@@ -712,10 +716,36 @@ public class UUOrderServiceImpl implements UUOrderService {
     }
 
     @Override
-    public void refundInvOrder(LoginUser loginUser,Long id, String userIp) {
+    public Integer refundInvOrder(LoginUser loginUser, OrderCancelVo orderCancelVo, String userIp) {
+        Optional<YouyouOrderDO> first = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
+                .eq(YouyouOrderDO::getOrderNo, orderCancelVo.getOrderNo())
+                .eq(YouyouOrderDO::getUserId, loginUser.getId())
+                .eq(YouyouOrderDO::getUserType, loginUser.getUserType())
+        ).stream().findFirst();
         // 1. 校验订单是否可以退款
-        YouyouOrderDO youyouOrderDO = validateInvOrderCanRefund(id,loginUser);
+        YouyouOrderDO youyouOrderDO = validateInvOrderCanRefund(first.orElse(null),loginUser);
+        //如果有uu的单子，这里则只发起uu的退款，uu退款后再发起我们的退款
+        if(Objects.nonNull(youyouOrderDO.getUuOrderNo())){
+            //传入uu的单子
+            ApiResult<OrderCancelResp> orderCancelRespApiResult = uuService.orderCancel(new OrderCancelVo().setOrderNo(youyouOrderDO.getUuOrderNo()));
+            log.info("取消UU订单结果{}{}",orderCancelRespApiResult,youyouOrderDO);
+            if(orderCancelRespApiResult.getData().getResult()==1){
+                refundAction(youyouOrderDO,loginUser);
+                return 1;
+            }
+            return orderCancelRespApiResult.getData().getResult();
+        }else{
+            refundAction(youyouOrderDO,loginUser);
+            return 1;
+        }
+    }
 
+    /**
+     * 执行退款
+     * @param youyouOrderDO
+     */
+    private void refundAction(YouyouOrderDO youyouOrderDO,LoginUser loginUser) {
+        validateInvOrderCanRefund(youyouOrderDO,loginUser);
         // 2.1 生成退款单号
         // 一般来说，用户发起退款的时候，都会单独插入一个售后维权表，然后使用该表的 id 作为 refundId
         // 这里我们是个简单的 demo，所以没有售后维权表，直接使用订单 id + "-refund" 来演示
@@ -727,7 +757,7 @@ public class UUOrderServiceImpl implements UUOrderService {
                 .setMerchantRefundId(refundId)
                 .setReason("用户不想要了主动退单").setPrice(youyouOrderDO.getPayAmount()));// 价格信息
         // 2.3 更新退款单到 demo 订单
-        youyouOrderMapper.updateById(new YouyouOrderDO().setId(id)
+        youyouOrderMapper.updateById(new YouyouOrderDO().setId(youyouOrderDO.getId())
                 .setPayRefundId(payRefundId).setRefundPrice(youyouOrderDO.getPayAmount()));
         //释放库存
         YouyouCommodityDO youyouCommodityDO = UUCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
@@ -735,10 +765,9 @@ public class UUOrderServiceImpl implements UUOrderService {
         UUCommodityMapper.updateById(youyouCommodityDO);
     }
 
-    private YouyouOrderDO validateInvOrderCanRefund(Long id,LoginUser loginUser) {
+    private YouyouOrderDO validateInvOrderCanRefund(YouyouOrderDO youyouOrderDO,LoginUser loginUser) {
         // 校验订单是否存在
-        YouyouOrderDO youyouOrderDO = youyouOrderMapper.selectById(id);
-        if (youyouOrderDO == null) {
+        if (Objects.isNull(youyouOrderDO)) {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_NOT_FOUND);
         }
         if(youyouOrderDO.getSellCashStatus().equals(InvSellCashStatusEnum.CASHED.getStatus())){
@@ -758,9 +787,16 @@ public class UUOrderServiceImpl implements UUOrderService {
         if (youyouOrderDO.getPayRefundId() != null) {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUNDED);
         }
+        //通过此接口可取消符合取消规则「创单成功后30min后卖家未发送交易报价」的代购订单。
+        if(Objects.nonNull(youyouOrderDO.getUuOrderNo()) && Objects.isNull(youyouOrderDO.getUuTradeOfferId())){
+            Duration between = Duration.between(youyouOrderDO.getCreateTime(), LocalDateTime.now());
+            if(between.getSeconds()<=30*60){//小于30分钟不能取消
+                throw exception(ErrorCodeConstants.UU_GOODS_ORDER_MIN_TIME);
+            }
+        }
         //检查是否已发货
         if(InvSellCashStatusEnum.CASHED.getStatus().equals(youyouOrderDO.getSellCashStatus())){
-            throw exception(ErrorCodeConstants.INVORDER_ORDER_TRANSFER_ALERY);
+            throw exception(ErrorCodeConstants.UU_GOODS_ORDER_TRANSFER_CASHED);
         }
         return youyouOrderDO;
     }

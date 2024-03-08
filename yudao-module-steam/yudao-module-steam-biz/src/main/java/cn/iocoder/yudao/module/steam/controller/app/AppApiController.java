@@ -137,7 +137,7 @@ public class AppApiController {
 
     /**
      * UU订单服务器回调
-     * @param notifyReq
+     * @param notifyReq UU回调接口
      * @return
      */
     @PostMapping("/uu/notify")
@@ -230,7 +230,7 @@ public class AppApiController {
                 URI uri = URI.create(openApiReqVo.getData().getTradeLinks());
                 String query = uri.getQuery();
                 Map<String, String> stringStringMap = steamWeb1.parseQuery(query);
-                String partner = steamWeb1.toCommunityID(stringStringMap.get("partner"));
+//                String partner = steamWeb1.toCommunityID(stringStringMap.get("partner"));
 
                 ApiCheckTradeUrlReSpVo tradeUrlReSpVo=new ApiCheckTradeUrlReSpVo();
 //                tradeUrlReSpVo.setSteamId(partner);
@@ -357,7 +357,6 @@ public class AppApiController {
                 data.setUserId(devAccount.getId());
                 data.setUserType(devAccount.getUserType());
                 PageResult<InvOrderResp> invOrderPageOrder = paySteamOrderService.getInvOrderPageOrder(data);
-
                 return ApiResult.success(invOrderPageOrder);
             });
         } catch (ServiceException e) {
@@ -477,29 +476,18 @@ public class AppApiController {
     @PostMapping("v1/api/orderCancel")
     @Operation(summary = "买家取消订单")
     @PermitAll
-    public ApiResult<CreateOrderCancel> orderCancel(@RequestBody OpenApiReqVo<CreateReqOrderCancel> openApiReqVo) {
+    public ApiResult<OrderCancelResp> orderCancel(@RequestBody OpenApiReqVo<OrderCancelVo> openApiReqVo) {
         try {
             return DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
-
-                List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
-                        .eq(YouyouOrderDO::getOrderNo, openApiReqVo.getData().getOrderNo())
-                        .eq(YouyouOrderDO::getUserId, devAccount.getUserId()));
-
-                CreateOrderCancel ret = new CreateOrderCancel();
-                if (youyouOrderDOS.isEmpty()) {
-                    ret.setResult(3);
-                    return ApiResult.success(ret, "取消失败，没有找到该订单");
-                } else {
-                    LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
-                    uUOrderService.refundInvOrder(loginUser, youyouOrderDOS.get(0).getId(), getClientIP());
-                    ret.setResult(1);
-                    return ApiResult.success(ret, "取消成功");
-                }
-                // TODO 文档有个处理中(2)的状态，我感觉应该是用不上
+                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
+                Integer integer = uUOrderService.refundInvOrder(loginUser, openApiReqVo.getData(), getClientIP());
+                OrderCancelResp ret = new OrderCancelResp();
+                ret.setResult(integer);
+                return ApiResult.success(ret);
             });
         } catch (ServiceException e) {
-            return ApiResult.error(e.getCode(), e.getMessage(), CreateOrderCancel.class);
+            return ApiResult.error(e.getCode(), e.getMessage(), OrderCancelResp.class);
         }
     }
 
