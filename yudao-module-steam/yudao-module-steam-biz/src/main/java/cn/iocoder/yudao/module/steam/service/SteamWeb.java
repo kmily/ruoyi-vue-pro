@@ -9,10 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Cookie;
-import okhttp3.OkHttpClient;
 
-import javax.annotation.Resource;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
@@ -26,7 +23,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -169,7 +165,7 @@ public class SteamWeb {
         //提取用户名
         String regex2="(?<=user_avatar playerAvatar offline\" aria-label=\"查看您的个人资料\">\\s{0,20}<img src=\")(.*?)(?=\">)";
         Pattern patternUser = Pattern.compile(regex2, Pattern.DOTALL);
-        Matcher matcherUser = patternUser.matcher(html);
+        Matcher matcherUser = patternUser.matcher(proxyResponseVo.getHtml());
         if (matcherUser.find()) {
             String imgSrc = matcherUser.group(1);
             String[] split = imgSrc.split(" alt=");
@@ -575,5 +571,5 @@ public class SteamWeb {
 //        } catch (JsonProcessingException e) {
 //            e.printStackTrace();
 //        }
-    }
+//    }
 }
