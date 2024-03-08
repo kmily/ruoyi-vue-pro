@@ -303,7 +303,7 @@ public class SteamInvService {
     }
 
 
-    public List<AppInvPageReqVO> getInvPage1(InvPageReqVO invPageReqVO){
+    public PageResult<AppInvPageReqVO> getInvPage1(InvPageReqVO invPageReqVO){
         // 用户库存
         PageResult<InvDO> invPage = invService.getInvPage(invPageReqVO);
         ArrayList<Object> list = new ArrayList<>();
@@ -329,7 +329,7 @@ public class SteamInvService {
             }
 
         }
-        return appInvPageReqVO;
+        return new PageResult<AppInvPageReqVO>(appInvPageReqVO, invPage.getTotal());
 
     }
 

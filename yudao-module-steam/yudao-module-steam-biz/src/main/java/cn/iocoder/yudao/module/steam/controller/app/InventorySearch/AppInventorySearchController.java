@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.steam.controller.app.InventorySearch;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
@@ -61,7 +62,7 @@ public class AppInventorySearchController {
      */
     @GetMapping("/after_SearchInDB")
     @Operation(summary = "从数据库中查询数据")
-    public CommonResult<List<AppInvPageReqVO>> SearchInDB(@Valid InvPageReqVO invPageReqVO) {
+    public CommonResult<PageResult<AppInvPageReqVO>> SearchInDB(@Valid InvPageReqVO invPageReqVO) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         List<BindUserDO> collect = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                 .eq(BindUserDO::getUserId, loginUser.getId())
@@ -70,9 +71,8 @@ public class AppInventorySearchController {
         if(Objects.isNull(collect) || collect.isEmpty()){
             throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
         }
-        invPageReqVO.setBindUserId(loginUser.getId());
-        invPageReqVO.setUserType(loginUser.getUserType());
-        return success(Collections.singletonList((AppInvPageReqVO) steamInvService.getInvPage1(invPageReqVO)));
+        invPageReqVO.setBindUserId(collect.get(0).getId());
+        return success(steamInvService.getInvPage1(invPageReqVO));
     }
 
 
