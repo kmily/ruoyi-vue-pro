@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppBindUserMaFileReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppUnBindUserReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
@@ -18,7 +19,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -80,7 +80,13 @@ public class AppBindUserController {
     public CommonResult<List<BindUserDO>> steamList(){
         return success(steamService.steamList());
     }
-
+    @PostMapping("/unBind")
+    @Operation(summary = "解绑steam")
+    @PreAuthenticated
+    public CommonResult<Integer> unBind(@RequestBody @Valid AppUnBindUserReqVO reqVO)  {
+        int i = steamService.unBind(reqVO);
+        return success(i);
+    }
     @PostMapping("/upload/mafile")
     @Operation(summary = "上传ma文件", description = "上传ma文件")
     @PreAuthenticated

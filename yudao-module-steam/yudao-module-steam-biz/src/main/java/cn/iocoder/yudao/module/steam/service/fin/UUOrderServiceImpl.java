@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.steam.service.fin;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
@@ -69,9 +69,8 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.temporal.TemporalField;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -364,40 +363,22 @@ public class UUOrderServiceImpl implements UUOrderService {
         YouyouCommodityDO youyouCommodityDO = UUCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
 
 
-//        SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
         //校验商品是否存在
         if (Objects.isNull(youyouCommodityDO)) {
             throw exception(ErrorCodeConstants.UU_GOODS_NOT_FOUND);
         }
-//        if(CommonStatusEnum.isDisable(sellingDO.getStatus())){
-//            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
-//        }
-//        if(CommonStatusEnum.isDisable(sellingDO.getStatus())){
-//            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
-//        }
-//        if(Objects.isNull(sellingDO.getBindUserId())){
+        if(CommonStatusEnum.isDisable(youyouCommodityDO.getStatus())){
+            throw exception(OpenApiCode.ERR_5299);
+        }
+//        if(Objects.isNull(youyouCommodityDO.getBindUserId())){
 //            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
 //        }
 //        if(invOrderDO.getUserId().equals(sellingDO.getUserId()) && invOrderDO.getUserType().equals(sellingDO.getUserType())){
 //            throw exception(ErrorCodeConstants.INVORDER_ORDERUSER_EXCEPT);
 //        }
-//        //检查是否可交易
-//        Optional<InvDescDO> first1 = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
-//                .eq(InvDescDO::getClassid, sellingDO.getClassid())
-//                .eq(InvDescDO::getInstanceid, sellingDO.getInstanceid())
-//                .eq(InvDescDO::getAppid, sellingDO.getAppid())
-//        ).stream().findFirst();
-//        if(!first1.isPresent()){
-//            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
-//        }
-//        InvDescDO invDescDO = first1.get();
-//        if(invDescDO.getTradable().intValue()!=1){
-//            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
-//        }
-//
 //        //库存状态为没有订单
         if(!InvTransferStatusEnum.SELL.getStatus().equals(youyouCommodityDO.getTransferStatus())){
-            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
+            throw exception(OpenApiCode.ERR_5214);
         }
 //        //使用库存的价格进行替换
         BigDecimal bigDecimal = new BigDecimal(youyouCommodityDO.getCommodityPrice());
@@ -411,7 +392,7 @@ public class UUOrderServiceImpl implements UUOrderService {
 //        //检查是否已经下过单
         List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
                         .eq(YouyouOrderDO::getRealCommodityId, youyouOrderDO.getRealCommodityId())
-//                .eq(InvOrderDO::getPayStatus, 1)
+                        .in(YouyouOrderDO::getPayStatus, Arrays.asList(PayOrderStatusEnum.WAITING.getStatus(),PayOrderStatusEnum.SUCCESS.getStatus()))
                         .isNull(YouyouOrderDO::getPayRefundId)
         );
         if(youyouOrderDOS.size()>0){
@@ -744,7 +725,7 @@ public class UUOrderServiceImpl implements UUOrderService {
      * 执行退款
      * @param youyouOrderDO
      */
-    private void refundAction(YouyouOrderDO youyouOrderDO,LoginUser loginUser) {
+    private void refundAction(YouyouOrderDO youyouOrderDO,LoginUser loginUser,String reason) {
         validateInvOrderCanRefund(youyouOrderDO,loginUser);
         // 2.1 生成退款单号
         // 一般来说，用户发起退款的时候，都会单独插入一个售后维权表，然后使用该表的 id 作为 refundId
@@ -755,7 +736,7 @@ public class UUOrderServiceImpl implements UUOrderService {
                 .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
                 .setMerchantOrderId(String.valueOf(youyouOrderDO.getId())) // 支付单号
                 .setMerchantRefundId(refundId)
-                .setReason("用户不想要了主动退单").setPrice(youyouOrderDO.getPayAmount()));// 价格信息
+                .setReason(reason).setPrice(youyouOrderDO.getPayAmount()));// 价格信息
         // 2.3 更新退款单到 demo 订单
         youyouOrderMapper.updateById(new YouyouOrderDO().setId(youyouOrderDO.getId())
                 .setPayRefundId(payRefundId).setRefundPrice(youyouOrderDO.getPayAmount()));
@@ -763,6 +744,9 @@ public class UUOrderServiceImpl implements UUOrderService {
         YouyouCommodityDO youyouCommodityDO = UUCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
         youyouCommodityDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
         UUCommodityMapper.updateById(youyouCommodityDO);
+    }
+    private void refundAction(YouyouOrderDO youyouOrderDO,LoginUser loginUser) {
+        refundAction(youyouOrderDO,loginUser,"用户不想要了主动退款");
     }
 
     private YouyouOrderDO validateInvOrderCanRefund(YouyouOrderDO youyouOrderDO,LoginUser loginUser) {
@@ -788,7 +772,13 @@ public class UUOrderServiceImpl implements UUOrderService {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUNDED);
         }
         //通过此接口可取消符合取消规则「创单成功后30min后卖家未发送交易报价」的代购订单。
-        if(Objects.nonNull(youyouOrderDO.getUuOrderNo()) && Objects.isNull(youyouOrderDO.getUuTradeOfferId())){
+        if(Objects.nonNull(youyouOrderDO.getUuOrderNo())){
+            //orderStatus,140的除 1101外其它状态不能取消，不能取消的还有340，280，360
+            if(Arrays.asList(UUOrderStatus.CODE140.getCode(),UUOrderStatus.CODE340.getCode(),UUOrderStatus.CODE280.getCode(),UUOrderStatus.CODE360.getCode()).contains(youyouOrderDO.getUuOrderStatus())){
+                if(!youyouOrderDO.getUuOrderStatus().equals(UUOrderSubStatus.SUB_CODE1104.getCode())){
+                    throw exception(ErrorCodeConstants.UU_GOODS_ORDER_CAN_NOT_CANCEL);
+                }
+            }
             Duration between = Duration.between(youyouOrderDO.getCreateTime(), LocalDateTime.now());
             if(between.getSeconds()<=30*60){//小于30分钟不能取消
                 throw exception(ErrorCodeConstants.UU_GOODS_ORDER_MIN_TIME);
@@ -871,6 +861,10 @@ public class UUOrderServiceImpl implements UUOrderService {
                     .setUuNotifyType(notifyVo.getNotifyType())
                     .setUuNotifyDesc(notifyVo.getNotifyDesc())
             );
+            if(notifyVo.getNotifyType()==4){
+                //订单被取消了，走退款
+                refundAction(youyouOrderDO,new LoginUser().setTenantId(1L).setUserType(youyouOrderDO.getUserType()).setId(youyouOrderDO.getUserId()));
+            }
         }
 
     }

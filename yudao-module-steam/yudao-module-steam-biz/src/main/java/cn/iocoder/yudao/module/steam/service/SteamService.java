@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.steam.service;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
@@ -14,6 +13,7 @@ import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.invdesc.vo.InvDescPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppUnBindUserReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
@@ -41,7 +41,6 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Steam相关接口
@@ -76,7 +75,6 @@ public class SteamService {
      * 帐号绑定
      * @param openApi
      * @return
-     * @throws Exception
      */
     public int bind(OpenApi openApi) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
@@ -96,6 +94,26 @@ public class SteamService {
                 .setSteamId(steamId);
 
         return bindUserMapper.insert(bindUserDO);
+    }
+    /**
+     * 帐号绑定
+     * @param reqVO 解绑ID
+     * @return
+     */
+    public int unBind(AppUnBindUserReqVO reqVO) {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        BindUserDO bindUserDO = bindUserMapper.selectById(reqVO.getBindId());
+        if(!bindUserDO.getUserId().equals(loginUser.getId())){
+            throw new ServiceException(-1,"无权限操作");
+        }
+        if(!bindUserDO.getUserType().equals(loginUser.getUserType())){
+            throw new ServiceException(-1,"无权限操作");
+        }
+        int i = bindUserMapper.deleteById(bindUserDO.getId());
+        if(i<0){
+            throw new ServiceException(-1,"操作失败");
+        }
+        return i;
     }
     public List<BindUserDO> steamList(){
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
