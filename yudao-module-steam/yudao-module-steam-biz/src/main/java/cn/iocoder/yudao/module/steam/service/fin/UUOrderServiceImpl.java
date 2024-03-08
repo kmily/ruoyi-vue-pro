@@ -72,6 +72,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.temporal.TemporalField;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -788,7 +789,13 @@ public class UUOrderServiceImpl implements UUOrderService {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUNDED);
         }
         //通过此接口可取消符合取消规则「创单成功后30min后卖家未发送交易报价」的代购订单。
-        if(Objects.nonNull(youyouOrderDO.getUuOrderNo()) && Objects.isNull(youyouOrderDO.getUuTradeOfferId())){
+        if(Objects.nonNull(youyouOrderDO.getUuOrderNo())){
+            //orderStatus,140的除 1101外其它状态不能取消，不能取消的还有340，280，360
+            if(Arrays.asList(UUOrderStatus.CODE140.getCode(),UUOrderStatus.CODE340.getCode(),UUOrderStatus.CODE280.getCode(),UUOrderStatus.CODE360.getCode()).contains(youyouOrderDO.getUuOrderStatus())){
+                if(!youyouOrderDO.getUuOrderStatus().equals(UUOrderSubStatus.SUB_CODE1104.getCode())){
+                    throw exception(ErrorCodeConstants.UU_GOODS_ORDER_CAN_NOT_CANCEL);
+                }
+            }
             Duration between = Duration.between(youyouOrderDO.getCreateTime(), LocalDateTime.now());
             if(between.getSeconds()<=30*60){//小于30分钟不能取消
                 throw exception(ErrorCodeConstants.UU_GOODS_ORDER_MIN_TIME);
