@@ -72,6 +72,7 @@ public class AppInventorySearchController {
             throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
         }
         invPageReqVO.setUserId(loginUser.getId());
+        invPageReqVO.setUserType(loginUser.getUserType());
         return success(steamInvService.getInvPage1(invPageReqVO));
     }
 
