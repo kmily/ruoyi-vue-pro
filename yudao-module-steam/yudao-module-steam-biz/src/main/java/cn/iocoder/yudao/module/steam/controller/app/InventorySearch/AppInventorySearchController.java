@@ -60,16 +60,16 @@ public class AppInventorySearchController {
      */
     @GetMapping("/after_SearchInDB")
     @Operation(summary = "从数据库中查询数据")
-    public CommonResult<InvDO> SearchInDB(@Valid InvPageReqVO invPageReqVO) {
+    public CommonResult<InvPageReqVO> SearchInDB(@Valid InvPageReqVO invPageReqVO) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         List<BindUserDO> collect = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                 .eq(BindUserDO::getUserId, loginUser.getId())
                 .eq(BindUserDO::getSteamId, invPageReqVO.getSteamId()));
-
 //        assert loginUser != null;
         if(collect.isEmpty()){
             throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
         }
+        invPageReqVO.setUserId(loginUser.getId());
         return success(steamInvService.getInvPage1(invPageReqVO));
     }
 

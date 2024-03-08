@@ -22,6 +22,7 @@ import cn.iocoder.yudao.module.steam.service.inv.InvService;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -301,23 +302,29 @@ public class SteamInvService {
         return steamInvUpdate;
     }
 
-    public InvDO getInvPage1(InvPageReqVO invPageReqVO){
+    // TODO
+    public InvPageReqVO getInvPage1(InvPageReqVO invPageReqVO){
+        // 用户库存
         PageResult<InvDO> invPage = invService.getInvPage(invPageReqVO);
-        InvDO invDO = new InvDO();
-        for(InvDO inv:invPage.getList()){
-            InvDescPageReqVO desc = new InvDescPageReqVO();
-            desc.setSteamId(inv.getSteamId());
-            desc.setClassid(inv.getClassid());
-            desc.setInstanceid(inv.getInstanceid());
-            PageResult<InvDescDO> invDescDOPageResult = invDescMapper.selectPage(desc);
-            invDO.setMarket_name(invDescDOPageResult.getList().get(0).getMarketName());
-            invDO.setPicture_url(invDescDOPageResult.getList().get(0).getIconUrl());
-            invDO.setStatus(inv.getStatus());
-            invDO.setPrice(inv.getPrice());
+        InvPageReqVO invPageReqVO1 = new InvPageReqVO();
+        InvDescRespVO invDescRespVO = new InvDescRespVO();
+
+        for(InvDO invDO : invPage.getList()){
+            // 价格   状态
+            invPageReqVO1.setPrice(invDO.getPrice());
+            invPageReqVO1.setStatus(invDO.getStatus());
+            invDescRespVO.setClassid(invDO.getClassid());
+            invDescRespVO.setInstanceid(invDO.getInstanceid());
+            List<InvDescDO> invDescDOS = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+                    .eq(InvDescDO::getClassid, invDO.getClassid())
+                    .eq(InvDescDO::getInstanceid, invDO.getInstanceid()));
+            invPageReqVO1.setPictureUrl(invDescDOS.get(0).getIconUrl());
+            invPageReqVO1.setMarketName(invDescDOS.get(0).getMarketName());
         }
-        return invDO;
+        return invPageReqVO1;
 
     }
+
 
 }
 

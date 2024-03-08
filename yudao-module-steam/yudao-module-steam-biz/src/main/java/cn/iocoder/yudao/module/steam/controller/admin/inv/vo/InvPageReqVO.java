@@ -56,10 +56,10 @@ public class InvPageReqVO extends PageParam {
     private Integer price;
 
     @Schema(description = "道具名称", example = "AUG")
-    private Integer market_name;
+    private String marketName;
 
     @Schema(description = "出售价格单价分", example = "3557")
-    private Integer picture_url;
+    private String pictureUrl;
 
 
 }
