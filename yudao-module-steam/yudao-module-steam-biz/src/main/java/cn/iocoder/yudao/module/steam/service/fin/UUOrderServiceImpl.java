@@ -742,7 +742,7 @@ public class UUOrderServiceImpl implements UUOrderService {
      * 执行退款
      * @param youyouOrderDO
      */
-    private void refundAction(YouyouOrderDO youyouOrderDO,LoginUser loginUser) {
+    private void refundAction(YouyouOrderDO youyouOrderDO,LoginUser loginUser,String reason) {
         validateInvOrderCanRefund(youyouOrderDO,loginUser);
         // 2.1 生成退款单号
         // 一般来说，用户发起退款的时候，都会单独插入一个售后维权表，然后使用该表的 id 作为 refundId
@@ -753,7 +753,7 @@ public class UUOrderServiceImpl implements UUOrderService {
                 .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
                 .setMerchantOrderId(String.valueOf(youyouOrderDO.getId())) // 支付单号
                 .setMerchantRefundId(refundId)
-                .setReason("用户不想要了主动退单").setPrice(youyouOrderDO.getPayAmount()));// 价格信息
+                .setReason(reason).setPrice(youyouOrderDO.getPayAmount()));// 价格信息
         // 2.3 更新退款单到 demo 订单
         youyouOrderMapper.updateById(new YouyouOrderDO().setId(youyouOrderDO.getId())
                 .setPayRefundId(payRefundId).setRefundPrice(youyouOrderDO.getPayAmount()));
@@ -761,6 +761,9 @@ public class UUOrderServiceImpl implements UUOrderService {
         YouyouCommodityDO youyouCommodityDO = UUCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
         youyouCommodityDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
         UUCommodityMapper.updateById(youyouCommodityDO);
+    }
+    private void refundAction(YouyouOrderDO youyouOrderDO,LoginUser loginUser) {
+        refundAction(youyouOrderDO,loginUser,"用户不想要了主动退款");
     }
 
     private YouyouOrderDO validateInvOrderCanRefund(YouyouOrderDO youyouOrderDO,LoginUser loginUser) {
@@ -875,6 +878,10 @@ public class UUOrderServiceImpl implements UUOrderService {
                     .setUuNotifyType(notifyVo.getNotifyType())
                     .setUuNotifyDesc(notifyVo.getNotifyDesc())
             );
+            if(notifyVo.getNotifyType()==4){
+                //订单被取消了，走退款
+                refundAction(youyouOrderDO,new LoginUser().setTenantId(1L).setUserType(youyouOrderDO.getUserType()).setId(youyouOrderDO.getUserId()));
+            }
         }
 
     }
