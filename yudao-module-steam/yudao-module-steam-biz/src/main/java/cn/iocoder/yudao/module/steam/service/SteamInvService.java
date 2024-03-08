@@ -4,8 +4,12 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.invdesc.vo.InvDescPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.invdesc.vo.InvDescRespVO;
+import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.InvPageReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
@@ -14,6 +18,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
+import cn.iocoder.yudao.module.steam.service.inv.InvService;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
@@ -54,16 +59,10 @@ public class SteamInvService {
     @Resource
     private SellingMapper sellingMapper;
 
-//    // 用户获得库存
-//    public InvDO AfterInventory(Long id, Long appid){
-//        BindUserDO bindUserDO = bindUserMapper.selectById(id);
-//        if (bindUserDO == null){
-//            throw new ServiceException(-1,"用户id错误，未查询到该用户的steam账户");
-//        }
-//        String steamid =  bindUserDO.getSteamId();
-//        List<InvDO> invDOS = invMapper.selectList().stream().filter(o -> o.getSteamId().equals(steamid)).collect(Collectors.toList());
-//        return (InvDO) invDOS;
-//    }
+    @Resource
+    private InvService invService;
+
+
 
     // 从steam线上获取库存
     public InventoryDto FistGetInventory(Long id, String appId) throws JsonProcessingException {
@@ -302,31 +301,33 @@ public class SteamInvService {
         return steamInvUpdate;
     }
 
-    /**
-     * @Discription 更新库存
-     * 1.查询steam_inv表里所有在售商品的数据
-     * 2.判断查询结果是否为空
-     * 3.查询steam接口中的库存数据
-     * 4.对比表中在售商品数据是否在steam接口中存在
-     * 5.如果存在，不做改变，如果不存在，则将steam_inv表中在售商品状态改为 1
-     *   TODO   接口优化，更新接口需要大量优化：遍历严重影响接口性能
-     */
-//    @NotNull
-//    private static InvDO InvUpdate1(PageResult<InvDO> invDOPageResult, InventoryDto.AssetsDTO item) {
-//        InvDO steamInvUpdate = new InvDO();
-//        // invDOPageResult: 本地库存信息
-//        List<InvDO> list = invDOPageResult.getList();
-//        // 对比本地库存和线上库存，如果本地库存中存在线上库存中不存在的，则将本地库存状态改为 1
-//        for(InvDO invDO: list){
-//            if(invDO.getClassid().equals(item.getClassid()) && invDO.getInstanceid().equals(item.getInstanceid())){
-//                LocalDateTime currentTime = LocalDateTime.now();
-//                steamInvUpdate.setUpdateTime(currentTime);
-//            } else {
-//                steamInvUpdate.setStatus(2);
-//            }
-//        }
-//        return steamInvUpdate;
-//    }
+    public InvDO getInvPage1(InvPageReqVO invPageReqVO){
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        List<BindUserDO> collect = bindUserMapper.selectList()
+                .stream()
+                .filter(o -> o.getSteamId().equals(invPageReqVO.getSteamId()))
+                .collect(Collectors.toList());
+        assert loginUser != null;
+        if(!(loginUser.getId()).equals(collect.get(0).getUserId())){
+            throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
+        }
+        // 图片   名字  价格
+        PageResult<InvDO> invPage = invService.getInvPage(invPageReqVO);
+        InvDO invDO = new InvDO();
+        for(InvDO inv:invPage.getList()){
+            InvDescPageReqVO desc = new InvDescPageReqVO();
+            desc.setSteamId(inv.getSteamId());
+            desc.setClassid(inv.getClassid());
+            desc.setInstanceid(inv.getInstanceid());
+            PageResult<InvDescDO> invDescDOPageResult = invDescMapper.selectPage(desc);
+            invDO.setMarket_name(invDescDOPageResult.getList().get(0).getMarketName());
+            invDO.setPicture_url(invDescDOPageResult.getList().get(0).getIconUrl());
+            invDO.setStatus(inv.getStatus());
+            invDO.setPrice(inv.getPrice());
+        }
+        return invDO;
+
+    }
 
 }
 
