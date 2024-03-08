@@ -36,7 +36,7 @@ public class NoticeDO extends BaseDO {
     /**
      * 公告内容
      */
-    private String content;
+    private byte[] content;
     /**
      * 公告状态
      *

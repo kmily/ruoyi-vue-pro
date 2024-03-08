@@ -38,7 +38,6 @@ public class NoticeController {
 
     @PostMapping("/create")
     @Operation(summary = "创建通知公告")
-    @OperateLog(enable = false)
     @PreAuthorize("@ss.hasPermission('system:notice:create')")
     public CommonResult<Long> createNotice(@Valid @RequestBody NoticeSaveReqVO createReqVO) {
         Long noticeId = noticeService.createNotice(createReqVO);
@@ -48,7 +47,6 @@ public class NoticeController {
     @PutMapping("/update")
     @Operation(summary = "修改通知公告")
     @PreAuthorize("@ss.hasPermission('system:notice:update')")
-    @OperateLog(enable = false)
     public CommonResult<Boolean> updateNotice(@Valid @RequestBody NoticeSaveReqVO updateReqVO) {
         noticeService.updateNotice(updateReqVO);
         return success(true);
