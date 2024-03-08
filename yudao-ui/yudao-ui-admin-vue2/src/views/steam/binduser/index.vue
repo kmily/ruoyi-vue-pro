@@ -2,7 +2,7 @@
   <div class="app-container">
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="steam名" prop="steamName">
+      <el-form-item label="steam名称" prop="steamName">
         <el-input v-model="queryParams.steamName" placeholder="请输入steam名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="用户ID" prop="userId">
@@ -11,9 +11,24 @@
       <el-form-item label="SteamId" prop="steamId">
         <el-input v-model="queryParams.steamId" placeholder="请输入SteamId" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
+      <el-form-item label="交易链接" prop="tradeUrl">
+        <el-input v-model="queryParams.tradeUrl" placeholder="请输入交易链接" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="API KEY" prop="apiKey">
+        <el-input v-model="queryParams.apiKey" placeholder="请输入API KEY" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="备注" prop="remark">
+        <el-input v-model="queryParams.remark" placeholder="请输入备注" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
       <el-form-item label="创建时间" prop="createTime">
         <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
                         range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
+      </el-form-item>
+      <el-form-item label="登录过后的cookie" prop="loginCookie">
+        <el-input v-model="queryParams.loginCookie" placeholder="请输入登录过后的cookie" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="地址池id" prop="addressId">
+        <el-input v-model="queryParams.addressId" placeholder="请输入地址池id" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -24,6 +39,10 @@
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
+        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="openForm(undefined)"
+                   v-hasPermi="['steam:bind-user:create']">新增</el-button>
+      </el-col>
+      <el-col :span="1.5">
         <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
                    v-hasPermi="['steam:bind-user:export']">导出</el-button>
       </el-col>
@@ -31,17 +50,29 @@
     </el-row>
 
             <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
-            <el-table-column label="ID" align="center" prop="id" />
-            <el-table-column label="steam名" align="center" prop="steamName" />
+            <el-table-column label="steam名称" align="center" prop="steamName" />
       <el-table-column label="用户ID" align="center" prop="userId" />
       <el-table-column label="SteamId" align="center" prop="steamId" />
       <el-table-column label="交易链接" align="center" prop="tradeUrl" />
+      <el-table-column label="API KEY" align="center" prop="apiKey" />
+      <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-
+      <el-table-column label="maFile文件" align="center" prop="maFile" />
+      <el-table-column label="ID" align="center" prop="id" />
+      <el-table-column label="登录过后的cookie" align="center" prop="loginCookie" />
+      <el-table-column label="地址池id" align="center" prop="addressId" />
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+        <template v-slot="scope">
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
+                     v-hasPermi="['steam:bind-user:update']">修改</el-button>
+          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
+                     v-hasPermi="['steam:bind-user:delete']">删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <!-- 分页组件 -->
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
@@ -89,6 +120,8 @@ export default {
         remark: null,
         createTime: [],
         maFile: null,
+        loginCookie: null,
+        addressId: null,
       },
             };
   },
@@ -145,4 +178,4 @@ export default {
     },
               }
 };
-</script>
+</script>

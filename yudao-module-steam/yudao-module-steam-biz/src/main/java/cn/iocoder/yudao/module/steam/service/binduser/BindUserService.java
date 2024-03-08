@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.module.steam.service.binduser;
 
 import java.util.*;
-import javax.validation.*;
 import cn.iocoder.yudao.module.steam.controller.admin.binduser.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+
+import javax.validation.Valid;
 
 /**
  *  steam用户绑定 Service 接口

@@ -2,8 +2,10 @@ package cn.iocoder.yudao.module.steam.controller.admin.binduser.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.*;
-import javax.validation.constraints.*;
 
 @Schema(description = "管理后台 -  steam用户绑定新增/修改 Request VO")
 @Data
@@ -37,5 +39,11 @@ public class BindUserSaveReqVO {
 
     @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "32702")
     private Long id;
+
+    @Schema(description = "登录过后的cookie")
+    private String loginCookie;
+
+    @Schema(description = "地址池id", example = "28016")
+    private Long addressId;
 
 }

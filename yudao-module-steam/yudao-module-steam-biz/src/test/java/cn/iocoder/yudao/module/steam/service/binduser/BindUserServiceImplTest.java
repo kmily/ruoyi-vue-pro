@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import javax.annotation.Resource;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 
@@ -13,8 +12,9 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
-import javax.annotation.Resource;
 import org.springframework.context.annotation.Import;
+
+import javax.annotation.Resource;
 import java.util.*;
 import java.time.LocalDateTime;
 
@@ -118,6 +118,8 @@ public class BindUserServiceImplTest extends BaseDbUnitTest {
            o.setRemark(null);
            o.setCreateTime(null);
            o.setMaFile(null);
+           o.setLoginCookie(null);
+           o.setAddressId(null);
        });
        bindUserMapper.insert(dbBindUser);
        // 测试 steamName 不匹配
@@ -136,6 +138,10 @@ public class BindUserServiceImplTest extends BaseDbUnitTest {
        bindUserMapper.insert(cloneIgnoreId(dbBindUser, o -> o.setCreateTime(null)));
        // 测试 maFile 不匹配
        bindUserMapper.insert(cloneIgnoreId(dbBindUser, o -> o.setMaFile(null)));
+       // 测试 loginCookie 不匹配
+       bindUserMapper.insert(cloneIgnoreId(dbBindUser, o -> o.setLoginCookie(null)));
+       // 测试 addressId 不匹配
+       bindUserMapper.insert(cloneIgnoreId(dbBindUser, o -> o.setAddressId(null)));
        // 准备参数
        BindUserPageReqVO reqVO = new BindUserPageReqVO();
        reqVO.setSteamName(null);
@@ -146,6 +152,8 @@ public class BindUserServiceImplTest extends BaseDbUnitTest {
        reqVO.setRemark(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
        reqVO.setMaFile(null);
+       reqVO.setLoginCookie(null);
+       reqVO.setAddressId(null);
 
        // 调用
        PageResult<BindUserDO> pageResult = bindUserService.getBindUserPage(reqVO);

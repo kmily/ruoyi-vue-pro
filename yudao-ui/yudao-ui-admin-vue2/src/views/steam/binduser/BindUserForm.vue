@@ -27,6 +27,12 @@
                     <el-form-item label="maFile文件">
                       <FileUpload v-model="formData.maFile"/>
                     </el-form-item>
+                    <el-form-item label="登录过后的cookie" prop="loginCookie">
+                      <el-input v-model="formData.loginCookie" placeholder="请输入登录过后的cookie" />
+                    </el-form-item>
+                    <el-form-item label="地址池id" prop="addressId">
+                      <el-input v-model="formData.addressId" placeholder="请输入地址池id" />
+                    </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm" :disabled="formLoading">确 定</el-button>
@@ -63,6 +69,8 @@
                             steamPassword: undefined,
                             maFile: undefined,
                             id: undefined,
+                            loginCookie: undefined,
+                            addressId: undefined,
         },
         // 表单校验
         formRules: {
@@ -125,6 +133,8 @@
                             steamPassword: undefined,
                             maFile: undefined,
                             id: undefined,
+                            loginCookie: undefined,
+                            addressId: undefined,
         };
         this.resetForm("formRef");
       }

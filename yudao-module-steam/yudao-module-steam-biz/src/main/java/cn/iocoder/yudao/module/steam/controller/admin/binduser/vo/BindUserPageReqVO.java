@@ -40,4 +40,10 @@ public class BindUserPageReqVO extends PageParam {
     @Schema(description = "maFile文件")
     private String maFile;
 
+    @Schema(description = "登录过后的cookie")
+    private String loginCookie;
+
+    @Schema(description = "地址池id", example = "28016")
+    private Long addressId;
+
 }
