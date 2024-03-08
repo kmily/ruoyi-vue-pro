@@ -103,14 +103,14 @@ public class SteamWeb {
                 SteamCookie steamCookie = objectMapper.readValue(proxyResponseVo.getHtml(), SteamCookie.class);
                 if (steamCookie.getCode() != 0) {
                     log.error("Steam通讯失败{}", steamCookie);
-                    throw new ServiceException(-1, "Steam通讯失败" + steamCookie.getMsg());
+                    throw new ServiceException(-1, steamCookie.getMsg());
                 }
                 cookieString = steamCookie.getData().getCookie();
             }else{
-                throw new ServiceException(-1,"Steam通讯失败");
+                throw new ServiceException(-1,"通讯失败");
             }
         }catch (Exception e){
-            throw new ServiceException(-1,"Steam通讯失败"+e.getMessage());
+            throw new ServiceException(-1,"登录失败原因："+e.getMessage());
         }
         initApiKey();
     }
