@@ -9,10 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Cookie;
-import okhttp3.OkHttpClient;
 
-import javax.annotation.Resource;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
@@ -26,7 +23,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,6 +58,16 @@ public class SteamWeb {
      */
     @Getter
     private Optional<String> treadUrl = Optional.empty();
+    /**
+     * steam用户名
+     */
+    @Getter
+    private Optional<String> steamName = Optional.empty();
+    /**
+     * steam用户名头像
+     */
+    @Getter
+    private Optional<String> steamAvatar = Optional.empty();
 
 
     private ConfigService configService;
@@ -90,7 +96,7 @@ public class SteamWeb {
         builder.url(configByKey.getValue()+"login");
 //        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
 //        builder.url(configByKey.getValue()+"login");
-////        builder.url("http://127.0.0.1:25852/login");
+//        builder.url("http://172.17.0.2:25852/login");
 //        builder.method(HttpUtil.Method.FORM);
         HashMap<String, String> stringStringHashMap = new HashMap<>();
         stringStringHashMap.put("username", steamMaFile.getAccountName());
@@ -154,6 +160,20 @@ public class SteamWeb {
             cookieString += ";sessionid=" + sessionid;
         } else {
             throw new ServiceException(-1, "获取sesionID失败");
+        }
+
+        //提取用户名
+        String regex2="(?<=user_avatar playerAvatar offline\" aria-label=\"查看您的个人资料\">\\s{0,20}<img src=\")(.*?)(?=\">)";
+        Pattern patternUser = Pattern.compile(regex2, Pattern.DOTALL);
+        Matcher matcherUser = patternUser.matcher(proxyResponseVo.getHtml());
+        if (matcherUser.find()) {
+            String imgSrc = matcherUser.group(1);
+            String[] split = imgSrc.split("\" alt=\"");
+            if(split.length>=2){
+                String s = split[0].replaceAll(".jpg", "_full.jpg").replaceAll(".png", "_full.png");
+                steamName= Optional.ofNullable(split[1]);
+                steamAvatar= Optional.ofNullable(s);
+            }
         }
     }
 
@@ -532,19 +552,22 @@ public class SteamWeb {
 //        SteamWeb steamWeb = new SteamWeb(null);
 //        try {
 //            SteamMaFile steamMaFile = steamWeb.objectMapper.readValue(maFileString, SteamMaFile.class);
-//            steamWeb.login("QFhG9jSs", steamMaFile);
-////            TradeUrlStatus tradeUrlStatus = steamWeb.checkTradeUrl("https://steamcommunity.com/tradeoffer/new/?partner=66353311&token=EOt4K8X5");
-////            steamWeb.initApiKey();
-//            String tradeUrl = "https://steamcommunity.com/tradeoffer/new/?partner=1440000356&token=5_JGX9AA";
-//            SteamInvDto steamInvDto = new SteamInvDto();
-//            steamInvDto.setAppid(730);
-//            steamInvDto.setContextid("2");
-//            steamInvDto.setAssetid("35965237262");
-//            steamInvDto.setInstanceid("302028390");
-//            steamInvDto.setClassid("5729789337");
-//            steamInvDto.setAmount("1");
-//            SteamTradeOfferResult trade = steamWeb.trade(steamInvDto, tradeUrl);
-//            log.info("将临信息{}", trade);
+////            steamWeb.login("QFhG9jSs", steamMaFile);
+//            steamWeb.initApiKey();
+//            log.info(steamWeb.steamName.get());
+//            log.info(steamWeb.steamAvatar.get());
+//////            TradeUrlStatus tradeUrlStatus = steamWeb.checkTradeUrl("https://steamcommunity.com/tradeoffer/new/?partner=66353311&token=EOt4K8X5");
+//////            steamWeb.initApiKey();
+////            String tradeUrl = "https://steamcommunity.com/tradeoffer/new/?partner=1440000356&token=5_JGX9AA";
+////            SteamInvDto steamInvDto = new SteamInvDto();
+////            steamInvDto.setAppid(730);
+////            steamInvDto.setContextid("2");
+////            steamInvDto.setAssetid("35965237262");
+////            steamInvDto.setInstanceid("302028390");
+////            steamInvDto.setClassid("5729789337");
+////            steamInvDto.setAmount("1");
+////            SteamTradeOfferResult trade = steamWeb.trade(steamInvDto, tradeUrl);
+////            log.info("将临信息{}", trade);
 //        } catch (JsonProcessingException e) {
 //            e.printStackTrace();
 //        }

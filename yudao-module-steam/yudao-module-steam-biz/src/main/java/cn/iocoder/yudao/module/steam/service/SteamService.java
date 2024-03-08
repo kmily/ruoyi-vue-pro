@@ -159,7 +159,12 @@ public class SteamService {
         bindUserDO.setSteamPassword(password);
         bindUserDO.setMaFile(steamMaFile);
         bindUserDO.setTradeUrl(steamWeb.getTreadUrl().get());
-        bindUserDO.setSteamName(steamMaFile.getAccountName());
+        if(steamWeb.getSteamName().isPresent()) {
+            bindUserDO.setSteamName(steamWeb.getSteamName().get());
+        }
+        if(steamWeb.getSteamAvatar().isPresent()){
+            bindUserDO.setAvatarUrl(steamWeb.getSteamAvatar().get());
+        }
         // 用户修改了密码，需要重新绑定ma文件
         InvPageReqVO invPageReqVO = new InvPageReqVO();
         invPageReqVO.setSteamId(bindUserDO.getSteamId());
