@@ -262,7 +262,7 @@ public class SteamService {
                 invDescDO.setInstanceid(item.getInstanceid());
                 invDescDO.setCurrency(item.getCurrency());
                 invDescDO.setBackgroundColor(item.getBackgroundColor());
-                invDescDO.setIconUrl(item.getIconUrl());
+                invDescDO.setIconUrl("https://community.steamstatic.com/economy/image/"+item.getIconUrl());
                 invDescDO.setIconUrlLarge(item.getIconUrlLarge());
                 invDescDO.setDescriptions(item.getDescriptions());
                 invDescDO.setTradable(item.getTradable());

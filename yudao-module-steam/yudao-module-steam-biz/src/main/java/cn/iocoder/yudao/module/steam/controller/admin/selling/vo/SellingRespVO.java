@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.steam.controller.admin.selling.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+
+import java.io.Serializable;
 import java.util.*;
 import java.util.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -11,7 +13,7 @@ import com.alibaba.excel.annotation.*;
 @Schema(description = "管理后台 - 在售饰品 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class SellingRespVO {
+public class SellingRespVO implements Serializable {
 
     @Schema(description = "Primary Key", requiredMode = Schema.RequiredMode.REQUIRED, example = "27975")
     @ExcelProperty("Primary Key")
@@ -80,5 +82,14 @@ public class SellingRespVO {
     @Schema(description = "库存表id", example = "23726")
     @ExcelProperty("库存表id")
     private Long invId;
+
+    @Schema(description = "商品图片", example = "23726")
+    @ExcelProperty("图片")
+    private String iconUrl;
+
+
+    @Schema(description = "武器名称", example = "23726")
+    @ExcelProperty("武器名称")
+    private String marketName;
 
 }
