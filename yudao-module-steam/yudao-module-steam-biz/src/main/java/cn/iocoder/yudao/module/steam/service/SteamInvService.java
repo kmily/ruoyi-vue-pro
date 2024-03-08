@@ -86,6 +86,7 @@ public class SteamInvService {
         for (InventoryDto.AssetsDTO item:json.getAssets()) {
             // steamid 和 绑定平台用户id 联合查询当前用户steam_inv的所有库存信息
             Long userId = bindUserDO.getUserId();
+
             InvPageReqVO steamInv= new InvPageReqVO();
             steamInv.setSteamId(bindUserDO.getSteamId());
             // invDOPageResult: 当前用户steam_inv的所有库存信息
@@ -108,7 +109,7 @@ public class SteamInvService {
             } else {
                 // 插入库存
                 String steamId = bindUserDO.getSteamId();
-                InvDO steamInvInsert = getInvDO(item,userId,steamId,id);
+                InvDO steamInvInsert = getInvDO(item,bindUserDO.getUserId(),steamId,bindUserDO.getId());
                 invMapper.insert(steamInvInsert);
             }
         }
@@ -261,8 +262,9 @@ public class SteamInvService {
         steamInvInsert.setAmount(item.getAmount());
         // 第一次入库，所有道具均为未起售状态 0
         steamInvInsert.setTransferStatus(0);
-        steamInvInsert.setBindUserId(userId);
-        steamInvInsert.setUserId(id);
+        // 用户表id
+        steamInvInsert.setBindUserId(id);
+        steamInvInsert.setUserId(userId);
         steamInvInsert.setUserType(1);
         steamInvInsert.setContextid(item.getContextid());
         return steamInvInsert;
