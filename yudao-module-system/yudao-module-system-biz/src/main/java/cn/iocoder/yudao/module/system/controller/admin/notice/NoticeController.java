@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.infra.api.websocket.WebSocketSenderApi;
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeSaveReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeVo;
 import cn.iocoder.yudao.module.system.dal.dataobject.notice.NoticeDO;
 import cn.iocoder.yudao.module.system.service.notice.NoticeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -75,7 +76,9 @@ public class NoticeController {
     @PreAuthorize("@ss.hasPermission('system:notice:query')")
     public CommonResult<NoticeRespVO> getNotice(@RequestParam("id") Long id) {
         NoticeDO notice = noticeService.getNotice(id);
-        return success(BeanUtils.toBean(notice, NoticeRespVO.class));
+        NoticeRespVO noticeRespVO = BeanUtils.toBean(notice, NoticeRespVO.class);
+        noticeRespVO.setContent(new String(notice.getContent()));
+        return success(noticeRespVO);
     }
 
     @PostMapping("/push")
@@ -85,8 +88,10 @@ public class NoticeController {
     public CommonResult<Boolean> push(@RequestParam("id") Long id) {
         NoticeDO notice = noticeService.getNotice(id);
         Assert.notNull(notice, "公告不能为空");
+        NoticeVo noticeVo = BeanUtils.toBean(notice, NoticeVo.class);
+        noticeVo.setContent(new String(notice.getContent()));
         // 通过 websocket 推送给在线的用户
-        webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), "notice-push", notice);
+        webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), "notice-push", noticeVo);
         return success(true);
     }
 
