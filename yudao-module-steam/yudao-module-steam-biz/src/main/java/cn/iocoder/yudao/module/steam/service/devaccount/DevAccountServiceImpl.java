@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.service.devaccount;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
@@ -86,14 +87,15 @@ public class DevAccountServiceImpl implements DevAccountService {
         List<DevAccountDO> devAccountDOS = devAccountMapper.selectList(
                 new LambdaQueryWrapperX<DevAccountDO>().eq(DevAccountDO::getUserId, loginUser1.getId())
                         .eq(DevAccountDO::getUserType, loginUser1.getUserType()));
-
         if (devAccountDOS.size() > 0) {
             //  修改
+            if (CommonStatusEnum.isDisable(devAccountDOS.get(0).getStatus())) {
+                throw exception(DEV_ACCOUNT_DISABLE);
+            }
             DevAccountDO devAccountDO = new DevAccountDO();
             devAccountDO.setApiPublicKey(createReqVO.getApiPublicKey());
             devAccountDO.setId(devAccountDOS.get(0).getId());
             devAccountMapper.updateById(devAccountDO);
-
             return devAccountDO.getId().toString();
         } else {
             //  新增
@@ -103,13 +105,13 @@ public class DevAccountServiceImpl implements DevAccountService {
             createReqVO.setUserId(loginUser.getId());
             createReqVO.setStatus(0);
             DevAccountDO devAccount = BeanUtils.toBean(createReqVO, DevAccountDO.class);
+            devAccount.setStatus(CommonStatusEnum.DISABLE.getStatus());
             devAccountMapper.insert(devAccount);
             // 返回
             return devAccount.getId().toString();
         }
 
     }
-
 
 
     @Override
