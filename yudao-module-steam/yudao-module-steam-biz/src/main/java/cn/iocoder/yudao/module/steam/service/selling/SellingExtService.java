@@ -56,7 +56,7 @@ public class SellingExtService {
                 .eqIfPresent(InvDO::getUserType, loginUser.getUserType())
                 .eq(InvDO::getUserId, loginUser.getId()));
         if (invDOS.isEmpty()) {
-            throw new ServiceException(-1, "请检查绑定用户和steam用户");
+            throw new ServiceException(-1, "操作异常，没有权限");
         }
 
         // 获取用户和在售列表匹配
