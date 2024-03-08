@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.steam.controller.app.InventorySearch;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
@@ -13,7 +12,6 @@ import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.service.SteamInvService;
-import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.inv.InvService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,9 +26,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -57,12 +53,13 @@ public class AppInventorySearchController {
 
     /**
      * 用户手动查询自己的 steam_inv 库存（从数据库中获取数据）
+     *
      * @param invPageReqVO steamid
      * @return
      */
     @GetMapping("/after_SearchInDB")
     @Operation(summary = "从数据库中查询数据")
-    public CommonResult<PageResult<InvDO>> SearchInDB(@Valid InvPageReqVO invPageReqVO) {
+    public CommonResult<InvDO> SearchInDB(@Valid InvPageReqVO invPageReqVO) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         List<BindUserDO> collect = bindUserMapper.selectList()
                 .stream()
@@ -72,8 +69,7 @@ public class AppInventorySearchController {
         if(!(loginUser.getId()).equals(collect.get(0).getUserId())){
             throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
         }
-        PageResult<InvDO> invPage = invService.getInvPage(invPageReqVO);
-        return success(invPage);
+        return success(steamInvService.getInvPage1(invPageReqVO));
     }
 
 
