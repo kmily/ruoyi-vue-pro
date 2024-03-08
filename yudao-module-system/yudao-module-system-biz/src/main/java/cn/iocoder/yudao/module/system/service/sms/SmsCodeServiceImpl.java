@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.system.service.sms;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeSendReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeValidateReqDTO;
@@ -15,6 +17,9 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Date;
+import java.util.List;
 
 import static cn.hutool.core.util.RandomUtil.randomInt;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -61,6 +66,14 @@ public class SmsCodeServiceImpl implements SmsCodeService {
             if (isToday(lastSmsCode.getCreateTime()) && // 必须是今天，才能计算超过当天的上限
                     lastSmsCode.getTodayIndex() >= smsCodeProperties.getSendMaximumQuantityPerDay()) { // 超过当天发送的上限。
                 throw exception(SMS_CODE_EXCEED_SEND_MAXIMUM_QUANTITY_PER_DAY);
+            }
+            LocalDateTime currentDateTime = LocalDateTime.now();
+            Long aLong = smsCodeMapper.selectCount(new LambdaQueryWrapperX<SmsCodeDO>()
+                    .eq(SmsCodeDO::getCreateIp, ip)
+                    .geIfPresent(SmsCodeDO::getCreateTime, currentDateTime.toLocalDate().atTime(LocalTime.MIDNIGHT))
+            );
+            if (aLong >= smsCodeProperties.getSendMaximumQuantityPerDayIp()) { // 超过当天发送的上限。
+                throw exception(SMS_CODE_EXCEED_SEND_MAXIMUM_QUANTITY_PER_DAY_IP);
             }
             // TODO 芋艿：提升，每个 IP 每天可发送数量
             // TODO 芋艿：提升，每个 IP 每小时可发送数量
