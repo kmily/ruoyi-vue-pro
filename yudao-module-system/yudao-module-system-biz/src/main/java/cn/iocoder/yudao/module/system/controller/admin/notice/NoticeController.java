@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.infra.api.websocket.WebSocketSenderApi;
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeRespVO;
@@ -37,6 +38,7 @@ public class NoticeController {
 
     @PostMapping("/create")
     @Operation(summary = "创建通知公告")
+    @OperateLog(enable = false)
     @PreAuthorize("@ss.hasPermission('system:notice:create')")
     public CommonResult<Long> createNotice(@Valid @RequestBody NoticeSaveReqVO createReqVO) {
         Long noticeId = noticeService.createNotice(createReqVO);
@@ -46,6 +48,7 @@ public class NoticeController {
     @PutMapping("/update")
     @Operation(summary = "修改通知公告")
     @PreAuthorize("@ss.hasPermission('system:notice:update')")
+    @OperateLog(enable = false)
     public CommonResult<Boolean> updateNotice(@Valid @RequestBody NoticeSaveReqVO updateReqVO) {
         noticeService.updateNotice(updateReqVO);
         return success(true);
