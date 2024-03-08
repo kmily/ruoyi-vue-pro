@@ -110,7 +110,7 @@ public class SteamWeb {
                 throw new ServiceException(-1,"Steam通讯失败");
             }
         }catch (Exception e){
-            throw new ServiceException(-1,"Steam通讯失败");
+            throw new ServiceException(-1,"Steam通讯失败"+e.getMessage());
         }
         initApiKey();
     }
