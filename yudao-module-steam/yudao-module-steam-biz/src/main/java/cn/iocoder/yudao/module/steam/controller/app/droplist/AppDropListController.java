@@ -19,6 +19,7 @@ import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewService;
 import cn.iocoder.yudao.module.steam.service.selexterior.SelExteriorService;
 import cn.iocoder.yudao.module.steam.service.selitemset.SelItemsetService;
 import cn.iocoder.yudao.module.steam.service.selling.SellingService;
+import cn.iocoder.yudao.module.steam.service.selling.SellingsearchService;
 import cn.iocoder.yudao.module.steam.service.selquality.SelQualityService;
 import cn.iocoder.yudao.module.steam.service.selrarity.SelRarityService;
 import cn.iocoder.yudao.module.steam.service.seltype.SelTypeService;
@@ -32,6 +33,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -56,6 +59,8 @@ public class AppDropListController {
     private InvPreviewService invPreviewService;
     @Resource
     private SellingService sellingService;
+    @Resource
+    private SellingsearchService sellingsearchService;
 
 
     /**
@@ -142,10 +147,11 @@ public class AppDropListController {
 
     @GetMapping("/search")
     @Operation(summary = "饰品在售预览")
-    public  CommonResult<PageResult<SellingRespVO>> getPreview(SellingPageReqVO sellingReqVo){
+    public  CommonResult<SellingRespVO> getPreview(SellingPageReqVO sellingReqVo){
         sellingReqVo.setPageSize(200);
-        PageResult<SellingDO> preview = sellingService.getSellingPage(sellingReqVo);
-        return success(BeanUtils.toBean(preview, SellingRespVO.class));
+//        PageResult<SellingDO> preview = sellingService.getSellingPage(sellingReqVo);
+        SellingRespVO sellingRespVO = sellingsearchService.sellingPageSearch(sellingReqVo);
+        return CommonResult.success(sellingRespVO);
     }
 
     @GetMapping("/search/view")
