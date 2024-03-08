@@ -61,5 +61,5 @@ public class InvPageReqVO extends PageParam {
     @Schema(description = "出售价格单价分", example = "3557")
     private String pictureUrl;
 
-
+    private Long id;
 }

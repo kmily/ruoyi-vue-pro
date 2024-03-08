@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -61,7 +62,7 @@ public class AppInventorySearchController {
      */
     @GetMapping("/after_SearchInDB")
     @Operation(summary = "从数据库中查询数据")
-    public CommonResult<InvPageReqVO> SearchInDB(@Valid InvPageReqVO invPageReqVO) {
+    public CommonResult<List<InvPageReqVO>> SearchInDB(@Valid InvPageReqVO invPageReqVO) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         List<BindUserDO> collect = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                 .eq(BindUserDO::getUserId, loginUser.getId())
@@ -73,7 +74,7 @@ public class AppInventorySearchController {
         }
         invPageReqVO.setBindUserId(loginUser.getId());
         invPageReqVO.setUserType(loginUser.getUserType());
-        return success(steamInvService.getInvPage1(invPageReqVO));
+        return success(Collections.singletonList(steamInvService.getInvPage1(invPageReqVO)));
     }
 
 

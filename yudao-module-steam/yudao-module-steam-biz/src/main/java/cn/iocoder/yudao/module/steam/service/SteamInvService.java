@@ -309,7 +309,9 @@ public class SteamInvService {
         InvPageReqVO invPageReqVO1 = new InvPageReqVO();
 
         for(InvDO invDO : invPage.getList()){
+
             // 价格   状态
+            invPageReqVO1.setId(invDO.getId());
             invPageReqVO1.setPrice(invDO.getPrice());
             invPageReqVO1.setStatus(invDO.getStatus());
             invPageReqVO1.setClassid(invDO.getClassid());
@@ -326,29 +328,29 @@ public class SteamInvService {
 
 
 
-    // 修改getInvPage1接口
-    public List<InvPageReqVO> getInvPage2(InvPageReqVO invPageReqVO){
-        // 用户库存
-        PageResult<InvDO> invPage = invService.getInvPage(invPageReqVO);
-        List<InvDescDO> invDescDOS1 = invDescMapper.selectList();
-
-        ArrayList<InvPageReqVO> invPageReqVO1 = new ArrayList<>();
-
-        for(InvDO invDO : invPage.getList()){
-            // 价格   状态
-            InvPageReqVO invPageReqVO11 = new InvPageReqVO();
-            invPageReqVO11.setPrice(invDO.getPrice());
-            invPageReqVO11.setStatus(invDO.getStatus());
-            invPageReqVO11.setClassid(invDO.getClassid());
-            invPageReqVO11.setInstanceid(invDO.getInstanceid());
-
-
-        }
-
-
-
-        return invPageReqVO1;
-    }
+//    // 修改getInvPage1接口
+//    public List<InvPageReqVO> getInvPage2(InvPageReqVO invPageReqVO){
+//        // 用户库存
+//        PageResult<InvDO> invPage = invService.getInvPage(invPageReqVO);
+//        List<InvDescDO> invDescDOS1 = invDescMapper.selectList();
+//
+//        ArrayList<InvPageReqVO> invPageReqVO1 = new ArrayList<>();
+//
+//        for(InvDO invDO : invPage.getList()){
+//            // 价格   状态
+//            InvPageReqVO invPageReqVO11 = new InvPageReqVO();
+//            invPageReqVO11.setPrice(invDO.getPrice());
+//            invPageReqVO11.setStatus(invDO.getStatus());
+//            invPageReqVO11.setClassid(invDO.getClassid());
+//            invPageReqVO11.setInstanceid(invDO.getInstanceid());
+//
+//
+//        }
+//
+//
+//
+//        return invPageReqVO1;
+//    }
 
 
 }
