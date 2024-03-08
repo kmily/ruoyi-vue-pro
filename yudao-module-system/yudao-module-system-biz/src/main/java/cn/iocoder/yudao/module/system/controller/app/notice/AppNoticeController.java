@@ -24,7 +24,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RestController
 @RequestMapping("/system/notice")
 @Validated
-public class NoticeController {
+public class AppNoticeController {
 
     @Resource
     private NoticeService noticeService;
