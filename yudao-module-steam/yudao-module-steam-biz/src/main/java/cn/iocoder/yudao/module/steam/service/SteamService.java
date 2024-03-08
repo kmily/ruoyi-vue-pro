@@ -27,6 +27,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.steam.*;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -332,6 +333,15 @@ public class SteamService {
                     invDescDO.setSelExterior(tagsDTO.getInternalName());
                 }
                 invDescMapper.insert(invDescDO);
+                List<InvDescDO> invDescDOS1 = invDescMapper.selectList(new QueryWrapper<InvDescDO>().eq("instanceid", item.getInstanceid()).eq("classid", item.getClassid()));
+                if(Objects.nonNull(invDescDOS1) && invDescDOS1.size()>0){
+                    InvDO invDO = new InvDO();
+                    invDO.setInvDescId(invDescDOS1.get(0).getId());
+                    invDO.setInstanceid(item.getInstanceid());
+                    invDO.setClassid(item.getClassid());
+                    invMapper.update(invDO,new UpdateWrapper<InvDO>().eq("instanceid",item.getInstanceid()).eq("classid",item.getClassid()));
+
+                }
             }
         }
     }

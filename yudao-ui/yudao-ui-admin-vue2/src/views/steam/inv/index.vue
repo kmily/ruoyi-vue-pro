@@ -2,53 +2,17 @@
   <div class="app-container">
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="classid" prop="classid">
-        <el-input v-model="queryParams.classid" placeholder="请输入classid" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="instanceid" prop="instanceid">
-        <el-input v-model="queryParams.instanceid" placeholder="请输入instanceid" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="amount" prop="amount">
-        <el-input v-model="queryParams.amount" placeholder="请输入amount" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="创建时间" prop="createTime">
-        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
-                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
-      </el-form-item>
       <el-form-item label="steamId" prop="steamId">
         <el-input v-model="queryParams.steamId" placeholder="请输入steamId" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="csgoid" prop="appid">
-        <el-input v-model="queryParams.appid" placeholder="请输入csgoid" clearable @keyup.enter.native="handleQuery"/>
+      <el-form-item label="Primary Key" prop="id">
+        <el-input v-model="queryParams.id" placeholder="请输入Primary Key" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="绑定用户ID" prop="bindUserId">
         <el-input v-model="queryParams.bindUserId" placeholder="请输入绑定用户ID" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
-                       :key="dict.value" :label="dict.label" :value="dict.value"/>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="发货状态(0代表未出售，1代表已出售 )" prop="transferStatus">
-        <el-select v-model="queryParams.transferStatus" placeholder="请选择发货状态(0代表未出售，1代表已出售 )" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="平台用户ID" prop="userId">
-        <el-input v-model="queryParams.userId" placeholder="请输入平台用户ID" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="用户类型(前后台用户)" prop="userType">
-        <el-select v-model="queryParams.userType" placeholder="请选择用户类型(前后台用户)" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.USER_TYPE)"
-                       :key="dict.value" :label="dict.label" :value="dict.value"/>
-        </el-select>
-      </el-form-item>
       <el-form-item label="资产id(饰品唯一)" prop="assetid">
         <el-input v-model="queryParams.assetid" placeholder="请输入资产id(饰品唯一)" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="出售价格单价分" prop="price">
-        <el-input v-model="queryParams.price" placeholder="请输入出售价格单价分" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -87,7 +51,6 @@
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
-      <el-table-column label="发货状态(0代表未出售，1代表已出售 )" align="center" prop="transferStatus" />
       <el-table-column label="平台用户ID" align="center" prop="userId" />
       <el-table-column label="用户类型(前后台用户)" align="center" prop="userType">
         <template v-slot="scope">
@@ -96,7 +59,9 @@
       </el-table-column>
       <el-table-column label="资产id(饰品唯一)" align="center" prop="assetid" />
       <el-table-column label="contextid" align="center" prop="contextid" />
-      <el-table-column label="出售价格单价分" align="center" prop="price" />
+      <el-table-column label="出售价格" align="center" prop="price" />
+      <el-table-column label="发货状态(0代表未出售，1代表出售中 )" align="center" prop="transferStatus" />
+      <el-table-column label="库存详情表id" align="center" prop="invDescId" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
@@ -144,19 +109,10 @@ export default {
       queryParams: {
                     pageNo: 1,
             pageSize: 10,
-        classid: null,
-        instanceid: null,
-        amount: null,
-        createTime: [],
         steamId: null,
-        appid: null,
+        id: null,
         bindUserId: null,
-        status: null,
-        transferStatus: null,
-        userId: null,
-        userType: null,
         assetid: null,
-        price: null,
       },
             };
   },

@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.steam.controller.admin.inv.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-
+import java.util.*;
 import javax.validation.constraints.*;
 
 @Schema(description = "管理后台 - 用户库存储新增/修改 Request VO")
@@ -52,7 +52,11 @@ public class InvSaveReqVO {
     @Schema(description = "contextid", example = "31061")
     private String contextid;
 
-    @Schema(description = "出售价格单价分", example = "3557")
+    @Schema(description = "出售价格", example = "11206")
     private Integer price;
+
+
+    @Schema(description = "库存详情表id", example = "8477")
+    private Integer invDescId;
 
 }

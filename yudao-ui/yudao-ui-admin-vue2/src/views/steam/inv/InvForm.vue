@@ -28,11 +28,6 @@
 >{{dict.label}}</el-radio>
                       </el-radio-group>
                     </el-form-item>
-                    <el-form-item label="发货状态(0代表未出售，1代表已出售 )" prop="transferStatus">
-                      <el-radio-group v-model="formData.transferStatus">
-                            <el-radio label="1">请选择字典生成</el-radio>
-                      </el-radio-group>
-                    </el-form-item>
                     <el-form-item label="平台用户ID" prop="userId">
                       <el-input v-model="formData.userId" placeholder="请输入平台用户ID" />
                     </el-form-item>
@@ -49,8 +44,16 @@
                     <el-form-item label="contextid" prop="contextid">
                       <el-input v-model="formData.contextid" placeholder="请输入contextid" />
                     </el-form-item>
-                    <el-form-item label="出售价格单价分" prop="price">
-                      <el-input v-model="formData.price" placeholder="请输入出售价格单价分" />
+                    <el-form-item label="出售价格" prop="price">
+                      <el-input v-model="formData.price" placeholder="请输入出售价格" />
+                    </el-form-item>
+                    <el-form-item label="发货状态(0代表未出售，1代表出售中 )" prop="transferStatus">
+                      <el-radio-group v-model="formData.transferStatus">
+                            <el-radio label="1">请选择字典生成</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="库存详情表id" prop="invDescId">
+                      <el-input v-model="formData.invDescId" placeholder="请输入库存详情表id" />
                     </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
@@ -83,15 +86,15 @@
                             steamId: undefined,
                             id: undefined,
                             appid: undefined,
-                            tenantId: undefined,
                             bindUserId: undefined,
                             status: undefined,
-                            transferStatus: undefined,
                             userId: undefined,
                             userType: undefined,
                             assetid: undefined,
                             contextid: undefined,
                             price: undefined,
+                            transferStatus: undefined,
+                            invDescId: undefined,
         },
         // 表单校验
         formRules: {
@@ -150,15 +153,15 @@
                             steamId: undefined,
                             id: undefined,
                             appid: undefined,
-                            tenantId: undefined,
                             bindUserId: undefined,
                             status: undefined,
-                            transferStatus: undefined,
                             userId: undefined,
                             userType: undefined,
                             assetid: undefined,
                             contextid: undefined,
                             price: undefined,
+                            transferStatus: undefined,
+                            invDescId: undefined,
         };
         this.resetForm("formRef");
       }

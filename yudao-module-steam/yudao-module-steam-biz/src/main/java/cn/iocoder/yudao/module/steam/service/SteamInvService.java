@@ -4,12 +4,9 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.invdesc.vo.InvDescPageReqVO;
-import cn.iocoder.yudao.module.steam.controller.admin.invdesc.vo.InvDescRespVO;
-import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.InvPageReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPageReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
@@ -23,6 +20,7 @@ import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -31,11 +29,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static cn.iocoder.yudao.framework.common.enums.CommonStatusEnum.DISABLE;
-import static cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum.INORDER;
-import static cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum.OFFSHELF;
 
 
 /**
@@ -242,6 +235,12 @@ public class SteamInvService {
                     invDescDO.setSelExterior(tagsDTO.getInternalName());
                 }
                 invDescMapper.insert(invDescDO);
+                List<InvDescDO> invDescDOS1 = invDescMapper.selectList(new QueryWrapper<InvDescDO>().eq("instanceid", item.getInstanceid()).eq("classid", item.getClassid()));
+                InvDO invDO = new InvDO();
+                invDO.setInstanceid(item.getInstanceid());
+                invDO.setClassid(item.getClassid());
+                invDO.setInvDescId(invDescDOS1.get(0).getId());
+                invMapper.update(invDO,new UpdateWrapper<InvDO>().eq("instanceid",item.getInstanceid()).eq("classid",item.getClassid()));
             }
         }
         return json;
@@ -303,55 +302,33 @@ public class SteamInvService {
     }
 
 
-    public InvPageReqVO getInvPage1(InvPageReqVO invPageReqVO){
+    public List<AppInvPageReqVO> getInvPage1(InvPageReqVO invPageReqVO){
         // 用户库存
         PageResult<InvDO> invPage = invService.getInvPage(invPageReqVO);
-        InvPageReqVO invPageReqVO1 = new InvPageReqVO();
+        ArrayList<Object> list = new ArrayList<>();
+        for(InvDO invDO : invPage.getList()){
+            list.add(invDO.getInvDescId());
+        }
+        List<InvDescDO> invDescDOS = invDescMapper.selectList(new QueryWrapper<InvDescDO>().in("id", list));
+        Map<Long,InvDescDO> map = new HashMap<>();
+        for(InvDescDO invDescDO : invDescDOS){
+            map.put(invDescDO.getId(),invDescDO);
+
+        }
+        List<AppInvPageReqVO> appInvPageReqVO =  new ArrayList<>();
 
         for(InvDO invDO : invPage.getList()){
-
-            // 价格   状态
-            invPageReqVO1.setId(invDO.getId());
-            invPageReqVO1.setTransferStatus(invDO.getTransferStatus());
-            invPageReqVO1.setPrice(invDO.getPrice());
-            invPageReqVO1.setStatus(invDO.getStatus());
-            invPageReqVO1.setClassid(invDO.getClassid());
-            invPageReqVO1.setInstanceid(invDO.getInstanceid());
-            List<InvDescDO> invDescDOS = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
-                    .eq(InvDescDO::getClassid, invDO.getClassid())
-                    .eq(InvDescDO::getInstanceid, invDO.getInstanceid()));
-            invPageReqVO1.setPictureUrl(invDescDOS.get(0).getIconUrl());
-            invPageReqVO1.setMarketName(invDescDOS.get(0).getMarketName());
+            AppInvPageReqVO appInvPageReqVO1 = new AppInvPageReqVO();
+            appInvPageReqVO1.setIconUrl(map.get(invDO.getInvDescId()).getIconUrl());
+            appInvPageReqVO1.setMarketName(map.get(invDO.getInvDescId()).getMarketName());
+            appInvPageReqVO.add(appInvPageReqVO1);
         }
-        return invPageReqVO1;
+        return appInvPageReqVO;
 
     }
 
 
 
-//    // 修改getInvPage1接口
-//    public List<InvPageReqVO> getInvPage2(InvPageReqVO invPageReqVO){
-//        // 用户库存
-//        PageResult<InvDO> invPage = invService.getInvPage(invPageReqVO);
-//        List<InvDescDO> invDescDOS1 = invDescMapper.selectList();
-//
-//        ArrayList<InvPageReqVO> invPageReqVO1 = new ArrayList<>();
-//
-//        for(InvDO invDO : invPage.getList()){
-//            // 价格   状态
-//            InvPageReqVO invPageReqVO11 = new InvPageReqVO();
-//            invPageReqVO11.setPrice(invDO.getPrice());
-//            invPageReqVO11.setStatus(invDO.getStatus());
-//            invPageReqVO11.setClassid(invDO.getClassid());
-//            invPageReqVO11.setInstanceid(invDO.getInstanceid());
-//
-//
-//        }
-//
-//
-//
-//        return invPageReqVO1;
-//    }
 
 
 }

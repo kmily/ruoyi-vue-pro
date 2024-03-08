@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.steam.dal.dataobject.inv;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
 import java.time.LocalDateTime;
@@ -60,6 +59,7 @@ public class InvDO extends BaseDO {
     private Integer status;
     /**
      * 发货状态(0代表未出售，1代表出售中 )
+     *   枚举 {@link cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum 对应的类}
      */
     private Integer transferStatus;
     /**
@@ -81,8 +81,13 @@ public class InvDO extends BaseDO {
      */
     private String contextid;
     /**
-     * 出售价格单价分
+     * 出售价格
      */
     private Integer price;
+
+    /**
+     * 库存详情表id
+     */
+    private Long invDescId;
 
 }

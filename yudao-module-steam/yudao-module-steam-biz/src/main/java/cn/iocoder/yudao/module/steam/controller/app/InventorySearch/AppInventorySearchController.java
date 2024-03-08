@@ -7,8 +7,8 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPageReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
@@ -29,7 +29,6 @@ import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -62,19 +61,18 @@ public class AppInventorySearchController {
      */
     @GetMapping("/after_SearchInDB")
     @Operation(summary = "从数据库中查询数据")
-    public CommonResult<List<InvPageReqVO>> SearchInDB(@Valid InvPageReqVO invPageReqVO) {
+    public CommonResult<List<AppInvPageReqVO>> SearchInDB(@Valid InvPageReqVO invPageReqVO) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         List<BindUserDO> collect = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                 .eq(BindUserDO::getUserId, loginUser.getId())
                 .eq(BindUserDO::getUserType, loginUser.getUserType())
                 .eq(BindUserDO::getSteamId, invPageReqVO.getSteamId()));
-//        assert loginUser != null;
         if(Objects.isNull(collect) || collect.isEmpty()){
             throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
         }
         invPageReqVO.setBindUserId(loginUser.getId());
         invPageReqVO.setUserType(loginUser.getUserType());
-        return success(Collections.singletonList(steamInvService.getInvPage1(invPageReqVO)));
+        return success(Collections.singletonList((AppInvPageReqVO) steamInvService.getInvPage1(invPageReqVO)));
     }
 
 

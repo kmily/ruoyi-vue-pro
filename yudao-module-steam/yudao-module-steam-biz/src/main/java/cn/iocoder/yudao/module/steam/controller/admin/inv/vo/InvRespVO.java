@@ -73,8 +73,14 @@ public class InvRespVO {
     @ExcelProperty("contextid")
     private String contextid;
 
-    @Schema(description = "出售价格单价分", example = "3557")
-    @ExcelProperty("出售价格单价分")
+    @Schema(description = "出售价格", example = "11206")
+    @ExcelProperty("出售价格")
     private Integer price;
+
+
+
+    @Schema(description = "库存详情表id", example = "8477")
+    @ExcelProperty("库存详情表id")
+    private Integer invDescId;
 
 }
