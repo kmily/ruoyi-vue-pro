@@ -1,14 +1,12 @@
 package cn.iocoder.yudao.module.steam.service.uu;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
-import cn.iocoder.yudao.module.steam.controller.admin.youyoucommodity.vo.YouyouCommodityPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTemplateRespVO;
 import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTemplatedownloadRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
-import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiCommodityReSpVo;
-import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodityVo;
-import cn.iocoder.yudao.module.steam.controller.app.vo.UUTemplate.ApiUUCommodityRespVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelResp;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
 import cn.iocoder.yudao.module.steam.service.steam.YouPingOrder;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
@@ -98,5 +96,14 @@ public class UUService {
     public ApiResult<YouyouTemplatedownloadRespVO> getCommodityList(YouyouTemplateRespVO reqVo){
         return openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/goodsQuery",new OpenApiReqVo<YouyouTemplateRespVO>().setData(reqVo), YouyouTemplatedownloadRespVO.class);
     }
-
+    /**
+     * 买家取消订单
+     * https://www.yuque.com/yyyoupin/ckahux/zmemsgmf9trt8fz8
+     * @return
+     */
+    public ApiResult<OrderCancelResp> orderCancel(OrderCancelVo reqVo){
+        ApiResult<OrderCancelResp> orderCancelRespApiResult = openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/orderCancel", new OpenApiReqVo<OrderCancelVo>().setData(reqVo), OrderCancelResp.class);
+        checkResponse(orderCancelRespApiResult);
+        return orderCancelRespApiResult;
+    }
 }

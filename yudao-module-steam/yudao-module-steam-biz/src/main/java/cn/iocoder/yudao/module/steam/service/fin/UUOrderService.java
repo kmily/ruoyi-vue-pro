@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.steam.service.fin;
 
 import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
@@ -71,7 +72,7 @@ public interface UUOrderService {
      * @param id 编号
      * @param userIp 用户编号
      */
-    void refundInvOrder(LoginUser loginUser,Long id, String userIp);
+    Integer refundInvOrder(LoginUser loginUser, OrderCancelVo id, String userIp);
 
     /**
      * 更新示例订单为已退款
