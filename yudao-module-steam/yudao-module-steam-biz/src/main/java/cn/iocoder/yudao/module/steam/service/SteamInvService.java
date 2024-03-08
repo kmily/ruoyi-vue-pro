@@ -314,10 +314,11 @@ public class SteamInvService {
         Map<Long,InvDescDO> map = new HashMap<>();
         for(InvDescDO invDescDO : invDescDOS){
             map.put(invDescDO.getId(),invDescDO);
-
         }
         List<AppInvPageReqVO> appInvPageReqVO =  new ArrayList<>();
-
+        if(map.isEmpty()){
+            throw new ServiceException(-1,"没有库存详情为空");
+        }
         for(InvDO invDO : invPage.getList()){
             AppInvPageReqVO appInvPageReqVO1 = new AppInvPageReqVO();
             appInvPageReqVO1.setIconUrl(map.get(invDO.getInvDescId()).getIconUrl());
