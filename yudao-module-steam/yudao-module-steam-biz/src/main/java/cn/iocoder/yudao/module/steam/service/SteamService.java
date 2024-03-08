@@ -175,7 +175,7 @@ public class SteamService {
         }
         bindUserMapper.updateById(bindUserDO);
         SteamService bean = SpringUtil.getBean(this.getClass());
-        bean.firstGetInv(bindUserDO.getSteamId());
+        bean.firstGetInv(bindUserDO);
 
     }
 
@@ -184,11 +184,11 @@ public class SteamService {
      * @description: 第一次绑定steam账号，获取用户库存
      */
     @Async
-    public void firstGetInv(String steamId){
+    public void firstGetInv(BindUserDO bindUserDO){
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.method(HttpUtil.Method.GET).url("https://steamcommunity.com/inventory/:steamId/:app/2?l=schinese&count=1000");
         Map<String,String> pathVar=new HashMap<>();
-        pathVar.put("steamId",steamId);
+        pathVar.put("steamId",bindUserDO.getSteamId());
         pathVar.put("app","730");
         builder.pathVar(pathVar);
         Map<String, String> header = new HashMap<>();
@@ -198,15 +198,12 @@ public class SteamService {
         InventoryDto json = sent.json(InventoryDto.class);
         for (InventoryDto.AssetsDTO item:json.getAssets()) {
             InvPageReqVO steamInv= new InvPageReqVO();
-            steamInv.setSteamId(steamId);
+            steamInv.setSteamId(bindUserDO.getSteamId());
             // 插入库存
-            List<BindUserDO> collect = bindUserMapper.selectList()
-                    .stream()
-                    .filter(bindUserDO -> bindUserDO.getSteamId().equals(steamId)).collect(Collectors.toList());
 
-            Long id = collect.get(0).getId();
-            Long  userId = collect.get(0).getUserId();
-            InvDO steamInvInsert = getInvDO(item,steamId,userId,id);
+
+
+            InvDO steamInvInsert = getInvDO(item,bindUserDO);
             invMapper.insert(steamInvInsert);
 
         }
@@ -224,7 +221,7 @@ public class SteamService {
             if(invDescDOS.size()>0){
                 Optional<InvDescDO> first = invDescDOS.stream().findFirst();
                 InvDescDO invDescDO = first.get();
-                invDescDO.setSteamId(steamId);
+                invDescDO.setSteamId(bindUserDO.getSteamId());
                 invDescDO.setAppid(item.getAppid());
                 invDescDO.setClassid(item.getClassid());
                 invDescDO.setInstanceid(item.getInstanceid());
@@ -280,7 +277,7 @@ public class SteamService {
                 invDescMapper.updateById(invDescDO);
             }else{
                 InvDescDO invDescDO=new InvDescDO();
-                invDescDO.setSteamId(steamId);
+                invDescDO.setSteamId(bindUserDO.getSteamId());
                 invDescDO.setAppid(item.getAppid());
                 invDescDO.setClassid(item.getClassid());
                 invDescDO.setInstanceid(item.getInstanceid());
@@ -356,9 +353,9 @@ public class SteamService {
      * @return  steamInvInsert
      */
     @NotNull
-    private static InvDO getInvDO(InventoryDto.AssetsDTO item,String steamId,Long id,Long userId) {
+    private static InvDO getInvDO(InventoryDto.AssetsDTO item,BindUserDO bindUserDO) {
         InvDO steamInvInsert = new InvDO();
-        steamInvInsert.setSteamId(steamId);
+        steamInvInsert.setSteamId(bindUserDO.getSteamId());
         steamInvInsert.setAppid(item.getAppid());
         steamInvInsert.setAssetid(item.getAssetid());
         steamInvInsert.setClassid(item.getClassid());
@@ -366,8 +363,8 @@ public class SteamService {
         steamInvInsert.setAmount(item.getAmount());
         // 第一次入库，所有道具均为未起售状态 0
         steamInvInsert.setTransferStatus(0);
-        steamInvInsert.setBindUserId(userId);
-        steamInvInsert.setUserId(id);
+        steamInvInsert.setBindUserId(bindUserDO.getId());
+        steamInvInsert.setUserId(bindUserDO.getUserId());
         steamInvInsert.setUserType(1);
         steamInvInsert.setContextid(item.getContextid());
         return steamInvInsert;
