@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.dal.dataobject.inv;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
 import java.time.LocalDateTime;
@@ -83,5 +84,9 @@ public class InvDO extends BaseDO {
      * 出售价格单价分
      */
     private Integer price;
+
+    private String market_name;
+
+    private String picture_url;
 
 }
