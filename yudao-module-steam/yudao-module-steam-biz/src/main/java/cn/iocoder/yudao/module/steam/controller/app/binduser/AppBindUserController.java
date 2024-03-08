@@ -83,7 +83,7 @@ public class AppBindUserController {
     @PostMapping("/unBind")
     @Operation(summary = "解绑steam")
     @PreAuthenticated
-    public CommonResult<Integer> unBind(@Valid AppUnBindUserReqVO reqVO)  {
+    public CommonResult<Integer> unBind(@RequestBody @Valid AppUnBindUserReqVO reqVO)  {
         int i = steamService.unBind(reqVO);
         return success(i);
     }
