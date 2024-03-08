@@ -261,8 +261,8 @@ public class SteamInvService {
         steamInvInsert.setAmount(item.getAmount());
         // 第一次入库，所有道具均为未起售状态 0
         steamInvInsert.setTransferStatus(0);
-        steamInvInsert.setBindUserId(id);
-        steamInvInsert.setUserId(userId);
+        steamInvInsert.setBindUserId(userId);
+        steamInvInsert.setUserId(id);
         steamInvInsert.setUserType(1);
         steamInvInsert.setContextid(item.getContextid());
         return steamInvInsert;
