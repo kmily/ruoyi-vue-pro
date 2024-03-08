@@ -2,33 +2,18 @@
   <div class="app-container">
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="steam名称" prop="steamName">
-        <el-input v-model="queryParams.steamName" placeholder="请输入steam名称" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="用户ID" prop="userId">
-        <el-input v-model="queryParams.userId" placeholder="请输入用户ID" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="SteamId" prop="steamId">
-        <el-input v-model="queryParams.steamId" placeholder="请输入SteamId" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="交易链接" prop="tradeUrl">
-        <el-input v-model="queryParams.tradeUrl" placeholder="请输入交易链接" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="API KEY" prop="apiKey">
-        <el-input v-model="queryParams.apiKey" placeholder="请输入API KEY" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="备注" prop="remark">
-        <el-input v-model="queryParams.remark" placeholder="请输入备注" clearable @keyup.enter.native="handleQuery"/>
+      <el-form-item label="端口" prop="port">
+        <el-input v-model="queryParams.port" placeholder="请输入端口" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="创建时间" prop="createTime">
         <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
                         range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
-      <el-form-item label="登录过后的cookie" prop="loginCookie">
-        <el-input v-model="queryParams.loginCookie" placeholder="请输入登录过后的cookie" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
       <el-form-item label="地址池id" prop="addressId">
         <el-input v-model="queryParams.addressId" placeholder="请输入地址池id" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="ip地址" prop="ipAddress">
+        <el-input v-model="queryParams.ipAddress" placeholder="请输入ip地址" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -40,37 +25,31 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="openForm(undefined)"
-                   v-hasPermi="['steam:bind-user:create']">新增</el-button>
+                   v-hasPermi="['steam:bind-ipaddress:create']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
-                   v-hasPermi="['steam:bind-user:export']">导出</el-button>
+                   v-hasPermi="['steam:bind-ipaddress:export']">导出</el-button>
       </el-col>
               <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
             <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
-            <el-table-column label="steam名称" align="center" prop="steamName" />
-      <el-table-column label="用户ID" align="center" prop="userId" />
-      <el-table-column label="SteamId" align="center" prop="steamId" />
-      <el-table-column label="交易链接" align="center" prop="tradeUrl" />
-      <el-table-column label="API KEY" align="center" prop="apiKey" />
-      <el-table-column label="备注" align="center" prop="remark" />
+            <el-table-column label="ID" align="center" prop="id" />
+      <el-table-column label="端口" align="center" prop="port" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="maFile文件" align="center" prop="maFile" />
-      <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="登录过后的cookie" align="center" prop="loginCookie" />
       <el-table-column label="地址池id" align="center" prop="addressId" />
+      <el-table-column label="ip地址" align="center" prop="ipAddress" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
-                     v-hasPermi="['steam:bind-user:update']">修改</el-button>
+                     v-hasPermi="['steam:bind-ipaddress:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
-                     v-hasPermi="['steam:bind-user:delete']">删除</el-button>
+                     v-hasPermi="['steam:bind-ipaddress:delete']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -78,17 +57,17 @@
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
     <!-- 对话框(添加 / 修改) -->
-    <BindUserForm ref="formRef" @success="getList" />
+    <BindIpaddressForm ref="formRef" @success="getList" />
     </div>
 </template>
 
 <script>
-import * as BindUserApi from '@/api/steam/binduser';
-import BindUserForm from './BindUserForm.vue';
+import * as BindIpaddressApi from '@/api/steam/bindipaddress';
+import BindIpaddressForm from './BindIpaddressForm.vue';
 export default {
-  name: "BindUser",
+  name: "BindIpaddress",
   components: {
-          BindUserForm,
+          BindIpaddressForm,
   },
   data() {
     return {
@@ -100,7 +79,7 @@ export default {
       showSearch: true,
               // 总条数
         total: 0,
-      //  steam用户绑定列表
+      // 绑定用户IP地址池列表
       list: [],
       // 是否展开，默认全部展开
       isExpandAll: true,
@@ -112,16 +91,10 @@ export default {
       queryParams: {
                     pageNo: 1,
             pageSize: 10,
-        steamName: null,
-        userId: null,
-        steamId: null,
-        tradeUrl: null,
-        apiKey: null,
-        remark: null,
+        port: null,
         createTime: [],
-        maFile: null,
-        loginCookie: null,
         addressId: null,
+        ipAddress: null,
       },
             };
   },
@@ -133,7 +106,7 @@ export default {
     async getList() {
       try {
       this.loading = true;
-              const res = await BindUserApi.getBindUserPage(this.queryParams);
+              const res = await BindIpaddressApi.getBindIpaddressPage(this.queryParams);
         this.list = res.data.list;
         this.total = res.data.total;
       } finally {
@@ -157,20 +130,20 @@ export default {
     /** 删除按钮操作 */
     async handleDelete(row) {
       const id = row.id;
-      await this.$modal.confirm('是否确认删除 steam用户绑定编号为"' + id + '"的数据项?')
+      await this.$modal.confirm('是否确认删除绑定用户IP地址池编号为"' + id + '"的数据项?')
       try {
-       await BindUserApi.deleteBindUser(id);
+       await BindIpaddressApi.deleteBindIpaddress(id);
        await this.getList();
        this.$modal.msgSuccess("删除成功");
       } catch {}
     },
     /** 导出按钮操作 */
     async handleExport() {
-      await this.$modal.confirm('是否确认导出所有 steam用户绑定数据项?');
+      await this.$modal.confirm('是否确认导出所有绑定用户IP地址池数据项?');
       try {
         this.exportLoading = true;
-        const res = await BindUserApi.exportBindUserExcel(this.queryParams);
-        this.$download.excel(res, ' steam用户绑定.xls');
+        const res = await BindIpaddressApi.exportBindIpaddressExcel(this.queryParams);
+        this.$download.excel(res, '绑定用户IP地址池.xls');
       } catch {
       } finally {
         this.exportLoading = false;

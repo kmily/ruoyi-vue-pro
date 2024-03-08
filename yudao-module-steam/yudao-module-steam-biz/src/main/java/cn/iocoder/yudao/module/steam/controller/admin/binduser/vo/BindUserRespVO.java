@@ -49,4 +49,12 @@ public class BindUserRespVO {
     @ExcelProperty("ID")
     private Long id;
 
+    @Schema(description = "登录过后的cookie")
+    @ExcelProperty("登录过后的cookie")
+    private String loginCookie;
+
+    @Schema(description = "地址池id", example = "28016")
+    @ExcelProperty("地址池id")
+    private Long addressId;
+
 }

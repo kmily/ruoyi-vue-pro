@@ -483,8 +483,9 @@ public class AppApiController {
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
                 Integer integer = uUOrderService.refundInvOrder(loginUser, openApiReqVo.getData(), getClientIP());
                 OrderCancelResp ret = new OrderCancelResp();
-                ret.setResult(integer);
-                return ApiResult.success(ret);
+                /*ret.setResult(integer);
+                return ApiResult.success(ret);*/
+                return null;
             });
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(), e.getMessage(), OrderCancelResp.class);

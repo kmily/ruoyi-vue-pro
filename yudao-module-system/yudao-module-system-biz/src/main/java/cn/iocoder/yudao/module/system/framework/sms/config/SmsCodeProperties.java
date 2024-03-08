@@ -28,6 +28,11 @@ public class SmsCodeProperties {
     @NotNull(message = "每日发送最大数量不能为空")
     private Integer sendMaximumQuantityPerDay;
     /**
+     * 每日单ip最大发送数量
+     */
+    @NotNull(message = "单ip最大发送数量")
+    private Integer sendMaximumQuantityPerDayIp;
+    /**
      * 验证码最小值
      */
     @NotNull(message = "验证码最小值不能为空")

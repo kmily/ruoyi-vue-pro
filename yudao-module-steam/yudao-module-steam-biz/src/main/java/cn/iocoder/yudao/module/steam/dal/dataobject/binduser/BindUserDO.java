@@ -68,5 +68,13 @@ public class BindUserDO extends BaseDO {
      */
     @TableId
     private Long id;
+    /**
+     * 登录过后的cookie
+     */
+    private String loginCookie;
+    /**
+     * 地址池id
+     */
+    private Long addressId;
 
 }

@@ -87,6 +87,9 @@ public interface ErrorCodeConstants {
     // ========== 悠悠商品列表 TODO 补充编号 ==========
     ErrorCode YOUYOU_DETAILS_NOT_EXISTS = new ErrorCode(1_400_010_01, "请求明细不存在");
 
+    // ========== 绑定用户IP地址池 TODO 补充编号 ==========
+    ErrorCode BIND_IPADDRESS_NOT_EXISTS = new ErrorCode(1_500_010_01, "绑定用户IP地址池不存在");
+
 
 
 }
