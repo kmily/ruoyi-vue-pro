@@ -1,8 +1,12 @@
 package cn.iocoder.yudao.module.steam.service.selling;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.InvPageReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.selling.vo.SellingChangePriceReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.SellingReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
@@ -19,6 +23,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -110,5 +115,40 @@ public class SellingExtService {
         invMapper.updateById(invDO);
         sellingMapper.deleteById(id);
         return sellingDO1;
+    }
+
+    /**
+     * 修改价格
+     * @param reqVo
+     * @return
+     */
+    public Integer changePrice(SellingChangePriceReqVo reqVo) {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        // 访问用户库存
+        InvDO invDO = invMapper.selectById(reqVo.getId());
+        // 获取当前上架信息
+        SellingDO sellingDO = sellingMapper.selectById(reqVo.getId());
+        if(Objects.isNull(sellingDO)){
+            throw new ServiceException(-1, "上架商品不存在");
+        }
+        if(Objects.isNull(reqVo.getPrice()) || reqVo.getPrice()<0L){
+            throw new ServiceException(-1, "商品价格不合法");
+        }
+        if(!sellingDO.getUserId().equals(loginUser.getId())){
+            throw new ServiceException(-1, "无权限");
+        }
+        if(!sellingDO.getUserType().equals(loginUser.getUserType())){
+            throw new ServiceException(-1, "无权限");
+        }
+        // 用户主动下架,当前饰品还存在用户steam库存中
+        if (CommonStatusEnum.isDisable(sellingDO.getStatus()) ) {
+            // 是否在库存
+            throw new ServiceException(-1, "商品未上架");
+        }
+        if (sellingDO.getTransferStatus() == InvTransferStatusEnum.INORDER.getStatus()){
+            throw new ServiceException(-1, "商品已下单");
+        }
+        int i = sellingMapper.updateById(new SellingDO().setId(reqVo.getId()).setPrice(reqVo.getPrice()));
+        return i;
     }
 }

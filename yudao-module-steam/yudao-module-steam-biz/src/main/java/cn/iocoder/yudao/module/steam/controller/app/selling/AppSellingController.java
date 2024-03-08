@@ -2,14 +2,17 @@ package cn.iocoder.yudao.module.steam.controller.app.selling;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.InvPageReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.selling.vo.SellingChangePriceReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.SellingReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.service.selling.SellingExtService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,6 +45,14 @@ public class AppSellingController {
 
         Optional<SellingDO> invPage = sellingExtService.getOffSale(sellingReqVo);
         return CommonResult.success(invPage);
+
+    }
+    @GetMapping("/changePrice")
+    @Operation(summary = "饰品改价")
+    public CommonResult<Integer> changePrice(@RequestBody @Valid SellingChangePriceReqVo reqVo) {
+
+        Integer integer = sellingExtService.changePrice(reqVo);
+        return CommonResult.success(integer);
 
     }
 }
