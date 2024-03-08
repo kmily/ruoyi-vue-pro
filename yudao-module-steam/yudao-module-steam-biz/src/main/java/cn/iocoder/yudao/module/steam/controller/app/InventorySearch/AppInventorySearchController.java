@@ -27,6 +27,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -64,9 +65,10 @@ public class AppInventorySearchController {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         List<BindUserDO> collect = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                 .eq(BindUserDO::getUserId, loginUser.getId())
+                .eq(BindUserDO::getUserType, loginUser.getUserType())
                 .eq(BindUserDO::getSteamId, invPageReqVO.getSteamId()));
 //        assert loginUser != null;
-        if(collect.isEmpty()){
+        if(Objects.isNull(collect) || collect.isEmpty()){
             throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
         }
         invPageReqVO.setUserId(loginUser.getId());
