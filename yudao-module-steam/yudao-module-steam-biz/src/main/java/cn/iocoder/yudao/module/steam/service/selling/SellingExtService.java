@@ -15,12 +15,14 @@ import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -47,60 +49,63 @@ public class SellingExtService {
      * @return
      */
     public SellingDO getToSale(InvPageReqVo invPageReqVos) {
-        InvDO invDO = invMapper.selectById(invPageReqVos.getId());
-        // TODO 上架验证    UserId和user_type同时验证
-
-       //  获取用户和在售列表匹配
-        List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
-                .eq(SellingDO::getUserId, invDO.getUserId())
-                .eq(SellingDO::getUserType, invDO.getUserType())
-                .eq(SellingDO::getBindUserId, invDO.getBindUserId()));
-        //  判断用户上架是否为指定账户
-        if (!sellingDOS.get(0).getUserId().equals(invDO.getUserId())
-                && !sellingDOS.get(0).getUserType().equals(invDO.getUserType())
-                && !sellingDOS.get(0).getBindUserId().equals(invDO.getBindUserId())) {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        // 判断用户是否上架指定为自己的库存
+        List<InvDO> invDOS = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
+                .eq(InvDO::getId, invPageReqVos.getId())
+                .eqIfPresent(InvDO::getUserType, loginUser.getUserType())
+                .eq(InvDO::getUserId, loginUser.getId()));
+        if (invDOS.isEmpty()) {
             throw new ServiceException(-1, "请检查绑定用户和steam用户");
-        } else {
-            if (invDO.getTransferStatus() != 0) {
-                throw new ServiceException(-1, "商品已上架");
-            } else {
-                invDO.setPrice(invPageReqVos.getPrice());
-                invDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
-                invMapper.updateById(invDO);
-                Optional<InvDescDO> invDescDO = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
-                        .eq(InvDescDO::getClassid, invDO.getClassid())
-                        .eq(InvDescDO::getInstanceid, invDO.getInstanceid())).stream().findFirst();
-                if (!invDescDO.isPresent()) {
-                    throw new ServiceException(-1, "exists");
-                }
-                Long l = sellingMapper.selectCount(new LambdaQueryWrapperX<SellingDO>()
-                        .eq(SellingDO::getId, invPageReqVos.getId())
-                );
-                if (l > 0) {
-                    throw new ServiceException(-1, "exists");
-                }
-                SellingDO sellingDO = new SellingDO();
-                sellingDO.setAppid(invDO.getAppid());
-                sellingDO.setAssetid(invDO.getAssetid());
-                sellingDO.setClassid(invDO.getClassid());
-                sellingDO.setInstanceid(invDO.getInstanceid());
-                sellingDO.setAmount(invDO.getAmount());
-                sellingDO.setSteamId(invDO.getSteamId());
-                sellingDO.setUserId(invDO.getUserId());
-                sellingDO.setUserType(invDO.getUserType());
-                sellingDO.setBindUserId(invDO.getBindUserId());
-                sellingDO.setContextid(invDO.getContextid());
-                sellingDO.setInvDescId(invDescDO.get().getId());
-                sellingDO.setInvId(invDO.getId());
-                if (invPageReqVos.getPrice() == null) {
-                    throw new ServiceException(-1, "未设置价格");
-                }
-                sellingDO.setPrice(invPageReqVos.getPrice());
-                sellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
-                sellingMapper.insert(sellingDO);
-                return sellingDO;
-            }
         }
+
+        // 获取用户和在售列表匹配
+        List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
+                .eq(SellingDO::getUserId, loginUser.getId())
+                .eq(SellingDO::getUserType, loginUser.getUserType())
+                .eq(SellingDO::getInvId, invDOS.get(0).getId())
+                .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus()));
+        if (!sellingDOS.isEmpty()) {
+            throw new ServiceException(-1, "商品已上架");
+        }
+
+        InvDO invDO = invDOS.get(0);
+        // 商品上架流程
+        invDO.setPrice(invPageReqVos.getPrice());
+        invDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
+        invMapper.updateById(invDO);
+        Optional<InvDescDO> invDescDO = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+                .eq(InvDescDO::getClassid, invDO.getClassid())
+                .eq(InvDescDO::getInstanceid, invDO.getInstanceid())).stream().findFirst();
+        if (!invDescDO.isPresent()) {
+            throw new ServiceException(-1, "exists");
+        }
+        Long l = sellingMapper.selectCount(new LambdaQueryWrapperX<SellingDO>()
+                .eq(SellingDO::getId, invPageReqVos.getId())
+        );
+        if (l > 0) {
+            throw new ServiceException(-1, "exists");
+        }
+        SellingDO sellingDO = new SellingDO();
+        sellingDO.setAppid(invDO.getAppid());
+        sellingDO.setAssetid(invDO.getAssetid());
+        sellingDO.setClassid(invDO.getClassid());
+        sellingDO.setInstanceid(invDO.getInstanceid());
+        sellingDO.setAmount(invDO.getAmount());
+        sellingDO.setSteamId(invDO.getSteamId());
+        sellingDO.setUserId(invDO.getUserId());
+        sellingDO.setUserType(invDO.getUserType());
+        sellingDO.setBindUserId(invDO.getBindUserId());
+        sellingDO.setContextid(invDO.getContextid());
+        sellingDO.setInvDescId(invDescDO.get().getId());
+        sellingDO.setInvId(invDO.getId());
+        if (invPageReqVos.getPrice() == null) {
+            throw new ServiceException(-1, "未设置价格");
+        }
+        sellingDO.setPrice(invPageReqVos.getPrice());
+        sellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
+        sellingMapper.insert(sellingDO);
+        return sellingDO;
     }
 
     public Optional<SellingDO> getOffSale(@Valid SellingReqVo sellingReqVo) {
