@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.steam.controller.app.InventorySearch;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
@@ -61,12 +62,12 @@ public class AppInventorySearchController {
     @Operation(summary = "从数据库中查询数据")
     public CommonResult<InvDO> SearchInDB(@Valid InvPageReqVO invPageReqVO) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        List<BindUserDO> collect = bindUserMapper.selectList()
-                .stream()
-                .filter(o -> o.getSteamId().equals(invPageReqVO.getSteamId()))
-                .collect(Collectors.toList());
-        assert loginUser != null;
-        if(!(loginUser.getId()).equals(collect.get(0).getUserId())){
+        List<BindUserDO> collect = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+                .eq(BindUserDO::getUserId, loginUser.getId())
+                .eq(BindUserDO::getSteamId, invPageReqVO.getSteamId()));
+
+//        assert loginUser != null;
+        if(collect.isEmpty()){
             throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
         }
         return success(steamInvService.getInvPage1(invPageReqVO));
