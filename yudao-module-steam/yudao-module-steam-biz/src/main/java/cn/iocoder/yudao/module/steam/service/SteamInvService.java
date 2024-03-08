@@ -312,6 +312,7 @@ public class SteamInvService {
 
             // 价格   状态
             invPageReqVO1.setId(invDO.getId());
+            invPageReqVO1.setTransferStatus(invDO.getTransferStatus());
             invPageReqVO1.setPrice(invDO.getPrice());
             invPageReqVO1.setStatus(invDO.getStatus());
             invPageReqVO1.setClassid(invDO.getClassid());
