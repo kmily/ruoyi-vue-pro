@@ -302,16 +302,6 @@ public class SteamInvService {
     }
 
     public InvDO getInvPage1(InvPageReqVO invPageReqVO){
-        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        List<BindUserDO> collect = bindUserMapper.selectList()
-                .stream()
-                .filter(o -> o.getSteamId().equals(invPageReqVO.getSteamId()))
-                .collect(Collectors.toList());
-        assert loginUser != null;
-        if(!(loginUser.getId()).equals(collect.get(0).getUserId())){
-            throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
-        }
-        // 图片   名字  价格
         PageResult<InvDO> invPage = invService.getInvPage(invPageReqVO);
         InvDO invDO = new InvDO();
         for(InvDO inv:invPage.getList()){
