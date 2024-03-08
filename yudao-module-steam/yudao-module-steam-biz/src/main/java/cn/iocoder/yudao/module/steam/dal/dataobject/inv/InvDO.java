@@ -85,8 +85,4 @@ public class InvDO extends BaseDO {
      */
     private Integer price;
 
-    private String market_name;
-
-    private String picture_url;
-
 }
