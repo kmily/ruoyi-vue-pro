@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.service.fin;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
@@ -362,40 +363,22 @@ public class UUOrderServiceImpl implements UUOrderService {
         YouyouCommodityDO youyouCommodityDO = UUCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
 
 
-//        SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
         //校验商品是否存在
         if (Objects.isNull(youyouCommodityDO)) {
             throw exception(ErrorCodeConstants.UU_GOODS_NOT_FOUND);
         }
-//        if(CommonStatusEnum.isDisable(sellingDO.getStatus())){
-//            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
-//        }
-//        if(CommonStatusEnum.isDisable(sellingDO.getStatus())){
-//            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
-//        }
-//        if(Objects.isNull(sellingDO.getBindUserId())){
+        if(CommonStatusEnum.isDisable(youyouCommodityDO.getStatus())){
+            throw exception(OpenApiCode.ERR_5299);
+        }
+//        if(Objects.isNull(youyouCommodityDO.getBindUserId())){
 //            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
 //        }
 //        if(invOrderDO.getUserId().equals(sellingDO.getUserId()) && invOrderDO.getUserType().equals(sellingDO.getUserType())){
 //            throw exception(ErrorCodeConstants.INVORDER_ORDERUSER_EXCEPT);
 //        }
-//        //检查是否可交易
-//        Optional<InvDescDO> first1 = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
-//                .eq(InvDescDO::getClassid, sellingDO.getClassid())
-//                .eq(InvDescDO::getInstanceid, sellingDO.getInstanceid())
-//                .eq(InvDescDO::getAppid, sellingDO.getAppid())
-//        ).stream().findFirst();
-//        if(!first1.isPresent()){
-//            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
-//        }
-//        InvDescDO invDescDO = first1.get();
-//        if(invDescDO.getTradable().intValue()!=1){
-//            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
-//        }
-//
 //        //库存状态为没有订单
         if(!InvTransferStatusEnum.SELL.getStatus().equals(youyouCommodityDO.getTransferStatus())){
-            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
+            throw exception(OpenApiCode.ERR_5214);
         }
 //        //使用库存的价格进行替换
         BigDecimal bigDecimal = new BigDecimal(youyouCommodityDO.getCommodityPrice());
@@ -409,7 +392,7 @@ public class UUOrderServiceImpl implements UUOrderService {
 //        //检查是否已经下过单
         List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
                         .eq(YouyouOrderDO::getRealCommodityId, youyouOrderDO.getRealCommodityId())
-//                .eq(InvOrderDO::getPayStatus, 1)
+                        .in(YouyouOrderDO::getPayStatus, Arrays.asList(PayOrderStatusEnum.WAITING.getStatus(),PayOrderStatusEnum.SUCCESS.getStatus()))
                         .isNull(YouyouOrderDO::getPayRefundId)
         );
         if(youyouOrderDOS.size()>0){
