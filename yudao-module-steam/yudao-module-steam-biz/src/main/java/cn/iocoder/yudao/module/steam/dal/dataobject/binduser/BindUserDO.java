@@ -76,5 +76,9 @@ public class BindUserDO extends BaseDO {
      * 地址池id
      */
     private Long addressId;
+    /**
+     * 地址池id
+     */
+    private String avatarUrl;
 
 }

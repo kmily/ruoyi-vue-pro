@@ -168,7 +168,7 @@ public class SteamWeb {
         Matcher matcherUser = patternUser.matcher(proxyResponseVo.getHtml());
         if (matcherUser.find()) {
             String imgSrc = matcherUser.group(1);
-            String[] split = imgSrc.split(" alt=");
+            String[] split = imgSrc.split("\" alt=\"");
             if(split.length>=2){
                 String s = split[0].replaceAll(".jpg", "_full.jpg").replaceAll(".png", "_full.png");
                 steamName= Optional.ofNullable(split[1]);
