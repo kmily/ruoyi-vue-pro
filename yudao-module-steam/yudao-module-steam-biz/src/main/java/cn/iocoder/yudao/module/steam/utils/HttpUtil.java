@@ -481,8 +481,22 @@ public class HttpUtil {
          * 原来的是Object
          */
         private String postObject;
+        /**
+         * header头
+         */
         private Map<String, String> headers;
+        /**
+         * cookie
+         */
         private String cookieString;
+        /**
+         * 代理服务IP
+         */
+        private String proxyIp;
+        /**
+         * 代理服务
+         */
+        private Integer proxyPort;
     }
 
 }
