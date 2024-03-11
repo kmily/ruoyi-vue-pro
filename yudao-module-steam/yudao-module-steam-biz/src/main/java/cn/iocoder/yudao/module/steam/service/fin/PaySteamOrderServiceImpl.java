@@ -333,7 +333,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 invOrderDO.setServiceFee(serviceFee.intValue());
             }
             BigDecimal bigDecimal2 = new BigDecimal(invOrderDO.getCommodityAmount());
-            BigDecimal add = bigDecimal2.add(new BigDecimal(invOrderDO.getServiceFee()));
+            BigDecimal add = bigDecimal2.add(serviceFee);
             invOrderDO.setPaymentAmount(add.intValue());
         }
 
