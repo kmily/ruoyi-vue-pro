@@ -71,7 +71,7 @@ public class AppInventorySearchController {
         if(Objects.isNull(collect) || collect.isEmpty()){
             throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
         }
-        invPageReqVO.setBindUserId(collect.get(0).getUserId());
+        invPageReqVO.setBindUserId(collect.get(0).getId());
         return success(steamInvService.getInvPage1(invPageReqVO));
     }
 
