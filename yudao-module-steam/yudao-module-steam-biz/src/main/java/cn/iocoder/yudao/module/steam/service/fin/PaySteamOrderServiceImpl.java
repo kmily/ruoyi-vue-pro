@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.steam.service.fin;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
+import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
@@ -42,6 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -96,6 +100,8 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     private InvDescMapper invDescMapper;
     @Autowired
     private PayWalletService payWalletService;
+    @Resource
+    private ConfigService configService;
 
 
     public PaySteamOrderServiceImpl() {
@@ -217,12 +223,15 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         InvDescDO invDescDO = invDescMapper.selectById(sellingDO.getInvDescId());
         // 1.1 获得商品
         InvOrderDO invOrderDO = new InvOrderDO().setSellId(createReqVO.getSellId()).setSteamId(createReqVO.getSteamId())
-                .setPrice(0).setSteamId(createReqVO.getSteamId())
+                .setCommodityAmount(0).setDiscountAmount(0).setServiceFeeRate("0").setServiceFee(0)
+                .setPaymentAmount(0)
+//                .setPrice(0)
+                .setSteamId(createReqVO.getSteamId())
                 .setPayOrderStatus(PayOrderStatusEnum.WAITING.getStatus())
                 .setTransferText(new TransferMsg()).setInvDescId(sellingDO.getInvDescId()).setInvId(sellingDO.getInvId())
                 //专家信息
                 .setSellCashStatus(InvSellCashStatusEnum.INIT.getStatus()).setSellUserId(sellingDO.getUserId()).setSellUserType(sellingDO.getUserType())
-                .setPayStatus(false).setRefundPrice(0).setUserId(loginUser.getId()).setUserType(loginUser.getUserType());
+                .setPayStatus(false).setRefundAmount(0).setUserId(loginUser.getId()).setUserType(loginUser.getUserType());
         validateInvOrderCanCreate(invOrderDO);
         invOrderMapper.insert(invOrderDO);
 
@@ -230,7 +239,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         Long payOrderId = payOrderApi.createOrder(new PayOrderCreateReqDTO()
                 .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
                 .setMerchantOrderId(invOrderDO.getId().toString()) // 业务的订单编号
-                .setSubject("购买"+invDescDO.getMarketName()).setBody("出售编号："+sellingDO.getId()).setPrice(invOrderDO.getPrice()) // 价格信息
+                .setSubject("购买"+invDescDO.getMarketName()).setBody("出售编号："+sellingDO.getId()).setPrice(invOrderDO.getPaymentAmount()) // 价格信息
                 .setExpireTime(addTime(Duration.ofHours(2L)))); // 支付的过期时间
         // 2.2 更新支付单到 demo 订单
         invOrderMapper.updateById(new InvOrderDO().setId(invOrderDO.getId())
@@ -280,9 +289,36 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
         }
         //使用库存的价格进行替换
-        invOrderDO.setPrice(sellingDO.getPrice());
+        //各价格计算
+        invOrderDO.setCommodityAmount(sellingDO.getPrice());
+        ConfigDO serviceFeeLimit = configService.getConfigByKey("steam.inv.serviceFeeLimit");
+        ConfigDO serviceFeeRateConfigByKey = configService.getConfigByKey("steam.inv.serviceFeeRate");
+        if(Objects.isNull(serviceFeeRateConfigByKey)){
+            invOrderDO.setServiceFeeRate("0");
+            invOrderDO.setServiceFee(0);
+        }else{
+            invOrderDO.setServiceFeeRate(serviceFeeRateConfigByKey.getValue());
+            BigDecimal rate = new BigDecimal("100").add(new BigDecimal(serviceFeeRateConfigByKey.getValue())).divide(new BigDecimal("100"));
+            rate.setScale(2,BigDecimal.ROUND_HALF_UP);
+            //四舍五入后金额
+            BigDecimal bigDecimal = new BigDecimal(invOrderDO.getCommodityAmount()).multiply(rate).setScale(2,BigDecimal.ROUND_HALF_UP);
 
-
+            if(Objects.nonNull(serviceFeeRateConfigByKey.getValue())){
+                int compareResult = bigDecimal.compareTo(new BigDecimal(serviceFeeLimit.getValue()));
+                if (compareResult < 0) { // 如果bigDemical1小于bigDemical2
+                    invOrderDO.setServiceFee(bigDecimal.intValue());
+                } else if (compareResult == 0) { // 如果两者相等
+                    invOrderDO.setServiceFee(bigDecimal.intValue());
+                } else { // 如果bigDemical1大于bigDemical2
+                    invOrderDO.setServiceFee(new BigDecimal(serviceFeeLimit.getValue()).intValue());
+                }
+            }else{
+                invOrderDO.setServiceFee(bigDecimal.intValue());
+            }
+        }
+        BigDecimal bigDecimal = new BigDecimal(invOrderDO.getCommodityAmount());
+        bigDecimal.add(new BigDecimal(invOrderDO.getServiceFee()));
+        invOrderDO.setPaymentAmount(bigDecimal.intValue());
         //检查是否已经下过单
         List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
                 .eq(InvOrderDO::getSellId, sellingDO.getId())
@@ -293,7 +329,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw exception(ErrorCodeConstants.INVORDER_ORDERED_EXCEPT);
         }
         // 校验订单是否支付
-        if (Objects.isNull(invOrderDO.getPrice()) || invOrderDO.getPrice()<=0) {
+        if (Objects.isNull(invOrderDO.getPaymentAmount()) || invOrderDO.getPaymentAmount()<=0) {
             throw exception(ErrorCodeConstants.INVORDER_AMOUNT_EXCEPT);
         }
         // 校验订单是否支付
@@ -356,10 +392,10 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw exception(DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
         InvOrderDO invOrderDO = invOrderMapper.selectById(id);
-        //获取专家钱包并进行打款
+        //获取卖家家钱包并进行打款
         PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(invOrderDO.getSellUserId(), invOrderDO.getSellUserType());
         payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(invOrderDO.getId()),
-                PayWalletBizTypeEnum.STEAM_CASH, invOrderDO.getPrice());
+                PayWalletBizTypeEnum.STEAM_CASH, invOrderDO.getCommodityAmount());
         invOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
         invOrderMapper.updateById(invOrderDO);
         try{
@@ -429,7 +465,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_STATUS_NOT_SUCCESS);
         }
         // 2.3 校验支付金额一致
-        if (notEqual(payOrder.getPrice(), invOrderDO.getPrice())) {
+        if (notEqual(payOrder.getPrice(), invOrderDO.getPaymentAmount())) {
             log.error("[validateDemoOrderCanPaid][order({}) payOrder({}) 支付金额不匹配，请进行处理！order 数据是：{}，payOrder 数据是：{}]",
                     id, payOrderId, toJsonString(invOrderDO), toJsonString(payOrder));
             throw exception(ErrorCodeConstants.INVORDER_ORDER_UPDATE_PAID_FAIL_PAY_PRICE_NOT_MATCH);
@@ -457,10 +493,10 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
                 .setMerchantOrderId(String.valueOf(invOrderDO.getId())) // 支付单号
                 .setMerchantRefundId(refundId)
-                .setReason("想退钱").setPrice(invOrderDO.getPrice()));// 价格信息
+                .setReason("想退钱").setPrice(invOrderDO.getPaymentAmount()));// 价格信息
         // 2.3 更新退款单到 demo 订单
         invOrderMapper.updateById(new InvOrderDO().setId(id)
-                .setPayRefundId(payRefundId).setRefundPrice(invOrderDO.getPrice()));
+                .setPayRefundId(payRefundId).setRefundAmount(invOrderDO.getCommodityAmount()));
         //释放库存
         SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
         sellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
@@ -530,7 +566,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_NOT_SUCCESS);
         }
         // 2.3 校验退款金额一致
-        if (notEqual(payRefund.getRefundPrice(), invOrderDO.getPrice())) {
+        if (notEqual(payRefund.getRefundPrice(), invOrderDO.getPaymentAmount())) {
             log.error("[validateDemoOrderCanRefunded][order({}) payRefund({}) 退款金额不匹配，请进行处理！order 数据是：{}，payRefund 数据是：{}]",
                     id, payRefundId, toJsonString(invOrderDO), toJsonString(payRefund));
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_PRICE_NOT_MATCH);
