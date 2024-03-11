@@ -79,4 +79,10 @@ public class InvOrderSaveReqVO {
     @Schema(description = "卖家金额状态", example = "2")
     private Integer sellCashStatus;
 
+    @Schema(description = "服务费，单位分")
+    private Integer serviceFee;
+
+    @Schema(description = "服务费率")
+    private String serviceFeeRate;
+
 }

@@ -147,10 +147,9 @@ public class AppDropListController {
 
     @GetMapping("/search")
     @Operation(summary = "饰品在售预览")
-    public  CommonResult<SellingRespVO> getPreview(SellingPageReqVO sellingReqVo){
+    public  CommonResult<PageResult<SellingRespVO>> getPreview(SellingPageReqVO sellingReqVo){
         sellingReqVo.setPageSize(200);
-//        PageResult<SellingDO> preview = sellingService.getSellingPage(sellingReqVo);
-        SellingRespVO sellingRespVO = sellingsearchService.sellingPageSearch(sellingReqVo);
+        PageResult<SellingRespVO> sellingRespVO = sellingsearchService.sellingPageSearch(sellingReqVo);
         return CommonResult.success(sellingRespVO);
     }
 
