@@ -133,10 +133,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
 
     private WithdrawalDO validateWithdrawalCanCreate(WithdrawalDO withdrawalDO) {
         // 校验订单是否存在
-//        if (invOrderDO == null) {
-//            throw exception(DEMO_ORDER_NOT_FOUND);
-//        }
-        if (Objects.isNull(withdrawalDO.getUserId()) || withdrawalDO.getUserId()<=0) {
+        if (Objects.isNull(withdrawalDO)) {
             throw exception(ErrorCodeConstants.WITHDRAWAL_USER_EXCEPT);
         }
         if (Objects.isNull(withdrawalDO.getUserType()) || withdrawalDO.getUserType()<=0) {
@@ -156,14 +153,13 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             withdrawalDO.setPaymentAmount(withdrawalDO.getWithdrawalPrice());
         }else{
             withdrawalDO.setServiceFeeRate(withdrawalRateConfig.getValue());
-            BigDecimal rate = new BigDecimal("100").add(new BigDecimal(withdrawalRateConfig.getValue())).divide(new BigDecimal("100"));
-            rate.setScale(2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal rate = new BigDecimal(withdrawalRateConfig.getValue()).divide(new BigDecimal("100"), 2, BigDecimal.ROUND_HALF_UP);
             //四舍五入后金额 分
-            BigDecimal bigDecimal = new BigDecimal(withdrawalDO.getWithdrawalPrice()).multiply(rate).setScale(0,BigDecimal.ROUND_HALF_UP);
-            withdrawalDO.setServiceFee(bigDecimal.intValue());
+            BigDecimal serviceFee = new BigDecimal(withdrawalDO.getWithdrawalPrice()).multiply(rate).setScale(0,BigDecimal.ROUND_HALF_UP);
+            withdrawalDO.setServiceFee(serviceFee.intValue());
             BigDecimal bigDecimal2 = new BigDecimal(withdrawalDO.getWithdrawalPrice());
-            bigDecimal2.add(new BigDecimal(withdrawalDO.getServiceFee()));
-            withdrawalDO.setPaymentAmount(bigDecimal2.intValue());
+            BigDecimal add = bigDecimal2.add(new BigDecimal(withdrawalDO.getServiceFee()));
+            withdrawalDO.setPaymentAmount(add.intValue());
         }
         return withdrawalDO;
     }
@@ -319,27 +315,31 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             invOrderDO.setPaymentAmount(invOrderDO.getCommodityAmount());
         }else{
             invOrderDO.setServiceFeeRate(serviceFeeRateConfigByKey.getValue());
-            BigDecimal rate = new BigDecimal("100").add(new BigDecimal(serviceFeeRateConfigByKey.getValue())).divide(new BigDecimal("100"));
-            rate.setScale(2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal rate = new BigDecimal(serviceFeeRateConfigByKey.getValue()).divide(new BigDecimal("100"), 2, BigDecimal.ROUND_HALF_UP);
             //四舍五入后金额
-            BigDecimal bigDecimal = new BigDecimal(invOrderDO.getCommodityAmount()).multiply(rate).setScale(2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal serviceFee = new BigDecimal(invOrderDO.getCommodityAmount()).multiply(rate).setScale(0,BigDecimal.ROUND_HALF_UP);
 
-            if(Objects.nonNull(serviceFeeRateConfigByKey.getValue())){
-                int compareResult = bigDecimal.compareTo(new BigDecimal(serviceFeeLimit.getValue()));
+
+            if(Objects.nonNull(serviceFeeLimit.getValue())){
+                int compareResult = serviceFee.compareTo(new BigDecimal(serviceFeeLimit.getValue()));
                 if (compareResult < 0) { // 如果bigDemical1小于bigDemical2
-                    invOrderDO.setServiceFee(bigDecimal.intValue());
+                    invOrderDO.setServiceFee(serviceFee.intValue());
                 } else if (compareResult == 0) { // 如果两者相等
-                    invOrderDO.setServiceFee(bigDecimal.intValue());
+                    invOrderDO.setServiceFee(serviceFee.intValue());
                 } else { // 如果bigDemical1大于bigDemical2
                     invOrderDO.setServiceFee(new BigDecimal(serviceFeeLimit.getValue()).intValue());
                 }
             }else{
-                invOrderDO.setServiceFee(bigDecimal.intValue());
+                invOrderDO.setServiceFee(serviceFee.intValue());
             }
             BigDecimal bigDecimal2 = new BigDecimal(invOrderDO.getCommodityAmount());
-            bigDecimal2.add(new BigDecimal(invOrderDO.getServiceFee()));
-            invOrderDO.setPaymentAmount(bigDecimal2.intValue());
+            BigDecimal add = bigDecimal2.add(new BigDecimal(invOrderDO.getServiceFee()));
+            invOrderDO.setPaymentAmount(add.intValue());
         }
+
+
+
+
         //检查是否已经下过单
         List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
                 .eq(InvOrderDO::getSellId, sellingDO.getId())
@@ -395,7 +395,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             }
         }
 
-        return new PageResult<InvOrderResp>(ret,invOrderDOPageResult.getTotal());
+        return new PageResult<>(ret, invOrderDOPageResult.getTotal());
     }
 
     @Override
