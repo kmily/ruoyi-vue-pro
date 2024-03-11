@@ -24,14 +24,8 @@
                     <el-form-item label="退款订单编号" prop="payRefundId">
                       <el-input v-model="formData.payRefundId" placeholder="请输入退款订单编号" />
                     </el-form-item>
-                    <el-form-item label="退款金额，单位：分" prop="refundPrice">
-                      <el-input v-model="formData.refundPrice" placeholder="请输入退款金额，单位：分" />
-                    </el-form-item>
                     <el-form-item label="退款时间" prop="refundTime">
                       <el-date-picker clearable v-model="formData.refundTime" type="date" value-format="timestamp" placeholder="选择退款时间" />
-                    </el-form-item>
-                    <el-form-item label="价格，单位：分 " prop="price">
-                      <el-input v-model="formData.price" placeholder="请输入价格，单位：分 " />
                     </el-form-item>
                     <el-form-item label="用户类型" prop="userType">
                       <el-select v-model="formData.userType" placeholder="请选择用户类型">
@@ -76,13 +70,27 @@
                       <el-input v-model="formData.sellUserId" placeholder="请输入卖家ID" />
                     </el-form-item>
                     <el-form-item label="卖家金额状态" prop="sellCashStatus">
-                      <el-input v-model="formData.sellCashStatus" placeholder="请输入卖家金额状态" />
+                      <el-radio-group v-model="formData.sellCashStatus">
+                            <el-radio label="1">请选择字典生成</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="退款金额，单位：分" prop="refundAmount">
+                      <el-input v-model="formData.refundAmount" placeholder="请输入退款金额，单位：分" />
+                    </el-form-item>
+                    <el-form-item label="价格，单位：分" prop="paymentAmount">
+                      <el-input v-model="formData.paymentAmount" placeholder="请输入价格，单位：分" />
                     </el-form-item>
                     <el-form-item label="服务费，单位分" prop="serviceFee">
                       <el-input v-model="formData.serviceFee" placeholder="请输入服务费，单位分" />
                     </el-form-item>
                     <el-form-item label="服务费率" prop="serviceFeeRate">
                       <el-input v-model="formData.serviceFeeRate" placeholder="请输入服务费率" />
+                    </el-form-item>
+                    <el-form-item label="商品总额" prop="commodityAmount">
+                      <el-input v-model="formData.commodityAmount" placeholder="请输入商品总额" />
+                    </el-form-item>
+                    <el-form-item label="优惠金额 分" prop="discountAmount">
+                      <el-input v-model="formData.discountAmount" placeholder="请输入优惠金额 分" />
                     </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
@@ -116,9 +124,7 @@
                             payChannelCode: undefined,
                             payTime: undefined,
                             payRefundId: undefined,
-                            refundPrice: undefined,
                             refundTime: undefined,
-                            price: undefined,
                             userType: undefined,
                             steamId: undefined,
                             transferText: undefined,
@@ -130,16 +136,20 @@
                             sellUserType: undefined,
                             sellUserId: undefined,
                             sellCashStatus: undefined,
+                            refundAmount: undefined,
+                            paymentAmount: undefined,
                             serviceFee: undefined,
                             serviceFeeRate: undefined,
+                            commodityAmount: undefined,
+                            discountAmount: undefined,
         },
         // 表单校验
         formRules: {
                         userId: [{ required: true, message: '用户编号不能为空', trigger: 'blur' }],
                         payStatus: [{ required: true, message: '是否已支付：[0:未支付 1:已经支付过]不能为空', trigger: 'blur' }],
-                        refundPrice: [{ required: true, message: '退款金额，单位：分不能为空', trigger: 'blur' }],
-                        price: [{ required: true, message: '价格，单位：分 不能为空', trigger: 'blur' }],
                         steamId: [{ required: true, message: '购买的steamId不能为空', trigger: 'blur' }],
+                        refundAmount: [{ required: true, message: '退款金额，单位：分不能为空', trigger: 'blur' }],
+                        paymentAmount: [{ required: true, message: '价格，单位：分不能为空', trigger: 'blur' }],
         },
                         };
     },
@@ -195,9 +205,7 @@
                             payChannelCode: undefined,
                             payTime: undefined,
                             payRefundId: undefined,
-                            refundPrice: undefined,
                             refundTime: undefined,
-                            price: undefined,
                             userType: undefined,
                             steamId: undefined,
                             transferText: undefined,
@@ -209,8 +217,12 @@
                             sellUserType: undefined,
                             sellUserId: undefined,
                             sellCashStatus: undefined,
+                            refundAmount: undefined,
+                            paymentAmount: undefined,
                             serviceFee: undefined,
                             serviceFeeRate: undefined,
+                            commodityAmount: undefined,
+                            discountAmount: undefined,
         };
         this.resetForm("formRef");
       }

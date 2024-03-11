@@ -41,6 +41,29 @@
       <el-form-item label="卖家ID" prop="sellUserId">
         <el-input v-model="queryParams.sellUserId" placeholder="请输入卖家ID" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
+      <el-form-item label="卖家金额状态" prop="sellCashStatus">
+        <el-select v-model="queryParams.sellCashStatus" placeholder="请选择卖家金额状态" clearable size="small">
+          <el-option label="请选择字典生成" value="" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="退款金额，单位：分" prop="refundAmount">
+        <el-input v-model="queryParams.refundAmount" placeholder="请输入退款金额，单位：分" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="价格，单位：分" prop="paymentAmount">
+        <el-input v-model="queryParams.paymentAmount" placeholder="请输入价格，单位：分" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="服务费，单位分" prop="serviceFee">
+        <el-input v-model="queryParams.serviceFee" placeholder="请输入服务费，单位分" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="服务费率" prop="serviceFeeRate">
+        <el-input v-model="queryParams.serviceFeeRate" placeholder="请输入服务费率" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="商品总额" prop="commodityAmount">
+        <el-input v-model="queryParams.commodityAmount" placeholder="请输入商品总额" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="优惠金额 分" prop="discountAmount">
+        <el-input v-model="queryParams.discountAmount" placeholder="请输入优惠金额 分" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -72,7 +95,6 @@
         </template>
       </el-table-column>
       <el-table-column label="退款订单编号" align="center" prop="payRefundId" />
-      <el-table-column label="退款金额(分)" align="center" prop="refundPrice" />
       <el-table-column label="退款时间" align="center" prop="refundTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.refundTime) }}</span>
@@ -83,11 +105,10 @@
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="价格(分)" align="center" prop="price" />
-      <el-table-column label="用户类型" align="center" prop="userType" >
-              <template v-slot="scope">
-                <dict-tag :type="DICT_TYPE.USER_TYPE" :value="scope.row.userType" />
-              </template>
+      <el-table-column label="用户类型" align="center" prop="userType">
+        <template v-slot="scope">
+          <dict-tag :type="DICT_TYPE.USER_TYPE" :value="scope.row.userType" />
+        </template>
       </el-table-column>
       <el-table-column label="购买的steamId" align="center" prop="steamId" />
       <el-table-column label="发货信息" align="center">
@@ -116,8 +137,12 @@
       </el-table-column>
       <el-table-column label="卖家ID" align="center" prop="sellUserId" />
       <el-table-column label="卖家金额状态" align="center" prop="sellCashStatus" />
+      <el-table-column label="退款金额，单位：分" align="center" prop="refundAmount" />
+      <el-table-column label="价格，单位：分" align="center" prop="paymentAmount" />
       <el-table-column label="服务费，单位分" align="center" prop="serviceFee" />
       <el-table-column label="服务费率" align="center" prop="serviceFeeRate" />
+      <el-table-column label="商品总额" align="center" prop="commodityAmount" />
+      <el-table-column label="优惠金额 分" align="center" prop="discountAmount" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button style="color: red" v-if="scope.row.payOrderStatus != 20 && scope.row.payStatus && !scope.row.transferText.tradeofferid" size="mini" type="text" @click="refundOrderClick(scope.row.id)"
@@ -177,6 +202,12 @@ export default {
         sellUserType: null,
         sellUserId: null,
         sellCashStatus: null,
+        refundAmount: null,
+        paymentAmount: null,
+        serviceFee: null,
+        serviceFeeRate: null,
+        commodityAmount: null,
+        discountAmount: null,
       },
             };
   },
