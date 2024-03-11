@@ -43,7 +43,6 @@ import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.UUOrderStatus;
 import cn.iocoder.yudao.module.steam.enums.UUOrderSubStatus;
-import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
@@ -167,7 +166,7 @@ public class UUOrderServiceImpl implements UUOrderService {
     public CreateOrderResult createWithdrawalOrder(LoginUser loginUser, PayWithdrawalOrderCreateReqVO createReqVO) {
         CreateOrderResult createWithdrawalResult=new CreateOrderResult();
         WithdrawalDO withdrawalDO=new WithdrawalDO().setPayStatus(false)
-                .setPrice(createReqVO.getAmount()).setUserId(loginUser.getId()).setUserType(loginUser.getUserType())
+                .setWithdrawalPrice(createReqVO.getAmount()).setUserId(loginUser.getId()).setUserType(loginUser.getUserType())
                 .setRefundPrice(0).setWithdrawalInfo(createReqVO.getWithdrawalInfo());
         validateWithdrawalCanCreate(withdrawalDO);
         withdrawalMapper.insert(withdrawalDO);
@@ -175,7 +174,7 @@ public class UUOrderServiceImpl implements UUOrderService {
         Long payOrderId = payOrderApi.createOrder(new PayOrderCreateReqDTO()
                 .setAppId(PAY_WITHDRAWAL_APP_ID).setUserIp(getClientIP()) // 支付应用
                 .setMerchantOrderId(withdrawalDO.getId().toString()) // 业务的订单编号
-                .setSubject("订单提现单号"+withdrawalDO.getId()).setBody("用户ID"+loginUser.getId()+"，提现金额"+withdrawalDO.getWithdrawalInfo()+"分").setPrice(withdrawalDO.getPrice()) // 价格信息
+                .setSubject("订单提现单号"+withdrawalDO.getId()).setBody("用户ID"+loginUser.getId()+"，提现金额"+withdrawalDO.getWithdrawalInfo()+"分").setPrice(withdrawalDO.getWithdrawalPrice()) // 价格信息
                 .setExpireTime(addTime(Duration.ofHours(2L)))); // 支付的过期时间
         // 2.2 更新支付单到 demo 订单
         withdrawalMapper.updateById(new WithdrawalDO().setId(withdrawalDO.getId())
@@ -198,7 +197,7 @@ public class UUOrderServiceImpl implements UUOrderService {
             throw exception(ErrorCodeConstants.WITHDRAWAL_USER_EXCEPT);
         }
         // 校验订单是否支付
-        if (withdrawalDO.getPrice()<0) {
+        if (withdrawalDO.getWithdrawalPrice()<0) {
             throw exception(ErrorCodeConstants.WITHDRAWAL_AMOUNT_EXCEPT);
         }
         return withdrawalDO;
@@ -259,7 +258,7 @@ public class UUOrderServiceImpl implements UUOrderService {
             throw exception(DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_STATUS_NOT_SUCCESS);
         }
         // 2.3 校验支付金额一致
-        if (notEqual(payOrder.getPrice(), withdrawalDO.getPrice())) {
+        if (notEqual(payOrder.getPrice(), withdrawalDO.getPaymentAmount())) {
             log.error("[validateDemoOrderCanPaid][order({}) payOrder({}) 支付金额不匹配，请进行处理！order 数据是：{}，payOrder 数据是：{}]",
                     id, payOrderId, toJsonString(withdrawalDO), toJsonString(payOrder));
             throw exception(DEMO_ORDER_UPDATE_PAID_FAIL_PAY_PRICE_NOT_MATCH);
