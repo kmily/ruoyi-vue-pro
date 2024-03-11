@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.system.service.permission;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuSaveVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
@@ -131,6 +132,16 @@ public class MenuServiceImpl implements MenuService {
     @Override
     public List<MenuDO> getMenuList(Collection<Long> ids) {
         return menuMapper.selectBatchIds(ids);
+    }
+
+    @Override
+    public void updateStatus(Long id, Integer status) {
+        List<MenuDO> menuDOS = menuMapper.selectList(new LambdaQueryWrapperX<MenuDO>()
+                .eqIfPresent(MenuDO::getParentId, id));
+        for (MenuDO menuDO : menuDOS) {
+            updateStatus(menuDO.getId(), status);
+        }
+        menuMapper.updateStatus(id,status);
     }
 
     /**

@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -28,4 +29,7 @@ public interface MenuMapper extends BaseMapperX<MenuDO> {
     default List<MenuDO> selectListByPermission(String permission) {
         return selectList(MenuDO::getPermission, permission);
     }
+
+    @Update("update system_menu set status = #{status} where id = #{id}")
+    void updateStatus(Long id, Integer status);
 }
