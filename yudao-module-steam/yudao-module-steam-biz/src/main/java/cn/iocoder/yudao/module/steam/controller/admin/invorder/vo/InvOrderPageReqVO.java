@@ -51,4 +51,22 @@ public class InvOrderPageReqVO extends PageParam {
     @Schema(description = "卖家金额状态", example = "2")
     private Integer sellCashStatus;
 
+    @Schema(description = "退款金额，单位：分")
+    private Integer refundAmount;
+
+    @Schema(description = "价格，单位：分")
+    private Integer paymentAmount;
+
+    @Schema(description = "服务费，单位分")
+    private Integer serviceFee;
+
+    @Schema(description = "服务费率")
+    private String serviceFeeRate;
+
+    @Schema(description = "商品总额")
+    private Integer commodityAmount;
+
+    @Schema(description = "优惠金额 分")
+    private Integer discountAmount;
+
 }

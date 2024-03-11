@@ -122,6 +122,12 @@ public class InvOrderServiceImplTest extends BaseDbUnitTest {
            o.setSellUserType(null);
            o.setSellUserId(null);
            o.setSellCashStatus(null);
+           o.setRefundAmount(null);
+           o.setPaymentAmount(null);
+           o.setServiceFee(null);
+           o.setServiceFeeRate(null);
+           o.setCommodityAmount(null);
+           o.setDiscountAmount(null);
        });
        invOrderMapper.insert(dbInvOrder);
        // 测试 userId 不匹配
@@ -148,6 +154,18 @@ public class InvOrderServiceImplTest extends BaseDbUnitTest {
        invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setSellUserId(null)));
        // 测试 sellCashStatus 不匹配
        invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setSellCashStatus(null)));
+       // 测试 refundAmount 不匹配
+       invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setRefundAmount(null)));
+       // 测试 paymentAmount 不匹配
+       invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setPaymentAmount(null)));
+       // 测试 serviceFee 不匹配
+       invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setServiceFee(null)));
+       // 测试 serviceFeeRate 不匹配
+       invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setServiceFeeRate(null)));
+       // 测试 commodityAmount 不匹配
+       invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setCommodityAmount(null)));
+       // 测试 discountAmount 不匹配
+       invOrderMapper.insert(cloneIgnoreId(dbInvOrder, o -> o.setDiscountAmount(null)));
        // 准备参数
        InvOrderPageReqVO reqVO = new InvOrderPageReqVO();
        reqVO.setUserId(null);
@@ -162,6 +180,12 @@ public class InvOrderServiceImplTest extends BaseDbUnitTest {
        reqVO.setSellUserType(null);
        reqVO.setSellUserId(null);
        reqVO.setSellCashStatus(null);
+       reqVO.setRefundAmount(null);
+       reqVO.setPaymentAmount(null);
+       reqVO.setServiceFee(null);
+       reqVO.setServiceFeeRate(null);
+       reqVO.setCommodityAmount(null);
+       reqVO.setDiscountAmount(null);
 
        // 调用
        PageResult<InvOrderDO> pageResult = invOrderService.getInvOrderPage(reqVO);

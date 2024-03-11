@@ -44,10 +44,6 @@ public class InvOrderRespVO {
     @ExcelProperty("退款订单编号")
     private Long payRefundId;
 
-    @Schema(description = "退款金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "19998")
-    @ExcelProperty("退款金额，单位：分")
-    private Integer refundPrice;
-
     @Schema(description = "退款时间")
     @ExcelProperty("退款时间")
     private LocalDateTime refundTime;
@@ -55,10 +51,6 @@ public class InvOrderRespVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
-
-    @Schema(description = "价格，单位：分 ", requiredMode = Schema.RequiredMode.REQUIRED, example = "5643")
-    @ExcelProperty("价格，单位：分 ")
-    private Integer price;
 
     @Schema(description = "用户类型", example = "2")
     @ExcelProperty(value = "用户类型", converter = DictConvert.class)
@@ -107,6 +99,14 @@ public class InvOrderRespVO {
     @ExcelProperty("卖家金额状态")
     private Integer sellCashStatus;
 
+    @Schema(description = "退款金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("退款金额，单位：分")
+    private Integer refundAmount;
+
+    @Schema(description = "价格，单位：分", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("价格，单位：分")
+    private Integer paymentAmount;
+
     @Schema(description = "服务费，单位分")
     @ExcelProperty("服务费，单位分")
     private Integer serviceFee;
@@ -114,5 +114,13 @@ public class InvOrderRespVO {
     @Schema(description = "服务费率")
     @ExcelProperty("服务费率")
     private String serviceFeeRate;
+
+    @Schema(description = "商品总额")
+    @ExcelProperty("商品总额")
+    private Integer commodityAmount;
+
+    @Schema(description = "优惠金额 分")
+    @ExcelProperty("优惠金额 分")
+    private Integer discountAmount;
 
 }

@@ -58,17 +58,9 @@ public class InvOrderDO extends BaseDO {
      */
     private Long payRefundId;
     /**
-     * 退款金额，单位：分
-     */
-    private Integer refundPrice;
-    /**
      * 退款时间
      */
     private LocalDateTime refundTime;
-    /**
-     * 价格，单位：分 
-     */
-    private Integer price;
     /**
      * 用户类型
      * 枚举 {@link cn.iocoder.yudao.framework.common.enums.UserTypeEnum 对应的类}
@@ -118,9 +110,16 @@ public class InvOrderDO extends BaseDO {
     private Long sellUserId;
     /**
      * 卖家金额状态
-     * 枚举 {@link cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum 对应的类}
      */
     private Integer sellCashStatus;
+    /**
+     * 退款金额，单位：分
+     */
+    private Integer refundAmount;
+    /**
+     * 价格，单位：分
+     */
+    private Integer paymentAmount;
     /**
      * 服务费，单位分
      */
@@ -129,5 +128,13 @@ public class InvOrderDO extends BaseDO {
      * 服务费率
      */
     private String serviceFeeRate;
+    /**
+     * 商品总额
+     */
+    private Integer commodityAmount;
+    /**
+     * 优惠金额 分
+     */
+    private Integer discountAmount;
 
 }
