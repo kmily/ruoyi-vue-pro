@@ -7,13 +7,14 @@
       </el-form-item>
       <el-form-item label="用户类型" prop="userType">
         <el-select v-model="queryParams.userType" placeholder="请选择用户类型" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.USER_TYPE)"
+                       :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="已支付" prop="payStatus">
         <el-select v-model="queryParams.payStatus" placeholder="请选择是否已支付[0未支付，1支付]" clearable size="small">
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_BOOLEAN_STRING)"
-                       :key="dict.value" :label="dict.label" :value="dict.value"/>
+                     :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="支付编号" prop="payOrderId">
@@ -36,12 +37,15 @@
         <el-date-picker v-model="queryParams.refundTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
                         range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
-      <el-form-item label="提现金额" prop="price">
-        <el-input v-model="queryParams.price" placeholder="请输入提现金额" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
       <el-form-item label="创建时间" prop="createTime">
         <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
                         range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
+      </el-form-item>
+      <el-form-item label="提现金额" prop="withdrawalPrice">
+        <el-input v-model="queryParams.withdrawalPrice" placeholder="请输入提现金额" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="提现信息" prop="withdrawalInfo">
+        <el-input v-model="queryParams.withdrawalInfo" placeholder="请输入提现信息" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -61,36 +65,42 @@
             <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
             <el-table-column label="编号" align="center" prop="id" />
       <el-table-column label="用户ID" align="center" prop="userId" />
-      <el-table-column label="用户类型" align="center" prop="userType" />
-      <el-table-column label="已支付" align="center" prop="payStatus">
+      <el-table-column label="用户类型" align="center" prop="userType">
         <template v-slot="scope">
-          <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="scope.row.payStatus" />
+          <dict-tag :type="DICT_TYPE.USER_TYPE" :value="scope.row.userType" />
         </template>
       </el-table-column>
-      <el-table-column label="支付编号" align="center" prop="payOrderId" />
-      <el-table-column label="支付渠道" align="center" prop="payChannelCode" />
-      <el-table-column label="支付时间" align="center" prop="payTime" width="180">
+      <el-table-column label="支付订单编号" align="center" prop="payOrderId" />
+      <el-table-column label="支付成功的支付渠道" align="center" prop="payChannelCode" />
+      <el-table-column label="订单支付时间" align="center" prop="payTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.payTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="退款编号" align="center" prop="payRefundId" />
-      <el-table-column label="退款金额(分)" align="center" prop="refundPrice" />
+      <el-table-column label="退款订单编号" align="center" prop="payRefundId" />
+      <el-table-column label="退款金额，单位分" align="center" prop="refundPrice" />
       <el-table-column label="退款时间" align="center" prop="refundTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.refundTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="提现金额" align="center" prop="price" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="是否已支付" align="center" prop="payStatus" />
+      <el-table-column label="提现金额" align="center" prop="withdrawalPrice" />
+      <el-table-column label="提现信息" align="center" prop="withdrawalInfo" />
+      <el-table-column label="服务费" align="center" prop="serviceFee" />
+      <el-table-column label="费率" align="center" prop="serviceFeeRate" />
+      <el-table-column label="支付金额" align="center" prop="paymentAmount" />
 <!--      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">-->
 <!--        <template v-slot="scope">-->
 <!--          <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"-->
 <!--                     v-hasPermi="['steam:withdrawal:update']">修改</el-button>-->
+<!--          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"-->
+<!--                     v-hasPermi="['steam:withdrawal:delete']">删除</el-button>-->
 <!--        </template>-->
 <!--      </el-table-column>-->
     </el-table>
@@ -134,15 +144,16 @@ export default {
             pageSize: 10,
         userId: null,
         userType: null,
-        payStatus: null,
         payOrderId: null,
         payChannelCode: null,
         payTime: [],
         payRefundId: null,
         refundPrice: null,
         refundTime: [],
-        price: null,
         createTime: [],
+        payStatus: null,
+        withdrawalPrice: null,
+        withdrawalInfo: null,
       },
             };
   },

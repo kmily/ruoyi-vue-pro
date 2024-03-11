@@ -8,14 +8,9 @@
                     </el-form-item>
                     <el-form-item label="用户类型" prop="userType">
                       <el-select v-model="formData.userType" placeholder="请选择用户类型">
-                            <el-option label="请选择字典生成" value="" />
+                            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.USER_TYPE)"
+                                       :key="dict.value" :label="dict.label" :value="parseInt(dict.value)" />
                       </el-select>
-                    </el-form-item>
-                    <el-form-item label="是否已支付[0未支付，1支付]" prop="payStatus">
-                      <el-radio-group v-model="formData.payStatus">
-                            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_BOOLEAN_STRING)"
-                                      :key="dict.value" :label="dict.value">{{dict.label}}</el-radio>
-                      </el-radio-group>
                     </el-form-item>
                     <el-form-item label="支付订单编号" prop="payOrderId">
                       <el-input v-model="formData.payOrderId" placeholder="请输入支付订单编号" />
@@ -35,11 +30,25 @@
                     <el-form-item label="退款时间" prop="refundTime">
                       <el-date-picker clearable v-model="formData.refundTime" type="date" value-format="timestamp" placeholder="选择退款时间" />
                     </el-form-item>
-                    <el-form-item label="提现金额" prop="price">
-                      <el-input v-model="formData.price" placeholder="请输入提现金额" />
+                    <el-form-item label="是否已支付" prop="payStatus">
+                      <el-radio-group v-model="formData.payStatus">
+                            <el-radio label="1">请选择字典生成</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="提现金额" prop="withdrawalPrice">
+                      <el-input v-model="formData.withdrawalPrice" placeholder="请输入提现金额" />
                     </el-form-item>
                     <el-form-item label="提现信息" prop="withdrawalInfo">
                       <el-input v-model="formData.withdrawalInfo" placeholder="请输入提现信息" />
+                    </el-form-item>
+                    <el-form-item label="服务费" prop="serviceFee">
+                      <el-input v-model="formData.serviceFee" placeholder="请输入服务费" />
+                    </el-form-item>
+                    <el-form-item label="费率" prop="serviceFeeRate">
+                      <el-input v-model="formData.serviceFeeRate" placeholder="请输入费率" />
+                    </el-form-item>
+                    <el-form-item label="支付金额" prop="paymentAmount">
+                      <el-input v-model="formData.paymentAmount" placeholder="请输入支付金额" />
                     </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
@@ -69,21 +78,26 @@
                             id: undefined,
                             userId: undefined,
                             userType: undefined,
-                            payStatus: undefined,
                             payOrderId: undefined,
                             payChannelCode: undefined,
                             payTime: undefined,
                             payRefundId: undefined,
                             refundPrice: undefined,
                             refundTime: undefined,
-                            price: undefined,
+                            payStatus: undefined,
+                            withdrawalPrice: undefined,
                             withdrawalInfo: undefined,
+                            serviceFee: undefined,
+                            serviceFeeRate: undefined,
+                            paymentAmount: undefined,
         },
         // 表单校验
         formRules: {
                         userId: [{ required: true, message: '用户ID不能为空', trigger: 'blur' }],
                         userType: [{ required: true, message: '用户类型不能为空', trigger: 'change' }],
-                        payStatus: [{ required: true, message: '是否已支付[0未支付，1支付]不能为空', trigger: 'blur' }],
+                        payStatus: [{ required: true, message: '是否已支付不能为空', trigger: 'blur' }],
+                        serviceFee: [{ required: true, message: '服务费不能为空', trigger: 'blur' }],
+                        serviceFeeRate: [{ required: true, message: '费率不能为空', trigger: 'blur' }],
         },
                         };
     },
@@ -135,15 +149,18 @@
                             id: undefined,
                             userId: undefined,
                             userType: undefined,
-                            payStatus: undefined,
                             payOrderId: undefined,
                             payChannelCode: undefined,
                             payTime: undefined,
                             payRefundId: undefined,
                             refundPrice: undefined,
                             refundTime: undefined,
-                            price: undefined,
+                            payStatus: undefined,
+                            withdrawalPrice: undefined,
                             withdrawalInfo: undefined,
+                            serviceFee: undefined,
+                            serviceFeeRate: undefined,
+                            paymentAmount: undefined,
         };
         this.resetForm("formRef");
       }

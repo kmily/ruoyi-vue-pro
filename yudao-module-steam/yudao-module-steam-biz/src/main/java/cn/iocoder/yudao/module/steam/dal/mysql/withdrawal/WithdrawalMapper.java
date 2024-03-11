@@ -5,7 +5,6 @@ import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal.WithdrawalDO;
 import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.steam.controller.admin.withdrawal.vo.*;
@@ -22,15 +21,16 @@ public interface WithdrawalMapper extends BaseMapperX<WithdrawalDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<WithdrawalDO>()
                 .eqIfPresent(WithdrawalDO::getUserId, reqVO.getUserId())
                 .eqIfPresent(WithdrawalDO::getUserType, reqVO.getUserType())
-                .eqIfPresent(WithdrawalDO::getPayStatus, reqVO.getPayStatus())
                 .eqIfPresent(WithdrawalDO::getPayOrderId, reqVO.getPayOrderId())
                 .eqIfPresent(WithdrawalDO::getPayChannelCode, reqVO.getPayChannelCode())
                 .betweenIfPresent(WithdrawalDO::getPayTime, reqVO.getPayTime())
                 .eqIfPresent(WithdrawalDO::getPayRefundId, reqVO.getPayRefundId())
                 .eqIfPresent(WithdrawalDO::getRefundPrice, reqVO.getRefundPrice())
                 .betweenIfPresent(WithdrawalDO::getRefundTime, reqVO.getRefundTime())
-                .eqIfPresent(WithdrawalDO::getPrice, reqVO.getPrice())
                 .betweenIfPresent(WithdrawalDO::getCreateTime, reqVO.getCreateTime())
+                .eqIfPresent(WithdrawalDO::getPayStatus, reqVO.getPayStatus())
+                .eqIfPresent(WithdrawalDO::getWithdrawalPrice, reqVO.getWithdrawalPrice())
+                .eqIfPresent(WithdrawalDO::getWithdrawalInfo, reqVO.getWithdrawalInfo())
                 .orderByDesc(WithdrawalDO::getId));
     }
     default int updateByIdAndPayed(Long id, boolean wherePayed, WithdrawalDO updateObj) {

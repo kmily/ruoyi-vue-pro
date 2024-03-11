@@ -21,7 +21,7 @@ public class WithdrawalPageReqVO extends PageParam {
     @Schema(description = "用户类型", example = "2")
     private Integer userType;
 
-    @Schema(description = "是否已支付[0未支付，1支付]", example = "2")
+    @Schema(description = "是否已支付", example = "2")
     private Boolean payStatus;
 
     @Schema(description = "支付订单编号", example = "30058")
@@ -44,11 +44,14 @@ public class WithdrawalPageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] refundTime;
 
-    @Schema(description = "提现金额", example = "25442")
-    private Integer price;
-
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
+
+    @Schema(description = "提现金额", example = "19208")
+    private Integer withdrawalPrice;
+
+    @Schema(description = "提现信息")
+    private String withdrawalInfo;
 
 }
