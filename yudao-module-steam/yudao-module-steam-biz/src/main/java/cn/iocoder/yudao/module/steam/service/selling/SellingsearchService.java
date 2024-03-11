@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.steam.service.selling;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
@@ -43,15 +45,15 @@ public class SellingsearchService {
 //        List<SellingDO> collect = sellingMapper.selectPage(pageReqVO).getList().stream().distinct().collect(Collectors.toList());
         PageResult<SellingDO> invPage = sellingService.getSellingPage(pageReqVO);
         List<Long> collect2 = invPage.getList().stream().map(SellingDO::getInvDescId).collect(Collectors.toList());
-        Map<Long, InvDescDO> invDescMap=new HashMap<>();
-        if(!collect2.isEmpty()){
+        Map<Long, InvDescDO> invDescMap = new HashMap<>();
+        if (!collect2.isEmpty()) {
             invDescMap = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
                     .inIfPresent(InvDescDO::getId, collect2)).stream().collect(Collectors.toMap(InvDescDO::getId, o -> o, (v1, v2) -> v1));
         }
 
 
         List<SellingRespVO> sellingRespVOList = new ArrayList<>();
-        for(SellingDO s : invPage.getList()){
+        for (SellingDO s : invPage.getList()) {
             SellingRespVO tempSellingRespVO = new SellingRespVO();
             tempSellingRespVO.setId(s.getId());
             tempSellingRespVO.setInvId(s.getInvId());
@@ -64,7 +66,7 @@ public class SellingsearchService {
             // 价格
             tempSellingRespVO.setPrice(s.getPrice());
             InvDescDO invDescDO = invDescMap.get(s.getInvDescId());
-            if(!Objects.isNull(invDescDO)){
+            if (!Objects.isNull(invDescDO)) {
                 // 图片
                 tempSellingRespVO.setIconUrl(invDescDO.getIconUrl());
                 // 武器名称
@@ -74,4 +76,17 @@ public class SellingsearchService {
         }
         return new PageResult<>(sellingRespVOList, invPage.getTotal());
     }
+
+    // 在售商品列表
+    public PageResult<SellingDO> sellView(SellingPageReqVO pageReqVO) {
+
+        pageReqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        if (pageReqVO.getInstanceid() == null) {
+            throw new ServiceException(-1, "instanceId不能为空");
+        }
+        PageResult<SellingDO> sellingPage;
+        sellingPage = sellingService.getSellingPage(pageReqVO);
+        return sellingPage;
+    }
+
 }
