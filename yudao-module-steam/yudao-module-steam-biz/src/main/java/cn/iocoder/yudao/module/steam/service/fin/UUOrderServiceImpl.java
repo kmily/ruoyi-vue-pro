@@ -137,8 +137,6 @@ public class UUOrderServiceImpl implements UUOrderService {
 
     @Resource
     private UUCommodityMapper UUCommodityMapper;
-    @Resource
-    private SteamService steamService;
 
     @Resource
     private UUTemplateService uuTemplateService;
