@@ -34,16 +34,8 @@ public class InvOrderSaveReqVO {
     @Schema(description = "退款订单编号", example = "15353")
     private Long payRefundId;
 
-    @Schema(description = "退款金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "19998")
-    @NotNull(message = "退款金额，单位：分不能为空")
-    private Integer refundPrice;
-
     @Schema(description = "退款时间")
     private LocalDateTime refundTime;
-
-    @Schema(description = "价格，单位：分 ", requiredMode = Schema.RequiredMode.REQUIRED, example = "5643")
-    @NotNull(message = "价格，单位：分 不能为空")
-    private Integer price;
 
     @Schema(description = "用户类型", example = "2")
     private Integer userType;
@@ -79,10 +71,24 @@ public class InvOrderSaveReqVO {
     @Schema(description = "卖家金额状态", example = "2")
     private Integer sellCashStatus;
 
+    @Schema(description = "退款金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "退款金额，单位：分不能为空")
+    private Integer refundAmount;
+
+    @Schema(description = "价格，单位：分", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "价格，单位：分不能为空")
+    private Integer paymentAmount;
+
     @Schema(description = "服务费，单位分")
     private Integer serviceFee;
 
     @Schema(description = "服务费率")
     private String serviceFeeRate;
+
+    @Schema(description = "商品总额")
+    private Integer commodityAmount;
+
+    @Schema(description = "优惠金额 分")
+    private Integer discountAmount;
 
 }
