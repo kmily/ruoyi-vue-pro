@@ -107,4 +107,12 @@ public class InvOrderRespVO {
     @ExcelProperty("卖家金额状态")
     private Integer sellCashStatus;
 
+    @Schema(description = "服务费，单位分")
+    @ExcelProperty("服务费，单位分")
+    private Integer serviceFee;
+
+    @Schema(description = "服务费率")
+    @ExcelProperty("服务费率")
+    private String serviceFeeRate;
+
 }

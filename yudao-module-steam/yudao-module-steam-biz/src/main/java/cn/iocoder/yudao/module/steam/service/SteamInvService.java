@@ -83,7 +83,9 @@ public class SteamInvService {
             throw new ServiceException(-1, "初始化steam失败");
         }
         InventoryDto json = objectMapper.readValue(proxyResponseVo.getHtml(), InventoryDto.class);
-
+        if(json == null){
+            throw new ServiceException(-1, "访问steam库存过于频繁，请稍后再试");
+        }
         for (InventoryDto.AssetsDTO item:json.getAssets()) {
             // steamid 和 绑定平台用户id 联合查询当前用户steam_inv的所有库存信息
 
@@ -307,6 +309,9 @@ public class SteamInvService {
     public PageResult<AppInvPageReqVO> getInvPage1(InvPageReqVO invPageReqVO){
         // 用户库存
         PageResult<InvDO> invPage = invService.getInvPage(invPageReqVO);
+        if(invPage.getList().isEmpty()){
+            throw new ServiceException(-1,"您暂时没有库存");
+        }
         ArrayList<Object> list = new ArrayList<>();
         for(InvDO invDO : invPage.getList()){
             list.add(invDO.getInvDescId());
