@@ -309,6 +309,9 @@ public class SteamInvService {
     public PageResult<AppInvPageReqVO> getInvPage1(InvPageReqVO invPageReqVO){
         // 用户库存
         PageResult<InvDO> invPage = invService.getInvPage(invPageReqVO);
+        if(invPage.getList().isEmpty()){
+            throw new ServiceException(-1,"您暂时没有库存");
+        }
         ArrayList<Object> list = new ArrayList<>();
         for(InvDO invDO : invPage.getList()){
             list.add(invDO.getInvDescId());
