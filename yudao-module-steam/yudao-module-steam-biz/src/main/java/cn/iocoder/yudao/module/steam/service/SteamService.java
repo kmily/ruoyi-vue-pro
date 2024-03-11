@@ -28,6 +28,7 @@ import cn.iocoder.yudao.module.steam.service.steam.*;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -71,6 +72,8 @@ public class SteamService {
     private InvDescMapper invDescMapper;
     @Resource
     private InvMapper invMapper;
+    @Resource
+    private SteamInvService steamInvService;
 
     /**
      * 帐号绑定
@@ -128,7 +131,7 @@ public class SteamService {
         }
         return bindUserDOS;
     }
-    public void bindMaFile(byte[] maFileJsonByte,String password,Integer bindUserId){
+    public void bindMaFile(byte[] maFileJsonByte,String password,Integer bindUserId) throws JsonProcessingException {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         BindUserDO bindUserDO = bindUserMapper.selectById(bindUserId);
         if(Objects.isNull(bindUserDO)){
@@ -170,205 +173,14 @@ public class SteamService {
         InvPageReqVO invPageReqVO = new InvPageReqVO();
         invPageReqVO.setSteamId(bindUserDO.getSteamId());
         invPageReqVO.setUserId(bindUserDO.getUserId());
+        // 删除之前绑定的所有库存
         if((invMapper.selectPage(invPageReqVO)) != null){
             invMapper.delete(new QueryWrapper<InvDO>().eq("steam_id",bindUserDO.getSteamId()).eq("user_id",bindUserDO.getUserId()));
         }
         bindUserMapper.updateById(bindUserDO);
-        SteamService bean = SpringUtil.getBean(this.getClass());
-        bean.firstGetInv(bindUserDO);
-
+        steamInvService.FistGetInventory(bindUserDO.getId(),"730");
     }
 
-
-    /**
-     * @description: 第一次绑定steam账号，获取用户库存
-     */
-    @Async
-    public void firstGetInv(BindUserDO bindUserDO){
-        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-        builder.method(HttpUtil.Method.GET).url("https://steamcommunity.com/inventory/:steamId/:app/2?l=schinese&count=1000");
-        Map<String,String> pathVar=new HashMap<>();
-        pathVar.put("steamId",bindUserDO.getSteamId());
-        pathVar.put("app","730");
-        builder.pathVar(pathVar);
-        Map<String, String> header = new HashMap<>();
-        header.put("Connection", "close");
-        builder.headers(header);
-        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(),HttpUtil.getClient(true,30000));
-        InventoryDto json = sent.json(InventoryDto.class);
-        for (InventoryDto.AssetsDTO item:json.getAssets()) {
-            InvPageReqVO steamInv= new InvPageReqVO();
-            steamInv.setSteamId(bindUserDO.getSteamId());
-            // 插入库存
-
-
-
-            InvDO steamInvInsert = getInvDO(item,bindUserDO);
-            invMapper.insert(steamInvInsert);
-
-        }
-        List<InventoryDto.DescriptionsDTOX> descriptions = json.getDescriptions();
-        for(InventoryDto.DescriptionsDTOX item:descriptions){
-            InvDescPageReqVO invDescPageReqVO=new InvDescPageReqVO();
-            invDescPageReqVO.setAppid(item.getAppid());
-            invDescPageReqVO.setClassid(item.getClassid());
-            invDescPageReqVO.setInstanceid(item.getInstanceid());
-            List<InvDescDO> invDescDOS = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
-                    .eqIfPresent(InvDescDO::getAppid, item.getAppid())
-                    .eqIfPresent(InvDescDO::getClassid, item.getClassid())
-                    .eqIfPresent(InvDescDO::getInstanceid, item.getInstanceid())
-                    .orderByDesc(InvDescDO::getId));
-            if(invDescDOS.size()>0){
-                Optional<InvDescDO> first = invDescDOS.stream().findFirst();
-                InvDescDO invDescDO = first.get();
-                invDescDO.setSteamId(bindUserDO.getSteamId());
-                invDescDO.setAppid(item.getAppid());
-                invDescDO.setClassid(item.getClassid());
-                invDescDO.setInstanceid(item.getInstanceid());
-                invDescDO.setCurrency(item.getCurrency());
-                invDescDO.setBackgroundColor(item.getBackgroundColor());
-                invDescDO.setIconUrl("https://community.steamstatic.com/economy/image/"+item.getIconUrl());
-                invDescDO.setIconUrlLarge(item.getIconUrlLarge());
-                invDescDO.setDescriptions(item.getDescriptions());
-                invDescDO.setTradable(item.getTradable());
-                invDescDO.setActions(item.getActions());
-                invDescDO.setName(item.getName());
-                invDescDO.setNameColor(item.getNameColor());
-                invDescDO.setType(item.getType());
-                invDescDO.setMarketName(item.getMarketName());
-                invDescDO.setMarketHashName(item.getMarketHashName());
-                invDescDO.setMarketActions(item.getMarketActions());
-                invDescDO.setCommodity(item.getCommodity());
-                invDescDO.setMarketTradableRestriction(item.getMarketTradableRestriction());
-                invDescDO.setMarketable(item.getMarketable());
-                invDescDO.setTags(item.getTags());
-                //解析tags
-                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> type = item.getTags().stream().filter(i -> i.getCategory().equals("Type")).findFirst();
-                if(type.isPresent()){
-                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = type.get();
-                    invDescDO.setSelType(tagsDTO.getInternalName());
-                }
-                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> weapon = item.getTags().stream().filter(i -> i.getCategory().equals("Weapon")).findFirst();
-                if(weapon.isPresent()){
-                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = weapon.get();
-                    invDescDO.setSelWeapon(tagsDTO.getInternalName());
-                }
-                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> itemSet = item.getTags().stream().filter(i -> i.getCategory().equals("ItemSet")).findFirst();
-                if(itemSet.isPresent()){
-                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = itemSet.get();
-                    invDescDO.setSelItemset(tagsDTO.getInternalName());
-                }
-                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> quality = item.getTags().stream().filter(i -> i.getCategory().equals("Quality")).findFirst();
-                if(quality.isPresent()){
-                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = quality.get();
-                    invDescDO.setSelQuality(tagsDTO.getInternalName());
-                }
-                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> rarity = item.getTags().stream().filter(i -> i.getCategory().equals("Rarity")).findFirst();
-                if(rarity.isPresent()){
-                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = rarity.get();
-                    invDescDO.setSelRarity(tagsDTO.getInternalName());
-                }
-                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> exterior = item.getTags().stream().filter(i -> i.getCategory().equals("Exterior")).findFirst();
-                if(exterior.isPresent()){
-                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = exterior.get();
-                    invDescDO.setSelExterior(tagsDTO.getInternalName());
-                }
-                invDescDO.setUpdateTime(LocalDateTime.now());
-                invDescMapper.updateById(invDescDO);
-            }else{
-                InvDescDO invDescDO=new InvDescDO();
-                invDescDO.setSteamId(bindUserDO.getSteamId());
-                invDescDO.setAppid(item.getAppid());
-                invDescDO.setClassid(item.getClassid());
-                invDescDO.setInstanceid(item.getInstanceid());
-                invDescDO.setCurrency(item.getCurrency());
-                invDescDO.setBackgroundColor(item.getBackgroundColor());
-                invDescDO.setIconUrl("https://community.steamstatic.com/economy/image/"+item.getIconUrl());
-                invDescDO.setIconUrlLarge(item.getIconUrlLarge());
-                invDescDO.setDescriptions(item.getDescriptions());
-                invDescDO.setTradable(item.getTradable());
-                invDescDO.setActions(item.getActions());
-                invDescDO.setName(item.getName());
-                invDescDO.setNameColor(item.getNameColor());
-                invDescDO.setType(item.getType());
-                invDescDO.setMarketName(item.getMarketName());
-                invDescDO.setMarketHashName(item.getMarketHashName());
-                invDescDO.setMarketActions(item.getMarketActions());
-                invDescDO.setCommodity(item.getCommodity());
-                invDescDO.setMarketTradableRestriction(item.getMarketTradableRestriction());
-                invDescDO.setMarketable(item.getMarketable());
-                invDescDO.setTags(item.getTags());
-                //解析tags
-                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> type = item.getTags().stream().filter(i -> i.getCategory().equals("Type")).findFirst();
-                if(type.isPresent()){
-                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = type.get();
-                    invDescDO.setSelType(tagsDTO.getInternalName());
-                }
-                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> weapon = item.getTags().stream().filter(i -> i.getCategory().equals("Weapon")).findFirst();
-                if(weapon.isPresent()){
-                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = weapon.get();
-                    invDescDO.setSelWeapon(tagsDTO.getInternalName());
-                }
-                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> itemSet = item.getTags().stream().filter(i -> i.getCategory().equals("ItemSet")).findFirst();
-                if(itemSet.isPresent()){
-                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = itemSet.get();
-                    invDescDO.setSelItemset(tagsDTO.getInternalName());
-                }
-                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> quality = item.getTags().stream().filter(i -> i.getCategory().equals("Quality")).findFirst();
-                if(quality.isPresent()){
-                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = quality.get();
-                    invDescDO.setSelQuality(tagsDTO.getInternalName());
-                }
-                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> rarity = item.getTags().stream().filter(i -> i.getCategory().equals("Rarity")).findFirst();
-                if(rarity.isPresent()){
-                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = rarity.get();
-                    invDescDO.setSelRarity(tagsDTO.getInternalName());
-                }
-                Optional<InventoryDto.DescriptionsDTOX.TagsDTO> exterior = item.getTags().stream().filter(i -> i.getCategory().equals("Exterior")).findFirst();
-                if(exterior.isPresent()){
-                    InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = exterior.get();
-                    invDescDO.setSelExterior(tagsDTO.getInternalName());
-                }
-                invDescMapper.insert(invDescDO);
-                List<InvDescDO> invDescDOS1 = invDescMapper.selectList(new QueryWrapper<InvDescDO>().eq("instanceid", item.getInstanceid()).eq("classid", item.getClassid()));
-                if(Objects.nonNull(invDescDOS1) && invDescDOS1.size()>0){
-                    InvDO invDO = new InvDO();
-                    invDO.setInvDescId(invDescDOS1.get(0).getId());
-                    invDO.setInstanceid(item.getInstanceid());
-                    invDO.setClassid(item.getClassid());
-                    invMapper.update(invDO,new UpdateWrapper<InvDO>().eq("instanceid",item.getInstanceid()).eq("classid",item.getClassid()));
-
-                }
-            }
-        }
-    }
-
-    @Async
-    public void updateInv(String steamId) {
-
-    }
-
-    /**
-     * @Discription 插入库存
-     * @return  steamInvInsert
-     */
-    @NotNull
-    private static InvDO getInvDO(InventoryDto.AssetsDTO item,BindUserDO bindUserDO) {
-        InvDO steamInvInsert = new InvDO();
-        steamInvInsert.setSteamId(bindUserDO.getSteamId());
-        steamInvInsert.setAppid(item.getAppid());
-        steamInvInsert.setAssetid(item.getAssetid());
-        steamInvInsert.setClassid(item.getClassid());
-        steamInvInsert.setInstanceid(item.getInstanceid());
-        steamInvInsert.setAmount(item.getAmount());
-        // 第一次入库，所有道具均为未起售状态 0
-        steamInvInsert.setTransferStatus(0);
-        steamInvInsert.setBindUserId(bindUserDO.getId());
-        steamInvInsert.setUserId(bindUserDO.getUserId());
-        steamInvInsert.setUserType(1);
-        steamInvInsert.setContextid(item.getContextid());
-        return steamInvInsert;
-    }
     /**
      * 验证用户是否已经被绑定
      * @param openApi steam open返回的信息

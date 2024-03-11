@@ -25,6 +25,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -57,8 +58,8 @@ public class SteamInvService {
     private InvService invService;
 
 
-
     // 从steam线上获取库存
+    @Async
     public InventoryDto FistGetInventory(Long id, String appId) throws JsonProcessingException {
         // 用户第一次登录查询库存  根据用户ID查找绑定的Steam账号ID
         BindUserDO bindUserDO = bindUserMapper.selectById(id);
