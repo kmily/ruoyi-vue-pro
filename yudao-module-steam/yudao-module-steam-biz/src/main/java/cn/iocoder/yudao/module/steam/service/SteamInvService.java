@@ -265,8 +265,8 @@ public class SteamInvService {
         // 第一次入库，所有道具均为未起售状态 0
         steamInvInsert.setTransferStatus(0);
         // 用户表id
-        steamInvInsert.setBindUserId(userId);
-        steamInvInsert.setUserId(id);
+        steamInvInsert.setBindUserId(id);
+        steamInvInsert.setUserId(userId);
         steamInvInsert.setUserType(1);
         steamInvInsert.setContextid(item.getContextid());
         return steamInvInsert;
@@ -296,7 +296,7 @@ public class SteamInvService {
                 steamInvUpdate.setAmount(item.getAmount());
                 // 第一次入库，所有道具均为未起售状态 0
                 steamInvUpdate.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
-                steamInvUpdate.setBindUserId(inv.getUserId());
+                steamInvUpdate.setBindUserId(inv.getId());
                 steamInvUpdate.setUserId(inv.getId());
                 steamInvUpdate.setUserType(1);
                 steamInvUpdate.setContextid(item.getContextid());
@@ -331,7 +331,7 @@ public class SteamInvService {
             }else {
                 appInvPageReqVO1.setIconUrl(map.get(invDO.getInvDescId()).getIconUrl());
                 appInvPageReqVO1.setMarketName(map.get(invDO.getInvDescId()).getMarketName());
-                appInvPageReqVO1.setId(invDO.getId());
+                appInvPageReqVO1.setId(invDO.getBindUserId());
                 appInvPageReqVO1.setSteamId(invPageReqVO.getSteamId());
                 appInvPageReqVO1.setStatus(invDO.getStatus());
                 appInvPageReqVO1.setTransferStatus(invDO.getTransferStatus());
