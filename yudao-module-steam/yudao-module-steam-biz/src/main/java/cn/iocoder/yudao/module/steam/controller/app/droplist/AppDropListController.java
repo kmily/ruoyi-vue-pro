@@ -3,8 +3,6 @@ package cn.iocoder.yudao.module.steam.controller.app.droplist;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewPageReqVO;
-import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewRespVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selexterior.vo.SelExteriorPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selitemset.vo.SelItemsetListReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
@@ -13,7 +11,6 @@ import cn.iocoder.yudao.module.steam.controller.admin.selquality.vo.SelQualityPa
 import cn.iocoder.yudao.module.steam.controller.admin.selrarity.vo.SelRarityPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.seltype.vo.SelTypePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppDropListRespVO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewService;
 import cn.iocoder.yudao.module.steam.service.selexterior.SelExteriorService;
@@ -34,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
-import java.util.stream.Collectors;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -153,17 +150,17 @@ public class AppDropListController {
         return CommonResult.success(sellingRespVO);
     }
 
-    @GetMapping("/search/view")
+/*    @GetMapping("/search/view")
     @Operation(summary = "商品详细信息")
     public CommonResult<PageResult<InvPreviewRespVO>> getSearchView(@Valid InvPreviewPageReqVO invPreviewPageReqVO) {
         PageResult<InvPreviewDO> view = invPreviewService.getInvPreviewPage(invPreviewPageReqVO);
         return success(BeanUtils.toBean(view, InvPreviewRespVO.class));
-    }
+    }*/
 
     @GetMapping("/search/viewSell")
     @Operation(summary = "在售商品列表")
     public CommonResult<PageResult<SellingRespVO>> getSellView(@Valid SellingPageReqVO sellingPageReqVO) {
-        PageResult<SellingDO> viewSell = sellingService.getSellingPage(sellingPageReqVO);
+        PageResult<SellingDO> viewSell = sellingsearchService.sellView(sellingPageReqVO);
         return success(BeanUtils.toBean(viewSell, SellingRespVO.class));
     }
 
