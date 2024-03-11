@@ -121,5 +121,13 @@ public class InvOrderDO extends BaseDO {
      * 枚举 {@link cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum 对应的类}
      */
     private Integer sellCashStatus;
+    /**
+     * 服务费，单位分
+     */
+    private Integer serviceFee;
+    /**
+     * 服务费率
+     */
+    private String serviceFeeRate;
 
 }
