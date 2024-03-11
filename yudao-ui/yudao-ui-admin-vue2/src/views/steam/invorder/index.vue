@@ -116,6 +116,8 @@
       </el-table-column>
       <el-table-column label="卖家ID" align="center" prop="sellUserId" />
       <el-table-column label="卖家金额状态" align="center" prop="sellCashStatus" />
+      <el-table-column label="服务费，单位分" align="center" prop="serviceFee" />
+      <el-table-column label="服务费率" align="center" prop="serviceFeeRate" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button style="color: red" v-if="scope.row.payOrderStatus != 20 && scope.row.payStatus && !scope.row.transferText.tradeofferid" size="mini" type="text" @click="refundOrderClick(scope.row.id)"
@@ -182,12 +184,6 @@ export default {
     this.getList();
   },
   methods: {
-    tradeAssetClick(id) {
-      InvOrderApi.tradeAsset(id).then(response => {this.$modal.msgSuccess("已发起请求");this.getList()});
-    },
-    refundOrderClick(id) {
-      InvOrderApi.refundOrder(id).then(response => {this.$modal.msgSuccess("已退款");this.getList()});
-    },
     /** 查询列表 */
     async getList() {
       try {

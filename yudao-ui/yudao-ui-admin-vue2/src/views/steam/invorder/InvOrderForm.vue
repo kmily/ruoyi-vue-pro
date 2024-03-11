@@ -78,6 +78,12 @@
                     <el-form-item label="卖家金额状态" prop="sellCashStatus">
                       <el-input v-model="formData.sellCashStatus" placeholder="请输入卖家金额状态" />
                     </el-form-item>
+                    <el-form-item label="服务费，单位分" prop="serviceFee">
+                      <el-input v-model="formData.serviceFee" placeholder="请输入服务费，单位分" />
+                    </el-form-item>
+                    <el-form-item label="服务费率" prop="serviceFeeRate">
+                      <el-input v-model="formData.serviceFeeRate" placeholder="请输入服务费率" />
+                    </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm" :disabled="formLoading">确 定</el-button>
@@ -124,6 +130,8 @@
                             sellUserType: undefined,
                             sellUserId: undefined,
                             sellCashStatus: undefined,
+                            serviceFee: undefined,
+                            serviceFeeRate: undefined,
         },
         // 表单校验
         formRules: {
@@ -201,6 +209,8 @@
                             sellUserType: undefined,
                             sellUserId: undefined,
                             sellCashStatus: undefined,
+                            serviceFee: undefined,
+                            serviceFeeRate: undefined,
         };
         this.resetForm("formRef");
       }
