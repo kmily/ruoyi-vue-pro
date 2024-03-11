@@ -110,7 +110,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     public CreateOrderResult createWithdrawalOrder(LoginUser loginUser, PayWithdrawalOrderCreateReqVO createReqVO) {
         CreateOrderResult createWithdrawalResult=new CreateOrderResult();
         WithdrawalDO withdrawalDO=new WithdrawalDO().setPayStatus(false)
-                .setPrice(createReqVO.getAmount()).setUserId(loginUser.getId()).setUserType(loginUser.getUserType())
+                .setWithdrawalPrice(createReqVO.getAmount()).setPaymentAmount(0)
+                .setServiceFee(0).setServiceFeeRate("0")
+                .setUserId(loginUser.getId()).setUserType(loginUser.getUserType())
                 .setRefundPrice(0).setWithdrawalInfo(createReqVO.getWithdrawalInfo());
         validateWithdrawalCanCreate(withdrawalDO);
         withdrawalMapper.insert(withdrawalDO);
@@ -118,7 +120,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         Long payOrderId = payOrderApi.createOrder(new PayOrderCreateReqDTO()
                 .setAppId(PAY_WITHDRAWAL_APP_ID).setUserIp(getClientIP()) // 支付应用
                 .setMerchantOrderId(withdrawalDO.getId().toString()) // 业务的订单编号
-                .setSubject("订单提现单号"+withdrawalDO.getId()).setBody("用户ID"+loginUser.getId()+"，提现金额"+withdrawalDO.getWithdrawalInfo()+"分").setPrice(withdrawalDO.getPrice()) // 价格信息
+                .setSubject("订单提现单号"+withdrawalDO.getId()).setBody("用户ID"+loginUser.getId()+"，提现金额"+withdrawalDO.getWithdrawalInfo()+"分").setPrice(withdrawalDO.getPaymentAmount()) // 价格信息
                 .setExpireTime(addTime(Duration.ofHours(2L)))); // 支付的过期时间
         // 2.2 更新支付单到 demo 订单
         withdrawalMapper.updateById(new WithdrawalDO().setId(withdrawalDO.getId())
@@ -141,8 +143,27 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw exception(ErrorCodeConstants.WITHDRAWAL_USER_EXCEPT);
         }
         // 校验订单是否支付
-        if (withdrawalDO.getPrice()<0) {
+        if (withdrawalDO.getWithdrawalPrice()<0) {
             throw exception(ErrorCodeConstants.WITHDRAWAL_AMOUNT_EXCEPT);
+        }
+
+        //计算金额
+        ConfigDO withdrawalRateConfig = configService.getConfigByKey("steam.pay.withdrawalRate");
+
+        if(Objects.isNull(withdrawalRateConfig)){
+            withdrawalDO.setServiceFeeRate("0");
+            withdrawalDO.setServiceFee(0);
+            withdrawalDO.setPaymentAmount(withdrawalDO.getWithdrawalPrice());
+        }else{
+            withdrawalDO.setServiceFeeRate(withdrawalRateConfig.getValue());
+            BigDecimal rate = new BigDecimal("100").add(new BigDecimal(withdrawalRateConfig.getValue())).divide(new BigDecimal("100"));
+            rate.setScale(2,BigDecimal.ROUND_HALF_UP);
+            //四舍五入后金额 分
+            BigDecimal bigDecimal = new BigDecimal(withdrawalDO.getWithdrawalPrice()).multiply(rate).setScale(0,BigDecimal.ROUND_HALF_UP);
+            withdrawalDO.setServiceFee(bigDecimal.intValue());
+            BigDecimal bigDecimal2 = new BigDecimal(withdrawalDO.getWithdrawalPrice());
+            bigDecimal2.add(new BigDecimal(withdrawalDO.getServiceFee()));
+            withdrawalDO.setPaymentAmount(bigDecimal2.intValue());
         }
         return withdrawalDO;
     }
@@ -202,7 +223,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw exception(DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_STATUS_NOT_SUCCESS);
         }
         // 2.3 校验支付金额一致
-        if (notEqual(payOrder.getPrice(), withdrawalDO.getPrice())) {
+        if (notEqual(payOrder.getPrice(), withdrawalDO.getPaymentAmount())) {
             log.error("[validateDemoOrderCanPaid][order({}) payOrder({}) 支付金额不匹配，请进行处理！order 数据是：{}，payOrder 数据是：{}]",
                     id, payOrderId, toJsonString(withdrawalDO), toJsonString(payOrder));
             throw exception(DEMO_ORDER_UPDATE_PAID_FAIL_PAY_PRICE_NOT_MATCH);
@@ -295,6 +316,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         if(Objects.isNull(serviceFeeRateConfigByKey)){
             invOrderDO.setServiceFeeRate("0");
             invOrderDO.setServiceFee(0);
+            invOrderDO.setPaymentAmount(invOrderDO.getCommodityAmount());
         }else{
             invOrderDO.setServiceFeeRate(serviceFeeRateConfigByKey.getValue());
             BigDecimal rate = new BigDecimal("100").add(new BigDecimal(serviceFeeRateConfigByKey.getValue())).divide(new BigDecimal("100"));
@@ -314,10 +336,10 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             }else{
                 invOrderDO.setServiceFee(bigDecimal.intValue());
             }
+            BigDecimal bigDecimal2 = new BigDecimal(invOrderDO.getCommodityAmount());
+            bigDecimal2.add(new BigDecimal(invOrderDO.getServiceFee()));
+            invOrderDO.setPaymentAmount(bigDecimal2.intValue());
         }
-        BigDecimal bigDecimal = new BigDecimal(invOrderDO.getCommodityAmount());
-        bigDecimal.add(new BigDecimal(invOrderDO.getServiceFee()));
-        invOrderDO.setPaymentAmount(bigDecimal.intValue());
         //检查是否已经下过单
         List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
                 .eq(InvOrderDO::getSellId, sellingDO.getId())
