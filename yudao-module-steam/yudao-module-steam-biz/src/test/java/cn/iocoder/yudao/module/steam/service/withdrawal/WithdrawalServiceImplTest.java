@@ -112,23 +112,22 @@ public class WithdrawalServiceImplTest extends BaseDbUnitTest {
        WithdrawalDO dbWithdrawal = randomPojo(WithdrawalDO.class, o -> { // 等会查询到
            o.setUserId(null);
            o.setUserType(null);
-           o.setPayStatus(null);
            o.setPayOrderId(null);
            o.setPayChannelCode(null);
            o.setPayTime(null);
            o.setPayRefundId(null);
            o.setRefundPrice(null);
            o.setRefundTime(null);
-           o.setPrice(null);
            o.setCreateTime(null);
+           o.setPayStatus(null);
+           o.setWithdrawalPrice(null);
+           o.setWithdrawalInfo(null);
        });
        withdrawalMapper.insert(dbWithdrawal);
        // 测试 userId 不匹配
        withdrawalMapper.insert(cloneIgnoreId(dbWithdrawal, o -> o.setUserId(null)));
        // 测试 userType 不匹配
        withdrawalMapper.insert(cloneIgnoreId(dbWithdrawal, o -> o.setUserType(null)));
-       // 测试 payStatus 不匹配
-       withdrawalMapper.insert(cloneIgnoreId(dbWithdrawal, o -> o.setPayStatus(null)));
        // 测试 payOrderId 不匹配
        withdrawalMapper.insert(cloneIgnoreId(dbWithdrawal, o -> o.setPayOrderId(null)));
        // 测试 payChannelCode 不匹配
@@ -141,23 +140,28 @@ public class WithdrawalServiceImplTest extends BaseDbUnitTest {
        withdrawalMapper.insert(cloneIgnoreId(dbWithdrawal, o -> o.setRefundPrice(null)));
        // 测试 refundTime 不匹配
        withdrawalMapper.insert(cloneIgnoreId(dbWithdrawal, o -> o.setRefundTime(null)));
-       // 测试 price 不匹配
-       withdrawalMapper.insert(cloneIgnoreId(dbWithdrawal, o -> o.setPrice(null)));
        // 测试 createTime 不匹配
        withdrawalMapper.insert(cloneIgnoreId(dbWithdrawal, o -> o.setCreateTime(null)));
+       // 测试 payStatus 不匹配
+       withdrawalMapper.insert(cloneIgnoreId(dbWithdrawal, o -> o.setPayStatus(null)));
+       // 测试 withdrawalPrice 不匹配
+       withdrawalMapper.insert(cloneIgnoreId(dbWithdrawal, o -> o.setWithdrawalPrice(null)));
+       // 测试 withdrawalInfo 不匹配
+       withdrawalMapper.insert(cloneIgnoreId(dbWithdrawal, o -> o.setWithdrawalInfo(null)));
        // 准备参数
        WithdrawalPageReqVO reqVO = new WithdrawalPageReqVO();
        reqVO.setUserId(null);
        reqVO.setUserType(null);
-       reqVO.setPayStatus(null);
        reqVO.setPayOrderId(null);
        reqVO.setPayChannelCode(null);
        reqVO.setPayTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
        reqVO.setPayRefundId(null);
        reqVO.setRefundPrice(null);
        reqVO.setRefundTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
-       reqVO.setPrice(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
+       reqVO.setPayStatus(null);
+       reqVO.setWithdrawalPrice(null);
+       reqVO.setWithdrawalInfo(null);
 
        // 调用
        PageResult<WithdrawalDO> pageResult = withdrawalService.getWithdrawalPage(reqVO);

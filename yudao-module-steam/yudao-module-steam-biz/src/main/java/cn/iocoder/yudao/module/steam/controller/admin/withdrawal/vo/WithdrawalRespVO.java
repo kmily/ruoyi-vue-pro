@@ -24,11 +24,12 @@ public class WithdrawalRespVO {
     private Long userId;
 
     @Schema(description = "用户类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @ExcelProperty("用户类型")
+    @ExcelProperty(value = "用户类型", converter = DictConvert.class)
+    @DictFormat("user_type") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
     private Integer userType;
 
-    @Schema(description = "是否已支付[0未支付，1支付]", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @ExcelProperty(value = "是否已支付[0未支付，1支付]", converter = DictConvert.class)
+    @Schema(description = "是否已支付", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @ExcelProperty(value = "是否已支付", converter = DictConvert.class)
     @DictFormat("infra_boolean_string") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
     private Boolean payStatus;
 
@@ -56,12 +57,29 @@ public class WithdrawalRespVO {
     @ExcelProperty("退款时间")
     private LocalDateTime refundTime;
 
-    @Schema(description = "提现金额", example = "25442")
-    @ExcelProperty("提现金额")
-    private Integer price;
-
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
+
+
+    @Schema(description = "提现金额", example = "19208")
+    @ExcelProperty("提现金额")
+    private Integer withdrawalPrice;
+
+    @Schema(description = "提现信息")
+    @ExcelProperty("提现信息")
+    private String withdrawalInfo;
+
+    @Schema(description = "服务费", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("服务费")
+    private Integer serviceFee;
+
+    @Schema(description = "费率", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("费率")
+    private String serviceFeeRate;
+
+    @Schema(description = "支付金额")
+    @ExcelProperty("支付金额")
+    private Integer paymentAmount;
 
 }

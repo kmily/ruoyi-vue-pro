@@ -22,8 +22,8 @@ public class WithdrawalSaveReqVO {
     @NotNull(message = "用户类型不能为空")
     private Integer userType;
 
-    @Schema(description = "是否已支付[0未支付，1支付]", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @NotNull(message = "是否已支付[0未支付，1支付]不能为空")
+    @Schema(description = "是否已支付", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @NotNull(message = "是否已支付不能为空")
     private Boolean payStatus;
 
     @Schema(description = "支付订单编号", example = "30058")
@@ -45,9 +45,20 @@ public class WithdrawalSaveReqVO {
     private LocalDateTime refundTime;
 
     @Schema(description = "提现金额", example = "25442")
-    private Integer price;
+    private Integer withdrawalPrice;
 
     @Schema(description = "提现信息")
     private String withdrawalInfo;
+
+    @Schema(description = "服务费", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "服务费不能为空")
+    private Integer serviceFee;
+
+    @Schema(description = "费率", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotEmpty(message = "费率不能为空")
+    private String serviceFeeRate;
+
+    @Schema(description = "支付金额")
+    private Integer paymentAmount;
 
 }

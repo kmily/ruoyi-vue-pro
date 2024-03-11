@@ -35,14 +35,10 @@ public class WithdrawalDO extends BaseDO {
     private Long userId;
     /**
      * 用户类型
+     *
+     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.UserTypeEnum 对应的类}
      */
     private Integer userType;
-    /**
-     * 是否已支付[0未支付，1支付]
-     *
-     * 枚举 {@link TODO infra_boolean_string 对应的类}
-     */
-    private Boolean payStatus;
     /**
      * 支付订单编号
      */
@@ -68,12 +64,28 @@ public class WithdrawalDO extends BaseDO {
      */
     private LocalDateTime refundTime;
     /**
+     * 是否已支付
+     */
+    private Boolean payStatus;
+    /**
      * 提现金额
      */
-    private Integer price;
+    private Integer withdrawalPrice;
     /**
      * 提现信息
      */
     private String withdrawalInfo;
+    /**
+     * 服务费
+     */
+    private Integer serviceFee;
+    /**
+     * 费率
+     */
+    private String serviceFeeRate;
+    /**
+     * 支付金额
+     */
+    private Integer paymentAmount;
 
 }
