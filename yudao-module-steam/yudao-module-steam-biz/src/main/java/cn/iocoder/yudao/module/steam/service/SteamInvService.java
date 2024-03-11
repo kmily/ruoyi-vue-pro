@@ -84,7 +84,7 @@ public class SteamInvService {
         }
         InventoryDto json = objectMapper.readValue(proxyResponseVo.getHtml(), InventoryDto.class);
         if(json == null){
-            throw new ServiceException(-1, "访问steam库存过于频繁，请稍后再试");
+            throw new ServiceException(-1, "访问steam库存过于频繁，请稍后再试/或当前库存为空");
         }
         for (InventoryDto.AssetsDTO item:json.getAssets()) {
             // steamid 和 绑定平台用户id 联合查询当前用户steam_inv的所有库存信息
