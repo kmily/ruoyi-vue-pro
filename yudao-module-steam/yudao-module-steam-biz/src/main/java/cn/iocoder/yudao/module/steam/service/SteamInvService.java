@@ -310,7 +310,7 @@ public class SteamInvService {
         for(InvDO invDO : invPage.getList()){
             list.add(invDO.getInvDescId());
         }
-        List<InvDescDO> invDescDOS = invDescMapper.selectList(new QueryWrapper<InvDescDO>().in("id", list));
+        List<InvDescDO> invDescDOS = invDescMapper.selectList(new QueryWrapper<InvDescDO>().in("id",list));
         Map<Long,InvDescDO> map = new HashMap<>();
         for(InvDescDO invDescDO : invDescDOS){
             map.put(invDescDO.getId(),invDescDO);
@@ -325,11 +325,17 @@ public class SteamInvService {
             }else {
                 appInvPageReqVO1.setIconUrl(map.get(invDO.getInvDescId()).getIconUrl());
                 appInvPageReqVO1.setMarketName(map.get(invDO.getInvDescId()).getMarketName());
+                appInvPageReqVO1.setId(invDO.getId());
+                appInvPageReqVO1.setSteamId(invPageReqVO.getSteamId());
+                appInvPageReqVO1.setStatus(invDO.getStatus());
+                appInvPageReqVO1.setTransferStatus(invDO.getTransferStatus());
+                appInvPageReqVO1.setUserType(invDO.getUserType());
                 appInvPageReqVO.add(appInvPageReqVO1);
+
             }
 
         }
-        return new PageResult<AppInvPageReqVO>(appInvPageReqVO, invPage.getTotal());
+        return new PageResult<>(appInvPageReqVO, invPage.getTotal());
 
     }
 
