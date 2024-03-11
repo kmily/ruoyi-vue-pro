@@ -178,7 +178,9 @@ public class SteamService {
             invMapper.delete(new QueryWrapper<InvDO>().eq("steam_id",bindUserDO.getSteamId()).eq("user_id",bindUserDO.getUserId()));
         }
         bindUserMapper.updateById(bindUserDO);
-        steamInvService.FistGetInventory(bindUserDO.getId(),"730");
+        InventoryDto inventoryDto = steamInvService.FistGetInventory(bindUserDO.getId(), "730");
+        if(inventoryDto.getAssets().isEmpty())
+            throw new ServiceException(-1,"steam库存为空，请确认后再次操作。");
     }
 
     /**
