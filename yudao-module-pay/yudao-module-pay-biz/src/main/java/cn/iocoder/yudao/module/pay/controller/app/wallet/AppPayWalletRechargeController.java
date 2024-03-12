@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.recharge.AppPayWalletRechargeCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.recharge.AppPayWalletRechargeCreateRespVO;
 import cn.iocoder.yudao.module.pay.controller.app.wallet.vo.recharge.AppPayWalletRechargeRespVO;
@@ -27,6 +28,7 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -48,6 +50,7 @@ public class AppPayWalletRechargeController {
 
     @PostMapping("/create")
     @Operation(summary = "创建钱包充值记录（发起充值）")
+    @Idempotent(timeout = 60, timeUnit = TimeUnit.SECONDS, message = "操作太快，请稍后再试")
     public CommonResult<AppPayWalletRechargeCreateRespVO> createWalletRecharge(
             @Valid @RequestBody  AppPayWalletRechargeCreateReqVO reqVO) {
         PayWalletRechargeDO walletRecharge = walletRechargeService.createWalletRecharge(

@@ -40,6 +40,7 @@ public interface ErrorCodeConstants {
     ErrorCode WITHDRAWAL_AMOUNT_EXCEPT = new ErrorCode(1_100_010_02, "提现金额不正确");
     ErrorCode WITHDRAWAL_USER_EXCEPT = new ErrorCode(1_100_010_03, "用户不存在");
     ErrorCode WITHDRAWAL_CANNOTDO = new ErrorCode(1_100_010_03, "收款帐号不允许提现");
+    ErrorCode WITHDRAWAL_AMOUNT_MIN = new ErrorCode(1_100_010_03, "低于最低提现金额");
 
     ErrorCode WITHDRAWAL_AUDIT = new ErrorCode(1_100_010_04, "审核中");
     ErrorCode WITHDRAWAL_AUDIT_FAIL = new ErrorCode(1_100_010_04, "审核未通过");
