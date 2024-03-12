@@ -99,21 +99,21 @@ public class SteamInvService {
                 invMapper.insert(steamInvInsert);
             }
         } else {
-            // 更新库存 删除 steam_selling 和 steam_inv 表中的信息
-            InventoryDto.AssetsDTO item = new InventoryDto.AssetsDTO();
-            for (InventoryDto.AssetsDTO assetsDTO : json.getAssets()) {
-                item.setContextid(assetsDTO.getContextid());
-                item.setAssetid(assetsDTO.getAssetid());
-                item.setClassid(assetsDTO.getClassid());
-            }
-            ArrayList<InventoryDto.AssetsDTO> assetList = new ArrayList<>(json.getAssets());
-            // 遍历本地表，查找本地表存在，线上库存中不存在的商品（说明该商品已经在其他平台卖出），在本地库存将 status 设置为1
-            InvDO steamInvUpdate = InvUpdate(invDOPageResult, item, assetList, bindUserDO);
-            invMapper.update(new LambdaUpdateWrapper<>(steamInvUpdate).eq(InvDO::getAssetid, steamInvUpdate.getAssetid()));
-            SellingDO sellingDO = sellingMapper.selectById(steamInvUpdate.getId());
-            if (sellingDO != null) {
-                sellingMapper.updateById(new SellingDO().setStatus(CommonStatusEnum.DISABLE.getStatus()).setId(sellingDO.getId()));
-            }
+//            // 更新库存 删除 steam_selling 和 steam_inv 表中的信息
+//            InventoryDto.AssetsDTO item = new InventoryDto.AssetsDTO();
+//            for (InventoryDto.AssetsDTO assetsDTO : json.getAssets()) {
+//                item.setContextid(assetsDTO.getContextid());
+//                item.setAssetid(assetsDTO.getAssetid());
+//                item.setClassid(assetsDTO.getClassid());
+//            }
+//            ArrayList<InventoryDto.AssetsDTO> assetList = new ArrayList<>(json.getAssets());
+//            // 遍历本地表，查找本地表存在，线上库存中不存在的商品（说明该商品已经在其他平台卖出），在本地库存将 status 设置为1
+//            InvDO steamInvUpdate = InvUpdate(invDOPageResult, item, assetList, bindUserDO);
+//            invMapper.update(new LambdaUpdateWrapper<>(steamInvUpdate).eq(InvDO::getAssetid, steamInvUpdate.getAssetid()));
+//            SellingDO sellingDO = sellingMapper.selectById(steamInvUpdate.getId());
+//            if (sellingDO != null) {
+//                sellingMapper.updateById(new SellingDO().setStatus(CommonStatusEnum.DISABLE.getStatus()).setId(sellingDO.getId()));
+//            }
             // 遍历线上库存表，查找线上库存表存在，本地库存中不存在的商品（说明该商品是玩家新获得道具），添加到本地库存表中
         }
 
@@ -360,7 +360,7 @@ public class SteamInvService {
             } else {
                 appInvPageReqVO1.setIconUrl(map.get(invDO.getInvDescId()).getIconUrl());
                 appInvPageReqVO1.setMarketName(map.get(invDO.getInvDescId()).getMarketName());
-                appInvPageReqVO1.setId(invDO.getBindUserId());
+                appInvPageReqVO1.setId(invDO.getId());
                 appInvPageReqVO1.setSteamId(invPageReqVO.getSteamId());
                 appInvPageReqVO1.setStatus(invDO.getStatus());
                 appInvPageReqVO1.setTransferStatus(invDO.getTransferStatus());
