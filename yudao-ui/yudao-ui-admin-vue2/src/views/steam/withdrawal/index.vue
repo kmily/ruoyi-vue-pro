@@ -47,6 +47,15 @@
       <el-form-item label="提现信息" prop="withdrawalInfo">
         <el-input v-model="queryParams.withdrawalInfo" placeholder="请输入提现信息" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
+      <el-form-item label="服务费" prop="serviceFee">
+        <el-input v-model="queryParams.serviceFee" placeholder="请输入服务费" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="费率" prop="serviceFeeRate">
+        <el-input v-model="queryParams.serviceFeeRate" placeholder="请输入费率" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="支付金额" prop="paymentAmount">
+        <el-input v-model="queryParams.paymentAmount" placeholder="请输入支付金额" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -95,6 +104,11 @@
       <el-table-column label="服务费" align="center" prop="serviceFee" />
       <el-table-column label="费率" align="center" prop="serviceFeeRate" />
       <el-table-column label="支付金额" align="center" prop="paymentAmount" />
+      <el-table-column label="审批状态" align="center" prop="auditStatus" />
+      <el-table-column label="审核人" align="center" prop="auditUserId" />
+      <el-table-column label="审核信息" align="center" prop="auditMsg" />
+      <el-table-column label="提现手续费收款钱包" align="center" prop="serviceFeeUserId" />
+      <el-table-column label="提现手续费收款人类型" align="center" prop="serviceFeeUserType" />
 <!--      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">-->
 <!--        <template v-slot="scope">-->
 <!--          <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"-->
@@ -154,6 +168,9 @@ export default {
         payStatus: null,
         withdrawalPrice: null,
         withdrawalInfo: null,
+        serviceFee: null,
+        serviceFeeRate: null,
+        paymentAmount: null,
       },
             };
   },

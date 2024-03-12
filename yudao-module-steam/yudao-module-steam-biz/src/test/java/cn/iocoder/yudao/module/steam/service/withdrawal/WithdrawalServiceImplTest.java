@@ -122,6 +122,9 @@ public class WithdrawalServiceImplTest extends BaseDbUnitTest {
            o.setPayStatus(null);
            o.setWithdrawalPrice(null);
            o.setWithdrawalInfo(null);
+           o.setServiceFee(null);
+           o.setServiceFeeRate(null);
+           o.setPaymentAmount(null);
        });
        withdrawalMapper.insert(dbWithdrawal);
        // 测试 userId 不匹配
@@ -148,6 +151,12 @@ public class WithdrawalServiceImplTest extends BaseDbUnitTest {
        withdrawalMapper.insert(cloneIgnoreId(dbWithdrawal, o -> o.setWithdrawalPrice(null)));
        // 测试 withdrawalInfo 不匹配
        withdrawalMapper.insert(cloneIgnoreId(dbWithdrawal, o -> o.setWithdrawalInfo(null)));
+       // 测试 serviceFee 不匹配
+       withdrawalMapper.insert(cloneIgnoreId(dbWithdrawal, o -> o.setServiceFee(null)));
+       // 测试 serviceFeeRate 不匹配
+       withdrawalMapper.insert(cloneIgnoreId(dbWithdrawal, o -> o.setServiceFeeRate(null)));
+       // 测试 paymentAmount 不匹配
+       withdrawalMapper.insert(cloneIgnoreId(dbWithdrawal, o -> o.setPaymentAmount(null)));
        // 准备参数
        WithdrawalPageReqVO reqVO = new WithdrawalPageReqVO();
        reqVO.setUserId(null);
@@ -162,6 +171,9 @@ public class WithdrawalServiceImplTest extends BaseDbUnitTest {
        reqVO.setPayStatus(null);
        reqVO.setWithdrawalPrice(null);
        reqVO.setWithdrawalInfo(null);
+       reqVO.setServiceFee(null);
+       reqVO.setServiceFeeRate(null);
+       reqVO.setPaymentAmount(null);
 
        // 调用
        PageResult<WithdrawalDO> pageResult = withdrawalService.getWithdrawalPage(reqVO);
