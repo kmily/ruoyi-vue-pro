@@ -158,6 +158,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         if (Objects.isNull(withdrawalDO.getUserType()) || withdrawalDO.getUserType()<=0) {
             throw exception(ErrorCodeConstants.WITHDRAWAL_USER_EXCEPT);
         }
+        if (Objects.isNull(withdrawalDO.getWithdrawalPrice()) || withdrawalDO.getWithdrawalPrice()<1000L) {
+            throw exception(ErrorCodeConstants.WITHDRAWAL_AMOUNT_MIN);
+        }
         // 校验订单是否支付
         if (withdrawalDO.getWithdrawalPrice()<0) {
             throw exception(ErrorCodeConstants.WITHDRAWAL_AMOUNT_EXCEPT);
