@@ -365,6 +365,7 @@ public class SteamInvService {
                 appInvPageReqVO1.setStatus(invDO.getStatus());
                 appInvPageReqVO1.setTransferStatus(invDO.getTransferStatus());
                 appInvPageReqVO1.setUserType(invDO.getUserType());
+                appInvPageReqVO1.setPrice(invDO.getPrice());
                 appInvPageReqVO.add(appInvPageReqVO1);
             }
 
