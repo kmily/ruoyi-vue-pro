@@ -20,6 +20,7 @@ import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -86,35 +87,35 @@ public class SteamInvService {
         if(json == null){
             throw new ServiceException(-1, "访问steam库存过于频繁，请稍后再试/或当前库存为空");
         }
-        for (InventoryDto.AssetsDTO item:json.getAssets()) {
-            // steamid 和 绑定平台用户id 联合查询当前用户steam_inv的所有库存信息
-
-            InvPageReqVO steamInv= new InvPageReqVO();
-            steamInv.setSteamId(bindUserDO.getSteamId());
-            // invDOPageResult: 当前用户steam_inv的所有库存信息
-            PageResult<InvDO> invDOPageResult = invMapper.selectPage(steamInv);;
-            if (invDOPageResult.getTotal() > 0){
-                // 更新库存 TODO 删除 steam_selling 和 steam_inv 表中的信息
-                ArrayList<InventoryDto.AssetsDTO> invCollect = new ArrayList<>(json.getAssets());
-                for (InvDO invDO : invDOPageResult.getList()){
-                    if(!invCollect.contains(invDO)){
-                        SellingDO updateDo = new SellingDO();
-                        // 默认0有效 1失效
-                        updateDo.setStatus(CommonStatusEnum.DISABLE.getStatus());
-                        updateDo.setId(invDO.getId());
-                        sellingMapper.updateById(updateDo);
-                        invMapper.deleteById(invDO.getId());
-                    }
-                }
-                InvDO steamInvUpdate = InvUpdate(invDOPageResult,item);
-                invMapper.insert(steamInvUpdate);
-            } else {
-                // 插入库存
-                String steamId = bindUserDO.getSteamId();
-                InvDO steamInvInsert = getInvDO(item,bindUserDO.getUserId(),steamId,bindUserDO.getId());
+        // 对比更新库存前，先查询本地库存是否为空
+        InvPageReqVO steamInv= new InvPageReqVO();
+        steamInv.setSteamId(bindUserDO.getSteamId());
+        PageResult<InvDO> invDOPageResult = invMapper.selectPage(steamInv);
+        // 第一次插入库存
+        if(invDOPageResult.getList().isEmpty()) {
+            for (InventoryDto.AssetsDTO item : json.getAssets()) {
+                InvDO steamInvInsert = InsertInvDO(item, bindUserDO.getUserId(), bindUserDO.getSteamId(), bindUserDO.getId());
                 invMapper.insert(steamInvInsert);
             }
+        }else {
+            // 更新库存 删除 steam_selling 和 steam_inv 表中的信息
+            InventoryDto.AssetsDTO item = new InventoryDto.AssetsDTO();
+            for(InventoryDto.AssetsDTO assetsDTO:json.getAssets()){
+                item.setContextid(assetsDTO.getContextid());
+                item.setAssetid(assetsDTO.getAssetid());
+                item.setClassid(assetsDTO.getClassid());
+            }
+            ArrayList<InventoryDto.AssetsDTO> assetList = new ArrayList<>(json.getAssets());
+            // 遍历本地表，查找本地表存在，线上库存中不存在的商品（说明该商品已经在其他平台卖出），在本地库存将 status 设置为1
+            InvDO steamInvUpdate = InvUpdate(invDOPageResult, item,assetList,bindUserDO);
+            invMapper.update(new LambdaUpdateWrapper<>(steamInvUpdate).eq(InvDO::getAssetid, steamInvUpdate.getAssetid()));
+            SellingDO sellingDO = sellingMapper.selectById(steamInvUpdate.getId());
+            if(sellingDO!= null){
+                sellingMapper.updateById(new SellingDO().setStatus(CommonStatusEnum.DISABLE.getStatus()).setId(sellingDO.getId()));
+            }
+            // 遍历线上库存表，查找线上库存表存在，本地库存中不存在的商品（说明该商品是玩家新获得道具），添加到本地库存表中
         }
+
         List<InventoryDto.DescriptionsDTOX> descriptions = json.getDescriptions();
         for(InventoryDto.DescriptionsDTOX item:descriptions){
             InvDescPageReqVO invDescPageReqVO=new InvDescPageReqVO();
@@ -254,7 +255,7 @@ public class SteamInvService {
      * @return  steamInvInsert
      */
     @NotNull
-    private static InvDO getInvDO(InventoryDto.AssetsDTO item,Long userId,String steamId,Long id) {
+    private static InvDO InsertInvDO(InventoryDto.AssetsDTO item,Long userId,String steamId,Long id) {
         InvDO steamInvInsert = new InvDO();
         steamInvInsert.setSteamId(steamId);
         steamInvInsert.setAppid(item.getAppid());
@@ -279,33 +280,56 @@ public class SteamInvService {
      * InventoryDto.AssetsDTO item 线上steam信息
      */
     @NotNull
-    private static InvDO InvUpdate(PageResult<InvDO> invDOPageResult, InventoryDto.AssetsDTO item) {
-        log.info("{}",item);
-        log.info("{}",invDOPageResult);
+    private static InvDO InvUpdate(PageResult<InvDO> invDOPageResult, InventoryDto.AssetsDTO item,ArrayList<InventoryDto.AssetsDTO> itemList,BindUserDO bindUserDO) {
+
+        // 本地表
         List<InvDO> invList = new ArrayList<>(invDOPageResult.getList());
+        List<Object> list = new ArrayList<>();
+        for(InvDO assetidList : invList){
+            list.add(assetidList.getAssetid());
+        }
+        List<Object> list1 = new ArrayList<>();
+        for(InventoryDto.AssetsDTO item1 : itemList){
+            list1.add(item1.getAssetid());
+        }
+
         InvDO steamInvUpdate = new InvDO();
 
-        // 线上steam库存中存在，本地不存在,插入本地库
-        for(InvDO inv : invList){
-            if(!inv.getAssetid().contains(item.getAssetid())){
-                steamInvUpdate.setSteamId(inv.getSteamId());
-                steamInvUpdate.setAppid(item.getAppid());
-                steamInvUpdate.setAssetid(item.getAssetid());
-                steamInvUpdate.setClassid(item.getClassid());
-                steamInvUpdate.setInstanceid(item.getInstanceid());
-                steamInvUpdate.setAmount(item.getAmount());
+        for(InvDO inv : invList) {
+            // 本地库存 不存在于 steam 线上库存 （商品已在其他平台出售）
+            if (!list1.contains(inv.getAssetid())) {
+                if (inv.getTransferStatus() == 0) {
+                    steamInvUpdate.setStatus(CommonStatusEnum.DISABLE.getStatus());
+                    steamInvUpdate.setAssetid(inv.getAssetid());
+                    steamInvUpdate.setClassid(inv.getClassid());
+                    steamInvUpdate.setInstanceid(inv.getInstanceid());
+                    steamInvUpdate.setId(inv.getId());
+                    return steamInvUpdate;
+                }
+            }
+        }
+        for(InventoryDto.AssetsDTO assetsDTO : itemList){
+            // 线上 steam 库存 不存在于 本地库存 （玩家新获得库存）
+            if(!list.contains(assetsDTO.getAssetid())){
+                steamInvUpdate.setSteamId(bindUserDO.getSteamId());
+                steamInvUpdate.setAppid(assetsDTO.getAppid());
+                steamInvUpdate.setAssetid(assetsDTO.getAssetid());
+                steamInvUpdate.setClassid(assetsDTO.getClassid());
+                steamInvUpdate.setInstanceid(assetsDTO.getInstanceid());
+                steamInvUpdate.setAmount(assetsDTO.getAmount());
                 // 第一次入库，所有道具均为未起售状态 0
                 steamInvUpdate.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
-                steamInvUpdate.setBindUserId(inv.getId());
-                steamInvUpdate.setUserId(inv.getId());
+                steamInvUpdate.setBindUserId(bindUserDO.getId());
+                steamInvUpdate.setUserId(bindUserDO.getUserId());
                 steamInvUpdate.setUserType(1);
-                steamInvUpdate.setContextid(item.getContextid());
+                steamInvUpdate.setContextid(assetsDTO.getContextid());
             }
         }
         return steamInvUpdate;
     }
 
 
+    // 第二次访问库存(只读库存表)
     public PageResult<AppInvPageReqVO> getInvPage1(InvPageReqVO invPageReqVO){
         // 用户库存
         PageResult<InvDO> invPage = invService.getInvPage(invPageReqVO);

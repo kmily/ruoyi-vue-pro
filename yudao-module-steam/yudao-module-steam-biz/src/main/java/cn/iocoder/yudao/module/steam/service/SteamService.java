@@ -174,7 +174,7 @@ public class SteamService {
         invPageReqVO.setSteamId(bindUserDO.getSteamId());
         invPageReqVO.setUserId(bindUserDO.getUserId());
         // 删除之前绑定的所有库存
-        if((invMapper.selectPage(invPageReqVO)) != null){
+        if(!(invMapper.selectPage(invPageReqVO)).getList().isEmpty()){
             invMapper.delete(new QueryWrapper<InvDO>().eq("steam_id",bindUserDO.getSteamId()).eq("user_id",bindUserDO.getUserId()));
         }
         bindUserMapper.updateById(bindUserDO);
