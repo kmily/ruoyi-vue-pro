@@ -5,6 +5,7 @@ import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.*;
@@ -35,6 +36,12 @@ public interface SellingMapper extends BaseMapperX<SellingDO> {
                 .eqIfPresent(SellingDO::getInvDescId, reqVO.getInvDescId())
                 .eqIfPresent(SellingDO::getTransferStatus, reqVO.getTransferStatus())
                 .eqIfPresent(SellingDO::getInvId, reqVO.getInvId())
+                .eqIfPresent(SellingDO::getSelQuality, reqVO.getSelQuality())
+                .eqIfPresent(SellingDO::getSelItemset, reqVO.getSelItemset())
+                .eqIfPresent(SellingDO::getSelWeapon, reqVO.getSelWeapon())
+                .eqIfPresent(SellingDO::getSelExterior, reqVO.getSelExterior())
+                .eqIfPresent(SellingDO::getSelRarity, reqVO.getSelRarity())
+                .eqIfPresent(SellingDO::getSelType, reqVO.getSelType())
                 .orderByDesc(SellingDO::getId));
     }
 

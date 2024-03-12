@@ -98,8 +98,14 @@ public class SellingExtService {
         sellingDO.setBindUserId(invDO.getBindUserId());
         sellingDO.setContextid(invDO.getContextid());
         sellingDO.setInvDescId(invDescDO.get().getId());
+        sellingDO.setSelExterior(invDescDO.get().getSelExterior());
+        sellingDO.setSelItemset(invDescDO.get().getSelItemset());
+        sellingDO.setSelQuality(invDescDO.get().getSelQuality());
+        sellingDO.setSelRarity(invDescDO.get().getSelRarity());
+        sellingDO.setSelType(invDescDO.get().getSelType());
+        sellingDO.setSelWeapon(invDescDO.get().getSelWeapon());
         sellingDO.setInvId(invDO.getId());
-        if (invPageReqVos.getPrice() == null) {
+        if (invPageReqVos.getPrice() == null || invPageReqVos.getPrice() == 0) {
             throw new ServiceException(-1, "未设置价格");
         }
         sellingDO.setPrice(invPageReqVos.getPrice());

@@ -61,6 +61,26 @@ public class SellingPageReqVO extends PageParam {
     @Schema(description = "发货状态(0代表未出售，1代表出售中，2代表已出售 )", example = "1")
     private Integer transferStatus;
 
+
+    @Schema(description = "类别选择")
+    private String selQuality;
+
+    @Schema(description = "收藏品选择")
+    private String selItemset;
+
+    @Schema(description = "武器选择")
+    private String selWeapon;
+
+    @Schema(description = "外观选择")
+    private String selExterior;
+
+    @Schema(description = "品质选择")
+    private String selRarity;
+
+    @Schema(description = "类型选择", example = "2")
+    private String selType;
+
+
     @Schema(description = "库存表id", example = "23726")
     private Long invId;
 
