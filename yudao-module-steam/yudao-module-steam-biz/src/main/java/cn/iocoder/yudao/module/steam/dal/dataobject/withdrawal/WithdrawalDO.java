@@ -87,5 +87,25 @@ public class WithdrawalDO extends BaseDO {
      * 支付金额
      */
     private Integer paymentAmount;
+    /**
+     * 审批状态
+     */
+    private Integer auditStatus;
+    /**
+     * 审核人
+     */
+    private Long auditUserId;
+    /**
+     * 审核信息
+     */
+    private String auditMsg;
+    /**
+     * 提现手续费收款钱包
+     */
+    private Long serviceFeeUserId;
+    /**
+     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.UserTypeEnum 对应的类}
+     */
+    private Integer serviceFeeUserType;
 
 }

@@ -31,6 +31,9 @@ public interface WithdrawalMapper extends BaseMapperX<WithdrawalDO> {
                 .eqIfPresent(WithdrawalDO::getPayStatus, reqVO.getPayStatus())
                 .eqIfPresent(WithdrawalDO::getWithdrawalPrice, reqVO.getWithdrawalPrice())
                 .eqIfPresent(WithdrawalDO::getWithdrawalInfo, reqVO.getWithdrawalInfo())
+                .eqIfPresent(WithdrawalDO::getServiceFee, reqVO.getServiceFee())
+                .eqIfPresent(WithdrawalDO::getServiceFeeRate, reqVO.getServiceFeeRate())
+                .eqIfPresent(WithdrawalDO::getPaymentAmount, reqVO.getPaymentAmount())
                 .orderByDesc(WithdrawalDO::getId));
     }
     default int updateByIdAndPayed(Long id, boolean wherePayed, WithdrawalDO updateObj) {

@@ -82,4 +82,24 @@ public class WithdrawalRespVO {
     @ExcelProperty("支付金额")
     private Integer paymentAmount;
 
+    @Schema(description = "审批状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @ExcelProperty("审批状态")
+    private Integer auditStatus;
+
+    @Schema(description = "审核人", example = "15626")
+    @ExcelProperty("审核人")
+    private Long auditUserId;
+
+    @Schema(description = "审核信息")
+    @ExcelProperty("审核信息")
+    private String auditMsg;
+
+    @Schema(description = "提现手续费收款钱包", example = "25194")
+    @ExcelProperty("提现手续费收款钱包")
+    private Long serviceFeeUserId;
+
+    @Schema(description = "提现手续费收款人类型", example = "2")
+    @ExcelProperty("提现手续费收款人类型")
+    private Integer serviceFeeUserType;
+
 }

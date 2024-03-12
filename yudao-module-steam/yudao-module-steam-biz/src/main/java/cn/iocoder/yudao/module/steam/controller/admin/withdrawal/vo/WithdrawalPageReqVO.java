@@ -54,4 +54,13 @@ public class WithdrawalPageReqVO extends PageParam {
     @Schema(description = "提现信息")
     private String withdrawalInfo;
 
+    @Schema(description = "服务费")
+    private Integer serviceFee;
+
+    @Schema(description = "费率")
+    private String serviceFeeRate;
+
+    @Schema(description = "支付金额")
+    private Integer paymentAmount;
+
 }

@@ -61,4 +61,20 @@ public class WithdrawalSaveReqVO {
     @Schema(description = "支付金额")
     private Integer paymentAmount;
 
+    @Schema(description = "审批状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @NotNull(message = "审批状态不能为空")
+    private Integer auditStatus;
+
+    @Schema(description = "审核人", example = "15626")
+    private Long auditUserId;
+
+    @Schema(description = "审核信息")
+    private String auditMsg;
+
+    @Schema(description = "提现手续费收款钱包", example = "25194")
+    private Long serviceFeeUserId;
+
+    @Schema(description = "提现手续费收款人类型", example = "2")
+    private Integer serviceFeeUserType;
+
 }
