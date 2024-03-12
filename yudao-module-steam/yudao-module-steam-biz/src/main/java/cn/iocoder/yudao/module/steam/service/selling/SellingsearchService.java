@@ -19,6 +19,7 @@ import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import io.reactivex.rxjava3.core.Maybe;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -87,6 +88,12 @@ public class SellingsearchService {
         PageResult<SellingDO> sellingPage;
         sellingPage = sellingService.getSellingPage(pageReqVO);
         return sellingPage;
+    }
+
+    //TODO 导航栏搜索
+    public PageResult<SellingDO> getSearch(SellingPageReqVO pageReqVO){
+
+            return null ;
     }
 
 }

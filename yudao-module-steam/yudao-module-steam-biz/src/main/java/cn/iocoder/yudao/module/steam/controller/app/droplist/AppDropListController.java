@@ -24,9 +24,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -148,11 +146,12 @@ public class AppDropListController {
         return CommonResult.success(sellingRespVO);
     }
 
-/*    @GetMapping("/search/view")
-    @Operation(summary = "商品详细信息")
-    public CommonResult<PageResult<InvPreviewRespVO>> getSearchView(@Valid InvPreviewPageReqVO invPreviewPageReqVO) {
-        PageResult<InvPreviewDO> view = invPreviewService.getInvPreviewPage(invPreviewPageReqVO);
-        return success(BeanUtils.toBean(view, InvPreviewRespVO.class));
+/*    @GetMapping("/getSearch")
+    @Operation(summary = "搜索导航栏")
+    public CommonResult<PageResult<InvPreviewRespVO>> getSearch(SellingPageReqVO sellingReqVo) {
+        sellingReqVo.setPageSize(200);
+        PageResult<SellingRespVO> sellingRespVO = sellingsearchService.getSearch(sellingReqVo);
+        return CommonResult.success(sellingRespVO);
     }*/
 
     @GetMapping("/search/viewSell")
