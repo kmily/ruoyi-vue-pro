@@ -109,12 +109,22 @@ public class SellingExtService {
     }
 
     public Optional<SellingDO> getOffSale(@Valid SellingReqVo sellingReqVo) {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         // 访问用户库存
         InvDO invDO = invMapper.selectById(sellingReqVo.getId());
         // 获取当前上架信息
         Optional<SellingDO> sellingDO1 = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
                 .eq(SellingDO::getClassid, invDO.getClassid())
                 .eq(SellingDO::getInstanceid, invDO.getInstanceid())).stream().findFirst();
+
+        // 在售账号是否是自己账号
+        if (!sellingDO1.get().getUserId().equals(loginUser.getId())) {
+            throw new ServiceException(-1, "无权限");
+        }
+        if (!sellingDO1.get().getUserType().equals(loginUser.getUserType())) {
+            throw new ServiceException(-1, "无权限");
+        }
+
         // 用户主动下架,当前饰品还存在用户steam库存中
         if (invDO.getTransferStatus() == InvTransferStatusEnum.INIT.getStatus()) {
             // 是否在库存
