@@ -30,7 +30,7 @@ public class PayOrderSyncJob implements JobHandler {
      *  因为一个订单发起支付，到支付成功，大多数在 10 分钟内，需要保证轮询到。
      *  如果设置为 30、60 或者更大时间范围，会导致轮询的订单太多，影响性能。当然，你也可以根据自己的业务情况来处理。
      */
-    private static final Duration CREATE_TIME_DURATION_BEFORE = Duration.ofMinutes(60);
+    private static final Duration CREATE_TIME_DURATION_BEFORE = Duration.ofMinutes(10);
 
     @Resource
     private PayOrderService orderService;
