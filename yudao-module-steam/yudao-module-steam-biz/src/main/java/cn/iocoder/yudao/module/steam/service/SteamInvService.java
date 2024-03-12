@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -64,61 +65,61 @@ public class SteamInvService {
     public InventoryDto FistGetInventory(Long id, String appId) throws JsonProcessingException {
         // 用户第一次登录查询库存  根据用户ID查找绑定的Steam账号ID
         BindUserDO bindUserDO = bindUserMapper.selectById(id);
-        if (bindUserDO == null){
-            throw new ServiceException(-1,"用户未绑定Steam账号");
+        if (bindUserDO == null) {
+            throw new ServiceException(-1, "用户未绑定Steam账号");
         }
-        if (bindUserDO.getSteamPassword() == null){
-            throw new ServiceException(-1,"用户未设置Steam密码,原因：未上传ma文件");
+        if (bindUserDO.getSteamPassword() == null) {
+            throw new ServiceException(-1, "用户未设置Steam密码,原因：未上传ma文件");
         }
         HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
         builder.url("https://steamcommunity.com/inventory/:steamId/:app/2?l=schinese&count=1000");
         Map<String, String> header = new HashMap<>();
         header.put("Accept-Language", "zh-CN,zh;q=0.9");
         builder.headers(header);
-        Map<String,String> pathVar=new HashMap<>();
-        pathVar.put("steamId",bindUserDO.getSteamId());
-        pathVar.put("app",appId);
+        Map<String, String> pathVar = new HashMap<>();
+        pathVar.put("steamId", bindUserDO.getSteamId());
+        pathVar.put("app", appId);
         builder.pathVar(pathVar);
         HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
-        if(Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus()!=200){
+        if (Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus() != 200) {
             throw new ServiceException(-1, "初始化steam失败");
         }
         InventoryDto json = objectMapper.readValue(proxyResponseVo.getHtml(), InventoryDto.class);
-        if(json == null){
+        if (json == null) {
             throw new ServiceException(-1, "访问steam库存过于频繁，请稍后再试/或当前库存为空");
         }
         // 对比更新库存前，先查询本地库存是否为空
-        InvPageReqVO steamInv= new InvPageReqVO();
+        InvPageReqVO steamInv = new InvPageReqVO();
         steamInv.setSteamId(bindUserDO.getSteamId());
         PageResult<InvDO> invDOPageResult = invMapper.selectPage(steamInv);
         // 第一次插入库存
-        if(invDOPageResult.getList().isEmpty()) {
+        if (invDOPageResult.getList().isEmpty()) {
             for (InventoryDto.AssetsDTO item : json.getAssets()) {
                 InvDO steamInvInsert = InsertInvDO(item, bindUserDO.getUserId(), bindUserDO.getSteamId(), bindUserDO.getId());
                 invMapper.insert(steamInvInsert);
             }
-        }else {
+        } else {
             // 更新库存 删除 steam_selling 和 steam_inv 表中的信息
             InventoryDto.AssetsDTO item = new InventoryDto.AssetsDTO();
-            for(InventoryDto.AssetsDTO assetsDTO:json.getAssets()){
+            for (InventoryDto.AssetsDTO assetsDTO : json.getAssets()) {
                 item.setContextid(assetsDTO.getContextid());
                 item.setAssetid(assetsDTO.getAssetid());
                 item.setClassid(assetsDTO.getClassid());
             }
             ArrayList<InventoryDto.AssetsDTO> assetList = new ArrayList<>(json.getAssets());
             // 遍历本地表，查找本地表存在，线上库存中不存在的商品（说明该商品已经在其他平台卖出），在本地库存将 status 设置为1
-            InvDO steamInvUpdate = InvUpdate(invDOPageResult, item,assetList,bindUserDO);
+            InvDO steamInvUpdate = InvUpdate(invDOPageResult, item, assetList, bindUserDO);
             invMapper.update(new LambdaUpdateWrapper<>(steamInvUpdate).eq(InvDO::getAssetid, steamInvUpdate.getAssetid()));
             SellingDO sellingDO = sellingMapper.selectById(steamInvUpdate.getId());
-            if(sellingDO!= null){
+            if (sellingDO != null) {
                 sellingMapper.updateById(new SellingDO().setStatus(CommonStatusEnum.DISABLE.getStatus()).setId(sellingDO.getId()));
             }
             // 遍历线上库存表，查找线上库存表存在，本地库存中不存在的商品（说明该商品是玩家新获得道具），添加到本地库存表中
         }
 
         List<InventoryDto.DescriptionsDTOX> descriptions = json.getDescriptions();
-        for(InventoryDto.DescriptionsDTOX item:descriptions){
-            InvDescPageReqVO invDescPageReqVO=new InvDescPageReqVO();
+        for (InventoryDto.DescriptionsDTOX item : descriptions) {
+            InvDescPageReqVO invDescPageReqVO = new InvDescPageReqVO();
             invDescPageReqVO.setAppid(item.getAppid());
             invDescPageReqVO.setClassid(item.getClassid());
             invDescPageReqVO.setInstanceid(item.getInstanceid());
@@ -127,7 +128,7 @@ public class SteamInvService {
                     .eqIfPresent(InvDescDO::getClassid, item.getClassid())
                     .eqIfPresent(InvDescDO::getInstanceid, item.getInstanceid())
                     .orderByDesc(InvDescDO::getId));
-            if(invDescDOS.size()>0){
+            if (invDescDOS.size() > 0) {
                 Optional<InvDescDO> first = invDescDOS.stream().findFirst();
                 InvDescDO invDescDO = first.get();
                 invDescDO.setSteamId(bindUserDO.getSteamId());
@@ -136,7 +137,7 @@ public class SteamInvService {
                 invDescDO.setInstanceid(item.getInstanceid());
                 invDescDO.setCurrency(item.getCurrency());
                 invDescDO.setBackgroundColor(item.getBackgroundColor());
-                invDescDO.setIconUrl("https://community.steamstatic.com/economy/image/"+item.getIconUrl());
+                invDescDO.setIconUrl("https://community.steamstatic.com/economy/image/" + item.getIconUrl());
                 invDescDO.setIconUrlLarge(item.getIconUrlLarge());
                 invDescDO.setDescriptions(item.getDescriptions());
                 invDescDO.setTradable(item.getTradable());
@@ -153,46 +154,46 @@ public class SteamInvService {
                 invDescDO.setTags(item.getTags());
                 //解析tags
                 Optional<InventoryDto.DescriptionsDTOX.TagsDTO> type = item.getTags().stream().filter(i -> i.getCategory().equals("Type")).findFirst();
-                if(type.isPresent()){
+                if (type.isPresent()) {
                     InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = type.get();
                     invDescDO.setSelType(tagsDTO.getInternalName());
                 }
                 Optional<InventoryDto.DescriptionsDTOX.TagsDTO> weapon = item.getTags().stream().filter(i -> i.getCategory().equals("Weapon")).findFirst();
-                if(weapon.isPresent()){
+                if (weapon.isPresent()) {
                     InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = weapon.get();
                     invDescDO.setSelWeapon(tagsDTO.getInternalName());
                 }
                 Optional<InventoryDto.DescriptionsDTOX.TagsDTO> itemSet = item.getTags().stream().filter(i -> i.getCategory().equals("ItemSet")).findFirst();
-                if(itemSet.isPresent()){
+                if (itemSet.isPresent()) {
                     InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = itemSet.get();
                     invDescDO.setSelItemset(tagsDTO.getInternalName());
                 }
                 Optional<InventoryDto.DescriptionsDTOX.TagsDTO> quality = item.getTags().stream().filter(i -> i.getCategory().equals("Quality")).findFirst();
-                if(quality.isPresent()){
+                if (quality.isPresent()) {
                     InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = quality.get();
                     invDescDO.setSelQuality(tagsDTO.getInternalName());
                 }
                 Optional<InventoryDto.DescriptionsDTOX.TagsDTO> rarity = item.getTags().stream().filter(i -> i.getCategory().equals("Rarity")).findFirst();
-                if(rarity.isPresent()){
+                if (rarity.isPresent()) {
                     InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = rarity.get();
                     invDescDO.setSelRarity(tagsDTO.getInternalName());
                 }
                 Optional<InventoryDto.DescriptionsDTOX.TagsDTO> exterior = item.getTags().stream().filter(i -> i.getCategory().equals("Exterior")).findFirst();
-                if(exterior.isPresent()){
+                if (exterior.isPresent()) {
                     InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = exterior.get();
                     invDescDO.setSelExterior(tagsDTO.getInternalName());
                 }
                 invDescDO.setUpdateTime(LocalDateTime.now());
                 invDescMapper.updateById(invDescDO);
-            }else{
-                InvDescDO invDescDO=new InvDescDO();
+            } else {
+                InvDescDO invDescDO = new InvDescDO();
                 invDescDO.setSteamId(bindUserDO.getSteamId());
                 invDescDO.setAppid(item.getAppid());
                 invDescDO.setClassid(item.getClassid());
                 invDescDO.setInstanceid(item.getInstanceid());
                 invDescDO.setCurrency(item.getCurrency());
                 invDescDO.setBackgroundColor(item.getBackgroundColor());
-                invDescDO.setIconUrl("https://community.steamstatic.com/economy/image/"+item.getIconUrl());
+                invDescDO.setIconUrl("https://community.steamstatic.com/economy/image/" + item.getIconUrl());
                 invDescDO.setIconUrlLarge(item.getIconUrlLarge());
                 invDescDO.setDescriptions(item.getDescriptions());
                 invDescDO.setTradable(item.getTradable());
@@ -209,53 +210,55 @@ public class SteamInvService {
                 invDescDO.setTags(item.getTags());
                 //解析tags
                 Optional<InventoryDto.DescriptionsDTOX.TagsDTO> type = item.getTags().stream().filter(i -> i.getCategory().equals("Type")).findFirst();
-                if(type.isPresent()){
+                if (type.isPresent()) {
                     InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = type.get();
                     invDescDO.setSelType(tagsDTO.getInternalName());
                 }
                 Optional<InventoryDto.DescriptionsDTOX.TagsDTO> weapon = item.getTags().stream().filter(i -> i.getCategory().equals("Weapon")).findFirst();
-                if(weapon.isPresent()){
+                if (weapon.isPresent()) {
                     InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = weapon.get();
                     invDescDO.setSelWeapon(tagsDTO.getInternalName());
                 }
                 Optional<InventoryDto.DescriptionsDTOX.TagsDTO> itemSet = item.getTags().stream().filter(i -> i.getCategory().equals("ItemSet")).findFirst();
-                if(itemSet.isPresent()){
+                if (itemSet.isPresent()) {
                     InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = itemSet.get();
                     invDescDO.setSelItemset(tagsDTO.getInternalName());
                 }
                 Optional<InventoryDto.DescriptionsDTOX.TagsDTO> quality = item.getTags().stream().filter(i -> i.getCategory().equals("Quality")).findFirst();
-                if(quality.isPresent()){
+                if (quality.isPresent()) {
                     InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = quality.get();
                     invDescDO.setSelQuality(tagsDTO.getInternalName());
                 }
                 Optional<InventoryDto.DescriptionsDTOX.TagsDTO> rarity = item.getTags().stream().filter(i -> i.getCategory().equals("Rarity")).findFirst();
-                if(rarity.isPresent()){
+                if (rarity.isPresent()) {
                     InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = rarity.get();
                     invDescDO.setSelRarity(tagsDTO.getInternalName());
                 }
                 Optional<InventoryDto.DescriptionsDTOX.TagsDTO> exterior = item.getTags().stream().filter(i -> i.getCategory().equals("Exterior")).findFirst();
-                if(exterior.isPresent()){
+                if (exterior.isPresent()) {
                     InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = exterior.get();
                     invDescDO.setSelExterior(tagsDTO.getInternalName());
                 }
                 invDescMapper.insert(invDescDO);
-                List<InvDescDO> invDescDOS1 = invDescMapper.selectList(new QueryWrapper<InvDescDO>().eq("instanceid", item.getInstanceid()).eq("classid", item.getClassid()));
+                List<InvDescDO> invDescDOS1 = invDescMapper.selectList(new QueryWrapper<InvDescDO>()
+                        .eq("classid", item.getClassid()));
                 InvDO invDO = new InvDO();
                 invDO.setInstanceid(item.getInstanceid());
                 invDO.setClassid(item.getClassid());
                 invDO.setInvDescId(invDescDOS1.get(0).getId());
-                invMapper.update(invDO,new UpdateWrapper<InvDO>().eq("instanceid",item.getInstanceid()).eq("classid",item.getClassid()));
+                invMapper.update(invDO, new UpdateWrapper<InvDO>()
+                        .eq("classid", item.getClassid()));
             }
         }
         return json;
     }
 
     /**
+     * @return steamInvInsert
      * @Discription 插入库存
-     * @return  steamInvInsert
      */
     @NotNull
-    private static InvDO InsertInvDO(InventoryDto.AssetsDTO item,Long userId,String steamId,Long id) {
+    private static InvDO InsertInvDO(InventoryDto.AssetsDTO item, Long userId, String steamId, Long id) {
         InvDO steamInvInsert = new InvDO();
         steamInvInsert.setSteamId(steamId);
         steamInvInsert.setAppid(item.getAppid());
@@ -274,28 +277,29 @@ public class SteamInvService {
     }
 
     /**
-     *   更新库存
+     * 更新库存
+     *
      * @return steamInvUpdate
      * invDOPageResult 库存信息
      * InventoryDto.AssetsDTO item 线上steam信息
      */
     @NotNull
-    private static InvDO InvUpdate(PageResult<InvDO> invDOPageResult, InventoryDto.AssetsDTO item,ArrayList<InventoryDto.AssetsDTO> itemList,BindUserDO bindUserDO) {
+    private static InvDO InvUpdate(PageResult<InvDO> invDOPageResult, InventoryDto.AssetsDTO item, ArrayList<InventoryDto.AssetsDTO> itemList, BindUserDO bindUserDO) {
 
         // 本地表
         List<InvDO> invList = new ArrayList<>(invDOPageResult.getList());
         List<Object> list = new ArrayList<>();
-        for(InvDO assetidList : invList){
+        for (InvDO assetidList : invList) {
             list.add(assetidList.getAssetid());
         }
         List<Object> list1 = new ArrayList<>();
-        for(InventoryDto.AssetsDTO item1 : itemList){
+        for (InventoryDto.AssetsDTO item1 : itemList) {
             list1.add(item1.getAssetid());
         }
 
         InvDO steamInvUpdate = new InvDO();
 
-        for(InvDO inv : invList) {
+        for (InvDO inv : invList) {
             // 本地库存 不存在于 steam 线上库存 （商品已在其他平台出售）
             if (!list1.contains(inv.getAssetid())) {
                 if (inv.getTransferStatus() == 0) {
@@ -308,9 +312,9 @@ public class SteamInvService {
                 }
             }
         }
-        for(InventoryDto.AssetsDTO assetsDTO : itemList){
+        for (InventoryDto.AssetsDTO assetsDTO : itemList) {
             // 线上 steam 库存 不存在于 本地库存 （玩家新获得库存）
-            if(!list.contains(assetsDTO.getAssetid())){
+            if (!list.contains(assetsDTO.getAssetid())) {
                 steamInvUpdate.setSteamId(bindUserDO.getSteamId());
                 steamInvUpdate.setAppid(assetsDTO.getAppid());
                 steamInvUpdate.setAssetid(assetsDTO.getAssetid());
@@ -330,29 +334,30 @@ public class SteamInvService {
 
 
     // 第二次访问库存(只读库存表)
-    public PageResult<AppInvPageReqVO> getInvPage1(InvPageReqVO invPageReqVO){
+    public PageResult<AppInvPageReqVO> getInvPage1(InvPageReqVO invPageReqVO) {
         // 用户库存
         PageResult<InvDO> invPage = invService.getInvPage(invPageReqVO);
-        if(invPage.getList().isEmpty()){
-            throw new ServiceException(-1,"您暂时没有库存");
+        if (invPage.getList().isEmpty()) {
+            throw new ServiceException(-1, "您暂时没有库存");
         }
         ArrayList<Object> list = new ArrayList<>();
-        for(InvDO invDO : invPage.getList()){
+        for (InvDO invDO : invPage.getList()) {
             list.add(invDO.getInvDescId());
         }
-        List<InvDescDO> invDescDOS = invDescMapper.selectList(new QueryWrapper<InvDescDO>().in("id",list));
-        Map<Long,InvDescDO> map = new HashMap<>();
-        for(InvDescDO invDescDO : invDescDOS){
-            map.put(invDescDO.getId(),invDescDO);
-        }
-        List<AppInvPageReqVO> appInvPageReqVO =  new ArrayList<>();
+        List<InvDescDO> invDescDOS = invDescMapper.selectList(new QueryWrapper<InvDescDO>().in("id", list));
 
-        for(InvDO invDO : invPage.getList()){
+        Map<Long, InvDescDO> map = new HashMap<>();
+        for (InvDescDO invDescDO : invDescDOS) {
+            map.put(invDescDO.getId(), invDescDO);
+        }
+        List<AppInvPageReqVO> appInvPageReqVO = new ArrayList<>();
+
+        for (InvDO invDO : invPage.getList()) {
             AppInvPageReqVO appInvPageReqVO1 = new AppInvPageReqVO();
-            if(map.isEmpty()){
-                appInvPageReqVO1.setMarketName(null);
-                appInvPageReqVO1.setMarketName(null);
-            }else {
+            if (map.isEmpty()) {
+                appInvPageReqVO1.setMarketName("null");
+                appInvPageReqVO1.setMarketName("null");
+            } else {
                 appInvPageReqVO1.setIconUrl(map.get(invDO.getInvDescId()).getIconUrl());
                 appInvPageReqVO1.setMarketName(map.get(invDO.getInvDescId()).getMarketName());
                 appInvPageReqVO1.setId(invDO.getBindUserId());
@@ -361,16 +366,12 @@ public class SteamInvService {
                 appInvPageReqVO1.setTransferStatus(invDO.getTransferStatus());
                 appInvPageReqVO1.setUserType(invDO.getUserType());
                 appInvPageReqVO.add(appInvPageReqVO1);
-
             }
 
         }
         return new PageResult<>(appInvPageReqVO, invPage.getTotal());
 
     }
-
-
-
 
 
 }
