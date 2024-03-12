@@ -50,6 +50,25 @@
                     <el-form-item label="支付金额" prop="paymentAmount">
                       <el-input v-model="formData.paymentAmount" placeholder="请输入支付金额" />
                     </el-form-item>
+                    <el-form-item label="审批状态" prop="auditStatus">
+                      <el-radio-group v-model="formData.auditStatus">
+                            <el-radio label="1">请选择字典生成</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="审核人" prop="auditUserId">
+                      <el-input v-model="formData.auditUserId" placeholder="请输入审核人" />
+                    </el-form-item>
+                    <el-form-item label="审核信息" prop="auditMsg">
+                      <el-input v-model="formData.auditMsg" placeholder="请输入审核信息" />
+                    </el-form-item>
+                    <el-form-item label="提现手续费收款钱包" prop="serviceFeeUserId">
+                      <el-input v-model="formData.serviceFeeUserId" placeholder="请输入提现手续费收款钱包" />
+                    </el-form-item>
+                    <el-form-item label="提现手续费收款人类型" prop="serviceFeeUserType">
+                      <el-select v-model="formData.serviceFeeUserType" placeholder="请选择提现手续费收款人类型">
+                            <el-option label="请选择字典生成" value="" />
+                      </el-select>
+                    </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm" :disabled="formLoading">确 定</el-button>
@@ -90,6 +109,11 @@
                             serviceFee: undefined,
                             serviceFeeRate: undefined,
                             paymentAmount: undefined,
+                            auditStatus: undefined,
+                            auditUserId: undefined,
+                            auditMsg: undefined,
+                            serviceFeeUserId: undefined,
+                            serviceFeeUserType: undefined,
         },
         // 表单校验
         formRules: {
@@ -98,6 +122,7 @@
                         payStatus: [{ required: true, message: '是否已支付不能为空', trigger: 'blur' }],
                         serviceFee: [{ required: true, message: '服务费不能为空', trigger: 'blur' }],
                         serviceFeeRate: [{ required: true, message: '费率不能为空', trigger: 'blur' }],
+                        auditStatus: [{ required: true, message: '审批状态不能为空', trigger: 'blur' }],
         },
                         };
     },
@@ -161,6 +186,11 @@
                             serviceFee: undefined,
                             serviceFeeRate: undefined,
                             paymentAmount: undefined,
+                            auditStatus: undefined,
+                            auditUserId: undefined,
+                            auditMsg: undefined,
+                            serviceFeeUserId: undefined,
+                            serviceFeeUserType: undefined,
         };
         this.resetForm("formRef");
       }
