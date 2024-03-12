@@ -112,6 +112,10 @@ public class SellingDO extends BaseDO {
      * 类型选择
      */
     private String selType;
+    /**
+     * market_name
+     */
+    private String marketName;
 
 
 }

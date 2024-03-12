@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "获取下拉选择信息")
@@ -146,13 +148,13 @@ public class AppDropListController {
         return CommonResult.success(sellingRespVO);
     }
 
-/*    @GetMapping("/getSearch")
+    @GetMapping("/getSearch")
     @Operation(summary = "搜索导航栏")
-    public CommonResult<PageResult<InvPreviewRespVO>> getSearch(SellingPageReqVO sellingReqVo) {
+    public CommonResult<List<SellingDO>> getSearch(SellingPageReqVO sellingReqVo) {
         sellingReqVo.setPageSize(200);
-        PageResult<SellingRespVO> sellingRespVO = sellingsearchService.getSearch(sellingReqVo);
+        List<SellingDO> sellingRespVO = sellingsearchService.getSearch(sellingReqVo);
         return CommonResult.success(sellingRespVO);
-    }*/
+    }
 
     @GetMapping("/search/viewSell")
     @Operation(summary = "在售商品列表")

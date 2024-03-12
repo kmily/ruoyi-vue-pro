@@ -80,6 +80,8 @@ public class SellingPageReqVO extends PageParam {
     @Schema(description = "类型选择", example = "2")
     private String selType;
 
+    @Schema(description = "market_name", example = "王五")
+    private String marketName;
 
     @Schema(description = "库存表id", example = "23726")
     private Long invId;

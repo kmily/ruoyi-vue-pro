@@ -91,9 +91,12 @@ public class SellingsearchService {
     }
 
     //TODO 导航栏搜索
-    public PageResult<SellingDO> getSearch(SellingPageReqVO pageReqVO){
+    public List<SellingDO> getSearch(SellingPageReqVO pageReqVO){
 
-            return null ;
+        List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
+                .in(SellingDO::getMarketName, pageReqVO.getMarketName()));
+
+        return sellingDOS ;
     }
 
 }
