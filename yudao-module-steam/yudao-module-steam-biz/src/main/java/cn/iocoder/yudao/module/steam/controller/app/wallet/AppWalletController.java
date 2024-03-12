@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.steam.controller.app.wallet;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
@@ -24,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
+
+import java.util.concurrent.TimeUnit;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -47,6 +50,7 @@ public class AppWalletController {
     @PostMapping("/create/withdrawal")
     @Operation(summary = "创建提现订单")
     @PreAuthenticated
+    @Idempotent(timeout = 60, timeUnit = TimeUnit.SECONDS, message = "操作太快，请稍后再试")
     public CommonResult<CreateOrderResult> createWithdrawal(@Valid @RequestBody PayWithdrawalOrderCreateReqVO createReqVO) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         CreateOrderResult withdrawalOrder = paySteamOrderService.createWithdrawalOrder(loginUser, createReqVO);
