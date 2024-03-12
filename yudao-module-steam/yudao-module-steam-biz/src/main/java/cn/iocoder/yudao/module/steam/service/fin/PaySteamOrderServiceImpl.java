@@ -1,8 +1,15 @@
 package cn.iocoder.yudao.module.steam.service.fin;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.pay.core.client.PayClient;
+import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferRespDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
@@ -12,10 +19,12 @@ import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
+import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
@@ -33,10 +42,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.service.SteamService;
-import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
-import cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum;
-import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
-import cn.iocoder.yudao.module.steam.service.steam.TransferMsg;
+import cn.iocoder.yudao.module.steam.service.steam.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -74,6 +80,8 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
      */
     private static final Long PAY_APP_ID = 9L;
     private static final Long PAY_WITHDRAWAL_APP_ID = 10L;
+    private static final Long WITHDRAWAL_ACCOUNT_ID = 251L;//UU收款账号ID
+    private static final UserTypeEnum WITHDRAWAL_ACCOUNT_TYPE = UserTypeEnum.MEMBER;//UU收款账号ID
 
 
     @Resource
@@ -102,6 +110,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     @Resource
     private ConfigService configService;
 
+    @Resource
+    private PayChannelService channelService;
+
 
     public PaySteamOrderServiceImpl() {
     }
@@ -113,7 +124,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 .setWithdrawalPrice(createReqVO.getAmount()).setPaymentAmount(0)
                 .setServiceFee(0).setServiceFeeRate("0")
                 .setUserId(loginUser.getId()).setUserType(loginUser.getUserType())
-                .setRefundPrice(0).setWithdrawalInfo(createReqVO.getWithdrawalInfo());
+                .setRefundPrice(0).setWithdrawalInfo(createReqVO.getWithdrawalInfo())
+                .setAuditMsg("").setAuditStatus(0).setAuditUserId(0l).setAuditUserType(UserTypeEnum.MEMBER.getValue())
+                .setServiceFeeUserId(WITHDRAWAL_ACCOUNT_ID).setServiceFeeUserType(WITHDRAWAL_ACCOUNT_TYPE.getValue());
         validateWithdrawalCanCreate(withdrawalDO);
         withdrawalMapper.insert(withdrawalDO);
         // 2.1 创建支付单
@@ -164,6 +177,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         return withdrawalDO;
     }
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateWithdrawalOrderPaid(Long id, Long payOrderId) {
         // 校验并获得支付订单（可支付）
         PayOrderRespDTO payOrder = validateWithdrawalOrderCanPaid(id, payOrderId);
@@ -175,6 +189,27 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         if (updateCount == 0) {
             throw exception(DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
+        //处理帐务
+        WithdrawalDO withdrawalDO = withdrawalMapper.selectById(id);
+        PayChannelDO channel = channelService.validPayChannel(PAY_WITHDRAWAL_APP_ID, PayChannelEnum.ALIPAY_PC.getCode());
+        PayClient client = channelService.getPayClient(channel.getId());
+        PayTransferUnifiedReqDTO reqDTO=new PayTransferUnifiedReqDTO();
+        reqDTO.setType(PayTransferTypeEnum.ALIPAY_BALANCE.getType());
+        reqDTO.setPrice(withdrawalDO.getWithdrawalPrice());
+        reqDTO.setUserIp(ServletUtils.getClientIP());
+        reqDTO.setOutTransferNo("TT"+withdrawalDO.getId());
+        reqDTO.setSubject("提现单号"+withdrawalDO.getId());
+        reqDTO.setUserName("ukagwe2912");
+        reqDTO.setAlipayLogonId("ukagwe2912@sandbox.com");
+        PayTransferRespDTO payTransferRespDTO = client.unifiedTransfer(reqDTO);
+        log.info("支付宝打款结果{}",payTransferRespDTO);
+        //打款手续费用
+        PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(withdrawalDO.getServiceFeeUserId(), withdrawalDO.getServiceFeeUserType());
+        payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(withdrawalDO.getId()),
+                PayWalletBizTypeEnum.SERVICE_FEE, withdrawalDO.getServiceFee());
+//        youyouOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
+//        youyouOrderMapper.updateById(youyouOrderDO);
+
     }
 
     /**
@@ -195,9 +230,19 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         }
         // 1.2 校验订单未支付
         if (withdrawalDO.getPayStatus()) {
-            log.error("[validateDemoOrderCanPaid][order({}) 不处于待支付状态，请进行处理！order 数据是：{}]",
+            log.error("[validateWithdrawalOrderCanPaid][order({}) 不处于待支付状态，请进行处理！order 数据是：{}]",
                     id, toJsonString(withdrawalDO));
             throw exception(DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
+        }
+        if (WithdrawalAuditStatusEnum.AUDIT.getStatus().equals(withdrawalDO.getAuditStatus())) {
+            log.error("[validateWithdrawalOrderCanPaid][order({}) 审核中！order 数据是：{}]",
+                    id, toJsonString(withdrawalDO));
+            throw exception(ErrorCodeConstants.WITHDRAWAL_AUDIT);
+        }
+        if (WithdrawalAuditStatusEnum.AUDIT_FAIL.getStatus().equals(withdrawalDO.getAuditStatus())) {
+            log.error("[validateWithdrawalOrderCanPaid][order({}) 审核未通过！order 数据是：{}]",
+                    id, toJsonString(withdrawalDO));
+            throw exception(ErrorCodeConstants.WITHDRAWAL_AUDIT_FAIL);
         }
         // 1.3 校验支付订单匹配
         if (notEqual(withdrawalDO.getPayOrderId(), payOrderId)) { // 支付单号

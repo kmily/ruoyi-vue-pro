@@ -182,6 +182,10 @@ public class PayWalletServiceImpl implements  PayWalletService {
                 walletMapper.updateWhenRecharge(payWallet.getId(), price);
                 break;
             }
+            case SERVICE_FEE:{//steam收款
+                walletMapper.updateWhenRecharge(payWallet.getId(), price);
+                break;
+            }
             default: {
                 // TODO 其它类型待实现
                 throw new UnsupportedOperationException("待实现");

@@ -96,6 +96,10 @@ public class WithdrawalDO extends BaseDO {
      */
     private Long auditUserId;
     /**
+     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.UserTypeEnum 对应的类}
+     */
+    private Integer auditUserType;
+    /**
      * 审核信息
      */
     private String auditMsg;

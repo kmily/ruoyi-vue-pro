@@ -39,6 +39,9 @@ public interface ErrorCodeConstants {
     ErrorCode WITHDRAWAL_NOT_EXISTS = new ErrorCode(1_100_010_01, "提现不存在");
     ErrorCode WITHDRAWAL_AMOUNT_EXCEPT = new ErrorCode(1_100_010_02, "提现金额不正确");
     ErrorCode WITHDRAWAL_USER_EXCEPT = new ErrorCode(1_100_010_03, "用户不存在");
+
+    ErrorCode WITHDRAWAL_AUDIT = new ErrorCode(1_100_010_04, "审核中");
+    ErrorCode WITHDRAWAL_AUDIT_FAIL = new ErrorCode(1_100_010_04, "审核未通过");
     //---库存订单
     ErrorCode INVORDER_INV_NOT_FOUND = new ErrorCode(1_100_011_02, "库存不存在");
     ErrorCode INVORDER_ORDERED_EXCEPT = new ErrorCode(1_100_011_01, "此库存已经存在有效订单");
