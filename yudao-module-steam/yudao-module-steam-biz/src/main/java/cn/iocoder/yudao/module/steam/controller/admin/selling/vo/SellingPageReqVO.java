@@ -83,6 +83,9 @@ public class SellingPageReqVO extends PageParam {
     @Schema(description = "market_name", example = "王五")
     private String marketName;
 
+    @Schema(description = "w", example = "王五")
+    private String iconUrl;
+
     @Schema(description = "库存表id", example = "23726")
     private Long invId;
 
