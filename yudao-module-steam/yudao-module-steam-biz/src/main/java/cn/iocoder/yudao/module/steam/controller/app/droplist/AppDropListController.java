@@ -150,9 +150,9 @@ public class AppDropListController {
 
     @GetMapping("/getSearch")
     @Operation(summary = "搜索导航栏")
-    public CommonResult<List<SellingDO>> getSearch(SellingPageReqVO sellingReqVo) {
+    public CommonResult<PageResult<SellingDO>> getSearch(SellingPageReqVO sellingReqVo) {
         sellingReqVo.setPageSize(200);
-        List<SellingDO> sellingRespVO = sellingsearchService.getSearch(sellingReqVo);
+        PageResult<SellingDO> sellingRespVO = sellingsearchService.getSearch(sellingReqVo);
         return CommonResult.success(sellingRespVO);
     }
 
