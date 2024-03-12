@@ -96,8 +96,8 @@ public class SellingsearchService {
         PageResult<SellingDO> invPage = sellingService.getSellingPage(pageReqVO);
 
         List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
-                .in(SellingDO::getMarketName, pageReqVO.getMarketName()));
-
+                .like(SellingDO::getMarketName, pageReqVO.getMarketName()));
+            invPage.setTotal(Long.valueOf(sellingDOS.size()));
         return new PageResult<>(sellingDOS, invPage.getTotal());
     }
 
