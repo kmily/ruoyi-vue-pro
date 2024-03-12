@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>cn.iocoder.boot</groupId>
+        <artifactId>yudao</artifactId>
+        <version>${revision}</version>
+    </parent>
+    <modules>
+        <module>yudao-module-im-api</module>
+        <module>yudao-module-im-biz</module>
+    </modules>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>yudao-module-im</artifactId>
+    <packaging>pom</packaging>
+
+    <name>${project.artifactId}</name>
+    <description>
+        im 模块，主要提供能力：
+        1. 通讯能力，例如：消息发送、消息接收、消息撤回、消息已读等。
+        2. 通讯会话，例如：单聊、群聊、聊天室等。
+        3. 通讯消息，例如：文本、图片、语音、视频、文件等。
+        4. 通讯消息的存储，例如：消息存储、消息索引、消息搜索等。
+        5. 通讯消息的推送，例如：消息推送、消息通知等。
+        6. 通讯消息的安全，例如：消息加密、消息签名等。
+    </description>
+
+</project>
