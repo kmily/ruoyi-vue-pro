@@ -15,22 +15,22 @@
     <!-- 支付选择框 -->
     <el-card style="margin-top: 10px" v-loading="submitLoading"  element-loading-text="提交支付中...">
       <!-- 支付宝 -->
-<!--      <el-descriptions title="选择支付宝支付">-->
-<!--      </el-descriptions>-->
-<!--      <div class="pay-channel-container">-->
-<!--        <div class="box" v-for="channel in channels" v-if="channel.code.indexOf('alipay_') === 0" :key="channel.code" @click="submit(channel.code)">-->
-<!--          <img :src="channel.icon">-->
-<!--          <div class="title">{{ channel.name }}</div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--      &lt;!&ndash; 微信支付 &ndash;&gt;-->
-<!--      <el-descriptions title="选择微信支付" style="margin-top: 20px;" />-->
-<!--      <div class="pay-channel-container">-->
-<!--        <div class="box" v-for="channel in channels" v-if="channel.code.indexOf('wx_') === 0" :key="channel.code" @click="submit(channel.code)">-->
-<!--          <img :src="channel.icon">-->
-<!--          <div class="title">{{ channel.name }}</div>-->
-<!--        </div>-->
-<!--      </div>-->
+      <el-descriptions title="选择支付宝支付">
+      </el-descriptions>
+      <div class="pay-channel-container">
+        <div class="box" v-for="channel in channels" v-if="channel.code.indexOf('alipay_') === 0" :key="channel.code" @click="submit(channel.code)">
+          <img :src="channel.icon">
+          <div class="title">{{ channel.name }}</div>
+        </div>
+      </div>
+      <!-- 微信支付 -->
+      <el-descriptions title="选择微信支付" style="margin-top: 20px;" />
+      <div class="pay-channel-container">
+        <div class="box" v-for="channel in channels" v-if="channel.code.indexOf('wx_') === 0" :key="channel.code" @click="submit(channel.code)">
+          <img :src="channel.icon">
+          <div class="title">{{ channel.name }}</div>
+        </div>
+      </div>
       <!-- 其它支付 -->
       <el-descriptions title="选择支付方式" style="margin-top: 20px;" />
       <div class="pay-channel-container">
