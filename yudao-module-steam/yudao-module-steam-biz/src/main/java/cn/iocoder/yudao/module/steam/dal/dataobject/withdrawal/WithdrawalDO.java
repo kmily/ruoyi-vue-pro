@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal;
 
+import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.WithdrawalInfo;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 import java.util.*;
 import java.time.LocalDateTime;
@@ -14,7 +16,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
  *
  * @author 芋道源码
  */
-@TableName("steam_withdrawal")
+@TableName(value = "steam_withdrawal",autoResultMap = true)
 @KeySequence("steam_withdrawal_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -74,7 +76,8 @@ public class WithdrawalDO extends BaseDO {
     /**
      * 提现信息
      */
-    private String withdrawalInfo;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private WithdrawalInfo withdrawalInfo;
     /**
      * 服务费
      */
@@ -111,5 +114,12 @@ public class WithdrawalDO extends BaseDO {
      * 枚举 {@link cn.iocoder.yudao.framework.common.enums.UserTypeEnum 对应的类}
      */
     private Integer serviceFeeUserType;
-
+    /**
+     * 支付接口返回
+     */
+    private String payTransferRet;
+    /**
+     * 服务费转帐接口返回
+     */
+    private String serviceFeeRet;
 }

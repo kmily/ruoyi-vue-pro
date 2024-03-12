@@ -21,6 +21,7 @@ import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
@@ -43,8 +44,10 @@ import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.steam.*;
+import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -149,6 +152,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         if (Objects.isNull(withdrawalDO)) {
             throw exception(ErrorCodeConstants.WITHDRAWAL_USER_EXCEPT);
         }
+        if (withdrawalDO.getUserId().equals(WITHDRAWAL_ACCOUNT_ID) && withdrawalDO.getUserType().equals(WITHDRAWAL_ACCOUNT_TYPE.getValue())) {
+            throw exception(ErrorCodeConstants.WITHDRAWAL_CANNOTDO);
+        }
         if (Objects.isNull(withdrawalDO.getUserType()) || withdrawalDO.getUserType()<=0) {
             throw exception(ErrorCodeConstants.WITHDRAWAL_USER_EXCEPT);
         }
@@ -203,12 +209,18 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         reqDTO.setAlipayLogonId("ukagwe2912@sandbox.com");
         PayTransferRespDTO payTransferRespDTO = client.unifiedTransfer(reqDTO);
         log.info("支付宝打款结果{}",payTransferRespDTO);
+        withdrawalMapper.updateById(new WithdrawalDO().setId(withdrawalDO.getId()).setPayTransferRet(JacksonUtils.writeValueAsString(payTransferRespDTO)));
         //打款手续费用
+        setPayWithdrawalServiceFee(withdrawalDO);
+    }
+    @Async
+    public void setPayWithdrawalServiceFee(WithdrawalDO withdrawalDO) {
+
         PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(withdrawalDO.getServiceFeeUserId(), withdrawalDO.getServiceFeeUserType());
-        payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(withdrawalDO.getId()),
+        PayWalletTransactionDO payWalletTransactionDO = payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(withdrawalDO.getId()),
                 PayWalletBizTypeEnum.SERVICE_FEE, withdrawalDO.getServiceFee());
-//        youyouOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
-//        youyouOrderMapper.updateById(youyouOrderDO);
+
+        withdrawalMapper.updateById(new WithdrawalDO().setId(withdrawalDO.getId()).setPayTransferRet(JacksonUtils.writeValueAsString(payWalletTransactionDO)));
 
     }
 
