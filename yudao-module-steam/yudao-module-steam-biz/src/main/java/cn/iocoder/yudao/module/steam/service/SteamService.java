@@ -59,8 +59,6 @@ public class SteamService {
     private InvOrderMapper invOrderMapper;
 
     @Resource
-    private SellingMapper sellingMapper;
-    @Resource
     private InvMapper invMapper;
     @Resource
     private SteamInvService steamInvService;
