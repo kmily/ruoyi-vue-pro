@@ -24,7 +24,7 @@ public interface InvPreviewMapper extends BaseMapperX<InvPreviewDO> {
                 .eqIfPresent(InvPreviewDO::getDeals, reqVO.getDeals())
                 .eqIfPresent(InvPreviewDO::getItemId, reqVO.getItemId())
                 .eqIfPresent(InvPreviewDO::getAppId, reqVO.getAppId())
-                .likeIfPresent(InvPreviewDO::getItemName, reqVO.getItemName()+"%")
+                .likeIfPresent(InvPreviewDO::getItemName, reqVO.getItemName())
                 .likeIfPresent(InvPreviewDO::getShortName, reqVO.getShortName())
                 .likeIfPresent(InvPreviewDO::getMarketHashName, reqVO.getMarketHashName())
                 .eqIfPresent(InvPreviewDO::getImageUrl, reqVO.getImageUrl())
