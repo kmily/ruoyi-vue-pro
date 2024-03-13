@@ -1,20 +1,27 @@
 package cn.iocoder.yudao.module.steam.service.selling;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.steam.controller.admin.invdesc.vo.InvDescPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppSellingPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.SellListItemResp;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.invdesc.InvDescService;
+import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import io.reactivex.rxjava3.core.Maybe;
 import org.springframework.stereotype.Service;
@@ -40,7 +47,28 @@ public class SellingsearchService {
 
     @Resource
     private InvDescService invDescService;
+    @Resource
+    private MemberUserApi memberUserApi;
+    //TODO 导航栏搜索
+    public PageResult<SellListItemResp> sellList(AppSellingPageReqVO pageReqVO){
+        PageResult<SellingDO> sellingDOPageResult = sellingMapper.selectPage(pageReqVO, new LambdaQueryWrapperX<SellingDO>()
+                .eq(SellingDO::getMarketHashName,pageReqVO.getMarketHashName())
+                .eq(SellingDO::getStatus,CommonStatusEnum.ENABLE.getStatus())
+                .eq(SellingDO::getUserType, UserTypeEnum.MEMBER.getValue())
+                .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
+                        .geIfPresent(SellingDO::getPrice,pageReqVO.getMinPrice())
+                        .leIfPresent(SellingDO::getPrice,pageReqVO.getMaxPrice())
+                .orderByAsc(SellingDO::getPrice)
+        );
+        PageResult<SellListItemResp> sellingPageReqVOPageResult = BeanUtils.toBean(sellingDOPageResult, SellListItemResp.class);
 
+        List<Long> collect = sellingDOPageResult.getList().stream().map(SellingDO::getUserId).distinct().collect(Collectors.toList());
+        Map<Long, MemberUserRespDTO> memberUserRespDTOMap = memberUserApi.getUserList(collect).stream().collect(Collectors.toMap(MemberUserRespDTO::getId, item -> item));
+        for (SellListItemResp item:sellingPageReqVOPageResult.getList()) {
+            item.setMemberUserRespDTO(memberUserRespDTOMap.get(item.getUserId()));
+        }
+        return sellingPageReqVOPageResult;
+    }
 
     public PageResult<SellingRespVO> sellingPageSearch(SellingPageReqVO pageReqVO) {
 //        List<SellingDO> collect = sellingMapper.selectPage(pageReqVO).getList().stream().distinct().collect(Collectors.toList());
@@ -103,5 +131,4 @@ public class SellingsearchService {
             invPage.setTotal(Long.valueOf(sellingDOS.size()));
         return new PageResult<>(sellingDOS, invPage.getTotal());
     }
-
 }

@@ -17,8 +17,8 @@ public class ItemResp implements Serializable {
     private String itemId;
     private String imageUrl;
     private C5ItemInfo itemInfo;
-    private String autoPrice;
-    private String salePrice;
+    private Integer autoPrice;
+    private Integer salePrice;
     private List<C5ItemTag> tagList;
     private String autoQuantity;
 }
