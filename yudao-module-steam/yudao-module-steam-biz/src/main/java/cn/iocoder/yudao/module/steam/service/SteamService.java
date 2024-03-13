@@ -22,6 +22,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
+import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
 import cn.iocoder.yudao.module.steam.service.steam.*;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -64,6 +65,9 @@ public class SteamService {
     private SteamInvService steamInvService;
 
     private PaySteamOrderService paySteamOrderService;
+
+    @Resource
+    private IOInvUpdateService ioInvUpdateService;
 
     @Autowired
     public void setPaySteamOrderService(PaySteamOrderService paySteamOrderService) {
@@ -173,7 +177,8 @@ public class SteamService {
             invMapper.delete(new QueryWrapper<InvDO>().eq("steam_id",bindUserDO.getSteamId()).eq("user_id",bindUserDO.getUserId()));
         }
         bindUserMapper.updateById(bindUserDO);
-        steamInvService.FistGetInventory(bindUserDO.getId(), "730");
+        InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
+        ioInvUpdateService.firstInsertInventory(inventoryDto,bindUserDO);
 
     }
 
