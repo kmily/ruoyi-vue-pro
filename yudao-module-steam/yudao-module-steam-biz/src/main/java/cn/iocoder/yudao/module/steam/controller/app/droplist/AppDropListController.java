@@ -11,10 +11,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingRespVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selquality.vo.SelQualityPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selrarity.vo.SelRarityPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.seltype.vo.SelTypePageReqVO;
-import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppDropListRespVO;
-import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppSellingPageReqVO;
-import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.ItemResp;
-import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.SellListItemResp;
+import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
@@ -182,6 +179,11 @@ public class AppDropListController {
     public CommonResult<PageResult<ItemResp>> itemSearch(@Valid InvPreviewPageReqVO sellingPageReqVO) {
         sellingPageReqVO.setExistInv(true);
         return success(invPreviewExtService.getInvPreviewPage(sellingPageReqVO));
+    }
+    @GetMapping("items/730/header")
+    @Operation(summary = "在售商品列表")
+    public CommonResult<ItemResp> itemHeader(@Valid PreviewReqVO reqVO) {
+        return success(invPreviewExtService.getInvPreview(reqVO));
     }
     @GetMapping("sell/list")
     @Operation(summary = "在售商品列表")
