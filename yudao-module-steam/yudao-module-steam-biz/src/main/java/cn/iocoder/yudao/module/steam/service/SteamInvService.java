@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.invdesc.vo.InvDescPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvMergeToSellPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPageReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
@@ -385,6 +386,45 @@ public class SteamInvService {
             }
         }
         return new PageResult<>(appInvPageReqVO, invPage.getTotal());
+    }
+
+
+
+    public List<AppInvMergeToSellPageReqVO> merge(PageResult<AppInvPageReqVO> invPage1){
+        Map<String,Integer> map = new HashMap<>();
+        List<AppInvMergeToSellPageReqVO> invPage = new ArrayList<>();
+
+        // 统计每一个 markName 的个数，并插入invPage
+        for(AppInvPageReqVO element : invPage1.getList()){
+
+            if(map.containsKey(element.getMarketName())){
+                map.put(element.getMarketName(),map.get(element.getMarketName())+1);  // 更新计数
+            } else {
+                map.put(element.getMarketName(),1);    // 初次计数 1
+                AppInvMergeToSellPageReqVO appInvPageReqVO = new AppInvMergeToSellPageReqVO();
+                appInvPageReqVO.setMarketName(element.getMarketName());
+                appInvPageReqVO.setAssetId(element.getAssetid());
+                appInvPageReqVO.setPrice(element.getPrice());
+                appInvPageReqVO.setIconUrl(element.getIconUrl());
+                appInvPageReqVO.setSelQuality(element.getSelQuality());
+                appInvPageReqVO.setSelWeapon(element.getSelWeapon());
+                appInvPageReqVO.setSelExterior(element.getSelExterior());
+                appInvPageReqVO.setSelRarity(element.getSelRarity());
+                appInvPageReqVO.setSelItemset(element.getSelItemset());
+                appInvPageReqVO.setSelType(element.getSelType());
+
+                invPage.add(appInvPageReqVO);
+            }
+        }
+        // 读取每一个商品合并后的件数
+        for(Map.Entry<String,Integer> key : map.entrySet()){
+            for(AppInvMergeToSellPageReqVO element : invPage){
+                if(element.getMarketName().equals(key.getKey())){
+                    element.setNumber(key.getValue());
+                }
+            }
+        }
+        return invPage;
     }
 }
 

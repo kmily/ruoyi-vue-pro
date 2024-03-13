@@ -88,53 +88,10 @@ public class AppInventorySearchController {
      * @param invPageReqVO
      */
     @GetMapping("/mergeToSell")
-    @Operation(summary = "合并出售")
+    @Operation(summary = "合并库存")
     public List<AppInvMergeToSellPageReqVO> mergeToSell(@Valid InvPageReqVO invPageReqVO) {
-//        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-//        assert loginUser != null;
-//        List<BindUserDO> collect = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
-//                .eq(BindUserDO::getUserId, loginUser.getId())
-//                .eq(BindUserDO::getUserType, loginUser.getUserType())
-//                .eq(BindUserDO::getSteamId, invPageReqVO.getSteamId()));
-//        if(Objects.isNull(collect) || collect.isEmpty()){
-//            throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
-//        }
-//        invPageReqVO.setBindUserId(collect.get(0).getId());
         PageResult<AppInvPageReqVO> invPage1 = steamInvService.getInvPage1(invPageReqVO);
-        Map<String,Integer> map = new HashMap<>();
-        List<AppInvMergeToSellPageReqVO> invPage = new ArrayList<>();
-
-        // 统计每一个 markName 的个数，并插入invPage
-        for(AppInvPageReqVO element : invPage1.getList()){
-
-            if(map.containsKey(element.getMarketName())){
-                map.put(element.getMarketName(),map.get(element.getMarketName())+1);  // 更新计数
-            } else {
-                map.put(element.getMarketName(),1);    // 初次计数 1
-                AppInvMergeToSellPageReqVO appInvPageReqVO = new AppInvMergeToSellPageReqVO();
-                appInvPageReqVO.setMarketName(element.getMarketName());
-                appInvPageReqVO.setAssetId(element.getAssetid());
-                appInvPageReqVO.setPrice(element.getPrice());
-                appInvPageReqVO.setIconUrl(element.getIconUrl());
-                appInvPageReqVO.setSelQuality(element.getSelQuality());
-                appInvPageReqVO.setSelWeapon(element.getSelWeapon());
-                appInvPageReqVO.setSelExterior(element.getSelExterior());
-                appInvPageReqVO.setSelRarity(element.getSelRarity());
-                appInvPageReqVO.setSelItemset(element.getSelItemset());
-                appInvPageReqVO.setSelType(element.getSelType());
-
-                invPage.add(appInvPageReqVO);
-            }
-        }
-        // 读取每一个商品合并后的件数
-        for(Map.Entry<String,Integer> key : map.entrySet()){
-            for(AppInvMergeToSellPageReqVO element : invPage){
-                if(element.getMarketName().equals(key.getKey())){
-                    element.setNumber(key.getValue());
-                }
-            }
-        }
-        return invPage;
+        return steamInvService.merge(invPage1);
     }
 }
 
