@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.invdesc.vo.InvDescPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvMergeToSellPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPickVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
@@ -97,7 +98,7 @@ public class SteamInvService {
         if (invDOPageResult.getList().isEmpty()) {
             for (InventoryDto.AssetsDTO item : json.getAssets()) {
                 InvDO steamInvInsert = InsertInvDO(item, bindUserDO.getUserId(), bindUserDO.getSteamId(), bindUserDO.getId());
-                invMapper.insert(steamInvInsert);
+//                invMapper.insert(steamInvInsert);
             }
         } else {
 //            // 更新库存 删除 steam_selling 和 steam_inv 表中的信息
@@ -210,45 +211,51 @@ public class SteamInvService {
                 invDescDO.setMarketable(item.getMarketable());
                 invDescDO.setTags(item.getTags());
                 //解析tags
+                // 类型选择
                 Optional<InventoryDto.DescriptionsDTOX.TagsDTO> type = item.getTags().stream().filter(i -> i.getCategory().equals("Type")).findFirst();
                 if (type.isPresent()) {
                     InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = type.get();
                     invDescDO.setSelType(tagsDTO.getInternalName());
                 }
+                //武器选择
                 Optional<InventoryDto.DescriptionsDTOX.TagsDTO> weapon = item.getTags().stream().filter(i -> i.getCategory().equals("Weapon")).findFirst();
                 if (weapon.isPresent()) {
                     InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = weapon.get();
                     invDescDO.setSelWeapon(tagsDTO.getInternalName());
                 }
+                // 收藏品选择
                 Optional<InventoryDto.DescriptionsDTOX.TagsDTO> itemSet = item.getTags().stream().filter(i -> i.getCategory().equals("ItemSet")).findFirst();
                 if (itemSet.isPresent()) {
                     InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = itemSet.get();
                     invDescDO.setSelItemset(tagsDTO.getInternalName());
                 }
+                //类别选择
                 Optional<InventoryDto.DescriptionsDTOX.TagsDTO> quality = item.getTags().stream().filter(i -> i.getCategory().equals("Quality")).findFirst();
                 if (quality.isPresent()) {
                     InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = quality.get();
                     invDescDO.setSelQuality(tagsDTO.getInternalName());
                 }
+                // 品质选择
                 Optional<InventoryDto.DescriptionsDTOX.TagsDTO> rarity = item.getTags().stream().filter(i -> i.getCategory().equals("Rarity")).findFirst();
                 if (rarity.isPresent()) {
                     InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = rarity.get();
                     invDescDO.setSelRarity(tagsDTO.getInternalName());
                 }
+                // 外观选择
                 Optional<InventoryDto.DescriptionsDTOX.TagsDTO> exterior = item.getTags().stream().filter(i -> i.getCategory().equals("Exterior")).findFirst();
                 if (exterior.isPresent()) {
                     InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = exterior.get();
                     invDescDO.setSelExterior(tagsDTO.getInternalName());
                 }
-                invDescMapper.insert(invDescDO);
+//                invDescMapper.insert(invDescDO);
                 List<InvDescDO> invDescDOS1 = invDescMapper.selectList(new QueryWrapper<InvDescDO>()
                         .eq("classid", item.getClassid()));
                 InvDO invDO = new InvDO();
                 invDO.setInstanceid(item.getInstanceid());
                 invDO.setClassid(item.getClassid());
                 invDO.setInvDescId(invDescDOS1.get(0).getId());
-                invMapper.update(invDO, new UpdateWrapper<InvDO>()
-                        .eq("classid", item.getClassid()));
+//                invMapper.update(invDO, new UpdateWrapper<InvDO>()
+//                        .eq("classid", item.getClassid()));
             }
         }
         return json;
@@ -347,6 +354,7 @@ public class SteamInvService {
         if (invPage.getList().isEmpty()) {
             throw new ServiceException(-1, "您暂时没有库存");
         }
+        // 提取每个库存对应的详情表主键
         ArrayList<Object> list = new ArrayList<>();
         for (InvDO invDO : invPage.getList()) {
             list.add(invDO.getInvDescId());
@@ -389,7 +397,11 @@ public class SteamInvService {
     }
 
 
-
+    /**
+     * 合并显示库存
+     * @param invPage1
+     * @return
+     */
     public List<AppInvMergeToSellPageReqVO> merge(PageResult<AppInvPageReqVO> invPage1){
         Map<String,Integer> map = new HashMap<>();
         List<AppInvMergeToSellPageReqVO> invPage = new ArrayList<>();
@@ -426,6 +438,17 @@ public class SteamInvService {
         }
         return invPage;
     }
+
+
+    /**
+     * 查找库存
+     * @param appInvPickVO
+     */
+//    public List<AppInvPageReqVO> findInv(AppInvPickVO appInvPickVO){
+//        invMapper.selectList(new LambdaQueryWrapperX<>()
+//                .eq(AppInvPageReqVO::getAssetid,appInvPickVO.getAssetId()));
+//        return invPage;
+//    }
 }
 
 

@@ -20,6 +20,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
+import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
 import cn.iocoder.yudao.module.steam.service.steam.*;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -63,7 +64,7 @@ public class SteamService {
     @Resource
     private InvMapper invMapper;
     @Resource
-    private SteamInvService steamInvService;
+    private IOInvUpdateService ioInvUpdateService;
 
     /**
      * 帐号绑定
@@ -168,7 +169,8 @@ public class SteamService {
             invMapper.delete(new QueryWrapper<InvDO>().eq("steam_id",bindUserDO.getSteamId()).eq("user_id",bindUserDO.getUserId()));
         }
         bindUserMapper.updateById(bindUserDO);
-        steamInvService.FistGetInventory(bindUserDO.getId(), "730");
+        InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
+        ioInvUpdateService.firstInsertInventory(inventoryDto,bindUserDO);
 
     }
 

@@ -48,25 +48,14 @@ public class UserInventoryRefreshJob implements JobHandler {
     public String execute(String param) {
 
         String execute = TenantUtils.execute(1l, () -> {
-//
-//            List<BindUserDO> bindUserDO= bindUserMapper.selectList();
-//            if(bindUserDO.isEmpty()){
-//                throw new ServiceException(-1,"未查询到用户");
-//            }
-//            if(bindUserDO.stream().map(BindUserDO::getSteamId).count() == 0){
-//                throw new ServiceException(-1,"用户未绑定steam");
-//            }
-//            for(BindUserDO bindUser:bindUserDO ){
-//
-//                bindUser.getSteamId();
-//            }
+
             List<SellingDO> sellingDOS = sellingMapper.selectList();
             if(sellingDOS.isEmpty()){
                 throw new ServiceException(-1,"未查询到用户库存");
             }
-            for(SellingDO sellingDO:sellingDOS){
-                steamInvService.FistGetInventory(sellingDO.getId(),"730");
-            }
+//            for(SellingDO sellingDO:sellingDOS){
+//                steamInvService.FistGetInventory(sellingDO.getId(),"730");
+//            }
             return "完成";
         });
         return String.format("执行关闭成功 %s 个", execute);
