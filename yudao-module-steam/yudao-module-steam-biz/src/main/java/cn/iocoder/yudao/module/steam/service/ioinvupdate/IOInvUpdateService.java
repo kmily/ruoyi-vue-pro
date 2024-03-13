@@ -171,7 +171,7 @@ public class IOInvUpdateService {
 
 
     /**
-     * 更新库存
+     * 更新库存  删除原有的 transferStatus != 0 的库存 插入新的库存，并比对 selling 表中的内容
      */
     public void updateInventory(InventoryDto inventoryDto, BindUserDO bindUserDO) {
 
