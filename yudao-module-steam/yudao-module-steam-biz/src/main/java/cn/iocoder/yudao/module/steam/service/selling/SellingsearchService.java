@@ -73,7 +73,7 @@ public class SellingsearchService {
             memberUserRespDTO.setPoint(999);
             memberUserRespDTO.setCreateTime(LocalDateTime.now());
             memberUserRespDTO.setLevelId(999l);
-            item.setMemberUserRespDTO(memberUserRespDTOMap.get(item.getUserId()));
+            item.setMemberUserRespDTO(memberUserRespDTO);
         }
         return sellingPageReqVOPageResult;
     }
