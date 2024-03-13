@@ -64,6 +64,8 @@ public class SellingsearchService {
             tempSellingRespVO.setInstanceid(s.getInstanceid());
             tempSellingRespVO.setSteamId(s.getSteamId());
             tempSellingRespVO.setStatus(s.getStatus());
+            tempSellingRespVO.setIconUrl(s.getIconUrl());
+            tempSellingRespVO.setMarketName(s.getMarketName());
             // 价格
             tempSellingRespVO.setPrice(s.getPrice());
             InvDescDO invDescDO = invDescMap.get(s.getInvDescId());

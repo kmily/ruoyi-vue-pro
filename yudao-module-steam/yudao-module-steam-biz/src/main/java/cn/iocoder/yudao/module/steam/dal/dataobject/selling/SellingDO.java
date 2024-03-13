@@ -116,6 +116,9 @@ public class SellingDO extends BaseDO {
      * market_name
      */
     private String marketName;
-
+    /**
+     * icon_url
+     */
+    private String iconUrl;
 
 }

@@ -43,6 +43,7 @@ public interface SellingMapper extends BaseMapperX<SellingDO> {
                 .eqIfPresent(SellingDO::getSelRarity, reqVO.getSelRarity())
                 .eqIfPresent(SellingDO::getSelType, reqVO.getSelType())
                 .eqIfPresent(SellingDO::getMarketName, reqVO.getMarketName())
+                .eqIfPresent(SellingDO::getIconUrl,reqVO.getIconUrl())
                 .orderByDesc(SellingDO::getId));
     }
 

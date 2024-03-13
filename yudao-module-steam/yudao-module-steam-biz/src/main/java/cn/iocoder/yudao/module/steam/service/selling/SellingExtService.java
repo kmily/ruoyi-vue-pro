@@ -105,6 +105,7 @@ public class SellingExtService {
         sellingDO.setSelType(invDescDO.get().getSelType());
         sellingDO.setSelWeapon(invDescDO.get().getSelWeapon());
         sellingDO.setMarketName(invDescDO.get().getMarketName());
+        sellingDO.setIconUrl(invDescDO.get().getIconUrl());
         sellingDO.setInvId(invDO.getId());
         if (invPageReqVos.getPrice() == null || invPageReqVos.getPrice() == 0) {
             throw new ServiceException(-1, "未设置价格");
