@@ -18,6 +18,6 @@ public class ItemResp implements Serializable {
     private String imageUrl;
     private C5ItemInfo itemInfo;
     private String autoPrice;
-    private String sellPrice;
+    private String salePrice;
     private List<C5ItemTag> tagList;
 }
