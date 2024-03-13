@@ -96,7 +96,7 @@ public class InvPreviewExtService {
             );
             invPreviewDOS.forEach(item->{
                 C5ItemInfo itemInfo = item.getItemInfo();
-                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(true).setAutoQuantity(aLong.toString())
+                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(aLong>0).setAutoQuantity(aLong.toString())
                         .setSelExterior(itemInfo.getExteriorName())
                         .setSelQuality(itemInfo.getQualityName())
                         .setSelRarity(itemInfo.getRarityName())
