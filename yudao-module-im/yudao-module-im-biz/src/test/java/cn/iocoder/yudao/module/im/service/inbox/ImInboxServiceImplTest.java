@@ -22,15 +22,15 @@ import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * {@link InboxServiceImpl} 的单元测试类
+ * {@link ImInboxServiceImpl} 的单元测试类
  *
  * @author 芋道源码
  */
-@Import(InboxServiceImpl.class)
-public class InboxServiceImplTest extends BaseDbUnitTest {
+@Import(ImInboxServiceImpl.class)
+public class ImInboxServiceImplTest extends BaseDbUnitTest {
 
     @Resource
-    private InboxServiceImpl inboxService;
+    private ImInboxServiceImpl inboxService;
 
     @Resource
     private InboxMapper inboxMapper;
@@ -38,7 +38,7 @@ public class InboxServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateInbox_success() {
         // 准备参数
-        InboxSaveReqVO createReqVO = randomPojo(InboxSaveReqVO.class).setId(null);
+        ImInboxSaveReqVO createReqVO = randomPojo(ImInboxSaveReqVO.class).setId(null);
 
         // 调用
         Long inboxId = inboxService.createInbox(createReqVO);
@@ -55,7 +55,7 @@ public class InboxServiceImplTest extends BaseDbUnitTest {
         ImInboxDO dbInbox = randomPojo(ImInboxDO.class);
         inboxMapper.insert(dbInbox);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        InboxSaveReqVO updateReqVO = randomPojo(InboxSaveReqVO.class, o -> {
+        ImInboxSaveReqVO updateReqVO = randomPojo(ImInboxSaveReqVO.class, o -> {
             o.setId(dbInbox.getId()); // 设置更新的 ID
         });
 
@@ -69,7 +69,7 @@ public class InboxServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateInbox_notExists() {
         // 准备参数
-        InboxSaveReqVO updateReqVO = randomPojo(InboxSaveReqVO.class);
+        ImInboxSaveReqVO updateReqVO = randomPojo(ImInboxSaveReqVO.class);
 
         // 调用, 并断言异常
         assertServiceException(() -> inboxService.updateInbox(updateReqVO), INBOX_NOT_EXISTS);
@@ -118,7 +118,7 @@ public class InboxServiceImplTest extends BaseDbUnitTest {
        // 测试 createTime 不匹配
        inboxMapper.insert(cloneIgnoreId(dbInbox, o -> o.setCreateTime(null)));
        // 准备参数
-       InboxPageReqVO reqVO = new InboxPageReqVO();
+       ImInboxPageReqVO reqVO = new ImInboxPageReqVO();
        reqVO.setUserId(null);
        reqVO.setMessageId(null);
        reqVO.setSequence(null);

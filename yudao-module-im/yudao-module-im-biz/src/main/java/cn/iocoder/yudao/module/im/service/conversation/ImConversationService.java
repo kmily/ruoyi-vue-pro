@@ -51,4 +51,5 @@ public interface ImConversationService {
      */
     PageResult<ImConversationDO> getConversationPage(ImConversationPageReqVO pageReqVO);
 
+
 }

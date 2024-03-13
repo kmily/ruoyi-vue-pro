@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.im.service.inbox;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.InboxPageReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.InboxSaveReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.ImInboxPageReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.ImInboxSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.inbox.ImInboxDO;
 import cn.iocoder.yudao.module.im.dal.mysql.inbox.InboxMapper;
 import jakarta.annotation.Resource;
@@ -20,13 +20,13 @@ import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.INBOX_NOT_EXIS
  */
 @Service
 @Validated
-public class InboxServiceImpl implements InboxService {
+public class ImInboxServiceImpl implements ImInboxService {
 
     @Resource
     private InboxMapper inboxMapper;
 
     @Override
-    public Long createInbox(InboxSaveReqVO createReqVO) {
+    public Long createInbox(ImInboxSaveReqVO createReqVO) {
         // 插入
         ImInboxDO inbox = BeanUtils.toBean(createReqVO, ImInboxDO.class);
         inboxMapper.insert(inbox);
@@ -35,7 +35,7 @@ public class InboxServiceImpl implements InboxService {
     }
 
     @Override
-    public void updateInbox(InboxSaveReqVO updateReqVO) {
+    public void updateInbox(ImInboxSaveReqVO updateReqVO) {
         // 校验存在
         validateInboxExists(updateReqVO.getId());
         // 更新
@@ -63,7 +63,7 @@ public class InboxServiceImpl implements InboxService {
     }
 
     @Override
-    public PageResult<ImInboxDO> getInboxPage(InboxPageReqVO pageReqVO) {
+    public PageResult<ImInboxDO> getInboxPage(ImInboxPageReqVO pageReqVO) {
         return inboxMapper.selectPage(pageReqVO);
     }
 

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.im.dal.mysql.inbox;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.InboxPageReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.ImInboxPageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.inbox.ImInboxDO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -15,7 +15,7 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface InboxMapper extends BaseMapperX<ImInboxDO> {
 
-    default PageResult<ImInboxDO> selectPage(InboxPageReqVO reqVO) {
+    default PageResult<ImInboxDO> selectPage(ImInboxPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ImInboxDO>()
                 .eqIfPresent(ImInboxDO::getUserId, reqVO.getUserId())
                 .eqIfPresent(ImInboxDO::getMessageId, reqVO.getMessageId())

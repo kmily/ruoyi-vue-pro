@@ -90,10 +90,4 @@ public class ImMessageController {
                 BeanUtils.toBean(list, ImMessageRespVO.class));
     }
 
-    @PostMapping("/send")
-    @Operation(summary = "发送私聊消息")
-    public CommonResult<Long> sendMessage(@Valid @RequestBody ImMessageSaveReqVO imMessageSaveReqVO) {
-        return success(imMessageService.sendPrivateMessage(imMessageSaveReqVO));
-    }
-
 }

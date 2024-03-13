@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessagePageReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
+import cn.iocoder.yudao.module.im.websocket.message.ImSendMessage;
 import jakarta.validation.Valid;
 
 /**
@@ -51,10 +52,13 @@ public interface ImMessageService {
      */
     PageResult<ImMessageDO> getMessagePage(ImMessagePageReqVO pageReqVO);
 
+
     /**
-     * 发送私聊消息
-     * @param imMessageSaveReqVO 消息信息
-     * @return 消息编号
+     * 保存私聊消息
+     *
+     * @param imSendMessage 消息信息
+     * @param fromUserId    发送人编号
+     * @return id
      */
-    Long sendPrivateMessage(ImMessageSaveReqVO imMessageSaveReqVO);
+    Long savePrivateMessage(ImSendMessage imSendMessage, Long fromUserId);
 }

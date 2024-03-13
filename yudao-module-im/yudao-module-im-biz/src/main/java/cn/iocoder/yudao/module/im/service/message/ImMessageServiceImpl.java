@@ -6,6 +6,9 @@ import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessagePageReqVO
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImMessageMapper;
+import cn.iocoder.yudao.module.im.websocket.message.ImSendMessage;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -24,6 +27,8 @@ public class ImMessageServiceImpl implements ImMessageService {
 
     @Resource
     private ImMessageMapper imMessageMapper;
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @Override
     public Long createMessage(ImMessageSaveReqVO createReqVO) {
@@ -67,9 +72,24 @@ public class ImMessageServiceImpl implements ImMessageService {
         return imMessageMapper.selectPage(pageReqVO);
     }
 
+
     @Override
-    public Long sendPrivateMessage(ImMessageSaveReqVO imMessageSaveReqVO) {
-        return 0L;
+    public Long savePrivateMessage(ImSendMessage message, Long fromUserId) {
+        ImMessageSaveReqVO imMessageSaveReqVO = new ImMessageSaveReqVO();
+        imMessageSaveReqVO.setClientMessageId(message.getClientMessageId());
+        imMessageSaveReqVO.setSenderId(fromUserId);
+        imMessageSaveReqVO.setReceiverId(message.getReceiverId());
+        //查询发送人昵称和发送人头像
+        AdminUserRespDTO user = adminUserApi.getUser(fromUserId);
+        imMessageSaveReqVO.setSenderNickname(user.getNickname());
+        imMessageSaveReqVO.setSenderAvatar(user.getAvatar());
+        imMessageSaveReqVO.setConversationType(message.getConversationType());
+        imMessageSaveReqVO.setContentType(message.getContentType());
+        imMessageSaveReqVO.setConversationNo("1");
+        imMessageSaveReqVO.setContent(message.getContent());
+        //消息来源 100-用户发送；200-系统发送（一般是通知）；不能为空
+        imMessageSaveReqVO.setSendFrom(100);
+        return createMessage(imMessageSaveReqVO);
     }
 
 }

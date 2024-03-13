@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.im.service.inbox;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.InboxPageReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.InboxSaveReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.ImInboxPageReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.ImInboxSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.inbox.ImInboxDO;
 import jakarta.validation.Valid;
 
@@ -11,7 +11,7 @@ import jakarta.validation.Valid;
  *
  * @author 芋道源码
  */
-public interface InboxService {
+public interface ImInboxService {
 
     /**
      * 创建收件箱
@@ -19,14 +19,14 @@ public interface InboxService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createInbox(@Valid InboxSaveReqVO createReqVO);
+    Long createInbox(@Valid ImInboxSaveReqVO createReqVO);
 
     /**
      * 更新收件箱
      *
      * @param updateReqVO 更新信息
      */
-    void updateInbox(@Valid InboxSaveReqVO updateReqVO);
+    void updateInbox(@Valid ImInboxSaveReqVO updateReqVO);
 
     /**
      * 删除收件箱
@@ -49,6 +49,6 @@ public interface InboxService {
      * @param pageReqVO 分页查询
      * @return 收件箱分页
      */
-    PageResult<ImInboxDO> getInboxPage(InboxPageReqVO pageReqVO);
+    PageResult<ImInboxDO> getInboxPage(ImInboxPageReqVO pageReqVO);
 
 }
