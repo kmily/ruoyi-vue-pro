@@ -89,9 +89,14 @@ public class InvPreviewExtService {
         List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
                 .eqIfPresent(InvPreviewDO::getMarketHashName, marketHashName));
         if(Objects.nonNull(invPreviewDOS)){
+            Long aLong = sellingMapper.selectCount(new LambdaQueryWrapperX<SellingDO>()
+                    .eq(SellingDO::getMarketHashName, marketHashName)
+                    .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
+                    .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
+            );
             invPreviewDOS.forEach(item->{
                 C5ItemInfo itemInfo = item.getItemInfo();
-                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(true)
+                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(true).setAutoQuantity(aLong.toString())
                         .setSelExterior(itemInfo.getExteriorName())
                         .setSelQuality(itemInfo.getQualityName())
                         .setSelRarity(itemInfo.getRarityName())
@@ -99,18 +104,6 @@ public class InvPreviewExtService {
                         .setSelType(itemInfo.getTypeName())
                         .setSelItemset(itemInfo.getItemSetName()));
             });
-        }
-    }
-    /**
-     * 增加库存标识
-     * @param marketHashName 标签名称
-     */
-    public void markInvDisable(String marketHashName) {
-        List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
-                .eqIfPresent(InvPreviewDO::getMarketHashName, marketHashName));
-        if(Objects.nonNull(invPreviewDOS)){
-            invPreviewDOS.forEach(item->
-                    invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(false)));
         }
     }
     @Async
@@ -121,12 +114,12 @@ public class InvPreviewExtService {
         if(Objects.nonNull(invPreviewDOS)){
             for(InvPreviewDO item:invPreviewDOS){
                 count++;
-                updateIvnFlag(item);
+                updateIvnFlagAndQuantity(item);
             }
         }
         return count;
     }
-    public void updateIvnFlag(InvPreviewDO invPreviewDO) {
+    public void updateIvnFlagAndQuantity(InvPreviewDO invPreviewDO) {
         Long aLong = sellingMapper.selectCount(new LambdaQueryWrapperX<SellingDO>()
                 .eq(SellingDO::getMarketHashName, invPreviewDO.getMarketHashName())
                 .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
