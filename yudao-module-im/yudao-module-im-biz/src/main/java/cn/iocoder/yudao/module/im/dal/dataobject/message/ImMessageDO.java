@@ -73,4 +73,9 @@ public class ImMessageDO extends BaseDO {
      */
     private Integer sendFrom;
 
+    /**
+     * 消息状态 1 发送中、2 发送成功、3 发送失败、4 已删除、5 已撤回
+     */
+    private Integer messageStatus;
+
 }

@@ -61,4 +61,12 @@ public interface ImMessageService {
      * @return id
      */
     Long savePrivateMessage(ImSendMessage imSendMessage, Long fromUserId);
+
+    /**
+     * 更新消息状态
+     *
+     * @param messageId     消息id
+     * @param messageStatus 消息状态
+     */
+    void updateMessageStatus(Long messageId, Integer messageStatus);
 }

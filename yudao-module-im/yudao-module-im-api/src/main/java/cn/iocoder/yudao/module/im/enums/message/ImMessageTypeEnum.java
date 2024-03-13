@@ -1,18 +1,21 @@
 package cn.iocoder.yudao.module.im.enums.message;
 
+import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Arrays;
+
 /**
  * IM 消息的类型枚举
- *
+ * <p>
  * 参考 <a href="https://doc.yunxin.163.com/messaging/docs/zg3NzA3NTA?platform=web#消息类型">“消息类型”</a> 文档
  *
  * @author 芋道源码
  */
 @Getter
 @AllArgsConstructor
-public enum ImMessageTypeEnum {
+public enum ImMessageTypeEnum implements IntArrayValuable {
 
     TEXT(1, "文本"), // 消息内容为普通文本
     IMAGE(2, "图片"), // 消息内容为图片 URL 地址、尺寸、图片大小等信息
@@ -25,6 +28,7 @@ public enum ImMessageTypeEnum {
     NOTIFICATION(8, "通知"), // 主要用于群组、聊天室和超大群的事件通知，由服务端下发，客户端无法发送事件通知消息。通知类消息有在线、离线、漫游机制；没有通知栏提醒
     ;
 
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ImMessageTypeEnum::getType).toArray();
     /**
      * 类型
      */
@@ -34,4 +38,8 @@ public enum ImMessageTypeEnum {
      */
     private final String name;
 
+    @Override
+    public int[] array() {
+        return ARRAYS;
+    }
 }

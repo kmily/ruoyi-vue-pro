@@ -38,7 +38,7 @@ public class ImMessageSaveReqVO {
     @NotNull(message = "会话类型不能为空")
     private Integer conversationType;
 
-    @Schema(description = "会话标志", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "会话标志 conversation_no = a_b", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "会话标志不能为空")
     private String conversationNo;
 
@@ -57,4 +57,7 @@ public class ImMessageSaveReqVO {
     @NotNull(message = "消息来源 100-用户发送；200-系统发送（一般是通知）；不能为空")
     private Integer sendFrom;
 
+    @Schema(description = "消息状态 1 发送中、2 发送成功、3 发送失败、4 已删除、5 已撤回", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "消息状态不能为空")
+    private Integer messageStatus;
 }

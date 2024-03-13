@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.im.controller.admin.message.vo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -54,5 +55,8 @@ public class ImMessagePageReqVO extends PageParam {
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
+
+    @Schema(description = "消息状态 1 发送中、2 发送成功、3 发送失败、4 已删除、5 已撤回", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Integer messageStatus;
 
 }

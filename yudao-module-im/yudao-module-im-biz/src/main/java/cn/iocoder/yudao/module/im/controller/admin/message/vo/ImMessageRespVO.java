@@ -1,8 +1,12 @@
 package cn.iocoder.yudao.module.im.controller.admin.message.vo;
 
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -46,6 +50,7 @@ public class ImMessageRespVO {
 
     @Schema(description = "消息类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @ExcelProperty("消息类型")
+    @InEnum(ImMessageTypeEnum.class)
     private Integer contentType;
 
     @Schema(description = "消息内容", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -63,5 +68,10 @@ public class ImMessageRespVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
+
+    @Schema(description = "消息状态 1 发送中、2 发送成功、3 发送失败、4 已删除、5 已撤回", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("消息状态")
+    @InEnum(ImMessageStatusEnum.class)
+    private Integer messageStatus;
 
 }

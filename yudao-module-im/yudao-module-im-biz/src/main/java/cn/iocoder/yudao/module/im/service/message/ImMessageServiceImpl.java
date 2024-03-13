@@ -6,10 +6,12 @@ import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessagePageReqVO
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImMessageMapper;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.websocket.message.ImSendMessage;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
+import org.dromara.hutool.core.date.TimeUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -74,22 +76,35 @@ public class ImMessageServiceImpl implements ImMessageService {
 
 
     @Override
-    public Long savePrivateMessage(ImSendMessage message, Long fromUserId) {
+    public Long savePrivateMessage(ImSendMessage message, Long senderId) {
         ImMessageSaveReqVO imMessageSaveReqVO = new ImMessageSaveReqVO();
         imMessageSaveReqVO.setClientMessageId(message.getClientMessageId());
-        imMessageSaveReqVO.setSenderId(fromUserId);
+        imMessageSaveReqVO.setSenderId(senderId);
         imMessageSaveReqVO.setReceiverId(message.getReceiverId());
         //查询发送人昵称和发送人头像
-        AdminUserRespDTO user = adminUserApi.getUser(fromUserId);
+        AdminUserRespDTO user = adminUserApi.getUser(senderId);
         imMessageSaveReqVO.setSenderNickname(user.getNickname());
         imMessageSaveReqVO.setSenderAvatar(user.getAvatar());
         imMessageSaveReqVO.setConversationType(message.getConversationType());
         imMessageSaveReqVO.setContentType(message.getContentType());
-        imMessageSaveReqVO.setConversationNo("1");
+        imMessageSaveReqVO.setConversationNo(senderId + "_" + message.getReceiverId());
         imMessageSaveReqVO.setContent(message.getContent());
         //消息来源 100-用户发送；200-系统发送（一般是通知）；不能为空
         imMessageSaveReqVO.setSendFrom(100);
+        imMessageSaveReqVO.setSendTime(TimeUtil.now());
+        imMessageSaveReqVO.setMessageStatus(ImMessageStatusEnum.SENDING.getStatus());
         return createMessage(imMessageSaveReqVO);
+    }
+
+    @Override
+    public void updateMessageStatus(Long messageId, Integer messageStatus) {
+        //校验 id 是否存在
+        validateMessageExists(messageId);
+        //更新消息状态
+        ImMessageDO imMessageDO = new ImMessageDO();
+        imMessageDO.setId(messageId);
+        imMessageDO.setMessageStatus(messageStatus);
+        imMessageMapper.updateById(imMessageDO);
     }
 
 }
