@@ -218,8 +218,8 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         reqDTO.setUserIp(ServletUtils.getClientIP());
         reqDTO.setOutTransferNo("TT"+withdrawalDO.getId());
         reqDTO.setSubject("提现单号"+withdrawalDO.getId());
-        reqDTO.setUserName("ukagwe2912");
-        reqDTO.setAlipayLogonId("ukagwe2912@sandbox.com");
+        reqDTO.setUserName(withdrawalDO.getWithdrawalInfo().getUserName());
+        reqDTO.setAlipayLogonId(withdrawalDO.getWithdrawalInfo().getAlipayLogonId());
         PayTransferRespDTO payTransferRespDTO = client.unifiedTransfer(reqDTO);
         log.info("支付宝打款结果{}",payTransferRespDTO);
         withdrawalMapper.updateById(new WithdrawalDO().setId(withdrawalDO.getId()).setPayTransferRet(JacksonUtils.writeValueAsString(payTransferRespDTO)));
@@ -232,8 +232,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(withdrawalDO.getServiceFeeUserId(), withdrawalDO.getServiceFeeUserType());
         PayWalletTransactionDO payWalletTransactionDO = payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(withdrawalDO.getId()),
                 PayWalletBizTypeEnum.SERVICE_FEE, withdrawalDO.getServiceFee());
-
-        withdrawalMapper.updateById(new WithdrawalDO().setId(withdrawalDO.getId()).setPayTransferRet(JacksonUtils.writeValueAsString(payWalletTransactionDO)));
+        withdrawalMapper.updateById(new WithdrawalDO().setId(withdrawalDO.getId()).setServiceFeeRet(JacksonUtils.writeValueAsString(payWalletTransactionDO)));
 
     }
 
@@ -311,6 +310,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         InvOrderDO invOrderDO = new InvOrderDO().setSellId(createReqVO.getSellId()).setSteamId(createReqVO.getSteamId())
                 .setCommodityAmount(0).setDiscountAmount(0).setServiceFeeRate("0").setServiceFee(0)
                 .setPaymentAmount(0)
+                .setServiceFeeUserId(WITHDRAWAL_ACCOUNT_ID).setServiceFeeUserType(WITHDRAWAL_ACCOUNT_TYPE.getValue())
 //                .setPrice(0)
                 .setSteamId(createReqVO.getSteamId())
                 .setPayOrderStatus(PayOrderStatusEnum.WAITING.getStatus())
@@ -503,6 +503,16 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         }catch (Exception e){
             log.info("发货异常{}",e);
         }
+
+    }
+    @Async
+    public void setPayInvOrderServiceFee(InvOrderDO invOrderDO) {
+
+        PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(invOrderDO.getServiceFeeUserId(), invOrderDO.getServiceFeeUserType());
+        PayWalletTransactionDO payWalletTransactionDO = payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(invOrderDO.getId()),
+                PayWalletBizTypeEnum.SERVICE_FEE, invOrderDO.getServiceFee());
+
+        invOrderMapper.updateById(new InvOrderDO().setId(invOrderDO.getId()).setServiceFeeRet(JacksonUtils.writeValueAsString(payWalletTransactionDO)));
 
     }
 
@@ -722,6 +732,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         invOrder.setTransferText(transferMsg);
         invOrderMapper.updateById(invOrder);
         sellingMapper.updateById(sellingDO);
+        setPayInvOrderServiceFee(invOrder);
     }
 
     private PayRefundRespDTO validateInvOrderCanRefunded(Long id, Long payRefundId) {
