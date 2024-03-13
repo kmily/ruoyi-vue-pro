@@ -51,6 +51,9 @@ public class InvPreviewExtService {
             if(Objects.nonNull(invPreviewDO.getSalePrice())){
                 itemResp.setSalePrice(new BigDecimal(invPreviewDO.getSalePrice()).multiply(new BigDecimal("100")).intValue());
             }
+            if(Objects.nonNull(invPreviewDO.getReferencePrice())){
+                itemResp.setReferencePrice(new BigDecimal(invPreviewDO.getReferencePrice()).multiply(new BigDecimal("100")).intValue());
+            }
             return itemResp;
         }else{
             throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
@@ -68,6 +71,9 @@ public class InvPreviewExtService {
             }
             if(Objects.nonNull(item.getSalePrice())){
                 itemResp.setSalePrice(new BigDecimal(item.getSalePrice()).multiply(new BigDecimal("100")).intValue());
+            }
+            if(Objects.nonNull(item.getReferencePrice())){
+                itemResp.setReferencePrice(new BigDecimal(item.getReferencePrice()).multiply(new BigDecimal("100")).intValue());
             }
 
             ret.add(itemResp);
@@ -114,16 +120,17 @@ public class InvPreviewExtService {
         Integer count=0;
         if(Objects.nonNull(invPreviewDOS)){
             for(InvPreviewDO item:invPreviewDOS){
-                Long aLong = sellingMapper.selectCount(new LambdaQueryWrapperX<SellingDO>()
-                        .eq(SellingDO::getMarketHashName, item.getMarketHashName())
-                        .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
-                        .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
-                );
-                if(aLong<=0){
-                    markInvDisable(item.getMarketHashName());
-                }
+                updateIvnFlag(item);
             }
         }
         return count;
+    }
+    public void updateIvnFlag(InvPreviewDO invPreviewDO) {
+        Long aLong = sellingMapper.selectCount(new LambdaQueryWrapperX<SellingDO>()
+                .eq(SellingDO::getMarketHashName, invPreviewDO.getMarketHashName())
+                .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
+                .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
+        );
+        invPreviewMapper.updateById(new InvPreviewDO().setId(invPreviewDO.getId()).setAutoQuantity(aLong.toString()).setExistInv(aLong>0));
     }
 }
