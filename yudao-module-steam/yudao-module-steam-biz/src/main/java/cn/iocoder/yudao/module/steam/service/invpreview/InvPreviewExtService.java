@@ -119,7 +119,14 @@ public class InvPreviewExtService {
                         .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
                         .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
                 );
-                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setAutoQuantity(aLong.toString()).setExistInv(aLong>0));
+                C5ItemInfo itemInfo = item.getItemInfo();
+                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setAutoQuantity(aLong.toString()).setExistInv(aLong>0)
+                        .setSelExterior(itemInfo.getExteriorName())
+                        .setSelQuality(itemInfo.getQualityName())
+                        .setSelRarity(itemInfo.getRarityName())
+                        .setSelWeapon(itemInfo.getWeaponName())
+                        .setSelType(itemInfo.getTypeName())
+                        .setSelItemset(itemInfo.getItemSetName()));
             }
         }
         return count;
