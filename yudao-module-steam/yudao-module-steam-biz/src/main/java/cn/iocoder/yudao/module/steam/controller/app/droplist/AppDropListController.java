@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.seltype.vo.SelTypePageReqV
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppDropListRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppSellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.ItemResp;
+import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.SellListItemResp;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
@@ -184,8 +185,8 @@ public class AppDropListController {
     }
     @GetMapping("sell/list")
     @Operation(summary = "在售商品列表")
-    public CommonResult<PageResult<SellingDO>> sellList(@Valid AppSellingPageReqVO reqVO) {
-        PageResult<SellingDO> sellingDOPageResult = sellingsearchService.sellList(reqVO);
+    public CommonResult<PageResult<SellListItemResp>> sellList(@Valid AppSellingPageReqVO reqVO) {
+        PageResult<SellListItemResp> sellingDOPageResult = sellingsearchService.sellList(reqVO);
 //        PageResult<ItemResp> itemRespPageResult = BeanUtils.toBean(invPreviewPage, ItemResp.class);
         return success(sellingDOPageResult);
     }
