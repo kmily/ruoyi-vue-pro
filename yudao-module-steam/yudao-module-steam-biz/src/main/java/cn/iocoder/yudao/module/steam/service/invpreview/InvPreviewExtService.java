@@ -51,6 +51,9 @@ public class InvPreviewExtService {
             if(Objects.nonNull(invPreviewDO.getSalePrice())){
                 itemResp.setSalePrice(new BigDecimal(invPreviewDO.getSalePrice()).multiply(new BigDecimal("100")).intValue());
             }
+            if(Objects.nonNull(invPreviewDO.getReferencePrice())){
+                itemResp.setReferencePrice(new BigDecimal(invPreviewDO.getReferencePrice()).multiply(new BigDecimal("100")).intValue());
+            }
             return itemResp;
         }else{
             throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
@@ -69,6 +72,9 @@ public class InvPreviewExtService {
             if(Objects.nonNull(item.getSalePrice())){
                 itemResp.setSalePrice(new BigDecimal(item.getSalePrice()).multiply(new BigDecimal("100")).intValue());
             }
+            if(Objects.nonNull(item.getReferencePrice())){
+                itemResp.setReferencePrice(new BigDecimal(item.getReferencePrice()).multiply(new BigDecimal("100")).intValue());
+            }
 
             ret.add(itemResp);
         }
@@ -76,16 +82,21 @@ public class InvPreviewExtService {
     }
 
     /**
-     * 增加库存标识
+     * 增加库存标识,上架构和下架构 都可以进行调用
      * @param marketHashName 标签名称
      */
     public void markInvEnable(String marketHashName) {
         List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
                 .eqIfPresent(InvPreviewDO::getMarketHashName, marketHashName));
         if(Objects.nonNull(invPreviewDOS)){
+            Long aLong = sellingMapper.selectCount(new LambdaQueryWrapperX<SellingDO>()
+                    .eq(SellingDO::getMarketHashName, marketHashName)
+                    .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
+                    .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
+            );
             invPreviewDOS.forEach(item->{
                 C5ItemInfo itemInfo = item.getItemInfo();
-                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(true)
+                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(aLong>0).setAutoQuantity(aLong.toString())
                         .setSelExterior(itemInfo.getExteriorName())
                         .setSelQuality(itemInfo.getQualityName())
                         .setSelRarity(itemInfo.getRarityName())
@@ -95,18 +106,6 @@ public class InvPreviewExtService {
             });
         }
     }
-    /**
-     * 增加库存标识
-     * @param marketHashName 标签名称
-     */
-    public void markInvDisable(String marketHashName) {
-        List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
-                .eqIfPresent(InvPreviewDO::getMarketHashName, marketHashName));
-        if(Objects.nonNull(invPreviewDOS)){
-            invPreviewDOS.forEach(item->
-                    invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(false)));
-        }
-    }
     @Async
     public Integer updateIvnFlag() {
         List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
@@ -114,14 +113,20 @@ public class InvPreviewExtService {
         Integer count=0;
         if(Objects.nonNull(invPreviewDOS)){
             for(InvPreviewDO item:invPreviewDOS){
+                count++;
                 Long aLong = sellingMapper.selectCount(new LambdaQueryWrapperX<SellingDO>()
                         .eq(SellingDO::getMarketHashName, item.getMarketHashName())
                         .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
                         .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
                 );
-                if(aLong<=0){
-                    markInvDisable(item.getMarketHashName());
-                }
+                C5ItemInfo itemInfo = item.getItemInfo();
+                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setAutoQuantity(aLong.toString()).setExistInv(aLong>0)
+                        .setSelExterior(itemInfo.getExteriorName())
+                        .setSelQuality(itemInfo.getQualityName())
+                        .setSelRarity(itemInfo.getRarityName())
+                        .setSelWeapon(itemInfo.getWeaponName())
+                        .setSelType(itemInfo.getTypeName())
+                        .setSelItemset(itemInfo.getItemSetName()));
             }
         }
         return count;
