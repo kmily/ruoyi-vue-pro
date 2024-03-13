@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.selquality.vo.SelQualityPa
 import cn.iocoder.yudao.module.steam.controller.admin.selrarity.vo.SelRarityPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.seltype.vo.SelTypePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppDropListRespVO;
+import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppSellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.ItemResp;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
@@ -185,11 +186,10 @@ public class AppDropListController {
     }
     @GetMapping("sell/list")
     @Operation(summary = "在售商品列表")
-    public CommonResult<PageResult<ItemResp>> sellList(@Valid InvPreviewPageReqVO sellingPageReqVO) {
-        sellingPageReqVO.setExistInv(true);
-        PageResult<InvPreviewDO> invPreviewPage = invPreviewExtService.getInvPreviewPage(sellingPageReqVO);
-        PageResult<ItemResp> itemRespPageResult = BeanUtils.toBean(invPreviewPage, ItemResp.class);
-        return success(itemRespPageResult);
+    public CommonResult<PageResult<SellingDO>> sellList(@Valid AppSellingPageReqVO reqVO) {
+        PageResult<SellingDO> sellingDOPageResult = sellingsearchService.sellList(reqVO);
+//        PageResult<ItemResp> itemRespPageResult = BeanUtils.toBean(invPreviewPage, ItemResp.class);
+        return success(sellingDOPageResult);
     }
 
 }
