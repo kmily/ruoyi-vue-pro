@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.controller.app.user;
 
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.*;
@@ -11,6 +12,7 @@ import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +47,9 @@ public class AppMemberUserController {
     @Operation(summary = "修改基本信息")
     @PreAuthenticated
     public CommonResult<Boolean> updateUser(@RequestBody @Valid AppMemberUserUpdateReqVO reqVO) {
+        if(!StringUtils.hasText(reqVO.getNickname())){
+            throw new ServiceException(-1,"用户昵称不能为空");
+        }
         userService.updateUser(getLoginUserId(), reqVO);
         return success(true);
     }
