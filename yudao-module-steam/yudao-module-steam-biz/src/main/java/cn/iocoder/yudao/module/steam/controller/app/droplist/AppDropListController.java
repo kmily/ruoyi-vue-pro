@@ -174,6 +174,7 @@ public class AppDropListController {
         PageResult<SellingDO> viewSell = sellingsearchService.sellView(sellingPageReqVO);
         return success(BeanUtils.toBean(viewSell, SellingRespVO.class));
     }
+
     @GetMapping("items/730/search")
     @Operation(summary = "在售商品列表")
     public CommonResult<PageResult<ItemResp>> itemSearch(@Valid InvPreviewPageReqVO sellingPageReqVO) {
@@ -182,11 +183,13 @@ public class AppDropListController {
         PageResult<ItemResp> itemRespPageResult = BeanUtils.toBean(invPreviewPage, ItemResp.class);
         return success(itemRespPageResult);
     }
-//    @GetMapping("/search/viewSell")
-//    @Operation(summary = "在售商品列表")
-//    public CommonResult<PageResult<SellingRespVO>> getSellView(@Valid SellingPageReqVO sellingPageReqVO) {
-//        PageResult<SellingDO> viewSell = sellingsearchService.sellView(sellingPageReqVO);
-//        return success(BeanUtils.toBean(viewSell, SellingRespVO.class));
-//    }
+    @GetMapping("sell/list")
+    @Operation(summary = "在售商品列表")
+    public CommonResult<PageResult<ItemResp>> sellList(@Valid InvPreviewPageReqVO sellingPageReqVO) {
+        sellingPageReqVO.setExistInv(true);
+        PageResult<InvPreviewDO> invPreviewPage = invPreviewExtService.getInvPreviewPage(sellingPageReqVO);
+        PageResult<ItemResp> itemRespPageResult = BeanUtils.toBean(invPreviewPage, ItemResp.class);
+        return success(itemRespPageResult);
+    }
 
 }
