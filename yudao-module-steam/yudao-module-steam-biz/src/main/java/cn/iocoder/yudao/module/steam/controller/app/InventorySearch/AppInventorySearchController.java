@@ -16,6 +16,8 @@ import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.service.SteamInvService;
 import cn.iocoder.yudao.module.steam.service.inv.InvService;
+import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
+import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +54,9 @@ public class AppInventorySearchController {
     @Resource
     private InvMapper invMapper;
 
+    @Resource
+    private IOInvUpdateService ioInvUpdateService;
+
 
     /**
      * 用户手动查询自己的 steam_inv 库存（从数据库中获取数据）
@@ -76,11 +81,11 @@ public class AppInventorySearchController {
 
 
     //
-    @GetMapping("/after_SearchFromSteam")
-    @Operation(summary = "查询数据库的库存数据")
-    public void SearchFromSteam(@RequestParam Long id) throws JsonProcessingException {
-        steamInvService.FistGetInventory(id,"730");
-    }
+//    @GetMapping("/after_SearchFromSteam")
+//    @Operation(summary = "查询数据库的库存数据")
+//    public void SearchFromSteam(@RequestParam Long id) throws JsonProcessingException {
+//        steamInvService.FistGetInventory(id,"730");
+//    }
 
 
     /**
@@ -92,6 +97,25 @@ public class AppInventorySearchController {
     public List<AppInvMergeToSellPageReqVO> mergeToSell(@Valid InvPageReqVO invPageReqVO) {
         PageResult<AppInvPageReqVO> invPage1 = steamInvService.getInvPage1(invPageReqVO);
         return steamInvService.merge(invPage1);
+    }
+
+
+    // =================================
+    //             测试  第一次插入库存
+    // =================================
+    @GetMapping("/firstGetFromSteam")
+    @Operation(summary = "查询数据库的库存数据")
+    public void searchFromSteam(@RequestParam Long id) throws JsonProcessingException {
+        // 用户第一次登录查询库存  根据用户ID查找绑定的Steam账号ID
+        BindUserDO bindUserDO = bindUserMapper.selectById(id);
+        if (bindUserDO == null) {
+            throw new ServiceException(-1, "用户未绑定Steam账号");
+        }
+        if (bindUserDO.getSteamPassword() == null) {
+            throw new ServiceException(-1, "用户未设置Steam密码,原因：未上传ma文件");
+        }
+        InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
+        ioInvUpdateService.firstInsertInventory(inventoryDto,bindUserDO);
     }
 }
 
