@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 饰品在售预览 Service 实现类
@@ -34,7 +35,9 @@ public class InvPreviewExtService {
     public void markInv(String marketHashName) {
         List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
                 .eqIfPresent(InvPreviewDO::getMarketHashName, marketHashName));
-        invPreviewDOS.forEach(item->
-                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(true)));
+        if(Objects.nonNull(invPreviewDOS)){
+            invPreviewDOS.forEach(item->
+                    invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(true)));
+        }
     }
 }
