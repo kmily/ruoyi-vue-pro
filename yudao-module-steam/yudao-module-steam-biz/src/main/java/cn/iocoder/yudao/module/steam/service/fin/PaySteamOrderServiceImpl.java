@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.service.fin;
 
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
@@ -45,7 +46,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
-import cn.iocoder.yudao.module.steam.service.SteamService;
+import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.steam.*;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
@@ -107,8 +108,6 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
 
     @Resource
     private BindUserMapper bindUserMapper;
-//    @Autowired
-//    private SteamService steamService;
 
     @Resource
     private InvDescMapper invDescMapper;
@@ -490,11 +489,12 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 PayWalletBizTypeEnum.STEAM_CASH, invOrderDO.getCommodityAmount());
         invOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
         invOrderMapper.updateById(invOrderDO);
-//        try{
-//            steamService.tradeAsset(invOrderDO);
-//        }catch (Exception e){
-//            log.info("发货异常{}",e);
-//        }
+        try{
+            PaySteamOrderServiceImpl bean = SpringUtil.getBean(this.getClass());
+            bean.tradeAsset(invOrderDO.getId());
+        }catch (Exception e){
+            log.info("发货异常{}",e);
+        }
 
     }
 
@@ -652,6 +652,68 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             sellingMapper.updateById(sellingDO);
             invPreviewExtService.markInvEnable(sellingDO.getMarketHashName());
         }
+    }
+
+    @Override
+    @Async
+    public void tradeAsset(Long id) {
+        InvOrderDO invOrder = getInvOrder(id);
+        SellingDO sellingDO = sellingMapper.selectById(invOrder.getSellId());
+        TransferMsg transferMsg=new TransferMsg();
+        try{
+            if (CommonStatusEnum.isDisable(sellingDO.getStatus())) {
+                throw new ServiceException(-1,"库存已经更新无法进行发货。");
+            }
+            if (PayOrderStatusEnum.isClosed(sellingDO.getStatus())) {
+                throw new ServiceException(-1,"已关闭无法进行发货。");
+            }
+            if (PayOrderStatusEnum.REFUND.getStatus().equals(sellingDO.getStatus())) {
+                throw new ServiceException(-1,"已退款无法进行发货。");
+            }
+            Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+                    .eq(BindUserDO::getUserId, invOrder.getUserId())
+                    .eq(BindUserDO::getUserType, invOrder.getUserType())
+                    .eq(BindUserDO::getSteamId, invOrder.getSteamId())
+            ).stream().findFirst();
+            if(!first.isPresent()){
+                throw new ServiceException(-1,"收货方绑定关系失败无法发货。");
+            }
+            BindUserDO bindUserDO = first.get();
+            //收货方tradeUrl
+            String tradeUrl = bindUserDO.getTradeUrl();
+//        SteamWeb steamWeb=new SteamWeb(configService);
+//        steamWeb.login(bindUserDO.getSteamPassword(),bindUserDO.getMaFile());
+//        steamWeb.initTradeUrl();
+//        if(!steamWeb.getTreadUrl().isPresent()){
+//
+//        }
+//        steamWeb.checkTradeUrl(steamWeb.getTreadUrl().get());
+            BindUserDO bindUserDO1 = bindUserMapper.selectById(sellingDO.getBindUserId());
+            //发货
+            SteamWeb steamWeb=new SteamWeb(configService);
+            steamWeb.login(bindUserDO1.getSteamPassword(),bindUserDO1.getMaFile());
+            SteamInvDto steamInvDto=new SteamInvDto();
+            steamInvDto.setAmount(sellingDO.getAmount());
+            steamInvDto.setAssetid(sellingDO.getAssetid());
+            steamInvDto.setClassid(sellingDO.getClassid());
+            steamInvDto.setContextid(sellingDO.getContextid());
+            steamInvDto.setInstanceid(sellingDO.getInstanceid());
+            steamInvDto.setAppid(sellingDO.getAppid());
+            SteamTradeOfferResult trade = steamWeb.trade(steamInvDto, tradeUrl);
+            log.info("发货信息{}",trade);
+            transferMsg.setTradeofferid(trade.getTradeofferid());
+            invOrder.setTransferStatus(InvTransferStatusEnum.TransferFINISH.getStatus());
+            sellingDO.setTransferStatus(InvTransferStatusEnum.TransferFINISH.getStatus());
+        }catch (ServiceException  e){
+            log.error("发送失败原因{}",e.getMessage());
+            transferMsg.setMsg(e.getMessage());
+            invOrder.setTransferStatus(-1);
+            invOrder.setTransferStatus(InvTransferStatusEnum.TransferERROR.getStatus());
+            sellingDO.setTransferStatus(InvTransferStatusEnum.TransferERROR.getStatus());
+        }
+        invOrder.setTransferText(transferMsg);
+        invOrderMapper.updateById(invOrder);
+        sellingMapper.updateById(sellingDO);
     }
 
     private PayRefundRespDTO validateInvOrderCanRefunded(Long id, Long payRefundId) {

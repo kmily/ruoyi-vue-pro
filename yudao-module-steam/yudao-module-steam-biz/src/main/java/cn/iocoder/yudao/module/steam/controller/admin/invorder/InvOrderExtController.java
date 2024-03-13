@@ -37,16 +37,10 @@ public class InvOrderExtController {
 
     private PaySteamOrderService paySteamOrderService;
 
-    private SteamService steamService;
-
     private PayOrderService payOrderService;
     @Autowired
     public void setPaySteamOrderService(PaySteamOrderService paySteamOrderService) {
         this.paySteamOrderService = paySteamOrderService;
-    }
-    @Autowired
-    public void setSteamService(SteamService steamService) {
-        this.steamService = steamService;
     }
     @Autowired
     public void setPayOrderService(PayOrderService payOrderService) {
@@ -78,7 +72,7 @@ public class InvOrderExtController {
         if(!PayOrderStatusEnum.isSuccess(order.getStatus())){
             return error(new ErrorCode(-1,"订单没有支付"));
         }
-        steamService.tradeAsset(invOrder);
+        paySteamOrderService.tradeAsset(invOrder.getId());
         return success(true);
     }
 }

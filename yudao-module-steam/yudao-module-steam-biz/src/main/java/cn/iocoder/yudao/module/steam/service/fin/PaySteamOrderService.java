@@ -88,4 +88,7 @@ public interface PaySteamOrderService {
     void closeInvOrder(Long id);
 
 
+    void tradeAsset(Long id);
+
+
 }
