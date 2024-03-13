@@ -20,4 +20,5 @@ public class ItemResp implements Serializable {
     private String autoPrice;
     private String salePrice;
     private List<C5ItemTag> tagList;
+    private String autoQuantity;
 }
