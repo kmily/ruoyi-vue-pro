@@ -189,7 +189,6 @@ public class AppDropListController {
     @Operation(summary = "在售商品列表")
     public CommonResult<PageResult<SellListItemResp>> sellList(@Valid AppSellingPageReqVO reqVO) {
         PageResult<SellListItemResp> sellingDOPageResult = sellingsearchService.sellList(reqVO);
-//        PageResult<ItemResp> itemRespPageResult = BeanUtils.toBean(invPreviewPage, ItemResp.class);
         return success(sellingDOPageResult);
     }
 
