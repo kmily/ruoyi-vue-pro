@@ -1,21 +1,24 @@
 package cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo;
 
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-
 @Data
-public class AppInvPageReqVO extends InvPageReqVO {
+public class AppInvMergeToSellPageReqVO {
 
+    // 图片
     private String iconUrl;
+    // 名称
     private String marketName;
-    private String classid;
-    private String steamId;
+    // 状态
     private Integer status;
+    // 发货状态
     private Integer transferStatus;
-    private Long id;
-    private String instanceid;
-    private Integer userType;
+    // 唯一实例id
+    private String assetId;
+    // 商品数量
+    private Integer number;
+    // 价格
+    private Integer price;
 
     // 分类查询字段
     /**
@@ -42,7 +45,5 @@ public class AppInvPageReqVO extends InvPageReqVO {
      * 类型选择
      */
     private String selType;
-
-
 
 }

@@ -4,13 +4,14 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.invdesc.vo.InvDescPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPageReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
@@ -20,7 +21,6 @@ import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -288,10 +288,12 @@ public class SteamInvService {
 
         // 本地表
         List<InvDO> invList = new ArrayList<>(invDOPageResult.getList());
+        // 提取本地库存的唯一资产id
         List<Object> list = new ArrayList<>();
         for (InvDO assetidList : invList) {
             list.add(assetidList.getAssetid());
         }
+        // 提取线上库存的唯一资产id
         List<Object> list1 = new ArrayList<>();
         for (InventoryDto.AssetsDTO item1 : itemList) {
             list1.add(item1.getAssetid());
@@ -310,6 +312,7 @@ public class SteamInvService {
                     steamInvUpdate.setId(inv.getId());
                     return steamInvUpdate;
                 }
+//                invMapper.updateById(steamInvUpdate);
             }
         }
         for (InventoryDto.AssetsDTO assetsDTO : itemList) {
@@ -327,6 +330,9 @@ public class SteamInvService {
                 steamInvUpdate.setUserId(bindUserDO.getUserId());
                 steamInvUpdate.setUserType(1);
                 steamInvUpdate.setContextid(assetsDTO.getContextid());
+                // desc的id 需要根据 appid 和 contextid 查询
+//                steamInvUpdate.setInvDescId();
+//                invMapper.insert(steamInvUpdate);
             }
         }
         return steamInvUpdate;
@@ -360,6 +366,15 @@ public class SteamInvService {
             } else {
                 appInvPageReqVO1.setIconUrl(map.get(invDO.getInvDescId()).getIconUrl());
                 appInvPageReqVO1.setMarketName(map.get(invDO.getInvDescId()).getMarketName());
+
+                // 分类选择字段
+                appInvPageReqVO1.setSelExterior(map.get(invDO.getInvDescId()).getSelExterior());
+                appInvPageReqVO1.setSelType(map.get(invDO.getInvDescId()).getSelType());
+                appInvPageReqVO1.setSelWeapon(map.get(invDO.getInvDescId()).getSelWeapon());
+                appInvPageReqVO1.setSelRarity(map.get(invDO.getInvDescId()).getSelRarity());
+                appInvPageReqVO1.setSelQuality(map.get(invDO.getInvDescId()).getSelQuality());
+                appInvPageReqVO1.setSelType(map.get(invDO.getInvDescId()).getSelType());
+
                 appInvPageReqVO1.setId(invDO.getId());
                 appInvPageReqVO1.setSteamId(invPageReqVO.getSteamId());
                 appInvPageReqVO1.setStatus(invDO.getStatus());
@@ -368,13 +383,9 @@ public class SteamInvService {
                 appInvPageReqVO1.setPrice(invDO.getPrice());
                 appInvPageReqVO.add(appInvPageReqVO1);
             }
-
         }
         return new PageResult<>(appInvPageReqVO, invPage.getTotal());
-
     }
-
-
 }
 
 
