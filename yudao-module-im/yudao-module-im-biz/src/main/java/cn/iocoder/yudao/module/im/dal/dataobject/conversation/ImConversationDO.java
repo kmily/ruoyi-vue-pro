@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConversationDO extends BaseDO {
+public class ImConversationDO extends BaseDO {
 
     /**
      * 编号
@@ -35,7 +35,7 @@ public class ConversationDO extends BaseDO {
     /**
      * 类型：1 单聊；2 群聊；4 通知会话（预留）
      */
-    private Boolean conversationType;
+    private Integer conversationType;
     /**
      * 单聊时，用户编号；群聊时，群编号
      */

@@ -2,42 +2,35 @@ package cn.iocoder.yudao.module.im.service.conversation;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import jakarta.annotation.Resource;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.*;
-import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ConversationDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationDO;
 import cn.iocoder.yudao.module.im.dal.mysql.conversation.ConversationMapper;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
-import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Import;
-import java.util.*;
-import java.time.LocalDateTime;
 
-import static cn.hutool.core.util.RandomUtil.*;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
- * {@link ConversationServiceImpl} 的单元测试类
+ * {@link ImConversationServiceImpl} 的单元测试类
  *
  * @author 芋道源码
  */
-@Import(ConversationServiceImpl.class)
-public class ConversationServiceImplTest extends BaseDbUnitTest {
+@Import(ImConversationServiceImpl.class)
+public class ImConversationServiceImplTest extends BaseDbUnitTest {
 
     @Resource
-    private ConversationServiceImpl conversationService;
+    private ImConversationServiceImpl conversationService;
 
     @Resource
     private ConversationMapper conversationMapper;
@@ -45,38 +38,38 @@ public class ConversationServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateConversation_success() {
         // 准备参数
-        ConversationSaveReqVO createReqVO = randomPojo(ConversationSaveReqVO.class).setId(null);
+        ImConversationSaveReqVO createReqVO = randomPojo(ImConversationSaveReqVO.class).setId(null);
 
         // 调用
         Long conversationId = conversationService.createConversation(createReqVO);
         // 断言
         assertNotNull(conversationId);
         // 校验记录的属性是否正确
-        ConversationDO conversation = conversationMapper.selectById(conversationId);
+        ImConversationDO conversation = conversationMapper.selectById(conversationId);
         assertPojoEquals(createReqVO, conversation, "id");
     }
 
     @Test
     public void testUpdateConversation_success() {
         // mock 数据
-        ConversationDO dbConversation = randomPojo(ConversationDO.class);
+        ImConversationDO dbConversation = randomPojo(ImConversationDO.class);
         conversationMapper.insert(dbConversation);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        ConversationSaveReqVO updateReqVO = randomPojo(ConversationSaveReqVO.class, o -> {
+        ImConversationSaveReqVO updateReqVO = randomPojo(ImConversationSaveReqVO.class, o -> {
             o.setId(dbConversation.getId()); // 设置更新的 ID
         });
 
         // 调用
         conversationService.updateConversation(updateReqVO);
         // 校验是否更新正确
-        ConversationDO conversation = conversationMapper.selectById(updateReqVO.getId()); // 获取最新的
+        ImConversationDO conversation = conversationMapper.selectById(updateReqVO.getId()); // 获取最新的
         assertPojoEquals(updateReqVO, conversation);
     }
 
     @Test
     public void testUpdateConversation_notExists() {
         // 准备参数
-        ConversationSaveReqVO updateReqVO = randomPojo(ConversationSaveReqVO.class);
+        ImConversationSaveReqVO updateReqVO = randomPojo(ImConversationSaveReqVO.class);
 
         // 调用, 并断言异常
         assertServiceException(() -> conversationService.updateConversation(updateReqVO), CONVERSATION_NOT_EXISTS);
@@ -85,7 +78,7 @@ public class ConversationServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testDeleteConversation_success() {
         // mock 数据
-        ConversationDO dbConversation = randomPojo(ConversationDO.class);
+        ImConversationDO dbConversation = randomPojo(ImConversationDO.class);
         conversationMapper.insert(dbConversation);// @Sql: 先插入出一条存在的数据
         // 准备参数
         Long id = dbConversation.getId();
@@ -109,7 +102,7 @@ public class ConversationServiceImplTest extends BaseDbUnitTest {
     @Disabled  // TODO 请修改 null 为需要的值，然后删除 @Disabled 注解
     public void testGetConversationPage() {
        // mock 数据
-       ConversationDO dbConversation = randomPojo(ConversationDO.class, o -> { // 等会查询到
+       ImConversationDO dbConversation = randomPojo(ImConversationDO.class, o -> { // 等会查询到
            o.setUserId(null);
            o.setConversationType(null);
            o.setTargetId(null);
@@ -134,7 +127,7 @@ public class ConversationServiceImplTest extends BaseDbUnitTest {
        // 测试 createTime 不匹配
        conversationMapper.insert(cloneIgnoreId(dbConversation, o -> o.setCreateTime(null)));
        // 准备参数
-       ConversationPageReqVO reqVO = new ConversationPageReqVO();
+       ImConversationPageReqVO reqVO = new ImConversationPageReqVO();
        reqVO.setUserId(null);
        reqVO.setConversationType(null);
        reqVO.setTargetId(null);
@@ -144,7 +137,7 @@ public class ConversationServiceImplTest extends BaseDbUnitTest {
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
        // 调用
-       PageResult<ConversationDO> pageResult = conversationService.getConversationPage(reqVO);
+       PageResult<ImConversationDO> pageResult = conversationService.getConversationPage(reqVO);
        // 断言
        assertEquals(1, pageResult.getTotal());
        assertEquals(1, pageResult.getList().size());

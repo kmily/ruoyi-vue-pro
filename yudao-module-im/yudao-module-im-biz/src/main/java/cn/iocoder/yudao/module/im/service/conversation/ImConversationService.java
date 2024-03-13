@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.im.service.conversation;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ConversationPageReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ConversationSaveReqVO;
-import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ConversationDO;
+import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationPageReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationSaveReqVO;
+import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationDO;
 import jakarta.validation.Valid;
 
 /**
@@ -11,7 +11,7 @@ import jakarta.validation.Valid;
  *
  * @author 芋道源码
  */
-public interface ConversationService {
+public interface ImConversationService {
 
     /**
      * 创建会话
@@ -19,14 +19,14 @@ public interface ConversationService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createConversation(@Valid ConversationSaveReqVO createReqVO);
+    Long createConversation(@Valid ImConversationSaveReqVO createReqVO);
 
     /**
      * 更新会话
      *
      * @param updateReqVO 更新信息
      */
-    void updateConversation(@Valid ConversationSaveReqVO updateReqVO);
+    void updateConversation(@Valid ImConversationSaveReqVO updateReqVO);
 
     /**
      * 删除会话
@@ -41,7 +41,7 @@ public interface ConversationService {
      * @param id 编号
      * @return 会话
      */
-    ConversationDO getConversation(Long id);
+    ImConversationDO getConversation(Long id);
 
     /**
      * 获得会话分页
@@ -49,6 +49,6 @@ public interface ConversationService {
      * @param pageReqVO 分页查询
      * @return 会话分页
      */
-    PageResult<ConversationDO> getConversationPage(ConversationPageReqVO pageReqVO);
+    PageResult<ImConversationDO> getConversationPage(ImConversationPageReqVO pageReqVO);
 
 }

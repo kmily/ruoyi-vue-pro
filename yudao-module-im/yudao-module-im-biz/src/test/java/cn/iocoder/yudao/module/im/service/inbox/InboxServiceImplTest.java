@@ -2,31 +2,24 @@ package cn.iocoder.yudao.module.im.service.inbox;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import jakarta.annotation.Resource;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 
 import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.*;
-import cn.iocoder.yudao.module.im.dal.dataobject.inbox.InboxDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.inbox.ImInboxDO;
 import cn.iocoder.yudao.module.im.dal.mysql.inbox.InboxMapper;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
-import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Import;
-import java.util.*;
-import java.time.LocalDateTime;
 
-import static cn.hutool.core.util.RandomUtil.*;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
  * {@link InboxServiceImpl} 的单元测试类
@@ -52,14 +45,14 @@ public class InboxServiceImplTest extends BaseDbUnitTest {
         // 断言
         assertNotNull(inboxId);
         // 校验记录的属性是否正确
-        InboxDO inbox = inboxMapper.selectById(inboxId);
+        ImInboxDO inbox = inboxMapper.selectById(inboxId);
         assertPojoEquals(createReqVO, inbox, "id");
     }
 
     @Test
     public void testUpdateInbox_success() {
         // mock 数据
-        InboxDO dbInbox = randomPojo(InboxDO.class);
+        ImInboxDO dbInbox = randomPojo(ImInboxDO.class);
         inboxMapper.insert(dbInbox);// @Sql: 先插入出一条存在的数据
         // 准备参数
         InboxSaveReqVO updateReqVO = randomPojo(InboxSaveReqVO.class, o -> {
@@ -69,7 +62,7 @@ public class InboxServiceImplTest extends BaseDbUnitTest {
         // 调用
         inboxService.updateInbox(updateReqVO);
         // 校验是否更新正确
-        InboxDO inbox = inboxMapper.selectById(updateReqVO.getId()); // 获取最新的
+        ImInboxDO inbox = inboxMapper.selectById(updateReqVO.getId()); // 获取最新的
         assertPojoEquals(updateReqVO, inbox);
     }
 
@@ -85,7 +78,7 @@ public class InboxServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testDeleteInbox_success() {
         // mock 数据
-        InboxDO dbInbox = randomPojo(InboxDO.class);
+        ImInboxDO dbInbox = randomPojo(ImInboxDO.class);
         inboxMapper.insert(dbInbox);// @Sql: 先插入出一条存在的数据
         // 准备参数
         Long id = dbInbox.getId();
@@ -109,7 +102,7 @@ public class InboxServiceImplTest extends BaseDbUnitTest {
     @Disabled  // TODO 请修改 null 为需要的值，然后删除 @Disabled 注解
     public void testGetInboxPage() {
        // mock 数据
-       InboxDO dbInbox = randomPojo(InboxDO.class, o -> { // 等会查询到
+       ImInboxDO dbInbox = randomPojo(ImInboxDO.class, o -> { // 等会查询到
            o.setUserId(null);
            o.setMessageId(null);
            o.setSequence(null);
@@ -132,7 +125,7 @@ public class InboxServiceImplTest extends BaseDbUnitTest {
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
        // 调用
-       PageResult<InboxDO> pageResult = inboxService.getInboxPage(reqVO);
+       PageResult<ImInboxDO> pageResult = inboxService.getInboxPage(reqVO);
        // 断言
        assertEquals(1, pageResult.getTotal());
        assertEquals(1, pageResult.getList().size());

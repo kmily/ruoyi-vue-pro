@@ -19,7 +19,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InboxDO extends BaseDO {
+public class ImInboxDO extends BaseDO {
 
     /**
      * 编号

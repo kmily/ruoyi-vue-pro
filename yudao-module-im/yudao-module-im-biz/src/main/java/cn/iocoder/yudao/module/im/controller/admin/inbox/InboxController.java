@@ -9,7 +9,7 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.InboxPageReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.InboxRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.InboxSaveReqVO;
-import cn.iocoder.yudao.module.im.dal.dataobject.inbox.InboxDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.inbox.ImInboxDO;
 import cn.iocoder.yudao.module.im.service.inbox.InboxService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -65,7 +65,7 @@ public class InboxController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('im:inbox:query')")
     public CommonResult<InboxRespVO> getInbox(@RequestParam("id") Long id) {
-        InboxDO inbox = inboxService.getInbox(id);
+        ImInboxDO inbox = inboxService.getInbox(id);
         return success(BeanUtils.toBean(inbox, InboxRespVO.class));
     }
 
@@ -73,7 +73,7 @@ public class InboxController {
     @Operation(summary = "获得收件箱分页")
     @PreAuthorize("@ss.hasPermission('im:inbox:query')")
     public CommonResult<PageResult<InboxRespVO>> getInboxPage(@Valid InboxPageReqVO pageReqVO) {
-        PageResult<InboxDO> pageResult = inboxService.getInboxPage(pageReqVO);
+        PageResult<ImInboxDO> pageResult = inboxService.getInboxPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, InboxRespVO.class));
     }
 
@@ -84,7 +84,7 @@ public class InboxController {
     public void exportInboxExcel(@Valid InboxPageReqVO pageReqVO,
                                  HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<InboxDO> list = inboxService.getInboxPage(pageReqVO).getList();
+        List<ImInboxDO> list = inboxService.getInboxPage(pageReqVO).getList();
         // 导出 Excel
         ExcelUtils.write(response, "收件箱.xls", "数据", InboxRespVO.class,
                 BeanUtils.toBean(list, InboxRespVO.class));

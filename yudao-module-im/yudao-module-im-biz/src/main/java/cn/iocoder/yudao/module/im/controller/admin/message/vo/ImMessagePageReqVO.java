@@ -15,7 +15,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class MessagePageReqVO extends PageParam {
+public class ImMessagePageReqVO extends PageParam {
 
     @Schema(description = "客户端消息编号 uuid，用于排重", example = "3331")
     private String clientMessageId;
@@ -33,13 +33,13 @@ public class MessagePageReqVO extends PageParam {
     private String senderAvatar;
 
     @Schema(description = "会话类型", example = "2")
-    private Boolean conversationType;
+    private Integer conversationType;
 
     @Schema(description = "会话标志")
     private String conversationNo;
 
     @Schema(description = "消息类型", example = "1")
-    private Boolean contentType;
+    private Integer contentType;
 
     @Schema(description = "消息内容")
     private String content;
@@ -49,7 +49,7 @@ public class MessagePageReqVO extends PageParam {
     private LocalDateTime[] sendTime;
 
     @Schema(description = "消息来源 100-用户发送；200-系统发送（一般是通知）；")
-    private Boolean sendFrom;
+    private Integer sendFrom;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.im.service.inbox;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.InboxPageReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.InboxSaveReqVO;
-import cn.iocoder.yudao.module.im.dal.dataobject.inbox.InboxDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.inbox.ImInboxDO;
 import jakarta.validation.Valid;
 
 /**
@@ -41,7 +41,7 @@ public interface InboxService {
      * @param id 编号
      * @return 收件箱
      */
-    InboxDO getInbox(Long id);
+    ImInboxDO getInbox(Long id);
 
     /**
      * 获得收件箱分页
@@ -49,6 +49,6 @@ public interface InboxService {
      * @param pageReqVO 分页查询
      * @return 收件箱分页
      */
-    PageResult<InboxDO> getInboxPage(InboxPageReqVO pageReqVO);
+    PageResult<ImInboxDO> getInboxPage(InboxPageReqVO pageReqVO);
 
 }

@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.InboxPageReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.InboxSaveReqVO;
-import cn.iocoder.yudao.module.im.dal.dataobject.inbox.InboxDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.inbox.ImInboxDO;
 import cn.iocoder.yudao.module.im.dal.mysql.inbox.InboxMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class InboxServiceImpl implements InboxService {
     @Override
     public Long createInbox(InboxSaveReqVO createReqVO) {
         // 插入
-        InboxDO inbox = BeanUtils.toBean(createReqVO, InboxDO.class);
+        ImInboxDO inbox = BeanUtils.toBean(createReqVO, ImInboxDO.class);
         inboxMapper.insert(inbox);
         // 返回
         return inbox.getId();
@@ -39,7 +39,7 @@ public class InboxServiceImpl implements InboxService {
         // 校验存在
         validateInboxExists(updateReqVO.getId());
         // 更新
-        InboxDO updateObj = BeanUtils.toBean(updateReqVO, InboxDO.class);
+        ImInboxDO updateObj = BeanUtils.toBean(updateReqVO, ImInboxDO.class);
         inboxMapper.updateById(updateObj);
     }
 
@@ -58,12 +58,12 @@ public class InboxServiceImpl implements InboxService {
     }
 
     @Override
-    public InboxDO getInbox(Long id) {
+    public ImInboxDO getInbox(Long id) {
         return inboxMapper.selectById(id);
     }
 
     @Override
-    public PageResult<InboxDO> getInboxPage(InboxPageReqVO pageReqVO) {
+    public PageResult<ImInboxDO> getInboxPage(InboxPageReqVO pageReqVO) {
         return inboxMapper.selectPage(pageReqVO);
     }
 

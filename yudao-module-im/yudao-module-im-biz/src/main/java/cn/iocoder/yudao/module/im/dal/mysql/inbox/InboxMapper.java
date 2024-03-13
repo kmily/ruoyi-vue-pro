@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.InboxPageReqVO;
-import cn.iocoder.yudao.module.im.dal.dataobject.inbox.InboxDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.inbox.ImInboxDO;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -13,15 +13,15 @@ import org.apache.ibatis.annotations.Mapper;
  * @author 芋道源码
  */
 @Mapper
-public interface InboxMapper extends BaseMapperX<InboxDO> {
+public interface InboxMapper extends BaseMapperX<ImInboxDO> {
 
-    default PageResult<InboxDO> selectPage(InboxPageReqVO reqVO) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<InboxDO>()
-                .eqIfPresent(InboxDO::getUserId, reqVO.getUserId())
-                .eqIfPresent(InboxDO::getMessageId, reqVO.getMessageId())
-                .eqIfPresent(InboxDO::getSequence, reqVO.getSequence())
-                .betweenIfPresent(InboxDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(InboxDO::getId));
+    default PageResult<ImInboxDO> selectPage(InboxPageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<ImInboxDO>()
+                .eqIfPresent(ImInboxDO::getUserId, reqVO.getUserId())
+                .eqIfPresent(ImInboxDO::getMessageId, reqVO.getMessageId())
+                .eqIfPresent(ImInboxDO::getSequence, reqVO.getSequence())
+                .betweenIfPresent(ImInboxDO::getCreateTime, reqVO.getCreateTime())
+                .orderByDesc(ImInboxDO::getId));
     }
 
 }

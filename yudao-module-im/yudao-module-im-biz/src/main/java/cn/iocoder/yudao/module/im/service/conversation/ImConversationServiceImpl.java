@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.im.service.conversation;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ConversationPageReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ConversationSaveReqVO;
-import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ConversationDO;
+import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationPageReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationSaveReqVO;
+import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationDO;
 import cn.iocoder.yudao.module.im.dal.mysql.conversation.ConversationMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -20,26 +20,26 @@ import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.CONVERSATION_N
  */
 @Service
 @Validated
-public class ConversationServiceImpl implements ConversationService {
+public class ImConversationServiceImpl implements ImConversationService {
 
     @Resource
     private ConversationMapper conversationMapper;
 
     @Override
-    public Long createConversation(ConversationSaveReqVO createReqVO) {
+    public Long createConversation(ImConversationSaveReqVO createReqVO) {
         // 插入
-        ConversationDO conversation = BeanUtils.toBean(createReqVO, ConversationDO.class);
+        ImConversationDO conversation = BeanUtils.toBean(createReqVO, ImConversationDO.class);
         conversationMapper.insert(conversation);
         // 返回
         return conversation.getId();
     }
 
     @Override
-    public void updateConversation(ConversationSaveReqVO updateReqVO) {
+    public void updateConversation(ImConversationSaveReqVO updateReqVO) {
         // 校验存在
         validateConversationExists(updateReqVO.getId());
         // 更新
-        ConversationDO updateObj = BeanUtils.toBean(updateReqVO, ConversationDO.class);
+        ImConversationDO updateObj = BeanUtils.toBean(updateReqVO, ImConversationDO.class);
         conversationMapper.updateById(updateObj);
     }
 
@@ -58,12 +58,12 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     @Override
-    public ConversationDO getConversation(Long id) {
+    public ImConversationDO getConversation(Long id) {
         return conversationMapper.selectById(id);
     }
 
     @Override
-    public PageResult<ConversationDO> getConversationPage(ConversationPageReqVO pageReqVO) {
+    public PageResult<ImConversationDO> getConversationPage(ImConversationPageReqVO pageReqVO) {
         return conversationMapper.selectPage(pageReqVO);
     }
 

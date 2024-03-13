@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MessageDO extends BaseDO {
+public class ImMessageDO extends BaseDO {
 
     /**
      * 编号
@@ -51,7 +51,7 @@ public class MessageDO extends BaseDO {
     /**
      * 会话类型
      */
-    private Boolean conversationType;
+    private Integer conversationType;
     /**
      * 会话标志
      */
@@ -59,7 +59,7 @@ public class MessageDO extends BaseDO {
     /**
      * 消息类型
      */
-    private Boolean contentType;
+    private Integer contentType;
     /**
      * 消息内容
      */
@@ -71,6 +71,6 @@ public class MessageDO extends BaseDO {
     /**
      * 消息来源 100-用户发送；200-系统发送（一般是通知）；
      */
-    private Boolean sendFrom;
+    private Integer sendFrom;
 
 }
