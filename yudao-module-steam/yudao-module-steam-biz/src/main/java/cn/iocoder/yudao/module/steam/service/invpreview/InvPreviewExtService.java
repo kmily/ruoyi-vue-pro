@@ -114,17 +114,14 @@ public class InvPreviewExtService {
         if(Objects.nonNull(invPreviewDOS)){
             for(InvPreviewDO item:invPreviewDOS){
                 count++;
-                updateIvnFlagAndQuantity(item);
+                Long aLong = sellingMapper.selectCount(new LambdaQueryWrapperX<SellingDO>()
+                        .eq(SellingDO::getMarketHashName, item.getMarketHashName())
+                        .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
+                        .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
+                );
+                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setAutoQuantity(aLong.toString()).setExistInv(aLong>0));
             }
         }
         return count;
-    }
-    public void updateIvnFlagAndQuantity(InvPreviewDO invPreviewDO) {
-        Long aLong = sellingMapper.selectCount(new LambdaQueryWrapperX<SellingDO>()
-                .eq(SellingDO::getMarketHashName, invPreviewDO.getMarketHashName())
-                .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
-                .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
-        );
-        invPreviewMapper.updateById(new InvPreviewDO().setId(invPreviewDO.getId()).setAutoQuantity(aLong.toString()).setExistInv(aLong>0));
     }
 }
