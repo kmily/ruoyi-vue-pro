@@ -20,6 +20,8 @@ import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
+import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
+import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.steam.*;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -56,14 +58,19 @@ public class SteamService {
     @Resource
     private InvOrderMapper invOrderMapper;
 
-    @Autowired
-    private PayOrderService payOrderService;
     @Resource
     private SellingMapper sellingMapper;
     @Resource
     private InvMapper invMapper;
     @Resource
     private SteamInvService steamInvService;
+
+    private PaySteamOrderService paySteamOrderService;
+
+    @Autowired
+    public void setPaySteamOrderService(PaySteamOrderService paySteamOrderService) {
+        this.paySteamOrderService = paySteamOrderService;
+    }
 
     /**
      * 帐号绑定
@@ -300,23 +307,13 @@ public class SteamService {
     public Integer autoCloseInvOrder(){
         List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
                 .eq(InvOrderDO::getPayStatus, false)
-                .neIfPresent(InvOrderDO::getPayOrderStatus, PayOrderStatusEnum.WAITING.getStatus())
+                .neIfPresent(InvOrderDO::getTransferStatus, InvTransferStatusEnum.CLOSE.getStatus())
         );
         log.info("invorder{}",invOrderDOS);
         Integer integer=0;
         for (InvOrderDO invOrderDO:invOrderDOS) {
-            PayOrderDO order = payOrderService.getOrder(invOrderDO.getPayOrderId());
-            if (PayOrderStatusEnum.isClosed(order.getStatus())) {
-                integer++;
-                invOrderDO.setPayStatus(false);
-                invOrderDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
-                invOrderDO.setPayOrderStatus(order.getStatus());
-                invOrderMapper.updateById(invOrderDO);
-                //释放库存
-                SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
-                sellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
-                sellingMapper.updateById(sellingDO);
-            }
+            paySteamOrderService.closeInvOrder(invOrderDO.getId());
+            integer++;
         }
         return integer;
     }

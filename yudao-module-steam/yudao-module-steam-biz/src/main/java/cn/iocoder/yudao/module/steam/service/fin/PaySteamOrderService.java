@@ -79,5 +79,13 @@ public interface PaySteamOrderService {
      * @param payRefundId 退款订单号
      */
     void updateInvOrderRefunded(Long id, Long payRefundId);
+    /**
+     * 关闭订单,
+     * 用于未支持的订单进行关闭,并释放库存
+     *
+     * @param id 编号
+     */
+    void closeInvOrder(Long id);
+
 
 }

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.steam.service.fin;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -20,12 +21,14 @@ import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
+import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
@@ -43,6 +46,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.service.SteamService;
+import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.steam.*;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -103,8 +107,8 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
 
     @Resource
     private BindUserMapper bindUserMapper;
-    @Autowired
-    private SteamService steamService;
+//    @Autowired
+//    private SteamService steamService;
 
     @Resource
     private InvDescMapper invDescMapper;
@@ -115,6 +119,13 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
 
     @Resource
     private PayChannelService channelService;
+
+    @Autowired
+    private PayOrderService payOrderService;
+
+
+    @Resource
+    private InvPreviewExtService invPreviewExtService;
 
 
     public PaySteamOrderServiceImpl() {
@@ -403,7 +414,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         //检查是否已经下过单
         List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
                 .eq(InvOrderDO::getSellId, sellingDO.getId())
-//                .eq(InvOrderDO::getPayStatus, 1)
+                .ne(InvOrderDO::getTransferStatus, InvTransferStatusEnum.CLOSE.getStatus())
                 .isNull(InvOrderDO::getPayRefundId)
         );
         if(invOrderDOS.size()>0){
@@ -479,11 +490,11 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 PayWalletBizTypeEnum.STEAM_CASH, invOrderDO.getCommodityAmount());
         invOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
         invOrderMapper.updateById(invOrderDO);
-        try{
-            steamService.tradeAsset(invOrderDO);
-        }catch (Exception e){
-            log.info("发货异常{}",e);
-        }
+//        try{
+//            steamService.tradeAsset(invOrderDO);
+//        }catch (Exception e){
+//            log.info("发货异常{}",e);
+//        }
 
     }
 
@@ -580,8 +591,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 .setPayRefundId(payRefundId).setRefundAmount(invOrderDO.getCommodityAmount()));
         //释放库存
         SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
-        sellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
-        sellingMapper.updateById(sellingDO);
+        closeInvOrder(sellingDO.getId());
     }
 
     private InvOrderDO validateInvOrderCanRefund(Long id,LoginUser loginUser) {
@@ -622,6 +632,26 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         // 2.2 更新退款单到 demo 订单
         invOrderMapper.updateById(new InvOrderDO().setId(id)
                 .setRefundTime(payRefund.getSuccessTime()).setPayOrderStatus(PayOrderStatusEnum.REFUND.getStatus()));
+    }
+
+    @Override
+    public void closeInvOrder(Long id) {
+        InvOrderDO invOrder = getInvOrder(id);
+        if(invOrder.getPayStatus()){
+            throw new ServiceException(-1,"订单已支付不支持关闭");
+        }
+        PayOrderDO order = payOrderService.getOrder(invOrder.getPayOrderId());
+        if (PayOrderStatusEnum.isClosed(order.getStatus())) {
+            invOrder.setPayStatus(false);
+            invOrder.setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus());
+            invOrder.setPayOrderStatus(order.getStatus());
+            invOrderMapper.updateById(invOrder);
+            //释放库存
+            SellingDO sellingDO = sellingMapper.selectById(invOrder.getSellId());
+            sellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
+            sellingMapper.updateById(sellingDO);
+            invPreviewExtService.markInvEnable(sellingDO.getMarketHashName());
+        }
     }
 
     private PayRefundRespDTO validateInvOrderCanRefunded(Long id, Long payRefundId) {

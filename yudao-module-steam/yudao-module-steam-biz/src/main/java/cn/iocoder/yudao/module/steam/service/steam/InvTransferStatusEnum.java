@@ -12,7 +12,8 @@ public enum InvTransferStatusEnum {
     INORDER(2, "下单"),
     TransferFINISH(3, "发货完成"),
     OFFSHELF(4, "已下架"),
-    TransferERROR(10,"发货失败");
+    TransferERROR(10,"发货失败"),
+    CLOSE(20,"关闭");
     /**
      * 状态值
      */

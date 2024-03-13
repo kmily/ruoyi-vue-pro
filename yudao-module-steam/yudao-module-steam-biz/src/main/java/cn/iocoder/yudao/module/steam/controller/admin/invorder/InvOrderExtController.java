@@ -34,13 +34,24 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @Validated
 public class InvOrderExtController {
 
-    @Resource
-    private PaySteamOrderService paySteamOrderService;
-    @Autowired
-    private SteamService steamService;
-    @Autowired
-    private PayOrderService payOrderService;
 
+    private PaySteamOrderService paySteamOrderService;
+
+    private SteamService steamService;
+
+    private PayOrderService payOrderService;
+    @Autowired
+    public void setPaySteamOrderService(PaySteamOrderService paySteamOrderService) {
+        this.paySteamOrderService = paySteamOrderService;
+    }
+    @Autowired
+    public void setSteamService(SteamService steamService) {
+        this.steamService = steamService;
+    }
+    @Autowired
+    public void setPayOrderService(PayOrderService payOrderService) {
+        this.payOrderService = payOrderService;
+    }
 
     @PostMapping("/invOrder/refundOrder")
     @Operation(summary = "steam订单退款")
