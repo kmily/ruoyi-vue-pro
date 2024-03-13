@@ -83,6 +83,11 @@ public class SellingRespVO implements Serializable {
     @ExcelProperty("库存表id")
     private Long invId;
 
+    @Schema(description = "market_hash_name", example = "23726")
+    @ExcelProperty("market_hash_name")
+    private String marketHashName;
+
+
     @Schema(description = "商品图片", example = "23726")
     @ExcelProperty("图片")
     private String iconUrl;

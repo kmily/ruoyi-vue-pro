@@ -120,5 +120,9 @@ public class SellingDO extends BaseDO {
      * icon_url
      */
     private String iconUrl;
+    /**
+     * market_hash_name
+     */
+    private String marketHashName;
 
 }
