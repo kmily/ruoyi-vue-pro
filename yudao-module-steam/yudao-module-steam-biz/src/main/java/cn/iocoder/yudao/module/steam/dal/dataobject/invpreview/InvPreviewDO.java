@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.steam.dal.dataobject.invpreview;
 
 import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
+import cn.iocoder.yudao.module.steam.service.steam.C5ItemTag;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import jdk.internal.instrumentation.TypeMapping;
 import lombok.*;
@@ -99,7 +100,8 @@ public class InvPreviewDO extends BaseDO {
     /**
      * tagList
      */
-    private String tagList;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<C5ItemTag> tagList;
     /**
      * subsidyTag
      */
