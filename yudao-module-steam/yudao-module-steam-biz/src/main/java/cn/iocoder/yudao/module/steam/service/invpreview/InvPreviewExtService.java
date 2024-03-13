@@ -120,6 +120,7 @@ public class InvPreviewExtService {
         Integer count=0;
         if(Objects.nonNull(invPreviewDOS)){
             for(InvPreviewDO item:invPreviewDOS){
+                count++;
                 updateIvnFlag(item);
             }
         }
