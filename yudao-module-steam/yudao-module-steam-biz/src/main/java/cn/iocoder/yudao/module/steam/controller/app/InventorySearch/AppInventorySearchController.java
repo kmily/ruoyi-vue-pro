@@ -116,6 +116,12 @@ public class AppInventorySearchController {
                 appInvPageReqVO.setAssetId(element.getAssetid());
                 appInvPageReqVO.setPrice(element.getPrice());
                 appInvPageReqVO.setIconUrl(element.getIconUrl());
+                appInvPageReqVO.setSelQuality(element.getSelQuality());
+                appInvPageReqVO.setSelWeapon(element.getSelWeapon());
+                appInvPageReqVO.setSelExterior(element.getSelExterior());
+                appInvPageReqVO.setSelRarity(element.getSelRarity());
+                appInvPageReqVO.setSelItemset(element.getSelItemset());
+                appInvPageReqVO.setSelType(element.getSelType());
 
                 invPage.add(appInvPageReqVO);
             }

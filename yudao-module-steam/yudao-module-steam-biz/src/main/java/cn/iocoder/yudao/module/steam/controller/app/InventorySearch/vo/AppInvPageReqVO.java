@@ -17,6 +17,32 @@ public class AppInvPageReqVO extends InvPageReqVO {
     private String instanceid;
     private Integer userType;
 
+    // 分类查询字段
+    /**
+     * 类别选择
+     */
+    private String selQuality;
+    /**
+     * 收藏品选择
+     */
+    private String selItemset;
+    /**
+     * 武器选择
+     */
+    private String selWeapon;
+    /**
+     * 外观选择
+     */
+    private String selExterior;
+    /**
+     * 品质选择
+     */
+    private String selRarity;
+    /**
+     * 类型选择
+     */
+    private String selType;
+
 
 
 }
