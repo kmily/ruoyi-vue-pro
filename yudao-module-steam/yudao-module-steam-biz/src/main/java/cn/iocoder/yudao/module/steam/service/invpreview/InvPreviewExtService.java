@@ -85,7 +85,13 @@ public class InvPreviewExtService {
         if(Objects.nonNull(invPreviewDOS)){
             invPreviewDOS.forEach(item->{
                 C5ItemInfo itemInfo = item.getItemInfo();
-                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(true).setSelExterior(itemInfo.getExteriorName()));
+                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(true)
+                        .setSelExterior(itemInfo.getExteriorName())
+                        .setSelQuality(itemInfo.getQualityName())
+                        .setSelRarity(itemInfo.getRarityName())
+                        .setSelWeapon(itemInfo.getWeaponName())
+                        .setSelType(itemInfo.getTypeName())
+                        .setSelItemset(itemInfo.getItemSetName()));
             });
         }
     }
