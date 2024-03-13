@@ -180,9 +180,7 @@ public class AppDropListController {
     @Operation(summary = "在售商品列表")
     public CommonResult<PageResult<ItemResp>> itemSearch(@Valid InvPreviewPageReqVO sellingPageReqVO) {
         sellingPageReqVO.setExistInv(true);
-        PageResult<InvPreviewDO> invPreviewPage = invPreviewExtService.getInvPreviewPage(sellingPageReqVO);
-        PageResult<ItemResp> itemRespPageResult = BeanUtils.toBean(invPreviewPage, ItemResp.class);
-        return success(itemRespPageResult);
+        return success(invPreviewExtService.getInvPreviewPage(sellingPageReqVO));
     }
     @GetMapping("sell/list")
     @Operation(summary = "在售商品列表")
