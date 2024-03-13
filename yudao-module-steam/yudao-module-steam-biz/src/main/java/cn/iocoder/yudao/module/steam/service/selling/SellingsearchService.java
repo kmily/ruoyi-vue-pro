@@ -87,8 +87,6 @@ public class SellingsearchService {
             invDescMap = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
                     .inIfPresent(InvDescDO::getId, collect2)).stream().collect(Collectors.toMap(InvDescDO::getId, o -> o, (v1, v2) -> v1));
         }
-
-
         List<SellingRespVO> sellingRespVOList = new ArrayList<>();
         for (SellingDO s : invPage.getList()) {
             SellingRespVO tempSellingRespVO = new SellingRespVO();

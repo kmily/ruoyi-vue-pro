@@ -87,6 +87,29 @@ public class SellingRespVO implements Serializable {
     @ExcelProperty("market_hash_name")
     private String marketHashName;
 
+    @Schema(description = "selQuality", example = "23726")
+    @ExcelProperty("selQuality")
+    private String selQuality;
+
+    @Schema(description = "selItemset", example = "23726")
+    @ExcelProperty("selItemset")
+    private String selItemset;
+
+    @Schema(description = "selWeapon", example = "23726")
+    @ExcelProperty("selWeapon")
+    private String selWeapon;
+
+    @Schema(description = "selExterior", example = "23726")
+    @ExcelProperty("selExterior")
+    private String selExterior;
+
+    @Schema(description = "selRarity", example = "23726")
+    @ExcelProperty("selRarity")
+    private String selRarity;
+
+    @Schema(description = "selType", example = "23726")
+    @ExcelProperty("selType")
+    private String selType;
 
     @Schema(description = "商品图片", example = "23726")
     @ExcelProperty("图片")

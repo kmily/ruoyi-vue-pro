@@ -85,7 +85,7 @@ public class SteamService {
             throw new ServiceException(-1,"此帐号已经被绑定");
         }
         BindUserDO bindUserDO=new BindUserDO().setUserId(loginUser.getId()).setUserType(loginUser.getUserType())
-                .setSteamId(steamId);
+                .setSteamId(steamId)/*.setLoginCookie(openApi.getResponseNonce()*/;
 
         return bindUserMapper.insert(bindUserDO);
     }
