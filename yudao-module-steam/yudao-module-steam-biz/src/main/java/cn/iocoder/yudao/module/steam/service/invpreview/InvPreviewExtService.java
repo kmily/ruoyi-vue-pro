@@ -34,8 +34,13 @@ public class InvPreviewExtService {
         for (InvPreviewDO item:invPreviewDOPageResult.getList()){
 
             ItemResp itemResp = BeanUtils.toBean(item, ItemResp.class);
-            itemResp.setAutoPrice(new BigDecimal(item.getAutoPrice()).multiply(new BigDecimal("100")).intValue());
-            itemResp.setSalePrice(new BigDecimal(item.getSalePrice()).multiply(new BigDecimal("100")).intValue());
+            if(Objects.nonNull(item.getAutoPrice())){
+                itemResp.setAutoPrice(new BigDecimal(item.getAutoPrice()).multiply(new BigDecimal("100")).intValue());
+            }
+            if(Objects.nonNull(item.getSalePrice())){
+                itemResp.setSalePrice(new BigDecimal(item.getSalePrice()).multiply(new BigDecimal("100")).intValue());
+            }
+
             ret.add(itemResp);
         }
         return new PageResult<>(ret, invPreviewDOPageResult.getTotal());
