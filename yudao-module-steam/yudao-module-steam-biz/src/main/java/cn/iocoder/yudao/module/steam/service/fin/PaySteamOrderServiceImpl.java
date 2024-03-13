@@ -411,11 +411,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
 
 
         //检查是否已经下过单
-        List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
-                .eq(InvOrderDO::getSellId, sellingDO.getId())
-                .ne(InvOrderDO::getTransferStatus, InvTransferStatusEnum.CLOSE.getStatus())
-                .isNull(InvOrderDO::getPayRefundId)
-        );
+        List<InvOrderDO> invOrderDOS = getExpOrder(sellingDO.getId());
         if(invOrderDOS.size()>0){
             throw exception(ErrorCodeConstants.INVORDER_ORDERED_EXCEPT);
         }
@@ -441,6 +437,18 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw exception(ErrorCodeConstants.INVORDER_BIND_STEAM_EXCEPT);
         }
         return invOrderDO;
+    }
+
+    /**
+     * 检查是否有有效订单
+     */
+    public List<InvOrderDO> getExpOrder(Long sellId){
+        List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
+                .eq(InvOrderDO::getSellId, sellId)
+                .ne(InvOrderDO::getTransferStatus, InvTransferStatusEnum.CLOSE.getStatus())
+                .isNull(InvOrderDO::getPayRefundId)
+        );
+        return invOrderDOS;
     }
 
     @Override
