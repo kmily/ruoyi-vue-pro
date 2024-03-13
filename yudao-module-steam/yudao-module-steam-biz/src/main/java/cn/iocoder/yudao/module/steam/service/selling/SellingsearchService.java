@@ -51,7 +51,7 @@ public class SellingsearchService {
                 .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
                         .geIfPresent(SellingDO::getPrice,pageReqVO.getMinPrice())
                         .leIfPresent(SellingDO::getPrice,pageReqVO.getMaxPrice())
-                .orderByDesc(SellingDO::getPrice)
+                .orderByAsc(SellingDO::getPrice)
         );
         return sellingDOPageResult;
     }
