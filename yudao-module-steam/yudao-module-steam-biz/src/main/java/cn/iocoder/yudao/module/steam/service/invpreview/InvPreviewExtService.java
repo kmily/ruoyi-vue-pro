@@ -82,7 +82,7 @@ public class InvPreviewExtService {
     }
 
     /**
-     * 增加库存标识
+     * 增加库存标识,上架构和下架构 都可以进行调用
      * @param marketHashName 标签名称
      */
     public void markInvEnable(String marketHashName) {
