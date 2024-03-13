@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.steam.service.fin;
 
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -20,12 +22,14 @@ import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
+import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
@@ -42,7 +46,8 @@ import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
-import cn.iocoder.yudao.module.steam.service.SteamService;
+import cn.iocoder.yudao.module.steam.service.SteamWeb;
+import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.steam.*;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -103,8 +108,6 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
 
     @Resource
     private BindUserMapper bindUserMapper;
-    @Autowired
-    private SteamService steamService;
 
     @Resource
     private InvDescMapper invDescMapper;
@@ -115,6 +118,13 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
 
     @Resource
     private PayChannelService channelService;
+
+    @Autowired
+    private PayOrderService payOrderService;
+
+
+    @Resource
+    private InvPreviewExtService invPreviewExtService;
 
 
     public PaySteamOrderServiceImpl() {
@@ -208,8 +218,8 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         reqDTO.setUserIp(ServletUtils.getClientIP());
         reqDTO.setOutTransferNo("TT"+withdrawalDO.getId());
         reqDTO.setSubject("提现单号"+withdrawalDO.getId());
-        reqDTO.setUserName("ukagwe2912");
-        reqDTO.setAlipayLogonId("ukagwe2912@sandbox.com");
+        reqDTO.setUserName(withdrawalDO.getWithdrawalInfo().getUserName());
+        reqDTO.setAlipayLogonId(withdrawalDO.getWithdrawalInfo().getAlipayLogonId());
         PayTransferRespDTO payTransferRespDTO = client.unifiedTransfer(reqDTO);
         log.info("支付宝打款结果{}",payTransferRespDTO);
         withdrawalMapper.updateById(new WithdrawalDO().setId(withdrawalDO.getId()).setPayTransferRet(JacksonUtils.writeValueAsString(payTransferRespDTO)));
@@ -222,8 +232,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(withdrawalDO.getServiceFeeUserId(), withdrawalDO.getServiceFeeUserType());
         PayWalletTransactionDO payWalletTransactionDO = payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(withdrawalDO.getId()),
                 PayWalletBizTypeEnum.SERVICE_FEE, withdrawalDO.getServiceFee());
-
-        withdrawalMapper.updateById(new WithdrawalDO().setId(withdrawalDO.getId()).setPayTransferRet(JacksonUtils.writeValueAsString(payWalletTransactionDO)));
+        withdrawalMapper.updateById(new WithdrawalDO().setId(withdrawalDO.getId()).setServiceFeeRet(JacksonUtils.writeValueAsString(payWalletTransactionDO)));
 
     }
 
@@ -301,6 +310,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         InvOrderDO invOrderDO = new InvOrderDO().setSellId(createReqVO.getSellId()).setSteamId(createReqVO.getSteamId())
                 .setCommodityAmount(0).setDiscountAmount(0).setServiceFeeRate("0").setServiceFee(0)
                 .setPaymentAmount(0)
+                .setServiceFeeUserId(WITHDRAWAL_ACCOUNT_ID).setServiceFeeUserType(WITHDRAWAL_ACCOUNT_TYPE.getValue())
 //                .setPrice(0)
                 .setSteamId(createReqVO.getSteamId())
                 .setPayOrderStatus(PayOrderStatusEnum.WAITING.getStatus())
@@ -401,11 +411,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
 
 
         //检查是否已经下过单
-        List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
-                .eq(InvOrderDO::getSellId, sellingDO.getId())
-//                .eq(InvOrderDO::getPayStatus, 1)
-                .isNull(InvOrderDO::getPayRefundId)
-        );
+        List<InvOrderDO> invOrderDOS = getExpOrder(sellingDO.getId());
         if(invOrderDOS.size()>0){
             throw exception(ErrorCodeConstants.INVORDER_ORDERED_EXCEPT);
         }
@@ -431,6 +437,18 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw exception(ErrorCodeConstants.INVORDER_BIND_STEAM_EXCEPT);
         }
         return invOrderDO;
+    }
+
+    /**
+     * 检查是否有有效订单
+     */
+    public List<InvOrderDO> getExpOrder(Long sellId){
+        List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
+                .eq(InvOrderDO::getSellId, sellId)
+                .ne(InvOrderDO::getTransferStatus, InvTransferStatusEnum.CLOSE.getStatus())
+                .isNull(InvOrderDO::getPayRefundId)
+        );
+        return invOrderDOS;
     }
 
     @Override
@@ -480,10 +498,21 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         invOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
         invOrderMapper.updateById(invOrderDO);
         try{
-            steamService.tradeAsset(invOrderDO);
+            PaySteamOrderServiceImpl bean = SpringUtil.getBean(this.getClass());
+            bean.tradeAsset(invOrderDO.getId());
         }catch (Exception e){
             log.info("发货异常{}",e);
         }
+
+    }
+    @Async
+    public void setPayInvOrderServiceFee(InvOrderDO invOrderDO) {
+
+        PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(invOrderDO.getServiceFeeUserId(), invOrderDO.getServiceFeeUserType());
+        PayWalletTransactionDO payWalletTransactionDO = payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(invOrderDO.getId()),
+                PayWalletBizTypeEnum.SERVICE_FEE, invOrderDO.getServiceFee());
+
+        invOrderMapper.updateById(new InvOrderDO().setId(invOrderDO.getId()).setServiceFeeRet(JacksonUtils.writeValueAsString(payWalletTransactionDO)));
 
     }
 
@@ -580,8 +609,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 .setPayRefundId(payRefundId).setRefundAmount(invOrderDO.getCommodityAmount()));
         //释放库存
         SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
-        sellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
-        sellingMapper.updateById(sellingDO);
+        closeInvOrder(sellingDO.getId());
     }
 
     private InvOrderDO validateInvOrderCanRefund(Long id,LoginUser loginUser) {
@@ -622,6 +650,89 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         // 2.2 更新退款单到 demo 订单
         invOrderMapper.updateById(new InvOrderDO().setId(id)
                 .setRefundTime(payRefund.getSuccessTime()).setPayOrderStatus(PayOrderStatusEnum.REFUND.getStatus()));
+    }
+
+    @Override
+    public void closeInvOrder(Long id) {
+        InvOrderDO invOrder = getInvOrder(id);
+        if(invOrder.getPayStatus()){
+            throw new ServiceException(-1,"订单已支付不支持关闭");
+        }
+        PayOrderDO order = payOrderService.getOrder(invOrder.getPayOrderId());
+        if (PayOrderStatusEnum.isClosed(order.getStatus())) {
+            invOrder.setPayStatus(false);
+            invOrder.setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus());
+            invOrder.setPayOrderStatus(order.getStatus());
+            invOrderMapper.updateById(invOrder);
+            //释放库存
+            SellingDO sellingDO = sellingMapper.selectById(invOrder.getSellId());
+            sellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
+            sellingMapper.updateById(sellingDO);
+            invPreviewExtService.markInvEnable(sellingDO.getMarketHashName());
+        }
+    }
+
+    @Override
+    @Async
+    public void tradeAsset(Long id) {
+        InvOrderDO invOrder = getInvOrder(id);
+        SellingDO sellingDO = sellingMapper.selectById(invOrder.getSellId());
+        TransferMsg transferMsg=new TransferMsg();
+        try{
+            if (CommonStatusEnum.isDisable(sellingDO.getStatus())) {
+                throw new ServiceException(-1,"库存已经更新无法进行发货。");
+            }
+            if (PayOrderStatusEnum.isClosed(sellingDO.getStatus())) {
+                throw new ServiceException(-1,"已关闭无法进行发货。");
+            }
+            if (PayOrderStatusEnum.REFUND.getStatus().equals(sellingDO.getStatus())) {
+                throw new ServiceException(-1,"已退款无法进行发货。");
+            }
+            Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+                    .eq(BindUserDO::getUserId, invOrder.getUserId())
+                    .eq(BindUserDO::getUserType, invOrder.getUserType())
+                    .eq(BindUserDO::getSteamId, invOrder.getSteamId())
+            ).stream().findFirst();
+            if(!first.isPresent()){
+                throw new ServiceException(-1,"收货方绑定关系失败无法发货。");
+            }
+            BindUserDO bindUserDO = first.get();
+            //收货方tradeUrl
+            String tradeUrl = bindUserDO.getTradeUrl();
+//        SteamWeb steamWeb=new SteamWeb(configService);
+//        steamWeb.login(bindUserDO.getSteamPassword(),bindUserDO.getMaFile());
+//        steamWeb.initTradeUrl();
+//        if(!steamWeb.getTreadUrl().isPresent()){
+//
+//        }
+//        steamWeb.checkTradeUrl(steamWeb.getTreadUrl().get());
+            BindUserDO bindUserDO1 = bindUserMapper.selectById(sellingDO.getBindUserId());
+            //发货
+            SteamWeb steamWeb=new SteamWeb(configService);
+            steamWeb.login(bindUserDO1.getSteamPassword(),bindUserDO1.getMaFile());
+            SteamInvDto steamInvDto=new SteamInvDto();
+            steamInvDto.setAmount(sellingDO.getAmount());
+            steamInvDto.setAssetid(sellingDO.getAssetid());
+            steamInvDto.setClassid(sellingDO.getClassid());
+            steamInvDto.setContextid(sellingDO.getContextid());
+            steamInvDto.setInstanceid(sellingDO.getInstanceid());
+            steamInvDto.setAppid(sellingDO.getAppid());
+            SteamTradeOfferResult trade = steamWeb.trade(steamInvDto, tradeUrl);
+            log.info("发货信息{}",trade);
+            transferMsg.setTradeofferid(trade.getTradeofferid());
+            invOrder.setTransferStatus(InvTransferStatusEnum.TransferFINISH.getStatus());
+            sellingDO.setTransferStatus(InvTransferStatusEnum.TransferFINISH.getStatus());
+        }catch (ServiceException  e){
+            log.error("发送失败原因{}",e.getMessage());
+            transferMsg.setMsg(e.getMessage());
+            invOrder.setTransferStatus(-1);
+            invOrder.setTransferStatus(InvTransferStatusEnum.TransferERROR.getStatus());
+            sellingDO.setTransferStatus(InvTransferStatusEnum.TransferERROR.getStatus());
+        }
+        invOrder.setTransferText(transferMsg);
+        invOrderMapper.updateById(invOrder);
+        sellingMapper.updateById(sellingDO);
+        setPayInvOrderServiceFee(invOrder);
     }
 
     private PayRefundRespDTO validateInvOrderCanRefunded(Long id, Long payRefundId) {

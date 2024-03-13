@@ -2,18 +2,25 @@ package cn.iocoder.yudao.module.steam.service.selling;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.InvPageReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.SellingChangePriceReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.selling.vo.SellingMergeListVO;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.SellingReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
+import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
+import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewService;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 
 import lombok.extern.slf4j.Slf4j;
@@ -22,10 +29,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * 在售饰品 Service 实现类
@@ -40,9 +44,17 @@ public class SellingExtService {
     @Resource
     private SellingMapper sellingMapper;
     @Resource
+    private SellingService sellingService;
+    @Resource
     private InvMapper invMapper;
     @Resource
     private InvDescMapper invDescMapper;
+    @Resource
+    private InvPreviewMapper invPreviewMapper;
+    @Resource
+    private InvPreviewService invPreviewService;
+    @Resource
+    private InvPreviewExtService invPreviewExtService;
 
     /**
      * @param invPageReqVos
@@ -106,13 +118,18 @@ public class SellingExtService {
         sellingDO.setSelWeapon(invDescDO.get().getSelWeapon());
         sellingDO.setMarketName(invDescDO.get().getMarketName());
         sellingDO.setIconUrl(invDescDO.get().getIconUrl());
+        sellingDO.setMarketHashName(invDescDO.get().getMarketHashName());
         sellingDO.setInvId(invDO.getId());
         if (invPageReqVos.getPrice() == null || invPageReqVos.getPrice() == 0) {
             throw new ServiceException(-1, "未设置价格");
         }
+
         sellingDO.setPrice(invPageReqVos.getPrice());
         sellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
         sellingMapper.insert(sellingDO);
+
+        invPreviewExtService.markInvEnable(sellingDO.getMarketHashName());
+
         return sellingDO;
     }
 
@@ -124,7 +141,9 @@ public class SellingExtService {
         Optional<SellingDO> sellingDO1 = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
                 .eq(SellingDO::getClassid, invDO.getClassid())
                 .eq(SellingDO::getInstanceid, invDO.getInstanceid())).stream().findFirst();
-
+        if (!sellingDO1.isPresent()) {
+            throw new ServiceException(-1, "无权限");
+        }
         // 在售账号是否是自己账号
         if (!sellingDO1.get().getUserId().equals(loginUser.getId())) {
             throw new ServiceException(-1, "无权限");
@@ -148,6 +167,9 @@ public class SellingExtService {
         invDO.setPrice(null);
         invMapper.updateById(invDO);
         sellingMapper.deleteById(id);
+
+        invPreviewExtService.markInvEnable(sellingDO1.get().getMarketHashName());
+
         return sellingDO1;
     }
 
@@ -185,6 +207,83 @@ public class SellingExtService {
         }
         int i = sellingMapper.updateById(new SellingDO().setId(reqVo.getId()).setPrice(reqVo.getPrice()));
         return i;
+    }
+
+
+    //  出售未合并
+    public PageResult<SellingRespVO> sellingUnMerge(SellingPageReqVO sellingPageReqVO) {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        PageResult<SellingDO> sellingPage = sellingService.getSellingPage(sellingPageReqVO);
+
+        List<SellingRespVO> sellingRespVOList = new ArrayList<>();
+        for (SellingDO sellingDO : sellingPage.getList()) {
+            SellingRespVO sellingDOS = new SellingRespVO();
+            sellingDOS.setAppid(sellingDO.getAppid());
+            sellingDOS.setAssetid(sellingDO.getAssetid());
+            sellingDOS.setClassid(sellingDO.getClassid());
+            sellingDOS.setInstanceid(sellingDO.getInstanceid());
+            sellingDOS.setAmount(sellingDO.getAmount());
+            sellingDOS.setSteamId(sellingDO.getSteamId());
+            sellingDOS.setUserId(sellingDO.getUserId());
+            sellingDOS.setUserType(sellingDO.getUserType());
+            sellingDOS.setBindUserId(sellingDO.getBindUserId());
+            sellingDOS.setContextid(sellingDO.getContextid());
+            sellingDOS.setInvDescId(sellingDO.getInvDescId());
+            sellingDOS.setSelExterior(sellingDO.getSelExterior());
+            sellingDOS.setSelItemset(sellingDO.getSelItemset());
+            sellingDOS.setSelQuality(sellingDO.getSelQuality());
+            sellingDOS.setSelRarity(sellingDO.getSelRarity());
+            sellingDOS.setSelType(sellingDO.getSelType());
+            sellingDOS.setSelWeapon(sellingDO.getSelWeapon());
+            sellingDOS.setMarketName(sellingDO.getMarketName());
+            sellingDOS.setMarketHashName(sellingDO.getMarketHashName());
+            sellingDOS.setIconUrl(sellingDO.getIconUrl());
+            sellingDOS.setInvId(sellingDO.getInvId());
+            sellingDOS.setTransferStatus(sellingDO.getTransferStatus());
+            sellingDOS.setStatus(sellingDO.getStatus());
+            sellingDOS.setPrice(sellingDO.getPrice());
+            sellingRespVOList.add(sellingDOS);
+        }
+
+        return new PageResult<>(sellingRespVOList, sellingPage.getTotal());
+    }
+
+    public PageResult<SellingMergeListVO> sellingMerge(SellingPageReqVO sellingPageReqVO) {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        PageResult<SellingDO> sellingPage = sellingService.getSellingPage(sellingPageReqVO);
+
+        Map<String, Integer> map = new HashMap<>();
+        List<SellingMergeListVO> invPage = new ArrayList<>();
+        // 统计每一个 markName 的个数，并插入invPage
+        for (SellingDO element : sellingPage.getList()) {
+            if (map.containsKey(element.getMarketName())) {
+                map.put(element.getMarketName(), map.get(element.getMarketName()) + 1);  // 更新计数
+            } else {
+                map.put(element.getMarketName(), 1);    // 初次计数 1
+                SellingMergeListVO sellingPageReqVO1 = new SellingMergeListVO();
+                sellingPageReqVO1.setMarketName(element.getMarketName());
+                sellingPageReqVO1.setMarketHashName(element.getMarketHashName());
+                sellingPageReqVO1.setPrice(element.getPrice());
+                sellingPageReqVO1.setIconUrl(element.getIconUrl());
+                sellingPageReqVO1.setSelQuality(element.getSelQuality());
+                sellingPageReqVO1.setSelWeapon(element.getSelWeapon());
+                sellingPageReqVO1.setSelExterior(element.getSelExterior());
+                sellingPageReqVO1.setSelRarity(element.getSelRarity());
+                sellingPageReqVO1.setSelItemset(element.getSelItemset());
+                sellingPageReqVO1.setSelType(element.getSelType());
+
+                invPage.add(sellingPageReqVO1);
+            }
+        }
+        // 读取每一个商品合并后的件数
+        for (Map.Entry<String, Integer> key : map.entrySet()) {
+            for (SellingMergeListVO element : invPage) {
+                if (element.getMarketName().equals(key.getKey())) {
+                    element.setNumber(key.getValue());
+                }
+            }
+        }
+        return new PageResult<>(invPage, sellingPage.getTotal());
     }
 
 }

@@ -34,13 +34,18 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @Validated
 public class InvOrderExtController {
 
-    @Resource
-    private PaySteamOrderService paySteamOrderService;
-    @Autowired
-    private SteamService steamService;
-    @Autowired
-    private PayOrderService payOrderService;
 
+    private PaySteamOrderService paySteamOrderService;
+
+    private PayOrderService payOrderService;
+    @Autowired
+    public void setPaySteamOrderService(PaySteamOrderService paySteamOrderService) {
+        this.paySteamOrderService = paySteamOrderService;
+    }
+    @Autowired
+    public void setPayOrderService(PayOrderService payOrderService) {
+        this.payOrderService = payOrderService;
+    }
 
     @PostMapping("/invOrder/refundOrder")
     @Operation(summary = "steam订单退款")
@@ -67,7 +72,7 @@ public class InvOrderExtController {
         if(!PayOrderStatusEnum.isSuccess(order.getStatus())){
             return error(new ErrorCode(-1,"订单没有支付"));
         }
-        steamService.tradeAsset(invOrder);
+        paySteamOrderService.tradeAsset(invOrder.getId());
         return success(true);
     }
 }

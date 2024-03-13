@@ -405,10 +405,8 @@ public class SteamInvService {
     public List<AppInvMergeToSellPageReqVO> merge(PageResult<AppInvPageReqVO> invPage1){
         Map<String,Integer> map = new HashMap<>();
         List<AppInvMergeToSellPageReqVO> invPage = new ArrayList<>();
-
         // 统计每一个 markName 的个数，并插入invPage
         for(AppInvPageReqVO element : invPage1.getList()){
-
             if(map.containsKey(element.getMarketName())){
                 map.put(element.getMarketName(),map.get(element.getMarketName())+1);  // 更新计数
             } else {

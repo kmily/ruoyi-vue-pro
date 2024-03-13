@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 示例订单 Service 接口
@@ -79,5 +80,23 @@ public interface PaySteamOrderService {
      * @param payRefundId 退款订单号
      */
     void updateInvOrderRefunded(Long id, Long payRefundId);
+    /**
+     * 关闭订单,
+     * 用于未支持的订单进行关闭,并释放库存
+     *
+     * @param id 编号
+     */
+    void closeInvOrder(Long id);
+
+
+    void tradeAsset(Long id);
+
+    /**
+     * 获取当前sellId下的有效订单
+     * @param sellId
+     * @return
+     */
+    List<InvOrderDO> getExpOrder(Long sellId);
+
 
 }

@@ -20,7 +20,8 @@ import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
-import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
+import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
+import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.steam.*;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -57,14 +58,17 @@ public class SteamService {
     @Resource
     private InvOrderMapper invOrderMapper;
 
-    @Autowired
-    private PayOrderService payOrderService;
-    @Resource
-    private SellingMapper sellingMapper;
     @Resource
     private InvMapper invMapper;
     @Resource
-    private IOInvUpdateService ioInvUpdateService;
+    private SteamInvService steamInvService;
+
+    private PaySteamOrderService paySteamOrderService;
+
+    @Autowired
+    public void setPaySteamOrderService(PaySteamOrderService paySteamOrderService) {
+        this.paySteamOrderService = paySteamOrderService;
+    }
 
     /**
      * 帐号绑定
@@ -86,7 +90,7 @@ public class SteamService {
             throw new ServiceException(-1,"此帐号已经被绑定");
         }
         BindUserDO bindUserDO=new BindUserDO().setUserId(loginUser.getId()).setUserType(loginUser.getUserType())
-                .setSteamId(steamId);
+                .setSteamId(steamId)/*.setLoginCookie(openApi.getResponseNonce()*/;
 
         return bindUserMapper.insert(bindUserDO);
     }
@@ -169,8 +173,7 @@ public class SteamService {
             invMapper.delete(new QueryWrapper<InvDO>().eq("steam_id",bindUserDO.getSteamId()).eq("user_id",bindUserDO.getUserId()));
         }
         bindUserMapper.updateById(bindUserDO);
-        InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
-        ioInvUpdateService.firstInsertInventory(inventoryDto,bindUserDO);
+        steamInvService.FistGetInventory(bindUserDO.getId(), "730");
 
     }
 
@@ -231,94 +234,19 @@ public class SteamService {
     }
 
     /**
-     * 发货
-     * @param invOrderDO
-     */
-    @Async
-    public void tradeAsset(InvOrderDO invOrderDO){
-        SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
-        TransferMsg transferMsg=new TransferMsg();
-        try{
-            if (CommonStatusEnum.isDisable(sellingDO.getStatus())) {
-                throw new ServiceException(-1,"库存已经更新无法进行发货。");
-            }
-            if (PayOrderStatusEnum.isClosed(sellingDO.getStatus())) {
-                throw new ServiceException(-1,"已关闭无法进行发货。");
-            }
-            if (PayOrderStatusEnum.REFUND.getStatus().equals(sellingDO.getStatus())) {
-                throw new ServiceException(-1,"已退款无法进行发货。");
-            }
-            Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
-                    .eq(BindUserDO::getUserId, invOrderDO.getUserId())
-                    .eq(BindUserDO::getUserType, invOrderDO.getUserType())
-                    .eq(BindUserDO::getSteamId, invOrderDO.getSteamId())
-            ).stream().findFirst();
-            if(!first.isPresent()){
-                throw new ServiceException(-1,"收货方绑定关系失败无法发货。");
-            }
-            BindUserDO bindUserDO = first.get();
-            //收货方tradeUrl
-            String tradeUrl = bindUserDO.getTradeUrl();
-//        SteamWeb steamWeb=new SteamWeb(configService);
-//        steamWeb.login(bindUserDO.getSteamPassword(),bindUserDO.getMaFile());
-//        steamWeb.initTradeUrl();
-//        if(!steamWeb.getTreadUrl().isPresent()){
-//
-//        }
-//        steamWeb.checkTradeUrl(steamWeb.getTreadUrl().get());
-            BindUserDO bindUserDO1 = bindUserMapper.selectById(sellingDO.getBindUserId());
-            //发货
-            SteamWeb steamWeb=new SteamWeb(configService);
-            steamWeb.login(bindUserDO1.getSteamPassword(),bindUserDO1.getMaFile());
-            SteamInvDto steamInvDto=new SteamInvDto();
-            steamInvDto.setAmount(sellingDO.getAmount());
-            steamInvDto.setAssetid(sellingDO.getAssetid());
-            steamInvDto.setClassid(sellingDO.getClassid());
-            steamInvDto.setContextid(sellingDO.getContextid());
-            steamInvDto.setInstanceid(sellingDO.getInstanceid());
-            steamInvDto.setAppid(sellingDO.getAppid());
-            SteamTradeOfferResult trade = steamWeb.trade(steamInvDto, tradeUrl);
-            log.info("发货信息{}",trade);
-            transferMsg.setTradeofferid(trade.getTradeofferid());
-            invOrderDO.setTransferStatus(0);
-            invOrderDO.setTransferStatus(InvTransferStatusEnum.TransferFINISH.getStatus());
-            sellingDO.setTransferStatus(InvTransferStatusEnum.TransferFINISH.getStatus());
-        }catch (ServiceException  e){
-            log.error("发送失败原因{}",e.getMessage());
-            transferMsg.setMsg(e.getMessage());
-            invOrderDO.setTransferStatus(-1);
-            invOrderDO.setTransferStatus(InvTransferStatusEnum.TransferERROR.getStatus());
-            sellingDO.setTransferStatus(InvTransferStatusEnum.TransferERROR.getStatus());
-        }
-        invOrderDO.setTransferText(transferMsg);
-        invOrderMapper.updateById(invOrderDO);
-        sellingMapper.updateById(sellingDO);
-    }
-
-    /**
      * 订单超时关闭时自动同步数据
      * @return
      */
     public Integer autoCloseInvOrder(){
         List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
                 .eq(InvOrderDO::getPayStatus, false)
-                .neIfPresent(InvOrderDO::getPayOrderStatus, PayOrderStatusEnum.WAITING.getStatus())
+                .neIfPresent(InvOrderDO::getTransferStatus, InvTransferStatusEnum.CLOSE.getStatus())
         );
         log.info("invorder{}",invOrderDOS);
         Integer integer=0;
         for (InvOrderDO invOrderDO:invOrderDOS) {
-            PayOrderDO order = payOrderService.getOrder(invOrderDO.getPayOrderId());
-            if (PayOrderStatusEnum.isClosed(order.getStatus())) {
-                integer++;
-                invOrderDO.setPayStatus(false);
-                invOrderDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
-                invOrderDO.setPayOrderStatus(order.getStatus());
-                invOrderMapper.updateById(invOrderDO);
-                //释放库存
-                SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
-                sellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
-                sellingMapper.updateById(sellingDO);
-            }
+            paySteamOrderService.closeInvOrder(invOrderDO.getId());
+            integer++;
         }
         return integer;
     }

@@ -137,4 +137,17 @@ public class InvOrderDO extends BaseDO {
      */
     private Integer discountAmount;
 
+    /**
+     * 提现手续费收款钱包
+     */
+    private Long serviceFeeUserId;
+    /**
+     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.UserTypeEnum 对应的类}
+     */
+    private Integer serviceFeeUserType;
+    /**
+     * 服务费转帐接口返回
+     */
+    private String serviceFeeRet;
+
 }

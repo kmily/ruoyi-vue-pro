@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.steam.dal.dataobject.invpreview;
 import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
 import cn.iocoder.yudao.module.steam.service.steam.C5ItemTag;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import jdk.internal.instrumentation.TypeMapping;
+//import jdk.internal.instrumentation.TypeMapping;
 import lombok.*;
 import java.util.*;
 import java.time.LocalDateTime;
