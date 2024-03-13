@@ -29,6 +29,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -65,6 +67,12 @@ public class SellingsearchService {
         List<Long> collect = sellingDOPageResult.getList().stream().map(SellingDO::getUserId).distinct().collect(Collectors.toList());
         Map<Long, MemberUserRespDTO> memberUserRespDTOMap = memberUserApi.getUserList(collect).stream().collect(Collectors.toMap(MemberUserRespDTO::getId, item -> item));
         for (SellListItemResp item:sellingPageReqVOPageResult.getList()) {
+            MemberUserRespDTO memberUserRespDTO = memberUserRespDTOMap.get(item.getUserId());
+            memberUserRespDTO.setMobile("");
+            memberUserRespDTO.setStatus(999);
+            memberUserRespDTO.setPoint(999);
+            memberUserRespDTO.setCreateTime(LocalDateTime.now());
+            memberUserRespDTO.setLevelId(999l);
             item.setMemberUserRespDTO(memberUserRespDTOMap.get(item.getUserId()));
         }
         return sellingPageReqVOPageResult;
