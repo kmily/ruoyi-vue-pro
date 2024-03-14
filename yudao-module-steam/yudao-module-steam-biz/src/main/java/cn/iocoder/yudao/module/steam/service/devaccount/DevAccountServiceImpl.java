@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.service.devaccount;
 
+import cn.hutool.core.lang.Validator;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
@@ -111,6 +112,9 @@ public class DevAccountServiceImpl implements DevAccountService {
             }
             if(Objects.isNull(createReqVO.getApplyReason())){
                 throw exception(OpenApiCode.JACKSON_EXCEPTION);
+            }
+            if(Validator.isCitizenId(createReqVO.getIdNum())){
+                throw exception(DEV_ACCOUNT_IDERROR);
             }
 //            createReqVO.setApiPublicKey(createReqVO.getApiPublicKey());
             // 插入
