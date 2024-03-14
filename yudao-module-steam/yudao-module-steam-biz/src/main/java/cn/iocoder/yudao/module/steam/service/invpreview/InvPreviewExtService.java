@@ -55,9 +55,6 @@ public class InvPreviewExtService {
             if(Objects.nonNull(invPreviewDO.getReferencePrice())){
                 itemResp.setReferencePrice(new BigDecimal(invPreviewDO.getReferencePrice()).multiply(new BigDecimal("100")).intValue());
             }
-            if(Objects.nonNull(invPreviewDO.getCnyPrice())){
-                itemResp.setMinPrice(new BigDecimal(invPreviewDO.getCnyPrice()).multiply(new BigDecimal("100")).intValue());
-            }
             return itemResp;
         }else{
             throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
@@ -79,10 +76,6 @@ public class InvPreviewExtService {
             if(Objects.nonNull(item.getReferencePrice())){
                 itemResp.setReferencePrice(new BigDecimal(item.getReferencePrice()).multiply(new BigDecimal("100")).intValue());
             }
-            if(Objects.nonNull(item.getCnyPrice())){
-                itemResp.setMinPrice(new BigDecimal(item.getCnyPrice()).multiply(new BigDecimal("100")).intValue());
-            }
-
             ret.add(itemResp);
         }
         return new PageResult<>(ret, invPreviewDOPageResult.getTotal());
@@ -101,9 +94,6 @@ public class InvPreviewExtService {
             }
             if(Objects.nonNull(item.getReferencePrice())){
                 itemResp.setReferencePrice(new BigDecimal(item.getReferencePrice()).multiply(new BigDecimal("100")).intValue());
-            }
-            if(Objects.nonNull(item.getCnyPrice())){
-                itemResp.setMinPrice(new BigDecimal(item.getCnyPrice()).multiply(new BigDecimal("100")).intValue());
             }
             ret.add(itemResp);
         }
@@ -135,7 +125,7 @@ public class InvPreviewExtService {
             invPreviewDOS.forEach(item->{
                 C5ItemInfo itemInfo = item.getItemInfo();
                 invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(sellingDOPageResult.getTotal()>0).setAutoQuantity(sellingDOPageResult.getTotal().toString())
-                        .setCnyPrice(sellingDOOptional.isPresent()?new BigDecimal(String.valueOf(sellingDOOptional.get().getPrice())).divide(new BigDecimal("100"),BigDecimal.ROUND_HALF_UP).toString():"0")
+                        .setMinPrice(sellingDOOptional.isPresent()?sellingDOOptional.get().getPrice():-1)
                         .setSelExterior(itemInfo.getExteriorName())
                         .setSelQuality(itemInfo.getQualityName())
                         .setSelRarity(itemInfo.getRarityName())

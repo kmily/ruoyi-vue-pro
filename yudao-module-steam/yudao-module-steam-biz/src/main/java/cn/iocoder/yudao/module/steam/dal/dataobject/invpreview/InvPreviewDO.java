@@ -148,4 +148,10 @@ public class InvPreviewDO extends BaseDO {
     private Boolean existInv;
 
 
+    /**
+     * 平台最低价
+     */
+    private Integer minPrice;
+
+
 }
