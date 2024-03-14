@@ -16,13 +16,11 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.SteamInvService;
 import cn.iocoder.yudao.module.steam.service.inv.InvService;
 import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
@@ -87,13 +85,14 @@ public class AppInventorySearchController {
 
     /**
      * 入参：steamId 或者 userId
+     *
      * @param invPageReqVO
      */
     @GetMapping("/mergeToSell")
     @Operation(summary = "合并库存")
-    public List<AppInvMergeToSellPageReqVO> mergeToSell(@Valid InvPageReqVO invPageReqVO) {
+    public CommonResult<PageResult<AppInvMergeToSellPageReqVO>> mergeToSell(@Valid InvPageReqVO invPageReqVO) {
         PageResult<AppInvPageReqVO> invPage1 = steamInvService.getInvPage1(invPageReqVO);
-        return steamInvService.merge(invPage1);
+        return success(steamInvService.merge(invPage1));
     }
 
 
@@ -123,7 +122,7 @@ public class AppInventorySearchController {
     @GetMapping("/updateFromSteam")
     @Operation(summary = "查询数据库的库存数据")
     @ResponseBody
-    public InventoryDto updateFromSteam(@RequestParam Long id) throws JsonProcessingException {
+    public CommonResult<InventoryDto> updateFromSteam(@RequestParam Long id) throws JsonProcessingException {
         // 用户第一次登录查询库存  根据用户ID查找绑定的Steam账号ID
         BindUserDO bindUserDO = bindUserMapper.selectById(id);
         if (bindUserDO == null) {
@@ -150,7 +149,7 @@ public class AppInventorySearchController {
             List<InvDO> invDOS = invMapper.selectPage(inv).getList();
             invMapper.deleteById(invDOS.get(0).getId());
         }
-        return inventoryDto;
+        return success(inventoryDto);
     }
 }
 

@@ -412,7 +412,7 @@ public class SteamInvService {
      * @param invPage1
      * @return
      */
-    public List<AppInvMergeToSellPageReqVO> merge(PageResult<AppInvPageReqVO> invPage1){
+    public PageResult<AppInvMergeToSellPageReqVO> merge(PageResult<AppInvPageReqVO> invPage1){
         Map<String,Integer> map = new HashMap<>();
         List<AppInvMergeToSellPageReqVO> invPage = new ArrayList<>();
         // 统计每一个 markName 的个数，并插入invPage
@@ -444,7 +444,7 @@ public class SteamInvService {
                 }
             }
         }
-        return invPage;
+        return new PageResult<>(invPage,invPage1.getTotal());
     }
 
 
