@@ -143,13 +143,19 @@ public class InvPreviewExtService {
         if(Objects.nonNull(invPreviewDOS)){
             for(InvPreviewDO item:invPreviewDOS){
                 count++;
-                Long aLong = sellingMapper.selectCount(new LambdaQueryWrapperX<SellingDO>()
+                PageParam pageParam = new PageParam();
+                pageParam.setPageNo(1);
+                pageParam.setPageSize(1);
+                PageResult<SellingDO> sellingDOPageResult = sellingMapper.selectPage(pageParam, new LambdaQueryWrapperX<SellingDO>()
                         .eq(SellingDO::getMarketHashName, item.getMarketHashName())
                         .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
                         .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
+                        .orderByAsc(SellingDO::getPrice)
                 );
+                Optional<SellingDO> sellingDOOptional = sellingDOPageResult.getList().stream().findFirst();
                 C5ItemInfo itemInfo = item.getItemInfo();
-                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setAutoQuantity(aLong.toString()).setExistInv(aLong>0)
+                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(sellingDOPageResult.getTotal()>0).setAutoQuantity(sellingDOPageResult.getTotal().toString())
+                        .setMinPrice(sellingDOOptional.isPresent()?sellingDOOptional.get().getPrice():-1)
                         .setSelExterior(itemInfo.getExteriorName())
                         .setSelQuality(itemInfo.getQualityName())
                         .setSelRarity(itemInfo.getRarityName())
