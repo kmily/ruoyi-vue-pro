@@ -351,19 +351,19 @@ public class SellingExtService {
         List<SellingDO> sellingDOInSelling = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
                 .eq(SellingDO::getUserId, loginUser.getId())
                 .eq(SellingDO::getUserType, loginUser.getUserType())
-                .eq(SellingDO::getInvId,invIds));
+                .in(SellingDO::getInvId,invIds)
+                .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus()));
 
-        long count1 = sellingDOInSelling.stream().filter(item -> Arrays.asList(
-                InvTransferStatusEnum.INORDER.getStatus(),
-                InvTransferStatusEnum.TransferFINISH.getStatus(),
-                InvTransferStatusEnum.OFFSHELF.getStatus(),
-                InvTransferStatusEnum.TransferERROR.getStatus()).contains(item.getTransferStatus())).count();
-        if (count1 > 0) {
+        if (Objects.isNull(sellingDOInSelling)){
+            throw new ServiceException(-1 , "商品不存在或已下架");
+        }
+
+        if (sellingDOInSelling.size() != invIds.size()) {
             throw new ServiceException(-1, "部分商品已不存在，请检查后再操作改价");
         }
 
         for (SellingDO item : sellingDOInSelling) {
-            Optional<BatchChangePriceReqVo.Item> first = reqVo.getItems().stream().filter(i -> i.getId().equals(item.getId())).findFirst();
+            Optional<BatchChangePriceReqVo.Item> first = reqVo.getItems().stream().filter(i -> i.getId().equals(item.getInvId())).findFirst();
             if(first.isPresent()){
                 BatchChangePriceReqVo.Item item1 = first.get();
                 item.setPrice(item1.getPrice());
