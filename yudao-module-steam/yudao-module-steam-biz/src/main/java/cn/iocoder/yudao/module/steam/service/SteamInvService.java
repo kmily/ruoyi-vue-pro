@@ -472,8 +472,11 @@ public class SteamInvService {
 //        }
 
 //        log.info("AssetIdList:{}",AssetIdList);
-        
-        return new PageResult<AppInvMergeToSellPageReqVO>(invPage,invPage1.getTotal());
+        List<AppInvMergeToSellPageReqVO> invMergePage = new ArrayList<>();
+        for(Map.Entry<String,AppInvMergeToSellPageReqVO> key : invPage.entrySet()){
+            invMergePage.add(key.getValue());
+        }
+        return new PageResult<AppInvMergeToSellPageReqVO>(invMergePage,invPage1.getTotal());
     }
 
 }
