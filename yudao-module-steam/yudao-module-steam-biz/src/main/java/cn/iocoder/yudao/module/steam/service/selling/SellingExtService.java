@@ -236,8 +236,11 @@ public class SellingExtService {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         PageResult<SellingDO> sellingPage = sellingService.getSellingPage(sellingPageReqVO);
 
+        List<SellingDO> sellingDO1 = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
+                .eq(SellingDO::getUserId, sellingPage.getList().get(0).getUserId()));
+
         List<SellingRespVO> sellingRespVOList = new ArrayList<>();
-        for (SellingDO sellingDO : sellingPage.getList()) {
+        for (SellingDO sellingDO : sellingDO1) {
             SellingRespVO sellingDOS = new SellingRespVO();
             sellingDOS.setAppid(sellingDO.getAppid());
             sellingDOS.setAssetid(sellingDO.getAssetid());
