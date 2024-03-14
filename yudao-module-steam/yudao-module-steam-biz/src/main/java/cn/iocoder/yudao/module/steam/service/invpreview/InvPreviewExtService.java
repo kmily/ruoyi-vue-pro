@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.steam.service.invpreview;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -54,6 +55,9 @@ public class InvPreviewExtService {
             if(Objects.nonNull(invPreviewDO.getReferencePrice())){
                 itemResp.setReferencePrice(new BigDecimal(invPreviewDO.getReferencePrice()).multiply(new BigDecimal("100")).intValue());
             }
+            if(Objects.nonNull(invPreviewDO.getCnyPrice())){
+                itemResp.setMinPrice(new BigDecimal(invPreviewDO.getCnyPrice()).multiply(new BigDecimal("100")).intValue());
+            }
             return itemResp;
         }else{
             throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
@@ -75,6 +79,9 @@ public class InvPreviewExtService {
             if(Objects.nonNull(item.getReferencePrice())){
                 itemResp.setReferencePrice(new BigDecimal(item.getReferencePrice()).multiply(new BigDecimal("100")).intValue());
             }
+            if(Objects.nonNull(item.getCnyPrice())){
+                itemResp.setMinPrice(new BigDecimal(item.getCnyPrice()).multiply(new BigDecimal("100")).intValue());
+            }
 
             ret.add(itemResp);
         }
@@ -95,7 +102,9 @@ public class InvPreviewExtService {
             if(Objects.nonNull(item.getReferencePrice())){
                 itemResp.setReferencePrice(new BigDecimal(item.getReferencePrice()).multiply(new BigDecimal("100")).intValue());
             }
-
+            if(Objects.nonNull(item.getCnyPrice())){
+                itemResp.setMinPrice(new BigDecimal(item.getCnyPrice()).multiply(new BigDecimal("100")).intValue());
+            }
             ret.add(itemResp);
         }
         return new PageResult<>(ret, invPreviewDOPageResult.getTotal());
@@ -108,14 +117,25 @@ public class InvPreviewExtService {
         List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
                 .eqIfPresent(InvPreviewDO::getMarketHashName, marketHashName));
         if(Objects.nonNull(invPreviewDOS)){
-            Long aLong = sellingMapper.selectCount(new LambdaQueryWrapperX<SellingDO>()
+//            Long aLong = sellingMapper.selectCount(new LambdaQueryWrapperX<SellingDO>()
+//                    .eq(SellingDO::getMarketHashName, marketHashName)
+//                    .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
+//                    .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
+//            );
+            PageParam pageParam = new PageParam();
+            pageParam.setPageNo(1);
+            pageParam.setPageSize(1);
+            PageResult<SellingDO> sellingDOPageResult = sellingMapper.selectPage(pageParam, new LambdaQueryWrapperX<SellingDO>()
                     .eq(SellingDO::getMarketHashName, marketHashName)
                     .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
                     .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
+                    .orderByAsc(SellingDO::getPrice)
             );
+            Optional<SellingDO> sellingDOOptional = sellingDOPageResult.getList().stream().findFirst();
             invPreviewDOS.forEach(item->{
                 C5ItemInfo itemInfo = item.getItemInfo();
-                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(aLong>0).setAutoQuantity(aLong.toString())
+                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(sellingDOPageResult.getTotal()>0).setAutoQuantity(sellingDOPageResult.getTotal().toString())
+                        .setCnyPrice(sellingDOOptional.isPresent()?new BigDecimal(String.valueOf(sellingDOOptional.get().getPrice())).divide(new BigDecimal("100"),BigDecimal.ROUND_HALF_UP).toString():"0")
                         .setSelExterior(itemInfo.getExteriorName())
                         .setSelQuality(itemInfo.getQualityName())
                         .setSelRarity(itemInfo.getRarityName())

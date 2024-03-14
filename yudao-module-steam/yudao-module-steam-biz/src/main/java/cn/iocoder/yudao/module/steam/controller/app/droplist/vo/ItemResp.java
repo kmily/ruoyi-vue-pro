@@ -25,4 +25,8 @@ public class ItemResp implements Serializable {
      * 参考价
      */
     private Integer referencePrice;
+    /**
+     * 最低价
+     */
+    private Integer minPrice;
 }
