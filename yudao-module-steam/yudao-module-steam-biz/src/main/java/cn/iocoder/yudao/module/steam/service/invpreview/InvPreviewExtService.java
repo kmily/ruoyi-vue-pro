@@ -80,7 +80,26 @@ public class InvPreviewExtService {
         }
         return new PageResult<>(ret, invPreviewDOPageResult.getTotal());
     }
+    public PageResult<ItemResp> getHot(InvPreviewPageReqVO pageReqVO) {
+        PageResult<InvPreviewDO> invPreviewDOPageResult = invPreviewMapper.selectPage(pageReqVO);
+        List<ItemResp> ret=new ArrayList<>();
+        for (InvPreviewDO item:invPreviewDOPageResult.getList()){
 
+            ItemResp itemResp = BeanUtils.toBean(item, ItemResp.class);
+            if(Objects.nonNull(item.getAutoPrice())){
+                itemResp.setAutoPrice(new BigDecimal(item.getAutoPrice()).multiply(new BigDecimal("100")).intValue());
+            }
+            if(Objects.nonNull(item.getSalePrice())){
+                itemResp.setSalePrice(new BigDecimal(item.getSalePrice()).multiply(new BigDecimal("100")).intValue());
+            }
+            if(Objects.nonNull(item.getReferencePrice())){
+                itemResp.setReferencePrice(new BigDecimal(item.getReferencePrice()).multiply(new BigDecimal("100")).intValue());
+            }
+
+            ret.add(itemResp);
+        }
+        return new PageResult<>(ret, invPreviewDOPageResult.getTotal());
+    }
     /**
      * 增加库存标识,上架构和下架构 都可以进行调用
      * @param marketHashName 标签名称
