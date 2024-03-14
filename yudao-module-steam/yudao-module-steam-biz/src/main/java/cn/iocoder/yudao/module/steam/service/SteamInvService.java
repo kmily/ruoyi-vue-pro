@@ -26,6 +26,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.scheduling.annotation.Async;
@@ -400,6 +401,7 @@ public class SteamInvService {
                 appInvPageReqVO1.setTransferStatus(invDO.getTransferStatus());
                 appInvPageReqVO1.setUserType(invDO.getUserType());
                 appInvPageReqVO1.setPrice(invDO.getPrice());
+                appInvPageReqVO1.setAssetid(invDO.getAssetid());
                 appInvPageReqVO.add(appInvPageReqVO1);
             }
         }
@@ -414,11 +416,13 @@ public class SteamInvService {
      */
     public PageResult<AppInvMergeToSellPageReqVO> mergeInv(PageResult<AppInvPageReqVO> invPage1){
         Map<String,Integer> map = new HashMap<>();
+        Map<String,String> AssetIdList = new HashMap<>();
         List<AppInvMergeToSellPageReqVO> invPage = new ArrayList<>();
         // 统计每一个 markName 的个数，并插入invPage
         for(AppInvPageReqVO element : invPage1.getList()){
             if(map.containsKey(element.getMarketName())){
                 map.put(element.getMarketName(),map.get(element.getMarketName())+1);  // 更新计数
+                AssetIdList.put(element.getMarketName(),element.getAssetid());
             } else {
                 map.put(element.getMarketName(),1);    // 初次计数 1
                 AppInvMergeToSellPageReqVO appInvPageReqVO = new AppInvMergeToSellPageReqVO();
@@ -441,22 +445,15 @@ public class SteamInvService {
             for(AppInvMergeToSellPageReqVO element : invPage){
                 if(element.getMarketName().equals(key.getKey())){
                     element.setNumber(key.getValue());
+                    element.setAssetIdList(AssetIdList);
                 }
             }
         }
+
+        log.info("AssetIdList:{}",AssetIdList);
         return new PageResult<>(invPage,invPage1.getTotal());
     }
 
-
-    /**
-     * 查找库存
-     * @param appInvPickVO
-     */
-//    public List<AppInvPageReqVO> findInv(AppInvPickVO appInvPickVO){
-//        invMapper.selectList(new LambdaQueryWrapperX<>()
-//                .eq(AppInvPageReqVO::getAssetid,appInvPickVO.getAssetId()));
-//        return invPage;
-//    }
 }
 
 

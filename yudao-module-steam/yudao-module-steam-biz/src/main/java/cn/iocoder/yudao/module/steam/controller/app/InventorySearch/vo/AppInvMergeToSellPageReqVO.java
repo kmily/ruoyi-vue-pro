@@ -1,7 +1,11 @@
 package cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo;
 
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.selling.vo.SellingReqVo;
 import lombok.Data;
+
+import java.util.Map;
+
 @Data
 public class AppInvMergeToSellPageReqVO {
 
@@ -45,5 +49,9 @@ public class AppInvMergeToSellPageReqVO {
      * 类型选择
      */
     private String selType;
+    /**
+     * 合并列表的资产id
+     */
+    private Map<String,String> assetIdList;
 
 }
