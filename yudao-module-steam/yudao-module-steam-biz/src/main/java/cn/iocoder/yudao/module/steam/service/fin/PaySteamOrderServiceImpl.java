@@ -59,6 +59,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -111,17 +112,25 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
 
     @Resource
     private InvDescMapper invDescMapper;
-    @Autowired
+
     private PayWalletService payWalletService;
+    @Autowired
+    public void setPayWalletService(PayWalletService payWalletService) {
+        this.payWalletService = payWalletService;
+    }
+
     @Resource
     private ConfigService configService;
 
     @Resource
     private PayChannelService channelService;
 
-    @Autowired
-    private PayOrderService payOrderService;
 
+    private PayOrderService payOrderService;
+    @Autowired
+    public void setPayOrderService(PayOrderService payOrderService) {
+        this.payOrderService = payOrderService;
+    }
 
     @Resource
     private InvPreviewExtService invPreviewExtService;
@@ -138,7 +147,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 .setServiceFee(0).setServiceFeeRate("0")
                 .setUserId(loginUser.getId()).setUserType(loginUser.getUserType())
                 .setRefundPrice(0).setWithdrawalInfo(createReqVO.getWithdrawalInfo())
-                .setAuditMsg("").setAuditStatus(0).setAuditUserId(0l).setAuditUserType(UserTypeEnum.MEMBER.getValue())
+                .setAuditMsg("").setAuditStatus(0).setAuditUserId(0L).setAuditUserType(UserTypeEnum.MEMBER.getValue())
                 .setServiceFeeUserId(WITHDRAWAL_ACCOUNT_ID).setServiceFeeUserType(WITHDRAWAL_ACCOUNT_TYPE.getValue());
         validateWithdrawalCanCreate(withdrawalDO);
         withdrawalMapper.insert(withdrawalDO);
@@ -185,9 +194,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             withdrawalDO.setPaymentAmount(withdrawalDO.getWithdrawalPrice());
         }else{
             withdrawalDO.setServiceFeeRate(withdrawalRateConfig.getValue());
-            BigDecimal rate = new BigDecimal(withdrawalRateConfig.getValue()).divide(new BigDecimal("100"), 2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal rate = new BigDecimal(withdrawalRateConfig.getValue()).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
             //四舍五入后金额 分
-            BigDecimal serviceFee = new BigDecimal(withdrawalDO.getWithdrawalPrice()).multiply(rate).setScale(0,BigDecimal.ROUND_HALF_UP);
+            BigDecimal serviceFee = new BigDecimal(withdrawalDO.getWithdrawalPrice()).multiply(rate).setScale(0, RoundingMode.HALF_UP);
             withdrawalDO.setServiceFee(serviceFee.intValue());
             BigDecimal bigDecimal2 = new BigDecimal(withdrawalDO.getWithdrawalPrice());
             BigDecimal add = bigDecimal2.add(new BigDecimal(withdrawalDO.getServiceFee()));
@@ -366,7 +375,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
         }
         InvDescDO invDescDO = first1.get();
-        if(invDescDO.getTradable().intValue()!=1){
+        if(invDescDO.getTradable() !=1){
             throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
         }
 
@@ -385,9 +394,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             invOrderDO.setPaymentAmount(invOrderDO.getCommodityAmount());
         }else{
             invOrderDO.setServiceFeeRate(serviceFeeRateConfigByKey.getValue());
-            BigDecimal rate = new BigDecimal(serviceFeeRateConfigByKey.getValue()).divide(new BigDecimal("100"), 2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal rate = new BigDecimal(serviceFeeRateConfigByKey.getValue()).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
             //四舍五入后金额
-            BigDecimal serviceFee = new BigDecimal(invOrderDO.getCommodityAmount()).multiply(rate).setScale(0,BigDecimal.ROUND_HALF_UP);
+            BigDecimal serviceFee = new BigDecimal(invOrderDO.getCommodityAmount()).multiply(rate).setScale(0, RoundingMode.HALF_UP);
 
 
             if(Objects.nonNull(serviceFeeLimit.getValue())){
@@ -443,12 +452,11 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
      * 检查是否有有效订单
      */
     public List<InvOrderDO> getExpOrder(Long sellId){
-        List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
+        return invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
                 .eq(InvOrderDO::getSellId, sellId)
                 .ne(InvOrderDO::getTransferStatus, InvTransferStatusEnum.CLOSE.getStatus())
                 .isNull(InvOrderDO::getPayRefundId)
         );
-        return invOrderDOS;
     }
 
     @Override
@@ -510,7 +518,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
 
         PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(invOrderDO.getServiceFeeUserId(), invOrderDO.getServiceFeeUserType());
         PayWalletTransactionDO payWalletTransactionDO = payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(invOrderDO.getId()),
-                PayWalletBizTypeEnum.SERVICE_FEE, invOrderDO.getServiceFee());
+                PayWalletBizTypeEnum.INV_SERVICE_FEE, invOrderDO.getServiceFee());
 
         invOrderMapper.updateById(new InvOrderDO().setId(invOrderDO.getId()).setServiceFeeRet(JacksonUtils.writeValueAsString(payWalletTransactionDO)));
 
