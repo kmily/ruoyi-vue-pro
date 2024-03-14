@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.SellingReqVo;
 import lombok.Data;
 
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -52,6 +53,6 @@ public class AppInvMergeToSellPageReqVO {
     /**
      * 合并列表的资产id
      */
-    private Map<String,String> assetIdList;
+    private List<String> assetIdList;
 
 }

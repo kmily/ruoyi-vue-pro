@@ -416,15 +416,17 @@ public class SteamInvService {
      */
     public PageResult<AppInvMergeToSellPageReqVO> mergeInv(PageResult<AppInvPageReqVO> invPage1){
         Map<String,Integer> map = new HashMap<>();
-        Map<String,String> AssetIdList = new HashMap<>();
-        List<AppInvMergeToSellPageReqVO> invPage = new ArrayList<>();
+//        Map<String,String> AssetIdList = new HashMap<>();
+        Map<String,AppInvMergeToSellPageReqVO> invPage = new HashMap<>();
+//        List<AppInvMergeToSellPageReqVO> invPage = new ArrayList<>();
         // 统计每一个 markName 的个数，并插入invPage
         for(AppInvPageReqVO element : invPage1.getList()){
-            if(map.containsKey(element.getMarketName())){
-                map.put(element.getMarketName(),map.get(element.getMarketName())+1);  // 更新计数
-                AssetIdList.put(element.getMarketName(),element.getAssetid());
-            } else {
-                map.put(element.getMarketName(),1);    // 初次计数 1
+            if(Objects.nonNull(invPage.get(element.getMarketName()))){
+                AppInvMergeToSellPageReqVO appInvMergeToSellPageReqVO = invPage.get(element.getMarketName());
+                ArrayList<String> strings = new ArrayList<>(appInvMergeToSellPageReqVO.getAssetIdList());
+                strings.add(element.getAssetid());
+                appInvMergeToSellPageReqVO.setAssetIdList(strings);
+            }else{
                 AppInvMergeToSellPageReqVO appInvPageReqVO = new AppInvMergeToSellPageReqVO();
                 appInvPageReqVO.setMarketName(element.getMarketName());
                 appInvPageReqVO.setAssetId(element.getAssetid());
@@ -436,22 +438,42 @@ public class SteamInvService {
                 appInvPageReqVO.setSelRarity(element.getSelRarity());
                 appInvPageReqVO.setSelItemset(element.getSelItemset());
                 appInvPageReqVO.setSelType(element.getSelType());
-
-                invPage.add(appInvPageReqVO);
+                appInvPageReqVO.setAssetIdList(Arrays.asList(element.getAssetid()));
+                invPage.put(element.getMarketName(),appInvPageReqVO);
             }
+//            if(map.containsKey(element.getMarketName())){
+//                map.put(element.getMarketName(),map.get(element.getMarketName())+1);  // 更新计数
+////                AssetIdList.put(element.getMarketName(),element.getAssetid());
+//            } else {
+//                map.put(element.getMarketName(),1);    // 初次计数 1
+//                AppInvMergeToSellPageReqVO appInvPageReqVO = new AppInvMergeToSellPageReqVO();
+//                appInvPageReqVO.setMarketName(element.getMarketName());
+//                appInvPageReqVO.setAssetId(element.getAssetid());
+//                appInvPageReqVO.setPrice(element.getPrice());
+//                appInvPageReqVO.setIconUrl(element.getIconUrl());
+//                appInvPageReqVO.setSelQuality(element.getSelQuality());
+//                appInvPageReqVO.setSelWeapon(element.getSelWeapon());
+//                appInvPageReqVO.setSelExterior(element.getSelExterior());
+//                appInvPageReqVO.setSelRarity(element.getSelRarity());
+//                appInvPageReqVO.setSelItemset(element.getSelItemset());
+//                appInvPageReqVO.setSelType(element.getSelType());
+//
+//                invPage.add(appInvPageReqVO);
+//            }
         }
-        // 读取每一个商品合并后的件数
-        for(Map.Entry<String,Integer> key : map.entrySet()){
-            for(AppInvMergeToSellPageReqVO element : invPage){
-                if(element.getMarketName().equals(key.getKey())){
-                    element.setNumber(key.getValue());
-                    element.setAssetIdList(AssetIdList);
-                }
-            }
-        }
+//        // 读取每一个商品合并后的件数
+//        for(Map.Entry<String,Integer> key : map.entrySet()){
+//            for(AppInvMergeToSellPageReqVO element : invPage){
+//                if(element.getMarketName().equals(key.getKey())){
+//                    element.setNumber(key.getValue());
+////                    element.setAssetIdList(AssetIdList);
+//                }
+//            }
+//        }
 
-        log.info("AssetIdList:{}",AssetIdList);
-        return new PageResult<>(invPage,invPage1.getTotal());
+//        log.info("AssetIdList:{}",AssetIdList);
+        
+        return new PageResult<AppInvMergeToSellPageReqVO>(invPage,invPage1.getTotal());
     }
 
 }
