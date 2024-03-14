@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.steam.service.devaccount;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.module.steam.controller.admin.devaccount.vo.*;
+import cn.iocoder.yudao.module.steam.controller.app.devaccount.vo.AppDevAccountSaveReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
@@ -59,7 +60,7 @@ public interface DevAccountService {
      * @param pageReqVO 分页查询
      * @return 开放平台用户分页
      */
-    String apply(DevAccountSaveReqVO pageReqVO);
+    String apply(AppDevAccountSaveReqVO pageReqVO);
     List<DevAccountDO> accountList();
     DevAccountDO selectByUserName (String userName, UserTypeEnum userType);
 

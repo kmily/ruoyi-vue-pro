@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.service.devaccount;
 
+import cn.hutool.core.lang.Validator;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
@@ -7,6 +8,8 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.steam.controller.app.devaccount.vo.AppDevAccountSaveReqVO;
+import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -79,33 +82,49 @@ public class DevAccountServiceImpl implements DevAccountService {
     }
 
     @Override
-    public String apply(DevAccountSaveReqVO createReqVO) {
-        LoginUser loginUser1 = SecurityFrameworkUtils.getLoginUser();
-        createReqVO.setUserId(loginUser1.getId());
+    public String apply(AppDevAccountSaveReqVO createReqVO) {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        createReqVO.setUserId(loginUser.getId());
 
-        createReqVO.setUserType(loginUser1.getUserType());
+        createReqVO.setUserType(loginUser.getUserType());
         List<DevAccountDO> devAccountDOS = devAccountMapper.selectList(
-                new LambdaQueryWrapperX<DevAccountDO>().eq(DevAccountDO::getUserId, loginUser1.getId())
-                        .eq(DevAccountDO::getUserType, loginUser1.getUserType()));
+                new LambdaQueryWrapperX<DevAccountDO>().eq(DevAccountDO::getUserId, loginUser.getId())
+                        .eq(DevAccountDO::getUserType, loginUser.getUserType()));
         if (devAccountDOS.size() > 0) {
             //  修改
             if (CommonStatusEnum.isDisable(devAccountDOS.get(0).getStatus())) {
                 throw exception(DEV_ACCOUNT_DISABLE);
             }
-            DevAccountDO devAccountDO = new DevAccountDO();
+            if(Objects.isNull(createReqVO.getApiPublicKey())){
+                throw exception(DEV_ACCOUNT_KEY);
+            }
+            DevAccountDO devAccountDO = devAccountDOS.get(0);
             devAccountDO.setApiPublicKey(createReqVO.getApiPublicKey());
-            devAccountDO.setId(devAccountDOS.get(0).getId());
             devAccountMapper.updateById(devAccountDO);
             return devAccountDO.getId().toString();
         } else {
             //  新增
-            createReqVO.setApiPublicKey(createReqVO.getApiPublicKey());
+            if(Objects.isNull(createReqVO.getIdNum())){
+                throw exception(OpenApiCode.JACKSON_EXCEPTION);
+            }
+            if(Objects.isNull(createReqVO.getTrueName())){
+                throw exception(OpenApiCode.JACKSON_EXCEPTION);
+            }
+            if(Objects.isNull(createReqVO.getApplyReason())){
+                throw exception(OpenApiCode.JACKSON_EXCEPTION);
+            }
+            if(Validator.isCitizenId(createReqVO.getIdNum())){
+                throw exception(DEV_ACCOUNT_IDERROR);
+            }
+//            createReqVO.setApiPublicKey(createReqVO.getApiPublicKey());
             // 插入
-            LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
             createReqVO.setUserId(loginUser.getId());
             createReqVO.setStatus(0);
             DevAccountDO devAccount = BeanUtils.toBean(createReqVO, DevAccountDO.class);
             devAccount.setStatus(CommonStatusEnum.DISABLE.getStatus());
+            devAccount.setTrueName(createReqVO.getTrueName());
+            devAccount.setApplyReason(createReqVO.getApplyReason());
+            devAccount.setIdNum(createReqVO.getIdNum());
             devAccountMapper.insert(devAccount);
             // 返回
             return devAccount.getId().toString();
