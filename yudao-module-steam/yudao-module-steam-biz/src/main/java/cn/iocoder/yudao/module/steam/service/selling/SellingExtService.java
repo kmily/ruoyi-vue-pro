@@ -351,7 +351,7 @@ public class SellingExtService {
         List<SellingDO> sellingDOInSelling = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
                 .eq(SellingDO::getUserId, loginUser.getId())
                 .eq(SellingDO::getUserType, loginUser.getUserType())
-                .eq(SellingDO::getInvId,invIds));
+                .in(SellingDO::getInvId,invIds));
 
         long count1 = sellingDOInSelling.stream().filter(item -> Arrays.asList(
                 InvTransferStatusEnum.INORDER.getStatus(),
@@ -363,7 +363,7 @@ public class SellingExtService {
         }
 
         for (SellingDO item : sellingDOInSelling) {
-            Optional<BatchChangePriceReqVo.Item> first = reqVo.getItems().stream().filter(i -> i.getId().equals(item.getId())).findFirst();
+            Optional<BatchChangePriceReqVo.Item> first = reqVo.getItems().stream().filter(i -> i.getId().equals(item.getInvId())).findFirst();
             if(first.isPresent()){
                 BatchChangePriceReqVo.Item item1 = first.get();
                 item.setPrice(item1.getPrice());
