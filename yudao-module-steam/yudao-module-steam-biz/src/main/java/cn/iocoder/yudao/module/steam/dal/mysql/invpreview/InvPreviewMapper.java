@@ -82,6 +82,8 @@ public interface InvPreviewMapper extends BaseMapperX<InvPreviewDO> {
                 .eqIfPresent(InvPreviewDO::getSelRarity, reqVO.getSelRarity())
                 .eqIfPresent(InvPreviewDO::getSelType, reqVO.getSelType())
                 .eqIfPresent(InvPreviewDO::getExistInv, reqVO.getExistInv())
+                .geIfPresent(InvPreviewDO::getMinPrice,reqVO.getMinPrice())
+                .leIfPresent(InvPreviewDO::getMinPrice,reqVO.getMaxPrice())
                 .orderByDesc(InvPreviewDO::getUpdateTime));
     }
 

@@ -81,7 +81,7 @@ public class InvPreviewExtService {
         return new PageResult<>(ret, invPreviewDOPageResult.getTotal());
     }
     public PageResult<ItemResp> getHot(InvPreviewPageReqVO pageReqVO) {
-        PageResult<InvPreviewDO> invPreviewDOPageResult = invPreviewMapper.selectPage(pageReqVO);
+        PageResult<InvPreviewDO> invPreviewDOPageResult = invPreviewMapper.hotPage(pageReqVO);
         List<ItemResp> ret=new ArrayList<>();
         for (InvPreviewDO item:invPreviewDOPageResult.getList()){
 
