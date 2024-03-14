@@ -362,9 +362,15 @@ public class SellingExtService {
         }
 
         for (SellingDO item : sellingDOInSelling) {
-            item.setPrice(reqVo.getItems().get(0).getPrice());
-            sellingMapper.updateById(item);
-            invPreviewExtService.markInvEnable(item.getMarketHashName());
+            Optional<BatchChangePriceReqVo.Item> first = reqVo.getItems().stream().filter(i -> i.getId().equals(item.getId())).findFirst();
+            if(first.isPresent()){
+                BatchChangePriceReqVo.Item item1 = first.get();
+                item.setPrice(item1.getPrice());
+                sellingMapper.updateById(item);
+                invPreviewExtService.markInvEnable(item.getMarketHashName());
+            }else{
+                throw new ServiceException(-1, "部分商品已不存在，请检查后再操作改价");
+            }
         }
     }
 
