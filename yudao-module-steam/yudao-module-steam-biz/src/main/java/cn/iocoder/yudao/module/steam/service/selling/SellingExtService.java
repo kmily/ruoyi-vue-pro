@@ -31,6 +31,7 @@ import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -64,6 +65,7 @@ public class SellingExtService {
     @Resource
     private InvDescService invDescService;
 
+    @Transactional(rollbackFor = ServiceException.class)
     public void batchSale(BatchSellReqVo reqVo,LoginUser loginUser){
         if(Objects.isNull(loginUser)){
             throw new ServiceException(OpenApiCode.ID_ERROR);
@@ -97,7 +99,7 @@ public class SellingExtService {
         }
         for(InvDO item:invDOList){
             Optional<BatchSellReqVo.Item> first = reqVo.getItems().stream().filter(i -> i.getId().equals(item.getId())).findFirst();
-            if(first.isPresent()){
+            if(!first.isPresent()){
                 log.error("价格信息未查找到{},{}",item,reqVo.getItems());
                 throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
             }
