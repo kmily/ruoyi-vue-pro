@@ -72,7 +72,7 @@ public class AppSellingController {
         // 查询 steam_inv
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         sellingExtService.batchOffSale(reqVo,loginUser);
-        return CommonResult.success("上架成功");
+        return CommonResult.success("下架成功");
     }
     @GetMapping("/changePrice")
     @Operation(summary = "饰品改价")

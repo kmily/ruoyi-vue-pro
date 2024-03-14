@@ -273,7 +273,7 @@ public class SellingExtService {
                 InvTransferStatusEnum.TransferERROR.getStatus()).contains(item.getTransferStatus())).count();
 
         if(count1>0){
-            throw new ServiceException(-1, "部分商品已上架，请检查后再操作上架");
+            throw new ServiceException(-1, "部分商品已不存在，请检查后再操作下架");
         }
         for(InvDO item:invDOList){
             item.setPrice(null);
