@@ -102,4 +102,9 @@ public class InvPreviewPageReqVO extends PageParam {
     @Schema(description = "页码")
     private Integer pageNum;
 
+    @Schema(description = "最高价格", example = "2")
+    private Integer maxPrice;
+    @Schema(description = "最低价格", example = "1")
+    private Integer minPrice;
+
 }

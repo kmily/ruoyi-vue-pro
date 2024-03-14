@@ -29,7 +29,7 @@ public interface ErrorCodeConstants {
     //开放平台
     ErrorCode DEV_ACCOUNT_NOT_EXISTS = new ErrorCode(1_100_007_01, "开放平台用户不存在");
     ErrorCode DEV_ACCOUNT_DISABLE = new ErrorCode(1_100_007_02, "开放平台用户未审核");
-    ErrorCode DEV_ACCOUNT_KEY = new ErrorCode(1_100_007_03, "开放平台用公钥不能为空");
+    ErrorCode DEV_ACCOUNT_KEY = new ErrorCode(1_100_007_03, "开放平台公钥不能为空");
     ErrorCode DEV_ACCOUNT_IDERROR = new ErrorCode(1_100_007_03, "身份证不正确");
 
     //库存信息
