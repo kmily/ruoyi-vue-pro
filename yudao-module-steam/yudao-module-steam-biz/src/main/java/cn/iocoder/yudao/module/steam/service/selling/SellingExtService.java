@@ -73,14 +73,16 @@ public class SellingExtService {
         List<InvDescDO> invDescDO2 = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
                 .eq(InvDescDO::getId, invDO2.get(0).getInvDescId()));
 
-        if (invDescDO2.get(0).getTradable() == 0){
+        if (invDescDO2.get(0).getTradable() == 0) {
             throw new ServiceException(-1, "饰品不能上架,请检查是否冷却中或其他");
         }
 
         // 判断用户库存是否能上架
+/*
         if (invDescMapper.selectList().get(0).getTradable() == 0) {
             throw new ServiceException(-1, "饰品不能上架,请检查");
         }
+*/
 
         // 判断用户是否上架指定为自己的库存
         List<InvDO> invDOS = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
@@ -180,7 +182,6 @@ public class SellingExtService {
         if (!sellingDO1.get().getUserType().equals(loginUser.getUserType())) {
             throw new ServiceException(-1, "无权限");
         }
-
         log.info(String.valueOf(sellingDO1.get().getId()));
         Long id = sellingDO1.get().getId();
         // 下架(设置transferstatus为‘0’未出售)
@@ -295,6 +296,7 @@ public class SellingExtService {
                 sellingPageReqVO1.setSelRarity(element.getSelRarity());
                 sellingPageReqVO1.setSelItemset(element.getSelItemset());
                 sellingPageReqVO1.setSelType(element.getSelType());
+                sellingPageReqVO1.setAssetId(element.getAssetid());
 
                 invPage.add(sellingPageReqVO1);
             }
@@ -309,5 +311,25 @@ public class SellingExtService {
         }
         return new PageResult<>(invPage, sellingPage.getTotal());
     }
+/*
+
+    public PageResult<SellingMergeListVO> offSaleMerge(SellingPageReqVO sellingPageReqVO) {
+
+
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        PageResult<SellingDO> sellingPage = sellingService.getSellingPage(sellingPageReqVO);
+
+        Map<String, Integer> map = new HashMap<>();
+        List<SellingMergeListVO> invPage = new ArrayList<>();
+
+        // 访问用户库存
+        InvDO invDO = invMapper.selectById(sellingPageReqVO.getInvId());
+        // 获取当前上架信息
+        List<SellingDO> sellingDO1 = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>());
+
+
+        return new PageResult<>(invPage, sellingPage.getTotal());
+    }
+*/
 
 }
