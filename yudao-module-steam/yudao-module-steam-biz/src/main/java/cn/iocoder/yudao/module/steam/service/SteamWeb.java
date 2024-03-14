@@ -72,7 +72,7 @@ public class SteamWeb {
 
     private ConfigService configService;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private Optional<String> browserid;
 
@@ -172,7 +172,7 @@ public class SteamWeb {
             if(split.length>=2){
                 String s = split[0].replaceAll(".jpg", "_full.jpg").replaceAll(".png", "_full.png");
                 steamName= Optional.ofNullable(split[1]);
-                steamAvatar= Optional.ofNullable(s);
+                steamAvatar= Optional.of(s);
             }
         }
     }
@@ -402,7 +402,7 @@ public class SteamWeb {
      * @return
      */
     private ConfirmHash generateConfirmationHashForTime(String tag) throws NoSuchAlgorithmException, InvalidKeyException {
-        long time = System.currentTimeMillis() / 1000l;
+        long time = System.currentTimeMillis() / 1000L;
         byte[] arr = new byte[8];
         // 将 long 类型的 time 转换为 8 个字节的大端序
         for (int i = 0; i < 8; i++) {
@@ -474,7 +474,7 @@ public class SteamWeb {
             throw new ServiceException(-1, "确认订单失败");
         }
 
-        SteamResult json = null;
+        SteamResult json;
         try {
             json = objectMapper.readValue(proxyResponseVo.getHtml(), SteamResult.class);
         } catch (JsonProcessingException e) {
@@ -509,9 +509,7 @@ public class SteamWeb {
             ConfirmHash confirmHash = generateConfirmationHashForTime("conf");
             query.put("k", confirmHash.getHash());
             query.put("t", String.valueOf(confirmHash.getTime()));
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             e.printStackTrace();
         }
         query.put("m", "react");
@@ -520,7 +518,7 @@ public class SteamWeb {
         Map<String, String> header = new HashMap<>();
         header.put("Accept-Language", "zh-CN,zh;q=0.9");
         builder.headers(header);
-        MobileConfList json = null;
+        MobileConfList json;
         try {
             log.info("发送到对方服务器数据{}", objectMapper.writeValueAsString(builder.build()));
             HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
@@ -539,8 +537,8 @@ public class SteamWeb {
     public Map<String, String> parseQuery(String query) throws UnsupportedEncodingException {
         Map<String, String> ret = new HashMap<>();
         String[] split = query.split("&");
-        for (int i = 0; i < split.length; i++) {
-            String[] split1 = split[i].split("=");
+        for (String s : split) {
+            String[] split1 = s.split("=");
             ret.put(split1[0], URLDecoder.decode(split1[1], "utf-8"));
         }
         return ret;
