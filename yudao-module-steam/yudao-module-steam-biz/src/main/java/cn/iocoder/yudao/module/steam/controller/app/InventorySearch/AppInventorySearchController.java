@@ -27,10 +27,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -86,12 +83,6 @@ public class AppInventorySearchController {
     }
 
 
-    //
-//    @GetMapping("/after_SearchFromSteam")
-//    @Operation(summary = "查询数据库的库存数据")
-//    public void SearchFromSteam(@RequestParam Long id) throws JsonProcessingException {
-//        steamInvService.FistGetInventory(id,"730");
-//    }
 
 
     /**
@@ -131,7 +122,8 @@ public class AppInventorySearchController {
     // =================================
     @GetMapping("/updateFromSteam")
     @Operation(summary = "查询数据库的库存数据")
-    public void updateFromSteam(@RequestParam Long id) throws JsonProcessingException {
+    @ResponseBody
+    public InventoryDto updateFromSteam(@RequestParam Long id) throws JsonProcessingException {
         // 用户第一次登录查询库存  根据用户ID查找绑定的Steam账号ID
         BindUserDO bindUserDO = bindUserMapper.selectById(id);
         if (bindUserDO == null) {
@@ -158,6 +150,7 @@ public class AppInventorySearchController {
             List<InvDO> invDOS = invMapper.selectPage(inv).getList();
             invMapper.deleteById(invDOS.get(0).getId());
         }
+        return inventoryDto;
     }
 }
 

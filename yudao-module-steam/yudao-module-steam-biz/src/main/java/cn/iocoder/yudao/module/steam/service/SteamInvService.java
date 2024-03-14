@@ -349,6 +349,16 @@ public class SteamInvService {
 
     // 第二次访问库存(只读库存表)
     public PageResult<AppInvPageReqVO> getInvPage1(InvPageReqVO invPageReqVO) {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        List<BindUserDO> collect = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+                .eq(BindUserDO::getUserId, loginUser.getId())
+                .eq(BindUserDO::getUserType, loginUser.getUserType())
+                .eq(BindUserDO::getSteamId, invPageReqVO.getSteamId()));
+        if(Objects.isNull(collect) || collect.isEmpty()){
+            throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
+        }
+        invPageReqVO.setUserId(loginUser.getId());
+        invPageReqVO.setBindUserId(collect.get(0).getId());
         // 用户库存
         PageResult<InvDO> invPage = invService.getInvPage(invPageReqVO);
         if (invPage.getList().isEmpty()) {
