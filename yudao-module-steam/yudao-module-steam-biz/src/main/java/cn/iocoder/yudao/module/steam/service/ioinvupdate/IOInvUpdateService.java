@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.steam.service.ioinvupdate;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
@@ -171,9 +172,21 @@ public class IOInvUpdateService {
 
 
     /**
-     * 更新库存  删除原有的 transferStatus != 0 的库存 插入新的库存，并比对 selling 表中的内容
+     * 删除库存  删除原有的 transferStatus != 0 的库存 插入新的库存，并比对 selling 表中的内容
      */
-    public void updateInventory(InventoryDto inventoryDto, BindUserDO bindUserDO) {
+    public void deleteInventory( BindUserDO bindUserDO) {
+        InvPageReqVO invDO = new InvPageReqVO();
+        invDO.setSteamId(bindUserDO.getSteamId());
+        invDO.setUserId(bindUserDO.getUserId());
+
+        // TODO 校验三个字段 或者（校验steamId 剩下两个字段二选一）
+        // 删除原有的 transferStatus != 0 的库存
+        List<InvDO> invDOS = invMapper.selectPage(invDO).getList();
+        for(InvDO deleteItem : invDOS){
+            if(deleteItem.getTransferStatus() == 0){
+                invMapper.deleteById(deleteItem.getId());
+            }
+        }
 
     }
 }

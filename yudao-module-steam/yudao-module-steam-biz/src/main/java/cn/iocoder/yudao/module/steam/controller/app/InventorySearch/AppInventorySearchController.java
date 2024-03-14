@@ -8,16 +8,21 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvMergeToSellPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPageReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.SteamInvService;
 import cn.iocoder.yudao.module.steam.service.inv.InvService;
 import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
@@ -50,9 +55,9 @@ public class AppInventorySearchController {
     @Resource
     private BindUserMapper bindUserMapper;
     @Resource
-    private InvDescMapper invDescMapper;
-    @Resource
     private InvMapper invMapper;
+    @Resource
+    private SellingMapper sellingMapper;
 
     @Resource
     private IOInvUpdateService ioInvUpdateService;
@@ -75,6 +80,7 @@ public class AppInventorySearchController {
         if(Objects.isNull(collect) || collect.isEmpty()){
             throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
         }
+        invPageReqVO.setUserId(loginUser.getId());
         invPageReqVO.setBindUserId(collect.get(0).getId());
         return success(steamInvService.getInvPage1(invPageReqVO));
     }
@@ -114,8 +120,44 @@ public class AppInventorySearchController {
         if (bindUserDO.getSteamPassword() == null) {
             throw new ServiceException(-1, "用户未设置Steam密码,原因：未上传ma文件");
         }
+        // 获取线上 steam 库存
         InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
         ioInvUpdateService.firstInsertInventory(inventoryDto,bindUserDO);
+    }
+
+
+    // =================================
+    //             测试  更新库存
+    // =================================
+    @GetMapping("/updateFromSteam")
+    @Operation(summary = "查询数据库的库存数据")
+    public void updateFromSteam(@RequestParam Long id) throws JsonProcessingException {
+        // 用户第一次登录查询库存  根据用户ID查找绑定的Steam账号ID
+        BindUserDO bindUserDO = bindUserMapper.selectById(id);
+        if (bindUserDO == null) {
+            throw new ServiceException(-1, "用户未绑定Steam账号");
+        }
+        if (bindUserDO.getSteamPassword() == null) {
+            throw new ServiceException(-1, "用户未设置Steam密码,原因：未上传ma文件");
+        }
+        // 获取线上 steam 库存
+        InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
+        // 删除原有库存中，getTransferStatus = 0 的库存
+        ioInvUpdateService.deleteInventory(bindUserDO);
+        // 插入库存 TODO 后期优化思路 copy插入库存方法在插入的时候比对Selling表中相同账户下的 AssetId ，有重复就不插入
+        ioInvUpdateService.firstInsertInventory(inventoryDto, bindUserDO);
+        // 查询 Selling 表中的库存  TODO  报错注意此处查询条件
+        SellingPageReqVO sellingPageReqVO = new SellingPageReqVO();
+        sellingPageReqVO.setSteamId(bindUserDO.getSteamId());
+        sellingPageReqVO.setBindUserId(bindUserDO.getId());
+        sellingPageReqVO.setUserId(bindUserDO.getUserId());
+        List<SellingDO> sellingDOS = sellingMapper.selectPage(sellingPageReqVO).getList();
+        InvPageReqVO inv = new InvPageReqVO();
+        for(SellingDO sellingDO: sellingDOS){
+            inv.setAssetid(sellingDO.getAssetid());
+            List<InvDO> invDOS = invMapper.selectPage(inv).getList();
+            invMapper.deleteById(invDOS.get(0).getId());
+        }
     }
 }
 
