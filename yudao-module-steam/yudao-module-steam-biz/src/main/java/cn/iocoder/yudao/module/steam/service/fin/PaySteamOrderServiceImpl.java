@@ -344,6 +344,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         //更新库存的标识
         sellingDO.setTransferStatus(InvTransferStatusEnum.INORDER.getStatus());
         sellingMapper.updateById(sellingDO);
+        invPreviewExtService.markInvEnable(sellingDO.getMarketHashName());
         // 返回
         createOrderResult.setBizOrderId(invOrderDO.getId());
         createOrderResult.setPayOrderId(payOrderId);
