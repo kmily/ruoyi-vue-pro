@@ -92,7 +92,7 @@ public class AppInventorySearchController {
     @Operation(summary = "合并库存")
     public CommonResult<PageResult<AppInvMergeToSellPageReqVO>> mergeToSell(@Valid InvPageReqVO invPageReqVO) {
         PageResult<AppInvPageReqVO> invPage1 = steamInvService.getInvPage1(invPageReqVO);
-        return success(steamInvService.merge(invPage1));
+        return success(steamInvService.mergeInv(invPage1));
     }
 
 
