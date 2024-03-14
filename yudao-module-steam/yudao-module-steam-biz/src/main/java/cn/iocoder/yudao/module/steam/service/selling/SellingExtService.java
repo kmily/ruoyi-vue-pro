@@ -266,14 +266,14 @@ public class SellingExtService {
                 .eq(SellingDO::getUserType, loginUser.getUserType())
                 .in(SellingDO::getInvId, invIds));
 
-        long count1 = sellingDOInSelling.stream().filter(item -> Arrays.asList(InvTransferStatusEnum.SELL.getStatus(),
+        long count1 = sellingDOInSelling.stream().filter(item -> Arrays.asList(
                 InvTransferStatusEnum.INORDER.getStatus(),
                 InvTransferStatusEnum.TransferFINISH.getStatus(),
                 InvTransferStatusEnum.OFFSHELF.getStatus(),
                 InvTransferStatusEnum.TransferERROR.getStatus()).contains(item.getTransferStatus())).count();
 
         if(count1>0){
-            throw new ServiceException(-1, "部分商品已上架构，请检查后再操作上架构");
+            throw new ServiceException(-1, "部分商品已上架，请检查后再操作上架");
         }
         for(InvDO item:invDOList){
             item.setPrice(null);
