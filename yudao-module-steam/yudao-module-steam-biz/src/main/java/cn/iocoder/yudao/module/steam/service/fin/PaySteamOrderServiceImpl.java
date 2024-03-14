@@ -46,6 +46,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.steam.*;
@@ -320,11 +321,12 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 .setCommodityAmount(0).setDiscountAmount(0).setServiceFeeRate("0").setServiceFee(0)
                 .setPaymentAmount(0)
                 .setServiceFeeUserId(WITHDRAWAL_ACCOUNT_ID).setServiceFeeUserType(WITHDRAWAL_ACCOUNT_TYPE.getValue())
+                .setPlatformName(createReqVO.getPlatform().getName()).setPlatformCode(createReqVO.getPlatform().getCode())
 //                .setPrice(0)
                 .setSteamId(createReqVO.getSteamId())
                 .setPayOrderStatus(PayOrderStatusEnum.WAITING.getStatus())
                 .setTransferText(new TransferMsg()).setInvDescId(sellingDO.getInvDescId()).setInvId(sellingDO.getInvId())
-                //专家信息
+                //卖家信息
                 .setSellCashStatus(InvSellCashStatusEnum.INIT.getStatus()).setSellUserId(sellingDO.getUserId()).setSellUserType(sellingDO.getUserType())
                 .setPayStatus(false).setRefundAmount(0).setUserId(loginUser.getId()).setUserType(loginUser.getUserType());
         validateInvOrderCanCreate(invOrderDO);
@@ -388,7 +390,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         invOrderDO.setCommodityAmount(sellingDO.getPrice());
         ConfigDO serviceFeeLimit = configService.getConfigByKey("steam.inv.serviceFeeLimit");
         ConfigDO serviceFeeRateConfigByKey = configService.getConfigByKey("steam.inv.serviceFeeRate");
-        if(Objects.isNull(serviceFeeRateConfigByKey)){
+        if(PlatFormEnum.WEB.getCode().equals(invOrderDO.getPlatformCode()) || Objects.isNull(serviceFeeRateConfigByKey)){
             invOrderDO.setServiceFeeRate("0");
             invOrderDO.setServiceFee(0);
             invOrderDO.setPaymentAmount(invOrderDO.getCommodityAmount());
@@ -740,7 +742,10 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         invOrder.setTransferText(transferMsg);
         invOrderMapper.updateById(invOrder);
         sellingMapper.updateById(sellingDO);
-        setPayInvOrderServiceFee(invOrder);
+        if(Objects.nonNull(invOrder.getServiceFee()) && invOrder.getServiceFee()>0){
+            setPayInvOrderServiceFee(invOrder);
+        }
+
     }
 
     private PayRefundRespDTO validateInvOrderCanRefunded(Long id, Long payRefundId) {

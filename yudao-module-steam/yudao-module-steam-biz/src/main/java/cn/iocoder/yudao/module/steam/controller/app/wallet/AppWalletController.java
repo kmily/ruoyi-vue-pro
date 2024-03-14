@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageRe
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
+import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
@@ -71,6 +72,7 @@ public class AppWalletController {
     @PreAuthenticated
     public CommonResult<CreateOrderResult> createInvOrder(@Valid @RequestBody PaySteamOrderCreateReqVO createReqVO) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        createReqVO.setPlatform(PlatFormEnum.WEB);
         CreateOrderResult invOrder = paySteamOrderService.createInvOrder(loginUser, createReqVO);
         return CommonResult.success(invOrder);
     }

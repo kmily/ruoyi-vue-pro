@@ -149,5 +149,16 @@ public class InvOrderDO extends BaseDO {
      * 服务费转帐接口返回
      */
     private String serviceFeeRet;
+    /**
+     * 订单平台
+     * 枚举 {@link cn.iocoder.yudao.module.steam.enums.PlatFormEnum 对应的类}
+     */
+    private String platformName;
+
+    /**
+     * 订单平台
+     * 枚举 {@link cn.iocoder.yudao.module.steam.enums.PlatFormEnum 对应的类}
+     */
+    private Integer platformCode;
 
 }
