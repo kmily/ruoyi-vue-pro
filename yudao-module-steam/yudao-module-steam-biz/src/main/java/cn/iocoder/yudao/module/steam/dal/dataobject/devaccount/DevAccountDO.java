@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.steam.dal.dataobject.devaccount;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+
+import javax.validation.constraints.NotEmpty;
 
 /**
  * 开放平台用户 DO
@@ -46,14 +49,26 @@ public class DevAccountDO extends BaseDO {
     /**
      * 状态
      *
-     * 枚举 {@link //TODO common_status 对应的类}
+     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum 对应的类}
      */
     private Integer status;
     /**
      * 用户类型
      *
-     * 枚举 {@link //TODO user_type 对应的类}
+     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.UserTypeEnum 对应的类}
      */
     private Integer userType;
+    /**
+     * 真实姓名
+     */
+    private String trueName;
+    /**
+     * 身份证号
+     */
+    private String idNum;
+    /**
+     * 申请理由
+     */
+    private String applyReason;
 
 }
