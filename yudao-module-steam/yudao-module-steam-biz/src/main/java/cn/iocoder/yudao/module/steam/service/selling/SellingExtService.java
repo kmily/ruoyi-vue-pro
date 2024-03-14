@@ -281,6 +281,9 @@ public class SellingExtService {
             invMapper.updateById(item);
         }
         for(SellingDO item:sellingDOInSelling){
+            if (paySteamOrderService.getExpOrder(item.getId()).size() > 0) {
+                throw new ServiceException(-1, "商品交易中，不允许下架");
+            }
             sellingMapper.deleteById(item.getId());
             invPreviewExtService.markInvEnable(item.getMarketHashName());
         }
