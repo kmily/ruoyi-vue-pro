@@ -350,7 +350,8 @@ public class SellingExtService {
 
         List<SellingDO> sellingDOInSelling = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
                 .eq(SellingDO::getUserId, loginUser.getId())
-                .eq(SellingDO::getUserType, loginUser.getUserType()));
+                .eq(SellingDO::getUserType, loginUser.getUserType())
+                .eq(SellingDO::getInvId,invIds));
 
         long count1 = sellingDOInSelling.stream().filter(item -> Arrays.asList(
                 InvTransferStatusEnum.INORDER.getStatus(),
@@ -369,7 +370,7 @@ public class SellingExtService {
                 sellingMapper.updateById(item);
                 invPreviewExtService.markInvEnable(item.getMarketHashName());
             }else{
-                throw new ServiceException(-1, "部分商品已不存在，请检查后再操作改价");
+                throw new ServiceException(-1, "信息不正确，请检查");
             }
         }
     }
