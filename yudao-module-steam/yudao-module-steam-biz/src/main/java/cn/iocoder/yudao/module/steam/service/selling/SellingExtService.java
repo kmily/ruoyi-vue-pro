@@ -10,10 +10,7 @@ import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.InvPageReqVo;
-import cn.iocoder.yudao.module.steam.controller.app.selling.vo.BatchSellReqVo;
-import cn.iocoder.yudao.module.steam.controller.app.selling.vo.SellingChangePriceReqVo;
-import cn.iocoder.yudao.module.steam.controller.app.selling.vo.SellingMergeListVO;
-import cn.iocoder.yudao.module.steam.controller.app.selling.vo.SellingReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.selling.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
@@ -31,6 +28,7 @@ import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -64,6 +62,7 @@ public class SellingExtService {
     @Resource
     private InvDescService invDescService;
 
+    @Transactional(rollbackFor = ServiceException.class)
     public void batchSale(BatchSellReqVo reqVo,LoginUser loginUser){
         if(Objects.isNull(loginUser)){
             throw new ServiceException(OpenApiCode.ID_ERROR);
@@ -97,7 +96,7 @@ public class SellingExtService {
         }
         for(InvDO item:invDOList){
             Optional<BatchSellReqVo.Item> first = reqVo.getItems().stream().filter(i -> i.getId().equals(item.getId())).findFirst();
-            if(first.isPresent()){
+            if(!first.isPresent()){
                 log.error("价格信息未查找到{},{}",item,reqVo.getItems());
                 throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
             }
@@ -245,7 +244,47 @@ public class SellingExtService {
 
         return sellingDO;
     }
+    @Transactional(rollbackFor = ServiceException.class)
+    public void batchOffSale(BatchOffSellReqVo reqVo, LoginUser loginUser){
+        if(Objects.isNull(loginUser)){
+            throw new ServiceException(OpenApiCode.ID_ERROR);
+        }
+        List<Long> invIds = reqVo.getItems().stream().map(BatchOffSellReqVo.Item::getId).distinct().collect(Collectors.toList());
+        if(invIds.size()!=reqVo.getItems().size()){
+            throw new ServiceException(-1,"传入的id不允许有重复");
+        }
+        List<InvDO> invDOList = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
+                .inIfPresent(InvDO::getId, invIds)
+                .eq(InvDO::getUserId,loginUser.getId())
+                .eq(InvDO::getUserType,loginUser.getUserType())
+        );
+        if(invIds.size()!=invDOList.size()){
+            throw new ServiceException(-1,"检测到你下线的库存部分不存在，请检查后再提交");
+        }
+        List<SellingDO> sellingDOInSelling = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
+                .eq(SellingDO::getUserId, loginUser.getId())
+                .eq(SellingDO::getUserType, loginUser.getUserType())
+                .in(SellingDO::getInvId, invIds));
 
+        long count1 = sellingDOInSelling.stream().filter(item -> Arrays.asList(
+                InvTransferStatusEnum.INORDER.getStatus(),
+                InvTransferStatusEnum.TransferFINISH.getStatus(),
+                InvTransferStatusEnum.OFFSHELF.getStatus(),
+                InvTransferStatusEnum.TransferERROR.getStatus()).contains(item.getTransferStatus())).count();
+
+        if(count1>0){
+            throw new ServiceException(-1, "部分商品已不存在，请检查后再操作下架");
+        }
+        for(InvDO item:invDOList){
+            item.setPrice(null);
+            item.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
+            invMapper.updateById(item);
+        }
+        for(SellingDO item:sellingDOInSelling){
+            sellingMapper.deleteById(item.getId());
+            invPreviewExtService.markInvEnable(item.getMarketHashName());
+        }
+    }
     public Optional<SellingDO> getOffSale(@Valid SellingReqVo sellingReqVo) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         // 访问用户库存
