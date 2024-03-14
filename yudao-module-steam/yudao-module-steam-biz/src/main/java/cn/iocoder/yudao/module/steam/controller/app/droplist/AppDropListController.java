@@ -180,6 +180,12 @@ public class AppDropListController {
         sellingPageReqVO.setExistInv(true);
         return success(invPreviewExtService.getInvPreviewPage(sellingPageReqVO));
     }
+    @GetMapping("items/730/getHot")
+    @Operation(summary = "热门在售卖")
+    public CommonResult<PageResult<ItemResp>> getHot(@Valid InvPreviewPageReqVO sellingPageReqVO) {
+        sellingPageReqVO.setExistInv(true);
+        return success(invPreviewExtService.getHot(sellingPageReqVO));
+    }
     @GetMapping("items/730/header")
     @Operation(summary = "在售商品列表")
     public CommonResult<ItemResp> itemHeader(@Valid PreviewReqVO reqVO) {
