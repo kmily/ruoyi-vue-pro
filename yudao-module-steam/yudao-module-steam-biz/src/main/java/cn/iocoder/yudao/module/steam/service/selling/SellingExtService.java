@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.InvPageReqVo;
@@ -19,11 +20,14 @@ import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
+import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
+import cn.iocoder.yudao.module.steam.service.invdesc.InvDescService;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewService;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -50,11 +54,11 @@ public class SellingExtService {
     @Resource
     private InvDescMapper invDescMapper;
     @Resource
-    private InvPreviewMapper invPreviewMapper;
-    @Resource
-    private InvPreviewService invPreviewService;
-    @Resource
     private InvPreviewExtService invPreviewExtService;
+    @Autowired
+    private PaySteamOrderService paySteamOrderService;
+    @Resource
+    private InvDescService invDescService;
 
     /**
      * @param invPageReqVos
@@ -62,6 +66,22 @@ public class SellingExtService {
      */
     public SellingDO getToSale(InvPageReqVo invPageReqVos) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+
+        List<InvDO> invDO2 = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
+                .eq(InvDO::getId, invPageReqVos.getId()));
+
+        List<InvDescDO> invDescDO2 = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+                .eq(InvDescDO::getId, invDO2.get(0).getInvDescId()));
+
+        if (invDescDO2.get(0).getTradable() == 0){
+            throw new ServiceException(-1, "饰品不能上架,请检查是否冷却中或其他");
+        }
+
+        // 判断用户库存是否能上架
+        if (invDescMapper.selectList().get(0).getTradable() == 0) {
+            throw new ServiceException(-1, "饰品不能上架,请检查");
+        }
+
         // 判断用户是否上架指定为自己的库存
         List<InvDO> invDOS = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
                 .eq(InvDO::getId, invPageReqVos.getId())
@@ -139,11 +159,20 @@ public class SellingExtService {
         InvDO invDO = invMapper.selectById(sellingReqVo.getId());
         // 获取当前上架信息
         Optional<SellingDO> sellingDO1 = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
+                .eq(SellingDO::getInvId, invDO.getId())
                 .eq(SellingDO::getClassid, invDO.getClassid())
+                .in(SellingDO::getTransferStatus, Arrays.asList(InvTransferStatusEnum.SELL.getStatus(),
+                        InvTransferStatusEnum.INORDER.getStatus(),
+                        InvTransferStatusEnum.TransferFINISH.getStatus(),
+                        InvTransferStatusEnum.OFFSHELF.getStatus(),
+                        InvTransferStatusEnum.TransferERROR.getStatus()))
                 .eq(SellingDO::getInstanceid, invDO.getInstanceid())).stream().findFirst();
-        if (!sellingDO1.isPresent()) {
-            throw new ServiceException(-1, "无权限");
+
+
+        if (paySteamOrderService.getExpOrder(sellingDO1.get().getId()).size() > 0) {
+            throw new ServiceException(-1, "商品交易中，不允许下架");
         }
+
         // 在售账号是否是自己账号
         if (!sellingDO1.get().getUserId().equals(loginUser.getId())) {
             throw new ServiceException(-1, "无权限");
@@ -152,14 +181,6 @@ public class SellingExtService {
             throw new ServiceException(-1, "无权限");
         }
 
-        // 用户主动下架,当前饰品还存在用户steam库存中
-        if (invDO.getTransferStatus() == InvTransferStatusEnum.INIT.getStatus()) {
-            // 是否在库存
-            throw new ServiceException(-1, "商品未上架");
-        }
-        if (sellingDO1.get().getTransferStatus() == InvTransferStatusEnum.INORDER.getStatus()) {
-            throw new ServiceException(-1, "商品已下单");
-        }
         log.info(String.valueOf(sellingDO1.get().getId()));
         Long id = sellingDO1.get().getId();
         // 下架(设置transferstatus为‘0’未出售)
