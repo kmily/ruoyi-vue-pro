@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.InvPageReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.selling.vo.BatchSellReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.SellingChangePriceReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.SellingMergeListVO;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.SellingReqVo;
@@ -20,6 +21,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
+import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.invdesc.InvDescService;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
@@ -34,6 +36,8 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 在售饰品 Service 实现类
@@ -60,6 +64,93 @@ public class SellingExtService {
     @Resource
     private InvDescService invDescService;
 
+    public void batchSale(BatchSellReqVo reqVo,LoginUser loginUser){
+        if(Objects.isNull(loginUser)){
+            throw new ServiceException(OpenApiCode.ID_ERROR);
+        }
+        List<Long> invIds = reqVo.getItems().stream().map(BatchSellReqVo.Item::getId).distinct().collect(Collectors.toList());
+        if(invIds.size()!=reqVo.getItems().size()){
+            throw new ServiceException(-1,"传入的id不允许有重复");
+        }
+        List<InvDO> invDOList = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
+                .inIfPresent(InvDO::getId, invIds)
+                .eq(InvDO::getUserId,loginUser.getId())
+                .eq(InvDO::getUserType,loginUser.getUserType())
+        );
+        if(invIds.size()!=invDOList.size()){
+            throw new ServiceException(-1,"检测到你上线的库存不是所有库存均为可上线状态，请检查后再提交");
+        }
+        List<Long> invDescId = invDOList.stream().map(InvDO::getInvDescId).collect(Collectors.toList());
+        List<InvDescDO> invDescDO2 = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+                .in(InvDescDO::getId, invDescId));
+        long count = invDescDO2.stream().filter(item -> item.getTradable() == 0).count();
+        if (count>0) {
+            throw new ServiceException(-1, "饰品不能上架,请检查是否冷却中或其他");
+        }
+        List<SellingDO> sellingDOInSelling = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
+                .eq(SellingDO::getUserId, loginUser.getId())
+                .eq(SellingDO::getUserType, loginUser.getUserType())
+                .in(SellingDO::getInvId, invIds)
+                .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus()));
+        if (!sellingDOInSelling.isEmpty()) {
+            throw new ServiceException(-1, "部分商品已上架构，请检查后再操作上架构");
+        }
+        for(InvDO item:invDOList){
+            Optional<BatchSellReqVo.Item> first = reqVo.getItems().stream().filter(i -> i.getId().equals(item.getId())).findFirst();
+            if(first.isPresent()){
+                log.error("价格信息未查找到{},{}",item,reqVo.getItems());
+                throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
+            }
+            BatchSellReqVo.Item itemPriceInfo = first.get();
+            item.setPrice(itemPriceInfo.getPrice());
+//            InvDO invDO = invDOS.get(0);
+            // 商品上架流程
+//            invDO.setPrice(invPageReqVos.getPrice());
+            item.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
+            invMapper.updateById(item);
+            Optional<InvDescDO> invDescDO = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+                    .eq(InvDescDO::getClassid, item.getClassid())
+                    .eq(InvDescDO::getInstanceid, item.getInstanceid())).stream().findFirst();
+            if (!invDescDO.isPresent()) {
+                throw new ServiceException(-1, "exists");
+            }
+            Long l = sellingMapper.selectCount(new LambdaQueryWrapperX<SellingDO>()
+                    .eq(SellingDO::getId, item.getId())
+            );
+            if (l > 0) {
+                throw new ServiceException(-1, "exists");
+            }
+            SellingDO sellingDO = new SellingDO();
+            sellingDO.setAppid(item.getAppid());
+            sellingDO.setAssetid(item.getAssetid());
+            sellingDO.setClassid(item.getClassid());
+            sellingDO.setInstanceid(item.getInstanceid());
+            sellingDO.setAmount(item.getAmount());
+            sellingDO.setSteamId(item.getSteamId());
+            sellingDO.setUserId(item.getUserId());
+            sellingDO.setUserType(item.getUserType());
+            sellingDO.setBindUserId(item.getBindUserId());
+            sellingDO.setContextid(item.getContextid());
+            sellingDO.setInvDescId(invDescDO.get().getId());
+            sellingDO.setSelExterior(invDescDO.get().getSelExterior());
+            sellingDO.setSelItemset(invDescDO.get().getSelItemset());
+            sellingDO.setSelQuality(invDescDO.get().getSelQuality());
+            sellingDO.setSelRarity(invDescDO.get().getSelRarity());
+            sellingDO.setSelType(invDescDO.get().getSelType());
+            sellingDO.setSelWeapon(invDescDO.get().getSelWeapon());
+            sellingDO.setMarketName(invDescDO.get().getMarketName());
+            sellingDO.setIconUrl(invDescDO.get().getIconUrl());
+            sellingDO.setMarketHashName(invDescDO.get().getMarketHashName());
+            sellingDO.setInvId(item.getId());
+            if (itemPriceInfo.getPrice() == null || itemPriceInfo.getPrice() == 0) {
+                throw new ServiceException(-1, "未设置价格");
+            }
+            sellingDO.setPrice(itemPriceInfo.getPrice());
+            sellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
+            sellingMapper.insert(sellingDO);
+            invPreviewExtService.markInvEnable(sellingDO.getMarketHashName());
+        }
+    }
     /**
      * @param invPageReqVos
      * @return

@@ -3,9 +3,12 @@ package cn.iocoder.yudao.module.steam.controller.app.selling;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.InvPageReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.selling.vo.BatchSellReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.SellingChangePriceReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.SellingMergeListVO;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.SellingReqVo;
@@ -15,10 +18,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -43,6 +43,17 @@ public class AppSellingController {
         // 查询 steam_inv
         SellingDO invPage = sellingExtService.getToSale(invPageReqVo);
         return CommonResult.success(invPage);
+
+    }
+    @PostMapping("/batchSale")
+    @Operation(summary = "批量上架")
+    @Idempotent(timeout = 3, timeUnit = TimeUnit.SECONDS, message = "操作太快，请稍后再试")
+    public CommonResult<String> batchSale(@RequestBody @Valid BatchSellReqVo reqVo) {
+        // 入参：id  price
+        // 查询 steam_inv
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        sellingExtService.batchSale(reqVo,loginUser);
+        return CommonResult.success("上架成功");
 
     }
     @GetMapping("/offsale")
