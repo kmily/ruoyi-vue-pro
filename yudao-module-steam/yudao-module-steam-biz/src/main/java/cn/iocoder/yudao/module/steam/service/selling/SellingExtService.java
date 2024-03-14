@@ -63,27 +63,27 @@ public class SellingExtService {
     private InvDescService invDescService;
 
     @Transactional(rollbackFor = ServiceException.class)
-    public void batchSale(BatchSellReqVo reqVo,LoginUser loginUser){
-        if(Objects.isNull(loginUser)){
+    public void batchSale(BatchSellReqVo reqVo, LoginUser loginUser) {
+        if (Objects.isNull(loginUser)) {
             throw new ServiceException(OpenApiCode.ID_ERROR);
         }
         List<Long> invIds = reqVo.getItems().stream().map(BatchSellReqVo.Item::getId).distinct().collect(Collectors.toList());
-        if(invIds.size()!=reqVo.getItems().size()){
-            throw new ServiceException(-1,"传入的id不允许有重复");
+        if (invIds.size() != reqVo.getItems().size()) {
+            throw new ServiceException(-1, "传入的id不允许有重复");
         }
         List<InvDO> invDOList = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
                 .inIfPresent(InvDO::getId, invIds)
-                .eq(InvDO::getUserId,loginUser.getId())
-                .eq(InvDO::getUserType,loginUser.getUserType())
+                .eq(InvDO::getUserId, loginUser.getId())
+                .eq(InvDO::getUserType, loginUser.getUserType())
         );
-        if(invIds.size()!=invDOList.size()){
-            throw new ServiceException(-1,"检测到你上线的库存不是所有库存均为可上线状态，请检查后再提交");
+        if (invIds.size() != invDOList.size()) {
+            throw new ServiceException(-1, "检测到你上线的库存不是所有库存均为可上线状态，请检查后再提交");
         }
         List<Long> invDescId = invDOList.stream().map(InvDO::getInvDescId).collect(Collectors.toList());
         List<InvDescDO> invDescDO2 = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
                 .in(InvDescDO::getId, invDescId));
         long count = invDescDO2.stream().filter(item -> item.getTradable() == 0).count();
-        if (count>0) {
+        if (count > 0) {
             throw new ServiceException(-1, "饰品不能上架,请检查是否冷却中或其他");
         }
         List<SellingDO> sellingDOInSelling = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
@@ -94,10 +94,10 @@ public class SellingExtService {
         if (!sellingDOInSelling.isEmpty()) {
             throw new ServiceException(-1, "部分商品已上架构，请检查后再操作上架构");
         }
-        for(InvDO item:invDOList){
+        for (InvDO item : invDOList) {
             Optional<BatchSellReqVo.Item> first = reqVo.getItems().stream().filter(i -> i.getId().equals(item.getId())).findFirst();
-            if(!first.isPresent()){
-                log.error("价格信息未查找到{},{}",item,reqVo.getItems());
+            if (!first.isPresent()) {
+                log.error("价格信息未查找到{},{}", item, reqVo.getItems());
                 throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
             }
             BatchSellReqVo.Item itemPriceInfo = first.get();
@@ -150,6 +150,7 @@ public class SellingExtService {
             invPreviewExtService.markInvEnable(sellingDO.getMarketHashName());
         }
     }
+
     /**
      * @param invPageReqVos
      * @return
@@ -244,22 +245,23 @@ public class SellingExtService {
 
         return sellingDO;
     }
+
     @Transactional(rollbackFor = ServiceException.class)
-    public void batchOffSale(BatchOffSellReqVo reqVo, LoginUser loginUser){
-        if(Objects.isNull(loginUser)){
+    public void batchOffSale(BatchOffSellReqVo reqVo, LoginUser loginUser) {
+        if (Objects.isNull(loginUser)) {
             throw new ServiceException(OpenApiCode.ID_ERROR);
         }
         List<Long> invIds = reqVo.getItems().stream().map(BatchOffSellReqVo.Item::getId).distinct().collect(Collectors.toList());
-        if(invIds.size()!=reqVo.getItems().size()){
-            throw new ServiceException(-1,"传入的id不允许有重复");
+        if (invIds.size() != reqVo.getItems().size()) {
+            throw new ServiceException(-1, "传入的id不允许有重复");
         }
         List<InvDO> invDOList = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
                 .inIfPresent(InvDO::getId, invIds)
-                .eq(InvDO::getUserId,loginUser.getId())
-                .eq(InvDO::getUserType,loginUser.getUserType())
+                .eq(InvDO::getUserId, loginUser.getId())
+                .eq(InvDO::getUserType, loginUser.getUserType())
         );
-        if(invIds.size()!=invDOList.size()){
-            throw new ServiceException(-1,"检测到你下线的库存部分不存在，请检查后再提交");
+        if (invIds.size() != invDOList.size()) {
+            throw new ServiceException(-1, "检测到你下线的库存部分不存在，请检查后再提交");
         }
         List<SellingDO> sellingDOInSelling = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
                 .eq(SellingDO::getUserId, loginUser.getId())
@@ -272,15 +274,15 @@ public class SellingExtService {
                 InvTransferStatusEnum.OFFSHELF.getStatus(),
                 InvTransferStatusEnum.TransferERROR.getStatus()).contains(item.getTransferStatus())).count();
 
-        if(count1>0){
+        if (count1 > 0) {
             throw new ServiceException(-1, "部分商品已不存在，请检查后再操作下架");
         }
-        for(InvDO item:invDOList){
+        for (InvDO item : invDOList) {
             item.setPrice(null);
             item.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
             invMapper.updateById(item);
         }
-        for(SellingDO item:sellingDOInSelling){
+        for (SellingDO item : sellingDOInSelling) {
             if (paySteamOrderService.getExpOrder(item.getId()).size() > 0) {
                 throw new ServiceException(-1, "商品交易中，不允许下架");
             }
@@ -288,6 +290,7 @@ public class SellingExtService {
             invPreviewExtService.markInvEnable(item.getMarketHashName());
         }
     }
+
     public Optional<SellingDO> getOffSale(@Valid SellingReqVo sellingReqVo) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         // 访问用户库存
@@ -326,6 +329,43 @@ public class SellingExtService {
         invPreviewExtService.markInvEnable(sellingDO1.get().getMarketHashName());
 
         return sellingDO1;
+    }
+
+    /**
+     * 批量修改价格
+     *
+     * @param reqVo
+     * @return
+     */
+
+    @Transactional(rollbackFor = ServiceException.class)
+    public void batchChangePrice(BatchChangePriceReqVo reqVo, LoginUser loginUser) {
+        if (Objects.isNull(loginUser)) {
+            throw new ServiceException(OpenApiCode.ID_ERROR);
+        }
+        List<Long> invIds = reqVo.getItems().stream().map(BatchChangePriceReqVo.Item::getId).distinct().collect(Collectors.toList());
+        if (invIds.size() != reqVo.getItems().size()) {
+            throw new ServiceException(-1, "传入的id不允许有重复");
+        }
+
+        List<SellingDO> sellingDOInSelling = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
+                .eq(SellingDO::getUserId, loginUser.getId())
+                .eq(SellingDO::getUserType, loginUser.getUserType()));
+
+        long count1 = sellingDOInSelling.stream().filter(item -> Arrays.asList(
+                InvTransferStatusEnum.INORDER.getStatus(),
+                InvTransferStatusEnum.TransferFINISH.getStatus(),
+                InvTransferStatusEnum.OFFSHELF.getStatus(),
+                InvTransferStatusEnum.TransferERROR.getStatus()).contains(item.getTransferStatus())).count();
+        if (count1 > 0) {
+            throw new ServiceException(-1, "部分商品已不存在，请检查后再操作改价");
+        }
+
+        for (SellingDO item : sellingDOInSelling) {
+            item.setPrice(reqVo.getItems().get(0).getPrice());
+            sellingMapper.updateById(item);
+            invPreviewExtService.markInvEnable(item.getMarketHashName());
+        }
     }
 
     /**
@@ -444,25 +484,5 @@ public class SellingExtService {
         }
         return new PageResult<>(invPage, sellingPage.getTotal());
     }
-/*
-
-    public PageResult<SellingMergeListVO> offSaleMerge(SellingPageReqVO sellingPageReqVO) {
-
-
-        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        PageResult<SellingDO> sellingPage = sellingService.getSellingPage(sellingPageReqVO);
-
-        Map<String, Integer> map = new HashMap<>();
-        List<SellingMergeListVO> invPage = new ArrayList<>();
-
-        // 访问用户库存
-        InvDO invDO = invMapper.selectById(sellingPageReqVO.getInvId());
-        // 获取当前上架信息
-        List<SellingDO> sellingDO1 = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>());
-
-
-        return new PageResult<>(invPage, sellingPage.getTotal());
-    }
-*/
 
 }
