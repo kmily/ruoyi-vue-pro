@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.app.devaccount.vo.AppDevAccountSaveReqVO;
+import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -93,14 +94,25 @@ public class DevAccountServiceImpl implements DevAccountService {
             if (CommonStatusEnum.isDisable(devAccountDOS.get(0).getStatus())) {
                 throw exception(DEV_ACCOUNT_DISABLE);
             }
-            DevAccountDO devAccountDO = new DevAccountDO();
+            if(Objects.isNull(createReqVO.getApiPublicKey())){
+                throw exception(DEV_ACCOUNT_KEY);
+            }
+            DevAccountDO devAccountDO = devAccountDOS.get(0);
             devAccountDO.setApiPublicKey(createReqVO.getApiPublicKey());
-//            devAccountDO.setId(devAccountDOS.get(0).getId());
             devAccountMapper.updateById(devAccountDO);
             return devAccountDO.getId().toString();
         } else {
             //  新增
-            createReqVO.setApiPublicKey(createReqVO.getApiPublicKey());
+            if(Objects.isNull(createReqVO.getIdNum())){
+                throw exception(OpenApiCode.JACKSON_EXCEPTION);
+            }
+            if(Objects.isNull(createReqVO.getTrueName())){
+                throw exception(OpenApiCode.JACKSON_EXCEPTION);
+            }
+            if(Objects.isNull(createReqVO.getApplyReason())){
+                throw exception(OpenApiCode.JACKSON_EXCEPTION);
+            }
+//            createReqVO.setApiPublicKey(createReqVO.getApiPublicKey());
             // 插入
             createReqVO.setUserId(loginUser.getId());
             createReqVO.setStatus(0);

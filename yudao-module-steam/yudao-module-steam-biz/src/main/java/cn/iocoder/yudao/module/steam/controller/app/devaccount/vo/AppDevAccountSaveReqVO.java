@@ -31,13 +31,13 @@ public class AppDevAccountSaveReqVO {
     @Schema(description = "用户类型", example = "1")
     private Integer userType;
     @Schema(description = "真实姓名", example = "1")
-    @NotEmpty(message = "真实姓名不能为空")
+//    @NotEmpty(message = "真实姓名不能为空")
     private String trueName;
     @Schema(description = "身份证号", example = "1")
-    @NotEmpty(message = "身份证号不能为空")
+//    @NotEmpty(message = "身份证号不能为空")
     private String idNum;
     @Schema(description = "申请理由", example = "1")
-    @NotEmpty(message = "申请理由不能为空")
+//    @NotEmpty(message = "申请理由不能为空")
     private String applyReason;
 
 }
