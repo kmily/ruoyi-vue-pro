@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.steam.controller.app.selling;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.InvPageReqVo;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @Validated
@@ -35,6 +37,7 @@ public class AppSellingController {
 
     @GetMapping("/onsale")
     @Operation(summary = "饰品上架出售")
+    @Idempotent(timeout = 3, timeUnit = TimeUnit.SECONDS, message = "操作太快，请稍后再试")
     public CommonResult<SellingDO> getOnSale(@Valid InvPageReqVo invPageReqVo) {
         // 入参：id  price
         // 查询 steam_inv
@@ -44,6 +47,7 @@ public class AppSellingController {
     }
     @GetMapping("/offsale")
     @Operation(summary = "饰品下架")
+    @Idempotent(timeout = 3, timeUnit = TimeUnit.SECONDS, message = "操作太快，请稍后再试")
     public CommonResult<Optional<SellingDO>> getOffSale(@Valid SellingReqVo sellingReqVo) {
 
         Optional<SellingDO> invPage = sellingExtService.getOffSale(sellingReqVo);
@@ -52,6 +56,7 @@ public class AppSellingController {
     }
     @GetMapping("/changePrice")
     @Operation(summary = "饰品改价")
+    @Idempotent(timeout = 3, timeUnit = TimeUnit.SECONDS, message = "操作太快，请稍后再试")
     public CommonResult<Integer> changePrice(@RequestBody @Valid SellingChangePriceReqVo reqVo) {
 
         Integer integer = sellingExtService.changePrice(reqVo);
