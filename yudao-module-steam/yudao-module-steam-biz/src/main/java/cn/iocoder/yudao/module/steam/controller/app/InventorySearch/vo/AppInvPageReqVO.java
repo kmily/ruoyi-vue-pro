@@ -1,8 +1,11 @@
 package cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo;
 
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
+import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class AppInvPageReqVO extends InvPageReqVO {
@@ -16,6 +19,8 @@ public class AppInvPageReqVO extends InvPageReqVO {
     private Long id;
     private String instanceid;
     private Integer userType;
+    private List<InventoryDto.DescriptionsDTOX.TagsDTO> tags;
+    private Integer tradeable;
 
     // 分类查询字段
     /**

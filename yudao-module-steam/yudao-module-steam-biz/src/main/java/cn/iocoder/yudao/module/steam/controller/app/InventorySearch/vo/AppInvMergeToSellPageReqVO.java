@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo;
 
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.SellingReqVo;
+import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import lombok.Data;
 
 import java.util.List;
@@ -26,6 +27,10 @@ public class AppInvMergeToSellPageReqVO {
     private Integer price;
     // 库存主键id
     private Long id;
+    // tags
+    private List<InventoryDto.DescriptionsDTOX.TagsDTO> tags;
+    // 是否可交易
+    private Integer Tradeable;
 
     // 分类查询字段
     /**
