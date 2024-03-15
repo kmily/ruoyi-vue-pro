@@ -14,15 +14,16 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class InvOrderJob implements JobHandler {
-    @Autowired
     private SteamService steamService;
-    @Override
-//    @TenantJob
-    public String execute(String param) throws Exception {
+    @Autowired
+    public void setSteamService(SteamService steamService) {
+        this.steamService = steamService;
+    }
 
-        Integer execute = TenantUtils.execute(1l, () -> {
-            return steamService.autoCloseInvOrder();
-        });
+    @Override
+    public String execute(String param) {
+
+        Integer execute = TenantUtils.execute(1L, () -> steamService.autoCloseInvOrder());
         return String.format("执行关闭成功 %s 个", execute);
     }
 }

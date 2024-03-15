@@ -333,7 +333,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 .setPlatformName(reqVo.getPlatform().getName()).setPlatformCode(reqVo.getPlatform().getCode())
                 .setSteamId(reqVo.getSteamId())
                 .setPayOrderStatus(PayOrderStatusEnum.WAITING.getStatus())
-                .setTransferText(new TransferMsg()).setInvDescId(sellingDO.getInvDescId()).setInvId(sellingDO.getInvId())
+                .setTransferText(new TransferMsg()).setTransferStatus(InvTransferStatusEnum.SELL.getStatus()).setInvDescId(sellingDO.getInvDescId()).setInvId(sellingDO.getInvId())
                 //卖家信息
                 .setSellCashStatus(InvSellCashStatusEnum.INIT.getStatus()).setSellUserId(sellingDO.getUserId()).setSellUserType(sellingDO.getUserType())
                 .setPayStatus(false).setRefundAmount(0).setUserId(loginUser.getId()).setUserType(loginUser.getUserType());
@@ -509,19 +509,19 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         if (updateCount == 0) {
             throw exception(DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
-        InvOrderDO invOrderDO = invOrderMapper.selectById(id);
-        //获取卖家家钱包并进行打款
-        PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(invOrderDO.getSellUserId(), invOrderDO.getSellUserType());
-        payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(invOrderDO.getId()),
-                PayWalletBizTypeEnum.STEAM_CASH, invOrderDO.getCommodityAmount());
-        invOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
-        invOrderMapper.updateById(invOrderDO);
-//        try{
-//            PaySteamOrderServiceImpl bean = SpringUtil.getBean(this.getClass());
-//            bean.tradeAsset(invOrderDO.getId());
-//        }catch (Exception e){
-//            log.info("发货异常{}",e);
-//        }
+//        InvOrderDO invOrderDO = invOrderMapper.selectById(id);
+//        //获取卖家家钱包并进行打款
+//        PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(invOrderDO.getSellUserId(), invOrderDO.getSellUserType());
+//        payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(invOrderDO.getId()),
+//                PayWalletBizTypeEnum.STEAM_CASH, invOrderDO.getCommodityAmount());
+//        invOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
+//        invOrderMapper.updateById(invOrderDO);
+        try{
+            PaySteamOrderServiceImpl bean = SpringUtil.getBean(this.getClass());
+            bean.tradeAsset(id);
+        }catch (Exception e){
+            log.info("发货异常{}",e);
+        }
 
     }
     @Async
@@ -627,8 +627,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         invOrderMapper.updateById(new InvOrderDO().setId(id)
                 .setPayRefundId(payRefundId).setRefundAmount(invOrderDO.getCommodityAmount()));
         //释放库存
-        SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
-        closeInvOrder(sellingDO.getId());
+        closeInvOrder(id);
     }
 
     private InvOrderDO validateInvOrderCanRefund(Long id,LoginUser loginUser) {
@@ -679,14 +678,11 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         }
         PayOrderDO order = payOrderService.getOrder(invOrder.getPayOrderId());
         if (PayOrderStatusEnum.isClosed(order.getStatus())) {
-            invOrder.setPayStatus(false);
-            invOrder.setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus());
-            invOrder.setPayOrderStatus(order.getStatus());
-            invOrderMapper.updateById(invOrder);
+            invOrderMapper.updateById(new InvOrderDO().setId(id).setPayStatus(false).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus())
+                    .setPayOrderStatus(order.getStatus()));
             //释放库存
             SellingDO sellingDO = sellingMapper.selectById(invOrder.getSellId());
-            sellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
-            sellingMapper.updateById(sellingDO);
+            sellingMapper.updateById(new SellingDO().setId(sellingDO.getId()).setTransferStatus(InvTransferStatusEnum.SELL.getStatus()));
             invPreviewExtService.markInvEnable(sellingDO.getMarketHashName());
         }
     }
@@ -751,9 +747,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         invOrder.setTransferText(transferMsg);
         invOrderMapper.updateById(invOrder);
         sellingMapper.updateById(sellingDO);
-        if(Objects.nonNull(invOrder.getServiceFee()) && invOrder.getServiceFee()>0){
-            setPayInvOrderServiceFee(invOrder);
-        }
+//        if(Objects.nonNull(invOrder.getServiceFee()) && invOrder.getServiceFee()>0){
+//            setPayInvOrderServiceFee(invOrder);
+//        }
 
     }
 
@@ -765,7 +761,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         }
         // 1.2 校验退款订单匹配
         if (Objects.equals(invOrderDO.getPayRefundId(), payRefundId)) {
-            log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！order 数据是：{}]",
+            log.error("[validateInvOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！order 数据是：{}]",
                     id, payRefundId, toJsonString(invOrderDO));
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
         }
@@ -781,13 +777,13 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         }
         // 2.3 校验退款金额一致
         if (notEqual(payRefund.getRefundPrice(), invOrderDO.getPaymentAmount())) {
-            log.error("[validateDemoOrderCanRefunded][order({}) payRefund({}) 退款金额不匹配，请进行处理！order 数据是：{}，payRefund 数据是：{}]",
+            log.error("[validateInvOrderCanRefunded][order({}) payRefund({}) 退款金额不匹配，请进行处理！order 数据是：{}，payRefund 数据是：{}]",
                     id, payRefundId, toJsonString(invOrderDO), toJsonString(payRefund));
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_PRICE_NOT_MATCH);
         }
         // 2.4 校验退款订单匹配（二次）
         if (notEqual(payRefund.getMerchantOrderId(), id.toString())) {
-            log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！payRefund 数据是：{}]",
+            log.error("[validateInvOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！payRefund 数据是：{}]",
                     id, payRefundId, toJsonString(payRefund));
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
         }
