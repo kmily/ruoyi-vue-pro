@@ -438,45 +438,17 @@ public class SteamInvService {
                 appInvPageReqVO.setSelRarity(element.getSelRarity());
                 appInvPageReqVO.setSelItemset(element.getSelItemset());
                 appInvPageReqVO.setSelType(element.getSelType());
+                appInvPageReqVO.setId(element.getId());
                 appInvPageReqVO.setAssetIdList(Arrays.asList(element.getAssetid()));
                 invPage.put(element.getMarketName(),appInvPageReqVO);
             }
-//            if(map.containsKey(element.getMarketName())){
-//                map.put(element.getMarketName(),map.get(element.getMarketName())+1);  // 更新计数
-////                AssetIdList.put(element.getMarketName(),element.getAssetid());
-//            } else {
-//                map.put(element.getMarketName(),1);    // 初次计数 1
-//                AppInvMergeToSellPageReqVO appInvPageReqVO = new AppInvMergeToSellPageReqVO();
-//                appInvPageReqVO.setMarketName(element.getMarketName());
-//                appInvPageReqVO.setAssetId(element.getAssetid());
-//                appInvPageReqVO.setPrice(element.getPrice());
-//                appInvPageReqVO.setIconUrl(element.getIconUrl());
-//                appInvPageReqVO.setSelQuality(element.getSelQuality());
-//                appInvPageReqVO.setSelWeapon(element.getSelWeapon());
-//                appInvPageReqVO.setSelExterior(element.getSelExterior());
-//                appInvPageReqVO.setSelRarity(element.getSelRarity());
-//                appInvPageReqVO.setSelItemset(element.getSelItemset());
-//                appInvPageReqVO.setSelType(element.getSelType());
-//
-//                invPage.add(appInvPageReqVO);
-//            }
         }
-//        // 读取每一个商品合并后的件数
-//        for(Map.Entry<String,Integer> key : map.entrySet()){
-//            for(AppInvMergeToSellPageReqVO element : invPage){
-//                if(element.getMarketName().equals(key.getKey())){
-//                    element.setNumber(key.getValue());
-////                    element.setAssetIdList(AssetIdList);
-//                }
-//            }
-//        }
 
-//        log.info("AssetIdList:{}",AssetIdList);
         List<AppInvMergeToSellPageReqVO> invMergePage = new ArrayList<>();
         for(Map.Entry<String,AppInvMergeToSellPageReqVO> key : invPage.entrySet()){
             invMergePage.add(key.getValue());
         }
-        return new PageResult<AppInvMergeToSellPageReqVO>(invMergePage,invPage1.getTotal());
+        return new PageResult<>(invMergePage,invPage1.getTotal());
     }
 
 }

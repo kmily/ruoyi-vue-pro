@@ -24,6 +24,8 @@ public class AppInvMergeToSellPageReqVO {
     private Integer number;
     // 价格
     private Integer price;
+    // 库存主键id
+    private Long id;
 
     // 分类查询字段
     /**
