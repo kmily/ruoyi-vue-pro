@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingRespVO;
+import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvMergeToSellPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.InvPageReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
@@ -449,22 +450,23 @@ public class SellingExtService {
         return new PageResult<>(sellingRespVOList, sellingPage.getTotal());
     }
 
-    public PageResult<SellingMergeListVO> sellingMerge(SellingPageReqVO sellingPageReqVO) {
+    public PageResult<SellingMergeListReqVo> sellingMerge(SellingPageReqVO sellingPageReqVO) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
 
         List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
                 .eqIfPresent(SellingDO::getUserType, loginUser.getUserType())
                 .eq(SellingDO::getUserId, loginUser.getId()));
 
-        Map<String, Integer> map = new HashMap<>();
-        List<SellingMergeListVO> invPages = new ArrayList<>();
+        Map<String,SellingMergeListReqVo> invPage = new HashMap<>();
 
         for (SellingDO element : sellingDOS) {
-            if (map.containsKey(element.getMarketName())) {
-                map.put(element.getMarketName(), map.get(element.getMarketName()) + 1);  // 更新计数
+            if (Objects.nonNull(invPage.get(element.getMarketName()))) {
+                SellingMergeListReqVo sellingMergeListReqVo = invPage.get(element.getMarketName());
+                ArrayList<String> list = new ArrayList<>(sellingMergeListReqVo.getInvId());
+                list.add(String.valueOf(element.getInvId()));
+                sellingMergeListReqVo.setInvId(list);
             } else {
-                map.put(element.getMarketName(), 1);    // 初次计数 1
-                SellingMergeListVO sellingPageReqVO1 = new SellingMergeListVO();
+                SellingMergeListReqVo sellingPageReqVO1 = new SellingMergeListReqVo();
                 sellingPageReqVO1.setMarketHashName(element.getMarketHashName());
                 sellingPageReqVO1.setIconUrl(element.getIconUrl());
                 sellingPageReqVO1.setSelType(element.getSelType());
@@ -478,18 +480,17 @@ public class SellingExtService {
                 sellingPageReqVO1.setMarketName(element.getMarketName());
                 sellingPageReqVO1.setStatus(element.getStatus());
                 sellingPageReqVO1.setTransferStatus(element.getTransferStatus());
-                invPages.add(sellingPageReqVO1);
+                sellingPageReqVO1.setInvId(Arrays.asList(String.valueOf(element.getInvId())));
+                invPage.put(element.getMarketName(),sellingPageReqVO1);
             }
         }
 
-        for (Map.Entry<String, Integer> key : map.entrySet()) {
-            for (SellingMergeListVO element : invPages) {
-                if (element.getMarketName().equals(key.getKey())) {
-                    element.setNumber(key.getValue());
-                }
-            }
+        List<SellingMergeListReqVo> sellingMergePage = new ArrayList<>();
+        for(Map.Entry<String,SellingMergeListReqVo> key : invPage.entrySet()){
+            sellingMergePage.add(key.getValue());
         }
-        return new PageResult<>(invPages, (long) sellingDOS.size());
+
+        return new PageResult<>(sellingMergePage, (long) sellingDOS.size());
     }
 }
 
