@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvMergeToSellPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.InvToMergeVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
@@ -21,6 +22,7 @@ import cn.iocoder.yudao.module.steam.service.SteamInvService;
 import cn.iocoder.yudao.module.steam.service.inv.InvService;
 import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.micrometer.core.instrument.binder.BaseUnits;
 import io.swagger.v3.oas.annotations.Operation;
@@ -87,38 +89,18 @@ public class AppInventorySearchController {
     /**
      * 入参：steamId 或者 userId
      *
-     * @param invPageReqVO
+//     * @param invToMergeVO
      */
-    @GetMapping("/mergeToSell")
-    @Operation(summary = "合并库存")
-    public CommonResult<PageResult<AppInvMergeToSellPageReqVO>> mergeToSell(@Valid InvPageReqVO invPageReqVO) {
-        // 访问本地库存
-        PageResult<AppInvPageReqVO> invPage1 = steamInvService.getInvPage1(invPageReqVO);
-        // 合并相同库存
-        return success(steamInvService.mergeInv(invPage1));
-    }
-
-
-//    // =================================
-//    //             测试  第一次插入库存
-//    // =================================
-//    @GetMapping("/firstGetFromSteam")
-//    @Operation(summary = "查询数据库的库存数据")
-//    public CommonResult searchFromSteam(@RequestParam Long id) throws JsonProcessingException {
-//        // 用户第一次登录查询库存  根据用户ID查找绑定的Steam账号ID
-//        BindUserDO bindUserDO = bindUserMapper.selectById(id);
-//        if (bindUserDO == null) {
-//            throw new ServiceException(-1, "用户未绑定Steam账号");
-//        }
-//        if (bindUserDO.getSteamPassword() == null) {
-//            throw new ServiceException(-1, "用户未设置Steam密码,原因：未上传ma文件");
-//        }
-//        // 从steam获取用户库存信息
-//        InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
-//        // 插入库存
-//        ioInvUpdateService.firstInsertInventory(inventoryDto,bindUserDO);
-//        return success(inventoryDto);
+//    @GetMapping("/mergeToSell")
+//    @Operation(summary = "合并库存")
+//    public CommonResult<AppInvMergeToSellPageReqVO> mergeToSell(@Valid InvToMergeVO invToMergeVO) {
+//        // 访问本地库存 筛选查询库存
+//        List<InvDO> invToMerge = ioInvUpdateService.getInvToMerge(invToMergeVO);
+//        // 将相同库存合并
+//        List<AppInvPageReqVO> allInvToMerge = steamInvService.getAllInvToMerge(invToMerge);
+//        return success(steamInvService.mergeInv(invToMerge));
 //    }
+
 
 
     // =================================
@@ -146,25 +128,22 @@ public class AppInventorySearchController {
         BindUserDO user = new BindUserDO();
         user.setSteamId(bindUserDO.getSteamId());
         user.setUserId(bindUserDO.getUserId());
+        user.setId(bindUserDO.getId());
         ioInvUpdateService.deleteInventory(user);
         // 插入库存 TODO 后期优化思路 copy插入库存方法在插入的时候比对Selling表中相同账户下的 AssetId ，有重复就不插入
         ioInvUpdateService.firstInsertInventory(inventoryDto, bindUserDO);
-        // 查询 Selling 表中的库存  TODO  报错注意此处查询条件
-        SellingPageReqVO sellingPageReqVO = new SellingPageReqVO();
-        sellingPageReqVO.setSteamId(bindUserDO.getSteamId());
-        sellingPageReqVO.setBindUserId(bindUserDO.getId());
-        sellingPageReqVO.setUserId(bindUserDO.getUserId());
-        List<SellingDO> sellingDOS = sellingMapper.selectPage(sellingPageReqVO).getList();
-        if(sellingDOS.isEmpty()){
+        List<InvDO> invDOS = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
+                .eq(InvDO::getSteamId, steamId)
+                .eq(InvDO::getBindUserId, bindUserDO.getId())
+                .eq(InvDO::getUserId, bindUserDO.getUserId())
+                .eq(InvDO::getTransferStatus, 1));
+        if (invDOS.isEmpty()){
             return success(inventoryDto);
         }
-        // 同步库存中的出售状态 （transferStatus）
-        for(SellingDO sellingDO: sellingDOS){
-            InvDO inv = new InvDO();
-            inv.setAssetid(sellingDO.getAssetid());
-            inv.setTransferStatus(sellingDO.getTransferStatus());
-            invMapper.update(inv,new LambdaQueryWrapperX<InvDO>().eq(InvDO::getAssetid,sellingDO.getAssetid()));
+        for(InvDO invDO : invDOS){
+            invMapper.delete(new LambdaQueryWrapperX<InvDO>().eq(InvDO::getAssetid,invDO.getAssetid()).eq(InvDO::getTransferStatus,0));
         }
+
         return success(inventoryDto);
     }
 }
