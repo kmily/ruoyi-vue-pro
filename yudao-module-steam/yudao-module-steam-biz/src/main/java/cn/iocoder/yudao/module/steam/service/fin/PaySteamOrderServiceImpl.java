@@ -33,7 +33,6 @@ import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
-import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
@@ -513,17 +512,12 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw exception(DEMO_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
 //        InvOrderDO invOrderDO = invOrderMapper.selectById(id);
-//        //获取卖家家钱包并进行打款
-//        PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(invOrderDO.getSellUserId(), invOrderDO.getSellUserType());
-//        payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(invOrderDO.getId()),
-//                PayWalletBizTypeEnum.STEAM_CASH, invOrderDO.getCommodityAmount());
-//        invOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
-//        invOrderMapper.updateById(invOrderDO);
+
         try{
             PaySteamOrderServiceImpl bean = SpringUtil.getBean(this.getClass());
             bean.tradeAsset(id);
         }catch (Exception e){
-            DevAccountUtils.tenantExecute(1l,()->{
+            DevAccountUtils.tenantExecute(1L,()->{
                 if(Objects.nonNull(invOrderDO)){
                     LoginUser loginUser=new LoginUser();
                     loginUser.setId(invOrderDO.getUserId());
@@ -536,16 +530,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         }
 
     }
-    @Async
-    public void setPayInvOrderServiceFee(InvOrderDO invOrderDO) {
 
-        PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(invOrderDO.getServiceFeeUserId(), invOrderDO.getServiceFeeUserType());
-        PayWalletTransactionDO payWalletTransactionDO = payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(invOrderDO.getId()),
-                PayWalletBizTypeEnum.INV_SERVICE_FEE, invOrderDO.getServiceFee());
-
-        invOrderMapper.updateById(new InvOrderDO().setId(invOrderDO.getId()).setServiceFeeRet(JacksonUtils.writeValueAsString(payWalletTransactionDO)));
-
-    }
 
     /**
      * 校验交易订单满足被支付的条件
@@ -683,19 +668,81 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     }
 
     @Override
-    public void closeInvOrder(Long id) {
-        InvOrderDO invOrder = getInvOrder(id);
+    public void closeInvOrder(Long invOrderId) {
+        InvOrderDO invOrder = getInvOrder(invOrderId);
         if(invOrder.getPayStatus()){
             throw new ServiceException(-1,"订单已支付不支持关闭");
         }
         PayOrderDO order = payOrderService.getOrder(invOrder.getPayOrderId());
         if (PayOrderStatusEnum.isClosed(order.getStatus())) {
-            invOrderMapper.updateById(new InvOrderDO().setId(id).setPayStatus(false).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus())
+            invOrderMapper.updateById(new InvOrderDO().setId(invOrderId).setPayStatus(false).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus())
                     .setPayOrderStatus(order.getStatus()));
             //释放库存
             SellingDO sellingDO = sellingMapper.selectById(invOrder.getSellId());
             sellingMapper.updateById(new SellingDO().setId(sellingDO.getId()).setTransferStatus(InvTransferStatusEnum.SELL.getStatus()));
             invPreviewExtService.markInvEnable(sellingDO.getMarketHashName());
+        }
+    }
+
+    /**
+     * 扣除商品的2%后退还买家
+     * @param invOrderId InvOrderId
+     */
+    @Override
+    @Transactional(rollbackFor = ServiceException.class)
+    public void damagesCloseInvOrder(Long invOrderId) {
+        InvOrderDO invOrder = getInvOrder(invOrderId);
+        if(invOrder.getPayStatus()){
+            throw new ServiceException(-1,"订单已支付不支持关闭");
+        }
+        PayOrderDO order = payOrderService.getOrder(invOrder.getPayOrderId());
+        if (PayOrderStatusEnum.isSuccess(order.getStatus())) {
+            Integer commodityAmount = invOrder.getCommodityAmount();
+            BigDecimal divide = new BigDecimal("2").divide(new BigDecimal("100"), BigDecimal.ROUND_HALF_UP);
+            int transferDamagesAmount = divide.multiply(new BigDecimal(commodityAmount.toString())).intValue();
+            int transferRefundAmount = commodityAmount - transferDamagesAmount;
+            invOrder.setTransferDamagesAmount(transferDamagesAmount);
+            invOrder.setTransferRefundAmount(transferRefundAmount);
+            invOrder.setTransferDamagesTime(LocalDateTime.now());
+            //打款违约金-打款到服务费用户
+            PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(invOrder.getServiceFeeUserId(), invOrder.getServiceFeeUserType());
+            PayWalletTransactionDO payWalletTransactionDO = payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(invOrder.getId()),
+                    PayWalletBizTypeEnum.INV_DAMAGES, invOrder.getServiceFee());
+            //获取买家钱包并进行退款
+            PayWalletDO orCreateWallet2 = payWalletService.getOrCreateWallet(invOrder.getUserId(), invOrder.getUserType());
+            PayWalletTransactionDO payWalletTransactionDO1 = payWalletService.addWalletBalance(orCreateWallet2.getId(), String.valueOf(invOrder.getId()),
+                    PayWalletBizTypeEnum.STEAM_REFUND, invOrder.getCommodityAmount());
+
+            List<PayWalletTransactionDO> payWalletTransactionDOS = Arrays.asList(payWalletTransactionDO, payWalletTransactionDO1);
+            invOrderMapper.updateById(new InvOrderDO().setId(invOrder.getId())
+                    .setTransferDamagesAmount(transferDamagesAmount)
+                    .setTransferRefundAmount(transferRefundAmount)
+                    .setTransferDamagesTime(LocalDateTime.now())
+                    .setTransferDamagesRet(JacksonUtils.writeValueAsString(payWalletTransactionDOS))
+            );
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = ServiceException.class)
+    public void cashInvOrder(Long invOrderId) {
+        InvOrderDO invOrder = getInvOrder(invOrderId);
+        if(invOrder.getPayStatus()){
+            throw new ServiceException(-1,"订单已支付不支持关闭");
+        }
+        PayOrderDO order = payOrderService.getOrder(invOrder.getPayOrderId());
+        if (PayOrderStatusEnum.isSuccess(order.getStatus())) {
+            //打款服务费
+            PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(invOrder.getServiceFeeUserId(), invOrder.getServiceFeeUserType());
+            PayWalletTransactionDO payWalletTransactionDO = payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(invOrder.getId()),
+                    PayWalletBizTypeEnum.INV_SERVICE_FEE, invOrder.getServiceFee());
+
+            invOrderMapper.updateById(new InvOrderDO().setId(invOrder.getId()).setServiceFeeRet(JacksonUtils.writeValueAsString(payWalletTransactionDO)));
+            //获取卖家家钱包并进行打款
+            PayWalletDO orCreateWallet2 = payWalletService.getOrCreateWallet(invOrder.getSellUserId(), invOrder.getSellUserType());
+            PayWalletTransactionDO payWalletTransactionDO1 = payWalletService.addWalletBalance(orCreateWallet2.getId(), String.valueOf(invOrder.getId()),
+                    PayWalletBizTypeEnum.STEAM_CASH, invOrder.getCommodityAmount());
+            invOrderMapper.updateById(new InvOrderDO().setId(invOrder.getId()).setSellCashRet(JacksonUtils.writeValueAsString(payWalletTransactionDO1)).setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus()));
         }
     }
 
