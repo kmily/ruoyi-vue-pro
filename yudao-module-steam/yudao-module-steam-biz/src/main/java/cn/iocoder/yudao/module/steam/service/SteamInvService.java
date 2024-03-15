@@ -424,7 +424,7 @@ public class SteamInvService {
             if(Objects.nonNull(invPage.get(element.getMarketName()))){
                 AppInvMergeToSellPageReqVO appInvMergeToSellPageReqVO = invPage.get(element.getMarketName());
                 ArrayList<String> strings = new ArrayList<>(appInvMergeToSellPageReqVO.getAssetIdList());
-                strings.add(element.getAssetid());
+                strings.add(Math.toIntExact(element.getId()),element.getAssetid());
                 appInvMergeToSellPageReqVO.setAssetIdList(strings);
             }else{
                 AppInvMergeToSellPageReqVO appInvPageReqVO = new AppInvMergeToSellPageReqVO();
