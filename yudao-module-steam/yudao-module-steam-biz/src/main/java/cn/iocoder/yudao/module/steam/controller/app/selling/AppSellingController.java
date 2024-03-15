@@ -82,6 +82,19 @@ public class AppSellingController {
         Integer integer = sellingExtService.changePrice(reqVo);
         return CommonResult.success(integer);
     }
+
+    @PostMapping("/batchChangePrice")
+    @Operation(summary = "批量改价")
+    @Idempotent(timeout = 3, timeUnit = TimeUnit.SECONDS, message = "操作太快，请稍后再试")
+    @PreAuthenticated
+    public CommonResult<String> batchChangePrice(@RequestBody @Valid BatchChangePriceReqVo reqVo) {
+        // 入参：id  price
+        // 查询 steam_inv
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        sellingExtService.batchChangePrice(reqVo,loginUser);
+        return CommonResult.success("改价成功");
+    }
+
     @GetMapping("/user/sellingUnMerge")
     @Operation(summary = "出售未合并")
     public CommonResult<PageResult<SellingRespVO>> sellingUnMerge(@Valid SellingPageReqVO sellingPageReqVO) {

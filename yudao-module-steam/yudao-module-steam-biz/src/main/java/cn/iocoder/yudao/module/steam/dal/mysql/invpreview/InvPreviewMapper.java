@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.*;
 
@@ -47,6 +48,8 @@ public interface InvPreviewMapper extends BaseMapperX<InvPreviewDO> {
                 .eqIfPresent(InvPreviewDO::getSelRarity, reqVO.getSelRarity())
                 .eqIfPresent(InvPreviewDO::getSelType, reqVO.getSelType())
                 .eqIfPresent(InvPreviewDO::getExistInv, reqVO.getExistInv())
+                .geIfPresent(InvPreviewDO::getMinPrice,reqVO.getMinPrice())
+                .leIfPresent(InvPreviewDO::getMinPrice,reqVO.getMaxPrice())
                 .orderByDesc(InvPreviewDO::getId));
     }
     default PageResult<InvPreviewDO> hotPage(InvPreviewPageReqVO reqVO) {
@@ -79,6 +82,8 @@ public interface InvPreviewMapper extends BaseMapperX<InvPreviewDO> {
                 .eqIfPresent(InvPreviewDO::getSelRarity, reqVO.getSelRarity())
                 .eqIfPresent(InvPreviewDO::getSelType, reqVO.getSelType())
                 .eqIfPresent(InvPreviewDO::getExistInv, reqVO.getExistInv())
+                .geIfPresent(InvPreviewDO::getMinPrice,reqVO.getMinPrice())
+                .leIfPresent(InvPreviewDO::getMinPrice,reqVO.getMaxPrice())
                 .orderByDesc(InvPreviewDO::getUpdateTime));
     }
 

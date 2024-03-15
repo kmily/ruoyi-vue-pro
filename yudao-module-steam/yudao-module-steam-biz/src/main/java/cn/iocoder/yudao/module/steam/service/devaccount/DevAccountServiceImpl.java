@@ -11,6 +11,7 @@ import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.app.devaccount.vo.AppDevAccountSaveReqVO;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
@@ -84,6 +85,9 @@ public class DevAccountServiceImpl implements DevAccountService {
     @Override
     public String apply(AppDevAccountSaveReqVO createReqVO) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        if(Objects.isNull(loginUser)){
+            throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
+        }
         createReqVO.setUserId(loginUser.getId());
 
         createReqVO.setUserType(loginUser.getUserType());
@@ -95,7 +99,7 @@ public class DevAccountServiceImpl implements DevAccountService {
             if (CommonStatusEnum.isDisable(devAccountDOS.get(0).getStatus())) {
                 throw exception(DEV_ACCOUNT_DISABLE);
             }
-            if(Objects.isNull(createReqVO.getApiPublicKey())){
+            if(!StringUtils.hasText(createReqVO.getApiPublicKey())){
                 throw exception(DEV_ACCOUNT_KEY);
             }
             DevAccountDO devAccountDO = devAccountDOS.get(0);
@@ -104,16 +108,16 @@ public class DevAccountServiceImpl implements DevAccountService {
             return devAccountDO.getId().toString();
         } else {
             //  新增
-            if(Objects.isNull(createReqVO.getIdNum())){
+            if(!StringUtils.hasText(createReqVO.getIdNum())){
                 throw exception(OpenApiCode.JACKSON_EXCEPTION);
             }
-            if(Objects.isNull(createReqVO.getTrueName())){
+            if(!StringUtils.hasText(createReqVO.getTrueName())){
                 throw exception(OpenApiCode.JACKSON_EXCEPTION);
             }
-            if(Objects.isNull(createReqVO.getApplyReason())){
+            if(!StringUtils.hasText(createReqVO.getApplyReason())){
                 throw exception(OpenApiCode.JACKSON_EXCEPTION);
             }
-            if(Validator.isCitizenId(createReqVO.getIdNum())){
+            if(!Validator.isCitizenId(createReqVO.getIdNum())){
                 throw exception(DEV_ACCOUNT_IDERROR);
             }
 //            createReqVO.setApiPublicKey(createReqVO.getApiPublicKey());
@@ -136,6 +140,9 @@ public class DevAccountServiceImpl implements DevAccountService {
     @Override
     public List<DevAccountDO> accountList() {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        if(Objects.isNull(loginUser)){
+            throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
+        }
         return devAccountMapper.selectList(new LambdaQueryWrapperX<DevAccountDO>()
                 .eq(DevAccountDO::getUserType, loginUser.getUserType())
                 .eq(DevAccountDO::getUserId, loginUser.getId())

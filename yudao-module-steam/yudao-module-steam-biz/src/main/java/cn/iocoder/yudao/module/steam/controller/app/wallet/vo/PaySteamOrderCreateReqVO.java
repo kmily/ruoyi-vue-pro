@@ -21,5 +21,10 @@ public class PaySteamOrderCreateReqVO implements Serializable {
     @Schema(description = "platform不能为空", requiredMode = Schema.RequiredMode.REQUIRED, example = "17682")
 //    @NotNull(message = "platform不能为空")
     private PlatFormEnum platform;
-
+    /**
+     * 商户订单号
+     */
+    @Schema(description = "steamId不能为空", requiredMode = Schema.RequiredMode.REQUIRED, example = "17682")
+    @NotNull(message = "商户订单号不能为空")
+    private String merchantNo;
 }
