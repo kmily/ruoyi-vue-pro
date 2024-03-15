@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppBindUserApiKeyReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppUnBindUserReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
@@ -117,6 +118,29 @@ public class SteamService {
             throw new ServiceException(-1,"无权限操作");
         }
         int i = bindUserMapper.deleteById(bindUserDO.getId());
+        if(i<0){
+            throw new ServiceException(-1,"操作失败");
+        }
+        return i;
+    }
+    /**
+     * 帐号绑定
+     * @param reqVO 解绑ID
+     * @return
+     */
+    public int changeWebApi(AppBindUserApiKeyReqVO reqVO) {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        if(Objects.isNull(loginUser)){
+            throw new ServiceException(OpenApiCode.ID_ERROR);
+        }
+        BindUserDO bindUserDO = bindUserMapper.selectById(reqVO.getBindId());
+        if(!bindUserDO.getUserId().equals(loginUser.getId())){
+            throw new ServiceException(-1,"无权限操作");
+        }
+        if(!bindUserDO.getUserType().equals(loginUser.getUserType())){
+            throw new ServiceException(-1,"无权限操作");
+        }
+        int i = bindUserMapper.updateById(new BindUserDO().setId(bindUserDO.getId()).setApiKey(reqVO.getApiKey()));
         if(i<0){
             throw new ServiceException(-1,"操作失败");
         }

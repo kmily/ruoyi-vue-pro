@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
+import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppBindUserApiKeyReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppBindUserMaFileReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppUnBindUserReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
@@ -95,6 +96,13 @@ public class AppBindUserController {
         MultipartFile file = appBindUserMaFileReqVO.getFile();
         steamService.bindMaFile(IoUtil.readBytes(file.getInputStream()),appBindUserMaFileReqVO.getPassword(),appBindUserMaFileReqVO.getBindUserId());
         return success("成功");
+    }
+    @PostMapping("/changeWebApi")
+    @Operation(summary = "解绑steam")
+    @PreAuthenticated
+    public CommonResult<Integer> changeWebApi(@RequestBody @Valid AppBindUserApiKeyReqVO reqVO)  {
+        int i = steamService.changeWebApi(reqVO);
+        return success(i);
     }
 
 }

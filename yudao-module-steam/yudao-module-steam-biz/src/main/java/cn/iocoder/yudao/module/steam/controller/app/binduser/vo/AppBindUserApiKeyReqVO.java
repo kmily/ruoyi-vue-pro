@@ -9,8 +9,11 @@ import javax.validation.constraints.NotNull;
 @Schema(description = "管理后台 -  用户解绑")
 @Data
 @ToString(callSuper = true)
-public class AppUnBindUserReqVO {
+public class AppBindUserApiKeyReqVO {
     @Schema(description = "bindId", example = "123456")
     @NotNull(message = "bindId不能为空")
     private Long bindId;
+    @Schema(description = "apiKey", example = "123456")
+    @NotNull(message = "apiKey不能为空")
+    private String apiKey;
 }
