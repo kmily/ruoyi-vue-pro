@@ -33,7 +33,6 @@ import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
-import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
@@ -518,7 +517,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             PaySteamOrderServiceImpl bean = SpringUtil.getBean(this.getClass());
             bean.tradeAsset(id);
         }catch (Exception e){
-            DevAccountUtils.tenantExecute(1l,()->{
+            DevAccountUtils.tenantExecute(1L,()->{
                 if(Objects.nonNull(invOrderDO)){
                     LoginUser loginUser=new LoginUser();
                     loginUser.setId(invOrderDO.getUserId());
