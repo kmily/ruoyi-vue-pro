@@ -99,6 +99,17 @@ public interface PaySteamOrderService {
      * @return 返回此sellId下有效订单列表
      */
     List<InvOrderDO> getExpOrder(Long sellId);
-
+    /**
+     * 违约关闭订单
+     *
+     * @param invOrderId InvOrderId
+     */
+    void damagesCloseInvOrder(Long invOrderId);
+    /**
+     * 订单打款给买家
+     *
+     * @param invOrderId InvOrderId
+     */
+    void cashInvOrder(Long invOrderId);
 
 }

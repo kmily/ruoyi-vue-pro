@@ -146,6 +146,10 @@ public class InvOrderDO extends BaseDO {
      */
     private String serviceFeeRet;
     /**
+     * 卖家收货转帐返回
+     */
+    private String sellCashRet;
+    /**
      * 购买平台
      * 枚举 {@link cn.iocoder.yudao.module.steam.enums.PlatFormEnum 对应的类}
      */
@@ -175,5 +179,9 @@ public class InvOrderDO extends BaseDO {
      * 交易违约判定时间
      */
     private LocalDateTime transferDamagesTime;
+    /**
+     * 交易违约判定时间
+     */
+    private String transferDamagesRet;
 
 }

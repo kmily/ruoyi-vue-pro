@@ -131,16 +131,13 @@ public class PayWalletServiceImpl implements  PayWalletService {
         // 2.1 扣除余额
         int updateCounts;
         switch (bizType) {
-            case PAYMENT: {
+            case PAYMENT:
+            case STEAM_PAY: {
                 updateCounts = walletMapper.updateWhenConsumption(payWallet.getId(), price);
                 break;
             }
             case RECHARGE_REFUND: {
                 updateCounts = walletMapper.updateWhenRechargeRefund(payWallet.getId(), price);
-                break;
-            }
-            case STEAM_PAY: {
-                updateCounts = walletMapper.updateWhenConsumption(payWallet.getId(), price);
                 break;
             }
             default: {
@@ -174,15 +171,12 @@ public class PayWalletServiceImpl implements  PayWalletService {
                 walletMapper.updateWhenConsumptionRefund(payWallet.getId(), price);
                 break;
             }
-            case RECHARGE: { // 充值更新
-                walletMapper.updateWhenRecharge(payWallet.getId(), price);
-                break;
-            }
-            case STEAM_CASH:{//steam收款
-                walletMapper.updateWhenRecharge(payWallet.getId(), price);
-                break;
-            }
-            case SERVICE_FEE:{//steam收款
+            case RECHARGE:
+            case STEAM_CASH:
+            case SERVICE_FEE:
+            case INV_SERVICE_FEE:
+            case INV_DAMAGES:
+            case STEAM_REFUND: {
                 walletMapper.updateWhenRecharge(payWallet.getId(), price);
                 break;
             }
