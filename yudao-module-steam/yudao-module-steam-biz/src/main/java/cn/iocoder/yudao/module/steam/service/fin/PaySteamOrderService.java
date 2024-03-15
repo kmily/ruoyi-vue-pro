@@ -84,7 +84,7 @@ public interface PaySteamOrderService {
      * 关闭订单,
      * 用于未支持的订单进行关闭,并释放库存
      *
-     * @param id 编号
+     * @param id InvOrderId
      */
     void closeInvOrder(Long id);
 

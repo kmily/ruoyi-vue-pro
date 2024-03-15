@@ -627,8 +627,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         invOrderMapper.updateById(new InvOrderDO().setId(id)
                 .setPayRefundId(payRefundId).setRefundAmount(invOrderDO.getCommodityAmount()));
         //释放库存
-        SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
-        closeInvOrder(sellingDO.getId());
+        closeInvOrder(id);
     }
 
     private InvOrderDO validateInvOrderCanRefund(Long id,LoginUser loginUser) {
@@ -762,7 +761,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         }
         // 1.2 校验退款订单匹配
         if (Objects.equals(invOrderDO.getPayRefundId(), payRefundId)) {
-            log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！order 数据是：{}]",
+            log.error("[validateInvOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！order 数据是：{}]",
                     id, payRefundId, toJsonString(invOrderDO));
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
         }
@@ -778,13 +777,13 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         }
         // 2.3 校验退款金额一致
         if (notEqual(payRefund.getRefundPrice(), invOrderDO.getPaymentAmount())) {
-            log.error("[validateDemoOrderCanRefunded][order({}) payRefund({}) 退款金额不匹配，请进行处理！order 数据是：{}，payRefund 数据是：{}]",
+            log.error("[validateInvOrderCanRefunded][order({}) payRefund({}) 退款金额不匹配，请进行处理！order 数据是：{}，payRefund 数据是：{}]",
                     id, payRefundId, toJsonString(invOrderDO), toJsonString(payRefund));
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_PRICE_NOT_MATCH);
         }
         // 2.4 校验退款订单匹配（二次）
         if (notEqual(payRefund.getMerchantOrderId(), id.toString())) {
-            log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！payRefund 数据是：{}]",
+            log.error("[validateInvOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！payRefund 数据是：{}]",
                     id, payRefundId, toJsonString(payRefund));
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
         }
