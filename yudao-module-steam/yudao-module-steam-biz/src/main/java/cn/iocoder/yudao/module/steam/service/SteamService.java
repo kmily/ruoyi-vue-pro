@@ -184,6 +184,7 @@ public class SteamService {
         }
         SteamWeb steamWeb=new SteamWeb(configService);
         bindUserDO.setSteamPassword(password);
+        bindUserDO.setMaFile(steamMaFile);
         if(steamWeb.checkLogin(bindUserDO)){
             bindUserDO.setLoginCookie(steamWeb.getCookieString());
         }

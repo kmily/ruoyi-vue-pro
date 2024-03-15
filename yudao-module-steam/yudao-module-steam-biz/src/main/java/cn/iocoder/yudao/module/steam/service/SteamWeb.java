@@ -101,9 +101,11 @@ public class SteamWeb {
                 return false;
             }
         }
-        if(bindUserDO.getLoginCookie().equals(this.cookieString)){
+        if(Objects.nonNull(bindUserDO.getLoginCookie()) && bindUserDO.getLoginCookie().equals(this.cookieString)){
+            log.info("cookie不需要更新");
             return false;
         }else{
+            log.info("cookie需要更新");
             return true;
         }
     }
