@@ -183,6 +183,8 @@ public class SteamService {
             throw new ServiceException(-1,"读取maFile失败，请检查后再试。");
         }
         SteamWeb steamWeb=new SteamWeb(configService);
+        bindUserDO.setSteamPassword(password);
+        bindUserDO.setMaFile(steamMaFile);
         if(steamWeb.checkLogin(bindUserDO)){
             bindUserDO.setLoginCookie(steamWeb.getCookieString());
         }
