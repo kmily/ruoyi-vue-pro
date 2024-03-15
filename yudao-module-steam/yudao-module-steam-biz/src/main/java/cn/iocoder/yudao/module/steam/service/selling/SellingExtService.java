@@ -6,24 +6,20 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
-import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.InvPageReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.invdesc.InvDescService;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
-import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewService;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +32,6 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * 在售饰品 Service 实现类
@@ -273,7 +268,7 @@ public class SellingExtService {
         long count1 = sellingDOInSelling.stream().filter(item -> Arrays.asList(
                 InvTransferStatusEnum.INORDER.getStatus(),
                 InvTransferStatusEnum.TransferFINISH.getStatus(),
-                InvTransferStatusEnum.OFFSHELF.getStatus(),
+                InvTransferStatusEnum.OFF_SALE.getStatus(),
                 InvTransferStatusEnum.TransferERROR.getStatus()).contains(item.getTransferStatus())).count();
 
         if (count1 > 0) {
@@ -304,7 +299,7 @@ public class SellingExtService {
                 .in(SellingDO::getTransferStatus, Arrays.asList(InvTransferStatusEnum.SELL.getStatus(),
                         InvTransferStatusEnum.INORDER.getStatus(),
                         InvTransferStatusEnum.TransferFINISH.getStatus(),
-                        InvTransferStatusEnum.OFFSHELF.getStatus(),
+                        InvTransferStatusEnum.OFF_SALE.getStatus(),
                         InvTransferStatusEnum.TransferERROR.getStatus()))
                 .eq(SellingDO::getInstanceid, invDO.getInstanceid())).stream().findFirst();
 
@@ -337,7 +332,6 @@ public class SellingExtService {
      * 批量修改价格
      *
      * @param reqVo
-     * @return
      */
 
     @Transactional(rollbackFor = ServiceException.class)

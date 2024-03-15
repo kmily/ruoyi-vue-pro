@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.steam.service.fin;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
-import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderListReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
@@ -14,9 +13,9 @@ import javax.validation.Valid;
 import java.util.List;
 
 /**
- * 示例订单 Service 接口
+ * 库存订单 PaySteamOrderService 接口
  *
- * @author 芋道源码
+ * @author glzaboy
  */
 public interface PaySteamOrderService {
     /**
@@ -53,8 +52,8 @@ public interface PaySteamOrderService {
 
     /**
      * 获得示例订单列表
-     * @param invOrderPageReqVO
-     * @return
+     * @param invOrderPageReqVO 订单入参
+     * @return 订单列表
      */
     PageResult<InvOrderResp> getInvOrderPageOrder(InvOrderPageReqVO invOrderPageReqVO);
     /**
@@ -88,13 +87,16 @@ public interface PaySteamOrderService {
      */
     void closeInvOrder(Long id);
 
-
+    /**
+     * 交易发货
+     * @param id 交易订单号 invOrderId
+     */
     void tradeAsset(Long id);
 
     /**
      * 获取当前sellId下的有效订单
-     * @param sellId
-     * @return
+     * @param sellId 出售ID
+     * @return 返回此sellId下有效订单列表
      */
     List<InvOrderDO> getExpOrder(Long sellId);
 

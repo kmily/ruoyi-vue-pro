@@ -21,7 +21,6 @@ public class InvOrderJob implements JobHandler {
     }
 
     @Override
-//    @TenantJob
     public String execute(String param) {
 
         Integer execute = TenantUtils.execute(1L, () -> steamService.autoCloseInvOrder());

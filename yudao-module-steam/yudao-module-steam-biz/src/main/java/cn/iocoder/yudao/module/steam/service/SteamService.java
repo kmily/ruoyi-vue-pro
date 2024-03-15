@@ -1,36 +1,31 @@
 package cn.iocoder.yudao.module.steam.service;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
-import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
-import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
-import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppUnBindUserReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
-import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
-import cn.iocoder.yudao.module.steam.service.steam.*;
+import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
+import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
+import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
+import cn.iocoder.yudao.module.steam.service.steam.SteamMaFile;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -61,8 +56,6 @@ public class SteamService {
 
     @Resource
     private InvMapper invMapper;
-    @Resource
-    private SteamInvService steamInvService;
 
     private PaySteamOrderService paySteamOrderService;
 
@@ -186,7 +179,6 @@ public class SteamService {
      * 验证用户是否已经被绑定
      * @param openApi steam open返回的信息
      * @return true 成功  false 失败
-     * @throws UnsupportedEncodingException 异常
      */
     public boolean verifyOpenApi(OpenApi openApi) {
         try{
