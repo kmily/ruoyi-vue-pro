@@ -47,6 +47,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
@@ -321,6 +322,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         return payOrder;
     }
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public CreateOrderResult createInvOrder(LoginUser loginUser, @Valid PaySteamOrderCreateReqVO reqVo) {
         CreateOrderResult createOrderResult=new CreateOrderResult();
         SellingDO sellingDO = sellingMapper.selectById(reqVo.getSellId());
@@ -424,7 +426,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 invOrderDO.setServiceFee(serviceFee.intValue());
             }
             BigDecimal bigDecimal2 = new BigDecimal(invOrderDO.getCommodityAmount());
-            BigDecimal add = bigDecimal2.add(serviceFee);
+            BigDecimal add = bigDecimal2.add(new BigDecimal(invOrderDO.getServiceFee()));
             invOrderDO.setPaymentAmount(add.intValue());
         }
 
@@ -695,7 +697,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         if(!invOrder.getPayStatus()){
             throw new ServiceException(-1,"不支付未支付的订单关闭");
         }
-        invOrderMapper.updateById(new InvOrderDO().setId(invOrderId).setPayStatus(false).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus()));
+        invOrderMapper.updateById(new InvOrderDO().setId(invOrderId).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus()));
             //释放库存
         SellingDO sellingDO = sellingMapper.selectById(invOrder.getSellId());
         sellingMapper.updateById(new SellingDO().setId(sellingDO.getId()).setTransferStatus(InvTransferStatusEnum.SELL.getStatus()));
@@ -710,26 +712,30 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     @Transactional(rollbackFor = ServiceException.class)
     public void damagesCloseInvOrder(Long invOrderId) {
         InvOrderDO invOrder = getInvOrder(invOrderId);
-        if(invOrder.getPayStatus()){
-            throw new ServiceException(-1,"订单已支付不支持关闭");
+        if(Objects.isNull(invOrder)){
+            throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
         }
+        if(!invOrder.getPayStatus()){
+            throw new ServiceException(-1,"订单未支付不支持退款");
+        }
+        closeInvOrder(invOrderId);
         PayOrderDO order = payOrderService.getOrder(invOrder.getPayOrderId());
         if (PayOrderStatusEnum.isSuccess(order.getStatus())) {
             Integer commodityAmount = invOrder.getCommodityAmount();
-            BigDecimal divide = new BigDecimal("2").divide(new BigDecimal("100"), BigDecimal.ROUND_HALF_UP);
+            BigDecimal divide = new BigDecimal("2").divide(new BigDecimal("100"), 2,RoundingMode.HALF_UP);
             int transferDamagesAmount = divide.multiply(new BigDecimal(commodityAmount.toString())).intValue();
             int transferRefundAmount = commodityAmount - transferDamagesAmount;
-            invOrder.setTransferDamagesAmount(transferDamagesAmount);
-            invOrder.setTransferRefundAmount(transferRefundAmount);
-            invOrder.setTransferDamagesTime(LocalDateTime.now());
+//            invOrder.setTransferDamagesAmount(transferDamagesAmount);
+//            invOrder.setTransferRefundAmount(transferRefundAmount);
+//            invOrder.setTransferDamagesTime(LocalDateTime.now());
             //打款违约金-打款到服务费用户
             PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(invOrder.getServiceFeeUserId(), invOrder.getServiceFeeUserType());
             PayWalletTransactionDO payWalletTransactionDO = payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(invOrder.getId()),
-                    PayWalletBizTypeEnum.INV_DAMAGES, invOrder.getServiceFee());
+                    PayWalletBizTypeEnum.INV_DAMAGES, transferDamagesAmount);
             //获取买家钱包并进行退款
             PayWalletDO orCreateWallet2 = payWalletService.getOrCreateWallet(invOrder.getUserId(), invOrder.getUserType());
             PayWalletTransactionDO payWalletTransactionDO1 = payWalletService.addWalletBalance(orCreateWallet2.getId(), String.valueOf(invOrder.getId()),
-                    PayWalletBizTypeEnum.STEAM_REFUND, invOrder.getCommodityAmount());
+                    PayWalletBizTypeEnum.STEAM_REFUND, transferRefundAmount);
 
             List<PayWalletTransactionDO> payWalletTransactionDOS = Arrays.asList(payWalletTransactionDO, payWalletTransactionDO1);
             invOrderMapper.updateById(new InvOrderDO().setId(invOrder.getId())
@@ -746,9 +752,13 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     @Transactional(rollbackFor = ServiceException.class)
     public void cashInvOrder(Long invOrderId) {
         InvOrderDO invOrder = getInvOrder(invOrderId);
-        if(invOrder.getPayStatus()){
-            throw new ServiceException(-1,"订单已支付不支持关闭");
+        if(Objects.isNull(invOrder)){
+            throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
         }
+        if(!invOrder.getPayStatus()){
+            throw new ServiceException(-1,"订单未支付不支持打款");
+        }
+        closeInvOrder(invOrderId);
         PayOrderDO order = payOrderService.getOrder(invOrder.getPayOrderId());
         if (PayOrderStatusEnum.isSuccess(order.getStatus())) {
             //打款服务费

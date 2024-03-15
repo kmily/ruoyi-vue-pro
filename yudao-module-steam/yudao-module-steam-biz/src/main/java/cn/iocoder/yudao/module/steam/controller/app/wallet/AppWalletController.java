@@ -142,4 +142,22 @@ public class AppWalletController {
         paySteamOrderService.refundInvOrder(loginUser,id, ServletUtils.getClientIP());
         return success(true);
     }
+    @PostMapping("/invOrder/damagesCloseInvOrder")
+    @Operation(summary = "退款并支付违约金") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
+    @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
+    @PreAuthenticated
+    public CommonResult<Boolean> damagesCloseInvOrder(@RequestParam("id") Long id) {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        paySteamOrderService.damagesCloseInvOrder(id);
+        return success(true);
+    }
+    @PostMapping("/invOrder/cashInvOrder")
+    @Operation(summary = "支付钱款给卖家") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
+    @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
+    @PreAuthenticated
+    public CommonResult<Boolean> cashInvOrder(@RequestParam("id") Long id) {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        paySteamOrderService.cashInvOrder(id);
+        return success(true);
+    }
 }
