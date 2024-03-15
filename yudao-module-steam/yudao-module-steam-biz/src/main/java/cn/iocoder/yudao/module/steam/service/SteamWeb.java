@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Cookie;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -94,7 +95,11 @@ public class SteamWeb {
         try{
             initApiKey();
         }catch (ServiceException e){
-            login(bindUserDO.getSteamPassword(),bindUserDO.getMaFile());
+            if(Objects.nonNull(bindUserDO.getSteamPassword()) && Objects.nonNull(bindUserDO.getMaFile())){
+                login(bindUserDO.getSteamPassword(),bindUserDO.getMaFile());
+            }else{
+                return false;
+            }
         }
         if(bindUserDO.getLoginCookie().equals(this.cookieString)){
             return false;
@@ -167,19 +172,38 @@ public class SteamWeb {
         }
         //set browserid
         Map<String, String> cookies = proxyResponseVo.getCookies();
-        String browserid = cookies.get("browserid");
-        if (Objects.nonNull(browserid)) {
-            this.browserid = Optional.of(browserid);
-            cookieString += ";browserid=" + this.browserid.get();
-        } else {
-            throw new ServiceException(-1, "获取浏览器ID失败");
-        }
-        String sessionid = cookies.get("sessionid");
-        if (Objects.nonNull(sessionid)) {
-            sessionId = Optional.of(sessionid);
-            cookieString += ";sessionid=" + sessionid;
-        } else {
-            throw new ServiceException(-1, "获取sesionID失败");
+        if(cookies.isEmpty()){
+            String[] split = cookieString.split(";");
+            for(int i=0;i<split.length;i++){
+                String[] split1 = split[i].split("=");
+                if(split1[0].trim().equals("browserid")){
+                    this.browserid = Optional.of(split1[1].trim());
+                }
+                if(split1[0].trim().equals("sessionid")){
+                    this.sessionId = Optional.of(split1[1].trim());
+                }
+            }
+            if(!sessionId.isPresent()){
+                throw new ServiceException(-1, "获取sessionID失败");
+            }
+            if(!browserid.isPresent()){
+                throw new ServiceException(-1, "获取浏览器ID失败");
+            }
+        }else{
+            String browserid = cookies.get("browserid");
+            if (Objects.nonNull(browserid)) {
+                this.browserid = Optional.of(browserid);
+                cookieString += ";browserid=" + this.browserid.get();
+            } else {
+                throw new ServiceException(-1, "获取浏览器ID失败");
+            }
+            String sessionid = cookies.get("sessionid");
+            if (Objects.nonNull(sessionid)) {
+                sessionId = Optional.of(sessionid);
+                cookieString += ";sessionid=" + sessionid;
+            } else {
+                throw new ServiceException(-1, "获取sessionID失败");
+            }
         }
 
         //提取用户名
