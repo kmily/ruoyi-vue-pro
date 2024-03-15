@@ -36,6 +36,7 @@ public class SteamWeb {
     /**
      * 登录后cookie信息
      */
+    @Getter
     private String cookieString = "";
     /**
      * webapikey

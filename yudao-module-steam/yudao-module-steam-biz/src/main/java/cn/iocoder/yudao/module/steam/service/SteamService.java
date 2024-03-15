@@ -171,6 +171,8 @@ public class SteamService {
         bindUserDO.setSteamPassword(password);
         bindUserDO.setMaFile(steamMaFile);
         bindUserDO.setTradeUrl(steamWeb.getTreadUrl().get());
+        bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
+        bindUserDO.setLoginCookie(steamWeb.getCookieString());
         if(steamWeb.getSteamName().isPresent()) {
             bindUserDO.setSteamName(steamWeb.getSteamName().get());
         }
