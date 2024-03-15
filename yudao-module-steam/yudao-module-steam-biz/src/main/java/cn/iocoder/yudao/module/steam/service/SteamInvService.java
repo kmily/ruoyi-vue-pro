@@ -429,7 +429,7 @@ public class SteamInvService {
             }else{
                 AppInvMergeToSellPageReqVO appInvPageReqVO = new AppInvMergeToSellPageReqVO();
                 appInvPageReqVO.setMarketName(element.getMarketName());
-                appInvPageReqVO.setAssetId(element.getAssetid());
+//                appInvPageReqVO.setAssetId(element.getAssetid());
                 appInvPageReqVO.setPrice(element.getPrice());
                 appInvPageReqVO.setIconUrl(element.getIconUrl());
                 appInvPageReqVO.setSelQuality(element.getSelQuality());
@@ -439,7 +439,7 @@ public class SteamInvService {
                 appInvPageReqVO.setSelItemset(element.getSelItemset());
                 appInvPageReqVO.setSelType(element.getSelType());
                 appInvPageReqVO.setId(element.getId());
-                appInvPageReqVO.setAssetIdList(Arrays.asList(element.getAssetid()));
+                appInvPageReqVO.setAssetIdList(Arrays.asList(String.valueOf(element.getId())));
                 invPage.put(element.getMarketName(),appInvPageReqVO);
             }
         }
