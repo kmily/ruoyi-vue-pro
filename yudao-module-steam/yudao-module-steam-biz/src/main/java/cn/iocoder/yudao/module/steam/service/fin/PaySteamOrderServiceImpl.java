@@ -606,6 +606,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void refundInvOrder(LoginUser loginUser,Long id, String userIp) {
         // 1. 校验订单是否可以退款
         InvOrderDO invOrderDO = validateInvOrderCanRefund(id,loginUser);
@@ -666,9 +667,8 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         invOrderMapper.updateById(new InvOrderDO().setId(id)
                 .setRefundTime(payRefund.getSuccessTime()).setPayOrderStatus(PayOrderStatusEnum.REFUND.getStatus()));
     }
-
     @Override
-    public void closeInvOrder(Long invOrderId) {
+    public void closeUnPayInvOrder(Long invOrderId) {
         InvOrderDO invOrder = getInvOrder(invOrderId);
         if(invOrder.getPayStatus()){
             throw new ServiceException(-1,"订单已支付不支持关闭");
@@ -682,6 +682,24 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             sellingMapper.updateById(new SellingDO().setId(sellingDO.getId()).setTransferStatus(InvTransferStatusEnum.SELL.getStatus()));
             invPreviewExtService.markInvEnable(sellingDO.getMarketHashName());
         }
+    }
+    @Override
+    public void closeInvOrder(Long invOrderId) {
+        InvOrderDO invOrder = getInvOrder(invOrderId);
+        if(invOrder.getSellCashStatus().equals(InvSellCashStatusEnum.CASHED.getStatus())){
+            throw new ServiceException(-1,"订单已经支付给卖家，不支持操作");
+        }
+        if(invOrder.getSellCashStatus().equals(InvSellCashStatusEnum.DAMAGES.getStatus())){
+            throw new ServiceException(-1,"订单已经支付违约金，不支持操作");
+        }
+        if(!invOrder.getPayStatus()){
+            throw new ServiceException(-1,"不支付未支付的订单关闭");
+        }
+        invOrderMapper.updateById(new InvOrderDO().setId(invOrderId).setPayStatus(false).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus()));
+            //释放库存
+        SellingDO sellingDO = sellingMapper.selectById(invOrder.getSellId());
+        sellingMapper.updateById(new SellingDO().setId(sellingDO.getId()).setTransferStatus(InvTransferStatusEnum.SELL.getStatus()));
+        invPreviewExtService.markInvEnable(sellingDO.getMarketHashName());
     }
 
     /**
@@ -719,6 +737,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                     .setTransferRefundAmount(transferRefundAmount)
                     .setTransferDamagesTime(LocalDateTime.now())
                     .setTransferDamagesRet(JacksonUtils.writeValueAsString(payWalletTransactionDOS))
+                    .setSellCashStatus(InvSellCashStatusEnum.DAMAGES.getStatus())
             );
         }
     }

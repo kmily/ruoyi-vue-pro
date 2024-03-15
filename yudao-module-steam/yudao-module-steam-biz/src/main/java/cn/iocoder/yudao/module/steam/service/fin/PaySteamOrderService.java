@@ -85,8 +85,14 @@ public interface PaySteamOrderService {
      *
      * @param id InvOrderId
      */
+    void closeUnPayInvOrder(Long id);
+    /**
+     * 关闭已经支付的订单,
+     * 主要用于后期交易失败时恢复库存
+     *
+     * @param id InvOrderId
+     */
     void closeInvOrder(Long id);
-
     /**
      * 交易发货
      * @param id 交易订单号 invOrderId

@@ -258,7 +258,7 @@ public class SteamService {
         log.info("invorder{}",invOrderDOS);
         Integer integer=0;
         for (InvOrderDO invOrderDO:invOrderDOS) {
-            paySteamOrderService.closeInvOrder(invOrderDO.getId());
+            paySteamOrderService.closeUnPayInvOrder(invOrderDO.getId());
             integer++;
         }
         return integer;
