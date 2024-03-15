@@ -12,6 +12,7 @@ public class AppInvPageReqVO extends InvPageReqVO {
 
     private String iconUrl;
     private String marketName;
+    private String marketHashName;
     private String classid;
     private String steamId;
     private Integer status;
@@ -21,6 +22,7 @@ public class AppInvPageReqVO extends InvPageReqVO {
     private Integer userType;
     private List<InventoryDto.DescriptionsDTOX.TagsDTO> tags;
     private Integer tradeable;
+
 
     // 分类查询字段
     /**

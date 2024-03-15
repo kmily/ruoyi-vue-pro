@@ -15,6 +15,7 @@ public class AppInvMergeToSellPageReqVO {
     private String iconUrl;
     // 名称
     private String marketName;
+    private String marketHashName;
     // 状态
     private Integer status;
     // 发货状态

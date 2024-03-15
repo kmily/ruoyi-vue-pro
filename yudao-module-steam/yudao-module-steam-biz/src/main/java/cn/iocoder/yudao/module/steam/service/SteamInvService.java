@@ -404,6 +404,7 @@ public class SteamInvService {
                 appInvPageReqVO1.setAssetid(invDO.getAssetid());
                 appInvPageReqVO1.setTags(map.get(invDO.getInvDescId()).getTags());
                 appInvPageReqVO1.setTradeable(map.get(invDO.getInvDescId()).getTradable());
+                appInvPageReqVO1.setMarketHashName(map.get(invDO.getInvDescId()).getMarketHashName());
                 appInvPageReqVO.add(appInvPageReqVO1);
             }
         }
@@ -443,6 +444,7 @@ public class SteamInvService {
                 appInvPageReqVO.setId(element.getId());
                 appInvPageReqVO.setTags(element.getTags());
                 appInvPageReqVO.setTradeable(element.getTradeable());
+                appInvPageReqVO.setMarketHashName(element.getMarketHashName());
                 appInvPageReqVO.setAssetIdList(Arrays.asList(String.valueOf(element.getId())));
                 invPage.put(element.getMarketName(),appInvPageReqVO);
             }
