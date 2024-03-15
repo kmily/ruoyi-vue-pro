@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.InvPageReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
@@ -96,6 +97,7 @@ public class SellingExtService {
         }
         for (InvDO item : invDOList) {
             Optional<BatchSellReqVo.Item> first = reqVo.getItems().stream().filter(i -> i.getId().equals(item.getId())).findFirst();
+            item.setPrice(invDOList.get(0).getPrice());
             if (!first.isPresent()) {
                 log.error("价格信息未查找到{},{}", item, reqVo.getItems());
                 throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
@@ -282,7 +284,7 @@ public class SellingExtService {
             item.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
             invMapper.updateById(item);
         }
-        for (SellingDO item : sellingDOInSelling) {
+            for (SellingDO item : sellingDOInSelling) {
             if (paySteamOrderService.getExpOrder(item.getId()).size() > 0) {
                 throw new ServiceException(-1, "商品交易中，不允许下架");
             }
