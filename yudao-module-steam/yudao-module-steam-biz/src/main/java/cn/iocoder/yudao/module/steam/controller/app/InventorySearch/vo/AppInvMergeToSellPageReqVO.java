@@ -32,6 +32,8 @@ public class AppInvMergeToSellPageReqVO {
     private List<InventoryDto.DescriptionsDTOX.TagsDTO> tags;
     // 是否可交易
     private Integer Tradeable;
+    // 自动发货价格
+    private String autoPrice;
 
     // 分类查询字段
     /**

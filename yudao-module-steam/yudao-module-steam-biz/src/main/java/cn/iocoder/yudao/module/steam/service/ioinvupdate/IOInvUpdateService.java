@@ -15,8 +15,10 @@ import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.scheduling.annotation.Async;
@@ -37,6 +39,7 @@ public class IOInvUpdateService {
 
     @Resource
     private InvDescMapper invDescMapper;
+
 
 //=======================================
 
@@ -69,7 +72,7 @@ public class IOInvUpdateService {
 
 
     /**
-     * 第一次插入库存
+     * 插入库存 (对应账户库存为空)
      */
     public void firstInsertInventory(InventoryDto inventoryDto, BindUserDO bindUserDO) {
         // inv 表入库
@@ -166,7 +169,9 @@ public class IOInvUpdateService {
             invDescId.setInstanceid(item.getInstanceid());
             invDescId.setClassid(item.getClassid());
             invDescId.setInvDescId(invDescDOS.get(0).getId());
-            invMapper.update(invDescId, new QueryWrapper<InvDO>().eq("instanceid", item.getInstanceid()).eq("classid", item.getClassid()));
+            invMapper.update(invDescId,new LambdaQueryWrapperX<InvDO>()
+                    .eq(InvDO::getInstanceid, invDescId.getInstanceid())
+                    .eq(InvDO::getClassid, invDescId.getClassid()));
         }
     }
 
@@ -178,15 +183,15 @@ public class IOInvUpdateService {
         InvPageReqVO invDO = new InvPageReqVO();
         invDO.setSteamId(bindUserDO.getSteamId());
         invDO.setUserId(bindUserDO.getUserId());
-
         // TODO 校验三个字段 或者（校验steamId 剩下两个字段二选一）
-        // 删除原有的 transferStatus != 0 的库存
-        List<InvDO> invDOS = invMapper.selectPage(invDO).getList();
-        for(InvDO deleteItem : invDOS){
-            if(deleteItem.getTransferStatus() == 0){
-                invMapper.deleteById(deleteItem.getId());
-            }
-        }
 
+        invMapper.delete(new LambdaQueryWrapperX<InvDO>().eq(InvDO::getSteamId, bindUserDO.getSteamId()).eq(InvDO::getUserId, bindUserDO.getUserId()));
     }
+
+    /**
+     * 查询最低售价
+     */
+//    public Map<String,Integer> getLowestSellingPrice(Map<String,Integer> map) {
+//        invPreviewMapper.select
+//    }
 }

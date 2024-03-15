@@ -8,15 +8,19 @@ import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.invdesc.vo.InvDescPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvMergeToSellPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPageReqVO;
 
+import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.LowestSellingPriceVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.inv.InvService;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
@@ -61,6 +65,9 @@ public class SteamInvService {
 
     @Resource
     private InvService invService;
+
+    @Resource
+    private InvPreviewMapper invPreviewMapper;
 
 
 
@@ -140,11 +147,11 @@ public class SteamInvService {
 //        List<AppInvMergeToSellPageReqVO> invPage = new ArrayList<>();
         // 统计每一个 markName 的个数，并插入invPage
         for(AppInvPageReqVO element : invPage1.getList()){
-            if(Objects.nonNull(invPage.get(element.getMarketName()))){
+            if(Objects.nonNull(invPage.get(element.getMarketName())) ){
                 AppInvMergeToSellPageReqVO appInvMergeToSellPageReqVO = invPage.get(element.getMarketName());
-                ArrayList<String> strings = new ArrayList<>(appInvMergeToSellPageReqVO.getAssetIdList());
-                strings.add(String.valueOf(element.getId()));
-                appInvMergeToSellPageReqVO.setAssetIdList(strings);
+                ArrayList<String> list = new ArrayList<>(appInvMergeToSellPageReqVO.getAssetIdList());
+                list.add(String.valueOf(element.getId()));
+                appInvMergeToSellPageReqVO.setAssetIdList(list);
             }else{
                 AppInvMergeToSellPageReqVO appInvPageReqVO = new AppInvMergeToSellPageReqVO();
                 appInvPageReqVO.setMarketName(element.getMarketName());
@@ -174,7 +181,23 @@ public class SteamInvService {
     }
 
 
+    /**
+     * 查询在售参考价
+     * 入参是库存的 MarketHashName
+     */
+//    public List<Map<String,Integer>> getLowestSellingPrice(LowestSellingPriceVO lowestSellingPriceVO){
+//        List<InvPreviewDO> invPreviewDOS = new ArrayList<>();
+//        List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
+//                .eq(InvPreviewDO::getMarketHashName, lowestSellingPriceVO.getMarketHashName()));
+//        AppInvMergeToSellPageReqVO priceVO = new LowestSellingPriceVO();
+//        for(InvPreviewDO item : invPreviewDOS){
+//            priceVO.setMarketHashName(item.getMarketHashName());
+//            priceVO.setAutoPrice(item.getAutoPrice());
+//        }
 
+
+//        return ;
+//    }
 
 }
 
