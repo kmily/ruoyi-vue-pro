@@ -828,7 +828,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             steamInvDto.setContextid(sellingDO.getContextid());
             steamInvDto.setInstanceid(sellingDO.getInstanceid());
             steamInvDto.setAppid(sellingDO.getAppid());
-            SteamTradeOfferResult trade = steamWeb.trade(steamInvDto, tradeUrl);
+            SteamTradeOfferResult trade = steamWeb.trade(steamInvDto, tradeUrl,"io661 订单号:"+invOrder.getOrderNo()+"商户号:"+invOrder.getMerchantNo());
             log.info("发货信息{}",trade);
             transferMsg.setTradeofferid(trade.getTradeofferid());
             invOrder.setTransferStatus(InvTransferStatusEnum.TransferFINISH.getStatus());

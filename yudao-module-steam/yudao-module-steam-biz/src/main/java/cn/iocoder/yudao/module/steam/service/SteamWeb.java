@@ -351,7 +351,7 @@ public class SteamWeb {
      * @param tradeUrl    接收方交易链接 如 https://steamcommunity.com/tradeoffer/new/?partner=1432096359&token=giLGhxtN
      * @return
      */
-    public SteamTradeOfferResult trade(SteamInvDto steamInvDto, String tradeUrl) {
+    public SteamTradeOfferResult trade(SteamInvDto steamInvDto, String tradeUrl,String msg) {
         try {
             URI uri = URI.create(tradeUrl);
             String query = uri.getQuery();
@@ -385,7 +385,7 @@ public class SteamWeb {
             themDTO.setReady(false);
             steamTradeOffer.setThem(themDTO);
             post.put("json_tradeoffer", objectMapper.writeValueAsString(steamTradeOffer));
-            post.put("tradeoffermessage", "交易测试" + LocalDateTime.now());
+            post.put("tradeoffermessage", msg+" 时间" + LocalDateTime.now());
             builder.form(post);
             Map<String, String> header = new HashMap<>();
             header.put("Accept-Language", "zh-CN,zh;q=0.9");

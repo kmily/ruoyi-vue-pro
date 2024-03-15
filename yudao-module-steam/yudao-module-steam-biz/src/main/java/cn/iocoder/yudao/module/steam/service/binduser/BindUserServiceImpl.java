@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.binduser.vo.BindUserPageRe
 import cn.iocoder.yudao.module.steam.controller.admin.binduser.vo.BindUserSaveReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -23,6 +24,7 @@ import static cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants.BIND_USER_N
  */
 @Service
 @Validated
+@Slf4j
 public class BindUserServiceImpl implements BindUserService {
 
     @Resource
@@ -77,11 +79,13 @@ public class BindUserServiceImpl implements BindUserService {
     @Override
     public void changeBindUserCookie(BindUserDO bindUserDO){
         if(Objects.isNull(bindUserDO.getId())){
-            throw new ServiceException(-1,"bindUserID为空");
+            log.error("更新用户登录账号出错");
+            return;
         }
         if(Objects.isNull(bindUserDO.getLoginCookie())){
-            throw new ServiceException(-1,"LoginCookie为空");
+            log.error("更新用户登录账号出错");
+            return;
         }
-        bindUserMapper.updateById(new BindUserDO().setUserId(bindUserDO.getId()).setLoginCookie(bindUserDO.getLoginCookie()));
+        bindUserMapper.updateById(new BindUserDO().setId(bindUserDO.getId()).setLoginCookie(bindUserDO.getLoginCookie()));
     }
 }
