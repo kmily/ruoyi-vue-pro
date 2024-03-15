@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
+import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
@@ -30,8 +31,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.util.*;
 
 /**
@@ -49,8 +48,14 @@ public class SteamService {
     }
     @Resource
     private BindUserMapper bindUserMapper;
-    @Autowired
+
     private ObjectMapper objectMapper;
+
+    @Autowired
+    public void setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
     @Resource
     private InvOrderMapper invOrderMapper;
 
@@ -74,6 +79,9 @@ public class SteamService {
      */
     public int bind(OpenApi openApi) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        if(Objects.isNull(loginUser)){
+            throw new ServiceException(OpenApiCode.ID_ERROR);
+        }
         // 校验OpenAPI  if
         verifyOpenApi(openApi);
         String steamId = getSteamId(openApi.getIdentity());
@@ -98,6 +106,9 @@ public class SteamService {
      */
     public int unBind(AppUnBindUserReqVO reqVO) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        if(Objects.isNull(loginUser)){
+            throw new ServiceException(OpenApiCode.ID_ERROR);
+        }
         BindUserDO bindUserDO = bindUserMapper.selectById(reqVO.getBindId());
         if(!bindUserDO.getUserId().equals(loginUser.getId())){
             throw new ServiceException(-1,"无权限操作");
@@ -113,7 +124,9 @@ public class SteamService {
     }
     public List<BindUserDO> steamList(){
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-
+        if(Objects.isNull(loginUser)){
+            throw new ServiceException(OpenApiCode.ID_ERROR);
+        }
         List<BindUserDO> bindUserDOS = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                 .eqIfPresent(BindUserDO::getUserId, loginUser.getId())
                 .orderByDesc(BindUserDO::getId));
@@ -125,6 +138,9 @@ public class SteamService {
     }
     public void bindMaFile(byte[] maFileJsonByte,String password,Integer bindUserId) throws JsonProcessingException {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        if(Objects.isNull(loginUser)){
+            throw new ServiceException(OpenApiCode.ID_ERROR);
+        }
         BindUserDO bindUserDO = bindUserMapper.selectById(bindUserId);
         if(Objects.isNull(bindUserDO)){
             throw new ServiceException(-1,"绑定失败，请检查后再试。");
@@ -216,7 +232,7 @@ public class SteamService {
                 throw new ServiceException(-1,"Steam openid 接口验证异常");
             }
         }catch (Exception e){
-            log.error("解析出错原因{}",e);
+            log.error("解析出错原因{}",e.getMessage());
             throw new ServiceException(-1,"Steam openid1 接口验证异常");
         }
     }
@@ -246,37 +262,6 @@ public class SteamService {
             integer++;
         }
         return integer;
-    }
-
-    /**
-     * 检测交易链接格式要求格式合法
-     * @param tradeUrl
-     * @return
-     */
-    public Boolean checkTradeUrlFormat(String tradeUrl) {
-        if(Objects.isNull(tradeUrl)){
-            throw new ServiceException(-1,"交易链接不合法");
-        }
-        SteamWeb steamWeb=new SteamWeb(configService);
-        URI uri = URI.create(tradeUrl);
-        String query = uri.getQuery();
-
-        try {
-            if(!tradeUrl.startsWith("https://steamcommunity.com/tradeoffer/new/")){
-                throw new ServiceException(-1,"交易链接不合法");
-            }
-            Map<String, String> query1 = steamWeb.parseQuery(query);
-            if(Objects.isNull(query1.get("partner"))){
-                throw new ServiceException(-1,"交易链接不合法");
-            }
-            if(Objects.isNull(query1.get("token"))){
-                throw new ServiceException(-1,"交易链接不合法");
-            }
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            throw new ServiceException(-1,"交易链接不合法");
-        }
-        return true;
     }
 
 }

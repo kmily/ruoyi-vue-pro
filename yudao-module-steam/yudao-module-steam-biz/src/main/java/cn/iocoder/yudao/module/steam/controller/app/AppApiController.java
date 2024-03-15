@@ -373,7 +373,7 @@ public class AppApiController {
     @PermitAll
     public ApiResult<String> detailDataQueryAplly(@RequestBody OpenApiReqVo<ApiDetailDataQueryApllyReqVo> openApiReqVo) {
         try {
-            ApiResult<String> execute = DevAccountUtils.tenantExecute(1l, () -> {
+            ApiResult<String> execute = DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 List<YouyouDetailsDO> detailsDOS = youyouDetailsMapper.selectList(new LambdaQueryWrapperX<YouyouDetailsDO>()
                         .eq(YouyouDetailsDO::getAppkey, devAccount.getUserName()));
@@ -449,7 +449,7 @@ public class AppApiController {
     @PermitAll
     public ApiResult<String> detailDataQueryResult(@RequestBody OpenApiReqVo<ApiDetailDataQueryResultReqVo> openApiReqVo) {
         try {
-            ApiResult<String> execute = DevAccountUtils.tenantExecute(1l, () -> {
+            ApiResult<String> execute = DevAccountUtils.tenantExecute(1L, () -> {
                 String applycode = openApiReqVo.getData().getApplyCode();
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 List<YouyouDetailsDO> detailsDOS = youyouDetailsMapper.selectList(new LambdaQueryWrapperX<YouyouDetailsDO>()
