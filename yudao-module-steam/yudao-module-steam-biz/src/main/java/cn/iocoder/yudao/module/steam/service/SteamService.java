@@ -183,7 +183,9 @@ public class SteamService {
             throw new ServiceException(-1,"读取maFile失败，请检查后再试。");
         }
         SteamWeb steamWeb=new SteamWeb(configService);
-        steamWeb.login(password,steamMaFile);
+        if(steamWeb.checkLogin(bindUserDO)){
+            bindUserDO.setLoginCookie(steamWeb.getCookieString());
+        }
         steamWeb.initTradeUrl();
         Optional<String> steamIdOptional = steamWeb.getSteamId();
         if(!steamIdOptional.isPresent()){
@@ -196,7 +198,6 @@ public class SteamService {
         bindUserDO.setMaFile(steamMaFile);
         bindUserDO.setTradeUrl(steamWeb.getTreadUrl().get());
         bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
-        bindUserDO.setLoginCookie(steamWeb.getCookieString());
         if(steamWeb.getSteamName().isPresent()) {
             bindUserDO.setSteamName(steamWeb.getSteamName().get());
         }

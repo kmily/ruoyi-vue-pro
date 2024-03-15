@@ -52,5 +52,9 @@ public interface BindUserService {
      * @return  steam用户绑定分页
      */
     PageResult<BindUserDO> getBindUserPage(BindUserPageReqVO pageReqVO);
-
+    /**
+     * 保存用户cookie 专用于steamweb更新
+     * @param bindUserDO
+     */
+    void changeBindUserCookie(BindUserDO bindUserDO);
 }

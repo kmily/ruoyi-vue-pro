@@ -40,6 +40,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.youyoudetails.YouyouDetailsMapper
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.*;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
+import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
@@ -131,6 +132,8 @@ public class AppApiController {
     private UUService uuService;
     @Resource
     private UUNotifyService uuNotifyService;
+    @Resource
+    private BindUserService bindUserService;
 
     /**
      * UU订单服务器回调
@@ -220,7 +223,9 @@ public class AppApiController {
                 }
                 BindUserDO bindUserDO = first.get();
                 SteamWeb steamWeb=new SteamWeb(configService);
-                steamWeb.login(bindUserDO.getSteamPassword(),bindUserDO.getMaFile());
+                if(steamWeb.checkLogin(bindUserDO)){
+                    bindUserService.changeBindUserCookie(new BindUserDO().setId(bindUserDO.getId()).setLoginCookie(steamWeb.getCookieString()));
+                }
                 steamWeb.initTradeUrl();
                 TradeUrlStatus tradeUrlStatus = steamWeb.checkTradeUrl(openApiReqVo.getData().getTradeLinks());
                 SteamWeb steamWeb1=new SteamWeb(configService);

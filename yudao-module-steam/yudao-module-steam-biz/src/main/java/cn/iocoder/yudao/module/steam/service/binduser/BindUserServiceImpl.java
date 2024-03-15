@@ -1,22 +1,20 @@
 package cn.iocoder.yudao.module.steam.service.binduser;
 
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.steam.controller.admin.binduser.vo.BindUserPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.binduser.vo.BindUserSaveReqVO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
+import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
-import cn.iocoder.yudao.module.steam.controller.admin.binduser.vo.*;
-import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-
-import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants.BIND_USER_NOT_EXISTS;
 
 /**
  *  steam用户绑定 Service 实现类
@@ -72,4 +70,18 @@ public class BindUserServiceImpl implements BindUserService {
         return bindUserMapper.selectPage(pageReqVO);
     }
 
+    /**
+     * 保存用户cookie 专用于steamweb更新
+     * @param bindUserDO
+     */
+    @Override
+    public void changeBindUserCookie(BindUserDO bindUserDO){
+        if(Objects.isNull(bindUserDO.getId())){
+            throw new ServiceException(-1,"bindUserID为空");
+        }
+        if(Objects.isNull(bindUserDO.getLoginCookie())){
+            throw new ServiceException(-1,"LoginCookie为空");
+        }
+        bindUserMapper.updateById(new BindUserDO().setUserId(bindUserDO.getId()).setLoginCookie(bindUserDO.getLoginCookie()));
+    }
 }

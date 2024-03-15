@@ -50,6 +50,7 @@ import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
+import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.steam.*;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
@@ -144,7 +145,8 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
 
     @Resource
     private PayNoRedisDAO noRedisDAO;
-
+    @Resource
+    private BindUserService bindUserService;
 
     public PaySteamOrderServiceImpl() {
     }
@@ -816,7 +818,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             BindUserDO bindUserDO1 = bindUserMapper.selectById(sellingDO.getBindUserId());
             //发货
             SteamWeb steamWeb=new SteamWeb(configService);
-            steamWeb.login(bindUserDO1.getSteamPassword(),bindUserDO1.getMaFile());
+            if(steamWeb.checkLogin(bindUserDO1)){
+                bindUserService.changeBindUserCookie(new BindUserDO().setId(bindUserDO1.getId()).setLoginCookie(steamWeb.getCookieString()));
+            }
             SteamInvDto steamInvDto=new SteamInvDto();
             steamInvDto.setAmount(sellingDO.getAmount());
             steamInvDto.setAssetid(sellingDO.getAssetid());

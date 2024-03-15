@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.steam.service;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
+import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.service.steam.*;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -84,12 +85,30 @@ public class SteamWeb {
     }
 
     /**
+     * 如果检测是否需要登录
+     * @param bindUserDO 登录用户信息
+     * @return true 用户cookie有更新， falsecookie没有更新   有更新需要及时保存起
+     */
+    public boolean checkLogin(BindUserDO bindUserDO){
+        this.cookieString=bindUserDO.getLoginCookie();
+        try{
+            initApiKey();
+        }catch (ServiceException e){
+            login(bindUserDO.getSteamPassword(),bindUserDO.getMaFile());
+        }
+        if(bindUserDO.getLoginCookie().equals(this.cookieString)){
+            return false;
+        }else{
+            return true;
+        }
+    }
+    /**
      * 登录steam网站
      *
      * @param passwd 密码
      * @param maFile ma文件结构
      */
-    public void login(String passwd, SteamMaFile maFile) {
+    private void login(String passwd, SteamMaFile maFile) {
         steamMaFile = maFile;
         //steam登录代理
         ConfigDO configByKey = configService.getConfigByKey("steam.proxy");
