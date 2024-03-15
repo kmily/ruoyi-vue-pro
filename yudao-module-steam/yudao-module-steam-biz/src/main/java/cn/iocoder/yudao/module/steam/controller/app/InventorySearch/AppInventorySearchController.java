@@ -101,7 +101,7 @@ public class AppInventorySearchController {
     // =================================
     @GetMapping("/firstGetFromSteam")
     @Operation(summary = "查询数据库的库存数据")
-    public void searchFromSteam(@RequestParam Long id) throws JsonProcessingException {
+    public CommonResult searchFromSteam(@RequestParam Long id) throws JsonProcessingException {
         // 用户第一次登录查询库存  根据用户ID查找绑定的Steam账号ID
         BindUserDO bindUserDO = bindUserMapper.selectById(id);
         if (bindUserDO == null) {
@@ -113,6 +113,7 @@ public class AppInventorySearchController {
         // 获取线上 steam 库存
         InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
         ioInvUpdateService.firstInsertInventory(inventoryDto,bindUserDO);
+        return success(inventoryDto);
     }
 
 
@@ -120,7 +121,7 @@ public class AppInventorySearchController {
     //             测试  更新库存
     // =================================
     @GetMapping("/updateFromSteam")
-    @Operation(summary = "查询数据库的库存数据")
+    @Operation(summary = "更新库存")
     @ResponseBody
     public CommonResult<InventoryDto> updateFromSteam(@RequestParam Long id) throws JsonProcessingException {
         // 用户第一次登录查询库存  根据用户ID查找绑定的Steam账号ID
@@ -143,6 +144,9 @@ public class AppInventorySearchController {
         sellingPageReqVO.setBindUserId(bindUserDO.getId());
         sellingPageReqVO.setUserId(bindUserDO.getUserId());
         List<SellingDO> sellingDOS = sellingMapper.selectPage(sellingPageReqVO).getList();
+        if(sellingDOS.isEmpty()){
+            return success(inventoryDto);
+        }
         InvPageReqVO inv = new InvPageReqVO();
         for(SellingDO sellingDO: sellingDOS){
             inv.setAssetid(sellingDO.getAssetid());
