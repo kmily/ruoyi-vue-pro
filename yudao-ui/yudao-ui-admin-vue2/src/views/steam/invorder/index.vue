@@ -5,37 +5,80 @@
       <el-form-item label="用户编号" prop="userId">
         <el-input v-model="queryParams.userId" placeholder="请输入用户编号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="已支付" prop="payStatus">
+      <el-form-item label="购买的steamId" prop="steamId">
+        <el-input v-model="queryParams.steamId" placeholder="请输入购买的steamId" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="是否已支付：[0:未支付 1:已经支付过]" prop="payStatus">
         <el-select v-model="queryParams.payStatus" placeholder="请选择是否已支付：[0:未支付 1:已经支付过]" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_BOOLEAN_STRING)"
-                       :key="dict.value" :label="dict.label" :value="dict.value"/>
+          <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
       <el-form-item label="支付订单编号" prop="payOrderId">
         <el-input v-model="queryParams.payOrderId" placeholder="请输入支付订单编号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
+      <el-form-item label="支付成功的支付渠道" prop="payChannelCode">
+        <el-input v-model="queryParams.payChannelCode" placeholder="请输入支付成功的支付渠道" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="订单支付时间" prop="payTime">
+        <el-date-picker v-model="queryParams.payTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
+      </el-form-item>
+      <el-form-item label="退款订单编号" prop="payRefundId">
+        <el-input v-model="queryParams.payRefundId" placeholder="请输入退款订单编号" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="退款金额，单位：分" prop="refundAmount">
+        <el-input v-model="queryParams.refundAmount" placeholder="请输入退款金额，单位：分" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="退款时间" prop="refundTime">
+        <el-date-picker v-model="queryParams.refundTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
+      </el-form-item>
+      <el-form-item label="创建时间" prop="createTime">
+        <el-date-picker v-model="queryParams.createTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
+      </el-form-item>
+      <el-form-item label="价格，单位：分" prop="paymentAmount">
+        <el-input v-model="queryParams.paymentAmount" placeholder="请输入价格，单位：分" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
       <el-form-item label="用户类型" prop="userType">
         <el-select v-model="queryParams.userType" placeholder="请选择用户类型" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.USER_TYPE)"
-                       :key="dict.value" :label="dict.label" :value="dict.value"/>
+          <el-option label="请选择字典生成" value="" />
         </el-select>
-      </el-form-item>
-      <el-form-item label="购买steamId" prop="steamId">
-        <el-input v-model="queryParams.steamId" placeholder="请输入购买的steamId" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="订单支付状态" prop="payOrderStatus">
         <el-select v-model="queryParams.payOrderStatus" placeholder="请选择订单支付状态" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.PAY_ORDER_STATUS)"
-                       :key="dict.value" :label="dict.label" :value="dict.value"/>
+          <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
-      <el-form-item label="sellID" prop="sellId">
+      <el-form-item label="服务费，单位分" prop="serviceFee">
+        <el-input v-model="queryParams.serviceFee" placeholder="请输入服务费，单位分" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="服务费率" prop="serviceFeeRate">
+        <el-input v-model="queryParams.serviceFeeRate" placeholder="请输入服务费率" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="优惠金额 分" prop="discountAmount">
+        <el-input v-model="queryParams.discountAmount" placeholder="请输入优惠金额 分" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="发货信息 json" prop="transferText">
+        <el-input v-model="queryParams.transferText" placeholder="请输入发货信息 json" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="发货状态" prop="transferStatus">
+        <el-select v-model="queryParams.transferStatus" placeholder="请选择发货状态" clearable size="small">
+          <el-option label="请选择字典生成" value="" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="库存表ID参考steam_sell" prop="sellId">
         <el-input v-model="queryParams.sellId" placeholder="请输入库存表ID参考steam_sell" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="商品描述ID" prop="invDescId">
+        <el-input v-model="queryParams.invDescId" placeholder="请输入商品描述ID" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="库存表ID" prop="invId">
+        <el-input v-model="queryParams.invId" placeholder="请输入库存表ID" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="卖家用户类型" prop="sellUserType">
         <el-select v-model="queryParams.sellUserType" placeholder="请选择卖家用户类型" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.USER_TYPE)"
-                       :key="dict.value" :label="dict.label" :value="dict.value"/>
+          <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
       <el-form-item label="卖家ID" prop="sellUserId">
@@ -46,23 +89,41 @@
           <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
-      <el-form-item label="退款金额，单位：分" prop="refundAmount">
-        <el-input v-model="queryParams.refundAmount" placeholder="请输入退款金额，单位：分" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="价格，单位：分" prop="paymentAmount">
-        <el-input v-model="queryParams.paymentAmount" placeholder="请输入价格，单位：分" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="服务费，单位分" prop="serviceFee">
-        <el-input v-model="queryParams.serviceFee" placeholder="请输入服务费，单位分" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="服务费率" prop="serviceFeeRate">
-        <el-input v-model="queryParams.serviceFeeRate" placeholder="请输入服务费率" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
       <el-form-item label="商品总额" prop="commodityAmount">
         <el-input v-model="queryParams.commodityAmount" placeholder="请输入商品总额" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="优惠金额 分" prop="discountAmount">
-        <el-input v-model="queryParams.discountAmount" placeholder="请输入优惠金额 分" clearable @keyup.enter.native="handleQuery"/>
+      <el-form-item label="提现手续费收款钱包" prop="serviceFeeUserId">
+        <el-input v-model="queryParams.serviceFeeUserId" placeholder="请输入提现手续费收款钱包" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="提现手续费收款人类型" prop="serviceFeeUserType">
+        <el-select v-model="queryParams.serviceFeeUserType" placeholder="请选择提现手续费收款人类型" clearable size="small">
+          <el-option label="请选择字典生成" value="" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="转帐接口返回" prop="serviceFeeRet">
+        <el-input v-model="queryParams.serviceFeeRet" placeholder="请输入转帐接口返回" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="购买平台" prop="platformName">
+        <el-input v-model="queryParams.platformName" placeholder="请输入购买平台" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="购买平台代码" prop="platformCode">
+        <el-input v-model="queryParams.platformCode" placeholder="请输入购买平台代码" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="订单号" prop="orderNo">
+        <el-input v-model="queryParams.orderNo" placeholder="请输入订单号" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="商户订单号" prop="merchantNo">
+        <el-input v-model="queryParams.merchantNo" placeholder="请输入商户订单号" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="交易失败时退还" prop="transferRefundAmount">
+        <el-input v-model="queryParams.transferRefundAmount" placeholder="请输入交易失败时退还" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="交易违约金" prop="transferDamagesAmount">
+        <el-input v-model="queryParams.transferDamagesAmount" placeholder="请输入交易违约金" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="交易违约判定时间" prop="transferDamagesTime">
+        <el-date-picker v-model="queryParams.transferDamagesTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -73,6 +134,10 @@
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
+        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="openForm(undefined)"
+                   v-hasPermi="['steam:inv-order:create']">新增</el-button>
+      </el-col>
+      <el-col :span="1.5">
         <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
                    v-hasPermi="['steam:inv-order:export']">导出</el-button>
       </el-col>
@@ -82,19 +147,17 @@
             <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
             <el-table-column label="订单编号" align="center" prop="id" />
       <el-table-column label="用户编号" align="center" prop="userId" />
-      <el-table-column label="已支付" align="center" prop="payStatus">
-        <template v-slot="scope">
-          <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="scope.row.payStatus" />
-        </template>
-      </el-table-column>
-      <el-table-column label="订单编号" align="center" prop="payOrderId" />
-      <el-table-column label="支付渠道" align="center" prop="payChannelCode" />
+      <el-table-column label="购买的steamId" align="center" prop="steamId" />
+      <el-table-column label="是否已支付：[0:未支付 1:已经支付过]" align="center" prop="payStatus" />
+      <el-table-column label="支付订单编号" align="center" prop="payOrderId" />
+      <el-table-column label="支付成功的支付渠道" align="center" prop="payChannelCode" />
       <el-table-column label="订单支付时间" align="center" prop="payTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.payTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="退款订单编号" align="center" prop="payRefundId" />
+      <el-table-column label="退款金额，单位：分" align="center" prop="refundAmount" />
       <el-table-column label="退款时间" align="center" prop="refundTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.refundTime) }}</span>
@@ -105,50 +168,41 @@
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="用户类型" align="center" prop="userType">
-        <template v-slot="scope">
-          <dict-tag :type="DICT_TYPE.USER_TYPE" :value="scope.row.userType" />
-        </template>
-      </el-table-column>
-      <el-table-column label="购买的steamId" align="center" prop="steamId" />
-      <el-table-column label="发货信息" align="center">
-        <template v-slot="scope">
-          {{scope.row.transferText.tradeofferid}}
-        </template>
-      </el-table-column>
-              <el-table-column label="发货错误信息" align="center">
-                <template v-slot="scope">
-                  {{scope.row.transferText.msg}}
-                </template>
-              </el-table-column>
-<!--      <el-table-column label="发货状态" align="center" prop="transferStatus" />-->
-      <el-table-column label="订单支付状态" align="center" prop="payOrderStatus">
-        <template v-slot="scope">
-          <dict-tag :type="DICT_TYPE.PAY_ORDER_STATUS" :value="scope.row.payOrderStatus" />
-        </template>
-      </el-table-column>
+      <el-table-column label="价格，单位：分" align="center" prop="paymentAmount" />
+      <el-table-column label="用户类型" align="center" prop="userType" />
+      <el-table-column label="订单支付状态" align="center" prop="payOrderStatus" />
+      <el-table-column label="服务费，单位分" align="center" prop="serviceFee" />
+      <el-table-column label="服务费率" align="center" prop="serviceFeeRate" />
+      <el-table-column label="优惠金额 分" align="center" prop="discountAmount" />
+      <el-table-column label="发货信息 json" align="center" prop="transferText" />
+      <el-table-column label="发货状态" align="center" prop="transferStatus" />
       <el-table-column label="库存表ID参考steam_sell" align="center" prop="sellId" />
       <el-table-column label="商品描述ID" align="center" prop="invDescId" />
       <el-table-column label="库存表ID" align="center" prop="invId" />
-      <el-table-column label="卖家用户类型" align="center" prop="sellUserType">
-        <template v-slot="scope">
-          <dict-tag :type="DICT_TYPE.USER_TYPE" :value="scope.row.sellUserType" />
-        </template>
-      </el-table-column>
+      <el-table-column label="卖家用户类型" align="center" prop="sellUserType" />
       <el-table-column label="卖家ID" align="center" prop="sellUserId" />
       <el-table-column label="卖家金额状态" align="center" prop="sellCashStatus" />
-      <el-table-column label="退款金额，单位：分" align="center" prop="refundAmount" />
-      <el-table-column label="价格，单位：分" align="center" prop="paymentAmount" />
-      <el-table-column label="服务费，单位分" align="center" prop="serviceFee" />
-      <el-table-column label="服务费率" align="center" prop="serviceFeeRate" />
       <el-table-column label="商品总额" align="center" prop="commodityAmount" />
-      <el-table-column label="优惠金额 分" align="center" prop="discountAmount" />
+      <el-table-column label="提现手续费收款钱包" align="center" prop="serviceFeeUserId" />
+      <el-table-column label="提现手续费收款人类型" align="center" prop="serviceFeeUserType" />
+      <el-table-column label="转帐接口返回" align="center" prop="serviceFeeRet" />
+      <el-table-column label="购买平台" align="center" prop="platformName" />
+      <el-table-column label="购买平台代码" align="center" prop="platformCode" />
+      <el-table-column label="订单号" align="center" prop="orderNo" />
+      <el-table-column label="商户订单号" align="center" prop="merchantNo" />
+      <el-table-column label="交易失败时退还" align="center" prop="transferRefundAmount" />
+      <el-table-column label="交易违约金" align="center" prop="transferDamagesAmount" />
+      <el-table-column label="交易违约判定时间" align="center" prop="transferDamagesTime" width="180">
+        <template v-slot="scope">
+          <span>{{ parseTime(scope.row.transferDamagesTime) }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
-          <el-button style="color: red" v-if="scope.row.payOrderStatus != 20 && scope.row.payStatus && !scope.row.transferText.tradeofferid" size="mini" type="text" @click="refundOrderClick(scope.row.id)"
-                     v-hasPermi="['steam:inv-order:update']">退款</el-button>
-          <el-button v-if="scope.row.payOrderStatus != 20 && scope.row.payStatus && !scope.row.transferText.tradeofferid" size="mini" type="text" @click="tradeAssetClick(scope.row.id)"
-                     v-hasPermi="['steam:inv-order:delete']">人工发货</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
+                     v-hasPermi="['steam:inv-order:update']">修改</el-button>
+          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
+                     v-hasPermi="['steam:inv-order:delete']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -191,23 +245,40 @@ export default {
                     pageNo: 1,
             pageSize: 10,
         userId: null,
+        steamId: null,
         payStatus: null,
         payOrderId: null,
+        payChannelCode: null,
+        payTime: [],
+        payRefundId: null,
+        refundAmount: null,
+        refundTime: [],
+        createTime: [],
+        paymentAmount: null,
         userType: null,
-        steamId: null,
+        payOrderStatus: null,
+        serviceFee: null,
+        serviceFeeRate: null,
+        discountAmount: null,
         transferText: null,
         transferStatus: null,
-        payOrderStatus: null,
         sellId: null,
+        invDescId: null,
+        invId: null,
         sellUserType: null,
         sellUserId: null,
         sellCashStatus: null,
-        refundAmount: null,
-        paymentAmount: null,
-        serviceFee: null,
-        serviceFeeRate: null,
         commodityAmount: null,
-        discountAmount: null,
+        serviceFeeUserId: null,
+        serviceFeeUserType: null,
+        serviceFeeRet: null,
+        platformName: null,
+        platformCode: null,
+        orderNo: null,
+        merchantNo: null,
+        transferRefundAmount: null,
+        transferDamagesAmount: null,
+        transferDamagesTime: [],
       },
             };
   },
@@ -264,4 +335,4 @@ export default {
     },
               }
 };
-</script>
+</script>

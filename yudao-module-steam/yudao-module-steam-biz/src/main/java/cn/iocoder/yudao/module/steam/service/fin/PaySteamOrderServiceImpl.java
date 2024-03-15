@@ -25,6 +25,7 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
+import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
@@ -59,6 +60,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
@@ -92,6 +94,8 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     private static final Long PAY_WITHDRAWAL_APP_ID = 10L;
     private static final Long WITHDRAWAL_ACCOUNT_ID = 251L;//UU收款账号ID
     private static final UserTypeEnum WITHDRAWAL_ACCOUNT_TYPE = UserTypeEnum.MEMBER;//UU收款账号ID
+
+    private final static String INV_ORDER_PREFIX="INV";
 
 
     @Resource
@@ -136,6 +140,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     @Resource
     private InvPreviewExtService invPreviewExtService;
 
+    @Resource
+    private PayNoRedisDAO noRedisDAO;
+
 
     public PaySteamOrderServiceImpl() {
     }
@@ -145,6 +152,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         CreateOrderResult createWithdrawalResult=new CreateOrderResult();
         WithdrawalDO withdrawalDO=new WithdrawalDO().setPayStatus(false)
                 .setWithdrawalPrice(createReqVO.getAmount()).setPaymentAmount(0)
+
                 .setServiceFee(0).setServiceFeeRate("0")
                 .setUserId(loginUser.getId()).setUserType(loginUser.getUserType())
                 .setRefundPrice(0).setWithdrawalInfo(createReqVO.getWithdrawalInfo())
@@ -312,18 +320,18 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         return payOrder;
     }
     @Override
-    public CreateOrderResult createInvOrder(LoginUser loginUser, PaySteamOrderCreateReqVO createReqVO) {
+    public CreateOrderResult createInvOrder(LoginUser loginUser, @Valid PaySteamOrderCreateReqVO reqVo) {
         CreateOrderResult createOrderResult=new CreateOrderResult();
-        SellingDO sellingDO = sellingMapper.selectById(createReqVO.getSellId());
+        SellingDO sellingDO = sellingMapper.selectById(reqVo.getSellId());
         InvDescDO invDescDO = invDescMapper.selectById(sellingDO.getInvDescId());
         // 1.1 获得商品
-        InvOrderDO invOrderDO = new InvOrderDO().setSellId(createReqVO.getSellId()).setSteamId(createReqVO.getSteamId())
+        InvOrderDO invOrderDO = new InvOrderDO().setOrderNo(noRedisDAO.generate(INV_ORDER_PREFIX)).setMerchantNo(reqVo.getMerchantNo())
+                .setSellId(reqVo.getSellId()).setSteamId(reqVo.getSteamId())
                 .setCommodityAmount(0).setDiscountAmount(0).setServiceFeeRate("0").setServiceFee(0)
                 .setPaymentAmount(0)
                 .setServiceFeeUserId(WITHDRAWAL_ACCOUNT_ID).setServiceFeeUserType(WITHDRAWAL_ACCOUNT_TYPE.getValue())
-                .setPlatformName(createReqVO.getPlatform().getName()).setPlatformCode(createReqVO.getPlatform().getCode())
-//                .setPrice(0)
-                .setSteamId(createReqVO.getSteamId())
+                .setPlatformName(reqVo.getPlatform().getName()).setPlatformCode(reqVo.getPlatform().getCode())
+                .setSteamId(reqVo.getSteamId())
                 .setPayOrderStatus(PayOrderStatusEnum.WAITING.getStatus())
                 .setTransferText(new TransferMsg()).setInvDescId(sellingDO.getInvDescId()).setInvId(sellingDO.getInvId())
                 //卖家信息
@@ -508,12 +516,12 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 PayWalletBizTypeEnum.STEAM_CASH, invOrderDO.getCommodityAmount());
         invOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
         invOrderMapper.updateById(invOrderDO);
-        try{
-            PaySteamOrderServiceImpl bean = SpringUtil.getBean(this.getClass());
-            bean.tradeAsset(invOrderDO.getId());
-        }catch (Exception e){
-            log.info("发货异常{}",e);
-        }
+//        try{
+//            PaySteamOrderServiceImpl bean = SpringUtil.getBean(this.getClass());
+//            bean.tradeAsset(invOrderDO.getId());
+//        }catch (Exception e){
+//            log.info("发货异常{}",e);
+//        }
 
     }
     @Async

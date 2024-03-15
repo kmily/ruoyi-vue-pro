@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
+import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
@@ -36,9 +37,11 @@ public class InvOrderDO extends BaseDO {
      */
     private Long userId;
     /**
+     * 购买的steamId
+     */
+    private String steamId;
+    /**
      * 是否已支付：[0:未支付 1:已经支付过]
-     *
-     * 枚举 {@link TODO infra_boolean_string 对应的类}
      */
     private Boolean payStatus;
     /**
@@ -58,18 +61,38 @@ public class InvOrderDO extends BaseDO {
      */
     private Long payRefundId;
     /**
+     * 退款金额，单位：分
+     */
+    private Integer refundAmount;
+    /**
      * 退款时间
      */
     private LocalDateTime refundTime;
+    /**
+     * 价格，单位：分
+     */
+    private Integer paymentAmount;
     /**
      * 用户类型
      * 枚举 {@link cn.iocoder.yudao.framework.common.enums.UserTypeEnum 对应的类}
      */
     private Integer userType;
     /**
-     * 购买的steamId
+     * 订单支付状态
      */
-    private String steamId;
+    private Integer payOrderStatus;
+    /**
+     * 服务费，单位分
+     */
+    private Integer serviceFee;
+    /**
+     * 服务费率
+     */
+    private String serviceFeeRate;
+    /**
+     * 优惠金额 分
+     */
+    private Integer discountAmount;
     /**
      * 发货信息 json
      */
@@ -80,12 +103,6 @@ public class InvOrderDO extends BaseDO {
      * 枚举 {@link cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum 对应的类}
      */
     private Integer transferStatus;
-    /**
-     * 订单支付状态
-     *
-     * 枚举 {@link cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum 对应的类}
-     */
-    private Integer payOrderStatus;
     /**
      * 库存表ID参考steam_sell
      */
@@ -113,30 +130,9 @@ public class InvOrderDO extends BaseDO {
      */
     private Integer sellCashStatus;
     /**
-     * 退款金额，单位：分
-     */
-    private Integer refundAmount;
-    /**
-     * 价格，单位：分
-     */
-    private Integer paymentAmount;
-    /**
-     * 服务费，单位分
-     */
-    private Integer serviceFee;
-    /**
-     * 服务费率
-     */
-    private String serviceFeeRate;
-    /**
      * 商品总额
      */
     private Integer commodityAmount;
-    /**
-     * 优惠金额 分
-     */
-    private Integer discountAmount;
-
     /**
      * 提现手续费收款钱包
      */
@@ -150,15 +146,34 @@ public class InvOrderDO extends BaseDO {
      */
     private String serviceFeeRet;
     /**
-     * 订单平台
+     * 购买平台
      * 枚举 {@link cn.iocoder.yudao.module.steam.enums.PlatFormEnum 对应的类}
      */
     private String platformName;
-
     /**
-     * 订单平台
+     * 购买平台代码
      * 枚举 {@link cn.iocoder.yudao.module.steam.enums.PlatFormEnum 对应的类}
      */
     private Integer platformCode;
+    /**
+     * 订单号
+     */
+    private String orderNo;
+    /**
+     * 商户订单号
+     */
+    private String merchantNo;
+    /**
+     * 交易失败时退还
+     */
+    private Integer transferRefundAmount;
+    /**
+     * 交易违约金
+     */
+    private Integer transferDamagesAmount;
+    /**
+     * 交易违约判定时间
+     */
+    private LocalDateTime transferDamagesTime;
 
 }
