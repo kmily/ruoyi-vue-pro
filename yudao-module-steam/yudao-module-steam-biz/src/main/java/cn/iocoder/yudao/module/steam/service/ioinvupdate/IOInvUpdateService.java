@@ -4,13 +4,19 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.InvToMergeVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
@@ -23,6 +29,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -40,7 +47,11 @@ public class IOInvUpdateService {
     @Resource
     private InvDescMapper invDescMapper;
 
+    @Resource
+    private BindUserMapper bindUserMapper;
 
+    @Resource
+    private SellingMapper sellingMapper;
 //=======================================
 
     //    测试 TODO  lgm
@@ -177,21 +188,50 @@ public class IOInvUpdateService {
 
 
     /**
-     * 删除库存  删除原有的 transferStatus != 0 的库存 插入新的库存，并比对 selling 表中的内容
+     * 删除库存  删除原有的 transferStatus = 0 的库存 插入新的库存，并比对 selling 表中的内容
      */
     public void deleteInventory( BindUserDO bindUserDO) {
         InvPageReqVO invDO = new InvPageReqVO();
         invDO.setSteamId(bindUserDO.getSteamId());
         invDO.setUserId(bindUserDO.getUserId());
+        invDO.setBindUserId(bindUserDO.getId());
         // TODO 校验三个字段 或者（校验steamId 剩下两个字段二选一）
-
-        invMapper.delete(new LambdaQueryWrapperX<InvDO>().eq(InvDO::getSteamId, bindUserDO.getSteamId()).eq(InvDO::getUserId, bindUserDO.getUserId()));
+//        SellingPageReqVO sellingPageReqVO = new SellingPageReqVO();
+//        sellingPageReqVO.setSteamId(bindUserDO.getSteamId());
+//        sellingPageReqVO.setBindUserId(bindUserDO.getId());
+//        sellingPageReqVO.setUserId(bindUserDO.getUserId());
+//        List<SellingDO> sellingDOS = sellingMapper.selectPage(sellingPageReqVO).getList();
+        invMapper.delete(new LambdaQueryWrapperX<InvDO>()
+                .eq(InvDO::getSteamId, invDO.getSteamId())
+                .eq(InvDO::getUserId, invDO.getUserId())
+                .eq(InvDO::getBindUserId, invDO.getBindUserId())
+                .eq(InvDO::getTransferStatus, "0"));
     }
 
     /**
-     * 查询最低售价
+     *  合并库存----查询库存方法  // TODO
      */
-//    public Map<String,Integer> getLowestSellingPrice(Map<String,Integer> map) {
-//        invPreviewMapper.select
-//    }
+    public List<InvDO> getInvToMerge(@RequestParam InvToMergeVO invToMergeVO) {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        List<BindUserDO> collect = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+                .eq(BindUserDO::getUserId, loginUser.getId())
+                .eq(BindUserDO::getUserType, loginUser.getUserType())
+                .eq(BindUserDO::getSteamId, invToMergeVO.getSteamId()));
+        if(Objects.isNull(collect) || collect.isEmpty()){
+            throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
+        }
+        BindUserDO bindUserDO = new BindUserDO();
+        bindUserDO.setSteamId(invToMergeVO.getSteamId());
+        bindUserDO.setId(collect.get(0).getId());
+        bindUserDO.setUserId(collect.get(0).getUserId());
+
+        // 查询库存
+        List<InvDO> invDOS = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
+                .eq(InvDO::getTransferStatus, invToMergeVO.getTransferStatus())
+                .eq(InvDO::getUserId, bindUserDO.getUserId())
+                .eq(InvDO::getSteamId, invToMergeVO.getSteamId())
+                .eq(InvDO::getBindUserId, bindUserDO.getId())
+                .eq(InvDO::getTransferStatus,invToMergeVO.getTransferStatus()));
+        return invDOS;
+    }
 }
