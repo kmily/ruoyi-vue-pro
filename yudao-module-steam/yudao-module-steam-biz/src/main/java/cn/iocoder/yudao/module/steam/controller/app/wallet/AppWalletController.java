@@ -10,6 +10,7 @@ import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
+import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
@@ -42,6 +43,8 @@ public class AppWalletController {
 
     @Resource
     private UUOrderService uUOrderService;
+    @Resource
+    private PayNoRedisDAO noRedisDAO;
 
     /**
      * 创建提现订单
@@ -70,10 +73,11 @@ public class AppWalletController {
     @PostMapping("/create/invOrder")
     @Operation(summary = "创建库存订单")
     @PreAuthenticated
-    public CommonResult<CreateOrderResult> createInvOrder(@Valid @RequestBody PaySteamOrderCreateReqVO createReqVO) {
+    public CommonResult<CreateOrderResult> createInvOrder(@RequestBody PaySteamOrderCreateReqVO reqVo) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        createReqVO.setPlatform(PlatFormEnum.WEB);
-        CreateOrderResult invOrder = paySteamOrderService.createInvOrder(loginUser, createReqVO);
+        reqVo.setPlatform(PlatFormEnum.WEB);
+        reqVo.setMerchantNo(noRedisDAO.generate("WEBINV"));
+        CreateOrderResult invOrder = paySteamOrderService.createInvOrder(loginUser, reqVo);
         return CommonResult.success(invOrder);
     }
     @PostMapping("/list/invOrder")

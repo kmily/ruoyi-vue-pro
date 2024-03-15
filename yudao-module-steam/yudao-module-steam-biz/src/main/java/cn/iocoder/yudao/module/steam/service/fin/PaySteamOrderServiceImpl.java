@@ -516,12 +516,12 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 PayWalletBizTypeEnum.STEAM_CASH, invOrderDO.getCommodityAmount());
         invOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
         invOrderMapper.updateById(invOrderDO);
-        try{
-            PaySteamOrderServiceImpl bean = SpringUtil.getBean(this.getClass());
-            bean.tradeAsset(invOrderDO.getId());
-        }catch (Exception e){
-            log.info("发货异常{}",e);
-        }
+//        try{
+//            PaySteamOrderServiceImpl bean = SpringUtil.getBean(this.getClass());
+//            bean.tradeAsset(invOrderDO.getId());
+//        }catch (Exception e){
+//            log.info("发货异常{}",e);
+//        }
 
     }
     @Async
