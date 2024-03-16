@@ -627,7 +627,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 .setReason("想退钱").setPrice(invOrderDO.getPaymentAmount()));// 价格信息
         // 2.3 更新退款单到 demo 订单
         invOrderMapper.updateById(new InvOrderDO().setId(id)
-                .setPayRefundId(payRefundId).setRefundAmount(invOrderDO.getCommodityAmount()));
+                .setPayRefundId(payRefundId).setRefundAmount(invOrderDO.getPaymentAmount()));
         //释放库存
         closeInvOrder(id);
     }
@@ -863,7 +863,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_NOT_FOUND);
         }
         // 1.2 校验退款订单匹配
-        if (Objects.equals(invOrderDO.getPayRefundId(), payRefundId)) {
+        if (!Objects.equals(invOrderDO.getPayRefundId(), payRefundId)) {
             log.error("[validateInvOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！order 数据是：{}]",
                     id, payRefundId, toJsonString(invOrderDO));
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);

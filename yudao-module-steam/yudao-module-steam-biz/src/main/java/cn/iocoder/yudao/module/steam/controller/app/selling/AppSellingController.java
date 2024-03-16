@@ -109,11 +109,11 @@ public class AppSellingController {
     }
     @GetMapping("/user/sellingMerge")
     @Operation(summary = "出售合并")
-    public CommonResult<PageResult<SellingMergeListVO>> sellingMerge(@Valid SellingPageReqVO sellingPageReqVO) {
+    public CommonResult<PageResult<SellingMergeListReqVo>> sellingMerge(@Valid SellingPageReqVO sellingPageReqVO) {
         SellingPageReqVO pageReqVO = new SellingPageReqVO();
         pageReqVO.setPageSize(20);
         pageReqVO.setPageNo(1);
-        PageResult<SellingMergeListVO> invPage = sellingExtService.sellingMerge(sellingPageReqVO);
+        PageResult<SellingMergeListReqVo> invPage = sellingExtService.sellingMerge(sellingPageReqVO);
         return CommonResult.success(invPage);
     }
 }

@@ -93,6 +93,7 @@ public class SteamWeb {
     public boolean checkLogin(BindUserDO bindUserDO){
         this.cookieString=bindUserDO.getLoginCookie();
         try{
+            steamMaFile = bindUserDO.getMaFile();
             initApiKey();
         }catch (ServiceException e){
             if(Objects.nonNull(bindUserDO.getSteamPassword()) && Objects.nonNull(bindUserDO.getMaFile())){
