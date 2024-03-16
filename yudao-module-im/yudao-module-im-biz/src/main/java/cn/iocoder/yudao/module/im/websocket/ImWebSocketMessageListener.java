@@ -75,8 +75,8 @@ public class ImWebSocketMessageListener implements WebSocketMessageListener<ImSe
 
         // 更新消息状态为成功
         imMessageService.updateMessageStatus(imMessageDO.getId(), ImMessageStatusEnum.SUCCESS.getStatus());
-        // 保存私人会话
-        imConversationService.savePrivateConversation(fromUserId, message.getReceiverId());
+        // 保存私人会话，只有在 client 操作会话（已读、置顶）时，才会延迟创建
+        //imConversationService.savePrivateConversation(fromUserId, message.getReceiverId());
     }
 
     /**
