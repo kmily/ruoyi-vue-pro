@@ -91,15 +91,15 @@ public class AppInventorySearchController {
      *
 //     * @param invToMergeVO
      */
-//    @GetMapping("/mergeToSell")
-//    @Operation(summary = "合并库存")
-//    public CommonResult<AppInvMergeToSellPageReqVO> mergeToSell(@Valid InvToMergeVO invToMergeVO) {
-//        // 访问本地库存 筛选查询库存
-//        List<InvDO> invToMerge = ioInvUpdateService.getInvToMerge(invToMergeVO);
-//        // 将相同库存合并
-//        List<AppInvPageReqVO> allInvToMerge = steamInvService.getAllInvToMerge(invToMerge);
-//        return success(steamInvService.mergeInv(invToMerge));
-//    }
+    @GetMapping("/mergeToSell")
+    @Operation(summary = "合并库存")
+    public CommonResult<List<AppInvPageReqVO>> mergeToSell(@Valid InvToMergeVO invToMergeVO) {
+        // 访问本地库存 按条件查询库存
+        List<InvDO> invToMerge = ioInvUpdateService.getInvToMerge(invToMergeVO);
+        // 将相同库存合并
+        List<AppInvPageReqVO> allInvToMerge = steamInvService.getAllInvToMerge(invToMerge);
+        return success(allInvToMerge);
+    }
 
 
 
@@ -109,7 +109,7 @@ public class AppInventorySearchController {
     @GetMapping("/updateFromSteam")
     @Operation(summary = "更新库存 入参steamid")
     @ResponseBody
-    public CommonResult<InventoryDto> updateFromSteam(@RequestParam String steamId) throws JsonProcessingException {
+    public CommonResult<InventoryDto> updateFromSteam(@RequestParam String steamId ,Long id) throws JsonProcessingException {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         List<BindUserDO> collect = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                 .eq(BindUserDO::getUserId, loginUser.getId())
@@ -122,6 +122,7 @@ public class AppInventorySearchController {
         bindUserDO.setSteamId(steamId);
         bindUserDO.setId(collect.get(0).getId());
         bindUserDO.setUserId(collect.get(0).getUserId());
+        bindUserDO.setUserType(collect.get(0).getUserType());
         // 获取线上 steam 库存
         InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
         // 删除原有库存中，getTransferStatus = 0 的库存
