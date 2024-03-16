@@ -300,7 +300,8 @@ public class SteamService {
     public Integer checkTransfer(){
         List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
                 .eq(InvOrderDO::getPayStatus, true)
-                .neIfPresent(InvOrderDO::getTransferStatus, InvTransferStatusEnum.TransferFINISH.getStatus())
+                .eqIfPresent(InvOrderDO::getTransferStatus, InvTransferStatusEnum.TransferFINISH.getStatus())
+                .eq(InvOrderDO::getSellCashStatus,InvSellCashStatusEnum.INIT.getStatus())
         );
         log.info("invorder{}",invOrderDOS);
         Integer integer=0;

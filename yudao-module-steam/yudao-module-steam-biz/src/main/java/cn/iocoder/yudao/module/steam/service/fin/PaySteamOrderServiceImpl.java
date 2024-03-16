@@ -769,7 +769,6 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         if(!invOrder.getPayStatus()){
             throw new ServiceException(-1,"订单未支付不支持打款");
         }
-        closeInvOrder(invOrderId);
         PayOrderDO order = payOrderService.getOrder(invOrder.getPayOrderId());
         if (PayOrderStatusEnum.isSuccess(order.getStatus())) {
             //打款服务费
@@ -915,7 +914,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         SellingDO sellingDO = sellingMapper.selectById(invOrder.getSellId());
         if(InvTransferStatusEnum.TransferFINISH.getStatus().equals(invOrder.getTransferStatus())){
             //发货完成时
-            BindUserDO bindUserDO = bindUserService.getBindUser(sellingDO.getId());
+            BindUserDO bindUserDO = bindUserService.getBindUser(sellingDO.getBindUserId());
             if(Objects.isNull(bindUserDO)){
                 throw new ServiceException(-1,"绑定用户已失效，无法检测。");
             }
@@ -936,7 +935,24 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 throw new ServiceException(-1,"无法获取用户apikey。");
             }
             TradeOfferInfo tradeOffInfo = getTradeOffInfo(bindUserDO, invOrder.getTransferText().getTradeofferid());
+            //steam返回HttpUtil.ProxyResponseVo(html={"response":{"offer":{"tradeofferid":"6840142603","accountid_other":1447022566,"message":"io661 订单号:INV202403161428161商户号:WEBINV202403161428161 时间2024-03-16T14:28:21.581","expiration_time":1711780108,"trade_offer_state":2,"items_to_give":[{"appid":730,"contextid":"2","assetid":"35965233242","classid":"4901046679","instanceid":"302028390","amount":"1","missing":false,"est_usd":"19"}],"is_our_offer":true,"time_created":1710570508,"time_updated":1710570511,"from_real_time_trade":false,"escrow_end_date":0,"confirmation_method":2,"eresult":1}}}, status=200, cookies={}, headers={connection=[keep-alive], content-type=[application/json; charset=UTF-8], date=[Sat, 16 Mar 2024 07:26:34 GMT], expires=[Sat, 16 Mar 2024 07:26:34 GMT], server=[nginx], vary=[Accept-Encoding], x-eresult=[1]})
+            //TradeOfferInfo(response=TradeOfferInfo.ResponseDTO(offer=TradeOfferInfo.ResponseDTO.OfferDTO(tradeofferid=6840143366, accountidOther=1447022566, message=io661 订单号:INV202403161428451商户号:WEBINV202403161428451 时间2024-03-16T14:28:46.093, expirationTime=1711780130, tradeOfferState=2, itemsToGive=[TradeOfferInfo.ResponseDTO.OfferDTO.ItemsToGiveDTO(appid=730, contextid=2, assetid=35965237262, classid=4901046679, instanceid=302028390, amount=1, missing=false, estUsd=19)], isOurOffer=true, timeCreated=1710570530, timeUpdated=1710570531, fromRealTimeTrade=false, escrowEndDate=0, confirmationMethod=2, eresult=1)))
+            //| TradeOfferInfo(response=TradeOfferInfo.ResponseDTO(offer=TradeOfferInfo.ResponseDTO.OfferDTO(tradeofferid=6840179532, accountidOther=1447022566, message=io661 订单号:INV202403161444071商户号:WEBINV202403161444071 时间2024-03-16T14:44:46.077, expirationTime=1711781090, tradeOfferState=3, itemsToGive=[TradeOfferInfo.ResponseDTO.OfferDTO.ItemsToGiveDTO(appid=730, contextid=2, assetid=35932930022, classid=4428807494, instanceid=188530170, amount=1, missing=true, estUsd=30)], isOurOffer=true, timeCreated=1710571490, timeUpdated=1710573937, fromRealTimeTrade=false, escrowEndDate=0, confirmationMethod=2, eresult=1)))
+            // | TradeOfferInfo(response=TradeOfferInfo.ResponseDTO(offer=TradeOfferInfo.ResponseDTO.OfferDTO(tradeofferid=6840143840, accountidOther=1447022566, message=io661 订单号:INV202403161429001商户号:WEBINV202403161429001 时间2024-03-16T14:29:01.417, expirationTime=1711780145, tradeOfferState=7, itemsToGive=[TradeOfferInfo.ResponseDTO.OfferDTO.ItemsToGiveDTO(appid=730, contextid=2, assetid=35681966414, classid=4901046679, instanceid=302028390, amount=1, missing=false, estUsd=19)], isOurOffer=true, timeCreated=1710570545, timeUpdated=1710573962, fromRealTimeTrade=false, escrowEndDate=0, confirmationMethod=2, eresult=1)))
             log.info("{}",tradeOffInfo);
+            if(tradeOffInfo.getResponse().getOffer().getTradeOfferState().intValue()==3){
+                //打款
+                cashInvOrder(invOrderId);
+            }else if(tradeOffInfo.getResponse().getOffer().getTradeOfferState().intValue()==7){
+                //打款
+                damagesCloseInvOrder(invOrderId);
+            }else{
+                LocalDateTime plus = invOrder.getPayTime().plus(Duration.ofHours(12));
+                if(LocalDateTime.now().compareTo(plus)==1){
+                    //时间是否超出12小时，超出则退款
+                    damagesCloseInvOrder(invOrderId);
+                }
+            }
         }
     }
     /**

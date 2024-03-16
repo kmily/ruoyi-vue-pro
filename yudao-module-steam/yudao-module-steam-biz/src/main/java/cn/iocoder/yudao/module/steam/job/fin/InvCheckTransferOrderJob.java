@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class InvTransferCheckOrderJob implements JobHandler {
+public class InvCheckTransferOrderJob implements JobHandler {
     private SteamService steamService;
     @Autowired
     public void setSteamService(SteamService steamService) {
