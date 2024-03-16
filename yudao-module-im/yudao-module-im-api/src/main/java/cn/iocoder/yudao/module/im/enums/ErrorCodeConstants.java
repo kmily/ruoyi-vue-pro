@@ -17,4 +17,10 @@ public interface ErrorCodeConstants {
 
     // ========== 消息 (1-040-300-000) ==========
     ErrorCode MESSAGE_NOT_EXISTS = new ErrorCode(1_040_300_000, "消息不存在");
+
+    // ========== 群 (1-040-400-000) ==========
+    ErrorCode GROUP_NOT_EXISTS = new ErrorCode(1_040_400_000, "群不存在");
+
+    // ========== 群成员 (1-040-500-000) ==========
+    ErrorCode GROUP_MEMBER_NOT_EXISTS = new ErrorCode(1_040_500_000, "群成员不存在");
 }

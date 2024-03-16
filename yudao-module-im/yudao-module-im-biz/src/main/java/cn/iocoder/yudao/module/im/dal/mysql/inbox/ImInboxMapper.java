@@ -13,7 +13,7 @@ import org.apache.ibatis.annotations.Mapper;
  * @author 芋道源码
  */
 @Mapper
-public interface InboxMapper extends BaseMapperX<ImInboxDO> {
+public interface ImInboxMapper extends BaseMapperX<ImInboxDO> {
 
     default PageResult<ImInboxDO> selectPage(ImInboxPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ImInboxDO>()

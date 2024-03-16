@@ -9,7 +9,7 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 
 import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.*;
 import cn.iocoder.yudao.module.im.dal.dataobject.inbox.ImInboxDO;
-import cn.iocoder.yudao.module.im.dal.mysql.inbox.InboxMapper;
+import cn.iocoder.yudao.module.im.dal.mysql.inbox.ImInboxMapper;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 import org.springframework.context.annotation.Import;
@@ -33,7 +33,7 @@ public class ImInboxServiceImplTest extends BaseDbUnitTest {
     private ImInboxServiceImpl inboxService;
 
     @Resource
-    private InboxMapper inboxMapper;
+    private ImInboxMapper imInboxMapper;
 
     @Test
     public void testCreateInbox_success() {
@@ -45,7 +45,7 @@ public class ImInboxServiceImplTest extends BaseDbUnitTest {
         // 断言
         assertNotNull(inboxId);
         // 校验记录的属性是否正确
-        ImInboxDO inbox = inboxMapper.selectById(inboxId);
+        ImInboxDO inbox = imInboxMapper.selectById(inboxId);
         assertPojoEquals(createReqVO, inbox, "id");
     }
 
@@ -53,7 +53,7 @@ public class ImInboxServiceImplTest extends BaseDbUnitTest {
     public void testUpdateInbox_success() {
         // mock 数据
         ImInboxDO dbInbox = randomPojo(ImInboxDO.class);
-        inboxMapper.insert(dbInbox);// @Sql: 先插入出一条存在的数据
+        imInboxMapper.insert(dbInbox);// @Sql: 先插入出一条存在的数据
         // 准备参数
         ImInboxSaveReqVO updateReqVO = randomPojo(ImInboxSaveReqVO.class, o -> {
             o.setId(dbInbox.getId()); // 设置更新的 ID
@@ -62,7 +62,7 @@ public class ImInboxServiceImplTest extends BaseDbUnitTest {
         // 调用
         inboxService.updateInbox(updateReqVO);
         // 校验是否更新正确
-        ImInboxDO inbox = inboxMapper.selectById(updateReqVO.getId()); // 获取最新的
+        ImInboxDO inbox = imInboxMapper.selectById(updateReqVO.getId()); // 获取最新的
         assertPojoEquals(updateReqVO, inbox);
     }
 
@@ -79,14 +79,14 @@ public class ImInboxServiceImplTest extends BaseDbUnitTest {
     public void testDeleteInbox_success() {
         // mock 数据
         ImInboxDO dbInbox = randomPojo(ImInboxDO.class);
-        inboxMapper.insert(dbInbox);// @Sql: 先插入出一条存在的数据
+        imInboxMapper.insert(dbInbox);// @Sql: 先插入出一条存在的数据
         // 准备参数
         Long id = dbInbox.getId();
 
         // 调用
         inboxService.deleteInbox(id);
        // 校验数据不存在了
-       assertNull(inboxMapper.selectById(id));
+       assertNull(imInboxMapper.selectById(id));
     }
 
     @Test
@@ -108,15 +108,15 @@ public class ImInboxServiceImplTest extends BaseDbUnitTest {
            o.setSequence(null);
            o.setCreateTime(null);
        });
-       inboxMapper.insert(dbInbox);
+       imInboxMapper.insert(dbInbox);
        // 测试 userId 不匹配
-       inboxMapper.insert(cloneIgnoreId(dbInbox, o -> o.setUserId(null)));
+       imInboxMapper.insert(cloneIgnoreId(dbInbox, o -> o.setUserId(null)));
        // 测试 messageId 不匹配
-       inboxMapper.insert(cloneIgnoreId(dbInbox, o -> o.setMessageId(null)));
+       imInboxMapper.insert(cloneIgnoreId(dbInbox, o -> o.setMessageId(null)));
        // 测试 sequence 不匹配
-       inboxMapper.insert(cloneIgnoreId(dbInbox, o -> o.setSequence(null)));
+       imInboxMapper.insert(cloneIgnoreId(dbInbox, o -> o.setSequence(null)));
        // 测试 createTime 不匹配
-       inboxMapper.insert(cloneIgnoreId(dbInbox, o -> o.setCreateTime(null)));
+       imInboxMapper.insert(cloneIgnoreId(dbInbox, o -> o.setCreateTime(null)));
        // 准备参数
        ImInboxPageReqVO reqVO = new ImInboxPageReqVO();
        reqVO.setUserId(null);

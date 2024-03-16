@@ -9,7 +9,7 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.*;
 import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationDO;
-import cn.iocoder.yudao.module.im.dal.mysql.conversation.ConversationMapper;
+import cn.iocoder.yudao.module.im.dal.mysql.conversation.ImConversationMapper;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 import org.springframework.context.annotation.Import;
@@ -33,7 +33,7 @@ public class ImConversationServiceImplTest extends BaseDbUnitTest {
     private ImConversationServiceImpl conversationService;
 
     @Resource
-    private ConversationMapper conversationMapper;
+    private ImConversationMapper imConversationMapper;
 
     @Test
     public void testCreateConversation_success() {
@@ -45,7 +45,7 @@ public class ImConversationServiceImplTest extends BaseDbUnitTest {
         // 断言
         assertNotNull(conversationId);
         // 校验记录的属性是否正确
-        ImConversationDO conversation = conversationMapper.selectById(conversationId);
+        ImConversationDO conversation = imConversationMapper.selectById(conversationId);
         assertPojoEquals(createReqVO, conversation, "id");
     }
 
@@ -53,7 +53,7 @@ public class ImConversationServiceImplTest extends BaseDbUnitTest {
     public void testUpdateConversation_success() {
         // mock 数据
         ImConversationDO dbConversation = randomPojo(ImConversationDO.class);
-        conversationMapper.insert(dbConversation);// @Sql: 先插入出一条存在的数据
+        imConversationMapper.insert(dbConversation);// @Sql: 先插入出一条存在的数据
         // 准备参数
         ImConversationSaveReqVO updateReqVO = randomPojo(ImConversationSaveReqVO.class, o -> {
             o.setId(dbConversation.getId()); // 设置更新的 ID
@@ -62,7 +62,7 @@ public class ImConversationServiceImplTest extends BaseDbUnitTest {
         // 调用
         conversationService.updateConversation(updateReqVO);
         // 校验是否更新正确
-        ImConversationDO conversation = conversationMapper.selectById(updateReqVO.getId()); // 获取最新的
+        ImConversationDO conversation = imConversationMapper.selectById(updateReqVO.getId()); // 获取最新的
         assertPojoEquals(updateReqVO, conversation);
     }
 
@@ -79,14 +79,14 @@ public class ImConversationServiceImplTest extends BaseDbUnitTest {
     public void testDeleteConversation_success() {
         // mock 数据
         ImConversationDO dbConversation = randomPojo(ImConversationDO.class);
-        conversationMapper.insert(dbConversation);// @Sql: 先插入出一条存在的数据
+        imConversationMapper.insert(dbConversation);// @Sql: 先插入出一条存在的数据
         // 准备参数
         Long id = dbConversation.getId();
 
         // 调用
         conversationService.deleteConversation(id);
        // 校验数据不存在了
-       assertNull(conversationMapper.selectById(id));
+       assertNull(imConversationMapper.selectById(id));
     }
 
     @Test
@@ -111,21 +111,21 @@ public class ImConversationServiceImplTest extends BaseDbUnitTest {
            o.setLastReadTime(null);
            o.setCreateTime(null);
        });
-       conversationMapper.insert(dbConversation);
+       imConversationMapper.insert(dbConversation);
        // 测试 userId 不匹配
-       conversationMapper.insert(cloneIgnoreId(dbConversation, o -> o.setUserId(null)));
+       imConversationMapper.insert(cloneIgnoreId(dbConversation, o -> o.setUserId(null)));
        // 测试 conversationType 不匹配
-       conversationMapper.insert(cloneIgnoreId(dbConversation, o -> o.setConversationType(null)));
+       imConversationMapper.insert(cloneIgnoreId(dbConversation, o -> o.setConversationType(null)));
        // 测试 targetId 不匹配
-       conversationMapper.insert(cloneIgnoreId(dbConversation, o -> o.setTargetId(null)));
+       imConversationMapper.insert(cloneIgnoreId(dbConversation, o -> o.setTargetId(null)));
        // 测试 no 不匹配
-       conversationMapper.insert(cloneIgnoreId(dbConversation, o -> o.setNo(null)));
+       imConversationMapper.insert(cloneIgnoreId(dbConversation, o -> o.setNo(null)));
        // 测试 pinned 不匹配
-       conversationMapper.insert(cloneIgnoreId(dbConversation, o -> o.setPinned(null)));
+       imConversationMapper.insert(cloneIgnoreId(dbConversation, o -> o.setPinned(null)));
        // 测试 lastReadTime 不匹配
-       conversationMapper.insert(cloneIgnoreId(dbConversation, o -> o.setLastReadTime(null)));
+       imConversationMapper.insert(cloneIgnoreId(dbConversation, o -> o.setLastReadTime(null)));
        // 测试 createTime 不匹配
-       conversationMapper.insert(cloneIgnoreId(dbConversation, o -> o.setCreateTime(null)));
+       imConversationMapper.insert(cloneIgnoreId(dbConversation, o -> o.setCreateTime(null)));
        // 准备参数
        ImConversationPageReqVO reqVO = new ImConversationPageReqVO();
        reqVO.setUserId(null);

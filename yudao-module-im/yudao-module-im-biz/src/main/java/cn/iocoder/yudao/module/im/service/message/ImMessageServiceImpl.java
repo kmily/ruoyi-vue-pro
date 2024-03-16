@@ -76,18 +76,22 @@ public class ImMessageServiceImpl implements ImMessageService {
 
 
     @Override
-    public ImMessageDO savePrivateMessage(ImSendMessage message, Long senderId) {
+    public ImMessageDO savePrivateMessage(ImSendMessage message, Long fromUserId) {
+        return saveImMessageDO(message, fromUserId);
+    }
+
+    private ImMessageDO saveImMessageDO(ImSendMessage message, Long fromUserId) {
         ImMessageDO imMessageDO = new ImMessageDO();
         imMessageDO.setClientMessageId(message.getClientMessageId());
-        imMessageDO.setSenderId(senderId);
+        imMessageDO.setSenderId(fromUserId);
         imMessageDO.setReceiverId(message.getReceiverId());
         //查询发送人昵称和发送人头像
-        AdminUserRespDTO user = adminUserApi.getUser(senderId);
+        AdminUserRespDTO user = adminUserApi.getUser(fromUserId);
         imMessageDO.setSenderNickname(user.getNickname());
         imMessageDO.setSenderAvatar(user.getAvatar());
         imMessageDO.setConversationType(message.getConversationType());
         imMessageDO.setContentType(message.getContentType());
-        imMessageDO.setConversationNo(senderId + "_" + message.getReceiverId());
+        imMessageDO.setConversationNo(fromUserId + "_" + message.getReceiverId());
         imMessageDO.setContent(message.getContent());
         //消息来源 100-用户发送；200-系统发送（一般是通知）；不能为空
         imMessageDO.setSendFrom(100);
@@ -106,6 +110,11 @@ public class ImMessageServiceImpl implements ImMessageService {
         imMessageDO.setId(messageId);
         imMessageDO.setMessageStatus(messageStatus);
         imMessageMapper.updateById(imMessageDO);
+    }
+
+    @Override
+    public ImMessageDO saveGroupMessage(ImSendMessage message, Long fromUserId) {
+        return saveImMessageDO(message, fromUserId);
     }
 
 }

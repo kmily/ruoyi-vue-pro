@@ -69,4 +69,12 @@ public interface ImMessageService {
      * @param messageStatus 消息状态
      */
     void updateMessageStatus(Long messageId, Integer messageStatus);
+
+    /**
+     * 保存群聊消息
+     * @param message 消息
+     * @param fromUserId 发送者用户ID
+     * @return id
+     */
+    ImMessageDO saveGroupMessage(ImSendMessage message, Long fromUserId);
 }
