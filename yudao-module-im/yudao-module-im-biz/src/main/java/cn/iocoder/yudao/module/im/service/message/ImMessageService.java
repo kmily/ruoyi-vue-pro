@@ -60,7 +60,7 @@ public interface ImMessageService {
      * @param fromUserId    发送人编号
      * @return id
      */
-    Long savePrivateMessage(ImSendMessage imSendMessage, Long fromUserId);
+    ImMessageDO savePrivateMessage(ImSendMessage imSendMessage, Long fromUserId);
 
     /**
      * 更新消息状态

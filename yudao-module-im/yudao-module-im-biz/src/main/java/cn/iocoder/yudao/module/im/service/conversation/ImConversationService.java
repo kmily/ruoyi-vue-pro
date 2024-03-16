@@ -52,4 +52,11 @@ public interface ImConversationService {
     PageResult<ImConversationDO> getConversationPage(ImConversationPageReqVO pageReqVO);
 
 
+    /**
+     * 保存私聊会话
+     *
+     * @param fromUserId 发送者
+     * @param receiverId 接收者
+     */
+    void savePrivateConversation(Long fromUserId, Long receiverId);
 }

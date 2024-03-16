@@ -24,7 +24,7 @@ public class ImConversationSaveReqVO {
 
     @Schema(description = "单聊时，用户编号；群聊时，群编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "21454")
     @NotEmpty(message = "单聊时，用户编号；群聊时，群编号不能为空")
-    private String targetId;
+    private Long targetId;
 
     @Schema(description = "会话标志 单聊：s_{userId}_{targetId}，需要排序 userId 和 targetId 群聊：g_groupId", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "会话标志 单聊：s_{userId}_{targetId}，需要排序 userId 和 targetId 群聊：g_groupId不能为空")

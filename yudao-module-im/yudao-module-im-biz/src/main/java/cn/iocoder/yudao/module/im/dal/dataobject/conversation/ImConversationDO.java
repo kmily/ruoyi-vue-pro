@@ -39,7 +39,7 @@ public class ImConversationDO extends BaseDO {
     /**
      * 单聊时，用户编号；群聊时，群编号
      */
-    private String targetId;
+    private Long targetId;
     /**
      * 会话标志 单聊：s_{userId}_{targetId}，需要排序 userId 和 targetId 群聊：g_groupId
      */

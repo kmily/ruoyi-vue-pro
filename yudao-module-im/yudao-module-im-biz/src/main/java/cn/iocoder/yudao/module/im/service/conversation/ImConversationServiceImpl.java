@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversatio
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationDO;
 import cn.iocoder.yudao.module.im.dal.mysql.conversation.ConversationMapper;
+import cn.iocoder.yudao.module.im.enums.conversation.ImConversationTypeEnum;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -65,6 +67,30 @@ public class ImConversationServiceImpl implements ImConversationService {
     @Override
     public PageResult<ImConversationDO> getConversationPage(ImConversationPageReqVO pageReqVO) {
         return conversationMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public void savePrivateConversation(Long fromUserId, Long receiverId) {
+        // 创建并保存会话
+        createAndSaveConversation(fromUserId, receiverId);
+        createAndSaveConversation(receiverId, fromUserId);
+    }
+
+    private void createAndSaveConversation(Long userId, Long targetId) {
+        // 创建会话
+        ImConversationDO conversation = new ImConversationDO();
+        conversation.setUserId(userId);
+        conversation.setConversationType(ImConversationTypeEnum.PRIVATE.getType());
+        conversation.setTargetId(targetId);
+        conversation.setNo("s_" + userId + "_" + targetId);
+        conversation.setPinned(false);
+
+        // 根据 no 查询是否存在,不存在则新增
+        QueryWrapper<ImConversationDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("no", conversation.getNo());
+        if (conversationMapper.selectOne(queryWrapper) == null) {
+            conversationMapper.insert(conversation);
+        }
     }
 
 }

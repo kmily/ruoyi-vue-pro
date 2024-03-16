@@ -13,7 +13,8 @@ import lombok.Getter;
 public enum ImConversationTypeEnum {
 
     PRIVATE(1, "单聊"),
-    GROUP(2, "群聊");
+    GROUP(2, "群聊"),
+    NOTICE(4, "通知会话");
 
     /**
      * 类型

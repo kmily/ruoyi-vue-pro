@@ -76,24 +76,25 @@ public class ImMessageServiceImpl implements ImMessageService {
 
 
     @Override
-    public Long savePrivateMessage(ImSendMessage message, Long senderId) {
-        ImMessageSaveReqVO imMessageSaveReqVO = new ImMessageSaveReqVO();
-        imMessageSaveReqVO.setClientMessageId(message.getClientMessageId());
-        imMessageSaveReqVO.setSenderId(senderId);
-        imMessageSaveReqVO.setReceiverId(message.getReceiverId());
+    public ImMessageDO savePrivateMessage(ImSendMessage message, Long senderId) {
+        ImMessageDO imMessageDO = new ImMessageDO();
+        imMessageDO.setClientMessageId(message.getClientMessageId());
+        imMessageDO.setSenderId(senderId);
+        imMessageDO.setReceiverId(message.getReceiverId());
         //查询发送人昵称和发送人头像
         AdminUserRespDTO user = adminUserApi.getUser(senderId);
-        imMessageSaveReqVO.setSenderNickname(user.getNickname());
-        imMessageSaveReqVO.setSenderAvatar(user.getAvatar());
-        imMessageSaveReqVO.setConversationType(message.getConversationType());
-        imMessageSaveReqVO.setContentType(message.getContentType());
-        imMessageSaveReqVO.setConversationNo(senderId + "_" + message.getReceiverId());
-        imMessageSaveReqVO.setContent(message.getContent());
+        imMessageDO.setSenderNickname(user.getNickname());
+        imMessageDO.setSenderAvatar(user.getAvatar());
+        imMessageDO.setConversationType(message.getConversationType());
+        imMessageDO.setContentType(message.getContentType());
+        imMessageDO.setConversationNo(senderId + "_" + message.getReceiverId());
+        imMessageDO.setContent(message.getContent());
         //消息来源 100-用户发送；200-系统发送（一般是通知）；不能为空
-        imMessageSaveReqVO.setSendFrom(100);
-        imMessageSaveReqVO.setSendTime(TimeUtil.now());
-        imMessageSaveReqVO.setMessageStatus(ImMessageStatusEnum.SENDING.getStatus());
-        return createMessage(imMessageSaveReqVO);
+        imMessageDO.setSendFrom(100);
+        imMessageDO.setSendTime(TimeUtil.now());
+        imMessageDO.setMessageStatus(ImMessageStatusEnum.SENDING.getStatus());
+        imMessageMapper.insert(imMessageDO);
+        return imMessageDO;
     }
 
     @Override
