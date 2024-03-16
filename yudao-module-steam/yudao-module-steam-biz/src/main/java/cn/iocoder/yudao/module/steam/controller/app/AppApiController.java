@@ -224,7 +224,10 @@ public class AppApiController {
                 BindUserDO bindUserDO = first.get();
                 SteamWeb steamWeb=new SteamWeb(configService);
                 if(steamWeb.checkLogin(bindUserDO)){
-                    bindUserService.changeBindUserCookie(new BindUserDO().setId(bindUserDO.getId()).setLoginCookie(steamWeb.getCookieString()));
+                    if(steamWeb.getWebApiKey().isPresent()){
+                        bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
+                    }
+                    bindUserService.changeBindUserCookie(new BindUserDO().setId(bindUserDO.getId()).setLoginCookie(steamWeb.getCookieString()).setApiKey(bindUserDO.getApiKey()));
                 }
                 steamWeb.initTradeUrl();
                 TradeUrlStatus tradeUrlStatus = steamWeb.checkTradeUrl(openApiReqVo.getData().getTradeLinks());

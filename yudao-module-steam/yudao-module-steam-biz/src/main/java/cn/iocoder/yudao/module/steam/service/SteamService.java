@@ -16,12 +16,10 @@ import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
+import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
-import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
-import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
-import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
-import cn.iocoder.yudao.module.steam.service.steam.SteamMaFile;
+import cn.iocoder.yudao.module.steam.service.steam.*;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -67,6 +65,8 @@ public class SteamService {
 
     @Resource
     private IOInvUpdateService ioInvUpdateService;
+    @Autowired
+    private BindUserService bindUserService;
 
     @Autowired
     public void setPaySteamOrderService(PaySteamOrderService paySteamOrderService) {
@@ -264,6 +264,54 @@ public class SteamService {
             log.error("解析出错原因{}",e.getMessage());
             throw new ServiceException(-1,"Steam openid1 接口验证异常");
         }
+    }
+
+    /**
+     * 获取订单信息
+     * @param bindUserDO
+     * @param tradeOfferId
+     * @return
+     */
+    public boolean getTradeOffInfo(BindUserDO bindUserDO,String tradeOfferId) {
+        try{
+            SteamWeb steamWeb=new SteamWeb(configService);
+            if(steamWeb.checkLogin(bindUserDO)){
+                if(steamWeb.getWebApiKey().isPresent()){
+                    bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
+                }
+                bindUserService.changeBindUserCookie(new BindUserDO().setId(bindUserDO.getId()).setLoginCookie(steamWeb.getCookieString()).setApiKey(bindUserDO.getApiKey()));
+            }
+
+//            HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+//            builder.url(configByKey.getValue() + "/openid/login");
+//            builder.method(HttpUtil.Method.FORM);
+            Map<String,String> post=new HashMap<>();
+            post.put("key",bindUserDO.getApiKey());
+            post.put("tradeofferid",tradeOfferId);
+//            builder.form(post);
+            HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
+            Map<String, String> header = new HashMap<>();
+            header.put("Accept-Language", "zh-CN,zh;q=0.9");
+            builder.headers(header);
+            builder.url("https://api.steampowered.com/IEconService/GetTradeOffer/v1");
+            builder.query(post);
+
+            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
+            log.error("steam返回{}",proxyResponseVo);
+            if(Objects.nonNull(proxyResponseVo.getStatus()) && proxyResponseVo.getStatus()==200){
+                String html = proxyResponseVo.getHtml();
+                TradeOfferInfo tradeOfferInfo = objectMapper.readValue(html, TradeOfferInfo.class);
+//                if(tradeOfferInfo.getResponse()){
+//
+//                }
+            }else{
+                throw new ServiceException(-1,"Steam openid 接口验证异常");
+            }
+        }catch (Exception e){
+            log.error("解析出错原因{}",e.getMessage());
+            throw new ServiceException(-1,"Steam openid1 接口验证异常");
+        }
+        return true;
     }
 
     /**
