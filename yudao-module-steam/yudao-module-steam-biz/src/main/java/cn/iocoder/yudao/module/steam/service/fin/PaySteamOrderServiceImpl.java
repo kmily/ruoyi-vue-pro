@@ -819,7 +819,10 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             //发货
             SteamWeb steamWeb=new SteamWeb(configService);
             if(steamWeb.checkLogin(bindUserDO1)){
-                bindUserService.changeBindUserCookie(new BindUserDO().setId(bindUserDO1.getId()).setLoginCookie(steamWeb.getCookieString()));
+                if(steamWeb.getWebApiKey().isPresent()){
+                    bindUserDO1.setApiKey(steamWeb.getWebApiKey().get());
+                }
+                bindUserService.changeBindUserCookie(new BindUserDO().setId(bindUserDO1.getId()).setLoginCookie(steamWeb.getCookieString()).setApiKey(bindUserDO1.getApiKey()));
             }
             SteamInvDto steamInvDto=new SteamInvDto();
             steamInvDto.setAmount(sellingDO.getAmount());
