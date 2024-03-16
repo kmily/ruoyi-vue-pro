@@ -2,10 +2,16 @@ package cn.iocoder.yudao.module.steam.controller.app.selling.vo;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-public class SellingMergeListVO {
+public class SellingMergeListReqVo {
     // 图片
     private String iconUrl;
+    //库存表ID
+    private List<String> invDescId;
+    //库存表ID
+    private List<String> invId;
     // 名称
     private String marketName;
     // 哈希name
