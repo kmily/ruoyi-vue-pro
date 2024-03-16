@@ -1,0 +1,38 @@
+import requests
+from bs4 import BeautifulSoup
+
+def create_links_with_headings(url):
+  """Extracts headings and links from a website and creates combined strings."""
+
+  try:
+    response = requests.get(url)
+    response.raise_for_status()  # Raise an exception for error responses
+
+    soup = BeautifulSoup(response.content, "html.parser")
+    headings = soup.find_all(([h1, h2, h3, h4, h5, h6]))  # Gather all headings
+
+    links_with_headings = []
+    for heading in headings:
+      link = heading.find_next("a")  # Find the first link after each heading
+      if link:
+        link_text = link.text
+        link_href = link.get("href")
+        combined_string = f"{link_text} - {link_href}"  # Combine the text and link
+        links_with_headings.append(combined_string)
+
+    return links_with_headings
+
+  except requests.exceptions.RequestException as e:
+    print(f"Error fetching website: {e}")
+    return []
+
+# Example usage:
+website_url = "https://nexthorizondigital.com/"  # Replace with the actual URL
+links_with_headings = create_links_with_headings(website_url)
+
+if links_with_headings:
+  print("Sotware Development")
+  for link_with_heading in links_with_headings:
+    print(link_with_heading)
+else:
+  print("No links found with headings.")
