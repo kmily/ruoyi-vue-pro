@@ -666,7 +666,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         }
         //检查是否已发货
         TransferMsg transferText = invOrderDO.getTransferText();
-        if(Objects.isNull(transferText) && Objects.isNull(transferText.getTradeofferid())){
+        if(Objects.isNull(transferText) || Objects.isNull(transferText.getTradeofferid())){
             throw exception(ErrorCodeConstants.INVORDER_ORDER_TRANSFER_ALERY);
         }
         return invOrderDO;
@@ -696,8 +696,10 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             invPreviewExtService.markInvEnable(sellingDO.getMarketHashName());
         }
     }
-    @Override
-    public void closeInvOrder(Long invOrderId) {
+    /**
+     * 释放库存
+     */
+    private void closeInvOrder(Long invOrderId) {
         InvOrderDO invOrder = getInvOrder(invOrderId);
         if(invOrder.getSellCashStatus().equals(InvSellCashStatusEnum.CASHED.getStatus())){
             throw new ServiceException(-1,"订单已经支付给卖家，不支持操作");
@@ -709,7 +711,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw new ServiceException(-1,"不支付未支付的订单关闭");
         }
         invOrderMapper.updateById(new InvOrderDO().setId(invOrderId).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus()));
-            //释放库存
+        //释放库存
         SellingDO sellingDO = sellingMapper.selectById(invOrder.getSellId());
         sellingMapper.updateById(new SellingDO().setId(sellingDO.getId()).setTransferStatus(InvTransferStatusEnum.SELL.getStatus()));
         invPreviewExtService.markInvEnable(sellingDO.getMarketHashName());
@@ -719,7 +721,6 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
      * 扣除商品的2%后退还买家
      * @param invOrderId InvOrderId
      */
-    @Override
     @Transactional(rollbackFor = ServiceException.class)
     public void damagesCloseInvOrder(Long invOrderId) {
         InvOrderDO invOrder = getInvOrder(invOrderId);
@@ -759,7 +760,6 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         }
     }
 
-    @Override
     @Transactional(rollbackFor = ServiceException.class)
     public void cashInvOrder(Long invOrderId) {
         InvOrderDO invOrder = getInvOrder(invOrderId);
@@ -940,15 +940,15 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             //| TradeOfferInfo(response=TradeOfferInfo.ResponseDTO(offer=TradeOfferInfo.ResponseDTO.OfferDTO(tradeofferid=6840179532, accountidOther=1447022566, message=io661 订单号:INV202403161444071商户号:WEBINV202403161444071 时间2024-03-16T14:44:46.077, expirationTime=1711781090, tradeOfferState=3, itemsToGive=[TradeOfferInfo.ResponseDTO.OfferDTO.ItemsToGiveDTO(appid=730, contextid=2, assetid=35932930022, classid=4428807494, instanceid=188530170, amount=1, missing=true, estUsd=30)], isOurOffer=true, timeCreated=1710571490, timeUpdated=1710573937, fromRealTimeTrade=false, escrowEndDate=0, confirmationMethod=2, eresult=1)))
             // | TradeOfferInfo(response=TradeOfferInfo.ResponseDTO(offer=TradeOfferInfo.ResponseDTO.OfferDTO(tradeofferid=6840143840, accountidOther=1447022566, message=io661 订单号:INV202403161429001商户号:WEBINV202403161429001 时间2024-03-16T14:29:01.417, expirationTime=1711780145, tradeOfferState=7, itemsToGive=[TradeOfferInfo.ResponseDTO.OfferDTO.ItemsToGiveDTO(appid=730, contextid=2, assetid=35681966414, classid=4901046679, instanceid=302028390, amount=1, missing=false, estUsd=19)], isOurOffer=true, timeCreated=1710570545, timeUpdated=1710573962, fromRealTimeTrade=false, escrowEndDate=0, confirmationMethod=2, eresult=1)))
             log.info("{}",tradeOffInfo);
-            if(tradeOffInfo.getResponse().getOffer().getTradeOfferState().intValue()==3){
+            if(tradeOffInfo.getResponse().getOffer().getTradeOfferState() ==3){
                 //打款
                 cashInvOrder(invOrderId);
-            }else if(tradeOffInfo.getResponse().getOffer().getTradeOfferState().intValue()==7){
+            }else if(tradeOffInfo.getResponse().getOffer().getTradeOfferState() ==7){
                 //打款
                 damagesCloseInvOrder(invOrderId);
             }else{
                 LocalDateTime plus = invOrder.getPayTime().plus(Duration.ofHours(12));
-                if(LocalDateTime.now().compareTo(plus)==1){
+                if(LocalDateTime.now().compareTo(plus) > 0){
                     //时间是否超出12小时，超出则退款
                     damagesCloseInvOrder(invOrderId);
                 }
@@ -986,8 +986,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             log.error("steam返回{}",proxyResponseVo);
             if(Objects.nonNull(proxyResponseVo.getStatus()) && proxyResponseVo.getStatus()==200){
                 String html = proxyResponseVo.getHtml();
-                TradeOfferInfo tradeOfferInfo = objectMapper.readValue(html, TradeOfferInfo.class);
-                return tradeOfferInfo;
+                return objectMapper.readValue(html, TradeOfferInfo.class);
             }else{
                 throw new ServiceException(-1,"Steam openid 接口验证异常");
             }

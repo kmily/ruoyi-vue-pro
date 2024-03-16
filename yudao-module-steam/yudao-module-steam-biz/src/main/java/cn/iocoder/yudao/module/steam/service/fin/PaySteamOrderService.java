@@ -86,13 +86,13 @@ public interface PaySteamOrderService {
      * @param id InvOrderId
      */
     void closeUnPayInvOrder(Long id);
-    /**
-     * 关闭已经支付的订单,
-     * 主要用于后期交易失败时恢复库存
-     *
-     * @param id InvOrderId
-     */
-    void closeInvOrder(Long id);
+//    /**
+//     * 关闭已经支付的订单,
+//     * 主要用于后期交易失败时恢复库存
+//     *
+//     * @param id InvOrderId
+//     */
+//    void closeInvOrder(Long id);
     /**
      * 交易发货
      * @param id 交易订单号 invOrderId
@@ -105,18 +105,18 @@ public interface PaySteamOrderService {
      * @return 返回此sellId下有效订单列表
      */
     List<InvOrderDO> getExpOrder(Long sellId);
-    /**
-     * 违约关闭订单
-     *
-     * @param invOrderId InvOrderId
-     */
-    void damagesCloseInvOrder(Long invOrderId);
-    /**
-     * 订单打款给买家
-     *
-     * @param invOrderId InvOrderId
-     */
-    void cashInvOrder(Long invOrderId);
+//    /**
+//     * 违约关闭订单
+//     *
+//     * @param invOrderId InvOrderId
+//     */
+//    void damagesCloseInvOrder(Long invOrderId);
+//    /**
+//     * 订单打款给买家
+//     *
+//     * @param invOrderId InvOrderId
+//     */
+//    void cashInvOrder(Long invOrderId);
 
 
     /**

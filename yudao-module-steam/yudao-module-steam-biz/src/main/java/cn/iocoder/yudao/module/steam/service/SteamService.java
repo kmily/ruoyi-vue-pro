@@ -65,8 +65,6 @@ public class SteamService {
 
     @Resource
     private IOInvUpdateService ioInvUpdateService;
-    @Autowired
-    private BindUserService bindUserService;
 
     @Autowired
     public void setPaySteamOrderService(PaySteamOrderService paySteamOrderService) {

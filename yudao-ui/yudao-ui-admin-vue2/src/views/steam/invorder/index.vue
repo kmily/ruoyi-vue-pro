@@ -8,26 +8,26 @@
       <el-form-item label="购买的steamId" prop="steamId">
         <el-input v-model="queryParams.steamId" placeholder="请输入购买的steamId" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="是否已支付：[0:未支付 1:已经支付过]" prop="payStatus">
-        <el-select v-model="queryParams.payStatus" placeholder="请选择是否已支付：[0:未支付 1:已经支付过]" clearable size="small">
+      <el-form-item label="是否支付" prop="payStatus">
+        <el-select v-model="queryParams.payStatus" placeholder="请选择是否支付：[0:未支付 1:已经支付过]" clearable size="small">
           <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
-      <el-form-item label="支付订单编号" prop="payOrderId">
-        <el-input v-model="queryParams.payOrderId" placeholder="请输入支付订单编号" clearable @keyup.enter.native="handleQuery"/>
+      <el-form-item label="支付订号" prop="payOrderId">
+        <el-input v-model="queryParams.payOrderId" placeholder="请输入支付订号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="支付成功的支付渠道" prop="payChannelCode">
-        <el-input v-model="queryParams.payChannelCode" placeholder="请输入支付成功的支付渠道" clearable @keyup.enter.native="handleQuery"/>
+      <el-form-item label="支付渠道" prop="payChannelCode">
+        <el-input v-model="queryParams.payChannelCode" placeholder="请输入支付渠道" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="订单支付时间" prop="payTime">
+      <el-form-item label="支付时间" prop="payTime">
         <el-date-picker v-model="queryParams.payTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
                         range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :default-time="['00:00:00', '23:59:59']" />
       </el-form-item>
-      <el-form-item label="退款订单编号" prop="payRefundId">
-        <el-input v-model="queryParams.payRefundId" placeholder="请输入退款订单编号" clearable @keyup.enter.native="handleQuery"/>
+      <el-form-item label="退款单号" prop="payRefundId">
+        <el-input v-model="queryParams.payRefundId" placeholder="请输入退订单号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="退款金额，单位：分" prop="refundAmount">
-        <el-input v-model="queryParams.refundAmount" placeholder="请输入退款金额，单位：分" clearable @keyup.enter.native="handleQuery"/>
+      <el-form-item label="退款金额 分" prop="refundAmount">
+        <el-input v-model="queryParams.refundAmount" placeholder="请输入退款金额 分" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="退款时间" prop="refundTime">
         <el-date-picker v-model="queryParams.refundTime" style="width: 240px" value-format="yyyy-MM-dd HH:mm:ss" type="daterange"
@@ -59,15 +59,12 @@
       <el-form-item label="优惠金额 分" prop="discountAmount">
         <el-input v-model="queryParams.discountAmount" placeholder="请输入优惠金额 分" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="发货信息 json" prop="transferText">
-        <el-input v-model="queryParams.transferText" placeholder="请输入发货信息 json" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
       <el-form-item label="发货状态" prop="transferStatus">
         <el-select v-model="queryParams.transferStatus" placeholder="请选择发货状态" clearable size="small">
           <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
-      <el-form-item label="库存表ID参考steam_sell" prop="sellId">
+      <el-form-item label="sellId" prop="sellId">
         <el-input v-model="queryParams.sellId" placeholder="请输入库存表ID参考steam_sell" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="商品描述ID" prop="invDescId">
@@ -148,7 +145,7 @@
             <el-table-column label="订单编号" align="center" prop="id" />
       <el-table-column label="用户编号" align="center" prop="userId" />
       <el-table-column label="购买的steamId" align="center" prop="steamId" />
-      <el-table-column label="是否已支付：[0:未支付 1:已经支付过]" align="center" prop="payStatus" />
+      <el-table-column label="是否已支付" align="center" prop="payStatus" />
       <el-table-column label="支付订单编号" align="center" prop="payOrderId" />
       <el-table-column label="支付成功的支付渠道" align="center" prop="payChannelCode" />
       <el-table-column label="订单支付时间" align="center" prop="payTime" width="180">
@@ -335,4 +332,4 @@ export default {
     },
               }
 };
-</script>
+</script>
