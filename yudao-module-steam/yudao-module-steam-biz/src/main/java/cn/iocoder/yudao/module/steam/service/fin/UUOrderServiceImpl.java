@@ -601,7 +601,7 @@ public class UUOrderServiceImpl implements UUOrderService {
 
         }catch (ServiceException e){
             log.error("发货失败，自动退款单号{}",youyouOrderDO);
-            DevAccountUtils.tenantExecute(1l,()->{
+            DevAccountUtils.tenantExecute(1L,()->{
                 if(Objects.nonNull(youyouOrderDO)){
                     LoginUser loginUser=new LoginUser();
                     loginUser.setId(youyouOrderDO.getUserId());
