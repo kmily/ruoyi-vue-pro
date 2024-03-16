@@ -266,53 +266,6 @@ public class SteamService {
         }
     }
 
-    /**
-     * 获取订单信息
-     * @param bindUserDO
-     * @param tradeOfferId
-     * @return
-     */
-    public boolean getTradeOffInfo(BindUserDO bindUserDO,String tradeOfferId) {
-        try{
-            SteamWeb steamWeb=new SteamWeb(configService);
-            if(steamWeb.checkLogin(bindUserDO)){
-                if(steamWeb.getWebApiKey().isPresent()){
-                    bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
-                }
-                bindUserService.changeBindUserCookie(new BindUserDO().setId(bindUserDO.getId()).setLoginCookie(steamWeb.getCookieString()).setApiKey(bindUserDO.getApiKey()));
-            }
-
-//            HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-//            builder.url(configByKey.getValue() + "/openid/login");
-//            builder.method(HttpUtil.Method.FORM);
-            Map<String,String> post=new HashMap<>();
-            post.put("key",bindUserDO.getApiKey());
-            post.put("tradeofferid",tradeOfferId);
-//            builder.form(post);
-            HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
-            Map<String, String> header = new HashMap<>();
-            header.put("Accept-Language", "zh-CN,zh;q=0.9");
-            builder.headers(header);
-            builder.url("https://api.steampowered.com/IEconService/GetTradeOffer/v1");
-            builder.query(post);
-
-            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
-            log.error("steam返回{}",proxyResponseVo);
-            if(Objects.nonNull(proxyResponseVo.getStatus()) && proxyResponseVo.getStatus()==200){
-                String html = proxyResponseVo.getHtml();
-                TradeOfferInfo tradeOfferInfo = objectMapper.readValue(html, TradeOfferInfo.class);
-//                if(tradeOfferInfo.getResponse()){
-//
-//                }
-            }else{
-                throw new ServiceException(-1,"Steam openid 接口验证异常");
-            }
-        }catch (Exception e){
-            log.error("解析出错原因{}",e.getMessage());
-            throw new ServiceException(-1,"Steam openid1 接口验证异常");
-        }
-        return true;
-    }
 
     /**
      * 将identity转成 steamId
@@ -340,5 +293,21 @@ public class SteamService {
         }
         return integer;
     }
-
+    /**
+     * 订单自动检测发货
+     * @return
+     */
+    public Integer checkTransfer(){
+        List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
+                .eq(InvOrderDO::getPayStatus, true)
+                .neIfPresent(InvOrderDO::getTransferStatus, InvTransferStatusEnum.TransferFINISH.getStatus())
+        );
+        log.info("invorder{}",invOrderDOS);
+        Integer integer=0;
+        for (InvOrderDO invOrderDO:invOrderDOS) {
+            paySteamOrderService.checkTransfer(invOrderDO.getId());
+            integer++;
+        }
+        return integer;
+    }
 }

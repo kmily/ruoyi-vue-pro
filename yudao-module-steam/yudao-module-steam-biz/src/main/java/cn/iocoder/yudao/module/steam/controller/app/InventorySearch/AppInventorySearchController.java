@@ -91,15 +91,15 @@ public class AppInventorySearchController {
      *
 //     * @param invToMergeVO
      */
-    @GetMapping("/mergeToSell")
-    @Operation(summary = "合并库存")
-    public CommonResult<List<AppInvPageReqVO>> mergeToSell(@Valid InvToMergeVO invToMergeVO) {
-        // 访问本地库存 按条件查询库存
-        List<InvDO> invToMerge = ioInvUpdateService.getInvToMerge(invToMergeVO);
-        // 将相同库存合并
-        List<AppInvPageReqVO> allInvToMerge = steamInvService.getAllInvToMerge(invToMerge);
-        return success(allInvToMerge);
-    }
+//    @GetMapping("/mergeToSell")
+//    @Operation(summary = "合并库存")
+//    public CommonResult<List<AppInvPageReqVO>> mergeToSell(@Valid InvToMergeVO invToMergeVO) {
+//        // 访问本地库存 按条件查询库存
+//        List<InvDO> invToMerge = ioInvUpdateService.getInvToMerge(invToMergeVO);
+//        // 将相同库存合并
+//        List<AppInvPageReqVO> allInvToMerge = steamInvService.getAllInvToMerge(invToMerge);
+//        return success(allInvToMerge);
+//    }
 
 
 

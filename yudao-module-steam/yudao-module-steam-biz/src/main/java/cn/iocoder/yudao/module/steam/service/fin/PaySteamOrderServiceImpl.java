@@ -54,7 +54,9 @@ import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.steam.*;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
+import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -147,6 +149,13 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     private PayNoRedisDAO noRedisDAO;
     @Resource
     private BindUserService bindUserService;
+
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    public void setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     public PaySteamOrderServiceImpl() {
     }
@@ -893,4 +902,82 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         return payRefund;
     }
 
+    @Override
+    @Transactional(rollbackFor = ServiceException.class)
+    public void checkTransfer(Long invOrderId) {
+        InvOrderDO invOrder = getInvOrder(invOrderId);
+        if(Objects.isNull(invOrder)){
+            throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
+        }
+        if(!invOrder.getPayStatus()){
+            throw new ServiceException(-1,"订单未支付不支持打款");
+        }
+        SellingDO sellingDO = sellingMapper.selectById(invOrder.getSellId());
+        if(InvTransferStatusEnum.TransferFINISH.getStatus().equals(invOrder.getTransferStatus())){
+            //发货完成时
+            BindUserDO bindUserDO = bindUserService.getBindUser(sellingDO.getId());
+            if(Objects.isNull(bindUserDO)){
+                throw new ServiceException(-1,"绑定用户已失效，无法检测。");
+            }
+            if(Objects.isNull(bindUserDO.getApiKey())){
+                SteamWeb steamWeb=new SteamWeb(configService);
+                if(steamWeb.checkLogin(bindUserDO)){
+                    if(steamWeb.getWebApiKey().isPresent()){
+                        bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
+                    }
+                    bindUserService.changeBindUserCookie(new BindUserDO().setId(bindUserDO.getId()).setLoginCookie(steamWeb.getCookieString()).setApiKey(bindUserDO.getApiKey()));
+                }else{
+                    if(steamWeb.getWebApiKey().isPresent()){
+                        bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
+                    }
+                }
+            }
+            if(Objects.isNull(bindUserDO.getApiKey())){
+                throw new ServiceException(-1,"无法获取用户apikey。");
+            }
+            TradeOfferInfo tradeOffInfo = getTradeOffInfo(bindUserDO, invOrder.getTransferText().getTradeofferid());
+            log.info("{}",tradeOffInfo);
+        }
+    }
+    /**
+     * 获取订单信息
+     * @param bindUserDO
+     * @param tradeOfferId
+     * @return
+     */
+    private TradeOfferInfo getTradeOffInfo(BindUserDO bindUserDO,String tradeOfferId) {
+        try{
+            SteamWeb steamWeb=new SteamWeb(configService);
+            if(steamWeb.checkLogin(bindUserDO)){
+                if(steamWeb.getWebApiKey().isPresent()){
+                    bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
+                }
+                bindUserService.changeBindUserCookie(new BindUserDO().setId(bindUserDO.getId()).setLoginCookie(steamWeb.getCookieString()).setApiKey(bindUserDO.getApiKey()));
+            }
+
+            Map<String,String> post=new HashMap<>();
+            post.put("key",bindUserDO.getApiKey());
+            post.put("tradeofferid",tradeOfferId);
+//            builder.form(post);
+            HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
+            Map<String, String> header = new HashMap<>();
+            header.put("Accept-Language", "zh-CN,zh;q=0.9");
+            builder.headers(header);
+            builder.url("https://api.steampowered.com/IEconService/GetTradeOffer/v1");
+            builder.query(post);
+
+            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
+            log.error("steam返回{}",proxyResponseVo);
+            if(Objects.nonNull(proxyResponseVo.getStatus()) && proxyResponseVo.getStatus()==200){
+                String html = proxyResponseVo.getHtml();
+                TradeOfferInfo tradeOfferInfo = objectMapper.readValue(html, TradeOfferInfo.class);
+                return tradeOfferInfo;
+            }else{
+                throw new ServiceException(-1,"Steam openid 接口验证异常");
+            }
+        }catch (Exception e){
+            log.error("解析出错原因{}",e.getMessage());
+            throw new ServiceException(-1,"Steam openid1 接口验证异常");
+        }
+    }
 }
