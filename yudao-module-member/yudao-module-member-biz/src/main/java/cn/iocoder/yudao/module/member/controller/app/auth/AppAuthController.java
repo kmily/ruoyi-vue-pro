@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.member.controller.app.auth;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
@@ -24,6 +25,8 @@ import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import java.util.concurrent.TimeUnit;
+
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -43,11 +46,11 @@ public class AppAuthController {
     @Resource
     private SecurityProperties securityProperties;
 
-    @PostMapping("/login")
-    @Operation(summary = "使用手机 + 密码登录")
-    public CommonResult<AppAuthLoginRespVO> login(@RequestBody @Valid AppAuthLoginReqVO reqVO) {
-        return success(authService.login(reqVO));
-    }
+//    @PostMapping("/login")
+//    @Operation(summary = "使用手机 + 密码登录")
+//    public CommonResult<AppAuthLoginRespVO> login(@RequestBody @Valid AppAuthLoginReqVO reqVO) {
+//        return success(authService.login(reqVO));
+//    }
 
     @PostMapping("/logout")
     @PermitAll
@@ -73,12 +76,14 @@ public class AppAuthController {
 
     @PostMapping("/sms-login")
     @Operation(summary = "使用手机 + 验证码登录")
+    @Idempotent(timeout = 10, timeUnit = TimeUnit.SECONDS, message = "操作太快，请稍后再试")
     public CommonResult<AppAuthLoginRespVO> smsLogin(@RequestBody @Valid AppAuthSmsLoginReqVO reqVO) {
         return success(authService.smsLogin(reqVO));
     }
 
     @PostMapping("/send-sms-code")
     @Operation(summary = "发送手机验证码")
+    @Idempotent(timeout = 30, timeUnit = TimeUnit.SECONDS, message = "操作太快，请稍后再试")
     public CommonResult<Boolean> sendSmsCode(@RequestBody @Valid AppAuthSmsSendReqVO reqVO) {
         authService.sendSmsCode(getLoginUserId(), reqVO);
         return success(true);
