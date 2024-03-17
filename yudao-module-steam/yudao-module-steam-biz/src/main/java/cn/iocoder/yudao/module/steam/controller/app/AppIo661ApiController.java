@@ -16,9 +16,13 @@ import cn.iocoder.yudao.module.pay.framework.pay.core.WalletPayClient;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppInvPreviewReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppSellingPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.ItemResp;
+import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.SellListItemResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
-import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
@@ -28,6 +32,8 @@ import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
+import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
+import cn.iocoder.yudao.module.steam.service.selling.SellingsearchService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.steam.TradeUrlStatus;
 import cn.iocoder.yudao.module.steam.service.uu.OpenApiService;
@@ -87,7 +93,13 @@ public class AppIo661ApiController {
 
     @Resource
     private BindUserService bindUserService;
-
+    @Autowired
+    private SellingsearchService sellingsearchService;
+    private InvPreviewExtService invPreviewExtService;
+    @Autowired
+    public void setInvPreviewExtService(InvPreviewExtService invPreviewExtService) {
+        this.invPreviewExtService = invPreviewExtService;
+    }
     /**
      * api余额接口
      * @return
@@ -116,7 +128,7 @@ public class AppIo661ApiController {
     @PostMapping("v1/api/sign")
     @Operation(summary = "余额查询")
     @PermitAll
-    public   OpenApiReqVo<QueryOrderReqVo> sign(@RequestBody OpenApiReqVo<QueryOrderReqVo> openApiReqVo) {
+    public   OpenApiReqVo<AppInvPreviewReqVO> sign(@RequestBody OpenApiReqVo<AppInvPreviewReqVO> openApiReqVo) {
         return DevAccountUtils.tenantExecute(1L, () -> openApiService.requestUUSign(openApiReqVo));
     }
     /**
@@ -161,6 +173,51 @@ public class AppIo661ApiController {
             });
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(),  e.getMessage(),ApiCheckTradeUrlReSpVo.class);
+        }
+    }
+    /**
+     * 查询在售的模板
+     * @return
+     */
+    @PostMapping("v1/api/batchGetOnTemplate")
+    @Operation(summary = "查询在售的模板")
+    @PermitAll
+    public ApiResult<PageResult> batchGetOnTemplate(@RequestBody OpenApiReqVo<AppInvPreviewReqVO> openApiReqVo) {
+        try {
+            return DevAccountUtils.tenantExecute(1L, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+                InvPreviewPageReqVO reqVO=new InvPreviewPageReqVO();
+                reqVO.setExistInv(true);
+                reqVO.setItemName(openApiReqVo.getData().getItemName());
+                reqVO.setSelRarity(openApiReqVo.getData().getSelRarity());
+                reqVO.setSelQuality(openApiReqVo.getData().getSelQuality());
+
+                reqVO.setSelExterior(openApiReqVo.getData().getSelExterior());
+                reqVO.setSelItemset(openApiReqVo.getData().getSelItemset());
+                PageResult<ItemResp> invPreviewPage = invPreviewExtService.getInvPreviewPage(reqVO);
+                return ApiResult.success(invPreviewPage);
+            });
+        } catch (ServiceException e) {
+            return ApiResult.error(e.getCode(),  e.getMessage(),PageResult.class);
+        }
+    }
+    /**
+     * 根据模板hash查询在售商品
+     * @return
+     */
+    @PostMapping("v1/api/batchGetOnSaleCommodityInfo")
+    @Operation(summary = "根据模板hash查询在售商品")
+    @PermitAll
+    public ApiResult<PageResult> batchGetOnSaleCommodityInfo(@RequestBody OpenApiReqVo<AppSellingPageReqVO> openApiReqVo) {
+        try {
+            return DevAccountUtils.tenantExecute(1L, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+
+                PageResult<SellListItemResp> sellingDOPageResult = sellingsearchService.sellList(openApiReqVo.getData());
+                return ApiResult.success(sellingDOPageResult);
+            });
+        } catch (ServiceException e) {
+            return ApiResult.error(e.getCode(),  e.getMessage(),PageResult.class);
         }
     }
     @Operation(summary = "创建库存订单")

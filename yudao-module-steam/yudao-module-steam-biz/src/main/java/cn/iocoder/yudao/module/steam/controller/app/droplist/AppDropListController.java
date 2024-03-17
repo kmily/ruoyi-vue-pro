@@ -176,9 +176,15 @@ public class AppDropListController {
 
     @GetMapping("items/730/search")
     @Operation(summary = "在售商品列表")
-    public CommonResult<PageResult<ItemResp>> itemSearch(@Valid InvPreviewPageReqVO sellingPageReqVO) {
-        sellingPageReqVO.setExistInv(true);
-        return success(invPreviewExtService.getInvPreviewPage(sellingPageReqVO));
+    public CommonResult<PageResult<ItemResp>> itemSearch(@Valid AppInvPreviewReqVO reqVO) {
+        InvPreviewPageReqVO reqVO1=new InvPreviewPageReqVO();
+        reqVO1.setItemName(reqVO.getItemName());
+        reqVO1.setSelRarity(reqVO.getSelRarity());
+        reqVO1.setSelQuality(reqVO.getSelQuality());
+        reqVO1.setSelExterior(reqVO.getSelExterior());
+        reqVO1.setSelItemset(reqVO.getSelItemset());
+        reqVO1.setExistInv(true);
+        return success(invPreviewExtService.getInvPreviewPage(reqVO1));
     }
     @GetMapping("items/730/getHot")
     @Operation(summary = "热门在售卖")
