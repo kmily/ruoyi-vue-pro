@@ -513,6 +513,48 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     }
 
     @Override
+    public PageResult<Io661OrderInfoResp> getInvOrderWithPage(QueryOrderReqVo reqVo, LoginUser loginUser) {
+        InvOrderPageReqVO invOrderPageReqVO=new InvOrderPageReqVO();
+        invOrderPageReqVO.setMerchantNo(reqVo.getMerchantNo());
+        invOrderPageReqVO.setOrderNo(reqVo.getOrderNo());
+        invOrderPageReqVO.setPageNo(reqVo.getPageNo());
+        invOrderPageReqVO.setPageSize(reqVo.getPageSize());
+        invOrderPageReqVO.setUserId(loginUser.getId());
+        invOrderPageReqVO.setUserType(loginUser.getUserType());
+        PageResult<InvOrderDO> invOrderDOPageResult = invOrderMapper.selectPage(invOrderPageReqVO);
+        List<Io661OrderInfoResp> ret=new ArrayList<>();
+        if(invOrderDOPageResult.getTotal()>0){
+
+            for(InvOrderDO item:invOrderDOPageResult.getList()){
+                Io661OrderInfoResp.Io661OrderInfoRespBuilder builder = Io661OrderInfoResp.builder();
+                //基础信息
+                builder.orderNo(item.getOrderNo()).merchantNo(item.getMerchantNo());
+                builder.steamId(item.getSteamId());
+                builder.platformName(item.getPlatformName());
+                builder.marketName(item.getMarketName());
+                builder.commodityAmount(item.getCommodityAmount());
+                //支付信息
+                builder.payTime(item.getPayTime()).payStatus(item.getPayStatus()).paymentAmount(item.getPaymentAmount());
+                builder.payRefundId(item.getPayRefundId()).refundAmount(item.getRefundAmount()).refundTime(item.getRefundTime());
+                //卖家信息
+                builder.sellSteamId(item.getSellSteamId());
+                //发货信息
+                if(Objects.nonNull(item.getTransferText())){
+                    builder.tradeOfferId(item.getTransferText().getTradeofferid());
+                }
+                builder.transferStatus(item.getTransferStatus());
+                //资金去向信息
+                builder.sellCashStatus(item.getSellCashStatus());
+                builder.transferDamagesAmount(item.getTransferDamagesAmount());
+                builder.transferRefundAmount(item.getTransferRefundAmount());
+                ret.add(builder.build());
+            }
+
+        }
+        return new PageResult<>(ret, invOrderDOPageResult.getTotal());
+    }
+
+    @Override
     public Io661OrderInfoResp getOrderInfo(QueryOrderReqVo reqVo, LoginUser loginUser) {
         InvOrderDO invOrderDO = null;
         if(Objects.nonNull(reqVo.getOrderNo())){

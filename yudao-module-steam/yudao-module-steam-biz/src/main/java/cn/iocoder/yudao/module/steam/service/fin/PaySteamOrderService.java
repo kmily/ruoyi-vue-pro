@@ -58,7 +58,12 @@ public interface PaySteamOrderService {
      * @return 订单列表
      */
     PageResult<InvOrderResp> getInvOrderPageOrder(InvOrderPageReqVO invOrderPageReqVO);
-
+    /**
+     * 获得示例订单列表
+     * @param invOrderPageReqVO 订单入参
+     * @return 订单列表
+     */
+    PageResult<Io661OrderInfoResp> getInvOrderWithPage(QueryOrderReqVo reqVo, LoginUser loginUser);
     /**
      * 获取订单详情
      * @param reqVo
