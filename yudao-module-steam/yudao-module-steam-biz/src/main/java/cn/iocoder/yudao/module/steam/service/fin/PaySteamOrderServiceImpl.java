@@ -351,6 +351,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 .setPayOrderStatus(PayOrderStatusEnum.WAITING.getStatus())
                 .setTransferText(new TransferMsg()).setTransferStatus(InvTransferStatusEnum.SELL.getStatus()).setInvDescId(sellingDO.getInvDescId()).setInvId(sellingDO.getInvId())
                 //卖家信息
+                .setSellSteamId(sellingDO.getSteamId()).setMarketName(sellingDO.getMarketName())
                 .setSellCashStatus(InvSellCashStatusEnum.INIT.getStatus()).setSellUserId(sellingDO.getUserId()).setSellUserType(sellingDO.getUserType())
                 .setPayStatus(false).setRefundAmount(0).setUserId(loginUser.getId()).setUserType(loginUser.getUserType());
         validateInvOrderCanCreate(invOrderDO);
@@ -533,12 +534,26 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
         }
         Io661OrderInfoResp.Io661OrderInfoRespBuilder builder = Io661OrderInfoResp.builder();
+        //基础信息
         builder.orderNo(invOrderDO.getOrderNo()).merchantNo(invOrderDO.getMerchantNo());
         builder.steamId(invOrderDO.getSteamId());
-        builder.payStatus(invOrderDO.getPayStatus()).paymentAmount(invOrderDO.getPaymentAmount());
+        builder.platformName(invOrderDO.getPlatformName());
+        builder.marketName(invOrderDO.getMarketName());
+        builder.commodityAmount(invOrderDO.getCommodityAmount());
+        //支付信息
+        builder.payTime(invOrderDO.getPayTime()).payStatus(invOrderDO.getPayStatus()).paymentAmount(invOrderDO.getPaymentAmount());
+        builder.payRefundId(invOrderDO.getPayRefundId()).refundAmount(invOrderDO.getRefundAmount()).refundTime(invOrderDO.getRefundTime());
+        //卖家信息
+        builder.sellSteamId(invOrderDO.getSellSteamId());
+        //发货信息
         if(Objects.nonNull(invOrderDO.getTransferText())){
             builder.tradeOfferId(invOrderDO.getTransferText().getTradeofferid());
         }
+        builder.transferStatus(invOrderDO.getTransferStatus());
+        //资金去向信息
+        builder.sellCashStatus(invOrderDO.getSellCashStatus());
+        builder.transferDamagesAmount(invOrderDO.getTransferDamagesAmount());
+        builder.transferRefundAmount(invOrderDO.getTransferRefundAmount());
 
         return builder.build();
     }
