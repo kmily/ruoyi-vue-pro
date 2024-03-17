@@ -96,7 +96,7 @@ public class AppInventorySearchController {
     /**
      * 入参：steamId(必传)
      *
-     * @param inv
+     * @param reqVo
      */
     @GetMapping("/mergeToSell")
     @Operation(summary = "合并库存")
