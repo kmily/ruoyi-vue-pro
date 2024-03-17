@@ -85,7 +85,7 @@ public class SellingExtService {
                 .in(InvDescDO::getId, invDescId));
         long count = invDescDO2.stream().filter(item -> item.getTradable() == 0).count();
         if (count > 0) {
-            throw new ServiceException(-1, "饰品不能上架,请检查是否冷却中或其他");
+            throw new ServiceException(-1, "饰品不能上架,请检查是否冷却中或不能交易");
         }
         List<SellingDO> sellingDOInSelling = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
                 .eq(SellingDO::getUserId, loginUser.getId())
@@ -456,7 +456,7 @@ public class SellingExtService {
 
     public PageResult<SellingMergeListReqVo> sellingMerge(SellingPageReqVO sellingPageReqVO) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        if(sellingPageReqVO.getSteamId()!=null && !sellingPageReqVO.getSteamId().equals("")){
+        if (sellingPageReqVO.getSteamId() != null && !sellingPageReqVO.getSteamId().equals("")) {
             List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
                     .eq(SellingDO::getUserType, loginUser.getUserType())
                     .eq(SellingDO::getUserId, loginUser.getId())
@@ -524,7 +524,7 @@ public class SellingExtService {
             }
 
             return new PageResult<>(sellingMergePage, (long) sellingDOS.size());
-        }else{
+        } else {
             List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
                     .eq(SellingDO::getUserType, loginUser.getUserType())
                     .eq(SellingDO::getUserId, loginUser.getId())
