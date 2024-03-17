@@ -117,7 +117,7 @@ public class AppInventorySearchController {
         // 访问本地库存 按条件查询库存
         inv.setUserId(loginUser.getId());
         inv.setBindUserId(collect.get(0).getId());
-        List<InvDO> invToMerge = ioInvUpdateService.getInvToMerge(inv);
+        List<InvDO> invToMerge = ioInvUpdateService.getInvToMerge1(inv);
         // 将相同库存合并
         return success(steamInvService.mergeInv(invToMerge));
     }

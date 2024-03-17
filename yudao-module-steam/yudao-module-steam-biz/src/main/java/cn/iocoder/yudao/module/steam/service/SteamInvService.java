@@ -148,8 +148,11 @@ public class SteamInvService {
         }
         // 根据 InvDescId 查询详情信息
         List<InvDescDO> invDescDOS = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
-                .in(InvDescDO::getId, invDescIdList));
-//        HashMap<String, InvDescDO> mapfz = new HashMap<>();
+                .in(InvDescDO::getId, invDescIdList)
+                .eq(InvDescDO::getTradable, 1));
+        List<Long> enableInvDescId = invDescDOS.stream().map(InvDescDO::getId).collect(Collectors.toList());
+        List<InvDO> collect = invToMerge.stream().filter(i -> enableInvDescId.contains(i.getInvDescId())).collect(Collectors.toList());
+
         HashMap<Long, InvDescDO> map = new HashMap<>();
         for (InvDescDO invDescDO : invDescDOS) {
             map.put(invDescDO.getId(), invDescDO);
@@ -177,7 +180,7 @@ public class SteamInvService {
 //        List<AppInvPageReqVO> appInvPageReqVO = new ArrayList<>();
         Map<Long, AppInvPageReqVO> stringAppInvPageReqVOMap = new HashMap<>();
 
-        for (InvDO item : invToMerge) {
+        for (InvDO item : collect) {
             AppInvPageReqVO appInvPageReqVO = stringAppInvPageReqVOMap.get(item.getInvDescId());
             if (Objects.isNull(appInvPageReqVO)) {
                 appInvPageReqVO = new AppInvPageReqVO();
