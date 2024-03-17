@@ -227,7 +227,7 @@ public class IOInvUpdateService {
     public List<InvDO> getInvToMerge1(@RequestParam InvDO invToMergeVO) {
         // 查询库存 (所有库存不分页查询)
         return invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
-//                .eq(InvDO::getTransferStatus, invToMergeVO.getTransferStatus())
+                .eqIfPresent(InvDO::getTransferStatus, invToMergeVO.getTransferStatus())
                 .eq(InvDO::getUserId, invToMergeVO.getUserId())
                 .eq(InvDO::getSteamId, invToMergeVO.getSteamId())
                 .eq(InvDO::getBindUserId, invToMergeVO.getBindUserId()));

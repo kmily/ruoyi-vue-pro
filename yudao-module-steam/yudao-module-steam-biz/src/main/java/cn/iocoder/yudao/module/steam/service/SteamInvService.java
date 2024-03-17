@@ -156,19 +156,17 @@ public class SteamInvService {
         HashMap<Long, InvDescDO> map = new HashMap<>();
         for (InvDescDO invDescDO : invDescDOS) {
             map.put(invDescDO.getId(), invDescDO);
-//            mapfz.put(invDescDO.getMarketName(),invDescDO);
         }
-//        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-//        List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
-//                .eq(SellingDO::getUserType, loginUser.getUserType())
-//                .eq(SellingDO::getUserId, loginUser.getId()));
-//        if (Objects.isNull(sellingDOS) || sellingDOS.size() < 0) {
-//
-//            ;
-//        }
+
         List<String> sellingHashNameList = invDescDOS.stream().map(InvDescDO::getMarketHashName).distinct().collect(Collectors.toList());
-        List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
-                .in(InvPreviewDO::getMarketHashName, sellingHashNameList));
+        List<InvPreviewDO> invPreviewDOS;
+        if(sellingHashNameList.isEmpty()){
+             invPreviewDOS = new ArrayList<>();
+        } else {
+            invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
+            .in(InvPreviewDO::getMarketHashName, sellingHashNameList));
+        }
+
         Map<String, InvPreviewDO> mapInvPreview = new HashMap<>();
         if (Objects.nonNull(invPreviewDOS)) {
             mapInvPreview = invPreviewDOS.stream().collect(Collectors.toMap(InvPreviewDO::getMarketHashName, i -> i, (v1, v2) -> v1));
