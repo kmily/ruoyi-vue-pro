@@ -233,7 +233,8 @@ public class IOInvUpdateService {
             DescIdList.add(invDO.getInvDescId());
         }
         List<InvDescDO> invDescDOS = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
-                .in(InvDescDO::getId, DescIdList));
+                .in(InvDescDO::getId, DescIdList)
+                .eq(InvDescDO::getTradable, 1));
 
         Map<Long, InvDescDO> map = new HashMap<>();
 
