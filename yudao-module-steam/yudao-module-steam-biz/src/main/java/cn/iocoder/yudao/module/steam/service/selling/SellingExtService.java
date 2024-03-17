@@ -456,71 +456,142 @@ public class SellingExtService {
 
     public PageResult<SellingMergeListReqVo> sellingMerge(SellingPageReqVO sellingPageReqVO) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-
-        List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
-                .eq(SellingDO::getUserType, loginUser.getUserType())
-                .eq(SellingDO::getUserId, loginUser.getId()));
-        if (Objects.isNull(sellingDOS) || sellingDOS.size() < 0) {
-
-            return new PageResult<>(Collections.emptyList(), 0L);
-        }
-
-        List<String> sellingHashNameList = sellingDOS.stream().map(SellingDO::getMarketHashName).distinct().collect(Collectors.toList());
-        List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
-                .in(InvPreviewDO::getMarketHashName, sellingHashNameList));
-        Map<String, InvPreviewDO> mapInvPreview = new HashMap<>();
-        if (Objects.nonNull(invPreviewDOS)) {
-            mapInvPreview = invPreviewDOS.stream().collect(Collectors.toMap(InvPreviewDO::getMarketHashName, i -> i, (v1, v2) -> v1));
-        }
+        if(sellingPageReqVO.getSteamId()!=null && !sellingPageReqVO.getSteamId().equals("")){
+            List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
+                    .eq(SellingDO::getUserType, loginUser.getUserType())
+                    .eq(SellingDO::getUserId, loginUser.getId())
+                    .eq(SellingDO::getSteamId, sellingPageReqVO.getSteamId())
+                    .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus()));
 
 
-        Map<String, SellingMergeListReqVo> invPage = new HashMap<>();
-        for (SellingDO element : sellingDOS) {
-            if (Objects.nonNull(invPage.get(element.getMarketName()))) {
-                SellingMergeListReqVo sellingMergeListReqVo = invPage.get(element.getMarketName());
-
-                List<Integer> list1 = new ArrayList<>(sellingMergeListReqVo.getPrice());
-                list1.add(Integer.valueOf(element.getPrice()));
-                sellingMergeListReqVo.setPrice(list1);
-
-                ArrayList<String> list = new ArrayList<>(sellingMergeListReqVo.getInvId());
-                list.add(String.valueOf(element.getInvId()));
-                sellingMergeListReqVo.setInvId(list);
-                sellingMergeListReqVo.setNumber(list.size());
-
-            } else {
-                SellingMergeListReqVo sellingPageReqVO1 = new SellingMergeListReqVo();
-
-                InvPreviewDO invPreviewDO = mapInvPreview.get(element.getMarketHashName());
-
-                if (Objects.nonNull(invPreviewDO)) {
-                    sellingPageReqVO1.setItemInfo(invPreviewDO.getItemInfo());
-                    sellingPageReqVO1.setMinPrice(invPreviewDO.getMinPrice());
-                }
-                sellingPageReqVO1.setMarketHashName(element.getMarketHashName());
-                sellingPageReqVO1.setIconUrl(element.getIconUrl());
-                sellingPageReqVO1.setSelType(element.getSelType());
-                sellingPageReqVO1.setSelExterior(element.getSelExterior());
-                sellingPageReqVO1.setSelItemset(element.getSelItemset());
-                sellingPageReqVO1.setSelQuality(element.getSelQuality());
-                sellingPageReqVO1.setSelRarity(element.getSelRarity());
-                sellingPageReqVO1.setSelWeapon(element.getSelWeapon());
-                sellingPageReqVO1.setAssetId(element.getAssetid());
-                sellingPageReqVO1.setMarketName(element.getMarketName());
-                sellingPageReqVO1.setStatus(element.getStatus());
-                sellingPageReqVO1.setTransferStatus(element.getTransferStatus());
-                sellingPageReqVO1.setInvId(Arrays.asList(String.valueOf(element.getInvId())));
-                sellingPageReqVO1.setPrice(Arrays.asList(element.getPrice()));
-                invPage.put(element.getMarketName(), sellingPageReqVO1);
+            if (Objects.isNull(sellingDOS) || sellingDOS.size() <= 0) {
+                return new PageResult<>(Collections.emptyList(), 0L);
             }
+
+            List<String> sellingHashNameList = sellingDOS.stream().map(SellingDO::getMarketHashName).distinct().collect(Collectors.toList());
+            List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
+                    .in(InvPreviewDO::getMarketHashName, sellingHashNameList));
+            Map<String, InvPreviewDO> mapInvPreview = new HashMap<>();
+            if (Objects.nonNull(invPreviewDOS)) {
+                mapInvPreview = invPreviewDOS.stream().collect(Collectors.toMap(InvPreviewDO::getMarketHashName, i -> i, (v1, v2) -> v1));
+            }
+
+
+            Map<String, SellingMergeListReqVo> invPage = new HashMap<>();
+            for (SellingDO element : sellingDOS) {
+                if (Objects.nonNull(invPage.get(element.getMarketName()))) {
+                    SellingMergeListReqVo sellingMergeListReqVo = invPage.get(element.getMarketName());
+
+                    List<Integer> list1 = new ArrayList<>(sellingMergeListReqVo.getPrice());
+                    list1.add(Integer.valueOf(element.getPrice()));
+                    sellingMergeListReqVo.setPrice(list1);
+
+                    ArrayList<String> list = new ArrayList<>(sellingMergeListReqVo.getInvId());
+                    list.add(String.valueOf(element.getInvId()));
+                    sellingMergeListReqVo.setInvId(list);
+                    sellingMergeListReqVo.setNumber(list.size());
+
+                } else {
+                    SellingMergeListReqVo sellingPageReqVO1 = new SellingMergeListReqVo();
+
+                    InvPreviewDO invPreviewDO = mapInvPreview.get(element.getMarketHashName());
+
+                    if (Objects.nonNull(invPreviewDO)) {
+                        sellingPageReqVO1.setItemInfo(invPreviewDO.getItemInfo());
+                        sellingPageReqVO1.setMinPrice(invPreviewDO.getMinPrice());
+                    }
+                    sellingPageReqVO1.setMarketHashName(element.getMarketHashName());
+                    sellingPageReqVO1.setIconUrl(element.getIconUrl());
+                    sellingPageReqVO1.setSelType(element.getSelType());
+                    sellingPageReqVO1.setSelExterior(element.getSelExterior());
+                    sellingPageReqVO1.setSelItemset(element.getSelItemset());
+                    sellingPageReqVO1.setSelQuality(element.getSelQuality());
+                    sellingPageReqVO1.setSelRarity(element.getSelRarity());
+                    sellingPageReqVO1.setSelWeapon(element.getSelWeapon());
+                    sellingPageReqVO1.setAssetId(element.getAssetid());
+                    sellingPageReqVO1.setMarketName(element.getMarketName());
+                    sellingPageReqVO1.setStatus(element.getStatus());
+                    sellingPageReqVO1.setTransferStatus(element.getTransferStatus());
+                    sellingPageReqVO1.setInvId(Arrays.asList(String.valueOf(element.getInvId())));
+                    sellingPageReqVO1.setPrice(Arrays.asList(element.getPrice()));
+                    invPage.put(element.getMarketName(), sellingPageReqVO1);
+                }
+            }
+
+            List<SellingMergeListReqVo> sellingMergePage = new ArrayList<>();
+            for (Map.Entry<String, SellingMergeListReqVo> key : invPage.entrySet()) {
+                sellingMergePage.add(key.getValue());
+            }
+
+            return new PageResult<>(sellingMergePage, (long) sellingDOS.size());
+        }else{
+            List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
+                    .eq(SellingDO::getUserType, loginUser.getUserType())
+                    .eq(SellingDO::getUserId, loginUser.getId())
+                    .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus()));
+
+            if (Objects.isNull(sellingDOS) || sellingDOS.size() <= 0) {
+                return new PageResult<>(Collections.emptyList(), 0L);
+            }
+
+            List<String> sellingHashNameList = sellingDOS.stream().map(SellingDO::getMarketHashName).distinct().collect(Collectors.toList());
+            List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
+                    .in(InvPreviewDO::getMarketHashName, sellingHashNameList));
+            Map<String, InvPreviewDO> mapInvPreview = new HashMap<>();
+            if (Objects.nonNull(invPreviewDOS)) {
+                mapInvPreview = invPreviewDOS.stream().collect(Collectors.toMap(InvPreviewDO::getMarketHashName, i -> i, (v1, v2) -> v1));
+            }
+
+
+            Map<String, SellingMergeListReqVo> invPage = new HashMap<>();
+            for (SellingDO element : sellingDOS) {
+                if (Objects.nonNull(invPage.get(element.getMarketName()))) {
+                    SellingMergeListReqVo sellingMergeListReqVo = invPage.get(element.getMarketName());
+
+                    List<Integer> list1 = new ArrayList<>(sellingMergeListReqVo.getPrice());
+                    list1.add(Integer.valueOf(element.getPrice()));
+                    sellingMergeListReqVo.setPrice(list1);
+
+                    ArrayList<String> list = new ArrayList<>(sellingMergeListReqVo.getInvId());
+                    list.add(String.valueOf(element.getInvId()));
+                    sellingMergeListReqVo.setInvId(list);
+                    sellingMergeListReqVo.setNumber(list.size());
+
+                } else {
+                    SellingMergeListReqVo sellingPageReqVO1 = new SellingMergeListReqVo();
+
+                    InvPreviewDO invPreviewDO = mapInvPreview.get(element.getMarketHashName());
+
+                    if (Objects.nonNull(invPreviewDO)) {
+                        sellingPageReqVO1.setItemInfo(invPreviewDO.getItemInfo());
+                        sellingPageReqVO1.setMinPrice(invPreviewDO.getMinPrice());
+                    }
+                    sellingPageReqVO1.setMarketHashName(element.getMarketHashName());
+                    sellingPageReqVO1.setIconUrl(element.getIconUrl());
+                    sellingPageReqVO1.setSelType(element.getSelType());
+                    sellingPageReqVO1.setSelExterior(element.getSelExterior());
+                    sellingPageReqVO1.setSelItemset(element.getSelItemset());
+                    sellingPageReqVO1.setSelQuality(element.getSelQuality());
+                    sellingPageReqVO1.setSelRarity(element.getSelRarity());
+                    sellingPageReqVO1.setSelWeapon(element.getSelWeapon());
+                    sellingPageReqVO1.setAssetId(element.getAssetid());
+                    sellingPageReqVO1.setMarketName(element.getMarketName());
+                    sellingPageReqVO1.setStatus(element.getStatus());
+                    sellingPageReqVO1.setTransferStatus(element.getTransferStatus());
+                    sellingPageReqVO1.setInvId(Arrays.asList(String.valueOf(element.getInvId())));
+                    sellingPageReqVO1.setPrice(Arrays.asList(element.getPrice()));
+                    invPage.put(element.getMarketName(), sellingPageReqVO1);
+                }
+            }
+
+            List<SellingMergeListReqVo> sellingMergePage = new ArrayList<>();
+            for (Map.Entry<String, SellingMergeListReqVo> key : invPage.entrySet()) {
+                sellingMergePage.add(key.getValue());
+            }
+
+            return new PageResult<>(sellingMergePage, (long) sellingDOS.size());
         }
 
-        List<SellingMergeListReqVo> sellingMergePage = new ArrayList<>();
-        for (Map.Entry<String, SellingMergeListReqVo> key : invPage.entrySet()) {
-            sellingMergePage.add(key.getValue());
-        }
-
-        return new PageResult<>(sellingMergePage, (long) sellingDOS.size());
     }
 }
 
