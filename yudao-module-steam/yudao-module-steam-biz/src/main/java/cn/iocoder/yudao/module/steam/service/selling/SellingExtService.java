@@ -13,9 +13,11 @@ import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.InvPageReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
@@ -58,6 +60,8 @@ public class SellingExtService {
     private PaySteamOrderService paySteamOrderService;
     @Resource
     private InvDescService invDescService;
+    @Resource
+    private InvPreviewMapper invPreviewMapper;
 
     @Transactional(rollbackFor = ServiceException.class)
     public void batchSale(BatchSellReqVo reqVo, LoginUser loginUser) {
@@ -454,10 +458,23 @@ public class SellingExtService {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
 
         List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
-                .eqIfPresent(SellingDO::getUserType, loginUser.getUserType())
+                .eq(SellingDO::getUserType, loginUser.getUserType())
                 .eq(SellingDO::getUserId, loginUser.getId()));
+        if (Objects.isNull(sellingDOS) || sellingDOS.size() < 0) {
 
-        Map<String,SellingMergeListReqVo> invPage = new HashMap<>();
+            return new PageResult<>(Collections.emptyList(), 0L);
+        }
+
+        List<String> sellingHashNameList = sellingDOS.stream().map(SellingDO::getMarketHashName).distinct().collect(Collectors.toList());
+        List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
+                .in(InvPreviewDO::getMarketHashName, sellingHashNameList));
+        Map<String, InvPreviewDO> mapInvPreview = new HashMap<>();
+        if (Objects.nonNull(invPreviewDOS)) {
+            mapInvPreview = invPreviewDOS.stream().collect(Collectors.toMap(InvPreviewDO::getMarketHashName, i -> i, (v1, v2) -> v1));
+        }
+
+
+        Map<String, SellingMergeListReqVo> invPage = new HashMap<>();
         for (SellingDO element : sellingDOS) {
             if (Objects.nonNull(invPage.get(element.getMarketName()))) {
                 SellingMergeListReqVo sellingMergeListReqVo = invPage.get(element.getMarketName());
@@ -473,6 +490,13 @@ public class SellingExtService {
 
             } else {
                 SellingMergeListReqVo sellingPageReqVO1 = new SellingMergeListReqVo();
+
+                InvPreviewDO invPreviewDO = mapInvPreview.get(element.getMarketHashName());
+
+                if (Objects.nonNull(invPreviewDO)) {
+                    sellingPageReqVO1.setItemInfo(invPreviewDO.getItemInfo());
+                    sellingPageReqVO1.setMinPrice(invPreviewDO.getMinPrice());
+                }
                 sellingPageReqVO1.setMarketHashName(element.getMarketHashName());
                 sellingPageReqVO1.setIconUrl(element.getIconUrl());
                 sellingPageReqVO1.setSelType(element.getSelType());
@@ -481,20 +505,18 @@ public class SellingExtService {
                 sellingPageReqVO1.setSelQuality(element.getSelQuality());
                 sellingPageReqVO1.setSelRarity(element.getSelRarity());
                 sellingPageReqVO1.setSelWeapon(element.getSelWeapon());
-                /*sellingPageReqVO1.setPrice(element.getPrice());*/
                 sellingPageReqVO1.setAssetId(element.getAssetid());
                 sellingPageReqVO1.setMarketName(element.getMarketName());
                 sellingPageReqVO1.setStatus(element.getStatus());
                 sellingPageReqVO1.setTransferStatus(element.getTransferStatus());
                 sellingPageReqVO1.setInvId(Arrays.asList(String.valueOf(element.getInvId())));
                 sellingPageReqVO1.setPrice(Arrays.asList(element.getPrice()));
-                invPage.put(element.getMarketName(),sellingPageReqVO1);
-                /*invPage.put(String.valueOf(sellingPageReqVO1.getNumber()),null);*/
+                invPage.put(element.getMarketName(), sellingPageReqVO1);
             }
         }
 
         List<SellingMergeListReqVo> sellingMergePage = new ArrayList<>();
-        for(Map.Entry<String,SellingMergeListReqVo> key : invPage.entrySet()){
+        for (Map.Entry<String, SellingMergeListReqVo> key : invPage.entrySet()) {
             sellingMergePage.add(key.getValue());
         }
 

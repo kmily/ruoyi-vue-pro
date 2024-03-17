@@ -92,4 +92,12 @@ public class SellingPageReqVO extends PageParam {
     @Schema(description = "库存表id", example = "23726")
     private Long invId;
 
+    @Schema(description = "itemInfo")
+    private String itemInfo;
+
+    @Schema(description = "最高价格", example = "2")
+    private Integer maxPrice;
+    @Schema(description = "最低价格", example = "1")
+    private Integer minPrice;
+
 }

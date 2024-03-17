@@ -101,7 +101,7 @@ public class AppSellingController {
         SellingPageReqVO pageReqVO = new SellingPageReqVO();
 
         PageResult<SellingRespVO> sellingDOS = sellingExtService.sellingUnMerge(sellingPageReqVO);
-        pageReqVO.setPageSize(20);
+        pageReqVO.setPageSize(2000);
         pageReqVO.setPageNo(1);
 
         return CommonResult.success(sellingDOS);
@@ -111,7 +111,7 @@ public class AppSellingController {
     @Operation(summary = "出售合并")
     public CommonResult<PageResult<SellingMergeListReqVo>> sellingMerge(@Valid SellingPageReqVO sellingPageReqVO) {
         SellingPageReqVO pageReqVO = new SellingPageReqVO();
-        pageReqVO.setPageSize(20);
+        pageReqVO.setPageSize(2000);
         pageReqVO.setPageNo(1);
         PageResult<SellingMergeListReqVo> invPage = sellingExtService.sellingMerge(sellingPageReqVO);
         return CommonResult.success(invPage);

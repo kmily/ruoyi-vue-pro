@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.controller.app.selling.vo;
 
+import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
 import lombok.Data;
 
 import java.util.List;
@@ -52,4 +53,12 @@ public class SellingMergeListReqVo {
      * 类型选择
      */
     private String selType;
+
+    /**
+     * 平台最低价
+     */
+    private Integer minPrice;
+
+
+    private C5ItemInfo itemInfo;
 }

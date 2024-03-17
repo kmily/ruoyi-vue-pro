@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.steam.dal.dataobject.selling;
 
+import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 import java.util.*;
 import java.time.LocalDateTime;
