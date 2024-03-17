@@ -25,7 +25,7 @@ public class SellingMergeListReqVo {
     // 商品数量
     private Integer number;
     // 价格
-    private Integer price;
+    private List<Integer> price;
 
     // 分类查询字段
     /**

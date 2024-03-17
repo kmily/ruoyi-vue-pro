@@ -415,7 +415,7 @@ public class SellingExtService {
         PageResult<SellingDO> sellingPage = sellingService.getSellingPage(sellingPageReqVO);
 
         List<SellingDO> sellingDO1 = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
-                .eq(SellingDO::getUserId, sellingPage.getList().get(0).getUserId()));
+                .eq(SellingDO::getUserId, loginUser.getId()));
 
         List<SellingRespVO> sellingRespVOList = new ArrayList<>();
         for (SellingDO sellingDO : sellingDO1) {
@@ -458,13 +458,19 @@ public class SellingExtService {
                 .eq(SellingDO::getUserId, loginUser.getId()));
 
         Map<String,SellingMergeListReqVo> invPage = new HashMap<>();
-
         for (SellingDO element : sellingDOS) {
             if (Objects.nonNull(invPage.get(element.getMarketName()))) {
                 SellingMergeListReqVo sellingMergeListReqVo = invPage.get(element.getMarketName());
+
+                List<Integer> list1 = new ArrayList<>(sellingMergeListReqVo.getPrice());
+                list1.add(Integer.valueOf(element.getPrice()));
+                sellingMergeListReqVo.setPrice(list1);
+
                 ArrayList<String> list = new ArrayList<>(sellingMergeListReqVo.getInvId());
                 list.add(String.valueOf(element.getInvId()));
                 sellingMergeListReqVo.setInvId(list);
+                sellingMergeListReqVo.setNumber(list.size());
+
             } else {
                 SellingMergeListReqVo sellingPageReqVO1 = new SellingMergeListReqVo();
                 sellingPageReqVO1.setMarketHashName(element.getMarketHashName());
@@ -475,13 +481,15 @@ public class SellingExtService {
                 sellingPageReqVO1.setSelQuality(element.getSelQuality());
                 sellingPageReqVO1.setSelRarity(element.getSelRarity());
                 sellingPageReqVO1.setSelWeapon(element.getSelWeapon());
-                sellingPageReqVO1.setPrice(element.getPrice());
+                /*sellingPageReqVO1.setPrice(element.getPrice());*/
                 sellingPageReqVO1.setAssetId(element.getAssetid());
                 sellingPageReqVO1.setMarketName(element.getMarketName());
                 sellingPageReqVO1.setStatus(element.getStatus());
                 sellingPageReqVO1.setTransferStatus(element.getTransferStatus());
                 sellingPageReqVO1.setInvId(Arrays.asList(String.valueOf(element.getInvId())));
+                sellingPageReqVO1.setPrice(Arrays.asList(element.getPrice()));
                 invPage.put(element.getMarketName(),sellingPageReqVO1);
+                /*invPage.put(String.valueOf(sellingPageReqVO1.getNumber()),null);*/
             }
         }
 
