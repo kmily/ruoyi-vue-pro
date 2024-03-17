@@ -221,6 +221,18 @@ public class IOInvUpdateService {
                 .eq(InvDO::getBindUserId, invToMergeVO.getBindUserId()));
     }
 
+    /**
+     *  合并库存----查询库存方法  不分页
+     */
+    public List<InvDO> getInvToMerge1(@RequestParam InvDO invToMergeVO) {
+        // 查询库存 (所有库存不分页查询)
+        return invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
+//                .eq(InvDO::getTransferStatus, invToMergeVO.getTransferStatus())
+                .eq(InvDO::getUserId, invToMergeVO.getUserId())
+                .eq(InvDO::getSteamId, invToMergeVO.getSteamId())
+                .eq(InvDO::getBindUserId, invToMergeVO.getBindUserId()));
+    }
+
 
     /**
      *   按入参查询库存  或者合并库存
@@ -233,10 +245,10 @@ public class IOInvUpdateService {
             DescIdList.add(invDO.getInvDescId());
         }
         List<InvDescDO> invDescDOS = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
-                .in(InvDescDO::getId, DescIdList)
-                .eq(InvDescDO::getTradable, 1));
-        List<Long> enableInvDescId = invDescDOS.stream().map(InvDescDO::getId).collect(Collectors.toList());
-        List<InvDO> collect = invToMerge.stream().filter(i -> enableInvDescId.contains(i.getInvDescId())).collect(Collectors.toList());
+                .in(InvDescDO::getId, DescIdList));
+//                .eq(InvDescDO::getTradable, 1));
+//        List<Long> enableInvDescId = invDescDOS.stream().map(InvDescDO::getId).collect(Collectors.toList());
+//        List<InvDO> collect = invToMerge.stream().filter(i -> enableInvDescId.contains(i.getInvDescId())).collect(Collectors.toList());
 
 //        for(InvDO invDO : invToMerge){
 //            if(invDescDOS.contains(invDO.getInvDescId())){
@@ -251,7 +263,7 @@ public class IOInvUpdateService {
         }
         List<AppInvPageReqVO> appInvPageReqVO = new ArrayList<>();
 
-        for (InvDO invDO : collect) {
+        for (InvDO invDO : invToMerge) {
                 AppInvPageReqVO appInvPageReqVO1 = new AppInvPageReqVO();
                 if (map.isEmpty()) {
                     appInvPageReqVO1.setMarketName("null");
