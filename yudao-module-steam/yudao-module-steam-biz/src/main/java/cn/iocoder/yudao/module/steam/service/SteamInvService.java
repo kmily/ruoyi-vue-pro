@@ -24,6 +24,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.inv.InvService;
+import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
@@ -185,13 +186,13 @@ public class SteamInvService {
                 // 中文名称
                 appInvPageReqVO.setMarketName(map.get(item.getInvDescId()).getMarketName());
                 appInvPageReqVO.setMarketHashName(map.get(item.getInvDescId()).getMarketHashName());
-                if(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName())==null){
+                if(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName())==null || mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getItemInfo() == null){
                     appInvPageReqVO.setPrice(0);
+                    appInvPageReqVO.setItemInfo(new C5ItemInfo());
                 } else {
                     appInvPageReqVO.setPrice(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getMinPrice());
-
+                    appInvPageReqVO.setItemInfo(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getItemInfo());
                 }
-                appInvPageReqVO.setItemInfo(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getItemInfo());
 
                 appInvPageReqVO.setInvId(Collections.emptyList());
                 stringAppInvPageReqVOMap.put(item.getInvDescId(), appInvPageReqVO);
