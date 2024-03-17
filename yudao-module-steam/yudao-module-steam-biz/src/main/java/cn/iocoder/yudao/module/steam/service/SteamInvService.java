@@ -185,13 +185,14 @@ public class SteamInvService {
                 // 中文名称
                 appInvPageReqVO.setMarketName(map.get(item.getInvDescId()).getMarketName());
                 appInvPageReqVO.setMarketHashName(map.get(item.getInvDescId()).getMarketHashName());
-                if(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getMinPrice()==null){
+                if(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName())==null){
                     appInvPageReqVO.setPrice(0);
                 } else {
                     appInvPageReqVO.setPrice(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getMinPrice());
-                }
 
+                }
                 appInvPageReqVO.setItemInfo(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getItemInfo());
+
                 appInvPageReqVO.setInvId(Collections.emptyList());
                 stringAppInvPageReqVOMap.put(item.getInvDescId(), appInvPageReqVO);
             }
