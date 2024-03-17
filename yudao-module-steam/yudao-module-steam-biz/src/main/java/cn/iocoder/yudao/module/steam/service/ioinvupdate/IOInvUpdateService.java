@@ -235,7 +235,14 @@ public class IOInvUpdateService {
         List<InvDescDO> invDescDOS = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
                 .in(InvDescDO::getId, DescIdList)
                 .eq(InvDescDO::getTradable, 1));
+        List<Long> enableInvDescId = invDescDOS.stream().map(InvDescDO::getId).collect(Collectors.toList());
+        List<InvDO> collect = invToMerge.stream().filter(i -> enableInvDescId.contains(i.getInvDescId())).collect(Collectors.toList());
 
+//        for(InvDO invDO : invToMerge){
+//            if(invDescDOS.contains(invDO.getInvDescId())){
+//                invToMerge.remove(invDO.getInvDescId());
+//            }
+//        }
         Map<Long, InvDescDO> map = new HashMap<>();
 
         // 提取每个库存对应的详情表主键
@@ -244,7 +251,7 @@ public class IOInvUpdateService {
         }
         List<AppInvPageReqVO> appInvPageReqVO = new ArrayList<>();
 
-        for (InvDO invDO : invToMerge) {
+        for (InvDO invDO : collect) {
                 AppInvPageReqVO appInvPageReqVO1 = new AppInvPageReqVO();
                 if (map.isEmpty()) {
                     appInvPageReqVO1.setMarketName("null");
