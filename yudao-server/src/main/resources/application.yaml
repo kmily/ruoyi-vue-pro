@@ -253,8 +253,8 @@ yudao:
     send-frequency: 1m
     send-maximum-quantity-per-day: 5
     send-maximum-quantity-per-day-ip: 10
-    begin-code: 0000 # 这里配置 9999 的原因是，测试方便。
-    end-code: 9999 # 这里配置 9999 的原因是，测试方便。
+    begin-code: 000000 # 这里配置 9999 的原因是，测试方便。
+    end-code: 999999 # 这里配置 9999 的原因是，测试方便。
   trade:
     order:
       app-id: 1 # 商户编号
