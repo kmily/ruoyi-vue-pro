@@ -15,7 +15,6 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.framework.pay.core.WalletPayClient;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
-import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppInvPreviewReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppSellingPageReqVO;
@@ -25,7 +24,6 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
-import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
@@ -254,30 +252,6 @@ public class AppIo661ApiController {
             return ApiResult.error(e.getCode(),  e.getMessage(),AppPayOrderSubmitRespVO.class);
         }
 
-    }
-
-    /**
-     * 买家角度订单
-     * @param openApiReqVo
-     * @return
-     */
-    @Operation(summary = "库存订单列表")
-    @PostMapping("v1/api/listInvOrder")
-    @PermitAll
-    public ApiResult<PageResult> listInvOrder(@RequestBody OpenApiReqVo<InvOrderPageReqVO> openApiReqVo) {
-        try {
-            return DevAccountUtils.tenantExecute(1L, () -> {
-                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
-                InvOrderPageReqVO data = openApiReqVo.getData();
-                data.setUserId(devAccount.getId());
-                data.setUserType(devAccount.getUserType());
-                PageResult<InvOrderResp> invOrderPageOrder = paySteamOrderService.getInvOrderPageOrder(data);
-                return ApiResult.success(invOrderPageOrder);
-            });
-        } catch (ServiceException e) {
-
-            return ApiResult.error(e.getCode(),  e.getMessage(),PageResult.class);
-        }
     }
     /**
      * 查询订单详情

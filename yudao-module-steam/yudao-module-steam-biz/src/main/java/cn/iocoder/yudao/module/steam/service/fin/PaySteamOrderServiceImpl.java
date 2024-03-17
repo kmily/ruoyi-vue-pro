@@ -35,7 +35,6 @@ import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
-import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
@@ -73,7 +72,6 @@ import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static cn.hutool.core.util.ObjectUtil.notEqual;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -351,6 +349,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 .setPayOrderStatus(PayOrderStatusEnum.WAITING.getStatus())
                 .setTransferText(new TransferMsg()).setTransferStatus(InvTransferStatusEnum.SELL.getStatus()).setInvDescId(sellingDO.getInvDescId()).setInvId(sellingDO.getInvId())
                 //卖家信息
+                .setSellSteamId(sellingDO.getSteamId()).setMarketName(sellingDO.getMarketName())
                 .setSellCashStatus(InvSellCashStatusEnum.INIT.getStatus()).setSellUserId(sellingDO.getUserId()).setSellUserType(sellingDO.getUserType())
                 .setPayStatus(false).setRefundAmount(0).setUserId(loginUser.getId()).setUserType(loginUser.getUserType());
         validateInvOrderCanCreate(invOrderDO);
@@ -491,23 +490,46 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         return invOrderMapper.selectById(id);
     }
 
+
     @Override
-    public PageResult<InvOrderResp> getInvOrderPageOrder(InvOrderPageReqVO invOrderPageReqVO) {
-
+    public PageResult<Io661OrderInfoResp> getInvOrderWithPage(QueryOrderReqVo reqVo, LoginUser loginUser) {
+        InvOrderPageReqVO invOrderPageReqVO=new InvOrderPageReqVO();
+        invOrderPageReqVO.setMerchantNo(reqVo.getMerchantNo());
+        invOrderPageReqVO.setOrderNo(reqVo.getOrderNo());
+        invOrderPageReqVO.setPageNo(reqVo.getPageNo());
+        invOrderPageReqVO.setPageSize(reqVo.getPageSize());
+        invOrderPageReqVO.setUserId(loginUser.getId());
+        invOrderPageReqVO.setUserType(loginUser.getUserType());
         PageResult<InvOrderDO> invOrderDOPageResult = invOrderMapper.selectPage(invOrderPageReqVO);
-        List<InvOrderResp> ret=new ArrayList<>();
+        List<Io661OrderInfoResp> ret=new ArrayList<>();
         if(invOrderDOPageResult.getTotal()>0){
-            List<Long> collect = invOrderDOPageResult.getList().stream().map(InvOrderDO::getInvDescId).collect(Collectors.toList());
-            Map<Long, InvDescDO> collect1 = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
-                    .in(InvDescDO::getId, collect)).stream().collect(Collectors.toMap(InvDescDO::getId, o -> o, (n1, n2) -> n1));
-            for(InvOrderDO item:invOrderDOPageResult.getList()){
-                InvOrderResp invOrderResp=new InvOrderResp();
-                invOrderResp.setInvOrderDO(item);
-                invOrderResp.setInvDescDO(collect1.get(item.getInvDescId()));
-                ret.add(invOrderResp);
-            }
-        }
 
+            for(InvOrderDO item:invOrderDOPageResult.getList()){
+                Io661OrderInfoResp.Io661OrderInfoRespBuilder builder = Io661OrderInfoResp.builder();
+                //基础信息
+                builder.orderNo(item.getOrderNo()).merchantNo(item.getMerchantNo());
+                builder.steamId(item.getSteamId());
+                builder.platformName(item.getPlatformName());
+                builder.marketName(item.getMarketName());
+                builder.commodityAmount(item.getCommodityAmount());
+                //支付信息
+                builder.payTime(item.getPayTime()).payStatus(item.getPayStatus()).paymentAmount(item.getPaymentAmount());
+                builder.payRefundId(item.getPayRefundId()).refundAmount(item.getRefundAmount()).refundTime(item.getRefundTime());
+                //卖家信息
+                builder.sellSteamId(item.getSellSteamId());
+                //发货信息
+                if(Objects.nonNull(item.getTransferText())){
+                    builder.tradeOfferId(item.getTransferText().getTradeofferid());
+                }
+                builder.transferStatus(item.getTransferStatus());
+                //资金去向信息
+                builder.sellCashStatus(item.getSellCashStatus());
+                builder.transferDamagesAmount(item.getTransferDamagesAmount());
+                builder.transferRefundAmount(item.getTransferRefundAmount());
+                ret.add(builder.build());
+            }
+
+        }
         return new PageResult<>(ret, invOrderDOPageResult.getTotal());
     }
 
@@ -533,12 +555,26 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
         }
         Io661OrderInfoResp.Io661OrderInfoRespBuilder builder = Io661OrderInfoResp.builder();
+        //基础信息
         builder.orderNo(invOrderDO.getOrderNo()).merchantNo(invOrderDO.getMerchantNo());
         builder.steamId(invOrderDO.getSteamId());
-        builder.payStatus(invOrderDO.getPayStatus()).paymentAmount(invOrderDO.getPaymentAmount());
+        builder.platformName(invOrderDO.getPlatformName());
+        builder.marketName(invOrderDO.getMarketName());
+        builder.commodityAmount(invOrderDO.getCommodityAmount());
+        //支付信息
+        builder.payTime(invOrderDO.getPayTime()).payStatus(invOrderDO.getPayStatus()).paymentAmount(invOrderDO.getPaymentAmount());
+        builder.payRefundId(invOrderDO.getPayRefundId()).refundAmount(invOrderDO.getRefundAmount()).refundTime(invOrderDO.getRefundTime());
+        //卖家信息
+        builder.sellSteamId(invOrderDO.getSellSteamId());
+        //发货信息
         if(Objects.nonNull(invOrderDO.getTransferText())){
             builder.tradeOfferId(invOrderDO.getTransferText().getTradeofferid());
         }
+        builder.transferStatus(invOrderDO.getTransferStatus());
+        //资金去向信息
+        builder.sellCashStatus(invOrderDO.getSellCashStatus());
+        builder.transferDamagesAmount(invOrderDO.getTransferDamagesAmount());
+        builder.transferRefundAmount(invOrderDO.getTransferRefundAmount());
 
         return builder.build();
     }

@@ -127,6 +127,7 @@ public class InvOrderDO extends BaseDO {
     private Long sellUserId;
     /**
      * 卖家金额状态
+     * 枚举 {@link cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum 对应的类}
      */
     private Integer sellCashStatus;
     /**
@@ -183,5 +184,14 @@ public class InvOrderDO extends BaseDO {
      * 交易违约判定时间
      */
     private String transferDamagesRet;
+
+    /**
+     * 卖家steamId
+     */
+    private String sellSteamId;
+    /**
+     * 商品名称
+     */
+    private String marketName;
 
 }
