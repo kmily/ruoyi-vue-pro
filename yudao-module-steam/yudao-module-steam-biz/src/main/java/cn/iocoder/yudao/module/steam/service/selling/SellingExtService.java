@@ -459,7 +459,8 @@ public class SellingExtService {
 
         List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
                 .eq(SellingDO::getUserType, loginUser.getUserType())
-                .eq(SellingDO::getUserId, loginUser.getId()));
+                .eq(SellingDO::getUserId, loginUser.getId())
+                .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus()));
         if (Objects.isNull(sellingDOS) || sellingDOS.size() < 0) {
 
             return new PageResult<>(Collections.emptyList(), 0L);
