@@ -40,6 +40,7 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -139,59 +140,80 @@ public class SteamInvService {
             throw new ServiceException(-1, "获取库存失败，请检查你是否拥有库存");
         }
         // 库存对应的详情表主键
-        ArrayList<Object> invDescIdList = new ArrayList<>();
+        ArrayList<Long> invDescIdList = new ArrayList<>();
         for (InvDO invDO : invToMerge) {
             invDescIdList.add(invDO.getInvDescId());
         }
         // 根据 InvDescId 查询详情信息
         List<InvDescDO> invDescDOS = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
                 .in(InvDescDO::getId, invDescIdList));
-        HashMap<String, InvDescDO> mapfz = new HashMap<>();
+//        HashMap<String, InvDescDO> mapfz = new HashMap<>();
         HashMap<Long, InvDescDO> map = new HashMap<>();
-        for(InvDescDO invDescDO : invDescDOS){
-            map.put(invDescDO.getId(),invDescDO);
+        for (InvDescDO invDescDO : invDescDOS) {
+            map.put(invDescDO.getId(), invDescDO);
 //            mapfz.put(invDescDO.getMarketName(),invDescDO);
         }
 
         // 计算每一个 MarketHashName 出现的次数 TODO 可以优化  不够高效的统计方式
         Map<String, Long> collect = invDescDOS.stream().collect(Collectors.groupingBy(InvDescDO::getMarketHashName, Collectors.counting()));
         // 合并显示库存
-        List<AppInvPageReqVO> appInvPageReqVO = new ArrayList<>();
-        for(InvDO invDO : invToMerge){
-            if(invDO.getTransferStatus() == 0 && (map.get(invDO.getInvDescId()).getTradable()) == 1){
+//        List<AppInvPageReqVO> appInvPageReqVO = new ArrayList<>();
+        Map<Long, AppInvPageReqVO> stringAppInvPageReqVOMap = new HashMap<>();
 
-            }
-                AppInvPageReqVO appInvPageReqVO1 = new AppInvPageReqVO();
+        for (InvDO item : invToMerge) {
+            AppInvPageReqVO appInvPageReqVO = stringAppInvPageReqVOMap.get(item.getInvDescId());
+            if (Objects.isNull(appInvPageReqVO)) {
+                appInvPageReqVO = new AppInvPageReqVO();
                 // 图片
-                appInvPageReqVO1.setIconUrl(map.get(invDO.getInvDescId()).getIconUrl());
+                appInvPageReqVO.setIconUrl(map.get(item.getInvDescId()).getIconUrl());
                 // 中文名称
-                appInvPageReqVO1.setMarketName(map.get(invDO.getInvDescId()).getMarketName());
-                // 英文名称
-                appInvPageReqVO1.setMarketHashName(map.get(invDO.getInvDescId()).getMarketHashName());
-                // 出现次数
-                appInvPageReqVO1.setMergeNum(collect.get(map.get(invDO.getInvDescId()).getMarketName()));
-                // 库存id
-                appInvPageReqVO1.setInvId(invDO.getId());
-                // 库存唯一资产Id
-                appInvPageReqVO1.setAssetid(invDO.getAssetid());
-                // 分类选择字段
-                appInvPageReqVO1.setSelExterior(map.get(invDO.getInvDescId()).getSelExterior());
-                appInvPageReqVO1.setSelType(map.get(invDO.getInvDescId()).getSelType());
-                appInvPageReqVO1.setSelWeapon(map.get(invDO.getInvDescId()).getSelWeapon());
-                appInvPageReqVO1.setSelRarity(map.get(invDO.getInvDescId()).getSelRarity());
-                appInvPageReqVO1.setSelQuality(map.get(invDO.getInvDescId()).getSelQuality());
-                appInvPageReqVO.add(appInvPageReqVO1);
+                appInvPageReqVO.setMarketName(map.get(item.getInvDescId()).getMarketName());
+                appInvPageReqVO.setInvId(Collections.emptyList());
+                stringAppInvPageReqVOMap.put(item.getInvDescId(), appInvPageReqVO);
             }
-        return appInvPageReqVO;
+
+            List<Long> invId = appInvPageReqVO.getInvId();
+            appInvPageReqVO.setInvId(Stream.of(invId, Arrays.asList(item.getId())).flatMap(Long -> Long.stream()).collect(Collectors.toList()));
+
+
         }
+        return stringAppInvPageReqVOMap.values().stream().collect(Collectors.toList());
+
 
     }
 
 
-//    /**
-//     * 合并显示库存
-//     * @param invPage1  TODo  测试合并库存
-//     * @return
-//     */
 
 
+
+
+
+//        for(InvDO invDO : invToMerge){
+//            if(invDO.getTransferStatus() == 0 && (map.get(invDO.getInvDescId()).getTradable()) == 1){
+//
+//            }
+//                AppInvPageReqVO appInvPageReqVO1 = new AppInvPageReqVO();
+//                // 图片
+//                appInvPageReqVO1.setIconUrl(map.get(invDO.getInvDescId()).getIconUrl());
+//                // 中文名称
+//                appInvPageReqVO1.setMarketName(map.get(invDO.getInvDescId()).getMarketName());
+//                // 英文名称
+//                appInvPageReqVO1.setMarketHashName(map.get(invDO.getInvDescId()).getMarketHashName());
+//                // 出现次数
+//                appInvPageReqVO1.setMergeNum(collect.get(map.get(invDO.getInvDescId()).getMarketName()));
+//                // 库存id
+//                appInvPageReqVO1.setInvId(invDO.getId());
+//                // 库存唯一资产Id
+//                appInvPageReqVO1.setAssetid(invDO.getAssetid());
+//                // 分类选择字段
+//                appInvPageReqVO1.setSelExterior(map.get(invDO.getInvDescId()).getSelExterior());
+//                appInvPageReqVO1.setSelType(map.get(invDO.getInvDescId()).getSelType());
+//                appInvPageReqVO1.setSelWeapon(map.get(invDO.getInvDescId()).getSelWeapon());
+//                appInvPageReqVO1.setSelRarity(map.get(invDO.getInvDescId()).getSelRarity());
+//                appInvPageReqVO1.setSelQuality(map.get(invDO.getInvDescId()).getSelQuality());
+//                appInvPageReqVO.add(appInvPageReqVO1);
+//            }
+//        return appInvPageReqVO;
+//        }
+
+}

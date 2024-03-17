@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.AppMergeToSellReq;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvMergeToSellPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPageReqVO;
@@ -99,15 +100,20 @@ public class AppInventorySearchController {
      */
     @GetMapping("/mergeToSell")
     @Operation(summary = "合并库存")
-    public CommonResult<List<AppInvPageReqVO>> mergeToSell(@Valid InvDO inv) {
+    public CommonResult<List<AppInvPageReqVO>> mergeToSell(@Valid AppMergeToSellReq reqVo) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         List<BindUserDO> collect = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                 .eq(BindUserDO::getUserId, loginUser.getId())
                 .eq(BindUserDO::getUserType, loginUser.getUserType())
-                .eq(BindUserDO::getSteamId, inv.getSteamId()));
+                .eq(BindUserDO::getSteamId, reqVo.getSteamId()));
         if(Objects.isNull(collect) || collect.isEmpty()){
             throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
         }
+        InvDO inv=new InvDO();
+        inv.setSteamId(reqVo.getSteamId());
+        inv.setBindUserId(collect.get(0).getId());
+        inv.setTransferStatus(reqVo.getSearchType());
+        inv.setTransferStatus(0);
         // 访问本地库存 按条件查询库存
         inv.setUserId(loginUser.getId());
         inv.setBindUserId(collect.get(0).getId());

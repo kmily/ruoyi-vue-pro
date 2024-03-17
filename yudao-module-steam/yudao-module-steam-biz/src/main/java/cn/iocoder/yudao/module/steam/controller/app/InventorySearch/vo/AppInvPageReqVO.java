@@ -23,7 +23,7 @@ public class AppInvPageReqVO extends InvPageReqVO {
     private List<InventoryDto.DescriptionsDTOX.TagsDTO> tags;
     private Integer tradeable;
     // 库存ID
-    private Long InvId;
+    private List<Long> InvId;
     // 合并数量
     private Long mergeNum;
 
