@@ -39,6 +39,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -120,81 +121,77 @@ public class SteamInvService {
                 appInvPageReqVO1.setMarketHashName(map.get(invDO.getInvDescId()).getMarketHashName());
                 appInvPageReqVO.add(appInvPageReqVO1);
             }
+
         }
         return new PageResult<>(appInvPageReqVO, invPage.getTotal());
     }
 
 
-
-
     /**
      * 合并显示库存
-     * @param invPage1
+     *
+     * @param invToMerge
      * @return
      */
-//    public PageResult<AppInvMergeToSellPageReqVO> mergeInv(List<InvDO> invToMerge){
-//
-//    }
-//
-//        Map<String,AppInvMergeToSellPageReqVO> invPage = new HashMap<>();
-//        AppInvMergeToSellPageReqVO invPageReqVO = new AppInvMergeToSellPageReqVO();
-//        // 统计每一个 markName 的个数，并插入invPage
-//        for(InvDO element : invToMerge){
-//            if(Objects.nonNull(invPage.get(element.getMarketName())) ){
-//                AppInvMergeToSellPageReqVO appInvMergeToSellPageReqVO = invPage.get(element.getMarketName());
-//                ArrayList<String> list = new ArrayList<>(appInvMergeToSellPageReqVO.getAssetIdList());
-//                list.add(String.valueOf(element.getId()));
-//                appInvMergeToSellPageReqVO.setAssetIdList(list);
-//            }else{
-//                AppInvMergeToSellPageReqVO appInvPageReqVO = new AppInvMergeToSellPageReqVO();
-//                appInvPageReqVO.setMarketName(element.getMarketName());
-////                appInvPageReqVO.setAssetId(element.getAssetid());
-//                appInvPageReqVO.setPrice(element.getPrice());
-//                appInvPageReqVO.setIconUrl(element.getIconUrl());
-//                appInvPageReqVO.setSelQuality(element.getSelQuality());
-//                appInvPageReqVO.setSelWeapon(element.getSelWeapon());
-//                appInvPageReqVO.setSelExterior(element.getSelExterior());
-//                appInvPageReqVO.setSelRarity(element.getSelRarity());
-//                appInvPageReqVO.setSelItemset(element.getSelItemset());
-//                appInvPageReqVO.setSelType(element.getSelType());
-//                appInvPageReqVO.setId(element.getId());
-//                appInvPageReqVO.setTags(element.getTags());
-//                appInvPageReqVO.setTradeable(element.getTradeable());
-//                appInvPageReqVO.setMarketHashName(element.getMarketHashName());
-//                appInvPageReqVO.setAssetIdList(Arrays.asList(String.valueOf(element.getId())));
-//                invPage.put(element.getMarketName(),appInvPageReqVO);
-//            }
-//        }
-//
-//        List<AppInvMergeToSellPageReqVO> invMergePage = new ArrayList<>();
-//        for(Map.Entry<String,AppInvMergeToSellPageReqVO> key : invPage.entrySet()){
-//            invMergePage.add(key.getValue());
-//        }
-//        return new PageResult<>(invMergePage,invPage1.getTotal());
-//    }
+    public List<AppInvPageReqVO> mergeInv(List<InvDO> invToMerge) {
+        // 用户库存
+        if (invToMerge.isEmpty()) {
+            throw new ServiceException(-1, "获取库存失败，请检查你是否拥有库存");
+        }
+        // 库存对应的详情表主键
+        ArrayList<Object> invDescIdList = new ArrayList<>();
+        for (InvDO invDO : invToMerge) {
+            invDescIdList.add(invDO.getInvDescId());
+        }
+        // 根据 InvDescId 查询详情信息
+        List<InvDescDO> invDescDOS = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+                .in(InvDescDO::getId, invDescIdList));
+        HashMap<String, InvDescDO> mapfz = new HashMap<>();
+        HashMap<Long, InvDescDO> map = new HashMap<>();
+        for(InvDescDO invDescDO : invDescDOS){
+            map.put(invDescDO.getId(),invDescDO);
+//            mapfz.put(invDescDO.getMarketName(),invDescDO);
+        }
+
+        // 计算每一个 MarketHashName 出现的次数 TODO 可以优化  不够高效的统计方式
+        Map<String, Long> collect = invDescDOS.stream().collect(Collectors.groupingBy(InvDescDO::getMarketHashName, Collectors.counting()));
+        // 合并显示库存
+        List<AppInvPageReqVO> appInvPageReqVO = new ArrayList<>();
+        for(InvDO invDO : invToMerge){
+            if(invDO.getTransferStatus() == 0 && (map.get(invDO.getInvDescId()).getTradable()) == 1){
+
+            }
+                AppInvPageReqVO appInvPageReqVO1 = new AppInvPageReqVO();
+                // 图片
+                appInvPageReqVO1.setIconUrl(map.get(invDO.getInvDescId()).getIconUrl());
+                // 中文名称
+                appInvPageReqVO1.setMarketName(map.get(invDO.getInvDescId()).getMarketName());
+                // 英文名称
+                appInvPageReqVO1.setMarketHashName(map.get(invDO.getInvDescId()).getMarketHashName());
+                // 出现次数
+                appInvPageReqVO1.setMergeNum(collect.get(map.get(invDO.getInvDescId()).getMarketName()));
+                // 库存id
+                appInvPageReqVO1.setInvId(invDO.getId());
+                // 库存唯一资产Id
+                appInvPageReqVO1.setAssetid(invDO.getAssetid());
+                // 分类选择字段
+                appInvPageReqVO1.setSelExterior(map.get(invDO.getInvDescId()).getSelExterior());
+                appInvPageReqVO1.setSelType(map.get(invDO.getInvDescId()).getSelType());
+                appInvPageReqVO1.setSelWeapon(map.get(invDO.getInvDescId()).getSelWeapon());
+                appInvPageReqVO1.setSelRarity(map.get(invDO.getInvDescId()).getSelRarity());
+                appInvPageReqVO1.setSelQuality(map.get(invDO.getInvDescId()).getSelQuality());
+                appInvPageReqVO.add(appInvPageReqVO1);
+            }
+        return appInvPageReqVO;
+        }
+
+    }
 
 
-    /**
-     * 查询在售参考价
-     * 入参是库存的 MarketHashName
-     */
-//    public List<Map<String,Integer>> getLowestSellingPrice(LowestSellingPriceVO lowestSellingPriceVO){
-//        List<InvPreviewDO> invPreviewDOS = new ArrayList<>();
-//        List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
-//                .eq(InvPreviewDO::getMarketHashName, lowestSellingPriceVO.getMarketHashName()));
-//        AppInvMergeToSellPageReqVO priceVO = new LowestSellingPriceVO();
-//        for(InvPreviewDO item : invPreviewDOS){
-//            priceVO.setMarketHashName(item.getMarketHashName());
-//            priceVO.setAutoPrice(item.getAutoPrice());
-//        }
-
-
-//        return ;
-//   }
-
-}
-
-
-
+//    /**
+//     * 合并显示库存
+//     * @param invPage1  TODo  测试合并库存
+//     * @return
+//     */
 
 

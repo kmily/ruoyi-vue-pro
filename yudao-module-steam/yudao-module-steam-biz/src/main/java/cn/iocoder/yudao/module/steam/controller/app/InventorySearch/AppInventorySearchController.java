@@ -92,26 +92,29 @@ public class AppInventorySearchController {
     }
 
 
-
-
-
-
-
-
     /**
-     * 入参：steamId 或者 userId
+     * 入参：steamId(必传)
      *
-//     * @param invToMergeVO
+     * @param inv
      */
-//    @GetMapping("/mergeToSell")
-//    @Operation(summary = "合并库存")
-//    public CommonResult<List<AppInvPageReqVO>> mergeToSell(@Valid InvToMergeVO invToMergeVO) {
-//        // 访问本地库存 按条件查询库存
-//        List<InvDO> invToMerge = ioInvUpdateService.getInvToMerge(invToMergeVO);
-//        // 将相同库存合并
-//        List<AppInvPageReqVO> allInvToMerge = steamInvService.getAllInvToMerge(invToMerge);
-//        return success(allInvToMerge);
-//    }
+    @GetMapping("/mergeToSell")
+    @Operation(summary = "合并库存")
+    public CommonResult<List<AppInvPageReqVO>> mergeToSell(@Valid InvDO inv) {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        List<BindUserDO> collect = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+                .eq(BindUserDO::getUserId, loginUser.getId())
+                .eq(BindUserDO::getUserType, loginUser.getUserType())
+                .eq(BindUserDO::getSteamId, inv.getSteamId()));
+        if(Objects.isNull(collect) || collect.isEmpty()){
+            throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
+        }
+        // 访问本地库存 按条件查询库存
+        inv.setUserId(loginUser.getId());
+        inv.setBindUserId(collect.get(0).getId());
+        List<InvDO> invToMerge = ioInvUpdateService.getInvToMerge(inv);
+        // 将相同库存合并
+        return success(steamInvService.mergeInv(invToMerge));
+    }
 
 
 

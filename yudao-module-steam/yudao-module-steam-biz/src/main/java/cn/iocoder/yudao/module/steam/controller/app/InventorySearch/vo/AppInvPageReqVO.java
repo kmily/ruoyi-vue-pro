@@ -22,6 +22,10 @@ public class AppInvPageReqVO extends InvPageReqVO {
     private Integer userType;
     private List<InventoryDto.DescriptionsDTOX.TagsDTO> tags;
     private Integer tradeable;
+    // 库存ID
+    private Long InvId;
+    // 合并数量
+    private Long mergeNum;
 
 
     // 分类查询字段
@@ -50,6 +54,6 @@ public class AppInvPageReqVO extends InvPageReqVO {
      */
     private String selType;
 
-
+    private String assetList;
 
 }
