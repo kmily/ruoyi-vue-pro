@@ -194,4 +194,7 @@ public class InvOrderDO extends BaseDO {
      */
     private String marketName;
 
+    private Long sellBindUserId;
+    private Long buyBindUserId;
+
 }

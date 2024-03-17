@@ -338,6 +338,15 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         CreateOrderResult createOrderResult=new CreateOrderResult();
         SellingDO sellingDO = sellingMapper.selectById(reqVo.getSellId());
         InvDescDO invDescDO = invDescMapper.selectById(sellingDO.getInvDescId());
+        List<BindUserDO> buyBindUserDOS = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+                .eq(BindUserDO::getUserId, loginUser.getId())
+                .eq(BindUserDO::getUserType, loginUser.getUserType())
+                .eq(BindUserDO::getSteamId, reqVo.getSteamId())
+        );
+        if(Objects.isNull(buyBindUserDOS) || buyBindUserDOS.size()>1){
+            throw new ServiceException(OpenApiCode.ID_ERROR);
+        }
+        BindUserDO buyBindUserDO = buyBindUserDOS.get(0);
         // 1.1 获得商品
         InvOrderDO invOrderDO = new InvOrderDO().setOrderNo(noRedisDAO.generate(INV_ORDER_PREFIX)).setMerchantNo(reqVo.getMerchantNo())
                 .setSellId(reqVo.getSellId()).setSteamId(reqVo.getSteamId())
@@ -345,11 +354,11 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 .setPaymentAmount(0)
                 .setServiceFeeUserId(WITHDRAWAL_ACCOUNT_ID).setServiceFeeUserType(WITHDRAWAL_ACCOUNT_TYPE.getValue())
                 .setPlatformName(reqVo.getPlatform().getName()).setPlatformCode(reqVo.getPlatform().getCode())
-                .setSteamId(reqVo.getSteamId())
+                .setSteamId(reqVo.getSteamId()).setBuyBindUserId(buyBindUserDO.getId())
                 .setPayOrderStatus(PayOrderStatusEnum.WAITING.getStatus())
                 .setTransferText(new TransferMsg()).setTransferStatus(InvTransferStatusEnum.SELL.getStatus()).setInvDescId(sellingDO.getInvDescId()).setInvId(sellingDO.getInvId())
                 //卖家信息
-                .setSellSteamId(sellingDO.getSteamId()).setMarketName(sellingDO.getMarketName())
+                .setSellSteamId(sellingDO.getSteamId()).setMarketName(sellingDO.getMarketName()).setSellBindUserId(sellingDO.getBindUserId())
                 .setSellCashStatus(InvSellCashStatusEnum.INIT.getStatus()).setSellUserId(sellingDO.getUserId()).setSellUserType(sellingDO.getUserType())
                 .setPayStatus(false).setRefundAmount(0).setUserId(loginUser.getId()).setUserType(loginUser.getUserType());
         validateInvOrderCanCreate(invOrderDO);
@@ -392,15 +401,16 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw exception(ErrorCodeConstants.INVORDER_ORDERUSER_EXCEPT);
         }
         //检查是否可交易
-        Optional<InvDescDO> first1 = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
-                .eq(InvDescDO::getClassid, sellingDO.getClassid())
-                .eq(InvDescDO::getInstanceid, sellingDO.getInstanceid())
-                .eq(InvDescDO::getAppid, sellingDO.getAppid())
-        ).stream().findFirst();
-        if(!first1.isPresent()){
-            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
-        }
-        InvDescDO invDescDO = first1.get();
+        InvDescDO invDescDO = invDescMapper.selectById(sellingDO.getInvDescId());
+//        Optional<InvDescDO> first1 = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+//                .eq(InvDescDO::getClassid, sellingDO.getClassid())
+//                .eq(InvDescDO::getInstanceid, sellingDO.getInstanceid())
+//                .eq(InvDescDO::getAppid, sellingDO.getAppid())
+//        ).stream().findFirst();
+//        if(!first1.isPresent()){
+//            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
+//        }
+//        InvDescDO invDescDO = first1.get();
         if(invDescDO.getTradable() !=1){
             throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
         }
@@ -459,15 +469,19 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
         //检查用户steamID是否正确只检查bindUser
-        Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
-                .eq(BindUserDO::getUserId, invOrderDO.getUserId())
-                .eq(BindUserDO::getUserType, invOrderDO.getUserType())
-                .eq(BindUserDO::getSteamId, invOrderDO.getSteamId())
-        ).stream().findFirst();
-        if(!first.isPresent()){
+        BindUserDO bindUserDO = bindUserMapper.selectById(sellingDO.getBindUserId());
+        if(Objects.isNull(bindUserDO)){
             throw exception(ErrorCodeConstants.INVORDER_BIND_STEAM_EXCEPT);
         }
-        BindUserDO bindUserDO = first.get();
+//        Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+//                .eq(BindUserDO::getUserId, invOrderDO.getUserId())
+//                .eq(BindUserDO::getUserType, invOrderDO.getUserType())
+//                .eq(BindUserDO::getSteamId, invOrderDO.getSteamId())
+//        ).stream().findFirst();
+//        if(!first.isPresent()){
+//            throw exception(ErrorCodeConstants.INVORDER_BIND_STEAM_EXCEPT);
+//        }
+//        BindUserDO bindUserDO = first.get();
         if(Objects.isNull(bindUserDO.getSteamPassword())){
             throw exception(ErrorCodeConstants.INVORDER_BIND_STEAM_EXCEPT);
         }
@@ -737,6 +751,8 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         //检查是否已发货
         TransferMsg transferText = invOrderDO.getTransferText();
         if(Objects.isNull(transferText) || Objects.isNull(transferText.getTradeofferid())){
+
+        }else{
             throw exception(ErrorCodeConstants.INVORDER_ORDER_TRANSFER_ALERY);
         }
         return invOrderDO;
@@ -875,15 +891,10 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             if (PayOrderStatusEnum.REFUND.getStatus().equals(sellingDO.getStatus())) {
                 throw new ServiceException(-1,"已退款无法进行发货。");
             }
-            Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
-                    .eq(BindUserDO::getUserId, invOrder.getUserId())
-                    .eq(BindUserDO::getUserType, invOrder.getUserType())
-                    .eq(BindUserDO::getSteamId, invOrder.getSteamId())
-            ).stream().findFirst();
-            if(!first.isPresent()){
+            BindUserDO bindUserDO = bindUserMapper.selectById(invOrder.getBuyBindUserId());
+            if(Objects.isNull(bindUserDO)){
                 throw new ServiceException(-1,"收货方绑定关系失败无法发货。");
             }
-            BindUserDO bindUserDO = first.get();
             //收货方tradeUrl
             String tradeUrl = bindUserDO.getTradeUrl();
 //        SteamWeb steamWeb=new SteamWeb(configService);
@@ -893,7 +904,10 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
 //
 //        }
 //        steamWeb.checkTradeUrl(steamWeb.getTreadUrl().get());
-            BindUserDO bindUserDO1 = bindUserMapper.selectById(sellingDO.getBindUserId());
+            BindUserDO bindUserDO1 = bindUserMapper.selectById(invOrder.getSellBindUserId());
+            if(Objects.isNull(bindUserDO1)){
+                throw new ServiceException(-1,"发货方绑定关系失败无法发货。");
+            }
             //发货
             SteamWeb steamWeb=new SteamWeb(configService);
             if(steamWeb.checkLogin(bindUserDO1)){
