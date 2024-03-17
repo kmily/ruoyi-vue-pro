@@ -27,6 +27,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
@@ -128,7 +129,7 @@ public class AppIo661ApiController {
     @PostMapping("v1/api/sign")
     @Operation(summary = "余额查询")
     @PermitAll
-    public   OpenApiReqVo<QueryOrderReqVo> sign(@RequestBody OpenApiReqVo<QueryOrderReqVo> openApiReqVo) {
+    public   OpenApiReqVo<PaySteamOrderCreateReqVO> sign(@RequestBody OpenApiReqVo<PaySteamOrderCreateReqVO> openApiReqVo) {
         return DevAccountUtils.tenantExecute(1L, () -> openApiService.requestUUSign(openApiReqVo));
     }
     /**
@@ -246,7 +247,11 @@ public class AppIo661ApiController {
                 }
                 // 2. 提交支付
                 PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, ServletUtils.getClientIP());
-                return ApiResult.success(PayOrderConvert.INSTANCE.convert3(respVO));
+                AppPayOrderSubmitRespVO appPayOrderSubmitRespVO = PayOrderConvert.INSTANCE.convert3(respVO);
+                InvOrderDO invOrder1 = paySteamOrderService.getInvOrder(invOrder.getBizOrderId());
+                appPayOrderSubmitRespVO.setOrderNo(invOrder1.getOrderNo());
+                appPayOrderSubmitRespVO.setMerchantNo(invOrder1.getMerchantNo());
+                return ApiResult.success(appPayOrderSubmitRespVO);
             });
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(),  e.getMessage(),AppPayOrderSubmitRespVO.class);
