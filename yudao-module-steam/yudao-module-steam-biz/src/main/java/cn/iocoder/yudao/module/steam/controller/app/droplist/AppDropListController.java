@@ -184,6 +184,8 @@ public class AppDropListController {
         reqVO1.setSelExterior(reqVO.getSelExterior());
         reqVO1.setSelItemset(reqVO.getSelItemset());
         reqVO1.setExistInv(true);
+        reqVO1.setPageSize(reqVO.getPageSize());
+        reqVO1.setPageNo(reqVO.getPageNo());
         return success(invPreviewExtService.getInvPreviewPage(reqVO1));
     }
     @GetMapping("items/730/getHot")
