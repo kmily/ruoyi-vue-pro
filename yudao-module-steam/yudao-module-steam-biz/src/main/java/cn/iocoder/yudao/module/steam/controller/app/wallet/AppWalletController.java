@@ -11,10 +11,8 @@ import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
-import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
-import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
@@ -81,17 +79,6 @@ public class AppWalletController {
         reqVo.setMerchantNo(noRedisDAO.generate("WEBINV"));
         CreateOrderResult invOrder = paySteamOrderService.createInvOrder(loginUser, reqVo);
         return CommonResult.success(invOrder);
-    }
-    @PostMapping("/list/invOrder")
-    @Operation(summary = "库存订单列表")
-    @PreAuthenticated
-    @Deprecated
-    public CommonResult<PageResult<InvOrderResp>> listInvOrder(@Valid @RequestBody InvOrderPageReqVO invOrderPageReqVO) {
-        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        invOrderPageReqVO.setUserId(loginUser.getId());
-        invOrderPageReqVO.setUserType(loginUser.getUserType());
-        PageResult<InvOrderResp> invOrderPageOrder = paySteamOrderService.getInvOrderPageOrder(invOrderPageReqVO);
-        return CommonResult.success(invOrderPageOrder);
     }
     @PostMapping("/getInvOrderWithPage")
     @Operation(summary = "库存订单列表")

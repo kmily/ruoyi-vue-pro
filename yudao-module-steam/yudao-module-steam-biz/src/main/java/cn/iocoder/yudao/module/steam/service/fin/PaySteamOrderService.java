@@ -2,10 +2,8 @@ package cn.iocoder.yudao.module.steam.service.fin;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
-import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
@@ -53,20 +51,16 @@ public interface PaySteamOrderService {
     InvOrderDO getInvOrder(Long id);
 
     /**
-     * 获得示例订单列表
-     * @param invOrderPageReqVO 订单入参
-     * @return 订单列表
-     */
-    PageResult<InvOrderResp> getInvOrderPageOrder(InvOrderPageReqVO invOrderPageReqVO);
-    /**
-     * 获得示例订单列表
-     * @param invOrderPageReqVO 订单入参
-     * @return 订单列表
+     * 获取订单列表
+     * @param reqVo 订单入参
+     * @param loginUser 用户
+     * @return
      */
     PageResult<Io661OrderInfoResp> getInvOrderWithPage(QueryOrderReqVo reqVo, LoginUser loginUser);
     /**
      * 获取订单详情
-     * @param reqVo
+     * @param reqVo 订单入参
+     * @param loginUser 用户
      * @return
      */
     Io661OrderInfoResp getOrderInfo(QueryOrderReqVo reqVo, LoginUser loginUser);
