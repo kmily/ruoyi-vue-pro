@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
@@ -153,6 +154,22 @@ public class SteamInvService {
             map.put(invDescDO.getId(), invDescDO);
 //            mapfz.put(invDescDO.getMarketName(),invDescDO);
         }
+//        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+//        List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
+//                .eq(SellingDO::getUserType, loginUser.getUserType())
+//                .eq(SellingDO::getUserId, loginUser.getId()));
+//        if (Objects.isNull(sellingDOS) || sellingDOS.size() < 0) {
+//
+//            ;
+//        }
+        List<String> sellingHashNameList = invDescDOS.stream().map(InvDescDO::getMarketHashName).distinct().collect(Collectors.toList());
+        List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
+                .in(InvPreviewDO::getMarketHashName, sellingHashNameList));
+        Map<String, InvPreviewDO> mapInvPreview = new HashMap<>();
+        if (Objects.nonNull(invPreviewDOS)) {
+            mapInvPreview = invPreviewDOS.stream().collect(Collectors.toMap(InvPreviewDO::getMarketHashName, i -> i, (v1, v2) -> v1));
+        }
+
 
         // 计算每一个 MarketHashName 出现的次数 TODO 可以优化  不够高效的统计方式
         Map<String, Long> collect = invDescDOS.stream().collect(Collectors.groupingBy(InvDescDO::getMarketHashName, Collectors.counting()));
@@ -168,6 +185,9 @@ public class SteamInvService {
                 appInvPageReqVO.setIconUrl(map.get(item.getInvDescId()).getIconUrl());
                 // 中文名称
                 appInvPageReqVO.setMarketName(map.get(item.getInvDescId()).getMarketName());
+                appInvPageReqVO.setMarketHashName(map.get(item.getInvDescId()).getMarketHashName());
+                appInvPageReqVO.setPrice(mapInvPreview.get(item.getInvDescId()).getMinPrice());
+                appInvPageReqVO.setItemInfo(mapInvPreview.get(item.getInvDescId()).getItemInfo());
                 appInvPageReqVO.setInvId(Collections.emptyList());
                 stringAppInvPageReqVOMap.put(item.getInvDescId(), appInvPageReqVO);
             }
@@ -182,38 +202,5 @@ public class SteamInvService {
 
     }
 
-
-
-
-
-
-
-//        for(InvDO invDO : invToMerge){
-//            if(invDO.getTransferStatus() == 0 && (map.get(invDO.getInvDescId()).getTradable()) == 1){
-//
-//            }
-//                AppInvPageReqVO appInvPageReqVO1 = new AppInvPageReqVO();
-//                // 图片
-//                appInvPageReqVO1.setIconUrl(map.get(invDO.getInvDescId()).getIconUrl());
-//                // 中文名称
-//                appInvPageReqVO1.setMarketName(map.get(invDO.getInvDescId()).getMarketName());
-//                // 英文名称
-//                appInvPageReqVO1.setMarketHashName(map.get(invDO.getInvDescId()).getMarketHashName());
-//                // 出现次数
-//                appInvPageReqVO1.setMergeNum(collect.get(map.get(invDO.getInvDescId()).getMarketName()));
-//                // 库存id
-//                appInvPageReqVO1.setInvId(invDO.getId());
-//                // 库存唯一资产Id
-//                appInvPageReqVO1.setAssetid(invDO.getAssetid());
-//                // 分类选择字段
-//                appInvPageReqVO1.setSelExterior(map.get(invDO.getInvDescId()).getSelExterior());
-//                appInvPageReqVO1.setSelType(map.get(invDO.getInvDescId()).getSelType());
-//                appInvPageReqVO1.setSelWeapon(map.get(invDO.getInvDescId()).getSelWeapon());
-//                appInvPageReqVO1.setSelRarity(map.get(invDO.getInvDescId()).getSelRarity());
-//                appInvPageReqVO1.setSelQuality(map.get(invDO.getInvDescId()).getSelQuality());
-//                appInvPageReqVO.add(appInvPageReqVO1);
-//            }
-//        return appInvPageReqVO;
-//        }
 
 }
