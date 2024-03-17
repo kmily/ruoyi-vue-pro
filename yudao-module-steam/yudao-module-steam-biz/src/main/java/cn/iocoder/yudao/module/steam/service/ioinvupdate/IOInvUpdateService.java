@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.InvToMergeVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
@@ -209,29 +210,70 @@ public class IOInvUpdateService {
     }
 
     /**
-     *  合并库存----查询库存方法  // TODO
+     *  合并库存----查询库存方法  不分页
      */
-    public List<InvDO> getInvToMerge(@RequestParam InvToMergeVO invToMergeVO) {
-        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        List<BindUserDO> collect = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
-                .eq(BindUserDO::getUserId, loginUser.getId())
-                .eq(BindUserDO::getUserType, loginUser.getUserType())
-                .eq(BindUserDO::getSteamId, invToMergeVO.getSteamId()));
-        if(Objects.isNull(collect) || collect.isEmpty()){
-            throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
-        }
-        BindUserDO bindUserDO = new BindUserDO();
-        bindUserDO.setSteamId(invToMergeVO.getSteamId());
-        bindUserDO.setId(collect.get(0).getId());
-        bindUserDO.setUserId(collect.get(0).getUserId());
-
-        // 查询库存
-        List<InvDO> invDOS = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
-                .eq(InvDO::getTransferStatus, invToMergeVO.getTransferStatus())
-                .eq(InvDO::getUserId, bindUserDO.getUserId())
+    public List<InvDO> getInvToMerge(@RequestParam InvDO invToMergeVO) {
+        // 查询库存 (所有库存不分页查询)
+        return invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
+//                .eq(InvDO::getTransferStatus, invToMergeVO.getTransferStatus())
+                .eq(InvDO::getUserId, invToMergeVO.getUserId())
                 .eq(InvDO::getSteamId, invToMergeVO.getSteamId())
-                .eq(InvDO::getBindUserId, bindUserDO.getId())
-                .eq(InvDO::getTransferStatus,invToMergeVO.getTransferStatus()));
-        return invDOS;
+                .eq(InvDO::getBindUserId, invToMergeVO.getBindUserId()));
     }
-}
+
+
+    /**
+     *   按入参查询库存  或者合并库存
+     *   入参可传  库存主键ID  唯一资产ID
+     */
+    public List<AppInvPageReqVO> searchInv(List<InvDO> invToMerge) {
+        // 提取每个库存对应的详情表主键
+        ArrayList<Object> DescIdList = new ArrayList<>();
+        for (InvDO invDO : invToMerge) {
+            DescIdList.add(invDO.getInvDescId());
+        }
+        List<InvDescDO> invDescDOS = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+                .in(InvDescDO::getId, DescIdList));
+
+        Map<Long, InvDescDO> map = new HashMap<>();
+
+        // 提取每个库存对应的详情表主键
+        for (InvDescDO invDescDO : invDescDOS) {
+            map.put(invDescDO.getId(), invDescDO);
+        }
+        List<AppInvPageReqVO> appInvPageReqVO = new ArrayList<>();
+
+        for (InvDO invDO : invToMerge) {
+                AppInvPageReqVO appInvPageReqVO1 = new AppInvPageReqVO();
+                if (map.isEmpty()) {
+                    appInvPageReqVO1.setMarketName("null");
+                    appInvPageReqVO1.setMarketName("null");
+                } else {
+                    appInvPageReqVO1.setIconUrl(map.get(invDO.getInvDescId()).getIconUrl());
+                    appInvPageReqVO1.setMarketName(map.get(invDO.getInvDescId()).getMarketName());
+
+                    // 分类选择字段
+                    appInvPageReqVO1.setSelExterior(map.get(invDO.getInvDescId()).getSelExterior());
+                    appInvPageReqVO1.setSelType(map.get(invDO.getInvDescId()).getSelType());
+                    appInvPageReqVO1.setSelWeapon(map.get(invDO.getInvDescId()).getSelWeapon());
+                    appInvPageReqVO1.setSelRarity(map.get(invDO.getInvDescId()).getSelRarity());
+                    appInvPageReqVO1.setSelQuality(map.get(invDO.getInvDescId()).getSelQuality());
+                    appInvPageReqVO1.setSelType(map.get(invDO.getInvDescId()).getSelType());
+
+                    appInvPageReqVO1.setId(invDO.getId());
+                    appInvPageReqVO1.setSteamId(invDO.getSteamId());
+                    appInvPageReqVO1.setStatus(invDO.getStatus());
+                    appInvPageReqVO1.setTransferStatus(invDO.getTransferStatus());
+                    appInvPageReqVO1.setUserType(invDO.getUserType());
+                    appInvPageReqVO1.setPrice(invDO.getPrice());
+                    appInvPageReqVO1.setAssetid(invDO.getAssetid());
+                    appInvPageReqVO1.setTags(map.get(invDO.getInvDescId()).getTags());
+                    appInvPageReqVO1.setTradeable(map.get(invDO.getInvDescId()).getTradable());
+                    appInvPageReqVO1.setMarketHashName(map.get(invDO.getInvDescId()).getMarketHashName());
+                    appInvPageReqVO.add(appInvPageReqVO1);
+                }
+            }
+            return appInvPageReqVO;
+        }
+    }
+

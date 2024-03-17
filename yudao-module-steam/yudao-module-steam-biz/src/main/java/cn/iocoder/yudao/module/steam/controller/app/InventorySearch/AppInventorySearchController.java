@@ -63,25 +63,37 @@ public class AppInventorySearchController {
 
     /**
      * 用户手动查询自己的 steam_inv 库存（从数据库中获取数据）
-     *
-     * @param invPageReqVO steamid
+     *  入参 steamid
+     * @param inv
      * @return
      */
     @GetMapping("/after_SearchInDB")
     @Operation(summary = "从数据库中查询数据")
-    public CommonResult<PageResult<AppInvPageReqVO>> SearchInDB(@Valid InvPageReqVO invPageReqVO) {
+    public List<AppInvPageReqVO> SearchInDB(@Valid InvDO inv) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        List<BindUserDO> collect = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+        List<BindUserDO> bindUserDOS = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                 .eq(BindUserDO::getUserId, loginUser.getId())
                 .eq(BindUserDO::getUserType, loginUser.getUserType())
-                .eq(BindUserDO::getSteamId, invPageReqVO.getSteamId()));
-        if(Objects.isNull(collect) || collect.isEmpty()){
+                .eq(BindUserDO::getSteamId, inv.getSteamId()));
+        if(Objects.isNull(bindUserDOS) || bindUserDOS.isEmpty()){
             throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
         }
-        invPageReqVO.setUserId(loginUser.getId());
-        invPageReqVO.setBindUserId(collect.get(0).getId());
-        return success(steamInvService.getInvPage1(invPageReqVO));
+        inv.setUserId(loginUser.getId());
+        inv.setBindUserId(bindUserDOS.get(0).getId());
+//        inv.setTransferStatus(0);
+        // 全量不分表查询库存
+        List<InvDO> invToMerge = ioInvUpdateService.getInvToMerge(inv);
+        if(invToMerge.isEmpty()){
+            throw new ServiceException(-1,"获取库存失败");
+        }
+        // 返回图片价格名称等
+        List<AppInvPageReqVO> appInvPageReqVOS = ioInvUpdateService.searchInv(invToMerge);
+        return appInvPageReqVOS;
     }
+
+
+
+
 
 
 

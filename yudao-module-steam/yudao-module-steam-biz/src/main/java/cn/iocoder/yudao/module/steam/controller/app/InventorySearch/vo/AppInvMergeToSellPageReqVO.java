@@ -15,6 +15,8 @@ public class AppInvMergeToSellPageReqVO {
     private String iconUrl;
     // 名称
     private String marketName;
+    // steamid
+    private String steamId;
     private String marketHashName;
     // 状态
     private Integer status;
