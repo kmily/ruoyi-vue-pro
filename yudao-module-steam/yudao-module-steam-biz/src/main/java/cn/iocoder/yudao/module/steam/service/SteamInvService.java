@@ -171,8 +171,7 @@ public class SteamInvService {
         }
 
 
-        // 计算每一个 MarketHashName 出现的次数 TODO 可以优化  不够高效的统计方式
-        Map<String, Long> collect = invDescDOS.stream().collect(Collectors.groupingBy(InvDescDO::getMarketHashName, Collectors.counting()));
+
         // 合并显示库存
 //        List<AppInvPageReqVO> appInvPageReqVO = new ArrayList<>();
         Map<Long, AppInvPageReqVO> stringAppInvPageReqVOMap = new HashMap<>();
@@ -186,15 +185,15 @@ public class SteamInvService {
                 // 中文名称
                 appInvPageReqVO.setMarketName(map.get(item.getInvDescId()).getMarketName());
                 appInvPageReqVO.setMarketHashName(map.get(item.getInvDescId()).getMarketHashName());
-                appInvPageReqVO.setPrice(mapInvPreview.get(item.getInvDescId()).getMinPrice());
-                appInvPageReqVO.setItemInfo(mapInvPreview.get(item.getInvDescId()).getItemInfo());
+
+                appInvPageReqVO.setPrice(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getMinPrice());
+                appInvPageReqVO.setItemInfo(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getItemInfo());
                 appInvPageReqVO.setInvId(Collections.emptyList());
                 stringAppInvPageReqVOMap.put(item.getInvDescId(), appInvPageReqVO);
             }
 
             List<Long> invId = appInvPageReqVO.getInvId();
             appInvPageReqVO.setInvId(Stream.of(invId, Arrays.asList(item.getId())).flatMap(Long -> Long.stream()).collect(Collectors.toList()));
-
 
         }
         return stringAppInvPageReqVOMap.values().stream().collect(Collectors.toList());
