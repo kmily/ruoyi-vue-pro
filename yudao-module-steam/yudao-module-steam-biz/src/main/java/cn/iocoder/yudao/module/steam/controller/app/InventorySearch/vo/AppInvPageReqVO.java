@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo;
 
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
+import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -54,6 +55,7 @@ public class AppInvPageReqVO extends InvPageReqVO {
      */
     private String selType;
 
+    private C5ItemInfo itemInfo;
     private String assetList;
 
 }
