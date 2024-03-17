@@ -99,7 +99,7 @@ public class SteamWeb {
             if(Objects.nonNull(bindUserDO.getSteamPassword()) && Objects.nonNull(bindUserDO.getMaFile())){
                 login(bindUserDO.getSteamPassword(),bindUserDO.getMaFile());
             }else{
-                return false;
+                throw new ServiceException(-1,"登录失败");
             }
         }
         if(Objects.nonNull(bindUserDO.getLoginCookie()) && bindUserDO.getLoginCookie().equals(this.cookieString)){
