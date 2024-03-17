@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.steam.service.fin;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
@@ -56,6 +58,13 @@ public interface PaySteamOrderService {
      * @return 订单列表
      */
     PageResult<InvOrderResp> getInvOrderPageOrder(InvOrderPageReqVO invOrderPageReqVO);
+
+    /**
+     * 获取订单详情
+     * @param reqVo
+     * @return
+     */
+    Io661OrderInfoResp getOrderInfo(QueryOrderReqVo reqVo, LoginUser loginUser);
     /**
      * 更新示例订单为已支付
      *

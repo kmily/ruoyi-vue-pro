@@ -33,6 +33,8 @@ import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
@@ -507,6 +509,38 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         }
 
         return new PageResult<>(ret, invOrderDOPageResult.getTotal());
+    }
+
+    @Override
+    public Io661OrderInfoResp getOrderInfo(QueryOrderReqVo reqVo, LoginUser loginUser) {
+        InvOrderDO invOrderDO = null;
+        if(Objects.nonNull(reqVo.getOrderNo())){
+            invOrderDO = invOrderMapper.selectOne(new LambdaQueryWrapperX<InvOrderDO>()
+                    .eq(InvOrderDO::getUserId, loginUser.getId())
+                    .eq(InvOrderDO::getUserType, loginUser.getUserType())
+                    .eq(InvOrderDO::getOrderNo, reqVo.getOrderNo())
+            );
+        }else{
+            if(Objects.nonNull(reqVo.getMerchantNo())){
+                invOrderDO = invOrderMapper.selectOne(new LambdaQueryWrapperX<InvOrderDO>()
+                        .eq(InvOrderDO::getUserId,loginUser.getId())
+                        .eq(InvOrderDO::getUserType,loginUser.getUserType())
+                        .eq(InvOrderDO::getMerchantNo,reqVo.getMerchantNo())
+                );
+            }
+        }
+        if(Objects.isNull(invOrderDO)){
+            throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
+        }
+        Io661OrderInfoResp.Io661OrderInfoRespBuilder builder = Io661OrderInfoResp.builder();
+        builder.orderNo(invOrderDO.getOrderNo()).merchantNo(invOrderDO.getMerchantNo());
+        builder.steamId(invOrderDO.getSteamId());
+        builder.payStatus(invOrderDO.getPayStatus()).paymentAmount(invOrderDO.getPaymentAmount());
+        if(Objects.nonNull(invOrderDO.getTransferText())){
+            builder.tradeOfferId(invOrderDO.getTransferText().getTradeofferid());
+        }
+
+        return builder.build();
     }
 
     @Override

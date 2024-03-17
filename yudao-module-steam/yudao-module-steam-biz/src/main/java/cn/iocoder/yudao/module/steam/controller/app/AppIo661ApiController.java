@@ -23,6 +23,8 @@ import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.ItemResp;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.SellListItemResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderResp;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
@@ -128,7 +130,7 @@ public class AppIo661ApiController {
     @PostMapping("v1/api/sign")
     @Operation(summary = "余额查询")
     @PermitAll
-    public   OpenApiReqVo<AppInvPreviewReqVO> sign(@RequestBody OpenApiReqVo<AppInvPreviewReqVO> openApiReqVo) {
+    public   OpenApiReqVo<QueryOrderReqVo> sign(@RequestBody OpenApiReqVo<QueryOrderReqVo> openApiReqVo) {
         return DevAccountUtils.tenantExecute(1L, () -> openApiService.requestUUSign(openApiReqVo));
     }
     /**
@@ -275,6 +277,26 @@ public class AppIo661ApiController {
         } catch (ServiceException e) {
 
             return ApiResult.error(e.getCode(),  e.getMessage(),PageResult.class);
+        }
+    }
+    /**
+     * 查询订单详情
+     * @param openApiReqVo
+     * @return
+     */
+    @Operation(summary = "查询订单详情")
+    @PostMapping("v1/api/orderStatus")
+    @PermitAll
+    public ApiResult<Io661OrderInfoResp> orderStatus(@RequestBody OpenApiReqVo<QueryOrderReqVo> openApiReqVo) {
+        try {
+            return DevAccountUtils.tenantExecute(1L, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
+                return ApiResult.success(paySteamOrderService.getOrderInfo(openApiReqVo.getData(), loginUser));
+            });
+        } catch (ServiceException e) {
+
+            return ApiResult.error(e.getCode(),  e.getMessage(),Io661OrderInfoResp.class);
         }
     }
 }
