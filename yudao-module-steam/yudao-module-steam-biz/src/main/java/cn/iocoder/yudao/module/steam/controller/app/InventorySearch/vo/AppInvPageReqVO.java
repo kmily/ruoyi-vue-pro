@@ -23,6 +23,7 @@ public class AppInvPageReqVO extends InvPageReqVO {
     private Integer userType;
     private List<InventoryDto.DescriptionsDTOX.TagsDTO> tags;
     private Integer tradeable;
+    private String C5Price;
     // 库存ID
     private List<Long> InvId;
     // 合并数量
