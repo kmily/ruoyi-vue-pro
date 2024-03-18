@@ -50,6 +50,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
+import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
@@ -151,6 +152,10 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     private BindUserService bindUserService;
 
     private ObjectMapper objectMapper;
+
+
+    @Autowired
+    private SteamService steamService;
 
     @Autowired
     public void setObjectMapper(ObjectMapper objectMapper) {
@@ -335,6 +340,12 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CreateOrderResult createInvOrder(LoginUser loginUser, @Valid PaySteamOrderCreateReqVO reqVo) {
+
+
+
+
+
+
         CreateOrderResult createOrderResult=new CreateOrderResult();
         SellingDO sellingDO = sellingMapper.selectById(reqVo.getSellId());
         InvDescDO invDescDO = invDescMapper.selectById(sellingDO.getInvDescId());

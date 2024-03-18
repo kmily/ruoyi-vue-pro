@@ -11,15 +11,14 @@ import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppBindUserApiKe
 import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppUnBindUserReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
-import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
-import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
-import cn.iocoder.yudao.module.steam.service.steam.*;
+import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
+import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
+import cn.iocoder.yudao.module.steam.service.steam.SteamMaFile;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -55,21 +54,15 @@ public class SteamService {
         this.objectMapper = objectMapper;
     }
 
-    @Resource
-    private InvOrderMapper invOrderMapper;
 
     @Resource
     private InvMapper invMapper;
 
-    private PaySteamOrderService paySteamOrderService;
 
     @Resource
     private IOInvUpdateService ioInvUpdateService;
 
-    @Autowired
-    public void setPaySteamOrderService(PaySteamOrderService paySteamOrderService) {
-        this.paySteamOrderService = paySteamOrderService;
-    }
+
 
     /**
      * 帐号绑定
