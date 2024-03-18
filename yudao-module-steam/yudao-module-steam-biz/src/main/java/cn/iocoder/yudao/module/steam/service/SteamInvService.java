@@ -131,7 +131,7 @@ public class SteamInvService {
 
 
     /**
-     * 合并显示库存
+     * 合并显示库存  不包含不可出售库存
      *
      * @param invToMerge
      * @return
@@ -207,6 +207,85 @@ public class SteamInvService {
 
 
     }
+
+    /**
+     * 合并显示库存  全部库存  包含不可出售库存
+     *
+     * @param invToMerge
+     * @return
+     */
+    public List<AppInvPageReqVO> mergeInvAll(List<InvDO> invToMerge) {
+        // 用户库存
+        if (invToMerge.isEmpty()) {
+            throw new ServiceException(-1, "获取库存失败，请检查你是否拥有库存，或者你的商品全部已经上架");
+        }
+        // 库存对应的详情表主键
+        ArrayList<Long> invDescIdList = new ArrayList<>();
+        for (InvDO invDO : invToMerge) {
+            invDescIdList.add(invDO.getInvDescId());
+        }
+        // 根据 InvDescId 查询详情信息
+        List<InvDescDO> invDescDOS = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+                .in(InvDescDO::getId, invDescIdList));
+//                .eq(InvDescDO::getTradable, 1));
+//        List<Long> enableInvDescId = invDescDOS.stream().map(InvDescDO::getId).collect(Collectors.toList());
+//        List<InvDO> collect = invToMerge.stream().filter(i -> enableInvDescId.contains(i.getInvDescId())).collect(Collectors.toList());
+
+        HashMap<Long, InvDescDO> map = new HashMap<>();
+        for (InvDescDO invDescDO : invDescDOS) {
+            map.put(invDescDO.getId(), invDescDO);
+        }
+
+        List<String> sellingHashNameList = invDescDOS.stream().map(InvDescDO::getMarketHashName).distinct().collect(Collectors.toList());
+        List<InvPreviewDO> invPreviewDOS;
+        if(sellingHashNameList.isEmpty()){
+            invPreviewDOS = new ArrayList<>();
+        } else {
+            invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
+                    .in(InvPreviewDO::getMarketHashName, sellingHashNameList));
+        }
+
+        Map<String, InvPreviewDO> mapInvPreview = new HashMap<>();
+        if (Objects.nonNull(invPreviewDOS)) {
+            mapInvPreview = invPreviewDOS.stream().collect(Collectors.toMap(InvPreviewDO::getMarketHashName, i -> i, (v1, v2) -> v1));
+        }
+
+
+
+        // 合并显示库存
+//        List<AppInvPageReqVO> appInvPageReqVO = new ArrayList<>();
+        Map<Long, AppInvPageReqVO> stringAppInvPageReqVOMap = new HashMap<>();
+
+        for (InvDO item : invToMerge) {
+            AppInvPageReqVO appInvPageReqVO = stringAppInvPageReqVOMap.get(item.getInvDescId());
+            if (Objects.isNull(appInvPageReqVO)) {
+                appInvPageReqVO = new AppInvPageReqVO();
+                // 图片
+                appInvPageReqVO.setIconUrl(map.get(item.getInvDescId()).getIconUrl());
+                // 中文名称
+                appInvPageReqVO.setMarketName(map.get(item.getInvDescId()).getMarketName());
+                appInvPageReqVO.setMarketHashName(map.get(item.getInvDescId()).getMarketHashName());
+                if(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName())==null){
+                    appInvPageReqVO.setC5Price("0.00");
+                    appInvPageReqVO.setItemInfo(new C5ItemInfo());
+                } else {
+                    appInvPageReqVO.setC5Price(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getPrice());
+                    appInvPageReqVO.setItemInfo(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getItemInfo());
+                }
+
+                appInvPageReqVO.setInvId(Collections.emptyList());
+                stringAppInvPageReqVOMap.put(item.getInvDescId(), appInvPageReqVO);
+            }
+
+            List<Long> invId = appInvPageReqVO.getInvId();
+            appInvPageReqVO.setInvId(Stream.of(invId, Arrays.asList(item.getId())).flatMap(Long -> Long.stream()).collect(Collectors.toList()));
+
+        }
+        return stringAppInvPageReqVOMap.values().stream().collect(Collectors.toList());
+
+
+    }
+
 
 
 }

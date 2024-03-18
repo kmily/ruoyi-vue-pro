@@ -819,10 +819,10 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         closeInvOrder(invOrderId);
         PayOrderDO order = payOrderService.getOrder(invOrder.getPayOrderId());
         if (PayOrderStatusEnum.isSuccess(order.getStatus())) {
-            Integer commodityAmount = invOrder.getCommodityAmount();
+            Integer paymentAmount = invOrder.getPaymentAmount();
             BigDecimal divide = new BigDecimal("2").divide(new BigDecimal("100"), 2,RoundingMode.HALF_UP);
-            int transferDamagesAmount = divide.multiply(new BigDecimal(commodityAmount.toString())).intValue();
-            int transferRefundAmount = commodityAmount - transferDamagesAmount;
+            int transferDamagesAmount = divide.multiply(new BigDecimal(paymentAmount.toString())).intValue();
+            int transferRefundAmount = paymentAmount - transferDamagesAmount;
 //            invOrder.setTransferDamagesAmount(transferDamagesAmount);
 //            invOrder.setTransferRefundAmount(transferRefundAmount);
 //            invOrder.setTransferDamagesTime(LocalDateTime.now());
