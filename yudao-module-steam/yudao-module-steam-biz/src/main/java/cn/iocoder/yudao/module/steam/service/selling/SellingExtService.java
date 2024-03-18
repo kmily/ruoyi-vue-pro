@@ -7,9 +7,6 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
-import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingRespVO;
-import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvMergeToSellPageReqVO;
-import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.InvPageReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
@@ -21,7 +18,6 @@ import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
-import cn.iocoder.yudao.module.steam.service.invdesc.InvDescService;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
@@ -33,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,8 +45,6 @@ public class SellingExtService {
     @Resource
     private SellingMapper sellingMapper;
     @Resource
-    private SellingService sellingService;
-    @Resource
     private InvMapper invMapper;
     @Resource
     private InvDescMapper invDescMapper;
@@ -59,8 +52,6 @@ public class SellingExtService {
     private InvPreviewExtService invPreviewExtService;
     @Autowired
     private PaySteamOrderService paySteamOrderService;
-    @Resource
-    private InvDescService invDescService;
     @Resource
     private InvPreviewMapper invPreviewMapper;
 
@@ -105,9 +96,6 @@ public class SellingExtService {
             }
             BatchSellReqVo.Item itemPriceInfo = first.get();
             item.setPrice(itemPriceInfo.getPrice());
-//            InvDO invDO = invDOS.get(0);
-            // 商品上架流程
-//            invDO.setPrice(invPageReqVos.getPrice());
             item.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
             invMapper.updateById(item);
             Optional<InvDescDO> invDescDO = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
@@ -199,6 +187,7 @@ public class SellingExtService {
             invPreviewExtService.markInvEnable(item.getMarketHashName());
         }
     }
+
     /**
      * 批量修改价格
      *
@@ -288,7 +277,7 @@ public class SellingExtService {
                     if (Objects.nonNull(invPreviewDO)) {
                         sellingPageReqVO1.setItemInfo(invPreviewDO.getItemInfo());
                         sellingPageReqVO1.setMinPrice(invPreviewDO.getMinPrice());
-                    }else{
+                    } else {
                         sellingPageReqVO1.setItemInfo(new C5ItemInfo());
                         sellingPageReqVO1.setMinPrice(0);
                     }
@@ -357,7 +346,7 @@ public class SellingExtService {
                     if (Objects.nonNull(invPreviewDO)) {
                         sellingPageReqVO1.setItemInfo(invPreviewDO.getItemInfo());
                         sellingPageReqVO1.setMinPrice(invPreviewDO.getMinPrice());
-                    }else{
+                    } else {
                         sellingPageReqVO1.setItemInfo(new C5ItemInfo());
                         sellingPageReqVO1.setMinPrice(0);
                     }
