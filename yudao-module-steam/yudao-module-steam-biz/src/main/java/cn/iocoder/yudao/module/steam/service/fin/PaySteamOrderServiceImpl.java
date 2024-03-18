@@ -459,15 +459,6 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         }
         //检查是否可交易
         InvDescDO invDescDO = invDescMapper.selectById(sellingDO.getInvDescId());
-//        Optional<InvDescDO> first1 = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
-//                .eq(InvDescDO::getClassid, sellingDO.getClassid())
-//                .eq(InvDescDO::getInstanceid, sellingDO.getInstanceid())
-//                .eq(InvDescDO::getAppid, sellingDO.getAppid())
-//        ).stream().findFirst();
-//        if(!first1.isPresent()){
-//            throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
-//        }
-//        InvDescDO invDescDO = first1.get();
         if(invDescDO.getTradable() !=1){
             throw exception(ErrorCodeConstants.INVORDER_INV_NOT_FOUND);
         }
