@@ -80,5 +80,9 @@ public class BindUserDO extends BaseDO {
      * 地址池id
      */
     private String avatarUrl;
+    /**
+     * 是否临时账号
+     */
+    private Boolean isTempAccount;
 
 }

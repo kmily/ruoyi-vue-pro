@@ -144,13 +144,42 @@ public class SteamService {
         }
         return i;
     }
-    public List<BindUserDO> steamList(){
-        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+
+    /**
+     * 获取临时帐号
+     * @param loginUser
+     * @param tradeUrl
+     * @return
+     */
+    public List<BindUserDO> getTempBindUserByLogin(LoginUser loginUser,String tradeUrl){
+        List<BindUserDO> bindUserDOS = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+                .eqIfPresent(BindUserDO::getUserId, loginUser.getId())
+                .eqIfPresent(BindUserDO::getTradeUrl,tradeUrl)
+                .eqIfPresent(BindUserDO::getIsTempAccount,false)
+                .orderByDesc(BindUserDO::getId));
+        for(BindUserDO bindUserDO:bindUserDOS){
+            bindUserDO.setSteamPassword(Objects.isNull(bindUserDO.getSteamPassword())?"0":"1");
+            bindUserDO.setMaFile(null);
+        }
+        return bindUserDOS;
+    }
+
+    /**
+     * 获取bind用户
+     * @param loginUser
+     * @return
+     */
+    public List<BindUserDO> getBindUserByLoginUser(LoginUser loginUser){
+        return getBindUserByLoginUser(loginUser,null);
+    }
+    public List<BindUserDO> getBindUserByLoginUser(LoginUser loginUser,String tradeUrl){
         if(Objects.isNull(loginUser)){
             throw new ServiceException(OpenApiCode.ID_ERROR);
         }
         List<BindUserDO> bindUserDOS = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                 .eqIfPresent(BindUserDO::getUserId, loginUser.getId())
+                .eqIfPresent(BindUserDO::getTradeUrl,tradeUrl)
+                .eqIfPresent(BindUserDO::getIsTempAccount,false)
                 .orderByDesc(BindUserDO::getId));
         for(BindUserDO bindUserDO:bindUserDOS){
             bindUserDO.setSteamPassword(Objects.isNull(bindUserDO.getSteamPassword())?"0":"1");
