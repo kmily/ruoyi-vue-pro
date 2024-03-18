@@ -144,7 +144,7 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
         // 2. 删除
         receivablePlanMapper.deleteById(id);
         // 3. 删除数据权限
-        permissionService.deletePermission(CrmBizTypeEnum.CRM_CUSTOMER.getType(), id);
+        permissionService.deletePermission(CrmBizTypeEnum.CRM_RECEIVABLE_PLAN.getType(), id);
 
         // 4. 记录操作日志上下文
         LogRecordContext.putVariable("receivablePlan", receivablePlan);
