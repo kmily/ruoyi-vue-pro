@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversatio
 import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationDO;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 /**
  * 会话 Service 接口
  *
@@ -53,10 +55,23 @@ public interface ImConversationService {
 
 
     /**
-     * 保存私聊会话
+     * 获得用户的会话列表
      *
-     * @param fromUserId 发送者
-     * @param receiverId 接收者
+     * @return 会话列表
      */
-    void savePrivateConversation(Long fromUserId, Long receiverId);
+    List<ImConversationDO> getConversationList();
+
+    /**
+     * 置顶会话
+     *
+     * @param updateReqVO 更新信息
+     */
+    void updateTop(ImConversationSaveReqVO updateReqVO);
+
+    /**
+     * 更新最后已读时间
+     *
+     * @param updateReqVO 更新信息
+     */
+    void updateLastReadTime(ImConversationSaveReqVO updateReqVO);
 }

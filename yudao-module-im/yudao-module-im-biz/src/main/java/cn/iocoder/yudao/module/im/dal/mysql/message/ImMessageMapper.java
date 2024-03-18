@@ -4,8 +4,12 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessagePageReqVO;
+import cn.iocoder.yudao.module.im.dal.dataobject.inbox.ImInboxDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 /**
  * 消息 Mapper
@@ -32,4 +36,24 @@ public interface ImMessageMapper extends BaseMapperX<ImMessageDO> {
                 .orderByDesc(ImMessageDO::getId));
     }
 
+    default List<ImMessageDO> getGreaterThanSequenceMessage(Long userId, Long sequence, Integer size) {
+        //查询 inbox 表中，大于 sequence 的消息,关联 message 表，按照 inbox 表 sequence 升序
+        return selectJoinList(ImMessageDO.class, new MPJLambdaWrapper<ImMessageDO>()
+                .selectAll(ImMessageDO.class)
+                .innerJoin(ImInboxDO.class, ImInboxDO::getMessageId, ImMessageDO::getId)
+                .eq(ImInboxDO::getUserId, userId)
+                .gt(ImInboxDO::getSequence, sequence)
+                .orderByAsc(ImInboxDO::getSequence)
+                .last("limit 0," + size));
+    }
+
+    default List<ImMessageDO> getAllMessage(Long userId, Integer size) {
+        //查询 inbox 表中，100条消息,关联 message 表，按照 inbox 表 sequence 降序
+        return selectJoinList(ImMessageDO.class, new MPJLambdaWrapper<ImMessageDO>()
+                .selectAll(ImMessageDO.class)
+                .innerJoin(ImInboxDO.class, ImInboxDO::getMessageId, ImMessageDO::getId)
+                .eq(ImInboxDO::getUserId, userId)
+                .orderByDesc(ImInboxDO::getSequence)
+                .last("limit 0," + size));
+    }
 }

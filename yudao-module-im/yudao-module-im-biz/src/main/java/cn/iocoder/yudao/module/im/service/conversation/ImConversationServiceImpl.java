@@ -1,15 +1,18 @@
 package cn.iocoder.yudao.module.im.service.conversation;
 
+import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationPageReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationDO;
 import cn.iocoder.yudao.module.im.dal.mysql.conversation.ImConversationMapper;
-import cn.iocoder.yudao.module.im.enums.conversation.ImConversationTypeEnum;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+
+import java.util.Date;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.CONVERSATION_NOT_EXISTS;
@@ -69,25 +72,36 @@ public class ImConversationServiceImpl implements ImConversationService {
     }
 
     @Override
-    public void savePrivateConversation(Long fromUserId, Long receiverId) {
-        // 创建并保存会话
-        createAndSaveConversation(fromUserId, receiverId);
-        createAndSaveConversation(receiverId, fromUserId);
+    public List<ImConversationDO> getConversationList() {
+        return imConversationMapper.selectList();
     }
 
-    private void createAndSaveConversation(Long userId, Long targetId) {
-        // 创建会话
-        ImConversationDO conversation = new ImConversationDO();
-        conversation.setUserId(userId);
-        conversation.setConversationType(ImConversationTypeEnum.PRIVATE.getType());
-        conversation.setTargetId(targetId);
-        conversation.setNo("s_" + userId + "_" + targetId);
-        conversation.setPinned(false);
+    @Override
+    public void updateTop(ImConversationSaveReqVO updateReqVO) {
+        createOrUpdateConversation(updateReqVO);
+    }
 
-        // 根据 no 查询是否存在,不存在则新增
-        ImConversationDO imConversationDO = imConversationMapper.selectByNo(conversation.getNo());
-        if (imConversationDO == null) {
-            imConversationMapper.insert(conversation);
+    @Override
+    public void updateLastReadTime(ImConversationSaveReqVO updateReqVO) {
+        createOrUpdateConversation(updateReqVO);
+    }
+
+    private void createOrUpdateConversation(ImConversationSaveReqVO updateReqVO) {
+        // 操作会话（已读、置顶）时，才会延迟创建,要先判断是否存在，根据 no 查询是否存在,不存在则新增
+        ImConversationDO conversation = imConversationMapper.selectByNo(updateReqVO.getNo());
+        if (conversation == null) {
+            ImConversationDO conversationDO = new ImConversationDO();
+            conversationDO.setNo(updateReqVO.getNo());
+            conversationDO.setUserId(updateReqVO.getUserId());
+            conversationDO.setTargetId(updateReqVO.getTargetId());
+            conversationDO.setConversationType(updateReqVO.getConversationType());
+            conversationDO.setPinned(updateReqVO.getPinned());
+            conversationDO.setLastReadTime(DateUtil.toLocalDateTime(new Date()));
+            imConversationMapper.insert(conversationDO);
+        } else {
+            // 更新
+            ImConversationDO updateObj = BeanUtils.toBean(updateReqVO, ImConversationDO.class);
+            imConversationMapper.updateById(updateObj);
         }
     }
 

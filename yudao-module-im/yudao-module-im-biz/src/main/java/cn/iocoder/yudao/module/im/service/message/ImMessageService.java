@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
 import cn.iocoder.yudao.module.im.websocket.message.ImSendMessage;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 /**
  * 消息 Service 接口
  *
@@ -72,9 +74,29 @@ public interface ImMessageService {
 
     /**
      * 保存群聊消息
-     * @param message 消息
+     *
+     * @param message    消息
      * @param fromUserId 发送者用户ID
      * @return id
      */
     ImMessageDO saveGroupMessage(ImSendMessage message, Long fromUserId);
+
+    /**
+     * 拉取消息-大于 seq 的消息
+     *
+     * @param userId   用户id
+     * @param sequence 序列号
+     * @param size 数量
+     * @return 消息列表
+     */
+    List<ImMessageDO> loadMessage(Long userId, Long sequence, Integer size);
+
+    /**
+     * 拉取全部消息
+     *
+     * @param userId   登录用户编号
+     * @param size 数量
+     * @return 消息列表
+     */
+    List<ImMessageDO> loadAllMessage(Long userId, Integer size);
 }

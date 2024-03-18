@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessagePageReqVO
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImMessageMapper;
+import cn.iocoder.yudao.module.im.enums.conversation.ImConversationTypeEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.websocket.message.ImSendMessage;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -14,6 +15,8 @@ import jakarta.annotation.Resource;
 import org.dromara.hutool.core.date.TimeUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.MESSAGE_NOT_EXISTS;
@@ -91,7 +94,12 @@ public class ImMessageServiceImpl implements ImMessageService {
         imMessageDO.setSenderAvatar(user.getAvatar());
         imMessageDO.setConversationType(message.getConversationType());
         imMessageDO.setContentType(message.getContentType());
-        imMessageDO.setConversationNo(fromUserId + "_" + message.getReceiverId());
+        //单聊：s_{userId}_{targetId} 群聊：群聊：g_{groupId}
+        if (message.getConversationType().equals(ImConversationTypeEnum.PRIVATE.getType())) {
+            imMessageDO.setConversationNo("s_" + fromUserId + "_" + message.getReceiverId());
+        } else if (message.getConversationType().equals(ImConversationTypeEnum.GROUP.getType())) {
+            imMessageDO.setConversationNo("g_" + message.getReceiverId());
+        }
         imMessageDO.setContent(message.getContent());
         //消息来源 100-用户发送；200-系统发送（一般是通知）；不能为空
         imMessageDO.setSendFrom(100);
@@ -115,6 +123,16 @@ public class ImMessageServiceImpl implements ImMessageService {
     @Override
     public ImMessageDO saveGroupMessage(ImSendMessage message, Long fromUserId) {
         return saveImMessageDO(message, fromUserId);
+    }
+
+    @Override
+    public List<ImMessageDO> loadMessage(Long userId, Long sequence, Integer size) {
+        return imMessageMapper.getGreaterThanSequenceMessage(userId, sequence, size);
+    }
+
+    @Override
+    public List<ImMessageDO> loadAllMessage(Long userId, Integer size) {
+        return imMessageMapper.getAllMessage(userId, size);
     }
 
 }

@@ -1,31 +1,28 @@
 package cn.iocoder.yudao.module.im.controller.admin.message;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessagePageReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageRespVO;
-import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
 import cn.iocoder.yudao.module.im.service.message.ImMessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 消息")
 @RestController
@@ -36,58 +33,36 @@ public class ImMessageController {
     @Resource
     private ImMessageService imMessageService;
 
-    @PostMapping("/create")
-    @Operation(summary = "创建消息")
-    @PreAuthorize("@ss.hasPermission('im:message:create')")
-    public CommonResult<Long> createMessage(@Valid @RequestBody ImMessageSaveReqVO createReqVO) {
-        return success(imMessageService.createMessage(createReqVO));
-    }
-
-    @PutMapping("/update")
-    @Operation(summary = "更新消息")
-    @PreAuthorize("@ss.hasPermission('im:message:update')")
-    public CommonResult<Boolean> updateMessage(@Valid @RequestBody ImMessageSaveReqVO updateReqVO) {
-        imMessageService.updateMessage(updateReqVO);
-        return success(true);
-    }
-
-    @DeleteMapping("/delete")
-    @Operation(summary = "删除消息")
-    @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('im:message:delete')")
-    public CommonResult<Boolean> deleteMessage(@RequestParam("id") Long id) {
-        imMessageService.deleteMessage(id);
-        return success(true);
-    }
-
-    @GetMapping("/get")
-    @Operation(summary = "获得消息")
-    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @GetMapping("/get-message-by-sequence")
+    @Operation(summary = "拉取消息-增量拉取大于 seq 的消息")
+    @Parameter(name = "sequence", description = "序号", required = true, example = "1")
+    @Parameter(name = "size", description = "条数", required = true, example = "10")
     @PreAuthorize("@ss.hasPermission('im:message:query')")
-    public CommonResult<ImMessageRespVO> getMessage(@RequestParam("id") Long id) {
-        ImMessageDO message = imMessageService.getMessage(id);
+    public CommonResult<List<ImMessageRespVO>> loadMessage(
+            @RequestParam("sequence") Long sequence,
+            @RequestParam("size") Integer size) {
+        List<ImMessageDO> message = imMessageService.loadMessage(getLoginUserId(), sequence, size);
         return success(BeanUtils.toBean(message, ImMessageRespVO.class));
     }
 
-    @GetMapping("/page")
-    @Operation(summary = "获得消息分页")
+
+    @GetMapping("/get-all-message")
+    @Operation(summary = "拉取全部消息")
+    @Parameter(name = "size", description = "条数", required = true, example = "10")
     @PreAuthorize("@ss.hasPermission('im:message:query')")
-    public CommonResult<PageResult<ImMessageRespVO>> getMessagePage(@Valid ImMessagePageReqVO pageReqVO) {
-        PageResult<ImMessageDO> pageResult = imMessageService.getMessagePage(pageReqVO);
-        return success(BeanUtils.toBean(pageResult, ImMessageRespVO.class));
+    public CommonResult<List<ImMessageRespVO>> loadAllMessage(@RequestParam("size") Integer size) {
+        List<ImMessageDO> message = imMessageService.loadAllMessage(getLoginUserId(), size);
+        return success(BeanUtils.toBean(message, ImMessageRespVO.class));
     }
 
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出消息 Excel")
-    @PreAuthorize("@ss.hasPermission('im:message:export')")
-    @OperateLog(type = EXPORT)
-    public void exportMessageExcel(@Valid ImMessagePageReqVO pageReqVO,
-                                   HttpServletResponse response) throws IOException {
-        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<ImMessageDO> list = imMessageService.getMessagePage(pageReqVO).getList();
-        // 导出 Excel
-        ExcelUtils.write(response, "消息.xls", "数据", ImMessageRespVO.class,
-                BeanUtils.toBean(list, ImMessageRespVO.class));
+
+    @GetMapping("/page")
+    @Operation(summary = "查询聊天记录-分页")
+    @PreAuthorize("@ss.hasPermission('im:message:query')")
+    public CommonResult<PageResult<ImMessageRespVO>> getMessagePage(@Valid ImMessagePageReqVO pageReqVO) {
+        PageResult<ImMessageDO> messagePage = imMessageService.getMessagePage(pageReqVO);
+        return success(BeanUtils.toBean(messagePage, ImMessageRespVO.class));
     }
+
 
 }
