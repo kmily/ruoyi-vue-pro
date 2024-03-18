@@ -145,20 +145,25 @@ public class SteamService {
      * @return
      */
     public BindUserDO getTempBindUserByLogin(LoginUser loginUser,String tradeUrl,Boolean autoCreate){
-        BindUserDO bindUserDO1 = bindUserMapper.selectOne(new LambdaQueryWrapperX<BindUserDO>()
+        Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                 .eqIfPresent(BindUserDO::getUserId, loginUser.getId())
                 .eqIfPresent(BindUserDO::getTradeUrl, tradeUrl)
                 .eqIfPresent(BindUserDO::getIsTempAccount, true)
-                .orderByDesc(BindUserDO::getId));
-        if(Objects.isNull(bindUserDO1) && autoCreate){
-
-            BindUserDO bindUserDO=new BindUserDO().setUserId(loginUser.getId())
-                    .setUserType(loginUser.getUserType()).setTradeUrl(tradeUrl).setIsTempAccount(true)
-                    .setSteamId("temp"+System.currentTimeMillis());
-            bindUserMapper.insert(bindUserDO);
-            return bindUserDO;
+                .orderByDesc(BindUserDO::getId)).stream().findFirst();
+        log.info("getTempBindUserByLogin",first);
+        if(!first.isPresent() && autoCreate){
+            if(autoCreate){
+                log.info("getTempBindUserByLogin--autoCreate",first);
+                BindUserDO bindUserDO=new BindUserDO().setUserId(loginUser.getId())
+                        .setUserType(loginUser.getUserType()).setTradeUrl(tradeUrl).setIsTempAccount(true)
+                        .setSteamId("temp"+System.currentTimeMillis());
+                bindUserMapper.insert(bindUserDO);
+                return bindUserDO;
+            }
+            return null;
         }
-        return bindUserDO1;
+        log.info("getTempBindUserByLogin--last ret{}",first.get());
+        return first.get();
     }
 
     /**
