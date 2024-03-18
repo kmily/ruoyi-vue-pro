@@ -88,9 +88,6 @@ public class IOInvUpdateService {
      */
     public void firstInsertInventory(InventoryDto inventoryDto, BindUserDO bindUserDO) {
         // inv 表入库
-        if(inventoryDto.getAssets() == null){
-            throw new ServiceException(-1,"steam库存为空");
-        }
         for(InventoryDto.AssetsDTO assetsDTO :inventoryDto.getAssets()){
 
             InvDO invDO = new InvDO();

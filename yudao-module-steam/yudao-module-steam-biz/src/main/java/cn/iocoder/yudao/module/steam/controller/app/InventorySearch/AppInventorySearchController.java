@@ -147,26 +147,29 @@ public class AppInventorySearchController {
         bindUserDO.setUserType(collect.get(0).getUserType());
         // 获取线上 steam 库存
         InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
-        // 删除原有库存中，getTransferStatus = 0 的库存
-        BindUserDO user = new BindUserDO();
-        user.setSteamId(bindUserDO.getSteamId());
-        user.setUserId(bindUserDO.getUserId());
-        user.setId(bindUserDO.getId());
-        ioInvUpdateService.deleteInventory(user);
-        // 插入库存 TODO 后期优化思路 copy插入库存方法在插入的时候比对Selling表中相同账户下的 AssetId ，有重复就不插入
-        ioInvUpdateService.firstInsertInventory(inventoryDto, bindUserDO);
-        List<InvDO> invDOS = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
-                .eq(InvDO::getSteamId, steamId)
-                .eq(InvDO::getBindUserId, bindUserDO.getId())
-                .eq(InvDO::getUserId, bindUserDO.getUserId())
-                .eq(InvDO::getTransferStatus, 1));
-        if (invDOS.isEmpty()){
-            return success(inventoryDto);
+        if(inventoryDto != null){
+            // 删除原有库存中，getTransferStatus = 0 的库存
+            BindUserDO user = new BindUserDO();
+            user.setSteamId(bindUserDO.getSteamId());
+            user.setUserId(bindUserDO.getUserId());
+            user.setId(bindUserDO.getId());
+            ioInvUpdateService.deleteInventory(user);
+            // 插入库存 TODO 后期优化思路 copy插入库存方法在插入的时候比对Selling表中相同账户下的 AssetId ，有重复就不插入
+            ioInvUpdateService.firstInsertInventory(inventoryDto, bindUserDO);
+            List<InvDO> invDOS = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
+                    .eq(InvDO::getSteamId, steamId)
+                    .eq(InvDO::getBindUserId, bindUserDO.getId())
+                    .eq(InvDO::getUserId, bindUserDO.getUserId())
+                    .eq(InvDO::getTransferStatus, 1));
+            if (invDOS.isEmpty()){
+                return success(inventoryDto);
+            }
+            for(InvDO invDO : invDOS){
+                invMapper.delete(new LambdaQueryWrapperX<InvDO>().eq(InvDO::getAssetid,invDO.getAssetid()).eq(InvDO::getTransferStatus,0));
+            }
+        } else {
+            throw new ServiceException(-1,"未获取到新的库存信息");
         }
-        for(InvDO invDO : invDOS){
-            invMapper.delete(new LambdaQueryWrapperX<InvDO>().eq(InvDO::getAssetid,invDO.getAssetid()).eq(InvDO::getTransferStatus,0));
-        }
-
         return success(inventoryDto);
     }
 }

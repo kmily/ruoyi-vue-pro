@@ -214,8 +214,9 @@ public class SteamService {
         }
         bindUserMapper.updateById(bindUserDO);
         InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
-        ioInvUpdateService.firstInsertInventory(inventoryDto,bindUserDO);
-
+        if(inventoryDto != null){
+            ioInvUpdateService.firstInsertInventory(inventoryDto,bindUserDO);
+        }
     }
 
     /**
