@@ -85,8 +85,8 @@ public class UUService {
      * 商品模板ID下载
      * @return
      */
-    public ApiResult<YouyouTemplatedownloadRespVO> getTemplateId(){
-        return openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/templateQuery",new OpenApiReqVo<>(), YouyouTemplatedownloadRespVO.class);
+    public ApiResult<String> getTemplateId(){
+        return openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/templateQuery",new OpenApiReqVo<>(), String.class);
     }
 
     /**

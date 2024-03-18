@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletMapper;
 import cn.iocoder.yudao.module.pay.framework.pay.core.WalletPayClient;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
+import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTemplatedownloadRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByIdRespVo;
@@ -29,9 +30,11 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoudetails.YouyouDetailsDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoudetails.YouyouDetailsMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.youyoutemplate.UUTemplateMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.UUOrderStatus;
@@ -43,16 +46,16 @@ import cn.iocoder.yudao.module.steam.service.steam.TradeUrlStatus;
 import cn.iocoder.yudao.module.steam.service.uu.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.uu.UUNotifyService;
 import cn.iocoder.yudao.module.steam.service.uu.UUService;
-import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
-import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
-import cn.iocoder.yudao.module.steam.service.uu.vo.ApiPayWalletRespVO;
-import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
+import cn.iocoder.yudao.module.steam.service.uu.vo.*;
 import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
+import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -85,6 +88,7 @@ import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.E
 @RestController
 @RequestMapping("openapi")
 @Validated
+@Slf4j
 public class AppApiController {
     @Resource
     private OpenApiService openApiService;
@@ -115,6 +119,8 @@ public class AppApiController {
     private PayOrderService payOrderService;
 
     private UUOrderService uUOrderService;
+    @Resource
+    private UUService uuService;
 
     @Autowired
     public void setuUOrderService(UUOrderService uUOrderService) {
@@ -122,11 +128,55 @@ public class AppApiController {
     }
 
     @Resource
-    private UUService uuService;
+    private BindUserService bindUserService;
     @Resource
     private UUNotifyService uuNotifyService;
+
+
     @Resource
-    private BindUserService bindUserService;
+    private UUTemplateMapper uuTemplateMapper;
+
+    @Resource
+    private ObjectMapper objectMapper;
+
+
+    @PostMapping("/v1/api/templateQuery")
+    @Operation(summary = "插入UU商品平台")
+    public ApiResult youyouTemplate() throws IOException {
+        ApiResult<String> templateId = uuService.getTemplateId();
+        log.info("{}",templateId);
+        return ApiResult.success(templateId.getData());
+        // 提取下载链接中的商品模板
+//        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+//        builder.method(HttpUtil.Method.GET).url(templateId.getData());
+//        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(),HttpUtil.getClient());
+//        ArrayList json = sent.json(ArrayList.class);
+//        List<ApiUUTemplateVO> templateVOS = new ArrayList<>();
+//        for (Object item:json){
+//            ApiUUTemplateVO apiUUTemplateVO = objectMapper.readValue(objectMapper.writeValueAsString(item), ApiUUTemplateVO.class);
+//            templateVOS.add(apiUUTemplateVO);
+//        }
+//        for(ApiUUTemplateVO item:templateVOS){
+//            YouyouTemplateDO templateDO = new YouyouTemplateDO();
+//            templateDO.setTemplateId(item.getId());
+//            templateDO.setName(item.getName());
+//            templateDO.setHashName(item.getHashName());
+//            templateDO.setTypeId(item.getTypeId());
+//            templateDO.setTypeHashName(item.getTypeHashName());
+//            templateDO.setWeaponId(item.getWeaponId());
+//            templateDO.setWeaponName(item.getWeaponName());
+//            uuTemplateMapper.insert(templateDO);
+//        }
+    }
+
+
+//    @PostMapping("/v1/api/goodsQuery")
+//    @Operation(summary = "查询UU商品列表")
+//    public void youyouCommodityList(@RequestBody ApiCommodityListRespVO reqVo) {
+//        ApiResult<ApiUUCommodityListRespVO> commodityList = uuService.getCommodityList(reqVo);
+//        log.info("commodityList:{}", commodityList);
+//    }
+
 
     /**
      * UU订单服务器回调
