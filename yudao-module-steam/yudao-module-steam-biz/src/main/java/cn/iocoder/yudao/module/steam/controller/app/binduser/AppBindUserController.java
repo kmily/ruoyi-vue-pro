@@ -3,7 +3,9 @@ package cn.iocoder.yudao.module.steam.controller.app.binduser;
 import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppBindUserApiKeyReqVO;
@@ -79,7 +81,8 @@ public class AppBindUserController {
     @PreAuthenticated
     @OperateLog(logArgs = false)
     public CommonResult<List<BindUserDO>> steamList(){
-        return success(steamService.steamList());
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        return success(steamService.getBindUserByLoginUser(loginUser));
     }
     @PostMapping("/unBind")
     @Operation(summary = "解绑steam")
