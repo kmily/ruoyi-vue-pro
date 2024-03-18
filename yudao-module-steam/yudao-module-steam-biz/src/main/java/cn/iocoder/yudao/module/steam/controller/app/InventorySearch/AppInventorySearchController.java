@@ -119,15 +119,15 @@ public class AppInventorySearchController {
         inv.setBindUserId(collect.get(0).getId());
         inv.setTransferStatus(reqVo.getSearchType());
         List<InvDO> invToMerge = ioInvUpdateService.getInvToMerge1(inv);
+        if(reqVo.getSearchType() == null){
+            return success(steamInvService.mergeInvAll(invToMerge));
+        }
         // 将相同库存合并
         return success(steamInvService.mergeInv(invToMerge));
     }
 
 
 
-    // =================================
-    //             测试  更新库存(重复)
-    // =================================
     @GetMapping("/updateFromSteam")
     @Operation(summary = "更新库存 入参steamid")
     @ResponseBody
