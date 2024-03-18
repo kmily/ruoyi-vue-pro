@@ -151,17 +151,20 @@ public class SteamService {
      * @param tradeUrl
      * @return
      */
-    public List<BindUserDO> getTempBindUserByLogin(LoginUser loginUser,String tradeUrl){
-        List<BindUserDO> bindUserDOS = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+    public BindUserDO getTempBindUserByLogin(LoginUser loginUser,String tradeUrl,Boolean autoCreate){
+        BindUserDO bindUserDO1 = bindUserMapper.selectOne(new LambdaQueryWrapperX<BindUserDO>()
                 .eqIfPresent(BindUserDO::getUserId, loginUser.getId())
-                .eqIfPresent(BindUserDO::getTradeUrl,tradeUrl)
-                .eqIfPresent(BindUserDO::getIsTempAccount,false)
+                .eqIfPresent(BindUserDO::getTradeUrl, tradeUrl)
+                .eqIfPresent(BindUserDO::getIsTempAccount, true)
                 .orderByDesc(BindUserDO::getId));
-        for(BindUserDO bindUserDO:bindUserDOS){
-            bindUserDO.setSteamPassword(Objects.isNull(bindUserDO.getSteamPassword())?"0":"1");
-            bindUserDO.setMaFile(null);
+        if(Objects.isNull(bindUserDO1)){
+            BindUserDO bindUserDO=new BindUserDO().setUserId(loginUser.getId())
+                    .setUserType(loginUser.getUserType()).setTradeUrl(tradeUrl).setIsTempAccount(true)
+                    .setSteamId("temp"+System.currentTimeMillis());
+            bindUserMapper.insert(bindUserDO);
+            return bindUserDO;
         }
-        return bindUserDOS;
+        return bindUserDO1;
     }
 
     /**
@@ -195,6 +198,9 @@ public class SteamService {
         BindUserDO bindUserDO = bindUserMapper.selectById(bindUserId);
         if(Objects.isNull(bindUserDO)){
             throw new ServiceException(-1,"绑定失败，请检查后再试。");
+        }
+        if(bindUserDO.getIsTempAccount()){
+            throw new ServiceException(-1,"不支持绑定");
         }
         if(!bindUserDO.getUserId().equals(loginUser.getId())){
             throw new ServiceException(-1,"没有权限操作。");
@@ -302,41 +308,5 @@ public class SteamService {
      */
     private String getSteamId(String identity){
         return identity.replace("https://steamcommunity.com/openid/id/","");
-    }
-
-    /**
-     * 订单超时关闭时自动同步数据
-     * @return
-     */
-    public Integer autoCloseInvOrder(){
-        List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
-                .eq(InvOrderDO::getPayStatus, false)
-                .neIfPresent(InvOrderDO::getTransferStatus, InvTransferStatusEnum.CLOSE.getStatus())
-        );
-        log.info("invorder{}",invOrderDOS);
-        Integer integer=0;
-        for (InvOrderDO invOrderDO:invOrderDOS) {
-            paySteamOrderService.closeUnPayInvOrder(invOrderDO.getId());
-            integer++;
-        }
-        return integer;
-    }
-    /**
-     * 订单自动检测发货
-     * @return
-     */
-    public Integer checkTransfer(){
-        List<InvOrderDO> invOrderDOS = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
-                .eq(InvOrderDO::getPayStatus, true)
-                .eqIfPresent(InvOrderDO::getTransferStatus, InvTransferStatusEnum.TransferFINISH.getStatus())
-                .eq(InvOrderDO::getSellCashStatus,InvSellCashStatusEnum.INIT.getStatus())
-        );
-        log.info("invorder{}",invOrderDOS);
-        Integer integer=0;
-        for (InvOrderDO invOrderDO:invOrderDOS) {
-            paySteamOrderService.checkTransfer(invOrderDO.getId());
-            integer++;
-        }
-        return integer;
     }
 }
