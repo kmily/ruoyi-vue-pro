@@ -33,6 +33,7 @@ import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
@@ -55,6 +56,9 @@ import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.steam.*;
+import cn.iocoder.yudao.module.steam.service.uu.UUService;
+import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
+import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
@@ -164,6 +168,13 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     @Autowired
     public void setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+    }
+
+    private UUService uuService;
+
+    @Autowired
+    public void setUuService(UUService uuService) {
+        this.uuService = uuService;
     }
 
     public PaySteamOrderServiceImpl() {
@@ -397,6 +408,38 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         return createOrderResult;
     }
     private InvOrderDO validateInvOrderCanCreate(InvOrderDO invOrderDO) {
+
+        BindUserDO buyBindUser = bindUserService.getBindUser(invOrderDO.getBuyBindUserId());
+        try{
+            ApiResult<ApiCheckTradeUrlReSpVo> apiCheckTradeUrlReSpVoApiResult = uuService.checkTradeUrl(new ApiCheckTradeUrlReqVo().setTradeLinks(buyBindUser.getTradeUrl()));
+            if(apiCheckTradeUrlReSpVoApiResult.getCode()!=0){
+                throw exception(OpenApiCode.CONCAT_ADMIN);
+            }
+            switch (apiCheckTradeUrlReSpVoApiResult.getData().getStatus()){
+                case 1://1：正常交易   6:该账户库存私密无法交易 7:该账号个人资料私密无法交易
+                    break;
+                case 2://2:交易链接格式错误
+                    throw exception(OpenApiCode.ERR_5408);
+                case 3://3:请稍后重试
+                    throw exception(OpenApiCode.ERR_5402);
+                case 4://4:账号交易权限被封禁，无法交易
+                    throw exception(OpenApiCode.ERR_5406);
+                case 5://5:该交易链接已不再可用
+                    throw exception(OpenApiCode.ERR_5405);
+                case 6:// 6:该账户库存私密无法交易
+                    throw exception(OpenApiCode.ERR_5403);
+                case 7://7:该账号个人资料私密无法交易
+                    throw exception(OpenApiCode.ERR_5403);
+                default:
+                    throw exception(OpenApiCode.CONCAT_ADMIN);
+            }
+        }catch (ServiceException e){
+            throw exception(OpenApiCode.ERR_5408);
+        }
+        //检查用户steamID是否正确只检查bindUser
+        if(Objects.isNull(buyBindUser)){
+            throw exception(ErrorCodeConstants.INVORDER_BIND_STEAM_EXCEPT);
+        }
         SellingDO sellingDO = sellingMapper.selectById(invOrderDO.getSellId());
 //        //校验订单是否存在
         if (sellingDO == null) {
@@ -481,23 +524,6 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         // 校验订单是否支付
         if (invOrderDO.getPayStatus()) {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
-        }
-        //检查用户steamID是否正确只检查bindUser
-        BindUserDO bindUserDO = bindUserMapper.selectById(sellingDO.getBindUserId());
-        if(Objects.isNull(bindUserDO)){
-            throw exception(ErrorCodeConstants.INVORDER_BIND_STEAM_EXCEPT);
-        }
-//        Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
-//                .eq(BindUserDO::getUserId, invOrderDO.getUserId())
-//                .eq(BindUserDO::getUserType, invOrderDO.getUserType())
-//                .eq(BindUserDO::getSteamId, invOrderDO.getSteamId())
-//        ).stream().findFirst();
-//        if(!first.isPresent()){
-//            throw exception(ErrorCodeConstants.INVORDER_BIND_STEAM_EXCEPT);
-//        }
-//        BindUserDO bindUserDO = first.get();
-        if(Objects.isNull(bindUserDO.getSteamPassword())){
-            throw exception(ErrorCodeConstants.INVORDER_BIND_STEAM_EXCEPT);
         }
         return invOrderDO;
     }
