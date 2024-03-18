@@ -68,6 +68,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -359,10 +360,10 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw new ServiceException(OpenApiCode.ID_ERROR);
         }
         BindUserDO buyBindUserDO=null;
-        if(Objects.nonNull(reqVo.getSteamId())){
+        if(StringUtils.hasText(reqVo.getSteamId())){
             buyBindUserDO = steamService.getBindUserByLoginUserAndSteamId(loginUser, reqVo.getSteamId());
         }else{
-            if(Objects.nonNull(reqVo.getTradeUrl())){
+            if(StringUtils.hasText(reqVo.getTradeUrl())){
                 buyBindUserDO = steamService.getTempBindUserByLogin(loginUser, reqVo.getTradeUrl(),true);
             }
         }
