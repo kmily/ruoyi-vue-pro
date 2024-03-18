@@ -154,8 +154,12 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     private ObjectMapper objectMapper;
 
 
-    @Autowired
     private SteamService steamService;
+
+    @Autowired
+    public void setSteamService(SteamService steamService) {
+        this.steamService = steamService;
+    }
 
     @Autowired
     public void setObjectMapper(ObjectMapper objectMapper) {
@@ -340,24 +344,23 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CreateOrderResult createInvOrder(LoginUser loginUser, @Valid PaySteamOrderCreateReqVO reqVo) {
-
-
-
-
-
-
+        if(Objects.isNull(loginUser)){
+            throw new ServiceException(OpenApiCode.ID_ERROR);
+        }
+        BindUserDO buyBindUserDO=null;
+        if(Objects.nonNull(reqVo.getSteamId())){
+            buyBindUserDO = steamService.getBindUserByLoginUserAndSteamId(loginUser, reqVo.getSteamId());
+        }else{
+            if(Objects.nonNull(reqVo.getTradeUrl())){
+                buyBindUserDO = steamService.getTempBindUserByLogin(loginUser, reqVo.getTradeUrl(),true);
+            }
+        }
+        if(Objects.isNull(buyBindUserDO)){
+            throw new ServiceException(-1,"获取steam帐号失败");
+        }
         CreateOrderResult createOrderResult=new CreateOrderResult();
         SellingDO sellingDO = sellingMapper.selectById(reqVo.getSellId());
         InvDescDO invDescDO = invDescMapper.selectById(sellingDO.getInvDescId());
-        List<BindUserDO> buyBindUserDOS = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
-                .eq(BindUserDO::getUserId, loginUser.getId())
-                .eq(BindUserDO::getUserType, loginUser.getUserType())
-                .eq(BindUserDO::getSteamId, reqVo.getSteamId())
-        );
-        if(Objects.isNull(buyBindUserDOS) || buyBindUserDOS.size()>1){
-            throw new ServiceException(OpenApiCode.ID_ERROR);
-        }
-        BindUserDO buyBindUserDO = buyBindUserDOS.get(0);
         // 1.1 获得商品
         InvOrderDO invOrderDO = new InvOrderDO().setOrderNo(noRedisDAO.generate(INV_ORDER_PREFIX)).setMerchantNo(reqVo.getMerchantNo())
                 .setSellId(reqVo.getSellId()).setSteamId(reqVo.getSteamId())

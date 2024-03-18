@@ -150,7 +150,8 @@ public class SteamService {
                 .eqIfPresent(BindUserDO::getTradeUrl, tradeUrl)
                 .eqIfPresent(BindUserDO::getIsTempAccount, true)
                 .orderByDesc(BindUserDO::getId));
-        if(Objects.isNull(bindUserDO1)){
+        if(Objects.isNull(bindUserDO1) && autoCreate){
+
             BindUserDO bindUserDO=new BindUserDO().setUserId(loginUser.getId())
                     .setUserType(loginUser.getUserType()).setTradeUrl(tradeUrl).setIsTempAccount(true)
                     .setSteamId("temp"+System.currentTimeMillis());
@@ -166,15 +167,11 @@ public class SteamService {
      * @return
      */
     public List<BindUserDO> getBindUserByLoginUser(LoginUser loginUser){
-        return getBindUserByLoginUser(loginUser,null);
-    }
-    public List<BindUserDO> getBindUserByLoginUser(LoginUser loginUser,String tradeUrl){
         if(Objects.isNull(loginUser)){
             throw new ServiceException(OpenApiCode.ID_ERROR);
         }
         List<BindUserDO> bindUserDOS = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                 .eqIfPresent(BindUserDO::getUserId, loginUser.getId())
-                .eqIfPresent(BindUserDO::getTradeUrl,tradeUrl)
                 .eqIfPresent(BindUserDO::getIsTempAccount,false)
                 .orderByDesc(BindUserDO::getId));
         for(BindUserDO bindUserDO:bindUserDOS){
@@ -182,6 +179,19 @@ public class SteamService {
             bindUserDO.setMaFile(null);
         }
         return bindUserDOS;
+    }
+    public BindUserDO getBindUserByLoginUserAndSteamId(LoginUser loginUser,String steamId){
+        if(Objects.isNull(loginUser)){
+            throw new ServiceException(OpenApiCode.ID_ERROR);
+        }
+        BindUserDO bindUserDO = bindUserMapper.selectOne(new LambdaQueryWrapperX<BindUserDO>()
+                .eqIfPresent(BindUserDO::getUserId, loginUser.getId())
+                .eqIfPresent(BindUserDO::getSteamId,steamId)
+                .eqIfPresent(BindUserDO::getIsTempAccount,false)
+                .orderByDesc(BindUserDO::getId));
+        bindUserDO.setSteamPassword(Objects.isNull(bindUserDO.getSteamPassword())?"0":"1");
+        bindUserDO.setMaFile(null);
+        return bindUserDO;
     }
     public void bindMaFile(byte[] maFileJsonByte,String password,Integer bindUserId) throws JsonProcessingException {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
