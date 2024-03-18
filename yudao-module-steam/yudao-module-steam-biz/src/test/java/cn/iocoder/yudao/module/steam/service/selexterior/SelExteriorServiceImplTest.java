@@ -35,11 +35,11 @@ import static org.mockito.Mockito.*;
  *
  * @author 芋道源码
  */
-@Import(SelExteriorServiceImpl.class)
+@Import(SelExteriorService.class)
 public class SelExteriorServiceImplTest extends BaseDbUnitTest {
 
     @Resource
-    private SelExteriorServiceImpl selExteriorService;
+    private SelExteriorService selExteriorService;
 
     @Resource
     private SelExteriorMapper selExteriorMapper;
