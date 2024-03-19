@@ -74,7 +74,7 @@ public class IOInvUpdateService {
     /**
      * 插入库存 (对应账户库存为空)
      */
-    @Async
+
     public void firstInsertInventory(InventoryDto inventoryDto, BindUserDO bindUserDO) {
         // inv 表入库
         for(InventoryDto.AssetsDTO assetsDTO :inventoryDto.getAssets()){

@@ -87,7 +87,7 @@ public class AppInventorySearchController {
 
     /**
      * 入参：steamId(必传)
-     *
+     *  查询可出售库存
      * @param reqVo
      */
     @GetMapping("/mergeToSell")
@@ -101,12 +101,9 @@ public class AppInventorySearchController {
         if(Objects.isNull(collect) || collect.isEmpty()){
             throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
         }
+        // 访问本地库存 按条件查询库存
         InvDO inv=new InvDO();
         inv.setSteamId(reqVo.getSteamId());
-        inv.setBindUserId(collect.get(0).getId());
-        inv.setTransferStatus(reqVo.getSearchType());
-
-        // 访问本地库存 按条件查询库存
         inv.setUserId(loginUser.getId());
         inv.setBindUserId(collect.get(0).getId());
         inv.setTransferStatus(reqVo.getSearchType());
@@ -114,7 +111,6 @@ public class AppInventorySearchController {
         if(reqVo.getSearchType() == null){
             return success(steamInvService.mergeInvAll(invToMerge));
         }
-        // 将相同库存合并
         return success(steamInvService.mergeInv(invToMerge));
     }
 
