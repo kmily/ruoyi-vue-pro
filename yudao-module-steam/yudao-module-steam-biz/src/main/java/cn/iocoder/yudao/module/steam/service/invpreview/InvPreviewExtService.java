@@ -175,6 +175,7 @@ public class InvPreviewExtService {
                     .setImageUrl(invDescDO.getIconUrl())
                     .setItemName(invDescDO.getMarketName())
                     .setItemId(System.currentTimeMillis())
+                    .setItemInfo(new C5ItemInfo())
             ;
             invPreviewDO.setReferencePrice(new BigDecimal(invPreviewDO.getMinPrice()).divide(new BigDecimal("100"),2,BigDecimal.ROUND_HALF_UP).toString());
             invPreviewMapper.insert(invPreviewDO);
