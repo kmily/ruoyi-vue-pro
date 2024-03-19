@@ -9,8 +9,10 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.ItemResp;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.PreviewReqVO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
+import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
@@ -36,6 +38,8 @@ public class InvPreviewExtService {
 
     @Resource
     private InvPreviewMapper invPreviewMapper;
+    @Resource
+    private InvDescMapper invDescMapper;
     @Resource
     private SellingMapper sellingMapper;
 
@@ -131,12 +135,33 @@ public class InvPreviewExtService {
                         .setSelItemset(itemInfo.getItemSetName()));
             });
         }else{
+            initPreView(marketHashName, sellingDOOptional,sellingDOPageResult.getTotal());
+        }
+    }
+
+    /**
+     * preview不存在的时候自动更新
+     * @param marketHashName
+     * @param sellingDOOptional
+     * @param total
+     */
+    private void initPreView(String marketHashName,Optional<SellingDO> sellingDOOptional,Long total){
+        if(Objects.isNull(marketHashName)){
+            return;
+        }
+        Optional<InvDescDO> first = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>().eq(InvDescDO::getMarketHashName, marketHashName)).stream().findFirst();
+        if(first.isPresent()){
+            InvDescDO invDescDO = first.get();
             InvPreviewDO invPreviewDO=new InvPreviewDO();
-            invPreviewDO.setMinPrice(sellingDOOptional.isPresent()?sellingDOOptional.get().getPrice():-1).setExistInv(sellingDOPageResult.getTotal()>0)
-                    .setAutoQuantity(sellingDOPageResult.getTotal().toString())
-                    .setMarketHashName(marketHashName);
+            invPreviewDO.setMinPrice(sellingDOOptional.isPresent()?sellingDOOptional.get().getPrice():-1).setExistInv(total>0)
+                    .setAutoQuantity(total.toString())
+                    .setMarketHashName(marketHashName)
+                    .setImageUrl(invDescDO.getIconUrl())
+                    .setItemName(invDescDO.getMarketName())
+            ;
             invPreviewMapper.insert(invPreviewDO);
         }
+
     }
     @Async
     public Integer updateIvnFlag() {
