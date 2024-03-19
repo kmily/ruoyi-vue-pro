@@ -181,7 +181,7 @@ public class SteamService {
                 .orderByDesc(BindUserDO::getId));
         for(BindUserDO bindUserDO:bindUserDOS){
             bindUserDO.setSteamPassword(Objects.isNull(bindUserDO.getSteamPassword())?"0":"1");
-            bindUserDO.setMaFile(null);
+            bindUserDO.setMaFile(new SteamMaFile().setSharedSecret(bindUserDO.getMaFile().getSharedSecret()));
         }
         return bindUserDOS;
     }
