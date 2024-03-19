@@ -106,22 +106,19 @@ public class InvPreviewExtService {
     public void markInvEnable(String marketHashName) {
         List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
                 .eqIfPresent(InvPreviewDO::getMarketHashName, marketHashName));
+        PageParam pageParam = new PageParam();
+        pageParam.setPageNo(1);
+        pageParam.setPageSize(1);
+        PageResult<SellingDO> sellingDOPageResult = sellingMapper.selectPage(pageParam, new LambdaQueryWrapperX<SellingDO>()
+                .eq(SellingDO::getMarketHashName, marketHashName)
+                .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
+                .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
+                .orderByAsc(SellingDO::getPrice)
+        );
+        Optional<SellingDO> sellingDOOptional = sellingDOPageResult.getList().stream().findFirst();
+
+
         if(Objects.nonNull(invPreviewDOS)){
-//            Long aLong = sellingMapper.selectCount(new LambdaQueryWrapperX<SellingDO>()
-//                    .eq(SellingDO::getMarketHashName, marketHashName)
-//                    .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
-//                    .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
-//            );
-            PageParam pageParam = new PageParam();
-            pageParam.setPageNo(1);
-            pageParam.setPageSize(1);
-            PageResult<SellingDO> sellingDOPageResult = sellingMapper.selectPage(pageParam, new LambdaQueryWrapperX<SellingDO>()
-                    .eq(SellingDO::getMarketHashName, marketHashName)
-                    .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
-                    .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
-                    .orderByAsc(SellingDO::getPrice)
-            );
-            Optional<SellingDO> sellingDOOptional = sellingDOPageResult.getList().stream().findFirst();
             invPreviewDOS.forEach(item->{
                 C5ItemInfo itemInfo = item.getItemInfo();
                 invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(sellingDOPageResult.getTotal()>0).setAutoQuantity(sellingDOPageResult.getTotal().toString())
@@ -133,6 +130,12 @@ public class InvPreviewExtService {
                         .setSelType(itemInfo.getTypeName())
                         .setSelItemset(itemInfo.getItemSetName()));
             });
+        }else{
+            InvPreviewDO invPreviewDO=new InvPreviewDO();
+            invPreviewDO.setMinPrice(sellingDOOptional.isPresent()?sellingDOOptional.get().getPrice():-1).setExistInv(sellingDOPageResult.getTotal()>0)
+                    .setAutoQuantity(sellingDOPageResult.getTotal().toString())
+                    .setMarketHashName(marketHashName);
+            invPreviewMapper.insert(invPreviewDO);
         }
     }
     @Async
