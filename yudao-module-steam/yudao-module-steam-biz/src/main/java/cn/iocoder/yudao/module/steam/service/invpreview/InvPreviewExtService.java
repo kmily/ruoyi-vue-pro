@@ -42,6 +42,7 @@ public class InvPreviewExtService {
     private InvDescMapper invDescMapper;
     @Resource
     private SellingMapper sellingMapper;
+    InvPreviewService invPreviewService;
 
     public ItemResp getInvPreview(PreviewReqVO reqVO) {
 
@@ -61,6 +62,7 @@ public class InvPreviewExtService {
             }
             return itemResp;
         }else{
+            markInvEnable(reqVO.getMarketHashName());
             throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
         }
     }
