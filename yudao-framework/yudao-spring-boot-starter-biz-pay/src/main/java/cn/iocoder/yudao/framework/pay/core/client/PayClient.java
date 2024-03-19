@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.pay.core.client;
 
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
@@ -7,6 +8,7 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReq
 import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
+import com.alipay.api.DefaultAlipayClient;
 
 import java.util.Map;
 
@@ -95,4 +97,8 @@ public interface PayClient {
      * @return 转账信息
      */
     PayTransferRespDTO getTransfer(String outTradeNo, PayTransferTypeEnum type);
+
+    default DefaultAlipayClient getDefaultAliPayClient(){
+        throw new ServiceException(-1,"未实现");
+    };
 }

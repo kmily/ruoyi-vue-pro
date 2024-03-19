@@ -2,11 +2,13 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.Method;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import com.alipay.api.AlipayApiException;
+import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.domain.AlipayTradePagePayModel;
 import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.alipay.api.response.AlipayTradePagePayResponse;
@@ -65,5 +67,13 @@ public class AlipayPcPayClient extends AbstractAlipayPayClient {
         }
         return PayOrderRespDTO.waitingOf(displayMode, response.getBody(),
                 reqDTO.getOutTradeNo(), response);
+    }
+    //-------------------以下接口为扩展接口，不得进行替换
+    @Override
+    public DefaultAlipayClient getDefaultAliPayClient() {
+        if(Objects.isNull(client)){
+            throw new ServiceException(-1,"获取支付配置失败，请稍后再试");
+        }
+        return client;
     }
 }
