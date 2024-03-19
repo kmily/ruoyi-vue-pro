@@ -57,10 +57,6 @@ public class AppDropListController {
     @Resource
     private SelRarityService selRarityService;
     @Resource
-    private InvPreviewService invPreviewService;
-    @Resource
-    private SellingService sellingService;
-    @Resource
     private SellingsearchService sellingsearchService;
 
     private InvPreviewExtService invPreviewExtService;

@@ -47,24 +47,38 @@ public class InvPreviewExtService {
     public ItemResp getInvPreview(PreviewReqVO reqVO) {
 
         Optional<InvPreviewDO> first = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>().eq(InvPreviewDO::getMarketHashName, reqVO.getMarketHashName())).stream().findFirst();
-        if(first.isPresent()){
-            InvPreviewDO invPreviewDO = first.get();
-            ItemResp itemResp = BeanUtils.toBean(invPreviewDO, ItemResp.class);
-
-            if(Objects.nonNull(invPreviewDO.getAutoPrice())){
-                itemResp.setAutoPrice(new BigDecimal(invPreviewDO.getAutoPrice()).multiply(new BigDecimal("100")).intValue());
-            }
-            if(Objects.nonNull(invPreviewDO.getSalePrice())){
-                itemResp.setSalePrice(new BigDecimal(invPreviewDO.getSalePrice()).multiply(new BigDecimal("100")).intValue());
-            }
-            if(Objects.nonNull(invPreviewDO.getReferencePrice())){
-                itemResp.setReferencePrice(new BigDecimal(invPreviewDO.getReferencePrice()).multiply(new BigDecimal("100")).intValue());
-            }
-            return itemResp;
-        }else{
+        if(!first.isPresent()){
             markInvEnable(reqVO.getMarketHashName());
-            throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
+            Optional<InvPreviewDO> first2 = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>().eq(InvPreviewDO::getMarketHashName, reqVO.getMarketHashName())).stream().findFirst();
+            if(first2.isPresent()){
+                InvPreviewDO invPreviewDO = first2.get();
+                ItemResp itemResp = BeanUtils.toBean(invPreviewDO, ItemResp.class);
+
+                if(Objects.nonNull(invPreviewDO.getAutoPrice())){
+                    itemResp.setAutoPrice(new BigDecimal(invPreviewDO.getAutoPrice()).multiply(new BigDecimal("100")).intValue());
+                }
+                if(Objects.nonNull(invPreviewDO.getSalePrice())){
+                    itemResp.setSalePrice(new BigDecimal(invPreviewDO.getSalePrice()).multiply(new BigDecimal("100")).intValue());
+                }
+                if(Objects.nonNull(invPreviewDO.getReferencePrice())){
+                    itemResp.setReferencePrice(new BigDecimal(invPreviewDO.getReferencePrice()).multiply(new BigDecimal("100")).intValue());
+                }
+                return itemResp;
+            }
         }
+        InvPreviewDO invPreviewDO = first.get();
+        ItemResp itemResp = BeanUtils.toBean(invPreviewDO, ItemResp.class);
+
+        if(Objects.nonNull(invPreviewDO.getAutoPrice())){
+            itemResp.setAutoPrice(new BigDecimal(invPreviewDO.getAutoPrice()).multiply(new BigDecimal("100")).intValue());
+        }
+        if(Objects.nonNull(invPreviewDO.getSalePrice())){
+            itemResp.setSalePrice(new BigDecimal(invPreviewDO.getSalePrice()).multiply(new BigDecimal("100")).intValue());
+        }
+        if(Objects.nonNull(invPreviewDO.getReferencePrice())){
+            itemResp.setReferencePrice(new BigDecimal(invPreviewDO.getReferencePrice()).multiply(new BigDecimal("100")).intValue());
+        }
+        return itemResp;
     }
 
     public PageResult<ItemResp> getInvPreviewPage(InvPreviewPageReqVO pageReqVO) {
@@ -124,7 +138,7 @@ public class InvPreviewExtService {
         Optional<SellingDO> sellingDOOptional = sellingDOPageResult.getList().stream().findFirst();
 
 
-        if(Objects.nonNull(invPreviewDOS)){
+        if(Objects.nonNull(invPreviewDOS) && invPreviewDOS.size()>0){
             invPreviewDOS.forEach(item->{
                 C5ItemInfo itemInfo = item.getItemInfo();
                 invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(sellingDOPageResult.getTotal()>0).setAutoQuantity(sellingDOPageResult.getTotal().toString())
@@ -160,7 +174,9 @@ public class InvPreviewExtService {
                     .setMarketHashName(marketHashName)
                     .setImageUrl(invDescDO.getIconUrl())
                     .setItemName(invDescDO.getMarketName())
+                    .setItemId(System.currentTimeMillis())
             ;
+            invPreviewDO.setReferencePrice(new BigDecimal(invPreviewDO.getMinPrice()).divide(new BigDecimal("100"),2,BigDecimal.ROUND_HALF_UP).toString());
             invPreviewMapper.insert(invPreviewDO);
         }
 
