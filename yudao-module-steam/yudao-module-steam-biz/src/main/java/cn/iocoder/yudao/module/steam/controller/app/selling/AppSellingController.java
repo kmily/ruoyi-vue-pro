@@ -31,7 +31,7 @@ public class AppSellingController {
 
     @PostMapping("/batchSale")
     @Operation(summary = "批量上架")
-    @Idempotent(timeout = 3, timeUnit = TimeUnit.SECONDS, message = "操作太快，请稍后再试")
+    @Idempotent(timeout = 30, timeUnit = TimeUnit.SECONDS, message = "操作太快，请稍后再试")
     @PreAuthenticated
     public CommonResult<String> batchSale(@RequestBody @Valid BatchSellReqVo reqVo) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
@@ -41,7 +41,7 @@ public class AppSellingController {
 
     @PostMapping("/batchOffSale")
     @Operation(summary = "批量下架")
-    @Idempotent(timeout = 3, timeUnit = TimeUnit.SECONDS, message = "操作太快，请稍后再试")
+    @Idempotent(timeout = 30, timeUnit = TimeUnit.SECONDS, message = "操作太快，请稍后再试")
     @PreAuthenticated
     public CommonResult<String> batchOffSale(@RequestBody @Valid BatchOffSellReqVo reqVo) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
@@ -51,7 +51,7 @@ public class AppSellingController {
 
     @PostMapping("/batchChangePrice")
     @Operation(summary = "批量改价")
-    @Idempotent(timeout = 3, timeUnit = TimeUnit.SECONDS, message = "操作太快，请稍后再试")
+    @Idempotent(timeout = 30, timeUnit = TimeUnit.SECONDS, message = "操作太快，请稍后再试")
     @PreAuthenticated
     public CommonResult<String> batchChangePrice(@RequestBody @Valid BatchChangePriceReqVo reqVo) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
