@@ -139,8 +139,9 @@ public class SteamInvService {
     public List<AppInvPageReqVO> mergeInv(List<InvDO> invToMerge) {
         // 用户库存
         if (invToMerge.isEmpty()) {
-            throw new ServiceException(-1, "获取库存失败，请检查你是否拥有库存，或者你的商品全部已经上架");
+            return new ArrayList<>();
         }
+
         // 库存对应的详情表主键
         ArrayList<Long> invDescIdList = new ArrayList<>();
         for (InvDO invDO : invToMerge) {
@@ -191,7 +192,7 @@ public class SteamInvService {
                     appInvPageReqVO.setC5Price("0.00");
                     appInvPageReqVO.setItemInfo(new C5ItemInfo());
                 } else {
-                    appInvPageReqVO.setC5Price(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getPrice());
+                    appInvPageReqVO.setC5Price(String.valueOf(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getMinPrice()));
                     appInvPageReqVO.setItemInfo(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getItemInfo());
                 }
 
