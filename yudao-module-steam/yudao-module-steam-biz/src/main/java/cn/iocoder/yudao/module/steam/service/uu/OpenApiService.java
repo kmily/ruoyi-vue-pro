@@ -89,6 +89,20 @@ public class OpenApiService {
     }
     /**
      * 有品请求公共实现类
+     * @param openApiReqVo 有品传入参数，只需要管data
+     * @param <T> 入参类型
+     * @return 签名后的json对象
+     */
+    public <T extends Serializable> OpenApiReqVo<T> testSign(OpenApiReqVo<T> openApiReqVo){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String key="MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDCpzqpYg1NOXUgH/GTSRyYmPqatoTaeZ+VK+zv6Z9zP8A/psy4Yc36UX23uFLq5IqH3DphGg9O+8hFGqmihkdI2lROeYsddv1uFxXC445Jf4fgPQQRLGKpe4ok4EA+4QPuXdKXm93xrKhLL7C/XORCy0qHYAUqDR/mEbo9mKGa9piwOg9nmYPP2rRWrYPywB0Yfd6ZPPox9U1Z7Lgy1JOmOFIRedJVPwOBnixIhvMGRuD09ti9L6MxcR+lZ4wfPNtubVANT+XdgOw22lBjZEpyW0+SHiybeMKhhc5SNKXHqaiSwrznBZH8YZMAROF1oqBCbMrjVZzH5l/9K8L1ta2VAgMBAAECggEAf8lpKWnFcb0Wt1BBN3/31fYYDxljfkn6CeQcWCP3GaHwg9js7N7Ialy1O7c2OB5xE1/ws254PlHs1/D5DEk64wjx79K7EUzcczmUf60D7BxdB0kHMn8BBmKj/jF5+82c1w+hAQbCXbYLhdB5KCfDclYjR1wyB7k2B8P7kBRzg1baXae506m4Y0DRx+KRHZ1tE6yqmzVbedF2jpZ9ZmI0EkOBayGQTuq2UphTiMiE5MHG45rGSZOHwbrN1zA1mvuYBF8NRKdAmvaD53rab6gcccBbgo3bQo/4JeLpY16NZ8shRrIoY6lkV90qdTLc/sdXHbwLaGT305Jdj04LMwIQAQKBgQDwePja68u6zO46ylNl+BRDEBYcTntLCrjE9Bkns8LGE2fxyIWyLHfjyQ2gCdG7x0yCHK1tbY32XvHMgb/oAAeVMOCKqoX7cRHG3oKBzRvYHPtW7xW9j/0s0B4/Sluo0ROBWpHVXZMuBMXsbNJW0DPK8KEuh/oUI0aDiAwNNDj7QQKBgQDPONxXQpDhBT+/R69denEkqkl+prj7IUHER6os1nfMTyzLxuOWZe11nBtpfUeOX2cFzGBmPUtRfdjRXb12KukwiNAqLvi5YYnnkgsP7cJUSTU91PVn/1NAMijrb2GBERjoX/cfMiKogXPXl13emu9SYrj96cdNR+596UwbbQ8BVQKBgQCEsuz4uegJ5C6OaLoO6hAcVdMtua1V4svFe8Ip44vXDDxu8y27/cgG/hqzttdzHO6+Wh7l5O/TBd++79a7qtCEZp1yR9l5wJKDwKQaBtqXrp6QAY1otv2J7irS2DCufvmZhyY0rNecLGwgJIkJ+Qirs4/ugoDg/fpaeQfVfXz4QQKBgDwV9bYLpCzLM9fH9m55gXMrOVJTD5Ip64L5cLu9mFESqB+SVQ2YEommsUAeRnBe82V4BH/AyCUiA4t5zeUEvkcHdKy2oAJI6Q7PhwugWlfMPnbmWB5Gp6IWqUzTKAefqIRAx0wxYmFP4AIkbuCMNlbCL3fYoKSk9d9mlV3iepZdAoGBANIyfy2FZkxTWkmKtB3zqKWiEBe0lFENt7lFLEqDh+bpny4lBJCULBjyLJ/DgfVNeFQlTDUszJ05psZ7O+mKhefzeWX1At/kx7w7Ep8/HERoMFoR42Km5buPuOFtvdaPRoehcF4jnLzzladAxKrWPCdMdEMx24ggaEhi5k5F27Tg";
+        openApiReqVo.setTimestamp(simpleDateFormat.format(new Date()));
+        openApiReqVo.setAppKey(openApiReqVo.getAppKey());
+        sign(openApiReqVo,key);
+        return openApiReqVo;
+    }
+    /**
+     * 有品请求公共实现类
      * @param url 接口地址
      * @param openApiReqVo 有品传入参数，只需要管data
      * @param classic 返回数据格式

@@ -126,11 +126,11 @@ public class AppIo661ApiController {
      * api余额接口
      * @return
      */
-    @PostMapping("v1/api/sign")
-    @Operation(summary = "余额查询")
+    @PostMapping("v1/api/testSign")
+    @Operation(summary = "签名测试")
     @PermitAll
-    public   OpenApiReqVo<PaySteamOrderCreateReqVO> sign(@RequestBody OpenApiReqVo<PaySteamOrderCreateReqVO> openApiReqVo) {
-        return DevAccountUtils.tenantExecute(1L, () -> openApiService.requestUUSign(openApiReqVo));
+    public   OpenApiReqVo<PaySteamOrderCreateReqVO> testSign(@RequestBody OpenApiReqVo<PaySteamOrderCreateReqVO> openApiReqVo) {
+        return DevAccountUtils.tenantExecute(1L, () -> openApiService.testSign(openApiReqVo));
     }
     /**
      * 检查交易链接
@@ -254,6 +254,7 @@ public class AppIo661ApiController {
                 return ApiResult.success(appPayOrderSubmitRespVO);
             });
         } catch (ServiceException e) {
+            e.printStackTrace();
             return ApiResult.error(e.getCode(),  e.getMessage(),AppPayOrderSubmitRespVO.class);
         }
 
