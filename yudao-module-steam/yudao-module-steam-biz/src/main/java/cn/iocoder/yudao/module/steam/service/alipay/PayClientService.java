@@ -23,12 +23,18 @@ public class PayClientService {
     @Resource
     private PayChannelService channelService;
 
-    private static final Long PAY_WITHDRAWAL_APP_ID = 10L;
+    private static final Long PAY_WITHDRAWAL_APP_ID = 7l;
     private DefaultAlipayClient getPayClient(){
         PayChannelDO channel = channelService.validPayChannel(PAY_WITHDRAWAL_APP_ID, PayChannelEnum.ALIPAY_PC.getCode());
         PayClient client = channelService.getPayClient(channel.getId());
         return client.getDefaultAliPayClient();
     }
+
+    /**
+     * 签约授权页面申请（获取签约链接）
+     * @param req
+     * @return
+     */
     public String createIsv(CreateIsvVo req) {
         DefaultAlipayClient payClient = getPayClient();
         AlipayOpenInviteOrderCreateRequest request = new AlipayOpenInviteOrderCreateRequest();
