@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.steam.controller.app.alipay;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.service.alipay.PayClientService;
-import cn.iocoder.yudao.module.steam.service.alipay.vo.CreateIsvVo;
+import cn.iocoder.yudao.module.steam.controller.app.alipay.vo.CreateIsvVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
@@ -29,7 +31,8 @@ public class AppAlipayController {
     @Operation(summary = "ISV邀约即授权页面创建")
     @PermitAll
     public CommonResult<String> createIsv(@RequestBody @Valid CreateIsvVo req){
-        String isv = payClientService.createIsv(req);
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        String isv = payClientService.createIsv(req,loginUser);
         return success(isv);
     }
 }
