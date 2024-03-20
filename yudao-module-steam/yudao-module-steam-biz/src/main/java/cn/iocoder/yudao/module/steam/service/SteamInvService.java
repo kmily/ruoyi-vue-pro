@@ -131,7 +131,7 @@ public class SteamInvService {
 
 
     /**
-     * 合并显示库存  不包含不可出售库存
+     * 合并显示库存  部分可出售库存
      *
      * @param invToMerge
      * @return
@@ -141,7 +141,6 @@ public class SteamInvService {
         if (invToMerge.isEmpty()) {
             return new ArrayList<>();
         }
-
         // 库存对应的详情表主键
         ArrayList<Long> invDescIdList = new ArrayList<>();
         for (InvDO invDO : invToMerge) {
@@ -173,10 +172,7 @@ public class SteamInvService {
             mapInvPreview = invPreviewDOS.stream().collect(Collectors.toMap(InvPreviewDO::getMarketHashName, i -> i, (v1, v2) -> v1));
         }
 
-
-
         // 合并显示库存
-//        List<AppInvPageReqVO> appInvPageReqVO = new ArrayList<>();
         Map<Long, AppInvPageReqVO> stringAppInvPageReqVOMap = new HashMap<>();
 
         for (InvDO item : collect) {
@@ -195,19 +191,16 @@ public class SteamInvService {
                     appInvPageReqVO.setC5Price(String.valueOf(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getMinPrice()));
                     appInvPageReqVO.setItemInfo(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getItemInfo());
                 }
-
                 appInvPageReqVO.setInvId(Collections.emptyList());
                 stringAppInvPageReqVOMap.put(item.getInvDescId(), appInvPageReqVO);
             }
-
             List<Long> invId = appInvPageReqVO.getInvId();
             appInvPageReqVO.setInvId(Stream.of(invId, Arrays.asList(item.getId())).flatMap(Long -> Long.stream()).collect(Collectors.toList()));
-
         }
         return stringAppInvPageReqVOMap.values().stream().collect(Collectors.toList());
-
-
     }
+
+
 
     /**
      * 合并显示库存  全部库存  包含不可出售库存
