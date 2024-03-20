@@ -241,8 +241,12 @@ public class SteamService {
         }
         bindUserDO.setSteamPassword(password);
         bindUserDO.setMaFile(steamMaFile);
-        bindUserDO.setTradeUrl(steamWeb.getTreadUrl().get());
-        bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
+        if(steamWeb.getTreadUrl().isPresent()){
+            bindUserDO.setTradeUrl(steamWeb.getTreadUrl().get());
+        }
+        if(steamWeb.getWebApiKey().isPresent()){
+            bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
+        }
         if(steamWeb.getSteamName().isPresent()) {
             bindUserDO.setSteamName(steamWeb.getSteamName().get());
         }
