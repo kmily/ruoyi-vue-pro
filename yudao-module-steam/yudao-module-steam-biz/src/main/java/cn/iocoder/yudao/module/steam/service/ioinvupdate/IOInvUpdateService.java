@@ -158,6 +158,7 @@ public class IOInvUpdateService {
                 InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = exterior.get();
                 invDescDO.setSelExterior(tagsDTO.getInternalName());
             }
+            invDescDOList.add(invDescDO);
         }
         // 批量插入 desc
         invDescMapper.insertBatch(invDescDOList);
@@ -280,5 +281,7 @@ public class IOInvUpdateService {
             }
             return appInvPageReqVO;
         }
+
+
     }
 
