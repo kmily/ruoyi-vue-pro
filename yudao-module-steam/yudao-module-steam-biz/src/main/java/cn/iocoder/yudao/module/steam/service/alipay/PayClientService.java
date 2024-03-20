@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.steam.service.alipay;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
@@ -70,13 +71,13 @@ public class PayClientService {
         }
     }
     private void checkAlipayResponse(AlipayResponse response){
-        log.error("alipay checkAlipayResponse{}",response);
-        if(Objects.isNull(response)){
+        log.error("alipay checkAlipayResponse{}", JsonUtils.toJsonString(response));
+        if(Objects.isNull(response) && Objects.isNull(response.getBody())){
             throw new ServiceException(OpenApiCode.TO_MANY);
         }
-        if(response.getCode().equals("0")){
+        if("0".equals(response.getCode()) || Objects.nonNull(response.getBody())){
             return;
         }
-        throw new ServiceException(Integer.valueOf(response.getCode()),response.getMsg());
+        throw new ServiceException(Integer.valueOf(response.getCode()),response.getMsg()+"--"+response.getSubMsg());
     }
 }
