@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppBindUserApiKeyReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppBindUserMaFileReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppUnBindUserReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
@@ -267,7 +268,66 @@ public class SteamService {
             ioInvUpdateService.firstInsertInventory(inventoryDto,bindUserDO);
         }
     }
+    public void bindMaFile2(byte[] maFileJsonByte, AppBindUserMaFileReqVO reqVO) throws JsonProcessingException {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        if(Objects.isNull(loginUser)){
+            throw new ServiceException(OpenApiCode.ID_ERROR);
+        }
+        BindUserDO bindUserDO = bindUserMapper.selectById(reqVO.getBindUserId());
+        if(Objects.isNull(bindUserDO)){
+            throw new ServiceException(-1,"绑定失败，请检查后再试。");
+        }
+        if(bindUserDO.getIsTempAccount()){
+            throw new ServiceException(-1,"不支持绑定");
+        }
+        if(!bindUserDO.getUserId().equals(loginUser.getId())){
+            throw new ServiceException(-1,"没有权限操作。");
+        }
+        if(!bindUserDO.getUserType().equals(loginUser.getUserType())){
+            throw new ServiceException(-1,"没有权限操作。");
+        }
+        SteamMaFile steamMaFile;
+        try {
+            steamMaFile = objectMapper.readValue(maFileJsonByte, SteamMaFile.class);
+        } catch (IOException e) {
+            log.error("读取maFile失败{}",e);
+            throw new ServiceException(-1,"读取maFile失败，请检查后再试。");
+        }
+//        SteamWeb steamWeb=new SteamWeb(configService);
+//        bindUserDO.setSteamPassword(password);
+//        bindUserDO.setMaFile(steamMaFile);
+//        if(steamWeb.checkLogin(bindUserDO)){
+//            bindUserDO.setLoginCookie(steamWeb.getCookieString());
+//        }
+//        steamWeb.initTradeUrl();
+//        Optional<String> steamIdOptional = steamWeb.getSteamId();
+//        if(!steamIdOptional.isPresent()){
+//            throw new ServiceException(-1,"绑定用户失败原因 无法检测steam帐号密码");
+//        }
+//        if (!steamIdOptional.get().equals(bindUserDO.getSteamId())) {
+//            throw new ServiceException(-1,"ma文件和绑定的steam文件不一致，请确认后再次操作。");
+//        }
+        bindUserDO.setSteamPassword(reqVO.getPassword());
+        bindUserDO.setTradeUrl(reqVO.getTradeUrl());
+        bindUserDO.setApiKey(reqVO.getApiKey());
+        bindUserDO.setSteamName(reqVO.getSteamName());
+        bindUserDO.setAvatarUrl(reqVO.getAvatarUrl());
 
+        bindUserDO.setMaFile(steamMaFile);
+        // 用户修改了密码，需要重新绑定ma文件
+        InvPageReqVO invPageReqVO = new InvPageReqVO();
+        invPageReqVO.setSteamId(bindUserDO.getSteamId());
+        invPageReqVO.setUserId(bindUserDO.getUserId());
+        // 删除之前绑定的所有库存
+        if(!(invMapper.selectPage(invPageReqVO)).getList().isEmpty()){
+            invMapper.delete(new QueryWrapper<InvDO>().eq("steam_id",bindUserDO.getSteamId()).eq("user_id",bindUserDO.getUserId()));
+        }
+        bindUserMapper.updateById(bindUserDO);
+        InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
+        if(inventoryDto != null){
+            ioInvUpdateService.firstInsertInventory(inventoryDto,bindUserDO);
+        }
+    }
     /**
      * 验证用户是否已经被绑定
      * @param openApi steam open返回的信息

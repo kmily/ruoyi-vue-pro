@@ -100,6 +100,15 @@ public class AppBindUserController {
         steamService.bindMaFile(IoUtil.readBytes(file.getInputStream()),appBindUserMaFileReqVO.getPassword(),appBindUserMaFileReqVO.getBindUserId());
         return success("成功");
     }
+    @PostMapping("/upload/mafile2")
+    @Operation(summary = "上传ma文件", description = "上传ma文件")
+    @PreAuthenticated
+    @OperateLog(logArgs = false) // 上传文件，没有记录操作日志的必要
+    public CommonResult<String> uploadFile2(@Valid AppBindUserMaFileReqVO appBindUserMaFileReqVO) throws Exception {
+        MultipartFile file = appBindUserMaFileReqVO.getFile();
+        steamService.bindMaFile2(IoUtil.readBytes(file.getInputStream()),appBindUserMaFileReqVO);
+        return success("成功");
+    }
     @PostMapping("/changeWebApi")
     @Operation(summary = "解绑steam")
     @PreAuthenticated

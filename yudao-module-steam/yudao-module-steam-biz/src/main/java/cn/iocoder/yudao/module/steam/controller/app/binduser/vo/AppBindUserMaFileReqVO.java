@@ -29,5 +29,21 @@ public class AppBindUserMaFileReqVO extends PageParam {
     @Schema(description = "bindUserId", example = "123456")
     @NotNull(message = "bindUserId不能为空")
     private Integer bindUserId;
+    /**
+     * 交易链接
+     */
+    private String tradeUrl;
+    /**
+     * API KEY
+     */
+    private String apiKey;
 
+    /**
+     * 地址池id
+     */
+    private String avatarUrl;
+    /**
+     * steam名称
+     */
+    private String steamName;
 }
