@@ -184,6 +184,7 @@ public class SellingExtService {
                 throw new ServiceException(-1, "商品交易中，不允许下架");
             }
             sellingMapper.deleteById(item.getId());
+            invPreviewExtService.markInvEnable(item.getMarketHashName());
         }
     }
 
