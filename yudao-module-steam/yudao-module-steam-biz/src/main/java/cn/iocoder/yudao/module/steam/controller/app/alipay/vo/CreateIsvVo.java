@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.steam.service.alipay.vo;
+package cn.iocoder.yudao.module.steam.controller.app.alipay.vo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
