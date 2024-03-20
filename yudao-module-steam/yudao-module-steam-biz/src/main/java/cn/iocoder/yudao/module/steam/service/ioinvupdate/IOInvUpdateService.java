@@ -14,10 +14,12 @@ import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
@@ -41,11 +43,9 @@ public class IOInvUpdateService {
 
     @Resource
     private SellingMapper sellingMapper;
-//=======================================
 
-    //    测试 TODO  lgm
 
-//========================================
+
 //    @Async
 
     // 从steam获取用户库存信息
@@ -74,11 +74,11 @@ public class IOInvUpdateService {
     /**
      * 插入库存 (对应账户库存为空)
      */
-
+    @Transactional
     public void firstInsertInventory(InventoryDto inventoryDto, BindUserDO bindUserDO) {
         // inv 表入库
+        List<InvDO> invDOList = new ArrayList<>();
         for(InventoryDto.AssetsDTO assetsDTO :inventoryDto.getAssets()){
-
             InvDO invDO = new InvDO();
             invDO.setClassid(assetsDTO.getClassid());
             invDO.setInstanceid(assetsDTO.getInstanceid());
@@ -93,11 +93,11 @@ public class IOInvUpdateService {
             invDO.setUserType(bindUserDO.getUserType());
             invDO.setBindUserId(bindUserDO.getId());
             invDO.setContextid(assetsDTO.getContextid());
-            // inv_desc_id
-            invMapper.insert(invDO);
+            invDOList.add(invDO);
         }
+        invMapper.insertBatch(invDOList);
         // inv_desc 表入库
-
+        List<InvDescDO> invDescDOList = new ArrayList<>();
         for(InventoryDto.DescriptionsDTOX item :inventoryDto.getDescriptions()){
             InvDescDO invDescDO = new InvDescDO();
             invDescDO.setSteamId(bindUserDO.getSteamId());
@@ -158,15 +158,19 @@ public class IOInvUpdateService {
                 InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = exterior.get();
                 invDescDO.setSelExterior(tagsDTO.getInternalName());
             }
-            invDescMapper.insert(invDescDO);
-            List<InvDescDO> invDescDOS = invDescMapper.selectList()
-                    .stream()
-                    .filter(i -> i.getClassid().equals(invDescDO.getClassid()) && i.getInstanceid().equals(invDescDO.getInstanceid()))
-                    .collect(Collectors.toList());
+        }
+        // 批量插入 desc
+        invDescMapper.insertBatch(invDescDOList);
+
+        // 给inv表绑定descID
+        for(InvDO item : invDOList){
+            List<InvDescDO> invDescIDList = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+                    .eq(InvDescDO::getInstanceid, item.getInstanceid())
+                    .eq(InvDescDO::getClassid, item.getClassid()));
             InvDO invDescId = new InvDO();
             invDescId.setInstanceid(item.getInstanceid());
             invDescId.setClassid(item.getClassid());
-            invDescId.setInvDescId(invDescDOS.get(0).getId());
+            invDescId.setInvDescId(invDescIDList.get(0).getId());
             invMapper.update(invDescId,new LambdaQueryWrapperX<InvDO>()
                     .eq(InvDO::getInstanceid, invDescId.getInstanceid())
                     .eq(InvDO::getClassid, invDescId.getClassid()));
@@ -182,12 +186,7 @@ public class IOInvUpdateService {
         invDO.setSteamId(bindUserDO.getSteamId());
         invDO.setUserId(bindUserDO.getUserId());
         invDO.setBindUserId(bindUserDO.getId());
-        // TODO 校验三个字段 或者（校验steamId 剩下两个字段二选一）
-//        SellingPageReqVO sellingPageReqVO = new SellingPageReqVO();
-//        sellingPageReqVO.setSteamId(bindUserDO.getSteamId());
-//        sellingPageReqVO.setBindUserId(bindUserDO.getId());
-//        sellingPageReqVO.setUserId(bindUserDO.getUserId());
-//        List<SellingDO> sellingDOS = sellingMapper.selectPage(sellingPageReqVO).getList();
+
         invMapper.delete(new LambdaQueryWrapperX<InvDO>()
                 .eq(InvDO::getSteamId, invDO.getSteamId())
                 .eq(InvDO::getUserId, invDO.getUserId())
