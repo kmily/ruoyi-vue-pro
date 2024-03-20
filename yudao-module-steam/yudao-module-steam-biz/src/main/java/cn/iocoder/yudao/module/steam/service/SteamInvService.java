@@ -270,7 +270,7 @@ public class SteamInvService {
                     appInvPageReqVO.setC5Price("0.00");
                     appInvPageReqVO.setItemInfo(new C5ItemInfo());
                 } else {
-                    appInvPageReqVO.setC5Price(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getPrice());
+                    appInvPageReqVO.setC5Price(String.valueOf(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getMinPrice()));
                     appInvPageReqVO.setItemInfo(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getItemInfo());
                 }
 
