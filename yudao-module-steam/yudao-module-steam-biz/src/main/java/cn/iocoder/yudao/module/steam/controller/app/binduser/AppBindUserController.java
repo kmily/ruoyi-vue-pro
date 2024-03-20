@@ -106,7 +106,12 @@ public class AppBindUserController {
     @OperateLog(logArgs = false) // 上传文件，没有记录操作日志的必要
     public CommonResult<String> uploadFile2(@Valid AppBindUserMaFileReqVO appBindUserMaFileReqVO) throws Exception {
         MultipartFile file = appBindUserMaFileReqVO.getFile();
-        steamService.bindMaFile2(IoUtil.readBytes(file.getInputStream()),appBindUserMaFileReqVO);
+        byte[] bytes = IoUtil.readBytes(file.getInputStream());
+        try{
+            steamService.bindMaFile(bytes,appBindUserMaFileReqVO.getPassword(),appBindUserMaFileReqVO.getBindUserId());
+        }catch (Exception e){
+            steamService.bindMaFile2(bytes,appBindUserMaFileReqVO);
+        }
         return success("成功");
     }
     @PostMapping("/changeWebApi")

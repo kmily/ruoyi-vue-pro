@@ -195,6 +195,11 @@ public class AppIo661ApiController {
 
                 reqVO.setSelExterior(openApiReqVo.getData().getSelExterior());
                 reqVO.setSelItemset(openApiReqVo.getData().getSelItemset());
+                reqVO.setPageNo(openApiReqVo.getData().getPageNo());
+                reqVO.setPageSize(openApiReqVo.getData().getPageSize());
+                if(reqVO.getPageSize()>200){
+                    reqVO.setPageSize(200);
+                }
                 PageResult<ItemResp> invPreviewPage = invPreviewExtService.getInvPreviewPage(reqVO);
                 return ApiResult.success(invPreviewPage);
             });
