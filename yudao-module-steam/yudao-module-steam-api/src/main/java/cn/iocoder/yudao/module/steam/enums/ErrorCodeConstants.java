@@ -99,5 +99,7 @@ public interface ErrorCodeConstants {
     ErrorCode BIND_IPADDRESS_NOT_EXISTS = new ErrorCode(1_500_010_01, "绑定用户IP地址池不存在");
 
 
+    // ========== 签约ISV用户  ==========
+    ErrorCode ALIPAY_ISV_NOT_EXISTS = new ErrorCode(1_600_010_01, "签约ISV用户不存在");
 
 }
