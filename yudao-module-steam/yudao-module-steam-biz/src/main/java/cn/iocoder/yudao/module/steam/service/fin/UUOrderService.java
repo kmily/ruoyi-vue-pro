@@ -60,6 +60,14 @@ public interface UUOrderService {
     Integer refundInvOrder(LoginUser loginUser, OrderCancelVo id, String userIp);
 
     /**
+     * 买家取消订单
+     *
+     * @param id 编号
+     * @param userIp 用户编号
+     */
+    Integer orderCancel(LoginUser loginUser, OrderCancelVo id, String userIp);
+
+    /**
      * 更新示例订单为已退款
      *
      * @param id 编号

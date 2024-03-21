@@ -223,30 +223,6 @@ public class AppApiController {
         }
     }
     /**
-     * api余额接口
-     * @return
-     */
-    @PostMapping("v1/api/uuGetAssetsInfo")
-    @Operation(summary = "查询UU余额查询,此接口线上需要删除")
-    @PermitAll
-    public ApiResult<ApiPayWalletRespVO> uuGetAssetsInfo(@RequestBody OpenApiReqVo<Serializable> openApiReqVo) {
-        try {
-            return uuService.getAssetsInfo();
-        } catch (ServiceException e) {
-            return ApiResult.error(e.getCode(),  e.getMessage(),ApiPayWalletRespVO.class);
-        }
-    }
-    /**
-     * api余额接口
-     * @return
-     */
-    @PostMapping("v1/api/sign")
-    @Operation(summary = "余额查询")
-    @PermitAll
-    public   OpenApiReqVo<QueryOrderReqVo> sign(@RequestBody OpenApiReqVo<QueryOrderReqVo> openApiReqVo) {
-        return DevAccountUtils.tenantExecute(1L, () -> openApiService.requestUUSign(openApiReqVo));
-    }
-    /**
      * 检查交易链接
      * @return
      */
