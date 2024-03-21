@@ -29,21 +29,18 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
-import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.withdrawal.WithdrawalDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.withdrawal.WithdrawalMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoucommodity.UUCommodityMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.UUOrderStatus;
 import cn.iocoder.yudao.module.steam.enums.UUOrderSubStatus;
-import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
+import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.YouPingOrder;
@@ -79,7 +76,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.addTime;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
-import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.PAY_ORDER_NOT_FOUND;
 
 /**
  * 示例订单 Service 实现类
@@ -115,9 +112,12 @@ public class UUOrderServiceImpl implements UUOrderService {
 
 
 
-    @Resource
-    private WithdrawalMapper withdrawalMapper;
+    private SteamService steamService;
 
+    @Autowired
+    public void setSteamService(SteamService steamService) {
+        this.steamService = steamService;
+    }
 
 
     @Resource
@@ -163,17 +163,29 @@ public class UUOrderServiceImpl implements UUOrderService {
     }
 
     @Override
-    public YouyouOrderDO createInvOrder(LoginUser loginUser, CreateCommodityOrderReqVo createReqVO) {
+    public YouyouOrderDO createInvOrder(LoginUser loginUser, CreateCommodityOrderReqVo reqVo) {
+        if(Objects.isNull(loginUser)){
+            throw new ServiceException(OpenApiCode.ID_ERROR);
+        }
+        BindUserDO buyBindUserDO=null;
+        if(StringUtils.hasText(reqVo.getTradeLinks())){
+            buyBindUserDO = steamService.getTempBindUserByLogin(loginUser, reqVo.getTradeLinks(),true);
+        }
+        if(Objects.isNull(buyBindUserDO)){
+            throw new ServiceException(-1,"获取steam帐号失败");
+        }
 
-        BigDecimal bigDecimal = new BigDecimal(createReqVO.getPurchasePrice());
+
+
+        BigDecimal bigDecimal = new BigDecimal(reqVo.getPurchasePrice());
         YouyouOrderDO youyouOrderDO=new YouyouOrderDO()
                 .setOrderNo(noRedisDAO.generate(PAY_NO_PREFIX))
                 .setUserId(loginUser.getId()).setUserType(loginUser.getUserType())
                 .setPayOrderStatus(PayOrderStatusEnum.WAITING.getStatus())
-                .setMerchantOrderNo(createReqVO.getMerchantOrderNo())
-                .setTradeLinks(createReqVO.getTradeLinks())
-                .setCommodityId(createReqVO.getCommodityId()).setCommodityHashName(createReqVO.getCommodityHashName()).setCommodityTemplateId(createReqVO.getCommodityTemplateId())
-                .setPurchasePrice(createReqVO.getPurchasePrice())
+                .setMerchantOrderNo(reqVo.getMerchantOrderNo())
+                .setTradeLinks(reqVo.getTradeLinks())
+                .setCommodityId(reqVo.getCommodityId()).setCommodityHashName(reqVo.getCommodityHashName()).setCommodityTemplateId(reqVo.getCommodityTemplateId())
+                .setPurchasePrice(reqVo.getPurchasePrice())
                 .setPayAmount(bigDecimal.multiply(new BigDecimal("100")).intValue())
                 .setSellCashStatus(InvSellCashStatusEnum.INIT.getStatus()).setSellUserId(UU_CASH_ACCOUNT_ID).setSellUserType(UserTypeEnum.MEMBER.getValue())
                 .setPayStatus(false).setRefundPrice(0);
@@ -183,7 +195,7 @@ public class UUOrderServiceImpl implements UUOrderService {
         Long payOrderId = payOrderApi.createOrder(new PayOrderCreateReqDTO()
                 .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
                 .setMerchantOrderId(youyouOrderDO.getId().toString()) // 业务的订单编号
-                .setSubject("购买").setBody("出售编号："+createReqVO.getCommodityId()).setPrice(youyouOrderDO.getPayAmount()) // 价格信息
+                .setSubject("购买").setBody("出售编号："+reqVo.getCommodityId()).setPrice(youyouOrderDO.getPayAmount()) // 价格信息
                 .setExpireTime(addTime(Duration.ofHours(2L)))); // 支付的过期时间
         youyouOrderDO.setPayOrderId(payOrderId);
 //        // 2.2 更新支付单到 demo 订单

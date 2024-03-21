@@ -163,6 +163,9 @@ public class SteamWeb {
         if(Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus()!=200){
             throw new ServiceException(-1, "apiKey失败");
         }
+        if(proxyResponseVo.getHtml().contains("<title>登录</title>")){
+            throw new ServiceException(-1, "登录失败");
+        }
         Pattern pattern = Pattern.compile("密钥: (.*?)<"); // 正则表达式匹配API密钥
         Matcher matcher = pattern.matcher(proxyResponseVo.getHtml());
         if (matcher.find()) {
