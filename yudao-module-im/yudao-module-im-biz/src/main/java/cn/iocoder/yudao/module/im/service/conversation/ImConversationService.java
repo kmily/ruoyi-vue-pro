@@ -9,7 +9,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 /**
- * 会话 Service 接口
+ * IM 会话 Service 接口
  *
  * @author 芋道源码
  */
@@ -74,4 +74,5 @@ public interface ImConversationService {
      * @param updateReqVO 更新信息
      */
     void updateLastReadTime(ImConversationSaveReqVO updateReqVO);
+
 }

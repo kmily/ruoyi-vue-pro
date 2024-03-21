@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+// TODO @hao：这个是不是删除掉，应该不会有这个 VO 哈；应该给前端的，是要屏蔽掉这个表，最终返回的都是 Message 哈；说白了，这个 inbox 是后端的内部实现
 @Schema(description = "管理后台 - 收件箱 Response VO")
 @Data
 @ExcelIgnoreUnannotated

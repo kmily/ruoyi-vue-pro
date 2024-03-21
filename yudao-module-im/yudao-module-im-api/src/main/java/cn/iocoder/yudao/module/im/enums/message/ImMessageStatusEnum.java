@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
+// TODO @hao：注释哈；
 @RequiredArgsConstructor
 @Getter
 public enum ImMessageStatusEnum implements IntArrayValuable {
@@ -16,7 +17,9 @@ public enum ImMessageStatusEnum implements IntArrayValuable {
     DELETED(4, "已删除"),
     RECALL(5, "已撤回");
 
+    // TODO @hao：静态变量，和普通变量，最好空一行；
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ImMessageStatusEnum::getStatus).toArray();
+    // TODO @hao：注释哈；
     private final Integer status;
     private final String name;
 

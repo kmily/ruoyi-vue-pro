@@ -91,6 +91,7 @@ public interface ImMessageService {
      */
     List<ImMessageDO> loadMessage(Long userId, Long sequence, Integer size);
 
+    // TODO @hao；这种接口，项目里叫 getMessageListByUserId，尽量保持 getList 获取列表哈；
     /**
      * 拉取全部消息
      *

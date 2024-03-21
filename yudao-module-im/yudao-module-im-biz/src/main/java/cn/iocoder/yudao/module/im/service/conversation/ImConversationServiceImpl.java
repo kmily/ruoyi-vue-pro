@@ -18,7 +18,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.CONVERSATION_NOT_EXISTS;
 
 /**
- * 会话 Service 实现类
+ * IM 会话 Service 实现类
  *
  * @author 芋道源码
  */
@@ -26,18 +26,19 @@ import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.CONVERSATION_N
 @Validated
 public class ImConversationServiceImpl implements ImConversationService {
 
+    // TODO @hao: 自己模块的注入，不用带 im 前缀哈；
     @Resource
     private ImConversationMapper imConversationMapper;
 
+    // TODO @hao: 这个方法，是不是不需要哈
     @Override
     public Long createConversation(ImConversationSaveReqVO createReqVO) {
-        // 插入
         ImConversationDO conversation = BeanUtils.toBean(createReqVO, ImConversationDO.class);
         imConversationMapper.insert(conversation);
-        // 返回
         return conversation.getId();
     }
 
+    // TODO @hao: 这个方法，是不是不需要哈
     @Override
     public void updateConversation(ImConversationSaveReqVO updateReqVO) {
         // 校验存在
@@ -47,6 +48,7 @@ public class ImConversationServiceImpl implements ImConversationService {
         imConversationMapper.updateById(updateObj);
     }
 
+    // TODO @hao: 考虑到可能和端上不同步，可以不校验是不是存储。另外，不基于 id 删除。要基于 no + userId 删除哈。说白了，对端上要屏蔽 id 字段
     @Override
     public void deleteConversation(Long id) {
         // 校验存在
@@ -86,6 +88,11 @@ public class ImConversationServiceImpl implements ImConversationService {
         createOrUpdateConversation(updateReqVO);
     }
 
+    // TODO @hao：updateTop 和 updateLastReadTime 使用独立的逻辑实现，不使用统一的 ImConversationSaveReqVO；
+    // TODO 大体步骤建议：
+    // 1. 先 getOrderCreateConversation，查询会话，不存在则插入；
+    // 2. 更新对应的字段
+    // 3. 做对应更新的 notify 推送
     private void createOrUpdateConversation(ImConversationSaveReqVO updateReqVO) {
         // 操作会话（已读、置顶）时，才会延迟创建,要先判断是否存在，根据 no 查询是否存在,不存在则新增
         ImConversationDO conversation = imConversationMapper.selectByNo(updateReqVO.getNo());

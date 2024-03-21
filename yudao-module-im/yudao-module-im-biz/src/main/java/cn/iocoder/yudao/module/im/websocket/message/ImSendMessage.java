@@ -1,11 +1,9 @@
 package cn.iocoder.yudao.module.im.websocket.message;
 
-import cn.iocoder.yudao.module.im.dal.dataobject.message.body.ImMessageBody;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
-@Schema(description = "管理后台 - 消息发送 send")
+@Schema(description = "管理后台 - IM 消息发送 send")
 @Data
 public class ImSendMessage {
 
@@ -13,6 +11,7 @@ public class ImSendMessage {
     private String clientMessageId;
 
     @Schema(description = "会话类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    // TODO @hao：用下 InEnum 校验。这样可以少写 15 的注释哈；类似 contentType 也是；
     private Integer conversationType; // 对应 ImConversationTypeEnum 枚举
 
     @Schema(description = "接收人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")

@@ -6,8 +6,9 @@ import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.ImInboxSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.inbox.ImInboxDO;
 import jakarta.validation.Valid;
 
+// TODO @hao：不用的方法，删除下哈；
 /**
- * 收件箱 Service 接口
+ * IM 收件箱 Service 接口
  *
  * @author 芋道源码
  */

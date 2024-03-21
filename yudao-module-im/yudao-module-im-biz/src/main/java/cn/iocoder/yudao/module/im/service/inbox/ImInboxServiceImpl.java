@@ -27,10 +27,8 @@ public class ImInboxServiceImpl implements ImInboxService {
 
     @Override
     public Long createInbox(ImInboxSaveReqVO createReqVO) {
-        // 插入
         ImInboxDO inbox = BeanUtils.toBean(createReqVO, ImInboxDO.class);
         imInboxMapper.insert(inbox);
-        // 返回
         return inbox.getId();
     }
 

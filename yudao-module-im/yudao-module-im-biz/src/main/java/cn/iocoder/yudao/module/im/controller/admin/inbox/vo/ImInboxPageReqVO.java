@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+// TODO @hao：这个是不是删除掉，应该不会有这个 VO 哈
 @Schema(description = "管理后台 - 收件箱分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)

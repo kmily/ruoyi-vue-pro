@@ -23,6 +23,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.util.List;
 
+// TODO @hao：消息发送，使用 http 上行。因为在 cloud 框架下，我们比较难去 Listener。因为 im-server 不会自己启动 websocket 路径
 /**
  * WebSocket im
  *
@@ -60,9 +61,10 @@ public class ImWebSocketMessageListener implements WebSocketMessageListener<ImSe
         if (message.getConversationType().equals(ImConversationTypeEnum.PRIVATE.getType())) {
             handlePrivateMessage(fromUserId, message);
         } else if (message.getConversationType().equals(ImConversationTypeEnum.GROUP.getType())) {
-            //处理群聊消息
+            // 处理群聊消息
             handleGroupMessage(fromUserId, message);
         } else {
+            // TODO @hao：是不是应该会话类型哈？然后打印这种错误日志，最好把 message 整个打进去，这样更好定位完整的消息；
             log.error("[onMessage][消息类型({}) 未支持]", message.getConversationType());
         }
     }
@@ -74,13 +76,17 @@ public class ImWebSocketMessageListener implements WebSocketMessageListener<ImSe
      * @param message    发送的IM消息
      */
     private void handleGroupMessage(Long fromUserId, ImSendMessage message) {
+        // TODO @hao：群存在；
+        // TODO @hao：发送人在群里；
         ImMessageDO imMessageDO = imMessageService.saveGroupMessage(message, fromUserId); // 保存群聊消息
         Long groupId = message.getReceiverId();
 
         // 发送消息给群聊成员
+        // TODO @hao：变量名可以叫 groupMembers；一般不用 DO 后缀，除非为了区分；
         List<GroupMemberDO> groupMemberDOList = imGroupMemberService.selectByGroupId(groupId);
         groupMemberDOList.forEach(groupMemberDO -> {
-            //过滤掉自己
+            // 过滤掉自己
+            // TODO @hao：98 到 99 的代码，是不是可以融合到这里来；
             if (groupMemberDO.getUserId().equals(fromUserId)) {
                 return;
             }
@@ -106,11 +112,14 @@ public class ImWebSocketMessageListener implements WebSocketMessageListener<ImSe
      * @param message    发送的IM消息
      */
     private void handlePrivateMessage(Long fromUserId, ImSendMessage message) {
+        // TODO @hao：需要校验 receiverId 存在；
         ImMessageDO imMessageDO = imMessageService.savePrivateMessage(message, fromUserId); // 保存私人消息
         Long receiverId = message.getReceiverId();
 
+        // TODO @hao：sequenceGeneratorRedisDao.generateSequence 和 createAndSaveInbox 步骤，要加锁；不然会有并发问题；如果有疑问，可以微信招我沟通哈；另外，创建 seq、保存收件箱、发送，可以统一封装到 imInboxService 里哈；这样，后续要发某个消息，就是丢个 message 对象进去；
         Long fromUserSequence = sequenceGeneratorRedisDao.generateSequence(fromUserId); // 生成发送者序列
         Long fromUserInboxId = createAndSaveInbox(fromUserId, imMessageDO.getId(), fromUserSequence); // 创建并保存发送者收件箱
+
         Long receiverSequence = sequenceGeneratorRedisDao.generateSequence(message.getReceiverId()); // 生成接收者序列
         Long receiverInboxId = createAndSaveInbox(message.getReceiverId(), imMessageDO.getId(), receiverSequence); // 创建并保存接收者收件箱
 
@@ -119,6 +128,7 @@ public class ImWebSocketMessageListener implements WebSocketMessageListener<ImSe
         sendMessage(receiverId, receiverInboxId, imMessageDO, message, receiverSequence);
 
         // 更新消息状态为成功
+        // TODO @hao：后端消息的发送，默认就是 success 哈，不要区分 status；status 更多是前端使用的；
         imMessageService.updateMessageStatus(imMessageDO.getId(), ImMessageStatusEnum.SUCCESS.getStatus());
         // 保存私人会话，只有在 client 操作会话（已读、置顶）时，才会延迟创建
         //imConversationService.savePrivateConversation(fromUserId, receiverId);
@@ -137,6 +147,7 @@ public class ImWebSocketMessageListener implements WebSocketMessageListener<ImSe
         return imInboxService.createInbox(inboxSaveReqVO); // 创建收件箱
     }
 
+    // TODO @hao：这个使用 WebSocketSenderApi 发送哈；
     /**
      * 发送消息
      *
@@ -147,6 +158,7 @@ public class ImWebSocketMessageListener implements WebSocketMessageListener<ImSe
      * @param sequence    序列
      */
     private void sendMessage(Long fromUserId, Long inboxId, ImMessageDO imMessageDO, ImSendMessage message, Long sequence) {
+        // TODO @hao：不要每个字段 set 占一行；想同类型的字段用一行，然后链式 set，会更简洁干净。
         ImReceiveMessage receiveMessage = new ImReceiveMessage(); // 创建接收消息
         receiveMessage.setFromId(fromUserId); // 设置发送者ID
         receiveMessage.setConversationType(message.getConversationType()); // 设置会话类型

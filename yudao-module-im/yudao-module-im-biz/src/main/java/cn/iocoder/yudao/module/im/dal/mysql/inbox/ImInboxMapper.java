@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.im.dal.dataobject.inbox.ImInboxDO;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * 收件箱 Mapper
+ * IM 收件箱 Mapper
  *
  * @author 芋道源码
  */

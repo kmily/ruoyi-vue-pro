@@ -36,6 +36,7 @@ public interface ImMessageMapper extends BaseMapperX<ImMessageDO> {
                 .orderByDesc(ImMessageDO::getId));
     }
 
+    // TODO @hao：不链表哈；先从 ImInboxDO 查询出 messageId，然后再到 ImMessageDO 里 IN
     default List<ImMessageDO> getGreaterThanSequenceMessage(Long userId, Long sequence, Integer size) {
         //查询 inbox 表中，大于 sequence 的消息,关联 message 表，按照 inbox 表 sequence 升序
         return selectJoinList(ImMessageDO.class, new MPJLambdaWrapper<ImMessageDO>()
@@ -47,6 +48,7 @@ public interface ImMessageMapper extends BaseMapperX<ImMessageDO> {
                 .last("limit 0," + size));
     }
 
+    // TODO @hao：在 dao 里，使用 selectListByUserId，查询用 select，条件用 by，这个算是 spring data 的 method dsl
     default List<ImMessageDO> getAllMessage(Long userId, Integer size) {
         //查询 inbox 表中，100条消息,关联 message 表，按照 inbox 表 sequence 降序
         return selectJoinList(ImMessageDO.class, new MPJLambdaWrapper<ImMessageDO>()
@@ -56,4 +58,5 @@ public interface ImMessageMapper extends BaseMapperX<ImMessageDO> {
                 .orderByDesc(ImInboxDO::getSequence)
                 .last("limit 0," + size));
     }
+
 }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.INBOX_SEQUENCE;
 
+// TODO @芋艿：这个名字，需要在考虑下；
 /**
  * 序号生成器 Redis DAO
  *

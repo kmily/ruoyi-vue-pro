@@ -41,6 +41,7 @@ public class AdminUserRespDTO {
      */
     private String mobile;
 
+    // TODO @hao：这种字段的添加，最好和 do 保持一致的顺序哈；
     /**
      * 用户头像
      */

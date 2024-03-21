@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// TODO @hao：这个是不是删除掉，应该不会有这个 VO 哈
 @Schema(description = "管理后台 - 收件箱新增/修改 Request VO")
 @Data
 @AllArgsConstructor
