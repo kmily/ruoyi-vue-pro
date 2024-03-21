@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppBindUserApiKeyReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppBindUserMaFileReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppUnBindUserReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
@@ -19,6 +20,9 @@ import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
 import cn.iocoder.yudao.module.steam.service.steam.SteamMaFile;
+import cn.iocoder.yudao.module.steam.service.uu.UUService;
+import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
+import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -62,6 +66,9 @@ public class SteamService {
 
     @Resource
     private IOInvUpdateService ioInvUpdateService;
+
+    @Resource
+    private UUService uuService;
 
 
 
@@ -135,12 +142,20 @@ public class SteamService {
         if(!bindUserDO.getUserType().equals(loginUser.getUserType())){
             throw new ServiceException(-1,"无权限操作");
         }
+        if(!StringUtils.hasText(reqVO.getTradeUrl()) && !StringUtils.hasText(reqVO.getApiKey())){
+            throw new ServiceException(-1,"请填写要修改的内容");
+        }
         BindUserDO bindUserDO1=new BindUserDO().setId(bindUserDO.getId());
         if(StringUtils.hasText(reqVO.getApiKey())){
             bindUserDO1.setApiKey(reqVO.getApiKey());
         }
         if(StringUtils.hasText(reqVO.getTradeUrl())){
-            bindUserDO1.setApiKey(reqVO.getTradeUrl());
+            ApiResult<ApiCheckTradeUrlReSpVo> apiCheckTradeUrlReSpVoApiResult = uuService.checkTradeUrl(new ApiCheckTradeUrlReqVo().setTradeLinks(reqVO.getTradeUrl()));
+            if(Objects.equals(Integer.valueOf("1"),apiCheckTradeUrlReSpVoApiResult.getData().getStatus())){
+                bindUserDO1.setTradeUrl(reqVO.getTradeUrl());
+            }else{
+                throw new ServiceException(-1,"交易链接不合法");
+            }
         }
         int i = bindUserMapper.updateById(bindUserDO1);
         if(i<0){
