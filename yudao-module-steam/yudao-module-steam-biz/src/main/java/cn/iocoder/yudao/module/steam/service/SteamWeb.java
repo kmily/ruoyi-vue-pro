@@ -163,6 +163,9 @@ public class SteamWeb {
         if(Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus()!=200){
             throw new ServiceException(-1, "apiKey失败");
         }
+        if(proxyResponseVo.getHtml().contains("<title>登录</title>")){
+            throw new ServiceException(-1, "登录失败");
+        }
         Pattern pattern = Pattern.compile("密钥: (.*?)<"); // 正则表达式匹配API密钥
         Matcher matcher = pattern.matcher(proxyResponseVo.getHtml());
         if (matcher.find()) {
@@ -425,13 +428,6 @@ public class SteamWeb {
                 throw new ServiceException(-1, "交易失败");
             }
             SteamTradeOfferResult json = objectMapper.readValue(proxyResponseVo.getHtml(), SteamTradeOfferResult.class);
-            Optional<MobileConfList.ConfDTO> confDTO = confirmOfferList(json.getTradeofferid());
-            if (confDTO.isPresent()) {
-//                confirmOffer(confDTO.get(), ConfirmAction.CANCEL);
-                confirmOffer(confDTO.get(), ConfirmAction.ALLOW);
-            }else {
-                log.warn("交易单据未进行手机自动确认{}",json.getTradeofferid());
-            }
             return json;
         } catch (UnsupportedEncodingException e) {
             log.error("解码出错{}", e);

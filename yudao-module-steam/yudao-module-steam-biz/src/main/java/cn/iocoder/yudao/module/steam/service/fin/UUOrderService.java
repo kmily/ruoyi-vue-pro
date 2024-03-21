@@ -19,21 +19,6 @@ import javax.validation.Valid;
  */
 public interface UUOrderService {
     /**
-     * 创建提现订单
-     *
-     * @param loginUser      用户
-     * @param createReqVO 创建信息
-     * @return 编号
-     */
-    CreateOrderResult createWithdrawalOrder(LoginUser loginUser, @Valid PayWithdrawalOrderCreateReqVO createReqVO);
-    /**
-     * 更新提现订单为已支付
-     *
-     * @param id 编号
-     * @param payOrderId 支付订单号
-     */
-    void updateWithdrawalOrderPaid(Long id, Long payOrderId);
-    /**
      * 创建示例订单
      *
      * @param loginUser      用户

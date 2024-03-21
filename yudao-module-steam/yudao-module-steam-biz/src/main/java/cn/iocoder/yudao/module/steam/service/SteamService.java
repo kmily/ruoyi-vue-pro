@@ -154,7 +154,7 @@ public class SteamService {
             if(Objects.equals(Integer.valueOf("1"),apiCheckTradeUrlReSpVoApiResult.getData().getStatus())){
                 bindUserDO1.setTradeUrl(reqVO.getTradeUrl());
             }else{
-                throw new ServiceException(-1,"交易链接不合法");
+                throw new ServiceException(-1,apiCheckTradeUrlReSpVoApiResult.getData().getMsg());
             }
         }
         int i = bindUserMapper.updateById(bindUserDO1);
