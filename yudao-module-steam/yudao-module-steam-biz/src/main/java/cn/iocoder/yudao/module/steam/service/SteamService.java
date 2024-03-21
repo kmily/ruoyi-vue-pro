@@ -86,13 +86,13 @@ public class SteamService {
         verifyOpenApi(openApi);
         String steamId = getSteamId(openApi.getIdentity());
         List<BindUserDO> bindUserDOS = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
-                .eqIfPresent(BindUserDO::getUserId, loginUser.getId())
+//                .eqIfPresent(BindUserDO::getUserId, loginUser.getId())
                 .eqIfPresent(BindUserDO::getSteamId, steamId)
-                .eqIfPresent(BindUserDO::getUserType, loginUser.getUserType())
+//                .eqIfPresent(BindUserDO::getUserType, loginUser.getUserType())
                 .orderByDesc(BindUserDO::getId));
 
         if(bindUserDOS.size()>0){
-            throw new ServiceException(-1,"此帐号已经被绑定");
+            throw new ServiceException(-1,"无法绑定,此帐号到系统,请登录原绑定的帐号进行操作");
         }
         BindUserDO bindUserDO=new BindUserDO().setUserId(loginUser.getId()).setUserType(loginUser.getUserType())
                 .setSteamId(steamId)/*.setLoginCookie(openApi.getResponseNonce()*/;
