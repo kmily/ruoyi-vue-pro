@@ -122,16 +122,16 @@ public class AppIo661ApiController {
             return ApiResult.error(e.getCode(),  e.getMessage(),ApiPayWalletRespVO.class);
         }
     }
-    /**
-     * api余额接口
-     * @return
-     */
-    @PostMapping("v1/api/testSign")
-    @Operation(summary = "签名测试")
-    @PermitAll
-    public   OpenApiReqVo<PaySteamOrderCreateReqVO> testSign(@RequestBody OpenApiReqVo<PaySteamOrderCreateReqVO> openApiReqVo) {
-        return DevAccountUtils.tenantExecute(1L, () -> openApiService.testSign(openApiReqVo));
-    }
+//    /**
+//     * api余额接口
+//     * @return
+//     */
+//    @PostMapping("v1/api/testSign")
+//    @Operation(summary = "签名测试")
+//    @PermitAll
+//    public   OpenApiReqVo<PaySteamOrderCreateReqVO> testSign(@RequestBody OpenApiReqVo<PaySteamOrderCreateReqVO> openApiReqVo) {
+//        return DevAccountUtils.tenantExecute(1L, () -> openApiService.testSign(openApiReqVo));
+//    }
     /**
      * 检查交易链接
      * @return
