@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.steam.service.uu;
 
+import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
@@ -54,6 +56,7 @@ public class OpenApiService {
         this.validator = validator;
     }
     public <T extends Serializable> DevAccountDO apiCheck(OpenApiReqVo<T> openApiReqVo) {
+        log.info("收到开发平台接口调用{}", JsonUtils.toJsonString(openApiReqVo));
         Set<ConstraintViolation<OpenApiReqVo<T>>> validate = validator.validate(openApiReqVo);
         if(!validate.isEmpty()){
             throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
