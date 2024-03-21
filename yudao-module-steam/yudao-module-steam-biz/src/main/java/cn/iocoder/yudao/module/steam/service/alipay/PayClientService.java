@@ -72,7 +72,7 @@ public class PayClientService {
     @Resource
     private PayChannelService channelService;
 
-    private static final Long PAY_WITHDRAWAL_APP_ID = 10L;
+    private static final Long PAY_WITHDRAWAL_APP_ID = 8L;
 
     private AlipayIsvExtService alipayIsvExtService;
 
@@ -88,6 +88,7 @@ public class PayClientService {
     }
     private DefaultAlipayClient getPayClient(){
         PayChannelDO channel = getPayConfig();
+        log.info("pay client config{}",JsonUtils.toJsonString(channel));
         PayClient client = channelService.getPayClient(channel.getId());
         return client.getDefaultAliPayClient();
     }

@@ -184,6 +184,8 @@ public class SteamService {
                         .setUserType(loginUser.getUserType()).setTradeUrl(tradeUrl).setIsTempAccount(true)
                         .setSteamId("temp"+System.currentTimeMillis());
                 bindUserMapper.insert(bindUserDO);
+                bindUserDO.setSteamId("temp"+bindUserDO.getSteamId());
+                bindUserMapper.updateById(bindUserDO);
                 return bindUserDO;
             }
             return null;

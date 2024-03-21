@@ -294,7 +294,7 @@ public class AppApiController {
                 // 2. 提交支付
                 PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, ServletUtils.getClientIP());
 //                AppPayOrderSubmitRespVO appPayOrderSubmitRespVO = PayOrderConvert.INSTANCE.convert3(respVO);
-                YouyouOrderDO uuOrder = uUOrderService.getUUOrder(invOrder.getId());
+//                YouyouOrderDO uuOrder = uUOrderService.getUUOrder(loginUser,new QueryOrderReqVo().setId(invOrder.getId()));
 
 
 
