@@ -11,7 +11,8 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@Schema(description = "管理后台 - 会话分页 Request VO")
+// TODO @hao：这个貌似业务上，暂时用不到，可以考虑删除哈。
+@Schema(description = "管理后台 - IM 会话分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

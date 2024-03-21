@@ -21,6 +21,7 @@ import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+// TODO @hao：单测可以先都删除，等后面搞了在弄
 /**
  * {@link ImConversationServiceImpl} 的单元测试类
  *

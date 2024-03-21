@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.IOException;
 
+// TODO @hao：可以讨论下：是不是前端传递 type + content，后端根据 type 判断后，直接 jsonutil 解析到对应的 body 就 ok 了
 public class ImMessageBodyDeserializer extends JsonDeserializer<ImMessageBody> {
 
     @Override
@@ -33,4 +34,5 @@ public class ImMessageBodyDeserializer extends JsonDeserializer<ImMessageBody> {
         // 如果没有匹配的属性，抛出异常
         throw ctxt.mappingException("Cannot deserialize to an instance of ImMessageBody");
     }
+
 }

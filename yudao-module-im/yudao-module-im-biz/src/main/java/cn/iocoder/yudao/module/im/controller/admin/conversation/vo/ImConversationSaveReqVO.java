@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+// TODO @hao：这个貌似业务上，暂时用不到，可以考虑删除哈。
 @Schema(description = "管理后台 - 会话新增/修改 Request VO")
 @Data
 public class ImConversationSaveReqVO {

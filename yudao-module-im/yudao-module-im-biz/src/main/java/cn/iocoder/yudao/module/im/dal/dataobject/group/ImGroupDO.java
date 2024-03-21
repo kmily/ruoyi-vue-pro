@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
- * 群 DO
+ * IM 群信息 DO
  *
  * @author 芋道源码
  */
@@ -24,14 +24,17 @@ public class ImGroupDO extends BaseDO {
      */
     @TableId
     private Long id;
+    // TODO @hao：name，如果这个表已经是 group 了，不用在带额外的
     /**
      * 群名字
      */
     private String groupName;
+    // TODO @hao：关联字段；
     /**
-     * 群主id
+     * 群主编号
      */
     private Long ownerId;
+    // TODO @hao：头像使用 avatar 好了，整个项目统一；然后 Thumb 是不是不用存，这个更多是文件服务做裁剪
     /**
      * 群头像
      */

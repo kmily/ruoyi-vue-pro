@@ -23,4 +23,5 @@ public interface ErrorCodeConstants {
 
     // ========== 群成员 (1-040-500-000) ==========
     ErrorCode GROUP_MEMBER_NOT_EXISTS = new ErrorCode(1_040_500_000, "群成员不存在");
+
 }

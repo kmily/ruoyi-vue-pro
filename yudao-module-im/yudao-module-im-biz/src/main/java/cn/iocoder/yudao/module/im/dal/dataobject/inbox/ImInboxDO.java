@@ -6,8 +6,9 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
+// TODO 我们要不要改成 ImMessageQueue 队列？从理解上，概念上，可能都更清晰一点哈。每个用户一个消息队列；
 /**
- * 收件箱 DO
+ * IM 收件箱 DO
  *
  * @author 芋道源码
  */
@@ -28,6 +29,8 @@ public class ImInboxDO extends BaseDO {
     private Long id;
     /**
      * 用户编号
+     *
+     * TODO @hao：写下 userId 和 messageId 的关联字段
      */
     private Long userId;
     /**

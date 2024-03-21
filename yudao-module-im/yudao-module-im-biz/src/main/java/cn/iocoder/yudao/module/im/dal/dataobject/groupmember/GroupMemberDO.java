@@ -7,8 +7,9 @@ import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
+// TODO @hao：这个挪到 group 包下；
 /**
- * 群成员 DO
+ * IM 群成员 DO
  *
  * @author 芋道源码
  */
@@ -27,14 +28,16 @@ public class GroupMemberDO extends BaseDO {
      */
     @TableId
     private Long id;
+    // TODO @hao：groupId 和 userId 都写下关联字段哈
     /**
-     * 群 id
+     * 群编号
      */
     private Long groupId;
     /**
-     * 用户id
+     * 用户编号
      */
     private Long userId;
+    // TODO @hao：nickname 和 avatar 是不是不用存储哈；
     /**
      * 昵称
      */

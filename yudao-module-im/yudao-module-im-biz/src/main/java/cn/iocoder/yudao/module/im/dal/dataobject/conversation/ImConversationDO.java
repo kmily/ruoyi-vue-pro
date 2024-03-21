@@ -9,7 +9,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 /**
- * 会话 DO
+ * IM 会话 DO
  *
  * @author 芋道源码
  */
@@ -32,12 +32,21 @@ public class ImConversationDO extends BaseDO {
      * 所属用户
      */
     private Long userId;
+    // TODO @hao：注释可以改成，如下
+    /**
+     * 会话类型
+     *
+     * 枚举 {@link cn.iocoder.yudao.module.im.enums.conversation.ImConversationTypeEnum}
+     */
     /**
      * 类型：1 单聊；2 群聊；4 通知会话（预留）
      */
+    // TODO @hao：conversationType 改成 type
     private Integer conversationType;
     /**
-     * 单聊时，用户编号；群聊时，群编号
+     * 聊天对象编号
+     *
+     * 1. 单聊时，用户编号；群聊时，群编号
      */
     private Long targetId;
     /**

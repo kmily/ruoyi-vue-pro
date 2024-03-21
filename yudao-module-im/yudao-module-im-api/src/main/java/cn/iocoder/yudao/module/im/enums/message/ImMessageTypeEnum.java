@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
+// TODO @hao：类型保持和 openim 一致
 /**
  * IM 消息的类型枚举
  * <p>
@@ -42,4 +43,5 @@ public enum ImMessageTypeEnum implements IntArrayValuable {
     public int[] array() {
         return ARRAYS;
     }
+
 }
