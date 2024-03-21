@@ -185,7 +185,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     public CreateOrderResult createWithdrawalOrder(LoginUser loginUser, PayWithdrawalOrderCreateReqVO createReqVO) {
         CreateOrderResult createWithdrawalResult=new CreateOrderResult();
         WithdrawalDO withdrawalDO=new WithdrawalDO().setPayStatus(false)
-                .setWithdrawalPrice(createReqVO.getAmount()).setPaymentAmount(0)
+                .setWithdrawalPrice(createReqVO.getAmount()).setPaymentAmount(createReqVO.getAmount())
 
                 .setServiceFee(0).setServiceFeeRate("0")
                 .setUserId(loginUser.getId()).setUserType(loginUser.getUserType())
@@ -223,6 +223,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         if (Objects.isNull(withdrawalDO.getWithdrawalPrice()) || withdrawalDO.getWithdrawalPrice()<1000L) {
             throw exception(ErrorCodeConstants.WITHDRAWAL_AMOUNT_MIN);
         }
+        if (Objects.isNull(withdrawalDO.getWithdrawalPrice()) || withdrawalDO.getWithdrawalPrice()>5000000L) {
+            throw exception(ErrorCodeConstants.WITHDRAWAL_AMOUNT_MAX);
+        }
         // 校验订单是否支付
         if (withdrawalDO.getWithdrawalPrice()<0) {
             throw exception(ErrorCodeConstants.WITHDRAWAL_AMOUNT_EXCEPT);
@@ -234,16 +237,18 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         if(Objects.isNull(withdrawalRateConfig)){
             withdrawalDO.setServiceFeeRate("0");
             withdrawalDO.setServiceFee(0);
-            withdrawalDO.setPaymentAmount(withdrawalDO.getWithdrawalPrice());
+//            withdrawalDO.setPaymentAmount(withdrawalDO.getWithdrawalPrice());
         }else{
             withdrawalDO.setServiceFeeRate(withdrawalRateConfig.getValue());
             BigDecimal rate = new BigDecimal(withdrawalRateConfig.getValue()).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
             //四舍五入后金额 分
-            BigDecimal serviceFee = new BigDecimal(withdrawalDO.getWithdrawalPrice()).multiply(rate).setScale(0, RoundingMode.HALF_UP);
+            BigDecimal serviceFee = new BigDecimal(withdrawalDO.getPaymentAmount()).multiply(rate).setScale(0, RoundingMode.HALF_UP);
             withdrawalDO.setServiceFee(serviceFee.intValue());
-            BigDecimal bigDecimal2 = new BigDecimal(withdrawalDO.getWithdrawalPrice());
-            BigDecimal add = bigDecimal2.add(new BigDecimal(withdrawalDO.getServiceFee()));
-            withdrawalDO.setPaymentAmount(add.intValue());
+            withdrawalDO.setWithdrawalPrice(withdrawalDO.getPaymentAmount()-withdrawalDO.getServiceFee());
+
+//            BigDecimal bigDecimal2 = new BigDecimal(withdrawalDO.getWithdrawalPrice());
+//            BigDecimal add = bigDecimal2.add(new BigDecimal(withdrawalDO.getServiceFee()));
+//            withdrawalDO.setPaymentAmount(add.intValue());
         }
         return withdrawalDO;
     }

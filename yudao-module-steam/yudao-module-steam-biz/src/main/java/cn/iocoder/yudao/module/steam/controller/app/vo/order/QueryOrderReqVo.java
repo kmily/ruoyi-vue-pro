@@ -23,4 +23,10 @@ public class QueryOrderReqVo  extends PageParam implements Serializable {
      */
     @JsonProperty("merchantNo")
     private String merchantNo;
+
+    /**
+     * ID
+     */
+    @JsonProperty("id")
+    private Long id;
 }

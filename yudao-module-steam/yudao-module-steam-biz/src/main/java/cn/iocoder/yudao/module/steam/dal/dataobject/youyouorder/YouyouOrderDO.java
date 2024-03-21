@@ -195,5 +195,9 @@ public class YouyouOrderDO extends BaseDO {
      * 通知类型描述(等待发货，等待收货，购买成功，订单取消)。
      */
     private String uuNotifyDesc;
+    /**
+     * 商户订单号
+     */
+    private String merchantNo;
 
 }

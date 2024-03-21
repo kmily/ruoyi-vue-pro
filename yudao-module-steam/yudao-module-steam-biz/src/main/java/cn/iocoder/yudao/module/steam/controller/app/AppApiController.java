@@ -13,6 +13,8 @@ import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitRespVO;
 import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitReqVO;
+import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitRespVO;
+import cn.iocoder.yudao.module.pay.convert.order.PayOrderConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletMapper;
 import cn.iocoder.yudao.module.pay.framework.pay.core.WalletPayClient;
@@ -28,6 +30,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiDetailDataQueryAp
 import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiDetailDataQueryResultReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoudetails.YouyouDetailsDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
@@ -133,13 +136,6 @@ public class AppApiController {
     private UUNotifyService uuNotifyService;
 
 
-    @Resource
-    private UUTemplateMapper uuTemplateMapper;
-
-    @Resource
-    private ObjectMapper objectMapper;
-
-
     @PostMapping("/v1/api/templateQuery")
     @Operation(summary = "插入UU商品平台")
     public ApiResult youyouTemplate() throws IOException {
@@ -223,30 +219,6 @@ public class AppApiController {
         }
     }
     /**
-     * api余额接口
-     * @return
-     */
-    @PostMapping("v1/api/uuGetAssetsInfo")
-    @Operation(summary = "查询UU余额查询,此接口线上需要删除")
-    @PermitAll
-    public ApiResult<ApiPayWalletRespVO> uuGetAssetsInfo(@RequestBody OpenApiReqVo<Serializable> openApiReqVo) {
-        try {
-            return uuService.getAssetsInfo();
-        } catch (ServiceException e) {
-            return ApiResult.error(e.getCode(),  e.getMessage(),ApiPayWalletRespVO.class);
-        }
-    }
-    /**
-     * api余额接口
-     * @return
-     */
-    @PostMapping("v1/api/sign")
-    @Operation(summary = "余额查询")
-    @PermitAll
-    public   OpenApiReqVo<QueryOrderReqVo> sign(@RequestBody OpenApiReqVo<QueryOrderReqVo> openApiReqVo) {
-        return DevAccountUtils.tenantExecute(1L, () -> openApiService.requestUUSign(openApiReqVo));
-    }
-    /**
      * 检查交易链接
      * @return
      */
@@ -306,6 +278,27 @@ public class AppApiController {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
                 YouyouOrderDO invOrder = uUOrderService.createInvOrder(loginUser, openApiReqVo.getData());
+
+
+                //付款
+                AppPayOrderSubmitReqVO reqVO=new AppPayOrderSubmitReqVO();
+                reqVO.setChannelCode(PayChannelEnum.WALLET.getCode());
+                reqVO.setId(invOrder.getPayOrderId());
+                if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
+                    Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
+                            Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
+                    channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(devAccount.getUserId()));
+                    channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(devAccount.getUserType()));
+                    reqVO.setChannelExtras(channelExtras);
+                }
+                // 2. 提交支付
+                PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, ServletUtils.getClientIP());
+//                AppPayOrderSubmitRespVO appPayOrderSubmitRespVO = PayOrderConvert.INSTANCE.convert3(respVO);
+//                YouyouOrderDO uuOrder = uUOrderService.getUUOrder(loginUser,new QueryOrderReqVo().setId(invOrder.getId()));
+
+
+
+
 
                 CreateByIdRespVo ret=new CreateByIdRespVo();
                 ret.setPayAmount(Double.valueOf(invOrder.getPayAmount()/100));

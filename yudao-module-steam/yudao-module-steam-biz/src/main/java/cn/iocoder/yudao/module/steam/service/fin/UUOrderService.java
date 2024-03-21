@@ -26,7 +26,6 @@ public interface UUOrderService {
      * @return 编号
      */
     YouyouOrderDO createInvOrder(LoginUser loginUser, @Valid CreateCommodityOrderReqVo createReqVO);
-
     /**
      * 获得订单详情
      * 订单是以买家身份进行查询
@@ -58,6 +57,14 @@ public interface UUOrderService {
      * @param userIp 用户编号
      */
     Integer refundInvOrder(LoginUser loginUser, OrderCancelVo id, String userIp);
+
+    /**
+     * 买家取消订单
+     *
+     * @param id 编号
+     * @param userIp 用户编号
+     */
+    Integer orderCancel(LoginUser loginUser, OrderCancelVo id, String userIp);
 
     /**
      * 更新示例订单为已退款

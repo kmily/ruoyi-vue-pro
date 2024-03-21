@@ -30,6 +30,8 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
@@ -167,17 +169,21 @@ public class UUOrderServiceImpl implements UUOrderService {
         if(Objects.isNull(loginUser)){
             throw new ServiceException(OpenApiCode.ID_ERROR);
         }
+        //买家身份检测
         BindUserDO buyBindUserDO=null;
         if(StringUtils.hasText(reqVo.getTradeLinks())){
             buyBindUserDO = steamService.getTempBindUserByLogin(loginUser, reqVo.getTradeLinks(),true);
         }
         if(Objects.isNull(buyBindUserDO)){
-            throw new ServiceException(-1,"获取steam帐号失败");
+            throw new ServiceException(OpenApiCode.ERR_5201);
         }
 
-
-
         BigDecimal bigDecimal = new BigDecimal(reqVo.getPurchasePrice());
+
+
+
+
+
         YouyouOrderDO youyouOrderDO=new YouyouOrderDO()
                 .setOrderNo(noRedisDAO.generate(PAY_NO_PREFIX))
                 .setUserId(loginUser.getId()).setUserType(loginUser.getUserType())
@@ -320,7 +326,6 @@ public class UUOrderServiceImpl implements UUOrderService {
 //        }
         return youyouOrderDO;
     }
-
     @Override
     public YouyouOrderDO getUUOrder(LoginUser loginUser, QueryOrderReqVo queryOrderReqVo) {
         LambdaQueryWrapperX<YouyouOrderDO> uuOrderDOLambdaQueryWrapperX = new LambdaQueryWrapperX<YouyouOrderDO>()
@@ -334,6 +339,9 @@ public class UUOrderServiceImpl implements UUOrderService {
             }else{
                 uuOrderDOLambdaQueryWrapperX.eqIfPresent(YouyouOrderDO::getMerchantOrderNo, queryOrderReqVo.getMerchantNo());
             }
+        }
+        if(Objects.nonNull(queryOrderReqVo.getId())){
+            uuOrderDOLambdaQueryWrapperX.eqIfPresent(YouyouOrderDO::getId, queryOrderReqVo.getId());
         }
         List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(uuOrderDOLambdaQueryWrapperX);
         if(youyouOrderDOS.isEmpty()){
@@ -619,7 +627,30 @@ public class UUOrderServiceImpl implements UUOrderService {
             return 1;
         }
     }
-
+    @Override
+    public Integer orderCancel(LoginUser loginUser, OrderCancelVo orderCancelVo, String userIp) {
+        Optional<YouyouOrderDO> first = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
+                .eq(YouyouOrderDO::getOrderNo, orderCancelVo.getOrderNo())
+                .eq(YouyouOrderDO::getUserId, loginUser.getId())
+                .eq(YouyouOrderDO::getUserType, loginUser.getUserType())
+        ).stream().findFirst();
+        // 1. 校验订单是否可以退款
+        YouyouOrderDO youyouOrderDO = validateInvOrderCanRefund(first.orElse(null),loginUser);
+        //如果有uu的单子，这里则只发起uu的退款，uu退款后再发起我们的退款
+        if(Objects.nonNull(youyouOrderDO.getUuOrderNo())){
+            //传入uu的单子
+            ApiResult<OrderCancelResp> orderCancelRespApiResult = uuService.orderCancel(new OrderCancelVo().setOrderNo(youyouOrderDO.getUuOrderNo()));
+            log.info("取消UU订单结果{}{}",orderCancelRespApiResult,youyouOrderDO);
+            if(orderCancelRespApiResult.getData().getResult()==1){
+                refundAction(youyouOrderDO,loginUser);
+                return 1;
+            }
+            return orderCancelRespApiResult.getData().getResult();
+        }else{
+            refundAction(youyouOrderDO,loginUser);
+            return 1;
+        }
+    }
     /**
      * 执行退款
      * @param youyouOrderDO
