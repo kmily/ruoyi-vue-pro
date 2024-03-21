@@ -10,4 +10,5 @@ import java.io.Serializable;
 public class TransferMsg implements Serializable {
     private String tradeofferid;
     private String msg;
+    private String errMsg;
 }

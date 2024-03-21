@@ -425,13 +425,6 @@ public class SteamWeb {
                 throw new ServiceException(-1, "交易失败");
             }
             SteamTradeOfferResult json = objectMapper.readValue(proxyResponseVo.getHtml(), SteamTradeOfferResult.class);
-            Optional<MobileConfList.ConfDTO> confDTO = confirmOfferList(json.getTradeofferid());
-            if (confDTO.isPresent()) {
-//                confirmOffer(confDTO.get(), ConfirmAction.CANCEL);
-                confirmOffer(confDTO.get(), ConfirmAction.ALLOW);
-            }else {
-                log.warn("交易单据未进行手机自动确认{}",json.getTradeofferid());
-            }
             return json;
         } catch (UnsupportedEncodingException e) {
             log.error("解码出错{}", e);

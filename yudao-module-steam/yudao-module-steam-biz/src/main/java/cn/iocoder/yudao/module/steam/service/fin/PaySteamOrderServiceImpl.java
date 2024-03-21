@@ -956,6 +956,18 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             steamInvDto.setInstanceid(sellingDO.getInstanceid());
             steamInvDto.setAppid(sellingDO.getAppid());
             SteamTradeOfferResult trade = steamWeb.trade(steamInvDto, tradeUrl,"io661 订单号:"+invOrder.getOrderNo()+"商户号:"+invOrder.getMerchantNo());
+            try{
+                Optional<MobileConfList.ConfDTO> confDTO = steamWeb.confirmOfferList(trade.getTradeofferid());
+                if (confDTO.isPresent()) {
+//                confirmOffer(confDTO.get(), ConfirmAction.CANCEL);
+                    steamWeb.confirmOffer(confDTO.get(), ConfirmAction.ALLOW);
+                }else {
+                    log.warn("交易单据未进行手机自动确认{}",trade.getTradeofferid());
+                }
+            }catch (Exception e){
+                log.info("交易单据未进行手机自动确认{}",e.getMessage());
+                transferMsg.setErrMsg("交易单据未进行手机自动确认"+e.getMessage());
+            }
             log.info("发货信息{}",trade);
             transferMsg.setTradeofferid(trade.getTradeofferid());
             invOrder.setTransferStatus(InvTransferStatusEnum.TransferFINISH.getStatus());
