@@ -172,9 +172,11 @@ public class IOInvUpdateService {
             invDescId.setInstanceid(item.getInstanceid());
             invDescId.setClassid(item.getClassid());
             invDescId.setInvDescId(invDescIDList.get(0).getId());
+            invDescId.setSteamId(item.getSteamId());
             invMapper.update(invDescId,new LambdaQueryWrapperX<InvDO>()
                     .eq(InvDO::getInstanceid, invDescId.getInstanceid())
-                    .eq(InvDO::getClassid, invDescId.getClassid()));
+                    .eq(InvDO::getClassid, invDescId.getClassid())
+                    .eq(InvDO::getSteamId,invDescId.getSteamId()));
         }
     }
 
