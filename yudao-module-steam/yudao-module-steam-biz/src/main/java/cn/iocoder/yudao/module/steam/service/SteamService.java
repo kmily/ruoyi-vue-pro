@@ -14,7 +14,6 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
@@ -27,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -132,7 +132,17 @@ public class SteamService {
         if(!bindUserDO.getUserType().equals(loginUser.getUserType())){
             throw new ServiceException(-1,"无权限操作");
         }
-        int i = bindUserMapper.updateById(new BindUserDO().setId(bindUserDO.getId()).setApiKey(reqVO.getApiKey()));
+        if(!bindUserDO.getUserType().equals(loginUser.getUserType())){
+            throw new ServiceException(-1,"无权限操作");
+        }
+        BindUserDO bindUserDO1=new BindUserDO().setId(bindUserDO.getId());
+        if(StringUtils.hasText(reqVO.getApiKey())){
+            bindUserDO1.setApiKey(reqVO.getApiKey());
+        }
+        if(StringUtils.hasText(reqVO.getTradeUrl())){
+            bindUserDO1.setApiKey(reqVO.getTradeUrl());
+        }
+        int i = bindUserMapper.updateById(bindUserDO1);
         if(i<0){
             throw new ServiceException(-1,"操作失败");
         }

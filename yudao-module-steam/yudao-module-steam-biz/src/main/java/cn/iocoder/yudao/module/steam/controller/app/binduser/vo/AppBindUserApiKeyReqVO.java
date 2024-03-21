@@ -16,4 +16,7 @@ public class AppBindUserApiKeyReqVO {
     @Schema(description = "apiKey", example = "123456")
     @NotNull(message = "apiKey不能为空")
     private String apiKey;
+    @Schema(description = "apiKey", example = "123456")
+    @NotNull(message = "apiKey不能为空")
+    private String tradeUrl;
 }
