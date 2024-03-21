@@ -368,7 +368,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             }
         }
         if(Objects.isNull(buyBindUserDO)){
-            throw new ServiceException(-1,"获取steam帐号失败");
+            throw new ServiceException(OpenApiCode.ERR_5201);
         }
         CreateOrderResult createOrderResult=new CreateOrderResult();
         SellingDO sellingDO = sellingMapper.selectById(reqVo.getSellId());

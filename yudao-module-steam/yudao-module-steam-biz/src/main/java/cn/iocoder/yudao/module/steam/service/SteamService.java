@@ -222,6 +222,9 @@ public class SteamService {
                 .eqIfPresent(BindUserDO::getSteamId,steamId)
                 .eqIfPresent(BindUserDO::getIsTempAccount,false)
                 .orderByDesc(BindUserDO::getId));
+        if(Objects.isNull(bindUserDO)){
+            throw new ServiceException(OpenApiCode.ERR_5201);
+        }
         bindUserDO.setSteamPassword(Objects.isNull(bindUserDO.getSteamPassword())?"0":"1");
         bindUserDO.setMaFile(null);
         return bindUserDO;
