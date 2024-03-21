@@ -19,14 +19,21 @@ import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -107,10 +114,11 @@ public class AppInventorySearchController {
         inv.setUserId(loginUser.getId());
         inv.setBindUserId(collect.get(0).getId());
         inv.setTransferStatus(reqVo.getSearchType());
-        List<InvDO> invToMerge = ioInvUpdateService.getInvToMerge1(inv);
         if(reqVo.getSearchType() == null){
+            List<InvDO> invToMerge = ioInvUpdateService.getInvToMerge1(inv);
             return success(steamInvService.mergeInvAll(invToMerge));
         }
+        List<InvDO> invToMerge = ioInvUpdateService.getInvToMerge(inv);
         return success(steamInvService.mergeInv(invToMerge));
     }
 
@@ -119,7 +127,7 @@ public class AppInventorySearchController {
     @GetMapping("/updateFromSteam")
     @Operation(summary = "更新库存 入参steamid")
     @ResponseBody
-    public CommonResult<InventoryDto> updateFromSteam(@RequestParam String steamId ,Long id) throws JsonProcessingException {
+    public CommonResult<List<String>> updateFromSteam(@RequestParam String steamId ,Long id) throws JsonProcessingException {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         List<BindUserDO> collect = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                 .eq(BindUserDO::getUserId, loginUser.getId())
@@ -150,15 +158,16 @@ public class AppInventorySearchController {
                     .eq(InvDO::getUserId, bindUserDO.getUserId())
                     .eq(InvDO::getTransferStatus, 1));
             if (invDOS.isEmpty()){
-                return success(inventoryDto);
+                return success(new ArrayList<>());
             }
             for(InvDO invDO : invDOS){
                 invMapper.delete(new LambdaQueryWrapperX<InvDO>().eq(InvDO::getAssetid,invDO.getAssetid()).eq(InvDO::getTransferStatus,0));
             }
+
         } else {
             throw new ServiceException(-1,"未获取到新的库存信息");
         }
-        return success(inventoryDto);
+        return success(new ArrayList<>());
     }
 }
 
