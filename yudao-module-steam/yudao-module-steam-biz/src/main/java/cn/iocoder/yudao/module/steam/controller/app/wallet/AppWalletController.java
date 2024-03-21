@@ -13,8 +13,10 @@ import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderExtService;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
@@ -28,6 +30,7 @@ import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -45,6 +48,8 @@ public class AppWalletController {
     private UUOrderService uUOrderService;
     @Resource
     private PayNoRedisDAO noRedisDAO;
+    @Resource
+    private InvOrderExtService invOrderExtService;
 
     /**
      * 创建提现订单
@@ -88,6 +93,15 @@ public class AppWalletController {
         PageResult<Io661OrderInfoResp> invOrderWithPage = paySteamOrderService.getInvOrderWithPage(reqVo, loginUser);
         return CommonResult.success(invOrderWithPage);
     }
+    @PostMapping("/getSellOrderWithPage")
+    @Operation(summary = "出售列表")
+    @PreAuthenticated
+    public CommonResult<CommonResult<List<InvOrderDO>>> getSellOrderWithPage(@Valid @RequestBody QueryOrderReqVo reqVo) {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        CommonResult<List<InvOrderDO>> invOrderWithPage = invOrderExtService.getSellOrderWithPage(reqVo, loginUser);
+        return CommonResult.success(invOrderWithPage);
+    }
+
     //youping
 
     @PostMapping("/uu/update-paid")
