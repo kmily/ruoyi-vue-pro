@@ -96,9 +96,9 @@ public class AppWalletController {
     @PostMapping("/getSellOrderWithPage")
     @Operation(summary = "出售列表")
     @PreAuthenticated
-    public CommonResult<CommonResult<List<SellingDoList>>> getSellOrderWithPage(@Valid @RequestBody QueryOrderReqVo reqVo) {
+    public CommonResult<PageResult<SellingDoList>> getSellOrderWithPage(@Valid @RequestBody QueryOrderReqVo reqVo) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        CommonResult<List<SellingDoList>> invOrderWithPage = invOrderExtService.getSellOrderWithPage(reqVo, loginUser);
+        PageResult<SellingDoList> invOrderWithPage = invOrderExtService.getSellOrderWithPage(reqVo, loginUser);
         return CommonResult.success(invOrderWithPage);
     }
 
