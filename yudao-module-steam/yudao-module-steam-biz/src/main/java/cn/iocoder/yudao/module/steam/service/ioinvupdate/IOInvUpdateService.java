@@ -219,16 +219,13 @@ public class IOInvUpdateService {
             invMapper.delete(new LambdaQueryWrapperX<InvDO>().eq(InvDO::getSteamId, bindUserDO.getSteamId()));
             invDescMapper.delete(new LambdaQueryWrapperX<InvDescDO>().eq(InvDescDO::getSteamId, bindUserDO.getSteamId()));
         } else {
-//            if(sellingDOS != null && !sellingDOS.isEmpty()){
             invMapper.delete(new LambdaQueryWrapperX<InvDO>()
                         .eq(InvDO::getSteamId, invDO.getSteamId())
                         .eq(InvDO::getTransferStatus, "0")
                         .notIn(InvDO::getId, invIdList));
                 // 删除库存描述表
-            invDescMapper.delete(new LambdaQueryWrapperX<InvDescDO>().notIn(InvDescDO::getId, invDescIdList));}
-            // 删除没上架的库存
+            invDescMapper.delete(new LambdaQueryWrapperX<InvDescDO>().notIn(InvDescDO::getId, invDescIdList).eq(InvDescDO::getSteamId, bindUserDO.getSteamId()));}
 
-//}
     }
 
 
