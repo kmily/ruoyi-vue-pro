@@ -16,7 +16,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderExtService;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
+import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.SellingDoList;
 import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
@@ -96,9 +96,9 @@ public class AppWalletController {
     @PostMapping("/getSellOrderWithPage")
     @Operation(summary = "出售列表")
     @PreAuthenticated
-    public CommonResult<CommonResult<List<InvOrderDO>>> getSellOrderWithPage(@Valid @RequestBody QueryOrderReqVo reqVo) {
+    public CommonResult<CommonResult<List<SellingDoList>>> getSellOrderWithPage(@Valid @RequestBody QueryOrderReqVo reqVo) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        CommonResult<List<InvOrderDO>> invOrderWithPage = invOrderExtService.getSellOrderWithPage(reqVo, loginUser);
+        CommonResult<List<SellingDoList>> invOrderWithPage = invOrderExtService.getSellOrderWithPage(reqVo, loginUser);
         return CommonResult.success(invOrderWithPage);
     }
 
