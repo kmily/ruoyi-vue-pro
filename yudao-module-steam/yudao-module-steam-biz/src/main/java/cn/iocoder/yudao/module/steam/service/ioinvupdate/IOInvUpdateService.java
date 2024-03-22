@@ -199,15 +199,11 @@ public class IOInvUpdateService {
         invDO.setSteamId(bindUserDO.getSteamId());
         invDO.setUserId(bindUserDO.getUserId());
         invDO.setBindUserId(bindUserDO.getId());
-//        // 查询没上架的库存
-//        List<InvDO> invDOS = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
-//                .eq(InvDO::getSteamId, invDO.getSteamId())
-//                .eq(InvDO::getUserId, invDO.getUserId())
-//                .eq(InvDO::getBindUserId, invDO.getBindUserId())
-//                .eq(InvDO::getTransferStatus, "0"));
+
 
         // selling表的引用
         List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>().eq(SellingDO::getSteamId, invDO.getSteamId()));
+
 
         // 上架的库存详情id
         List<Long> invDescIdList = new ArrayList<>();
@@ -232,13 +228,7 @@ public class IOInvUpdateService {
             invDescMapper.delete(new LambdaQueryWrapperX<InvDescDO>().notIn(InvDescDO::getId, invDescIdList));}
             // 删除没上架的库存
 
-//            invMapper.delete(new LambdaQueryWrapperX<InvDO>()
-//                    .eq(InvDO::getSteamId, invDO.getSteamId())
-//                    .eq(InvDO::getTransferStatus, "0")
-//                    .notIn(InvDO::getId, invIdList));
-//            // 删除库存描述表
-//            invDescMapper.delete(new LambdaQueryWrapperX<InvDescDO>().notIn(InvDescDO::getId, invDescIdList));
-//            }
+//}
     }
 
 
