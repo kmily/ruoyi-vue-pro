@@ -294,9 +294,18 @@ public class SteamService {
         }
         bindUserMapper.updateById(bindUserDO);
         InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
-        if(inventoryDto != null){
+        if(inventoryDto.getAssets() != null){
             ioInvUpdateService.firstInsertInventory(inventoryDto,bindUserDO);
         }
+//        // 删除之前绑定的所有库存  TODO 有问题 没有删除inv_desc
+//        if(!(invMapper.selectPage(invPageReqVO)).getList().isEmpty()){
+//            invMapper.delete(new QueryWrapper<InvDO>().eq("steam_id",bindUserDO.getSteamId()).eq("user_id",bindUserDO.getUserId()));
+//        }
+//        bindUserMapper.updateById(bindUserDO);
+//        InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
+//        if(inventoryDto.getAssets() != null && !inventoryDto.getAssets().isEmpty()){
+//            ioInvUpdateService.firstInsertInventory(inventoryDto,bindUserDO);
+//        }
     }
     public void bindMaFile2(byte[] maFileJsonByte, AppBindUserMaFileReqVO reqVO) throws JsonProcessingException {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();

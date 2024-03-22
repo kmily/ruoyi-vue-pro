@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.AppMergeToSell
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPageReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
@@ -143,14 +144,14 @@ public class AppInventorySearchController {
         bindUserDO.setUserType(collect.get(0).getUserType());
         // 获取线上 steam 库存
         InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
-        if(inventoryDto != null){
+        if(inventoryDto.getAssets() != null){
             // 删除原有库存中，getTransferStatus = 0 的库存
             BindUserDO user = new BindUserDO();
             user.setSteamId(bindUserDO.getSteamId());
             user.setUserId(bindUserDO.getUserId());
             user.setId(bindUserDO.getId());
             ioInvUpdateService.deleteInventory(user);
-            // 插入库存 TODO 后期优化思路 copy插入库存方法在插入的时候比对Selling表中相同账户下的 AssetId ，有重复就不插入
+            // 插入库存 返回库存绑定的descId TODO 后期优化思路 copy插入库存方法在插入的时候比对Selling表中相同账户下的 AssetId ，有重复就不插入
             ioInvUpdateService.firstInsertInventory(inventoryDto, bindUserDO);
             List<InvDO> invDOS = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
                     .eq(InvDO::getSteamId, steamId)
