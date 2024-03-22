@@ -11,6 +11,7 @@ import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
+import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderExtService;
@@ -98,6 +99,10 @@ public class AppWalletController {
     @PreAuthenticated
     public CommonResult<PageResult<SellingDoList>> getSellOrderWithPage(@Valid @RequestBody QueryOrderReqVo reqVo) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        SellingDoList reqVO=new SellingDoList();
+        if(reqVO.getPageSize() > 500){
+            reqVO.setPageSize(500);
+        }
         PageResult<SellingDoList> invOrderWithPage = invOrderExtService.getSellOrderWithPage(reqVo, loginUser);
         return CommonResult.success(invOrderWithPage);
     }

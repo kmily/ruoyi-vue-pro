@@ -65,10 +65,10 @@ public class InvOrderExtService {
             if(invPreviewDOS.isEmpty()){
                 invPreviewDOS.add(new InvPreviewDO());
             }
-            // a
             sellingDoListTemp.setSelExterior(invPreviewDOS.get(0).getSelExterior());
             sellingDoListTemp.setIconUrl(invPreviewDOS.get(0).getImageUrl());
             sellingDoListTemp.setMarketName(invPreviewDOS.get(0).getItemName());
+            sellingDoListTemp.setMarketHashName(invPreviewDOS.get(0).getMarketHashName());
 
             InvPreviewDO matchingInvPreviewDO = invPreviewDOS.stream()
                     .filter(invPreview -> invPreview.getMarketHashName().equals(invPreviewDOS.get(0).getMarketHashName()))
@@ -79,7 +79,6 @@ public class InvOrderExtService {
             } else {
                 sellingDoListTemp.setSelExteriorColor((invPreviewDOS.get(0).getItemInfo()).getExteriorColor());
             }
-            // b
             sellingDoLists.add(sellingDoListTemp);
         }
         return new PageResult<>(sellingDoLists, (long) sellingDoLists.size());

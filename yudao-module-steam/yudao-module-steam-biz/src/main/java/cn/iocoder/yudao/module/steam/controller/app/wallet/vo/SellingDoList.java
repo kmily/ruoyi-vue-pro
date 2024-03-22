@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.controller.app.wallet.vo;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.steam.service.steam.TransferMsg;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -18,7 +19,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SellingDoList extends BaseDO {
+public class SellingDoList extends PageParam {
 
     /**
      * 订单编号
@@ -29,6 +30,10 @@ public class SellingDoList extends BaseDO {
      * 订单支付时间
      */
     private LocalDateTime payTime;
+    /**
+     * 订单创建时间
+     */
+    private LocalDateTime createTime;
     /**
      * 价格，单位：分
      */
@@ -45,6 +50,11 @@ public class SellingDoList extends BaseDO {
      * 商品名称
      */
     private String marketName;
+    /**
+     * 商品hash
+     */
+    private String marketHashName;
+
 
     /**
      * 商品图片
