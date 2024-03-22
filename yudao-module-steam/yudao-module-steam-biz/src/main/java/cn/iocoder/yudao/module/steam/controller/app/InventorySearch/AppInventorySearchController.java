@@ -151,7 +151,6 @@ public class AppInventorySearchController {
             user.setSteamId(bindUserDO.getSteamId());
             user.setUserId(bindUserDO.getUserId());
             user.setId(bindUserDO.getId());
-
             ioInvUpdateService.deleteInventory(user);
             // 插入库存 返回库存绑定的descId TODO 后期优化思路 copy插入库存方法在插入的时候比对Selling表中相同账户下的 AssetId ，有重复就不插入
             ioInvUpdateService.firstInsertInventory(inventoryDto, bindUserDO);
@@ -173,6 +172,5 @@ public class AppInventorySearchController {
         }
         return success(new ArrayList<>());
     }
-
 }
 
