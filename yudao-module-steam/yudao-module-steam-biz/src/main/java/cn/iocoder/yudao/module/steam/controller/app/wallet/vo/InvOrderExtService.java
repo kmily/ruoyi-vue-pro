@@ -44,18 +44,12 @@ public class InvOrderExtService {
                 InvTransferStatusEnum.INORDER.getStatus());
         List<SellingDoList> sellingDoLists = new ArrayList<>();
 
-
         // 匹配订单状态
         LambdaQueryWrapper<InvOrderDO> invOrderDO = new LambdaQueryWrapper<InvOrderDO>()
                 .eq(InvOrderDO::getSellUserId, loginUser.getId())
                 .eq(InvOrderDO::getSellUserType, loginUser.getUserType())
                 .in(InvOrderDO::getTransferStatus, statusesToMatch)
                 .orderByDesc(InvOrderDO::getCreateTime);
-/*        List<InvOrderDO> invOrderDO = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
-                .eq(InvOrderDO::getSellUserId, loginUser.getId())
-                .eq(InvOrderDO::getSellUserType, loginUser.getUserType())
-                .in(InvOrderDO::getTransferStatus, statusesToMatch)
-                .orderByDesc(InvOrderDO::getCreateTime));*/
         // 执行分页查询
         IPage<InvOrderDO> invOrderPage = invOrderMapper.selectPage(page, invOrderDO);
 
@@ -94,6 +88,6 @@ public class InvOrderExtService {
             }
             sellingDoLists.add(sellingDoListTemp);
         }
-        return new PageResult<>(sellingDoLists, (long) sellingDoLists.size());
+        return new PageResult<>(sellingDoLists, invOrderPage.getTotal());
     }
 }
