@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 @TableName(value = "steam_inv_order",autoResultMap = true)
 @KeySequence("steam_inv_order_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -19,7 +20,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SellingDoList extends PageParam {
+public class SellingDoList extends PageParam implements Serializable {
 
     /**
      * 订单编号
