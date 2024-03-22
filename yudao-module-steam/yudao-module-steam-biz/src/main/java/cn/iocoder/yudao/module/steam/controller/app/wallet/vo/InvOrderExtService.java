@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
@@ -12,6 +13,9 @@ import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -30,7 +34,7 @@ public class InvOrderExtService {
     @Resource
     private InvPreviewMapper invPreviewMapper;
 
-    public PageResult<SellingDoList> getSellOrderWithPage(QueryOrderReqVo reqVo, LoginUser loginUser) {
+    public PageResult<SellingDoList> getSellOrderWithPage(Page<InvOrderDO> page, LoginUser loginUser) {
         // 下单状态
         List<Integer> statusesToMatch = Arrays.asList(
                 InvTransferStatusEnum.TransferFINISH.getStatus(),
@@ -41,17 +45,20 @@ public class InvOrderExtService {
         List<SellingDoList> sellingDoLists = new ArrayList<>();
 
         // 匹配订单状态
-        List<InvOrderDO> invOrderDO = invOrderMapper.selectList(new LambdaQueryWrapperX<InvOrderDO>()
+        LambdaQueryWrapper<InvOrderDO> invOrderDO = new LambdaQueryWrapper<InvOrderDO>()
                 .eq(InvOrderDO::getSellUserId, loginUser.getId())
                 .eq(InvOrderDO::getSellUserType, loginUser.getUserType())
                 .in(InvOrderDO::getTransferStatus, statusesToMatch)
-                .orderByDesc(InvOrderDO::getCreateTime));
+                .orderByDesc(InvOrderDO::getCreateTime);
+        // 执行分页查询
+        IPage<InvOrderDO> invOrderPage = invOrderMapper.selectPage(page, invOrderDO);
+
         // 判断
-        if (invOrderDO.isEmpty()) {
+        if (invOrderDO.isEmptyOfWhere()) {
             return new PageResult<>(sellingDoLists, 0L);
         }
         // 遍历订单，返回订单号等关键数据
-        for (InvOrderDO invOrderDOTemp : invOrderDO) {
+        for (InvOrderDO invOrderDOTemp : invOrderPage.getRecords()) {
             SellingDoList sellingDoListTemp = new SellingDoList();
             sellingDoListTemp.setOrderNo(invOrderDOTemp.getOrderNo());
             sellingDoListTemp.setPayTime(invOrderDOTemp.getPayTime());
@@ -81,6 +88,6 @@ public class InvOrderExtService {
             }
             sellingDoLists.add(sellingDoListTemp);
         }
-        return new PageResult<>(sellingDoLists, (long) sellingDoLists.size());
+        return new PageResult<>(sellingDoLists, invOrderPage.getTotal());
     }
 }
