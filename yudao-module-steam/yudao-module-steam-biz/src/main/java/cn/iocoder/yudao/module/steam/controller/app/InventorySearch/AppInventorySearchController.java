@@ -161,6 +161,7 @@ public class AppInventorySearchController {
             if (invDOS.isEmpty()){
                 return success(new ArrayList<>());
             }
+            // 删除重复的数据
             for(InvDO invDO : invDOS){
                 invMapper.delete(new LambdaQueryWrapperX<InvDO>().eq(InvDO::getAssetid,invDO.getAssetid()).eq(InvDO::getTransferStatus,0));
             }

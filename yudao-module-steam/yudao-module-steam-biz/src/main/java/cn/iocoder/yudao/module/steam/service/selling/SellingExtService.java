@@ -100,6 +100,7 @@ public class SellingExtService {
             invMapper.updateById(item);
             Optional<InvDescDO> invDescDO = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
                     .eq(InvDescDO::getClassid, item.getClassid())
+                    .eq(InvDescDO::getSteamId, item.getSteamId())
                     .eq(InvDescDO::getInstanceid, item.getInstanceid())).stream().findFirst();
             if (!invDescDO.isPresent()) {
                 throw new ServiceException(-1, "exists");

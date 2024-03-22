@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPag
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
@@ -198,23 +199,33 @@ public class IOInvUpdateService {
         invDO.setSteamId(bindUserDO.getSteamId());
         invDO.setUserId(bindUserDO.getUserId());
         invDO.setBindUserId(bindUserDO.getId());
-        // 查询
-        List<InvDO> invDOS = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
-                .eq(InvDO::getSteamId, invDO.getSteamId())
-                .eq(InvDO::getUserId, invDO.getUserId())
-                .eq(InvDO::getBindUserId, invDO.getBindUserId())
-                .eq(InvDO::getTransferStatus, "0"));
-        if (invDOS != null && !invDOS.isEmpty()){
-            List<Long> invDescIdList = new ArrayList<>();
-            for (InvDO invDO1 : invDOS) {
-                invDescIdList.add(invDO1.getInvDescId());
-            }
+//        // 查询没上架的库存
+//        List<InvDO> invDOS = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
+//                .eq(InvDO::getSteamId, invDO.getSteamId())
+//                .eq(InvDO::getUserId, invDO.getUserId())
+//                .eq(InvDO::getBindUserId, invDO.getBindUserId())
+//                .eq(InvDO::getTransferStatus, "0"));
+
+        // selling表的引用
+        List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>().eq(SellingDO::getSteamId, invDO.getSteamId()));
+
+        // 上架的库存详情id
+        List<Long> invDescIdList = new ArrayList<>();
+        // 上架的库存id
+        List<Long> invIdList = new ArrayList<>();
+
+        for(SellingDO sellingDO : sellingDOS){
+            invDescIdList.add(sellingDO.getInvDescId());
+            invIdList.add(sellingDO.getInvId());
+        }
+        if(!sellingDOS.isEmpty()){
+            // 删除没上架的库存
             invMapper.delete(new LambdaQueryWrapperX<InvDO>()
                     .eq(InvDO::getSteamId, invDO.getSteamId())
-                    .eq(InvDO::getUserId, invDO.getUserId())
-                    .eq(InvDO::getBindUserId, invDO.getBindUserId())
-                    .eq(InvDO::getTransferStatus, "0"));
-            invDescMapper.delete(new LambdaQueryWrapperX<InvDescDO>().in(InvDescDO::getId, invDescIdList));
+                    .eq(InvDO::getTransferStatus, "0")
+                    .notIn(InvDO::getId, invIdList));
+            // 删除库存描述表
+            invDescMapper.delete(new LambdaQueryWrapperX<InvDescDO>().notIn(InvDescDO::getId, invDescIdList));
         }
     }
 
