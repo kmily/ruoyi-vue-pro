@@ -26,6 +26,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
 import java.sql.Array;
 import java.util.ArrayList;
@@ -162,6 +163,39 @@ public class AppInventorySearchController {
                 return success(new ArrayList<>());
             }
             // 删除重复的数据
+            for(InvDO invDO : invDOS){
+                invMapper.delete(new LambdaQueryWrapperX<InvDO>().eq(InvDO::getAssetid,invDO.getAssetid()).eq(InvDO::getTransferStatus,0));
+            }
+
+        } else {
+            throw new ServiceException(-1,"未获取到新的库存信息");
+        }
+        return success(new ArrayList<>());
+    }
+
+    @GetMapping("/updateFromSteam2")
+    @Operation(summary = "更新库存 入参steamid")
+    @PermitAll
+    public CommonResult<List<String>> updateFromSteam2(@RequestParam String steamId ,@RequestParam Long bindUserId) throws JsonProcessingException {
+        BindUserDO bindUserDO = bindUserMapper.selectById(bindUserId);
+        InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
+        if(inventoryDto != null){
+            // 删除原有库存中，getTransferStatus = 0 的库存
+            BindUserDO user = new BindUserDO();
+            user.setSteamId(bindUserDO.getSteamId());
+            user.setUserId(bindUserDO.getUserId());
+            user.setId(bindUserDO.getId());
+            ioInvUpdateService.deleteInventory(user);
+            // 插入库存 TODO 后期优化思路 copy插入库存方法在插入的时候比对Selling表中相同账户下的 AssetId ，有重复就不插入
+            ioInvUpdateService.firstInsertInventory(inventoryDto, bindUserDO);
+            List<InvDO> invDOS = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
+                    .eq(InvDO::getSteamId, steamId)
+                    .eq(InvDO::getBindUserId, bindUserDO.getId())
+                    .eq(InvDO::getUserId, bindUserDO.getUserId())
+                    .eq(InvDO::getTransferStatus, 1));
+            if (invDOS.isEmpty()){
+                return success(new ArrayList<>());
+            }
             for(InvDO invDO : invDOS){
                 invMapper.delete(new LambdaQueryWrapperX<InvDO>().eq(InvDO::getAssetid,invDO.getAssetid()).eq(InvDO::getTransferStatus,0));
             }
