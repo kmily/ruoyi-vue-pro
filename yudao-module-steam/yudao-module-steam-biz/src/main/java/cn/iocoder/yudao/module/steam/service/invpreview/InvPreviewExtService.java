@@ -227,10 +227,10 @@ public class InvPreviewExtService {
             rarityMap.put("Rarity_Rare", new MutablePair<>("高级", "#4b69ff"));
             rarityMap.put("Rarity_Common", new MutablePair<>("普通级", "#90ACCC"));
             rarityMap.put("Rarity_Contraband", new MutablePair<>("违禁", "#E4AE39"));
-            rarityMap.put("Rarity_Ancient_Character", new MutablePair<>("探员：大师", ""));
-            rarityMap.put("Rarity_Legendary_Character", new MutablePair<>("探员：非凡", ""));
-            rarityMap.put("Rarity_Mythical_Character", new MutablePair<>("探员：卓越", ""));
-            rarityMap.put("Rarity_Rare_Character", new MutablePair<>("探员：高级", ""));
+            rarityMap.put("Rarity_Ancient_Character", new MutablePair<>("探员：大师", "#EB4B4B"));
+            rarityMap.put("Rarity_Legendary_Character", new MutablePair<>("探员：非凡", "#D32CE6"));
+            rarityMap.put("Rarity_Mythical_Character", new MutablePair<>("探员：卓越", "#8847FF"));
+            rarityMap.put("Rarity_Rare_Character", new MutablePair<>("探员：高级", "#4B69FF"));
 
             String selRarity = invDescDO.getSelRarity();
             Pair<String, String> rarityInfo = rarityMap.get(selRarity);
