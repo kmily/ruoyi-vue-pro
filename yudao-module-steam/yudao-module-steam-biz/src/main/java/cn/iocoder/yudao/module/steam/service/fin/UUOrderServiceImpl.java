@@ -247,6 +247,41 @@ public class UUOrderServiceImpl implements UUOrderService {
         List<PayWalletTransactionDO> payWalletTransactionDOS = Arrays.asList(payWalletTransactionDO, payWalletTransactionDO1);
         youyouOrderMapper.updateById(new YouyouOrderDO().setId(uuOrder.getId()).setPayPayRet(JacksonUtils.writeValueAsString(payWalletTransactionDOS)).setPayStatus(true)
                 .setPayOrderStatus(PayOrderStatusEnum.SUCCESS.getStatus()));
+        YouyouOrderDO uuOrder1 = getUUOrder(loginUser, queryOrderReqVo);
+//        try{
+            YouPingOrder youPingOrder = uploadYY(uuOrder1);
+            if(youPingOrder.getCode().intValue()==0){
+
+            }else{
+                throw new ServiceException(youPingOrder.getCode(),youPingOrder.getMsg());
+            }
+//            if(youPingOrder.getCode().intValue()==0){
+//                //获取专家钱包并进行打款
+//                PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(youyouOrderDO.getSellUserId(), youyouOrderDO.getSellUserType());
+//                payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(youyouOrderDO.getId()),
+//                        PayWalletBizTypeEnum.STEAM_CASH, youyouOrderDO.getPayAmount());
+//                youyouOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
+//                youyouOrderMapper.updateById(youyouOrderDO);
+//            }else{
+//                throw new ServiceException(-1,"发货失败原因"+youPingOrder.getMsg());
+//            }
+
+
+//        }catch (ServiceException e){
+//            log.error("发货失败，自动退款单号{}",uuOrder1);
+//            DevAccountUtils.tenantExecute(1L,()->{
+//                if(Objects.nonNull(youyouOrderDO)){
+//                    LoginUser loginUser=new LoginUser();
+//                    loginUser.setId(youyouOrderDO.getBuyUserId());
+//                    loginUser.setUserType(youyouOrderDO.getBuyUserType());
+//                    OrderCancelVo orderCancelVo=new OrderCancelVo();
+//                    orderCancelVo.setOrderNo(youyouOrderDO.getOrderNo());
+//                    refundInvOrder(loginUser,orderCancelVo, ServletUtils.getClientIP());
+//                }
+//                return "";
+//            });
+//        }
+
         return null;
     }
 
