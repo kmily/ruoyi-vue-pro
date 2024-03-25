@@ -291,19 +291,27 @@ public class UUOrderServiceImpl implements UUOrderService {
             throw exception(OpenApiCode.ERR_5214);
         }
         //新的采购服务费标准为收取开放平台采购成交订单金额的5%，单笔采购服务费最多收取500元。本次调整自2024年3月11日10时起生效。
-        BigDecimal bigDecimal = new BigDecimal(youyouCommodityDO.getCommodityPrice());
-        youyouOrderDO.setCommodityAmount(bigDecimal.multiply(new BigDecimal("100")).intValue());
+        BigDecimal commodityAmount = new BigDecimal(youyouCommodityDO.getCommodityPrice());
+        youyouOrderDO.setCommodityAmount(commodityAmount.multiply(new BigDecimal("100")).intValue());
+        BigDecimal totalAmount = commodityAmount.multiply(new BigDecimal("105"));
+        if(totalAmount.subtract(commodityAmount).intValue()<50000){
+            youyouOrderDO.setPayAmount(totalAmount.intValue());
+            youyouOrderDO.setServiceFee(totalAmount.subtract(commodityAmount).intValue());
+            youyouOrderDO.setServiceFeeRate("5");
+            youyouOrderDO.setServiceFee(totalAmount.subtract(commodityAmount).intValue());
+        }else{
+            youyouOrderDO.setPayAmount(commodityAmount.add(new BigDecimal("50000")).intValue());
+            youyouOrderDO.setServiceFeeRate("5");
+            youyouOrderDO.setServiceFee(new BigDecimal("50000").intValue());
+        }
 
-
-
-        youyouOrderDO.setPayAmount(bigDecimal.multiply(new BigDecimal("100")).intValue());
         //判断用户钱包是否有足够的钱
         PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(youyouOrderDO.getBuyUserId(), youyouOrderDO.getBuyUserType());
         if(Objects.isNull(orCreateWallet) || orCreateWallet.getBalance()<youyouOrderDO.getPayAmount()){
             throw exception(OpenApiCode.ERR_5212);
         }
-//
-//        //检查是否已经下过单
+
+        //检查是否已经下过单
         List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
                         .eq(YouyouOrderDO::getRealCommodityId, youyouOrderDO.getRealCommodityId())
                         .in(YouyouOrderDO::getPayStatus, Arrays.asList(PayOrderStatusEnum.WAITING.getStatus(),PayOrderStatusEnum.SUCCESS.getStatus()))
