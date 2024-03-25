@@ -10,17 +10,15 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
+import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitRespVO;
 import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitReqVO;
-import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitRespVO;
-import cn.iocoder.yudao.module.pay.convert.order.PayOrderConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletMapper;
 import cn.iocoder.yudao.module.pay.framework.pay.core.WalletPayClient;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
-import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTemplatedownloadRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByIdRespVo;
@@ -30,14 +28,11 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiDetailDataQueryAp
 import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiDetailDataQueryResultReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoudetails.YouyouDetailsDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoudetails.YouyouDetailsMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.youyoutemplate.UUTemplateMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.UUOrderStatus;
@@ -45,14 +40,18 @@ import cn.iocoder.yudao.module.steam.enums.UUOrderSubStatus;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
+import cn.iocoder.yudao.module.steam.service.steam.SteamMaFile;
 import cn.iocoder.yudao.module.steam.service.steam.TradeUrlStatus;
 import cn.iocoder.yudao.module.steam.service.uu.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.uu.UUNotifyService;
 import cn.iocoder.yudao.module.steam.service.uu.UUService;
-import cn.iocoder.yudao.module.steam.service.uu.vo.*;
+import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
+import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
+import cn.iocoder.yudao.module.steam.service.uu.vo.ApiPayWalletRespVO;
+import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
-import cn.iocoder.yudao.module.steam.utils.HttpUtil;
+import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
@@ -77,7 +76,10 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URI;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
@@ -229,14 +231,13 @@ public class AppApiController {
         try {
             return DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
-                Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
-                        .eq(BindUserDO::getUserId, devAccount.getUserId())
-                        .ne(BindUserDO::getTradeUrl,openApiReqVo.getData().getTradeLinks())
-                        .eq(BindUserDO::getUserType, devAccount.getUserType())).stream().findFirst();
-                if(!first.isPresent()){
-                    throw new ServiceException(-1,"没有检测机器人");
-                }
-                BindUserDO bindUserDO = first.get();
+                BindUserDO bindUserDO = new BindUserDO();
+                ConfigDO configMa = configService.getConfigByKey("steam.bot.ma");
+                ConfigDO configPasswd = configService.getConfigByKey("steam.bot.passwd");
+
+                bindUserDO.setSteamPassword(configPasswd.getValue());
+                SteamMaFile steamMaFile = JacksonUtils.readValue(configMa.getValue(), SteamMaFile.class);
+                bindUserDO.setMaFile(steamMaFile);
                 SteamWeb steamWeb=new SteamWeb(configService);
                 if(steamWeb.checkLogin(bindUserDO)){
                     if(steamWeb.getWebApiKey().isPresent()){
