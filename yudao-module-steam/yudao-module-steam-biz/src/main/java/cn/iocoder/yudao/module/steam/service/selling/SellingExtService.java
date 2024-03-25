@@ -159,7 +159,7 @@ public class SellingExtService {
                 .eq(InvDO::getUserType, loginUser.getUserType())
         );
         if (invIds.size() != invDOList.size()) {
-            throw new ServiceException(-1, "检测到你下线的库存部分不存在，请检查后再提交");
+            throw new ServiceException(-1, "检测到你下架的库存部分不存在，请检查后再提交");
         }
         List<SellingDO> sellingDOInSelling = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
                 .eq(SellingDO::getUserId, loginUser.getId())
