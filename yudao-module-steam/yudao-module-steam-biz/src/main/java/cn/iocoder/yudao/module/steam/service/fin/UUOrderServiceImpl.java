@@ -190,7 +190,7 @@ public class UUOrderServiceImpl implements UUOrderService {
                 //设置买家
                 .setBuyUserId(loginUser.getId()).setBuyUserType(loginUser.getUserType())
                 .setBuyBindUserId(buyBindUserDO.getId()).setBuySteamId(buyBindUserDO.getSteamId()).setBuyTradeLinks(buyBindUserDO.getTradeUrl())
-                //专家信息
+                //卖家信息
                 .setSellUserId(UU_CASH_ACCOUNT_ID).setSellUserType(UserTypeEnum.MEMBER.getValue())
                 .setSellCashStatus(InvSellCashStatusEnum.INIT.getStatus())
                 //订单信息
@@ -208,15 +208,15 @@ public class UUOrderServiceImpl implements UUOrderService {
         validateInvOrderCanCreate(youyouOrderDO);
         youyouOrderMapper.insert(youyouOrderDO);
 //        // 2.1 创建支付单
-        Long payOrderId = payOrderApi.createOrder(new PayOrderCreateReqDTO()
-                .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
-                .setMerchantOrderId(youyouOrderDO.getId().toString()) // 业务的订单编号
-                .setSubject("购买").setBody("出售编号："+reqVo.getCommodityId()).setPrice(youyouOrderDO.getPayAmount()) // 价格信息
-                .setExpireTime(addTime(Duration.ofHours(2L)))); // 支付的过期时间
-        youyouOrderDO.setPayOrderId(payOrderId);
+//        Long payOrderId = payOrderApi.createOrder(new PayOrderCreateReqDTO()
+//                .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
+//                .setMerchantOrderId(youyouOrderDO.getId().toString()) // 业务的订单编号
+//                .setSubject("购买").setBody("出售编号："+reqVo.getCommodityId()).setPrice(youyouOrderDO.getPayAmount()) // 价格信息
+//                .setExpireTime(addTime(Duration.ofHours(2L)))); // 支付的过期时间
+//        youyouOrderDO.setPayOrderId(payOrderId);
 //        // 2.2 更新支付单到 demo 订单
-        youyouOrderMapper.updateById(new YouyouOrderDO().setId(youyouOrderDO.getId())
-                .setPayOrderId(payOrderId));
+//        youyouOrderMapper.updateById(new YouyouOrderDO().setId(youyouOrderDO.getId())
+//                .setPayOrderId(payOrderId));
         YouyouCommodityDO youyouCommodityDO = UUCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
 //        //更新库存的标识
         youyouCommodityDO.setTransferStatus(InvTransferStatusEnum.INORDER.getStatus());
@@ -258,10 +258,12 @@ public class UUOrderServiceImpl implements UUOrderService {
                         .setUuMerchantOrderNo(youPingOrder.getData().getMerchantOrderNo())
                         .setUuShippingMode(youPingOrder.getData().getShippingMode())
                         .setUuOrderStatus(youPingOrder.getData().getOrderStatus())
+                        .setPayOrderStatus(PayOrderStatusEnum.SUCCESS.getStatus())
                 );
             }else{
                 throw new ServiceException(youPingOrder.getCode(),youPingOrder.getMsg());
             }
+        YouyouOrderDO uuOrder2 = getUUOrder(loginUser, queryOrderReqVo);
 //            if(youPingOrder.getCode().intValue()==0){
 //                //获取专家钱包并进行打款
 //                PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(youyouOrderDO.getSellUserId(), youyouOrderDO.getSellUserType());
@@ -289,7 +291,7 @@ public class UUOrderServiceImpl implements UUOrderService {
 //            });
 //        }
 
-        return uuOrder1;
+        return uuOrder2;
     }
 
     private YouyouOrderDO validateInvOrderCanCreate(YouyouOrderDO youyouOrderDO) {
