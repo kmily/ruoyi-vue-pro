@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPag
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
@@ -156,18 +157,23 @@ public class AppInventorySearchController {
             user.setUserId(bindUserDO.getUserId());
             user.setId(bindUserDO.getId());
             // 返回出售中的库存id
-            List<Long> invIds = ioInvUpdateService.deleteInventory(user);
+            List<Long> invIdsList = ioInvUpdateService.deleteInventory(user);
             // 插入库存 返回库存绑定的descId TODO 后期优化思路 copy插入库存方法在插入的时候比对Selling表中相同账户下的 AssetId ，有重复就不插入
             ioInvUpdateService.firstInsertInventory(inventoryDto, bindUserDO);
+
             // 查询上架出售中的物品
-            List<InvDO> invDOS = invMapper.selectBatchIds(invIds);
-            if (invDOS.isEmpty()){
+            List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>().eq(SellingDO::getSteamId, steamId));
+
+            if (sellingDOS.isEmpty()){
                 return success(new ArrayList<>());
             }
             // 删除重复的数据
-            for(InvDO invDO : invDOS){
-                invMapper.delete(new LambdaQueryWrapperX<InvDO>().eq(InvDO::getAssetid,invDO.getAssetid()).eq(InvDO::getTransferStatus,0));
-                invDescMapper.delete(new LambdaQueryWrapperX<InvDescDO>().eq(InvDescDO::getId,invDO.getInvDescId()));
+            for(SellingDO invDO : sellingDOS){
+                // 筛选重复的一条（新插入的重复数据 TransferStatus = 0）
+                List<InvDO> invDOS1 = invMapper.selectList(new LambdaQueryWrapperX<InvDO>().eq(InvDO::getAssetid, invDO.getAssetid())
+                        .eq(InvDO::getTransferStatus, 0));
+                invMapper.deleteById(invDOS1.get(0).getId());
+                invDescMapper.deleteById(invDOS1.get(0).getInvDescId());
             }
 
         } else {
