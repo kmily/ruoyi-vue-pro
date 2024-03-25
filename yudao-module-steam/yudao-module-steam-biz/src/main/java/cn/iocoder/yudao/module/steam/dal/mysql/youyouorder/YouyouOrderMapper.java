@@ -76,5 +76,8 @@ public interface YouyouOrderMapper extends BaseMapperX<YouyouOrderDO> {
                 .eqIfPresent(YouyouOrderDO::getUuTradeOfferLinks, reqVO.getUuTradeOfferLinks())
                 .orderByDesc(YouyouOrderDO::getId));
     }
-
+    default int updateByIdAndPayed(Long id, boolean wherePayed, YouyouOrderDO updateObj) {
+        return update(updateObj, new LambdaQueryWrapperX<YouyouOrderDO>()
+                .eq(YouyouOrderDO::getId, id).eq(YouyouOrderDO::getPayStatus, wherePayed));
+    }
 }

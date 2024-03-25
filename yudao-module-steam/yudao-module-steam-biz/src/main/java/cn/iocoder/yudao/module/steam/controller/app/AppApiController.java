@@ -420,7 +420,7 @@ public class AppApiController {
                 case 1:
                     //  1....订单明细
                     List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
-                            .eq(YouyouOrderDO::getUserId, userId));
+                            .eq(YouyouOrderDO::getBuyUserId, userId));
                     result = JSON.toJSONString(youyouOrderDOS);
                     break;
                 case 2:

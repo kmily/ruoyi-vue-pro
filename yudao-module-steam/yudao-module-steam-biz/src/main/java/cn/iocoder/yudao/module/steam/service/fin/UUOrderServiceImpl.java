@@ -30,8 +30,6 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
@@ -186,10 +184,10 @@ public class UUOrderServiceImpl implements UUOrderService {
 
         YouyouOrderDO youyouOrderDO=new YouyouOrderDO()
                 .setOrderNo(noRedisDAO.generate(PAY_NO_PREFIX))
-                .setUserId(loginUser.getId()).setUserType(loginUser.getUserType())
+                .setBuyUserId(loginUser.getId()).setBuyUserType(loginUser.getUserType())
                 .setPayOrderStatus(PayOrderStatusEnum.WAITING.getStatus())
                 .setMerchantOrderNo(reqVo.getMerchantOrderNo())
-                .setTradeLinks(reqVo.getTradeLinks())
+                .setBuyTradeLinks(reqVo.getTradeLinks())
                 .setCommodityId(reqVo.getCommodityId()).setCommodityHashName(reqVo.getCommodityHashName()).setCommodityTemplateId(reqVo.getCommodityTemplateId())
                 .setPurchasePrice(reqVo.getPurchasePrice())
                 .setPayAmount(bigDecimal.multiply(new BigDecimal("100")).intValue())
@@ -216,7 +214,7 @@ public class UUOrderServiceImpl implements UUOrderService {
     private YouyouOrderDO validateInvOrderCanCreate(YouyouOrderDO youyouOrderDO) {
         //检测交易链接
         try{
-            ApiResult<ApiCheckTradeUrlReSpVo> apiCheckTradeUrlReSpVoApiResult = uuService.checkTradeUrl(new ApiCheckTradeUrlReqVo().setTradeLinks(youyouOrderDO.getTradeLinks()));
+            ApiResult<ApiCheckTradeUrlReSpVo> apiCheckTradeUrlReSpVoApiResult = uuService.checkTradeUrl(new ApiCheckTradeUrlReqVo().setTradeLinks(youyouOrderDO.getBuyTradeLinks()));
             if(apiCheckTradeUrlReSpVoApiResult.getCode()!=0){
                 throw exception(OpenApiCode.CONCAT_ADMIN);
             }
@@ -243,9 +241,9 @@ public class UUOrderServiceImpl implements UUOrderService {
         }
         //检测交易链接是否是自己
         Long aLong = bindUserMapper.selectCount(new LambdaQueryWrapperX<BindUserDO>()
-                .eq(BindUserDO::getUserId, youyouOrderDO.getUserId())
-                .eqIfPresent(BindUserDO::getUserType, youyouOrderDO.getUserType())
-                .eqIfPresent(BindUserDO::getTradeUrl, youyouOrderDO.getTradeLinks())
+                .eq(BindUserDO::getUserId, youyouOrderDO.getBuyUserId())
+                .eqIfPresent(BindUserDO::getUserType, youyouOrderDO.getBuyUserType())
+                .eqIfPresent(BindUserDO::getTradeUrl, youyouOrderDO.getBuyTradeLinks())
         );
         if(aLong>0){
             throw exception(OpenApiCode.ERR_5407);
@@ -289,7 +287,7 @@ public class UUOrderServiceImpl implements UUOrderService {
         BigDecimal bigDecimal = new BigDecimal(youyouCommodityDO.getCommodityPrice());
         youyouOrderDO.setPayAmount(bigDecimal.multiply(new BigDecimal("100")).intValue());
         //判断用户钱包是否有足够的钱
-        PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(youyouOrderDO.getUserId(), youyouOrderDO.getUserType());
+        PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(youyouOrderDO.getBuyUserId(), youyouOrderDO.getBuyUserType());
         if(Objects.isNull(orCreateWallet) || orCreateWallet.getBalance()<youyouOrderDO.getPayAmount()){
             throw exception(OpenApiCode.ERR_5212);
         }
@@ -329,8 +327,8 @@ public class UUOrderServiceImpl implements UUOrderService {
     @Override
     public YouyouOrderDO getUUOrder(LoginUser loginUser, QueryOrderReqVo queryOrderReqVo) {
         LambdaQueryWrapperX<YouyouOrderDO> uuOrderDOLambdaQueryWrapperX = new LambdaQueryWrapperX<YouyouOrderDO>()
-                .eqIfPresent(YouyouOrderDO::getUserId, loginUser.getId())
-                .eqIfPresent(YouyouOrderDO::getUserType, loginUser.getUserType());
+                .eqIfPresent(YouyouOrderDO::getBuyUserId, loginUser.getId())
+                .eqIfPresent(YouyouOrderDO::getBuyUserType, loginUser.getUserType());
         if(Objects.nonNull(queryOrderReqVo.getOrderNo())){
             uuOrderDOLambdaQueryWrapperX.eqIfPresent(YouyouOrderDO::getOrderNo, queryOrderReqVo.getOrderNo());
         }else{
@@ -357,7 +355,7 @@ public class UUOrderServiceImpl implements UUOrderService {
         Optional<YouyouTemplateDO> first = uuTemplateService.getYouyouTemplatePage(new YouyouTemplatePageReqVO().setTemplateId(youyouCommodity.getTemplateId())).getList().stream().findFirst();
         PayOrderDO payOrder = payOrderService.getOrder(uuOrder.getPayOrderId());
         //买家
-        MemberUserRespDTO buyUser = memberUserApi.getUser(uuOrder.getUserId());
+        MemberUserRespDTO buyUser = memberUserApi.getUser(uuOrder.getBuyUserId());
         //卖家
         MemberUserRespDTO sellUser = memberUserApi.getUser(uuOrder.getSellUserId());
 
@@ -379,7 +377,7 @@ public class UUOrderServiceImpl implements UUOrderService {
         }
 
 
-        ret.setTradeUrl(uuOrder.getTradeLinks());
+        ret.setTradeUrl(uuOrder.getBuyTradeLinks());
         ret.setOrderStatus(uuOrder.getUuOrderStatus());
         if(Objects.nonNull(ret.getOrderStatus())){
             ret.setOrderStatusName(UUOrderStatus.valueOf(ret.getOrderStatus()).getMsg());
@@ -388,7 +386,7 @@ public class UUOrderServiceImpl implements UUOrderService {
         if(Objects.nonNull(ret.getOrderSubStatus())){
             ret.setOrderSubStatusName(UUOrderSubStatus.valueOf(ret.getOrderSubStatus()).getMsg());
         }
-        ret.setBuyerUserId(uuOrder.getUserId());
+        ret.setBuyerUserId(uuOrder.getBuyUserId());
         ret.setBuyerUserName(buyUser.getNickname());
         if(StringUtils.hasText(buyUser.getAvatar())){
             ret.setBuyerUserIcon(buyUser.getAvatar());
@@ -514,8 +512,8 @@ public class UUOrderServiceImpl implements UUOrderService {
             DevAccountUtils.tenantExecute(1L,()->{
                 if(Objects.nonNull(youyouOrderDO)){
                     LoginUser loginUser=new LoginUser();
-                    loginUser.setId(youyouOrderDO.getUserId());
-                    loginUser.setUserType(youyouOrderDO.getUserType());
+                    loginUser.setId(youyouOrderDO.getBuyUserId());
+                    loginUser.setUserType(youyouOrderDO.getBuyUserType());
                     OrderCancelVo orderCancelVo=new OrderCancelVo();
                     orderCancelVo.setOrderNo(youyouOrderDO.getOrderNo());
                     refundInvOrder(loginUser,orderCancelVo, ServletUtils.getClientIP());
@@ -533,7 +531,7 @@ public class UUOrderServiceImpl implements UUOrderService {
     private YouPingOrder uploadYY(YouyouOrderDO youyouOrderDO){
         CreateCommodityOrderReqVo createReqVo = new CreateCommodityOrderReqVo();
         createReqVo.setMerchantOrderNo("YY"+youyouOrderDO.getMerchantOrderNo());
-        createReqVo.setTradeLinks(youyouOrderDO.getTradeLinks());
+        createReqVo.setTradeLinks(youyouOrderDO.getBuyTradeLinks());
         createReqVo.setCommodityId(youyouOrderDO.getCommodityId());
         createReqVo.setCommodityHashName(youyouOrderDO.getCommodityHashName());
         createReqVo.setPurchasePrice(youyouOrderDO.getPurchasePrice());
@@ -607,8 +605,8 @@ public class UUOrderServiceImpl implements UUOrderService {
     public Integer refundInvOrder(LoginUser loginUser, OrderCancelVo orderCancelVo, String userIp) {
         Optional<YouyouOrderDO> first = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
                 .eq(YouyouOrderDO::getOrderNo, orderCancelVo.getOrderNo())
-                .eq(YouyouOrderDO::getUserId, loginUser.getId())
-                .eq(YouyouOrderDO::getUserType, loginUser.getUserType())
+                .eq(YouyouOrderDO::getBuyUserId, loginUser.getId())
+                .eq(YouyouOrderDO::getBuyUserType, loginUser.getUserType())
         ).stream().findFirst();
         // 1. 校验订单是否可以退款
         YouyouOrderDO youyouOrderDO = validateInvOrderCanRefund(first.orElse(null),loginUser);
@@ -631,8 +629,8 @@ public class UUOrderServiceImpl implements UUOrderService {
     public Integer orderCancel(LoginUser loginUser, OrderCancelVo orderCancelVo, String userIp) {
         Optional<YouyouOrderDO> first = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
                 .eq(YouyouOrderDO::getOrderNo, orderCancelVo.getOrderNo())
-                .eq(YouyouOrderDO::getUserId, loginUser.getId())
-                .eq(YouyouOrderDO::getUserType, loginUser.getUserType())
+                .eq(YouyouOrderDO::getBuyUserId, loginUser.getId())
+                .eq(YouyouOrderDO::getBuyUserType, loginUser.getUserType())
         ).stream().findFirst();
         // 1. 校验订单是否可以退款
         YouyouOrderDO youyouOrderDO = validateInvOrderCanRefund(first.orElse(null),loginUser);
@@ -687,10 +685,10 @@ public class UUOrderServiceImpl implements UUOrderService {
         if(youyouOrderDO.getSellCashStatus().equals(InvSellCashStatusEnum.CASHED.getStatus())){
             throw exception(ErrorCodeConstants.INVORDER_ORDER_CASHED_CANNOTREFUND);
         }
-        if(!youyouOrderDO.getUserId().equals(loginUser.getId())){
+        if(!youyouOrderDO.getBuyUserId().equals(loginUser.getId())){
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_USER_ERROR);
         }
-        if(!youyouOrderDO.getUserType().equals(loginUser.getUserType())){
+        if(!youyouOrderDO.getBuyUserType().equals(loginUser.getUserType())){
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_USER_ERROR);
         }
         // 校验订单是否支付
@@ -793,7 +791,7 @@ public class UUOrderServiceImpl implements UUOrderService {
             );
             if(notifyVo.getNotifyType()==4){
                 //订单被取消了，走退款
-                refundAction(youyouOrderDO,new LoginUser().setTenantId(1L).setUserType(youyouOrderDO.getUserType()).setId(youyouOrderDO.getUserId()));
+                refundAction(youyouOrderDO,new LoginUser().setTenantId(1L).setUserType(youyouOrderDO.getBuyUserType()).setId(youyouOrderDO.getBuyUserId()));
             }
         }
 
