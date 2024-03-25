@@ -87,6 +87,10 @@ public class YouyouOrderDO extends BaseDO {
      */
     private String commodityId;
     /**
+     * 商品总额
+     */
+    private Integer commodityAmount;
+    /**
      * 极速发货购买模式0：优先购买极速发货；1：只购买极速发货
      */
     private Integer fastShipping;

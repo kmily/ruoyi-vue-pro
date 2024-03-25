@@ -183,16 +183,24 @@ public class UUOrderServiceImpl implements UUOrderService {
 
 
         YouyouOrderDO youyouOrderDO=new YouyouOrderDO()
-                .setOrderNo(noRedisDAO.generate(PAY_NO_PREFIX))
+                //设置买家
                 .setBuyUserId(loginUser.getId()).setBuyUserType(loginUser.getUserType())
+                .setBuyBindUserId(buyBindUserDO.getId()).setBuySteamId(buyBindUserDO.getSteamId()).setBuyTradeLinks(buyBindUserDO.getTradeUrl())
+                //专家信息
+                .setSellUserId(UU_CASH_ACCOUNT_ID).setSellUserType(UserTypeEnum.MEMBER.getValue())
+                .setSellCashStatus(InvSellCashStatusEnum.INIT.getStatus())
+                //订单信息
+                .setOrderNo(noRedisDAO.generate(PAY_NO_PREFIX)).setMerchantOrderNo(reqVo.getMerchantOrderNo())
+
+                //设置支付信息
+                .setPayStatus(false)
                 .setPayOrderStatus(PayOrderStatusEnum.WAITING.getStatus())
-                .setMerchantOrderNo(reqVo.getMerchantOrderNo())
-                .setBuyTradeLinks(reqVo.getTradeLinks())
+                //设置退款
+                .setRefundPrice(0)
+                //设置商品信息
                 .setCommodityId(reqVo.getCommodityId()).setCommodityHashName(reqVo.getCommodityHashName()).setCommodityTemplateId(reqVo.getCommodityTemplateId())
                 .setPurchasePrice(reqVo.getPurchasePrice())
-                .setPayAmount(bigDecimal.multiply(new BigDecimal("100")).intValue())
-                .setSellCashStatus(InvSellCashStatusEnum.INIT.getStatus()).setSellUserId(UU_CASH_ACCOUNT_ID).setSellUserType(UserTypeEnum.MEMBER.getValue())
-                .setPayStatus(false).setRefundPrice(0);
+                .setPayAmount(bigDecimal.multiply(new BigDecimal("100")).intValue());
         validateInvOrderCanCreate(youyouOrderDO);
         youyouOrderMapper.insert(youyouOrderDO);
 //        // 2.1 创建支付单
@@ -252,7 +260,6 @@ public class UUOrderServiceImpl implements UUOrderService {
             throw exception(ErrorCodeConstants.UU_GOODS_ERR);
         }
         youyouOrderDO.setRealCommodityId(youyouOrderDO.getCommodityId());
-
         if(Objects.isNull(youyouOrderDO.getCommodityId())){//指定ID购买
             //todo 查询出一个商品并获取商品ID
             youyouOrderDO.setRealCommodityId("1");
@@ -283,8 +290,12 @@ public class UUOrderServiceImpl implements UUOrderService {
         if(!InvTransferStatusEnum.SELL.getStatus().equals(youyouCommodityDO.getTransferStatus())){
             throw exception(OpenApiCode.ERR_5214);
         }
-//        //使用库存的价格进行替换
+        //新的采购服务费标准为收取开放平台采购成交订单金额的5%，单笔采购服务费最多收取500元。本次调整自2024年3月11日10时起生效。
         BigDecimal bigDecimal = new BigDecimal(youyouCommodityDO.getCommodityPrice());
+        youyouOrderDO.setCommodityAmount(bigDecimal.multiply(new BigDecimal("100")).intValue());
+
+
+
         youyouOrderDO.setPayAmount(bigDecimal.multiply(new BigDecimal("100")).intValue());
         //判断用户钱包是否有足够的钱
         PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(youyouOrderDO.getBuyUserId(), youyouOrderDO.getBuyUserType());
