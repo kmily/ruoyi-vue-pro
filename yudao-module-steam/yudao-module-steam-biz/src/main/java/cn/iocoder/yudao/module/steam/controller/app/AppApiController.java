@@ -11,6 +11,7 @@ import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
+import cn.iocoder.yudao.module.infra.controller.admin.config.vo.ConfigSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitRespVO;
@@ -234,25 +235,41 @@ public class AppApiController {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 BindUserDO bindUserDO = new BindUserDO();
                 ConfigDO configMa = configService.getConfigByKey("steam.bot.ma");
+                ConfigDO configCookie = configService.getConfigByKey("steam.bot.cookie");
                 ConfigDO configPasswd = configService.getConfigByKey("steam.bot.passwd");
 
                 bindUserDO.setSteamPassword(configPasswd.getValue());
-                SteamMaFile steamMaFile = JacksonUtils.readValue(configMa.getValue(), SteamMaFile.class);
+                SteamMaFile steamMaFile = JacksonUtils.readValue(Objects.requireNonNull(configMa.getValue(),()->""), SteamMaFile.class);
                 bindUserDO.setMaFile(steamMaFile);
+                if(Objects.nonNull(configCookie)){
+                    bindUserDO.setLoginCookie(Objects.requireNonNull(configCookie.getValue(),()->"登录密码不能为空"));
+                }
                 SteamWeb steamWeb=new SteamWeb(configService);
                 if(steamWeb.checkLogin(bindUserDO)){
-                    if(steamWeb.getWebApiKey().isPresent()){
-                        bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
+                    ConfigSaveReqVO configSaveReqVO=new ConfigSaveReqVO();
+                    if(Objects.isNull(configCookie)){
+                        configSaveReqVO.setCategory("steam.bot");
+                        configSaveReqVO.setName("steam.bot 机器人cookie");
+                        configSaveReqVO.setKey("steam.bot.cookie");
+                        configSaveReqVO.setValue(steamWeb.getCookieString());
+                        configSaveReqVO.setVisible(false);
+                        configService.createConfig(configSaveReqVO);
+                    }else{
+                        configSaveReqVO.setId(configCookie.getId());
+                        configSaveReqVO.setCategory("steam.bot");
+                        configSaveReqVO.setName("steam.bot 机器人cookie");
+                        configSaveReqVO.setKey("steam.bot.cookie");
+                        configSaveReqVO.setValue(steamWeb.getCookieString());
+                        configSaveReqVO.setVisible(false);
+                        configService.updateConfig(configSaveReqVO);
                     }
-                    bindUserService.changeBindUserCookie(new BindUserDO().setId(bindUserDO.getId()).setLoginCookie(steamWeb.getCookieString()).setApiKey(bindUserDO.getApiKey()));
                 }
-                steamWeb.initTradeUrl();
+//                steamWeb.initTradeUrl();
                 TradeUrlStatus tradeUrlStatus = steamWeb.checkTradeUrl(openApiReqVo.getData().getTradeLinks());
-                SteamWeb steamWeb1=new SteamWeb(configService);
                 URI uri = URI.create(openApiReqVo.getData().getTradeLinks());
                 String query = uri.getQuery();
-                Map<String, String> stringStringMap = steamWeb1.parseQuery(query);
-                String partner = steamWeb1.toCommunityID(stringStringMap.get("partner"));
+                Map<String, String> stringStringMap = steamWeb.parseQuery(query);
+                String partner = steamWeb.toCommunityID(stringStringMap.get("partner"));
 
                 ApiCheckTradeUrlReSpVo tradeUrlReSpVo=new ApiCheckTradeUrlReSpVo();
                 tradeUrlReSpVo.setSteamId(partner);
