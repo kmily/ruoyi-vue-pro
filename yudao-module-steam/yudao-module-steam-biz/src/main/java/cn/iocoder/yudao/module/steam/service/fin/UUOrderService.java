@@ -26,6 +26,14 @@ public interface UUOrderService {
      * @return 编号
      */
     YouyouOrderDO createInvOrder(LoginUser loginUser, @Valid CreateCommodityOrderReqVo createReqVO);
+
+    /**
+     * 支付订单
+     * @param loginUser 前端用户
+     * @param invOrderId 订单号
+     * @return
+     */
+    YouyouOrderDO payInvOrder(LoginUser loginUser, @Valid Long invOrderId);
     /**
      * 获得订单详情
      * 订单是以买家身份进行查询

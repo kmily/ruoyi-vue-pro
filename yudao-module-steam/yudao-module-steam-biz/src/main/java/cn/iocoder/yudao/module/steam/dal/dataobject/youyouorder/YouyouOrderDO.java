@@ -250,5 +250,14 @@ public class YouyouOrderDO extends BaseDO {
      * 报价链接
      */
     private String uuTradeOfferLinks;
+    /**
+     * 支付退款结果
+     */
+    private String payRefundRet;
+    /**
+     * 支付接口返回
+     */
+    private String payPayRet;
+
 
 }

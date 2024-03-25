@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
@@ -30,6 +31,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
@@ -58,6 +60,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
@@ -219,6 +222,34 @@ public class UUOrderServiceImpl implements UUOrderService {
         UUCommodityMapper.updateById(youyouCommodityDO);
         return youyouOrderDO;
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public YouyouOrderDO payInvOrder(LoginUser loginUser, Long invOrderId) {
+        QueryOrderReqVo queryOrderReqVo=new QueryOrderReqVo();
+        queryOrderReqVo.setId(invOrderId);
+        YouyouOrderDO uuOrder = getUUOrder(loginUser, queryOrderReqVo);
+        if(Objects.isNull(uuOrder)){
+            log.error("订单不存在{}",JacksonUtils.writeValueAsString(invOrderId));
+            throw new ServiceException(OpenApiCode.CONCAT_ADMIN);
+        }
+        PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(uuOrder.getBuyUserId(), uuOrder.getBuyUserType());
+        if(Objects.isNull(orCreateWallet) || orCreateWallet.getBalance()<uuOrder.getPayAmount()){
+            throw exception(OpenApiCode.ERR_5212);
+        }
+        //生成支付流水
+        //扣除服务费
+        PayWalletTransactionDO payWalletTransactionDO = payWalletService.reduceWalletBalance(orCreateWallet.getId(), uuOrder.getId(),
+                PayWalletBizTypeEnum.INV_SERVICE_FEE, uuOrder.getServiceFee());
+        //获取卖家家钱包并进行打款
+        PayWalletTransactionDO payWalletTransactionDO1 = payWalletService.reduceWalletBalance(orCreateWallet.getId(),uuOrder.getId(),
+                PayWalletBizTypeEnum.STEAM_CASH, uuOrder.getCommodityAmount());
+        List<PayWalletTransactionDO> payWalletTransactionDOS = Arrays.asList(payWalletTransactionDO, payWalletTransactionDO1);
+        youyouOrderMapper.updateById(new YouyouOrderDO().setId(uuOrder.getId()).setPayPayRet(JacksonUtils.writeValueAsString(payWalletTransactionDOS)).setPayStatus(true)
+                .setPayOrderStatus(PayOrderStatusEnum.SUCCESS.getStatus()));
+        return null;
+    }
+
     private YouyouOrderDO validateInvOrderCanCreate(YouyouOrderDO youyouOrderDO) {
         //检测交易链接
         try{
