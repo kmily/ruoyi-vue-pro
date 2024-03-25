@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.SteamInvService;
 import cn.iocoder.yudao.module.steam.service.inv.InvService;
@@ -56,6 +57,9 @@ public class AppInventorySearchController {
     private BindUserMapper bindUserMapper;
     @Resource
     private InvMapper invMapper;
+
+    @Resource
+    private InvDescMapper invDescMapper;
     @Resource
     private SellingMapper sellingMapper;
 
@@ -151,20 +155,19 @@ public class AppInventorySearchController {
             user.setSteamId(bindUserDO.getSteamId());
             user.setUserId(bindUserDO.getUserId());
             user.setId(bindUserDO.getId());
-            ioInvUpdateService.deleteInventory(user);
+            // 返回出售中的库存id
+            List<Long> invIds = ioInvUpdateService.deleteInventory(user);
             // 插入库存 返回库存绑定的descId TODO 后期优化思路 copy插入库存方法在插入的时候比对Selling表中相同账户下的 AssetId ，有重复就不插入
             ioInvUpdateService.firstInsertInventory(inventoryDto, bindUserDO);
-            List<InvDO> invDOS = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
-                    .eq(InvDO::getSteamId, steamId)
-                    .eq(InvDO::getBindUserId, bindUserDO.getId())
-                    .eq(InvDO::getUserId, bindUserDO.getUserId())
-                    .eq(InvDO::getTransferStatus, 1));
+            // 查询上架出售中的物品
+            List<InvDO> invDOS = invMapper.selectBatchIds(invIds);
             if (invDOS.isEmpty()){
                 return success(new ArrayList<>());
             }
             // 删除重复的数据
             for(InvDO invDO : invDOS){
                 invMapper.delete(new LambdaQueryWrapperX<InvDO>().eq(InvDO::getAssetid,invDO.getAssetid()).eq(InvDO::getTransferStatus,0));
+                invDescMapper.delete(new LambdaQueryWrapperX<InvDescDO>().eq(InvDescDO::getId,invDO.getInvDescId()));
             }
 
         } else {

@@ -194,7 +194,7 @@ public class IOInvUpdateService {
     /**
      * 删除库存  删除原有的 transferStatus = 0 的库存 插入新的库存，并比对 selling 表中的内容
      */
-    public void deleteInventory( BindUserDO bindUserDO) {
+    public List<Long> deleteInventory(BindUserDO bindUserDO) {
         InvPageReqVO invDO = new InvPageReqVO();
         invDO.setSteamId(bindUserDO.getSteamId());
         invDO.setUserId(bindUserDO.getUserId());
@@ -214,18 +214,20 @@ public class IOInvUpdateService {
             invDescIdList.add(sellingDO.getInvDescId());
             invIdList.add(sellingDO.getInvId());
         }
+        // 如果出售表为空，说明当前库存不存在上架饰品，该账户的库存可以全部删除
         if(sellingDOS.isEmpty()){
             // 删除selling表
             invMapper.delete(new LambdaQueryWrapperX<InvDO>().eq(InvDO::getSteamId, bindUserDO.getSteamId()));
             invDescMapper.delete(new LambdaQueryWrapperX<InvDescDO>().eq(InvDescDO::getSteamId, bindUserDO.getSteamId()));
         } else {
+            // 删除库存描述表中不在selling表中的数据
             invMapper.delete(new LambdaQueryWrapperX<InvDO>()
                         .eq(InvDO::getSteamId, invDO.getSteamId())
                         .eq(InvDO::getTransferStatus, "0")
                         .notIn(InvDO::getId, invIdList));
-                // 删除库存描述表
+            // 删除库存描述表
             invDescMapper.delete(new LambdaQueryWrapperX<InvDescDO>().notIn(InvDescDO::getId, invDescIdList).eq(InvDescDO::getSteamId, bindUserDO.getSteamId()));}
-
+        return invIdList;
     }
 
 
