@@ -83,6 +83,7 @@ import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.PAY_ORDER_NOT
 
 /**
  * 示例订单 Service 实现类
+ * 因需要两服务费和商品费用分开收取，所以这里不再使用以前的订单，直接走钱包支付
  *
  * @author 芋道源码
  */
@@ -251,7 +252,13 @@ public class UUOrderServiceImpl implements UUOrderService {
 //        try{
             YouPingOrder youPingOrder = uploadYY(uuOrder1);
             if(youPingOrder.getCode().intValue()==0){
-
+                //回写数据表
+                youyouOrderMapper.updateById(new YouyouOrderDO().setId(uuOrder1.getId()).
+                        setUuOrderNo(youPingOrder.getData().getOrderNo())
+                        .setUuMerchantOrderNo(youPingOrder.getData().getMerchantOrderNo())
+                        .setUuShippingMode(youPingOrder.getData().getShippingMode())
+                        .setUuOrderStatus(youPingOrder.getData().getOrderStatus())
+                );
             }else{
                 throw new ServiceException(youPingOrder.getCode(),youPingOrder.getMsg());
             }
@@ -282,7 +289,7 @@ public class UUOrderServiceImpl implements UUOrderService {
 //            });
 //        }
 
-        return null;
+        return uuOrder1;
     }
 
     private YouyouOrderDO validateInvOrderCanCreate(YouyouOrderDO youyouOrderDO) {
@@ -566,6 +573,7 @@ public class UUOrderServiceImpl implements UUOrderService {
 
     @Override
 //    @Transactional(rollbackFor = Exception.class)
+    @Deprecated
     public void updateInvOrderPaid(Long id, Long payOrderId) {
         // 校验并获得支付订单（可支付
         YouyouOrderDO youyouOrderDO = youyouOrderMapper.selectById(id);
@@ -637,6 +645,7 @@ public class UUOrderServiceImpl implements UUOrderService {
      * @param payOrderId 支付订单编号
      * @return 交易订单
      */
+    @Deprecated
     private PayOrderRespDTO validateInvOrderCanPaid(Long id, Long payOrderId) {
         // 1.1 校验订单是否存在
         YouyouOrderDO youyouOrderDO = youyouOrderMapper.selectById(id);
@@ -687,6 +696,7 @@ public class UUOrderServiceImpl implements UUOrderService {
     }
 
     @Override
+    @Deprecated
     public Integer refundInvOrder(LoginUser loginUser, OrderCancelVo orderCancelVo, String userIp) {
         Optional<YouyouOrderDO> first = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
                 .eq(YouyouOrderDO::getOrderNo, orderCancelVo.getOrderNo())
@@ -736,32 +746,37 @@ public class UUOrderServiceImpl implements UUOrderService {
     }
     /**
      * 执行退款
+     * 退款不正走此方法，
      * @param youyouOrderDO
      */
+    @Deprecated
     private void refundAction(YouyouOrderDO youyouOrderDO,LoginUser loginUser,String reason) {
-        validateInvOrderCanRefund(youyouOrderDO,loginUser);
-        // 2.1 生成退款单号
-        // 一般来说，用户发起退款的时候，都会单独插入一个售后维权表，然后使用该表的 id 作为 refundId
-        // 这里我们是个简单的 demo，所以没有售后维权表，直接使用订单 id + "-refund" 来演示
-        String refundId = youyouOrderDO.getId() + "-refund";
-        // 2.2 创建退款单
-        Long payRefundId = payRefundApi.createRefund(new PayRefundCreateReqDTO()
-                .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
-                .setMerchantOrderId(String.valueOf(youyouOrderDO.getId())) // 支付单号
-                .setMerchantRefundId(refundId)
-                .setReason(reason).setPrice(youyouOrderDO.getPayAmount()));// 价格信息
-        // 2.3 更新退款单到 demo 订单
-        youyouOrderMapper.updateById(new YouyouOrderDO().setId(youyouOrderDO.getId())
-                .setPayRefundId(payRefundId).setRefundPrice(youyouOrderDO.getPayAmount()));
-        //释放库存
-        YouyouCommodityDO youyouCommodityDO = UUCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
-        youyouCommodityDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
-        UUCommodityMapper.updateById(youyouCommodityDO);
+        throw new ServiceException(-1,"方法停用");
+//        validateInvOrderCanRefund(youyouOrderDO,loginUser);
+//        // 2.1 生成退款单号
+//        // 一般来说，用户发起退款的时候，都会单独插入一个售后维权表，然后使用该表的 id 作为 refundId
+//        // 这里我们是个简单的 demo，所以没有售后维权表，直接使用订单 id + "-refund" 来演示
+//        String refundId = youyouOrderDO.getId() + "-refund";
+//        // 2.2 创建退款单
+//        Long payRefundId = payRefundApi.createRefund(new PayRefundCreateReqDTO()
+//                .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
+//                .setMerchantOrderId(String.valueOf(youyouOrderDO.getId())) // 支付单号
+//                .setMerchantRefundId(refundId)
+//                .setReason(reason).setPrice(youyouOrderDO.getPayAmount()));// 价格信息
+//        // 2.3 更新退款单到 demo 订单
+//        youyouOrderMapper.updateById(new YouyouOrderDO().setId(youyouOrderDO.getId())
+//                .setPayRefundId(payRefundId).setRefundPrice(youyouOrderDO.getPayAmount()));
+//        //释放库存
+//        YouyouCommodityDO youyouCommodityDO = UUCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
+//        youyouCommodityDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
+//        UUCommodityMapper.updateById(youyouCommodityDO);
     }
+    @Deprecated
     private void refundAction(YouyouOrderDO youyouOrderDO,LoginUser loginUser) {
         refundAction(youyouOrderDO,loginUser,"用户不想要了主动退款");
     }
 
+    @Deprecated
     private YouyouOrderDO validateInvOrderCanRefund(YouyouOrderDO youyouOrderDO,LoginUser loginUser) {
         // 校验订单是否存在
         if (Objects.isNull(youyouOrderDO)) {
@@ -805,6 +820,7 @@ public class UUOrderServiceImpl implements UUOrderService {
     }
 
     @Override
+    @Deprecated
     public void updateInvOrderRefunded(Long id, Long payRefundId) {
         // 1. 校验并获得退款订单（可退款）
         PayRefundRespDTO payRefund = validateInvOrderCanRefunded(id, payRefundId);
@@ -813,6 +829,7 @@ public class UUOrderServiceImpl implements UUOrderService {
                 .setRefundTime(payRefund.getSuccessTime()).setPayOrderStatus(PayOrderStatusEnum.REFUND.getStatus()));
     }
 
+    @Deprecated
     private PayRefundRespDTO validateInvOrderCanRefunded(Long id, Long payRefundId) {
         // 1.1 校验示例订单
         YouyouOrderDO youyouOrderDO = youyouOrderMapper.selectById(id);
