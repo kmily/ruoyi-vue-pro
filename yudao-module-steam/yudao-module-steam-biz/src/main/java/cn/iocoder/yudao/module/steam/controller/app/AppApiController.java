@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
@@ -251,10 +252,10 @@ public class AppApiController {
                 URI uri = URI.create(openApiReqVo.getData().getTradeLinks());
                 String query = uri.getQuery();
                 Map<String, String> stringStringMap = steamWeb1.parseQuery(query);
-//                String partner = steamWeb1.toCommunityID(stringStringMap.get("partner"));
+                String partner = steamWeb1.toCommunityID(stringStringMap.get("partner"));
 
                 ApiCheckTradeUrlReSpVo tradeUrlReSpVo=new ApiCheckTradeUrlReSpVo();
-//                tradeUrlReSpVo.setSteamId(partner);
+                tradeUrlReSpVo.setSteamId(partner);
                 tradeUrlReSpVo.setMsg(tradeUrlStatus.getMessage());
                 tradeUrlReSpVo.setStatus(tradeUrlStatus.getStatus());
                 return ApiResult.success(tradeUrlReSpVo);
@@ -305,6 +306,7 @@ public class AppApiController {
                 ret.setPayAmount(Double.valueOf(invOrder.getPayAmount()/100));
                 ret.setOrderNo(invOrder.getOrderNo());
                 ret.setMerchantOrderNo(invOrder.getMerchantOrderNo());
+                ret.setOrderStatus(PayOrderStatusRespEnum.isSuccess(respVO.getStatus())?1:0);
                 return ApiResult.success(ret);
             });
         } catch (ServiceException e) {
@@ -349,6 +351,7 @@ public class AppApiController {
                 ret.setPayAmount(Double.valueOf(invOrder.getPayAmount()/100));
                 ret.setOrderNo(invOrder.getOrderNo());
                 ret.setMerchantOrderNo(invOrder.getMerchantOrderNo());
+                ret.setOrderStatus(PayOrderStatusRespEnum.isSuccess(respVO.getStatus())?1:0);
                 return ApiResult.success(ret);
             });
             return execute;

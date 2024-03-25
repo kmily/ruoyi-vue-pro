@@ -18,4 +18,7 @@ public class ApiCheckTradeUrlReSpVo implements Serializable {
      */
     @Schema(description = "交易链接账户steam ID", example = "https://steamcommunity.com/tradeoffer/new/?partner=111&token=222")
     private String msg;
+
+    @Schema(description = "交易链接账户steam ID", example = "https://steamcommunity.com/tradeoffer/new/?partner=111&token=222")
+    private String steamId;
 }

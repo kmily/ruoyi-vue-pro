@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitRespVO;
 import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitReqVO;
@@ -36,12 +37,14 @@ import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.selling.SellingsearchService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
+import cn.iocoder.yudao.module.steam.service.steam.SteamMaFile;
 import cn.iocoder.yudao.module.steam.service.steam.TradeUrlStatus;
 import cn.iocoder.yudao.module.steam.service.uu.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiPayWalletRespVO;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
+import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -133,14 +136,13 @@ public class AppIo661ApiController {
         try {
             return DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
-                Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
-                        .eq(BindUserDO::getUserId, devAccount.getUserId())
-                        .ne(BindUserDO::getTradeUrl,openApiReqVo.getData().getTradeLinks())
-                        .eq(BindUserDO::getUserType, devAccount.getUserType())).stream().findFirst();
-                if(!first.isPresent()){
-                    throw new ServiceException(-1,"没有检测机器人");
-                }
-                BindUserDO bindUserDO = first.get();
+                BindUserDO bindUserDO = new BindUserDO();
+                ConfigDO configMa = configService.getConfigByKey("steam.bot.ma");
+                ConfigDO configPasswd = configService.getConfigByKey("steam.bot.passwd");
+
+                bindUserDO.setSteamPassword(configPasswd.getValue());
+                SteamMaFile steamMaFile = JacksonUtils.readValue(configMa.getValue(), SteamMaFile.class);
+                bindUserDO.setMaFile(steamMaFile);
                 SteamWeb steamWeb=new SteamWeb(configService);
                 if(steamWeb.checkLogin(bindUserDO)){
                     if(steamWeb.getWebApiKey().isPresent()){
@@ -154,10 +156,10 @@ public class AppIo661ApiController {
                 URI uri = URI.create(openApiReqVo.getData().getTradeLinks());
                 String query = uri.getQuery();
                 Map<String, String> stringStringMap = steamWeb1.parseQuery(query);
-//                String partner = steamWeb1.toCommunityID(stringStringMap.get("partner"));
+                String partner = steamWeb1.toCommunityID(stringStringMap.get("partner"));
 
                 ApiCheckTradeUrlReSpVo tradeUrlReSpVo=new ApiCheckTradeUrlReSpVo();
-//                tradeUrlReSpVo.setSteamId(partner);
+                tradeUrlReSpVo.setSteamId(partner);
                 tradeUrlReSpVo.setMsg(tradeUrlStatus.getMessage());
                 tradeUrlReSpVo.setStatus(tradeUrlStatus.getStatus());
                 return ApiResult.success(tradeUrlReSpVo);
