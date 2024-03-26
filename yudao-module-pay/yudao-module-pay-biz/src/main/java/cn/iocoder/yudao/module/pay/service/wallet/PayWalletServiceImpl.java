@@ -132,6 +132,8 @@ public class PayWalletServiceImpl implements  PayWalletService {
         int updateCounts;
         switch (bizType) {
             case PAYMENT:
+            case SUB_INV_SERVICE_FEE:
+            case SUB_STEAM_CASH:
             case STEAM_PAY: {
                 updateCounts = walletMapper.updateWhenConsumption(payWallet.getId(), price);
                 break;
