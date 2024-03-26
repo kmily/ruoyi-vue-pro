@@ -321,7 +321,6 @@ public class UUOrderServiceImpl implements UUOrderService {
         List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
                         .eq(YouyouOrderDO::getRealCommodityId, youyouOrderDO.getRealCommodityId())
                         .in(YouyouOrderDO::getPayStatus, Arrays.asList(PayOrderStatusEnum.WAITING.getStatus(),PayOrderStatusEnum.SUCCESS.getStatus()))
-                        .isNull(YouyouOrderDO::getPayRefundId)
         );
         if(youyouOrderDOS.size()>0){
             throw exception(ErrorCodeConstants.UU_GOODS_ORDERED_EXCEPT);
@@ -445,30 +444,30 @@ public class UUOrderServiceImpl implements UUOrderService {
         if(Objects.nonNull(uuOrder.getPayAmount())){
             ret.setPaymentAmount(new BigDecimal(uuOrder.getPayAmount()).divide(new BigDecimal("100")).toString());
         }
-        if(Objects.nonNull(uuOrder.getPayChannelCode())){
-            switch (PayChannelEnum.getByCode(uuOrder.getPayChannelCode())){
-                case WALLET:
-                    ret.setPayMethod(100);
-                    break;
-                case ALIPAY_PC:
-                case ALIPAY_WAP:
-                case ALIPAY_APP:
-                case ALIPAY_QR:
-                case ALIPAY_BAR:
-                    ret.setPayMethod(200);
-                    break;
-                default:
-            }
-
-        }
+//        if(Objects.nonNull(uuOrder.getPayChannelCode())){
+//            switch (PayChannelEnum.getByCode(uuOrder.getPayChannelCode())){
+//                case WALLET:
+//                    ret.setPayMethod(100);
+//                    break;
+//                case ALIPAY_PC:
+//                case ALIPAY_WAP:
+//                case ALIPAY_APP:
+//                case ALIPAY_QR:
+//                case ALIPAY_BAR:
+//                    ret.setPayMethod(200);
+//                    break;
+//                default:
+//            }
+//
+//        }
         ret.setProductDetail(productDetailDTO);
-        if(Objects.nonNull(uuOrder.getRefundPrice())){
-            ret.setReturnAmount(new BigDecimal(uuOrder.getRefundPrice()).divide(new BigDecimal("100")).toString());
-            if(uuOrder.getRefundTime() != null) {
-                ret.setCancelOrderTime(uuOrder.getRefundTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
-            }
+//        if(Objects.nonNull(uuOrder.getRefundPrice())){
+//            ret.setReturnAmount(new BigDecimal(uuOrder.getRefundPrice()).divide(new BigDecimal("100")).toString());
+//            if(uuOrder.getRefundTime() != null) {
+//                ret.setCancelOrderTime(uuOrder.getRefundTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
+//            }
 //            ret.setCancelOrderTime(uuOrder.getRefundTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
-        }
+//        }
         return ret;
     }
 
@@ -590,10 +589,10 @@ public class UUOrderServiceImpl implements UUOrderService {
         if (!youyouOrderDO.getPayStatus()) {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_NOT_PAID);
         }
-        // 校验订单是否已退款
-        if (youyouOrderDO.getPayRefundId() != null) {
-            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUNDED);
-        }
+//        // 校验订单是否已退款
+//        if (youyouOrderDO.getPayRefundId() != null) {
+//            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUNDED);
+//        }
         //通过此接口可取消符合取消规则「创单成功后30min后卖家未发送交易报价」的代购订单。
         if(Objects.nonNull(youyouOrderDO.getUuOrderNo())){
             //orderStatus,140的除 1101外其它状态不能取消，不能取消的还有340，280，360
