@@ -357,22 +357,25 @@ public class AppApiController {
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
                 YouyouOrderDO invOrder = uUOrderService.createInvOrder(loginUser, openApiReqVo.getData());
 
+                YouyouOrderDO youyouOrderDO = uUOrderService.payInvOrder(loginUser, invOrder.getId());
 
-                //付款
-                AppPayOrderSubmitReqVO reqVO=new AppPayOrderSubmitReqVO();
-                reqVO.setChannelCode(PayChannelEnum.WALLET.getCode());
-                reqVO.setId(invOrder.getPayOrderId());
-                if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
-                    Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
-                            Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
-                    channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(devAccount.getUserId()));
-                    channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(devAccount.getUserType()));
-                    reqVO.setChannelExtras(channelExtras);
-                }
-                // 2. 提交支付
-                PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, ServletUtils.getClientIP());
-//                AppPayOrderSubmitRespVO appPayOrderSubmitRespVO = PayOrderConvert.INSTANCE.convert3(respVO);
-//                YouyouOrderDO uuOrder = uUOrderService.getUUOrder(loginUser,new QueryOrderReqVo().setId(invOrder.getId()));
+
+//
+//                //付款
+//                AppPayOrderSubmitReqVO reqVO=new AppPayOrderSubmitReqVO();
+//                reqVO.setChannelCode(PayChannelEnum.WALLET.getCode());
+//                reqVO.setId(invOrder.getPayOrderId());
+//                if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
+//                    Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
+//                            Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
+//                    channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(devAccount.getUserId()));
+//                    channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(devAccount.getUserType()));
+//                    reqVO.setChannelExtras(channelExtras);
+//                }
+//                // 2. 提交支付
+//                PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, ServletUtils.getClientIP());
+////                AppPayOrderSubmitRespVO appPayOrderSubmitRespVO = PayOrderConvert.INSTANCE.convert3(respVO);
+////                YouyouOrderDO uuOrder = uUOrderService.getUUOrder(loginUser,new QueryOrderReqVo().setId(invOrder.getId()));
 
 
 
@@ -382,7 +385,7 @@ public class AppApiController {
                 ret.setPayAmount(Double.valueOf(invOrder.getPayAmount()/100));
                 ret.setOrderNo(invOrder.getOrderNo());
                 ret.setMerchantOrderNo(invOrder.getMerchantOrderNo());
-                ret.setOrderStatus(PayOrderStatusRespEnum.isSuccess(respVO.getStatus())?1:0);
+                ret.setOrderStatus(PayOrderStatusRespEnum.isSuccess(youyouOrderDO.getPayOrderStatus())?1:0);
                 return ApiResult.success(ret);
             });
         } catch (ServiceException e) {
@@ -406,28 +409,30 @@ public class AppApiController {
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
                 YouyouOrderDO invOrder = uUOrderService.createInvOrder(loginUser, openApiReqVo.getData());
 
+                YouyouOrderDO youyouOrderDO = uUOrderService.payInvOrder(loginUser, invOrder.getId());
 
-                //付款
-                AppPayOrderSubmitReqVO reqVO=new AppPayOrderSubmitReqVO();
-                reqVO.setChannelCode(PayChannelEnum.WALLET.getCode());
-                reqVO.setId(invOrder.getPayOrderId());
-                if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
-                    Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
-                            Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
-                    channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(devAccount.getUserId()));
-                    channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(devAccount.getUserType()));
-                    reqVO.setChannelExtras(channelExtras);
-                }
-                // 2. 提交支付
-                PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, ServletUtils.getClientIP());
+
+//                //付款
+//                AppPayOrderSubmitReqVO reqVO=new AppPayOrderSubmitReqVO();
+//                reqVO.setChannelCode(PayChannelEnum.WALLET.getCode());
+//                reqVO.setId(invOrder.getPayOrderId());
+//                if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
+//                    Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
+//                            Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
+//                    channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(devAccount.getUserId()));
+//                    channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(devAccount.getUserType()));
+//                    reqVO.setChannelExtras(channelExtras);
+//                }
+//                // 2. 提交支付
+//                PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, ServletUtils.getClientIP());
 //                return ApiResult.success(PayOrderConvert.INSTANCE.convert3(respVO));
 
 
                 CreateByTemplateRespVo ret=new CreateByTemplateRespVo();
-                ret.setPayAmount(Double.valueOf(invOrder.getPayAmount()/100));
-                ret.setOrderNo(invOrder.getOrderNo());
-                ret.setMerchantOrderNo(invOrder.getMerchantOrderNo());
-                ret.setOrderStatus(PayOrderStatusRespEnum.isSuccess(respVO.getStatus())?1:0);
+                ret.setPayAmount(Double.valueOf(youyouOrderDO.getPayAmount()/100));
+                ret.setOrderNo(youyouOrderDO.getOrderNo());
+                ret.setMerchantOrderNo(youyouOrderDO.getMerchantOrderNo());
+                ret.setOrderStatus(PayOrderStatusRespEnum.isSuccess(youyouOrderDO.getPayOrderStatus())?1:0);
                 return ApiResult.success(ret);
             });
             return execute;
