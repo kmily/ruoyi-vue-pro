@@ -214,8 +214,8 @@ public class UUOrderServiceImpl implements UUOrderService {
 //                .setPayOrderId(payOrderId));
         YouyouCommodityDO youyouCommodityDO = UUCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
 //        //更新库存的标识
-        youyouCommodityDO.setTransferStatus(InvTransferStatusEnum.INORDER.getStatus());
-        UUCommodityMapper.updateById(youyouCommodityDO);
+//        youyouCommodityDO.setTransferStatus(InvTransferStatusEnum.INORDER.getStatus());
+        UUCommodityMapper.updateById(new YouyouCommodityDO().setId(youyouCommodityDO.getId()).setTransferStatus(InvTransferStatusEnum.INORDER.getStatus()));
         return youyouOrderDO;
     }
 
@@ -234,12 +234,12 @@ public class UUOrderServiceImpl implements UUOrderService {
             throw exception(OpenApiCode.ERR_5212);
         }
         //生成支付流水
-        //扣除服务费
+        //扣除服务费到平台
         PayWalletTransactionDO payWalletTransactionDO = payWalletService.reduceWalletBalance(orCreateWallet.getId(), uuOrder.getId(),
-                PayWalletBizTypeEnum.INV_SERVICE_FEE, uuOrder.getServiceFee());
+                PayWalletBizTypeEnum.SUB_INV_SERVICE_FEE, uuOrder.getServiceFee());
         //获取卖家家钱包并进行打款
         PayWalletTransactionDO payWalletTransactionDO1 = payWalletService.reduceWalletBalance(orCreateWallet.getId(),uuOrder.getId(),
-                PayWalletBizTypeEnum.STEAM_CASH, uuOrder.getCommodityAmount());
+                PayWalletBizTypeEnum.SUB_STEAM_CASH, uuOrder.getCommodityAmount());
         List<PayWalletTransactionDO> payWalletTransactionDOS = Arrays.asList(payWalletTransactionDO, payWalletTransactionDO1);
         youyouOrderMapper.updateById(new YouyouOrderDO().setId(uuOrder.getId()).setPayPayRet(JacksonUtils.writeValueAsString(payWalletTransactionDOS)).setPayStatus(true)
                 .setPayOrderStatus(PayOrderStatusEnum.SUCCESS.getStatus()));
@@ -318,14 +318,14 @@ public class UUOrderServiceImpl implements UUOrderService {
             throw exception(OpenApiCode.ERR_5408);
         }
         //检测交易链接是否是自己
-        Long aLong = bindUserMapper.selectCount(new LambdaQueryWrapperX<BindUserDO>()
-                .eq(BindUserDO::getUserId, youyouOrderDO.getBuyUserId())
-                .eqIfPresent(BindUserDO::getUserType, youyouOrderDO.getBuyUserType())
-                .eqIfPresent(BindUserDO::getTradeUrl, youyouOrderDO.getBuyTradeLinks())
-        );
-        if(aLong>0){
-            throw exception(OpenApiCode.ERR_5407);
-        }
+//        Long aLong = bindUserMapper.selectCount(new LambdaQueryWrapperX<BindUserDO>()
+//                .eq(BindUserDO::getUserId, youyouOrderDO.getBuyUserId())
+//                .eqIfPresent(BindUserDO::getUserType, youyouOrderDO.getBuyUserType())
+//                .eqIfPresent(BindUserDO::getTradeUrl, youyouOrderDO.getBuyTradeLinks())
+//        );
+//        if(aLong>0){
+//            throw exception(OpenApiCode.ERR_5407);
+//        }
         if(Objects.isNull(youyouOrderDO.getCommodityHashName()) && Objects.isNull(youyouOrderDO.getCommodityTemplateId()) && Objects.isNull(youyouOrderDO.getCommodityId())){
             throw exception(ErrorCodeConstants.UU_GOODS_ERR);
         }
@@ -418,23 +418,20 @@ public class UUOrderServiceImpl implements UUOrderService {
         LambdaQueryWrapperX<YouyouOrderDO> uuOrderDOLambdaQueryWrapperX = new LambdaQueryWrapperX<YouyouOrderDO>()
                 .eqIfPresent(YouyouOrderDO::getBuyUserId, loginUser.getId())
                 .eqIfPresent(YouyouOrderDO::getBuyUserType, loginUser.getUserType());
-        if(Objects.nonNull(queryOrderReqVo.getOrderNo())){
-            uuOrderDOLambdaQueryWrapperX.eqIfPresent(YouyouOrderDO::getOrderNo, queryOrderReqVo.getOrderNo());
-        }else{
-            if(Objects.isNull(queryOrderReqVo.getMerchantNo())){
-                throw exception(OpenApiCode.JACKSON_EXCEPTION);
-            }else{
-                uuOrderDOLambdaQueryWrapperX.eqIfPresent(YouyouOrderDO::getMerchantOrderNo, queryOrderReqVo.getMerchantNo());
-            }
+        if (Objects.isNull(queryOrderReqVo.getOrderNo()) && Objects.isNull(queryOrderReqVo.getMerchantNo()) && Objects.isNull(queryOrderReqVo.getId())){
+            throw exception(OpenApiCode.JACKSON_EXCEPTION);
         }
+        uuOrderDOLambdaQueryWrapperX.eqIfPresent(YouyouOrderDO::getOrderNo, queryOrderReqVo.getOrderNo());
+        uuOrderDOLambdaQueryWrapperX.eqIfPresent(YouyouOrderDO::getMerchantOrderNo, queryOrderReqVo.getMerchantNo());
+        uuOrderDOLambdaQueryWrapperX.eqIfPresent(YouyouOrderDO::getId, queryOrderReqVo.getId());
         if(Objects.nonNull(queryOrderReqVo.getId())){
             uuOrderDOLambdaQueryWrapperX.eqIfPresent(YouyouOrderDO::getId, queryOrderReqVo.getId());
         }
-        List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(uuOrderDOLambdaQueryWrapperX);
-        if(youyouOrderDOS.isEmpty()){
+        YouyouOrderDO youyouOrderDO = youyouOrderMapper.selectOne(uuOrderDOLambdaQueryWrapperX);
+        if(Objects.isNull(youyouOrderDO)){
             throw exception(OpenApiCode.JACKSON_EXCEPTION);
         }else{
-            return youyouOrderDOS.get(0);
+            return youyouOrderDO;
         }
     }
 

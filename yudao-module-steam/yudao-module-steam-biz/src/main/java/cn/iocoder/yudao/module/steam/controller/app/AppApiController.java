@@ -382,9 +382,9 @@ public class AppApiController {
 
 
                 CreateByIdRespVo ret=new CreateByIdRespVo();
-                ret.setPayAmount(Double.valueOf(invOrder.getPayAmount()/100));
-                ret.setOrderNo(invOrder.getOrderNo());
-                ret.setMerchantOrderNo(invOrder.getMerchantOrderNo());
+                ret.setPayAmount(Double.valueOf(youyouOrderDO.getPayAmount()/100));
+                ret.setOrderNo(youyouOrderDO.getOrderNo());
+                ret.setMerchantOrderNo(youyouOrderDO.getMerchantOrderNo());
                 ret.setOrderStatus(PayOrderStatusRespEnum.isSuccess(youyouOrderDO.getPayOrderStatus())?1:0);
                 return ApiResult.success(ret);
             });
