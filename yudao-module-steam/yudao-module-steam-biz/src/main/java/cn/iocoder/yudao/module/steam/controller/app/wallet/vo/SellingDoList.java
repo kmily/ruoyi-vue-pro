@@ -56,7 +56,7 @@ public class SellingDoList extends PageParam implements Serializable {
      */
     private String marketHashName;
 
-    private String orderStatus;
+    private Integer transferStatus;
 
     /**
      * 商品图片
