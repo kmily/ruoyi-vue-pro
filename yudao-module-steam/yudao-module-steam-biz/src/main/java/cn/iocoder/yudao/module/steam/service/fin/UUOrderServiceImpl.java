@@ -4,12 +4,9 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
-import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
-import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
@@ -186,7 +183,41 @@ public class UUOrderServiceImpl implements UUOrderService {
         UUCommodityMapper.updateById(new YouyouCommodityDO().setId(youyouCommodityDO.getId()).setTransferStatus(InvTransferStatusEnum.INORDER.getStatus()));
         return youyouOrderDO;
     }
-
+    public void closeUnPayInvOrder(Long invOrderId) {
+        YouyouOrderDO uuOrder = getUUOrderById(invOrderId);
+        if(uuOrder.getPayStatus()){
+            throw new ServiceException(-1,"订单已支付不支持关闭");
+        }
+//        PayOrderDO order = payOrderService.getOrder(invOrder.getPayOrderId());
+//        if (PayOrderStatusEnum.isClosed(order.getStatus())) {
+        youyouOrderMapper.updateById(new YouyouOrderDO().setId(invOrderId).setPayStatus(false).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus())
+                    .setPayOrderStatus(PayOrderStatusEnum.CLOSED.getStatus()));
+            //释放库存
+            YouyouCommodityDO youyouCommodityDO = UUCommodityMapper.selectById(uuOrder.getRealCommodityId());
+            UUCommodityMapper.updateById(new YouyouCommodityDO().setId(youyouCommodityDO.getId()).setTransferStatus(InvTransferStatusEnum.SELL.getStatus()));
+//        }
+    }
+    /**
+     * 释放库存
+     * 已经支付的订单退还库存
+     * 请不要直接调用
+     */
+    private void closeInvOrder(Long invOrderId) {
+        YouyouOrderDO uuOrder = getUUOrderById(invOrderId);
+        if(uuOrder.getSellCashStatus().equals(InvSellCashStatusEnum.CASHED.getStatus())){
+            throw new ServiceException(-1,"订单已经支付给卖家，不支持操作");
+        }
+        if(uuOrder.getSellCashStatus().equals(InvSellCashStatusEnum.DAMAGES.getStatus())){
+            throw new ServiceException(-1,"订单已经支付违约金，不支持操作");
+        }
+        if(!uuOrder.getPayStatus()){
+            throw new ServiceException(-1,"不支付未支付的订单关闭");
+        }
+        youyouOrderMapper.updateById(new YouyouOrderDO().setId(invOrderId).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus()));
+        //释放库存
+        YouyouCommodityDO youyouCommodityDO = UUCommodityMapper.selectById(uuOrder.getRealCommodityId());
+        UUCommodityMapper.updateById(new YouyouCommodityDO().setId(youyouCommodityDO.getId()).setTransferStatus(InvTransferStatusEnum.SELL.getStatus()));
+    }
     @Override
     @Transactional(rollbackFor = Exception.class)
     public YouyouOrderDO payInvOrder(LoginUser loginUser, Long invOrderId) {
@@ -218,6 +249,7 @@ public class UUOrderServiceImpl implements UUOrderService {
                 .setUuMerchantOrderNo(youPingOrder.getMerchantOrderNo())
                 .setUuShippingMode(youPingOrder.getShippingMode())
                 .setUuOrderStatus(youPingOrder.getOrderStatus())
+                .setUuMerchantOrderNo(youPingOrder.getMerchantOrderNo())
                 .setPayOrderStatus(PayOrderStatusEnum.SUCCESS.getStatus())
                 .setPayStatus(true)
                 .setPayTime(LocalDateTime.now())
@@ -334,6 +366,15 @@ public class UUOrderServiceImpl implements UUOrderService {
             throw exception(ErrorCodeConstants.UU_GOODS_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
         return youyouOrderDO;
+    }
+
+    public YouyouOrderDO getUUOrderById(Long orderId) {
+        YouyouOrderDO youyouOrderDO = youyouOrderMapper.selectById(orderId);
+        if(Objects.isNull(youyouOrderDO)){
+            throw exception(OpenApiCode.JACKSON_EXCEPTION);
+        }else{
+            return youyouOrderDO;
+        }
     }
     @Override
     public YouyouOrderDO getUUOrder(LoginUser loginUser, QueryOrderReqVo queryOrderReqVo) {
