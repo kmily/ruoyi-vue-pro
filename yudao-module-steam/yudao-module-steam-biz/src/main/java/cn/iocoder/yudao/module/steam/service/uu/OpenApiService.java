@@ -232,7 +232,7 @@ public class OpenApiService {
      * @param <T>
      * @param <E>
      */
-    public <T extends Serializable,E extends Serializable> ApiResult<E> requestUUTest(String url, OpenApiReqVo<T> openApiReqVo, Class<E> classic){
+    public <T extends Serializable,E extends Serializable> ApiResult<E> requestUUCommodity(String url, OpenApiReqVo<T> openApiReqVo, Class<E> classic){
 
         OpenApiReqVo<T> tOpenApiReqVo = requestUUSign(openApiReqVo);
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
