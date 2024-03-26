@@ -69,7 +69,7 @@ public class InvOrderExtService {
             SellingDoList sellingDoListTemp = new SellingDoList();
             sellingDoListTemp.setOrderNo(invOrderDOTemp.getOrderNo());
             sellingDoListTemp.setPayTime(invOrderDOTemp.getPayTime());
-            sellingDoListTemp.setPaymentAmount(invOrderDOTemp.getPaymentAmount());
+            sellingDoListTemp.setCommodityAmount(invOrderDOTemp.getCommodityAmount());
             sellingDoListTemp.setMerchantNo(invOrderDOTemp.getMerchantNo());
             sellingDoListTemp.setMarketName(invOrderDOTemp.getMarketName());
             sellingDoListTemp.setCreateTime(invOrderDOTemp.getCreateTime());
