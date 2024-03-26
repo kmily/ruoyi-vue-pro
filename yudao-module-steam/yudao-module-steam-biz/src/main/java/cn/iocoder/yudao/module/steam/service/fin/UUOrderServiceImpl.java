@@ -190,7 +190,7 @@ public class UUOrderServiceImpl implements UUOrderService {
                 .setPayStatus(false)
                 .setPayOrderStatus(PayOrderStatusEnum.WAITING.getStatus())
                 //设置退款
-                .setRefundPrice(0)
+//                .setRefundPrice(0)
                 //设置商品信息
                 .setCommodityId(reqVo.getCommodityId()).setCommodityHashName(reqVo.getCommodityHashName()).setCommodityTemplateId(reqVo.getCommodityTemplateId())
                 .setPurchasePrice(reqVo.getPurchasePrice())
@@ -486,68 +486,6 @@ public class UUOrderServiceImpl implements UUOrderService {
         }
         return ret;
     }
-    //    @Override
-//    public PageResult<YouyouOrderDO> getInvOrderPageOrder(YouyouOrderPageReqVO invOrderPageReqVO) {
-//
-//        PageResult<YouyouOrderDO> invOrderDOPageResult = youyouOrderMapper.selectPage(invOrderPageReqVO);
-//        List<YouyouOrderDO> ret=new ArrayList<>();
-//        if(invOrderDOPageResult.getTotal()>0){
-//            List<Long> collect = invOrderDOPageResult.getList().stream().map(InvOrderDO::getInvDescId).collect(Collectors.toList());
-//            Map<Long, InvDescDO> collect1 = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
-//                    .in(InvDescDO::getId, collect)).stream().collect(Collectors.toMap(InvDescDO::getId, o -> o, (n1, n2) -> n1));
-//            for(InvOrderDO item:invOrderDOPageResult.getList()){
-//                InvOrderResp invOrderResp=new InvOrderResp();
-//                invOrderResp.setInvOrderDO(item);
-//                invOrderResp.setInvDescDO(collect1.get(item.getInvDescId()));
-//                ret.add(invOrderResp);
-//            }
-//        }
-//
-//        return new PageResult<YouyouOrderDO>(ret,invOrderDOPageResult.getTotal());
-//    }
-
-    @Override
-//    @Transactional(rollbackFor = Exception.class)
-    @Deprecated
-    public void updateInvOrderPaid(Long id, Long payOrderId) {
-        // 校验并获得支付订单（可支付
-        YouyouOrderDO youyouOrderDO = youyouOrderMapper.selectById(id);
-        PayOrderRespDTO payOrder = validateInvOrderCanPaid(id, payOrderId);
-        // 更新 状态为已支付
-        int updateCount = youyouOrderMapper.updateByIdAndPayed(id, false,
-                new YouyouOrderDO().setPayStatus(true).setPayTime(LocalDateTime.now())
-                        .setPayOrderStatus(payOrder.getStatus())
-                        .setPayChannelCode(payOrder.getChannelCode()));
-        if (updateCount == 0) {
-            throw exception(ErrorCodeConstants.UU_GOODS_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
-        }
-        try{
-            YouPingOrder youPingOrder = uploadYY(youyouOrderDO);
-
-                //获取专家钱包并进行打款
-                PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(youyouOrderDO.getSellUserId(), youyouOrderDO.getSellUserType());
-                payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(youyouOrderDO.getId()),
-                        PayWalletBizTypeEnum.STEAM_CASH, youyouOrderDO.getPayAmount());
-                youyouOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
-                youyouOrderMapper.updateById(youyouOrderDO);
-
-
-
-        }catch (ServiceException e){
-            log.error("发货失败，自动退款单号{}",youyouOrderDO);
-            DevAccountUtils.tenantExecute(1L,()->{
-                if(Objects.nonNull(youyouOrderDO)){
-                    LoginUser loginUser=new LoginUser();
-                    loginUser.setId(youyouOrderDO.getBuyUserId());
-                    loginUser.setUserType(youyouOrderDO.getBuyUserType());
-                    OrderCancelVo orderCancelVo=new OrderCancelVo();
-                    orderCancelVo.setOrderNo(youyouOrderDO.getOrderNo());
-                    refundInvOrder(loginUser,orderCancelVo, ServletUtils.getClientIP());
-                }
-                return "";
-            });
-        }
-    }
 
     /**
      * 上传订单到有品
@@ -567,67 +505,6 @@ public class UUOrderServiceImpl implements UUOrderService {
         uuService.checkResponse(youPingOrderApiResult);
         return youPingOrderApiResult.getData();
     }
-
-    /**
-     * 校验交易订单满足被支付的条件
-     *
-     * 1. 交易订单未支付
-     * 2. 支付单已支付
-     *
-     * @param id 交易订单编号
-     * @param payOrderId 支付订单编号
-     * @return 交易订单
-     */
-    @Deprecated
-    private PayOrderRespDTO validateInvOrderCanPaid(Long id, Long payOrderId) {
-        // 1.1 校验订单是否存在
-        YouyouOrderDO youyouOrderDO = youyouOrderMapper.selectById(id);
-        if (youyouOrderDO == null) {
-            throw exception(ErrorCodeConstants.INVORDER_ORDER_NOT_FOUND);
-        }
-        if(youyouOrderDO.getSellCashStatus().equals(InvSellCashStatusEnum.CASHED.getStatus())){
-            throw exception(ErrorCodeConstants.INVORDER_ORDER_CASHED_CANNOTREFUND);
-        }
-        // 1.2 校验订单未支付
-        if (youyouOrderDO.getPayStatus()) {
-            log.error("[validateDemoOrderCanPaid][order({}) 不处于待支付状态，请进行处理！order 数据是：{}]",
-                    id, toJsonString(youyouOrderDO));
-            throw exception(ErrorCodeConstants.INVORDER_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
-        }
-        // 1.3 校验支付订单匹配
-        if (notEqual(youyouOrderDO.getPayOrderId(), payOrderId)) { // 支付单号
-            log.error("[validateDemoOrderCanPaid][order({}) 支付单不匹配({})，请进行处理！order 数据是：{}]",
-                    id, payOrderId, toJsonString(youyouOrderDO));
-            throw exception(ErrorCodeConstants.INVORDER_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR);
-        }
-
-        // 2.1 校验支付单是否存在
-        PayOrderRespDTO payOrder = payOrderApi.getOrder(payOrderId);
-        if (payOrder == null) {
-            log.error("[validateDemoOrderCanPaid][order({}) payOrder({}) 不存在，请进行处理！]", id, payOrderId);
-            throw exception(PAY_ORDER_NOT_FOUND);
-        }
-        // 2.2 校验支付单已支付
-        if (!PayOrderStatusEnum.isSuccess(payOrder.getStatus())) {
-            log.error("[validateDemoOrderCanPaid][order({}) payOrder({}) 未支付，请进行处理！payOrder 数据是：{}]",
-                    id, payOrderId, toJsonString(payOrder));
-            throw exception(ErrorCodeConstants.INVORDER_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_STATUS_NOT_SUCCESS);
-        }
-        // 2.3 校验支付金额一致
-        if (notEqual(payOrder.getPrice(), youyouOrderDO.getPayAmount())) {
-            log.error("[validateDemoOrderCanPaid][order({}) payOrder({}) 支付金额不匹配，请进行处理！order 数据是：{}，payOrder 数据是：{}]",
-                    id, payOrderId, toJsonString(youyouOrderDO), toJsonString(payOrder));
-            throw exception(ErrorCodeConstants.INVORDER_ORDER_UPDATE_PAID_FAIL_PAY_PRICE_NOT_MATCH);
-        }
-        // 2.4 校验支付订单匹配（二次）
-        if (notEqual(payOrder.getMerchantOrderId(), id.toString())) {
-            log.error("[validateDemoOrderCanPaid][order({}) 支付单不匹配({})，请进行处理！payOrder 数据是：{}]",
-                    id, payOrderId, toJsonString(payOrder));
-            throw exception(ErrorCodeConstants.INVORDER_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR);
-        }
-        return payOrder;
-    }
-
     @Override
     @Deprecated
     public Integer refundInvOrder(LoginUser loginUser, OrderCancelVo orderCancelVo, String userIp) {
@@ -752,53 +629,53 @@ public class UUOrderServiceImpl implements UUOrderService {
         return youyouOrderDO;
     }
 
-    @Override
-    @Deprecated
-    public void updateInvOrderRefunded(Long id, Long payRefundId) {
-        // 1. 校验并获得退款订单（可退款）
-        PayRefundRespDTO payRefund = validateInvOrderCanRefunded(id, payRefundId);
-        // 2.2 更新退款单到 demo 订单
-        youyouOrderMapper.updateById(new YouyouOrderDO().setId(id)
-                .setRefundTime(payRefund.getSuccessTime()).setPayOrderStatus(PayOrderStatusEnum.REFUND.getStatus()));
-    }
+//    @Override
+//    @Deprecated
+//    public void updateInvOrderRefunded(Long id, Long payRefundId) {
+//        // 1. 校验并获得退款订单（可退款）
+//        PayRefundRespDTO payRefund = validateInvOrderCanRefunded(id, payRefundId);
+//        // 2.2 更新退款单到 demo 订单
+//        youyouOrderMapper.updateById(new YouyouOrderDO().setId(id)
+//                .setRefundTime(payRefund.getSuccessTime()).setPayOrderStatus(PayOrderStatusEnum.REFUND.getStatus()));
+//    }
 
-    @Deprecated
-    private PayRefundRespDTO validateInvOrderCanRefunded(Long id, Long payRefundId) {
-        // 1.1 校验示例订单
-        YouyouOrderDO youyouOrderDO = youyouOrderMapper.selectById(id);
-        if (youyouOrderDO == null) {
-            throw exception(ErrorCodeConstants.INVORDER_ORDER_NOT_FOUND);
-        }
-        // 1.2 校验退款订单匹配
-        if (Objects.equals(youyouOrderDO.getPayRefundId(), payRefundId)) {
-            log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！order 数据是：{}]",
-                    id, payRefundId, toJsonString(youyouOrderDO));
-            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
-        }
-
-        // 2.1 校验退款订单
-        PayRefundRespDTO payRefund = payRefundApi.getRefund(payRefundId);
-        if (payRefund == null) {
-            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_NOT_FOUND);
-        }
-        // 2.2
-        if (!PayRefundStatusEnum.isSuccess(payRefund.getStatus())) {
-            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_NOT_SUCCESS);
-        }
-        // 2.3 校验退款金额一致
-        if (notEqual(payRefund.getRefundPrice(), youyouOrderDO.getPayAmount())) {
-            log.error("[validateDemoOrderCanRefunded][order({}) payRefund({}) 退款金额不匹配，请进行处理！order 数据是：{}，payRefund 数据是：{}]",
-                    id, payRefundId, toJsonString(youyouOrderDO), toJsonString(payRefund));
-            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_PRICE_NOT_MATCH);
-        }
-        // 2.4 校验退款订单匹配（二次）
-        if (notEqual(payRefund.getMerchantOrderId(), id.toString())) {
-            log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！payRefund 数据是：{}]",
-                    id, payRefundId, toJsonString(payRefund));
-            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
-        }
-        return payRefund;
-    }
+//    @Deprecated
+//    private PayRefundRespDTO validateInvOrderCanRefunded(Long id, Long payRefundId) {
+//        // 1.1 校验示例订单
+//        YouyouOrderDO youyouOrderDO = youyouOrderMapper.selectById(id);
+//        if (youyouOrderDO == null) {
+//            throw exception(ErrorCodeConstants.INVORDER_ORDER_NOT_FOUND);
+//        }
+//        // 1.2 校验退款订单匹配
+//        if (Objects.equals(youyouOrderDO.getPayRefundId(), payRefundId)) {
+//            log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！order 数据是：{}]",
+//                    id, payRefundId, toJsonString(youyouOrderDO));
+//            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
+//        }
+//
+//        // 2.1 校验退款订单
+//        PayRefundRespDTO payRefund = payRefundApi.getRefund(payRefundId);
+//        if (payRefund == null) {
+//            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_NOT_FOUND);
+//        }
+//        // 2.2
+//        if (!PayRefundStatusEnum.isSuccess(payRefund.getStatus())) {
+//            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_NOT_SUCCESS);
+//        }
+//        // 2.3 校验退款金额一致
+//        if (notEqual(payRefund.getRefundPrice(), youyouOrderDO.getPayAmount())) {
+//            log.error("[validateDemoOrderCanRefunded][order({}) payRefund({}) 退款金额不匹配，请进行处理！order 数据是：{}，payRefund 数据是：{}]",
+//                    id, payRefundId, toJsonString(youyouOrderDO), toJsonString(payRefund));
+//            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_PRICE_NOT_MATCH);
+//        }
+//        // 2.4 校验退款订单匹配（二次）
+//        if (notEqual(payRefund.getMerchantOrderId(), id.toString())) {
+//            log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！payRefund 数据是：{}]",
+//                    id, payRefundId, toJsonString(payRefund));
+//            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
+//        }
+//        return payRefund;
+//    }
 
     @Override
     public void processNotify(NotifyReq notifyReq) {

@@ -119,18 +119,6 @@ public class YouyouOrderDO extends BaseDO {
      */
     private Integer payOrderStatus;
     /**
-     * 退款订单编号
-     */
-    private Long payRefundId;
-    /**
-     * 退款金额，单位：分
-     */
-    private Integer refundPrice;
-    /**
-     * 退款时间
-     */
-    private LocalDateTime refundTime;
-    /**
      * 提现手续费收款人类型
      */
     private Integer serviceFeeUserType;
