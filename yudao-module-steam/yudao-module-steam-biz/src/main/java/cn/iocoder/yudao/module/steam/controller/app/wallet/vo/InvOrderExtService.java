@@ -48,7 +48,6 @@ public class InvOrderExtService {
         }else{
             List<Integer> statusesToMatch = Arrays.asList(
                     InvTransferStatusEnum.TransferFINISH.getStatus(),
-                    InvTransferStatusEnum.INORDER.getStatus(),
                     InvTransferStatusEnum.TransferERROR.getStatus(),
                     InvTransferStatusEnum.CLOSE.getStatus());
             invOrderDO = new LambdaQueryWrapper<InvOrderDO>()
