@@ -23,6 +23,9 @@ import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodityDO;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodityReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.CommodityList;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByIdRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByTemplateRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.*;
@@ -30,9 +33,11 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiDetailDataQueryAp
 import cn.iocoder.yudao.module.steam.controller.app.vo.user.ApiDetailDataQueryResultReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoudetails.YouyouDetailsDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.youyoucommodity.UUCommodityMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoudetails.YouyouDetailsMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
@@ -55,6 +60,8 @@ import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
@@ -139,7 +146,18 @@ public class AppApiController {
     @Resource
     private UUNotifyService uuNotifyService;
 
+    @Resource
+    private UUCommodityMapper uuCommodityMapper;
 
+    @Resource
+    private ObjectMapper objectMapper;
+
+
+    /**
+     * 下载UU商品模板
+     * @param
+     * @return CommodityList
+     */
     @PostMapping("/v1/api/templateQuery")
     @Operation(summary = "插入UU商品平台")
     public ApiResult youyouTemplate() throws IOException {
@@ -167,15 +185,56 @@ public class AppApiController {
 //            templateDO.setWeaponName(item.getWeaponName());
 //            uuTemplateMapper.insert(templateDO);
 //        }
+//        return ApiResult.success(templateId.getData());
+    }
+
+    /**
+     * 查询UU商品列表
+     * @param reqVo
+     * @return CommodityList
+     */
+    @PostMapping("/v1/api/goodsQuery")
+    @Operation(summary = "查询UU商品列表")
+    public ApiResult<CommodityList> youyouCommodityList(@RequestBody ApiUUCommodityReqVO reqVo) throws JsonProcessingException {
+        ApiResult<CommodityList> commodityList = uuService.getCommodityList(reqVo);
+        String commodityListJson = objectMapper.writeValueAsString(commodityList.getData());
+        List<ApiUUCommodityDO> apiUUCommodityDOS = objectMapper.readValue(commodityListJson, new TypeReference<List<ApiUUCommodityDO>>() {});
+
+        YouyouCommodityDO goods = new YouyouCommodityDO();
+        for (ApiUUCommodityDO apiUUCommodityDO : apiUUCommodityDOS) {
+            goods.setId(apiUUCommodityDO.getId());
+            goods.setTemplateId(apiUUCommodityDO.getTemplateId());
+            goods.setShippingMode(apiUUCommodityDO.getShippingMode());
+            goods.setCommodityName(apiUUCommodityDO.getCommodityName());
+            goods.setCommodityPrice(apiUUCommodityDO.getCommodityPrice());
+            goods.setCommodityAbrade(apiUUCommodityDO.getCommodityAbrade());
+            goods.setCommodityPaintSeed(apiUUCommodityDO.getCommodityPaintSeed());
+            goods.setCommodityPaintIndex(apiUUCommodityDO.getCommodityPaintIndex());
+            goods.setCommodityHaveNameTag(apiUUCommodityDO.getCommodityHaveNameTag());
+            goods.setCommodityHaveBuzhang(apiUUCommodityDO.getCommodityHaveBuzhang());
+            goods.setCommodityHaveSticker(apiUUCommodityDO.getCommodityHaveSticker());
+            goods.setTemplateisFade(apiUUCommodityDO.getTemplateisFade());
+            goods.setTemplateisHardened(apiUUCommodityDO.getTemplateisHardened());
+            goods.setTemplateisDoppler(apiUUCommodityDO.getTemplateisDoppler());
+            goods.setCommodityStickers(apiUUCommodityDO.getCommodityStickers().toString());
+            uuCommodityMapper.insert(goods);
+        }
+        return commodityList;
     }
 
 
+
+//    /**
+//     * 批量查询在售商品价格
+//     * @param reqVo
+//     * @return CommodityList
+//     */
 //    @PostMapping("/v1/api/goodsQuery")
 //    @Operation(summary = "查询UU商品列表")
-//    public void youyouCommodityList(@RequestBody ApiCommodityListRespVO reqVo) {
-//        ApiResult<ApiUUCommodityListRespVO> commodityList = uuService.getCommodityList(reqVo);
-//        log.info("commodityList:{}", commodityList);
+//    public ApiResult<CommodityList> youyouCommodityList(@RequestBody ApiUUCommodityReqVO reqVo) throws JsonProcessingException {
+//
 //    }
+
 
 
     /**
@@ -298,25 +357,22 @@ public class AppApiController {
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
                 YouyouOrderDO invOrder = uUOrderService.createInvOrder(loginUser, openApiReqVo.getData());
 
-                YouyouOrderDO youyouOrderDO = uUOrderService.payInvOrder(loginUser, invOrder.getId());
 
-
-//
-//                //付款
-//                AppPayOrderSubmitReqVO reqVO=new AppPayOrderSubmitReqVO();
-//                reqVO.setChannelCode(PayChannelEnum.WALLET.getCode());
-//                reqVO.setId(invOrder.getPayOrderId());
-//                if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
-//                    Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
-//                            Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
-//                    channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(devAccount.getUserId()));
-//                    channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(devAccount.getUserType()));
-//                    reqVO.setChannelExtras(channelExtras);
-//                }
-//                // 2. 提交支付
-//                PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, ServletUtils.getClientIP());
-////                AppPayOrderSubmitRespVO appPayOrderSubmitRespVO = PayOrderConvert.INSTANCE.convert3(respVO);
-////                YouyouOrderDO uuOrder = uUOrderService.getUUOrder(loginUser,new QueryOrderReqVo().setId(invOrder.getId()));
+                //付款
+                AppPayOrderSubmitReqVO reqVO=new AppPayOrderSubmitReqVO();
+                reqVO.setChannelCode(PayChannelEnum.WALLET.getCode());
+                reqVO.setId(invOrder.getPayOrderId());
+                if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
+                    Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
+                            Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
+                    channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(devAccount.getUserId()));
+                    channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(devAccount.getUserType()));
+                    reqVO.setChannelExtras(channelExtras);
+                }
+                // 2. 提交支付
+                PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, ServletUtils.getClientIP());
+//                AppPayOrderSubmitRespVO appPayOrderSubmitRespVO = PayOrderConvert.INSTANCE.convert3(respVO);
+//                YouyouOrderDO uuOrder = uUOrderService.getUUOrder(loginUser,new QueryOrderReqVo().setId(invOrder.getId()));
 
 
 
@@ -326,7 +382,7 @@ public class AppApiController {
                 ret.setPayAmount(Double.valueOf(invOrder.getPayAmount()/100));
                 ret.setOrderNo(invOrder.getOrderNo());
                 ret.setMerchantOrderNo(invOrder.getMerchantOrderNo());
-                ret.setOrderStatus(PayOrderStatusRespEnum.isSuccess(youyouOrderDO.getPayOrderStatus())?1:0);
+                ret.setOrderStatus(PayOrderStatusRespEnum.isSuccess(respVO.getStatus())?1:0);
                 return ApiResult.success(ret);
             });
         } catch (ServiceException e) {
@@ -350,30 +406,28 @@ public class AppApiController {
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
                 YouyouOrderDO invOrder = uUOrderService.createInvOrder(loginUser, openApiReqVo.getData());
 
-                YouyouOrderDO youyouOrderDO = uUOrderService.payInvOrder(loginUser, invOrder.getId());
 
-
-//                //付款
-//                AppPayOrderSubmitReqVO reqVO=new AppPayOrderSubmitReqVO();
-//                reqVO.setChannelCode(PayChannelEnum.WALLET.getCode());
-//                reqVO.setId(invOrder.getPayOrderId());
-//                if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
-//                    Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
-//                            Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
-//                    channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(devAccount.getUserId()));
-//                    channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(devAccount.getUserType()));
-//                    reqVO.setChannelExtras(channelExtras);
-//                }
-//                // 2. 提交支付
-//                PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, ServletUtils.getClientIP());
+                //付款
+                AppPayOrderSubmitReqVO reqVO=new AppPayOrderSubmitReqVO();
+                reqVO.setChannelCode(PayChannelEnum.WALLET.getCode());
+                reqVO.setId(invOrder.getPayOrderId());
+                if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
+                    Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
+                            Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
+                    channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(devAccount.getUserId()));
+                    channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(devAccount.getUserType()));
+                    reqVO.setChannelExtras(channelExtras);
+                }
+                // 2. 提交支付
+                PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, ServletUtils.getClientIP());
 //                return ApiResult.success(PayOrderConvert.INSTANCE.convert3(respVO));
 
 
                 CreateByTemplateRespVo ret=new CreateByTemplateRespVo();
-                ret.setPayAmount(Double.valueOf(youyouOrderDO.getPayAmount()/100));
-                ret.setOrderNo(youyouOrderDO.getOrderNo());
-                ret.setMerchantOrderNo(youyouOrderDO.getMerchantOrderNo());
-                ret.setOrderStatus(PayOrderStatusRespEnum.isSuccess(youyouOrderDO.getPayOrderStatus())?1:0);
+                ret.setPayAmount(Double.valueOf(invOrder.getPayAmount()/100));
+                ret.setOrderNo(invOrder.getOrderNo());
+                ret.setMerchantOrderNo(invOrder.getMerchantOrderNo());
+                ret.setOrderStatus(PayOrderStatusRespEnum.isSuccess(respVO.getStatus())?1:0);
                 return ApiResult.success(ret);
             });
             return execute;

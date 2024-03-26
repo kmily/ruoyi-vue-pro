@@ -5,6 +5,8 @@ import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTe
 import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTemplatedownloadRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodityReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.CommodityList;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
 import cn.iocoder.yudao.module.steam.service.steam.YouPingOrder;
@@ -12,6 +14,7 @@ import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiPayWalletRespVO;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -90,11 +93,12 @@ public class UUService {
     }
 
     /**
-     * 商品模板ID下载
-     * @return
+     * 模板ID查询商品信息
+     *
+     * @return ApiResult<ApiUUCommodityRespVO>
      */
-    public ApiResult<YouyouTemplatedownloadRespVO> getCommodityList(YouyouTemplateRespVO reqVo){
-        return openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/goodsQuery",new OpenApiReqVo<YouyouTemplateRespVO>().setData(reqVo), YouyouTemplatedownloadRespVO.class);
+    public ApiResult<CommodityList> getCommodityList(ApiUUCommodityReqVO reqVo) throws JsonProcessingException {
+        return openApiService.requestUUTest("https://gw-openapi.youpin898.com/open/v1/api/goodsQuery",new OpenApiReqVo<ApiUUCommodityReqVO>().setData(reqVo),CommodityList.class);
     }
     /**
      * 买家取消订单

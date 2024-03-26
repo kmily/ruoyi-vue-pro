@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import cn.iocoder.yudao.module.steam.utils.RSAUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -217,6 +218,41 @@ public class OpenApiService {
         }catch (IllegalAccessException e){
             log.error("检查签名出错类不可访问{}",e.getMessage());
             throw new ServiceException(OpenApiCode.SIGN_ERROR);
+        }
+    }
+
+
+
+    /**
+     *
+     * @param url
+     * @param openApiReqVo
+     * @param classic
+     * @return
+     * @param <T>
+     * @param <E>
+     */
+    public <T extends Serializable,E extends Serializable> ApiResult<E> requestUUTest(String url, OpenApiReqVo<T> openApiReqVo, Class<E> classic){
+
+        OpenApiReqVo<T> tOpenApiReqVo = requestUUSign(openApiReqVo);
+        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+        builder.url(url);
+        builder.method(HttpUtil.Method.JSON);
+        builder.postObject(tOpenApiReqVo);
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
+        ApiResult json = sent.json(ApiResult.class);
+        Object data = json.getData();
+        try {
+            ApiResult<E> apiResult=new ApiResult<>();
+            E e1 = objectMapper.readValue(objectMapper.writeValueAsString(data), new TypeReference<E>() {});
+            apiResult.setData(e1);
+            apiResult.setMsg(json.getMsg());
+            apiResult.setTimestamp(json.getTimestamp());
+            apiResult.setCode(json.getCode());
+            return apiResult;
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            throw new ServiceException(-1,"格式转换出错");
         }
     }
 }
