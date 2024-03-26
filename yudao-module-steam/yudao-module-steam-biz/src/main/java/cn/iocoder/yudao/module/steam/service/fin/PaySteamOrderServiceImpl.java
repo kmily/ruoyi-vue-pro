@@ -377,7 +377,13 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         }
         CreateOrderResult createOrderResult=new CreateOrderResult();
         SellingDO sellingDO = sellingMapper.selectById(reqVo.getSellId());
+        if(Objects.isNull(sellingDO)){
+            throw new ServiceException(OpenApiCode.ERR_5214);
+        }
         InvDescDO invDescDO = invDescMapper.selectById(sellingDO.getInvDescId());
+        if(Objects.isNull(invDescDO)){
+            throw new ServiceException(OpenApiCode.ERR_5214);
+        }
         // 1.1 获得商品
         InvOrderDO invOrderDO = new InvOrderDO().setOrderNo(noRedisDAO.generate(INV_ORDER_PREFIX)).setMerchantNo(reqVo.getMerchantNo())
                 .setSellId(reqVo.getSellId()).setSteamId(reqVo.getSteamId())
@@ -558,6 +564,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             for(InvOrderDO item:invOrderDOPageResult.getList()){
                 Io661OrderInfoResp.Io661OrderInfoRespBuilder builder = Io661OrderInfoResp.builder();
                 //基础信息
+                builder.id(item.getId()).payOrderId(item.getPayOrderId());
                 builder.orderNo(item.getOrderNo()).merchantNo(item.getMerchantNo());
                 builder.steamId(item.getSteamId());
                 builder.platformName(item.getPlatformName());

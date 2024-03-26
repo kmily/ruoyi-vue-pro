@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 @Builder
 @ToString
 public class Io661OrderInfoResp {
+    private Long payOrderId;
+    private Long id;
     private String orderNo;
     private String merchantNo;
     /**
