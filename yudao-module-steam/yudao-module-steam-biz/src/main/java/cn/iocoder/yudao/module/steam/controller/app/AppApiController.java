@@ -469,44 +469,33 @@ public class AppApiController {
     @Async
     @OperateLog(type = EXPORT)
     protected void jusDataType(Long userId, String fileName, Integer dataType) {
-        String result = "";
-        try {
-            switch (dataType) {
-                case 1:
-                    //  1....订单明细
-                    List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
-                            .eq(YouyouOrderDO::getBuyUserId, userId));
-                    result = JSON.toJSONString(youyouOrderDOS);
-                    break;
-                case 2:
-                    //  2....资金流水
-                    List<PayWalletDO> payWalletDOS = payWalletMapper.selectList(new LambdaQueryWrapperX<PayWalletDO>()
-                            .eq(PayWalletDO::getUserId, userId));
-
-                    List<PayWalletTransactionDO> payWalletTransactionDOS = payWalletTransactionMapper.selectList(new LambdaQueryWrapperX<PayWalletTransactionDO>()
-                            .eq(PayWalletTransactionDO::getWalletId, payWalletDOS.get(0).getId()));
-
-                    result = JSON.toJSONString(payWalletTransactionDOS);
-                    break;
-                default:
-                    throw new ServiceException(ErrorCodeConstants.YOUYOU_DETAILS_NOT_EXISTS);
-            }
-            File file = new File("" + fileName);
-
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-            FileWriter writer = new FileWriter(file);
-            writer.write(result);
-            writer.flush();
-            writer.close();
-            byte[] byte1 = result.getBytes();
-            fileApi.createFile(fileName, "", byte1);
-            YouyouDetailsDO youyouDetailsDO = new YouyouDetailsDO();
-            youyouDetailsDO.setData(fileApi.createFile(fileName, "", byte1));
-            youyouDetailsMapper.updateBatch(youyouDetailsDO);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        switch (dataType) {
+            case 1:
+                // 1....订单明细
+                List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
+                        .eq(YouyouOrderDO::getBuyUserId, userId));
+                String result = JSON.toJSONString(youyouOrderDOS);
+                byte[] byte1 = result.getBytes();
+                String url = fileApi.createFile(fileName + ".txt", "", byte1);
+                YouyouDetailsDO youyouDetailsDO = new YouyouDetailsDO();
+                youyouDetailsDO.setData(url);
+                youyouDetailsMapper.updateBatch(youyouDetailsDO);
+                break;
+            case 2:
+                // 2....资金流水
+                List<PayWalletDO> payWalletDOS = payWalletMapper.selectList(new LambdaQueryWrapperX<PayWalletDO>()
+                        .eq(PayWalletDO::getUserId, userId));
+                List<PayWalletTransactionDO> payWalletTransactionDOS = payWalletTransactionMapper.selectList(new LambdaQueryWrapperX<PayWalletTransactionDO>()
+                        .eq(PayWalletTransactionDO::getWalletId, payWalletDOS.get(0).getId()));
+                result = JSON.toJSONString(payWalletTransactionDOS);
+                byte1 = result.getBytes();
+                url = fileApi.createFile(fileName + ".txt", "", byte1);
+                youyouDetailsDO = new YouyouDetailsDO();
+                youyouDetailsDO.setData(url);
+                youyouDetailsMapper.updateBatch(youyouDetailsDO);
+                break;
+            default:
+                throw new ServiceException(ErrorCodeConstants.YOUYOU_DETAILS_NOT_EXISTS);
         }
     }
 
