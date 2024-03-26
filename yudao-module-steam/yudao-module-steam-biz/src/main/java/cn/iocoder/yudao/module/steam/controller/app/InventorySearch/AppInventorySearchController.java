@@ -50,18 +50,14 @@ public class AppInventorySearchController {
 
     @Resource
     private SteamInvService steamInvService;
-    @Resource
-    private InvService invService;
+
     @Resource
     private BindUserMapper bindUserMapper;
     @Resource
     private InvMapper invMapper;
-    @Resource
-    private SellingMapper sellingMapper;
 
     @Resource
     private IOInvUpdateService ioInvUpdateService;
-
 
     /**
      * 用户手动查询自己的 steam_inv 库存（从数据库中获取数据）
@@ -158,7 +154,8 @@ public class AppInventorySearchController {
                     .eq(InvDO::getSteamId, steamId)
                     .eq(InvDO::getBindUserId, bindUserDO.getId())
                     .eq(InvDO::getUserId, bindUserDO.getUserId())
-                    .eq(InvDO::getTransferStatus, 1));
+                    .eq(InvDO::getTransferStatus, 1)
+                    .eq(InvDO::getTransferStatus, 2));
             if (invDOS.isEmpty()){
                 return success(new ArrayList<>());
             }
@@ -172,5 +169,49 @@ public class AppInventorySearchController {
         }
         return success(new ArrayList<>());
     }
+//
+//
+//
+//    //================================================================
+//                    // TODO 库存更新重写版
+//    //================================================================
+//
+//    @GetMapping("/updateFromSteam")
+//    @Operation(summary = "更新库存 入参steamid")
+//    @ResponseBody
+//    public CommonResult<List<String>> updateFromSteam2(@RequestParam String steamId) throws JsonProcessingException {
+//        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+//        List<BindUserDO> collect = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+//                .eq(BindUserDO::getUserId, loginUser.getId())
+//                .eq(BindUserDO::getUserType, loginUser.getUserType())
+//                .eq(BindUserDO::getSteamId, steamId));
+//        if(Objects.isNull(collect) || collect.isEmpty()){
+//            throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
+//        }
+//        BindUserDO bindUserDO = new BindUserDO();
+//        bindUserDO.setSteamId(steamId);
+//        // 获取线上 steam 库存
+//        InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
+//        if(inventoryDto.getAssets() != null){
+//            // TODO 后期优化思路 copy插入库存方法在插入的时候比对Selling表中相同账户下的 AssetId ，有重复就不插入
+//            ioInvUpdateService.updateInventory(inventoryDto, bindUserDO);
+//            List<InvDO> invDOS = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
+//                    .eq(InvDO::getSteamId, steamId)
+//                    .eq(InvDO::getBindUserId, bindUserDO.getId())
+//                    .eq(InvDO::getUserId, bindUserDO.getUserId())
+//                    .eq(InvDO::getTransferStatus, 1));
+//            if (invDOS.isEmpty()){
+//                return success(new ArrayList<>());
+//            }
+//            // 删除重复的数据
+//            for(InvDO invDO : invDOS){
+//                invMapper.delete(new LambdaQueryWrapperX<InvDO>().eq(InvDO::getAssetid,invDO.getAssetid()).eq(InvDO::getTransferStatus,0));
+//            }
+//
+//        } else {
+//            throw new ServiceException(-1,"未获取到新的库存信息");
+//        }
+//        return success(new ArrayList<>());
+//    }
 }
 
