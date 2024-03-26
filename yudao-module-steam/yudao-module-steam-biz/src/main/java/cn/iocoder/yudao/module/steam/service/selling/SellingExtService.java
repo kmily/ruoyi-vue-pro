@@ -100,15 +100,16 @@ public class SellingExtService {
             invMapper.updateById(item);
             Optional<InvDescDO> invDescDO = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
                     .eq(InvDescDO::getClassid, item.getClassid())
+                    .eq(InvDescDO::getSteamId, item.getSteamId())
                     .eq(InvDescDO::getInstanceid, item.getInstanceid())).stream().findFirst();
             if (!invDescDO.isPresent()) {
-                throw new ServiceException(-1, "exists");
+                throw new ServiceException(-1, "物品描述信息未查找到");
             }
             Long l = sellingMapper.selectCount(new LambdaQueryWrapperX<SellingDO>()
                     .eq(SellingDO::getId, item.getId())
             );
             if (l > 0) {
-                throw new ServiceException(-1, "exists");
+                throw new ServiceException(-1, "该物品已上架");
             }
             SellingDO sellingDO = new SellingDO();
             sellingDO.setAppid(item.getAppid());

@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.steam.service.invpreview;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -15,18 +14,17 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
-import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * 饰品在售预览 Service 实现类
@@ -42,6 +40,7 @@ public class InvPreviewExtService {
     private InvDescMapper invDescMapper;
     @Resource
     private SellingMapper sellingMapper;
+    @Resource
     InvPreviewService invPreviewService;
 
     public ItemResp getInvPreview(PreviewReqVO reqVO) {
@@ -169,15 +168,102 @@ public class InvPreviewExtService {
         if(first.isPresent()){
             InvDescDO invDescDO = first.get();
             InvPreviewDO invPreviewDO=new InvPreviewDO();
-            invPreviewDO.setMinPrice(sellingDOOptional.isPresent()?sellingDOOptional.get().getPrice():-1).setExistInv(total>0)
+            C5ItemInfo c5ItemInfo = new C5ItemInfo();
+
+            //磨损
+            Map<String, Pair<String, String>> exteriorMap = new HashMap<>();
+            exteriorMap.put("WearCategoryNA", new MutablePair<>("无涂装", ""));
+            exteriorMap.put("WearCategory0", new MutablePair<>("崭新出厂", "#228149"));
+            exteriorMap.put("WearCategory1", new MutablePair<>("略有磨损", "#64b02b"));
+            exteriorMap.put("WearCategory2", new MutablePair<>("久经沙场", "#efad4d"));
+            exteriorMap.put("WearCategory3", new MutablePair<>("破损不堪", "#b7625f"));
+            exteriorMap.put("WearCategory4", new MutablePair<>("战痕累累", "#993a38"));
+
+
+            String selExterior = invDescDO.getSelExterior();
+            Pair<String, String> exteriorInfo = exteriorMap.get(selExterior);
+            if (exteriorInfo != null) {
+                c5ItemInfo.setExteriorName(exteriorInfo.getLeft());
+                c5ItemInfo.setExterior(exteriorInfo.getKey());
+                invPreviewDO.setSelExterior(exteriorInfo.getKey());
+                c5ItemInfo.setExteriorColor(exteriorInfo.getRight());
+            } else {
+                c5ItemInfo.setExteriorName("");
+                c5ItemInfo.setExterior("");
+                c5ItemInfo.setExteriorColor("");
+            }
+
+            //类别
+            Map<String, Pair<String, String>> qualityMap = new HashMap<>();
+            qualityMap.put("normal", new MutablePair<>("普通", ""));
+            qualityMap.put("strange", new MutablePair<>("StatTrak™", "#cf6a32"));
+            qualityMap.put("tournament", new MutablePair<>("纪念品", "#ffb100"));
+            qualityMap.put("unusual", new MutablePair<>("★", "#8650ac"));
+            qualityMap.put("unusual_strange", new MutablePair<>("★ StatTrak™", "#8650ac"));
+
+            String selQuality = invDescDO.getSelQuality();
+            Pair<String, String> qualityInfo = qualityMap.get(selQuality);
+            if (qualityInfo != null) {
+                c5ItemInfo.setQualityName(qualityInfo.getLeft());
+                c5ItemInfo.setQuality(qualityInfo.getLeft());
+                invPreviewDO.setSelQuality(qualityInfo.getKey());
+                c5ItemInfo.setQualityColor(qualityInfo.getRight());
+            } else {
+                c5ItemInfo.setQualityName("");
+                c5ItemInfo.setQuality("");
+                c5ItemInfo.setQualityColor("");
+            }
+            //品质
+            Map<String, Pair<String, String>> rarityMap = new HashMap<>();
+            rarityMap.put("Rarity_Rare_Weapon", new MutablePair<>("军规级", "#4b69ff"));
+            rarityMap.put("Rarity_Legendary_Weapon", new MutablePair<>("保密", "#d32ce6"));
+            rarityMap.put("Rarity_Ancient_Weapon", new MutablePair<>("隐秘", "#f07373"));
+            rarityMap.put("Rarity_Mythical_Weapon", new MutablePair<>("受限", "#8847ff"));
+            rarityMap.put("Rarity_Uncommon_Weapon", new MutablePair<>("工业级", "#5e98d9"));
+            rarityMap.put("Rarity_Common_Weapon", new MutablePair<>("消费级", "#90accc"));
+            rarityMap.put("Rarity_Ancient", new MutablePair<>("非凡", "#eb4b4b"));
+            rarityMap.put("Rarity_Mythical", new MutablePair<>("卓越", "#8847ff"));
+            rarityMap.put("Rarity_Legendary", new MutablePair<>("奇异", "#d32ce6"));
+            rarityMap.put("Rarity_Rare", new MutablePair<>("高级", "#4b69ff"));
+            rarityMap.put("Rarity_Common", new MutablePair<>("普通级", "#90ACCC"));
+            rarityMap.put("Rarity_Contraband", new MutablePair<>("违禁", "#E4AE39"));
+            rarityMap.put("Rarity_Ancient_Character", new MutablePair<>("探员：大师", "#EB4B4B"));
+            rarityMap.put("Rarity_Legendary_Character", new MutablePair<>("探员：非凡", "#D32CE6"));
+            rarityMap.put("Rarity_Mythical_Character", new MutablePair<>("探员：卓越", "#8847FF"));
+            rarityMap.put("Rarity_Rare_Character", new MutablePair<>("探员：高级", "#4B69FF"));
+
+            String selRarity = invDescDO.getSelRarity();
+            Pair<String, String> rarityInfo = rarityMap.get(selRarity);
+            if (rarityInfo != null) {
+                c5ItemInfo.setRarityName((rarityInfo.getLeft()));
+                c5ItemInfo.setRarity(rarityInfo.getLeft());
+                invPreviewDO.setSelRarity(rarityInfo.getKey());
+                c5ItemInfo.setRarityColor(rarityInfo.getRight());
+            } else {
+                c5ItemInfo.setRarityName("");
+                c5ItemInfo.setRarity("");
+                c5ItemInfo.setRarityColor("");
+            }
+
+            c5ItemInfo.setItemSetName(invDescDO.getSelItemset());
+            c5ItemInfo.setTypeName(invDescDO.getSelType());
+            c5ItemInfo.setWeaponName(invDescDO.getSelWeapon());
+
+
+            invPreviewDO.setMinPrice(sellingDOOptional.isPresent()?sellingDOOptional.get().getPrice(): -1).setExistInv(total>0)
                     .setAutoQuantity(total.toString())
                     .setMarketHashName(marketHashName)
                     .setImageUrl(invDescDO.getIconUrl())
                     .setItemName(invDescDO.getMarketName())
                     .setItemId(System.currentTimeMillis())
-                    .setItemInfo(new C5ItemInfo())
-            ;
+                    .setAutoPrice(String.valueOf(sellingDOOptional.isPresent()?sellingDOOptional.get().getPrice(): -1))
+                    .setItemInfo(c5ItemInfo);
+
+
             invPreviewDO.setReferencePrice(new BigDecimal(invPreviewDO.getMinPrice()).divide(new BigDecimal("100"),2,BigDecimal.ROUND_HALF_UP).toString());
+/*
+            invPreviewDO.setMinPrice(Integer.valueOf(new BigDecimal(invPreviewDO.getMinPrice()).divide(new BigDecimal("100"),2,BigDecimal.ROUND_HALF_UP).toString()));
+*/
             invPreviewMapper.insert(invPreviewDO);
         }
 

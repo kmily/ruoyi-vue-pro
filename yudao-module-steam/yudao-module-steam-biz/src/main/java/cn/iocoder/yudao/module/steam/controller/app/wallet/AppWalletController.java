@@ -11,16 +11,20 @@ import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
+import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderExtService;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.SellingDoList;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
@@ -96,9 +100,10 @@ public class AppWalletController {
     @PostMapping("/getSellOrderWithPage")
     @Operation(summary = "出售列表")
     @PreAuthenticated
-    public CommonResult<CommonResult<List<InvOrderDO>>> getSellOrderWithPage(@Valid @RequestBody QueryOrderReqVo reqVo) {
+    public CommonResult<PageResult<SellingDoList>> getSellOrderWithPage(@Valid @RequestBody InvOrderPageReqVO reqVo) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        CommonResult<List<InvOrderDO>> invOrderWithPage = invOrderExtService.getSellOrderWithPage(reqVo, loginUser);
+        Page<InvOrderDO> page = new Page<>(reqVo.getPageNo(), reqVo.getPageSize());
+        PageResult<SellingDoList> invOrderWithPage = invOrderExtService.getSellOrderWithPage(page,loginUser);
         return CommonResult.success(invOrderWithPage);
     }
 

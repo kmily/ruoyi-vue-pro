@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPag
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
@@ -72,10 +73,10 @@ public class IOInvUpdateService {
 
 
     /**
-     * 插入库存 (对应账户库存为空)
+     * 插入库存
      */
     @Transactional
-    public void firstInsertInventory(InventoryDto inventoryDto, BindUserDO bindUserDO) {
+    public List<InvDescDO> firstInsertInventory(InventoryDto inventoryDto, BindUserDO bindUserDO) {
         // inv 表入库
         List<InvDO> invDOList = new ArrayList<>();
         for(InventoryDto.AssetsDTO assetsDTO :inventoryDto.getAssets()){
@@ -160,13 +161,19 @@ public class IOInvUpdateService {
             }
             invDescDOList.add(invDescDO);
         }
-        // 批量插入 desc
-        invDescMapper.insertBatch(invDescDOList);
+//        // 为空  批量插入 desc
+//        if((invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>().eq(InvDescDO::getSteamId, invDescDOList.get(0).getSteamId()))).isEmpty()){
+//            invDescMapper.insertBatch(invDescDOList);
+//        }
+        // 插入desc
 
+        invDescMapper.insertBatch(invDescDOList);
+        List<InvDescDO> invDescIdList = new ArrayList<>();
         // 给inv表绑定descID
         for(InvDO item : invDOList){
             List<InvDescDO> invDescIDList = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
                     .eq(InvDescDO::getInstanceid, item.getInstanceid())
+                    .eq(InvDescDO::getSteamId, item.getSteamId())
                     .eq(InvDescDO::getClassid, item.getClassid()));
             InvDO invDescId = new InvDO();
             invDescId.setInstanceid(item.getInstanceid());
@@ -177,7 +184,10 @@ public class IOInvUpdateService {
                     .eq(InvDO::getInstanceid, invDescId.getInstanceid())
                     .eq(InvDO::getClassid, invDescId.getClassid())
                     .eq(InvDO::getSteamId,invDescId.getSteamId()));
+            invDescIdList.add(invDescIDList.get(0));
         }
+        // 返回每一条 inv 对应的 desc 详情描述信息
+        return invDescIdList;
     }
 
 
@@ -190,12 +200,34 @@ public class IOInvUpdateService {
         invDO.setUserId(bindUserDO.getUserId());
         invDO.setBindUserId(bindUserDO.getId());
 
-        invMapper.delete(new LambdaQueryWrapperX<InvDO>()
-                .eq(InvDO::getSteamId, invDO.getSteamId())
-                .eq(InvDO::getUserId, invDO.getUserId())
-                .eq(InvDO::getBindUserId, invDO.getBindUserId())
-                .eq(InvDO::getTransferStatus, "0"));
+
+        // selling表的引用
+        List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>().eq(SellingDO::getSteamId, invDO.getSteamId()));
+
+
+        // 上架的库存详情id
+        List<Long> invDescIdList = new ArrayList<>();
+        // 上架的库存id
+        List<Long> invIdList = new ArrayList<>();
+
+        for(SellingDO sellingDO : sellingDOS){
+            invDescIdList.add(sellingDO.getInvDescId());
+            invIdList.add(sellingDO.getInvId());
+        }
+        if(sellingDOS.isEmpty()){
+            // 删除selling表
+            invMapper.delete(new LambdaQueryWrapperX<InvDO>().eq(InvDO::getSteamId, bindUserDO.getSteamId()));
+            invDescMapper.delete(new LambdaQueryWrapperX<InvDescDO>().eq(InvDescDO::getSteamId, bindUserDO.getSteamId()));
+        } else {
+            invMapper.delete(new LambdaQueryWrapperX<InvDO>()
+                        .eq(InvDO::getSteamId, invDO.getSteamId())
+                        .eq(InvDO::getTransferStatus, "0")
+                        .notIn(InvDO::getId, invIdList));
+                // 删除库存描述表
+            invDescMapper.delete(new LambdaQueryWrapperX<InvDescDO>().notIn(InvDescDO::getId, invDescIdList).eq(InvDescDO::getSteamId, bindUserDO.getSteamId()));}
+
     }
+
 
     /**
      *  合并库存----查询库存方法  不分页
