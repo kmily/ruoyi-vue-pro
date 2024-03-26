@@ -98,7 +98,7 @@ public class UUService {
      * @return ApiResult<ApiUUCommodityRespVO>
      */
     public ApiResult<CommodityList> getCommodityList(ApiUUCommodityReqVO reqVo) throws JsonProcessingException {
-        return openApiService.requestUUTest("https://gw-openapi.youpin898.com/open/v1/api/goodsQuery",new OpenApiReqVo<ApiUUCommodityReqVO>().setData(reqVo),CommodityList.class);
+        return openApiService.requestUUCommodity("https://gw-openapi.youpin898.com/open/v1/api/goodsQuery",new OpenApiReqVo<ApiUUCommodityReqVO>().setData(reqVo),CommodityList.class);
     }
     /**
      * 买家取消订单
