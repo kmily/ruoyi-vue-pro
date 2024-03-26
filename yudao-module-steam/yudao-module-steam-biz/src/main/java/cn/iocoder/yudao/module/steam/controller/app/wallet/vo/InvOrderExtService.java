@@ -65,7 +65,23 @@ public class InvOrderExtService {
             sellingDoListTemp.setMerchantNo(invOrderDOTemp.getMerchantNo());
             sellingDoListTemp.setMarketName(invOrderDOTemp.getMarketName());
             sellingDoListTemp.setCreateTime(invOrderDOTemp.getCreateTime());
-            sellingDoListTemp.setOrderStatus(String.valueOf(invOrderDOTemp.getTransferStatus()));
+            switch (invOrderDOTemp.getTransferStatus()){
+                case 2:
+                    sellingDoListTemp.setOrderStatus("已下单");
+                    break;
+                case 3:
+                    sellingDoListTemp.setOrderStatus("发货完成");
+                    break;
+                case 4:
+                    sellingDoListTemp.setOrderStatus("已下架");
+                    break;
+                case 10:
+                    sellingDoListTemp.setOrderStatus("发货失败");
+                    break;
+                case 20:
+                    sellingDoListTemp.setOrderStatus("订单关闭");
+                    break;
+            }
 
             List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
                     .eq(InvPreviewDO::getItemName, invOrderDOTemp.getMarketName()));
