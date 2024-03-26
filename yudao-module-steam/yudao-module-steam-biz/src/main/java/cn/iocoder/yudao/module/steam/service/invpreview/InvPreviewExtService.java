@@ -46,20 +46,20 @@ public class InvPreviewExtService {
     public ItemResp getInvPreview(PreviewReqVO reqVO) {
 
         Optional<InvPreviewDO> first = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>().eq(InvPreviewDO::getMarketHashName, reqVO.getMarketHashName())).stream().findFirst();
-        if(!first.isPresent()){
+        if (!first.isPresent()) {
             markInvEnable(reqVO.getMarketHashName());
             Optional<InvPreviewDO> first2 = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>().eq(InvPreviewDO::getMarketHashName, reqVO.getMarketHashName())).stream().findFirst();
-            if(first2.isPresent()){
+            if (first2.isPresent()) {
                 InvPreviewDO invPreviewDO = first2.get();
                 ItemResp itemResp = BeanUtils.toBean(invPreviewDO, ItemResp.class);
 
-                if(Objects.nonNull(invPreviewDO.getAutoPrice())){
+                if (Objects.nonNull(invPreviewDO.getAutoPrice())) {
                     itemResp.setAutoPrice(new BigDecimal(invPreviewDO.getAutoPrice()).multiply(new BigDecimal("100")).intValue());
                 }
-                if(Objects.nonNull(invPreviewDO.getSalePrice())){
+                if (Objects.nonNull(invPreviewDO.getSalePrice())) {
                     itemResp.setSalePrice(new BigDecimal(invPreviewDO.getSalePrice()).multiply(new BigDecimal("100")).intValue());
                 }
-                if(Objects.nonNull(invPreviewDO.getReferencePrice())){
+                if (Objects.nonNull(invPreviewDO.getReferencePrice())) {
                     itemResp.setReferencePrice(new BigDecimal(invPreviewDO.getReferencePrice()).multiply(new BigDecimal("100")).intValue());
                 }
                 return itemResp;
@@ -68,13 +68,13 @@ public class InvPreviewExtService {
         InvPreviewDO invPreviewDO = first.get();
         ItemResp itemResp = BeanUtils.toBean(invPreviewDO, ItemResp.class);
 
-        if(Objects.nonNull(invPreviewDO.getAutoPrice())){
+        if (Objects.nonNull(invPreviewDO.getAutoPrice())) {
             itemResp.setAutoPrice(new BigDecimal(invPreviewDO.getAutoPrice()).multiply(new BigDecimal("100")).intValue());
         }
-        if(Objects.nonNull(invPreviewDO.getSalePrice())){
+        if (Objects.nonNull(invPreviewDO.getSalePrice())) {
             itemResp.setSalePrice(new BigDecimal(invPreviewDO.getSalePrice()).multiply(new BigDecimal("100")).intValue());
         }
-        if(Objects.nonNull(invPreviewDO.getReferencePrice())){
+        if (Objects.nonNull(invPreviewDO.getReferencePrice())) {
             itemResp.setReferencePrice(new BigDecimal(invPreviewDO.getReferencePrice()).multiply(new BigDecimal("100")).intValue());
         }
         return itemResp;
@@ -82,44 +82,47 @@ public class InvPreviewExtService {
 
     public PageResult<ItemResp> getInvPreviewPage(InvPreviewPageReqVO pageReqVO) {
         PageResult<InvPreviewDO> invPreviewDOPageResult = invPreviewMapper.selectPage(pageReqVO);
-        List<ItemResp> ret=new ArrayList<>();
-        for (InvPreviewDO item:invPreviewDOPageResult.getList()){
+        List<ItemResp> ret = new ArrayList<>();
+        for (InvPreviewDO item : invPreviewDOPageResult.getList()) {
 
             ItemResp itemResp = BeanUtils.toBean(item, ItemResp.class);
-            if(Objects.nonNull(item.getAutoPrice())){
+            if (Objects.nonNull(item.getAutoPrice())) {
                 itemResp.setAutoPrice(new BigDecimal(item.getAutoPrice()).multiply(new BigDecimal("100")).intValue());
             }
-            if(Objects.nonNull(item.getSalePrice())){
+            if (Objects.nonNull(item.getSalePrice())) {
                 itemResp.setSalePrice(new BigDecimal(item.getSalePrice()).multiply(new BigDecimal("100")).intValue());
             }
-            if(Objects.nonNull(item.getReferencePrice())){
+            if (Objects.nonNull(item.getReferencePrice())) {
                 itemResp.setReferencePrice(new BigDecimal(item.getReferencePrice()).multiply(new BigDecimal("100")).intValue());
             }
             ret.add(itemResp);
         }
         return new PageResult<>(ret, invPreviewDOPageResult.getTotal());
     }
+
     public PageResult<ItemResp> getHot(InvPreviewPageReqVO pageReqVO) {
         PageResult<InvPreviewDO> invPreviewDOPageResult = invPreviewMapper.hotPage(pageReqVO);
-        List<ItemResp> ret=new ArrayList<>();
-        for (InvPreviewDO item:invPreviewDOPageResult.getList()){
+        List<ItemResp> ret = new ArrayList<>();
+        for (InvPreviewDO item : invPreviewDOPageResult.getList()) {
 
             ItemResp itemResp = BeanUtils.toBean(item, ItemResp.class);
-            if(Objects.nonNull(item.getAutoPrice())){
+            if (Objects.nonNull(item.getAutoPrice())) {
                 itemResp.setAutoPrice(new BigDecimal(item.getAutoPrice()).multiply(new BigDecimal("100")).intValue());
             }
-            if(Objects.nonNull(item.getSalePrice())){
+            if (Objects.nonNull(item.getSalePrice())) {
                 itemResp.setSalePrice(new BigDecimal(item.getSalePrice()).multiply(new BigDecimal("100")).intValue());
             }
-            if(Objects.nonNull(item.getReferencePrice())){
+            if (Objects.nonNull(item.getReferencePrice())) {
                 itemResp.setReferencePrice(new BigDecimal(item.getReferencePrice()).multiply(new BigDecimal("100")).intValue());
             }
             ret.add(itemResp);
         }
         return new PageResult<>(ret, invPreviewDOPageResult.getTotal());
     }
+
     /**
      * 增加库存标识,上架构和下架构 都可以进行调用
+     *
      * @param marketHashName 标签名称
      */
     public void markInvEnable(String marketHashName) {
@@ -137,11 +140,11 @@ public class InvPreviewExtService {
         Optional<SellingDO> sellingDOOptional = sellingDOPageResult.getList().stream().findFirst();
 
 
-        if(Objects.nonNull(invPreviewDOS) && invPreviewDOS.size()>0){
-            invPreviewDOS.forEach(item->{
+        if (Objects.nonNull(invPreviewDOS) && invPreviewDOS.size() > 0) {
+            invPreviewDOS.forEach(item -> {
                 C5ItemInfo itemInfo = item.getItemInfo();
-                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(sellingDOPageResult.getTotal()>0).setAutoQuantity(sellingDOPageResult.getTotal().toString())
-                        .setMinPrice(sellingDOOptional.isPresent()?sellingDOOptional.get().getPrice():-1)
+                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(sellingDOPageResult.getTotal() > 0).setAutoQuantity(sellingDOPageResult.getTotal().toString())
+                        .setMinPrice(sellingDOOptional.isPresent() ? sellingDOOptional.get().getPrice() : -1)
                         .setSelExterior(itemInfo.getExteriorName())
                         .setSelQuality(itemInfo.getQualityName())
                         .setSelRarity(itemInfo.getRarityName())
@@ -149,25 +152,26 @@ public class InvPreviewExtService {
                         .setSelType(itemInfo.getTypeName())
                         .setSelItemset(itemInfo.getItemSetName()));
             });
-        }else{
-            initPreView(marketHashName, sellingDOOptional,sellingDOPageResult.getTotal());
+        } else {
+            initPreView(marketHashName, sellingDOOptional, sellingDOPageResult.getTotal());
         }
     }
 
     /**
      * preview不存在的时候自动更新
+     *
      * @param marketHashName
      * @param sellingDOOptional
      * @param total
      */
-    private void initPreView(String marketHashName,Optional<SellingDO> sellingDOOptional,Long total){
-        if(Objects.isNull(marketHashName)){
+    private void initPreView(String marketHashName, Optional<SellingDO> sellingDOOptional, Long total) {
+        if (Objects.isNull(marketHashName)) {
             return;
         }
         Optional<InvDescDO> first = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>().eq(InvDescDO::getMarketHashName, marketHashName)).stream().findFirst();
-        if(first.isPresent()){
+        if (first.isPresent()) {
             InvDescDO invDescDO = first.get();
-            InvPreviewDO invPreviewDO=new InvPreviewDO();
+            InvPreviewDO invPreviewDO = new InvPreviewDO();
             C5ItemInfo c5ItemInfo = new C5ItemInfo();
 
             //磨损
@@ -205,7 +209,7 @@ public class InvPreviewExtService {
             Pair<String, String> qualityInfo = qualityMap.get(selQuality);
             if (qualityInfo != null) {
                 c5ItemInfo.setQualityName(qualityInfo.getLeft());
-                c5ItemInfo.setQuality(qualityInfo.getLeft());
+                c5ItemInfo.setQuality(qualityInfo.getKey());
                 invPreviewDO.setSelQuality(qualityInfo.getKey());
                 c5ItemInfo.setQualityColor(qualityInfo.getRight());
             } else {
@@ -236,7 +240,7 @@ public class InvPreviewExtService {
             Pair<String, String> rarityInfo = rarityMap.get(selRarity);
             if (rarityInfo != null) {
                 c5ItemInfo.setRarityName((rarityInfo.getLeft()));
-                c5ItemInfo.setRarity(rarityInfo.getLeft());
+                c5ItemInfo.setRarity(rarityInfo.getKey());
                 invPreviewDO.setSelRarity(rarityInfo.getKey());
                 c5ItemInfo.setRarityColor(rarityInfo.getRight());
             } else {
@@ -245,22 +249,24 @@ public class InvPreviewExtService {
                 c5ItemInfo.setRarityColor("");
             }
 
+/*
             // 样式
             Map<String, String> typeMap = new HashMap<>();
-            typeMap.put("knife", "匕首");
-            typeMap.put("rifle", "步枪");
-            typeMap.put("pistol", "手枪");
-            typeMap.put("hands", "手套");
-            typeMap.put("smg", "微型冲锋枪");
-            typeMap.put("shotgun", "霰弹枪");
-            typeMap.put("machinegun", "机枪");
-            typeMap.put("sticker", "印花");
-            typeMap.put("other", "其他");
-            typeMap.put("customplayer", "探员");
+            typeMap.put("CSGO_Type_Knife", "匕首");
+            typeMap.put("CSGO_Type_Rifle", "步枪");
+            typeMap.put("CSGO_Type_Pistol", "手枪");
+            typeMap.put("CSGO_Type_Hands", "手套");
+            typeMap.put("CSGO_Type_SMG", "微型冲锋枪");
+            typeMap.put("CSGO_Type_Shotgun", "霰弹枪");
+            typeMap.put("CSGO_Type_Machinegun", "机枪");
+            typeMap.put("CSGO_Type_Sticker", "印花");
+            typeMap.put("CSGO_Type_Other", "其他");
+            typeMap.put("CSGO_Type_Customplayer", "探员");
 
             String selType = invDescDO.getSelType();
+            List<String> typeList = new ArrayList<>(typeMap.keySet());
 
-            if (qualityInfo != null) {
+            if (!typeList.isEmpty()) {
                 c5ItemInfo.setTypeName(typeMap.get(selType));
                 c5ItemInfo.setType(selType);
                 invPreviewDO.setSelType(selType);
@@ -277,7 +283,7 @@ public class InvPreviewExtService {
 
             String selItemSet = invDescDO.getSelItemset();
 
-            if (qualityInfo != null) {
+            if (selItemSet != null) {
                 c5ItemInfo.setItemSetName(itemSetMap.get(selItemSet));
                 c5ItemInfo.setItemSet(selItemSet);
                 invPreviewDO.setSelItemset(selItemSet);
@@ -419,7 +425,7 @@ public class InvPreviewExtService {
 
             String selWeapon = invDescDO.getSelItemset();
 
-            if (qualityInfo != null) {
+            if (selWeapon != null) {
                 c5ItemInfo.setWeaponName(weaponMap.get(selWeapon));
                 c5ItemInfo.setWeapon(selWeapon);
                 invPreviewDO.setSelWeapon(selWeapon);
@@ -427,18 +433,25 @@ public class InvPreviewExtService {
                 c5ItemInfo.setWeaponName("");
                 c5ItemInfo.setWeapon("");
             }
+*/
 
-            invPreviewDO.setMinPrice(sellingDOOptional.isPresent()?sellingDOOptional.get().getPrice(): -1).setExistInv(total>0)
+
+            c5ItemInfo.setItemSetName(invDescDO.getSelItemset());
+            c5ItemInfo.setTypeName(invDescDO.getSelType());
+            c5ItemInfo.setWeaponName(invDescDO.getSelWeapon());
+
+
+            invPreviewDO.setMinPrice(sellingDOOptional.isPresent() ? sellingDOOptional.get().getPrice() : -1).setExistInv(total > 0)
                     .setAutoQuantity(total.toString())
                     .setMarketHashName(marketHashName)
                     .setImageUrl(invDescDO.getIconUrl())
                     .setItemName(invDescDO.getMarketName())
                     .setItemId(System.currentTimeMillis())
-                    .setAutoPrice(String.valueOf(sellingDOOptional.isPresent()?sellingDOOptional.get().getPrice(): -1))
+                    .setAutoPrice(String.valueOf(sellingDOOptional.isPresent() ? sellingDOOptional.get().getPrice() : -1))
                     .setItemInfo(c5ItemInfo);
 
 
-            invPreviewDO.setReferencePrice(new BigDecimal(invPreviewDO.getMinPrice()).divide(new BigDecimal("100"),2,BigDecimal.ROUND_HALF_UP).toString());
+            invPreviewDO.setReferencePrice(new BigDecimal(invPreviewDO.getMinPrice()).divide(new BigDecimal("100"), 2, BigDecimal.ROUND_HALF_UP).toString());
 /*
             invPreviewDO.setMinPrice(Integer.valueOf(new BigDecimal(invPreviewDO.getMinPrice()).divide(new BigDecimal("100"),2,BigDecimal.ROUND_HALF_UP).toString()));
 */
@@ -446,13 +459,14 @@ public class InvPreviewExtService {
         }
 
     }
+
     @Async
     public Integer updateIvnFlag() {
         List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
                 .eqIfPresent(InvPreviewDO::getExistInv, true));
-        Integer count=0;
-        if(Objects.nonNull(invPreviewDOS)){
-            for(InvPreviewDO item:invPreviewDOS){
+        Integer count = 0;
+        if (Objects.nonNull(invPreviewDOS)) {
+            for (InvPreviewDO item : invPreviewDOS) {
                 count++;
                 PageParam pageParam = new PageParam();
                 pageParam.setPageNo(1);
@@ -465,8 +479,8 @@ public class InvPreviewExtService {
                 );
                 Optional<SellingDO> sellingDOOptional = sellingDOPageResult.getList().stream().findFirst();
                 C5ItemInfo itemInfo = item.getItemInfo();
-                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(sellingDOPageResult.getTotal()>0).setAutoQuantity(sellingDOPageResult.getTotal().toString())
-                        .setMinPrice(sellingDOOptional.isPresent()?sellingDOOptional.get().getPrice():-1)
+                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(sellingDOPageResult.getTotal() > 0).setAutoQuantity(sellingDOPageResult.getTotal().toString())
+                        .setMinPrice(sellingDOOptional.isPresent() ? sellingDOOptional.get().getPrice() : -1)
                         .setSelExterior(itemInfo.getExteriorName())
                         .setSelQuality(itemInfo.getQualityName())
                         .setSelRarity(itemInfo.getRarityName())
