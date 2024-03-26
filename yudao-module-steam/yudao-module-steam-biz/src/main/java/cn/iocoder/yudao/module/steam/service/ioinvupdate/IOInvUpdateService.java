@@ -161,12 +161,7 @@ public class IOInvUpdateService {
             }
             invDescDOList.add(invDescDO);
         }
-//        // 为空  批量插入 desc
-//        if((invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>().eq(InvDescDO::getSteamId, invDescDOList.get(0).getSteamId()))).isEmpty()){
-//            invDescMapper.insertBatch(invDescDOList);
-//        }
         // 插入desc
-
         invDescMapper.insertBatch(invDescDOList);
         List<InvDescDO> invDescIdList = new ArrayList<>();
         // 给inv表绑定descID
@@ -174,7 +169,8 @@ public class IOInvUpdateService {
             List<InvDescDO> invDescIDList = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
                     .eq(InvDescDO::getInstanceid, item.getInstanceid())
                     .eq(InvDescDO::getSteamId, item.getSteamId())
-                    .eq(InvDescDO::getClassid, item.getClassid()));
+                    .eq(InvDescDO::getClassid, item.getClassid())
+                    .orderByDesc(InvDescDO::getId));
             InvDO invDescId = new InvDO();
             invDescId.setInstanceid(item.getInstanceid());
             invDescId.setClassid(item.getClassid());
@@ -183,7 +179,8 @@ public class IOInvUpdateService {
             invMapper.update(invDescId,new LambdaQueryWrapperX<InvDO>()
                     .eq(InvDO::getInstanceid, invDescId.getInstanceid())
                     .eq(InvDO::getClassid, invDescId.getClassid())
-                    .eq(InvDO::getSteamId,invDescId.getSteamId()));
+                    .eq(InvDO::getSteamId,invDescId.getSteamId())
+                    .eq(InvDO::getTransferStatus,0));
             invDescIdList.add(invDescIDList.get(0));
         }
         // 返回每一条 inv 对应的 desc 详情描述信息
@@ -194,39 +191,27 @@ public class IOInvUpdateService {
     /**
      * 删除库存  删除原有的 transferStatus = 0 的库存 插入新的库存，并比对 selling 表中的内容
      */
-    public void deleteInventory( BindUserDO bindUserDO) {
+    public void deleteInventory(BindUserDO bindUserDO) {
         InvPageReqVO invDO = new InvPageReqVO();
         invDO.setSteamId(bindUserDO.getSteamId());
         invDO.setUserId(bindUserDO.getUserId());
         invDO.setBindUserId(bindUserDO.getId());
+        // 查找未上架的库存并删除
+        List<InvDO> invDOS = invMapper.selectList((new LambdaQueryWrapperX<InvDO>()
+                .eq(InvDO::getSteamId, invDO.getSteamId()))
+                .eq(InvDO::getTransferStatus, 0));
 
-
-        // selling表的引用
-        List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>().eq(SellingDO::getSteamId, invDO.getSteamId())
-                .ne(SellingDO::getTransferStatus, 3));
-
-
-        // 上架的库存详情id
         List<Long> invDescIdList = new ArrayList<>();
-        // 上架的库存id
         List<Long> invIdList = new ArrayList<>();
 
-        for(SellingDO sellingDO : sellingDOS){
-            invDescIdList.add(sellingDO.getInvDescId());
-            invIdList.add(sellingDO.getInvId());
+        for (InvDO inv : invDOS) {
+             invIdList.add(inv.getId());
+             invDescIdList.add(inv.getInvDescId());
         }
-        if(sellingDOS.isEmpty()){
-            // 删除selling表
-            invMapper.delete(new LambdaQueryWrapperX<InvDO>().eq(InvDO::getSteamId, bindUserDO.getSteamId()));
-            invDescMapper.delete(new LambdaQueryWrapperX<InvDescDO>().eq(InvDescDO::getSteamId, bindUserDO.getSteamId()));
-        } else {
-            invMapper.delete(new LambdaQueryWrapperX<InvDO>()
-                        .eq(InvDO::getSteamId, invDO.getSteamId())
-                        .eq(InvDO::getTransferStatus, "0")
-                        .notIn(InvDO::getId, invIdList));
-                // 删除库存描述表
-            invDescMapper.delete(new LambdaQueryWrapperX<InvDescDO>().notIn(InvDescDO::getId, invDescIdList).eq(InvDescDO::getSteamId, bindUserDO.getSteamId()));}
-
+        if(!invIdList.isEmpty()){
+            invMapper.deleteBatchIds(invIdList);
+            invDescMapper.deleteBatchIds(invDescIdList);
+        }
     }
 
 
@@ -316,128 +301,6 @@ public class IOInvUpdateService {
             }
             return appInvPageReqVO;
         }
-//
-//
-//    /**
-//     *  TODO 库存更新方法重写版
-//     * @param inventoryDto
-//     * @param bindUserDO
-//     * @return
-//     */
-//    @Transactional
-//    public List<InvDescDO> updateInventory(InventoryDto inventoryDto, BindUserDO bindUserDO) {
-//        // inv 表入库
-//        List<InvDO> invDOList = new ArrayList<>();
-//        for(InventoryDto.AssetsDTO assetsDTO :inventoryDto.getAssets()){
-//            InvDO invDO = new InvDO();
-//            invDO.setClassid(assetsDTO.getClassid());
-//            invDO.setInstanceid(assetsDTO.getInstanceid());
-//            invDO.setAppid(assetsDTO.getAppid());
-//            invDO.setAssetid(assetsDTO.getAssetid());
-//            invDO.setAmount(assetsDTO.getAmount());
-//            invDO.setSteamId(bindUserDO.getSteamId());
-////            invDO.setStatus(0);   // 默认为0
-//            invDO.setPrice(0);
-//            invDO.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
-//            invDO.setUserId(bindUserDO.getUserId());
-//            invDO.setUserType(bindUserDO.getUserType());
-//            invDO.setBindUserId(bindUserDO.getId());
-//            invDO.setContextid(assetsDTO.getContextid());
-//            invDOList.add(invDO);
-//        }
-//        invMapper.insertBatch(invDOList);
-//        // inv_desc 表入库
-//        List<InvDescDO> invDescDOList = new ArrayList<>();
-//        for(InventoryDto.DescriptionsDTOX item :inventoryDto.getDescriptions()){
-//            InvDescDO invDescDO = new InvDescDO();
-//            invDescDO.setSteamId(bindUserDO.getSteamId());
-//            invDescDO.setAppid(item.getAppid());
-//            invDescDO.setClassid(item.getClassid());
-//            invDescDO.setInstanceid(item.getInstanceid());
-//            invDescDO.setCurrency(item.getCurrency());
-//            invDescDO.setBackgroundColor(item.getBackgroundColor());
-//            invDescDO.setIconUrl("https://community.steamstatic.com/economy/image/" + item.getIconUrl());
-//            invDescDO.setIconUrlLarge(item.getIconUrlLarge());
-//            invDescDO.setDescriptions(item.getDescriptions());
-//            invDescDO.setTradable(item.getTradable());
-//            invDescDO.setActions(item.getActions());
-//            invDescDO.setName(item.getName());
-//            invDescDO.setNameColor(item.getNameColor());
-//            invDescDO.setType(item.getType());
-//            invDescDO.setMarketName(item.getMarketName());
-//            invDescDO.setMarketHashName(item.getMarketHashName());
-//            invDescDO.setMarketActions(item.getMarketActions());
-//            invDescDO.setCommodity(item.getCommodity());
-//            invDescDO.setMarketTradableRestriction(item.getMarketTradableRestriction());
-//            invDescDO.setMarketable(item.getMarketable());
-//            invDescDO.setTags(item.getTags());
-//            //解析tags
-//            // 类型选择
-//            Optional<InventoryDto.DescriptionsDTOX.TagsDTO> type = item.getTags().stream().filter(i -> i.getCategory().equals("Type")).findFirst();
-//            if (type.isPresent()) {
-//                InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = type.get();
-//                invDescDO.setSelType(tagsDTO.getInternalName());
-//            }
-//            //武器选择
-//            Optional<InventoryDto.DescriptionsDTOX.TagsDTO> weapon = item.getTags().stream().filter(i -> i.getCategory().equals("Weapon")).findFirst();
-//            if (weapon.isPresent()) {
-//                InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = weapon.get();
-//                invDescDO.setSelWeapon(tagsDTO.getInternalName());
-//            }
-//            // 收藏品选择
-//            Optional<InventoryDto.DescriptionsDTOX.TagsDTO> itemSet = item.getTags().stream().filter(i -> i.getCategory().equals("ItemSet")).findFirst();
-//            if (itemSet.isPresent()) {
-//                InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = itemSet.get();
-//                invDescDO.setSelItemset(tagsDTO.getInternalName());
-//            }
-//            //类别选择
-//            Optional<InventoryDto.DescriptionsDTOX.TagsDTO> quality = item.getTags().stream().filter(i -> i.getCategory().equals("Quality")).findFirst();
-//            if (quality.isPresent()) {
-//                InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = quality.get();
-//                invDescDO.setSelQuality(tagsDTO.getInternalName());
-//            }
-//            // 品质选择
-//            Optional<InventoryDto.DescriptionsDTOX.TagsDTO> rarity = item.getTags().stream().filter(i -> i.getCategory().equals("Rarity")).findFirst();
-//            if (rarity.isPresent()) {
-//                InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = rarity.get();
-//                invDescDO.setSelRarity(tagsDTO.getInternalName());
-//            }
-//            // 外观选择
-//            Optional<InventoryDto.DescriptionsDTOX.TagsDTO> exterior = item.getTags().stream().filter(i -> i.getCategory().equals("Exterior")).findFirst();
-//            if (exterior.isPresent()) {
-//                InventoryDto.DescriptionsDTOX.TagsDTO tagsDTO = exterior.get();
-//                invDescDO.setSelExterior(tagsDTO.getInternalName());
-//            }
-//            invDescDOList.add(invDescDO);
-//        }
-////        // 为空  批量插入 desc
-////        if((invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>().eq(InvDescDO::getSteamId, invDescDOList.get(0).getSteamId()))).isEmpty()){
-////            invDescMapper.insertBatch(invDescDOList);
-////        }
-//        // 插入desc
-//
-//        invDescMapper.insertBatch(invDescDOList);
-//        List<InvDescDO> invDescIdList = new ArrayList<>();
-//        // 给inv表绑定descID
-//        for(InvDO item : invDOList){
-//            List<InvDescDO> invDescIDList = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
-//                    .eq(InvDescDO::getInstanceid, item.getInstanceid())
-//                    .eq(InvDescDO::getSteamId, item.getSteamId())
-//                    .eq(InvDescDO::getClassid, item.getClassid()));
-//            InvDO invDescId = new InvDO();
-//            invDescId.setInstanceid(item.getInstanceid());
-//            invDescId.setClassid(item.getClassid());
-//            invDescId.setInvDescId(invDescIDList.get(0).getId());
-//            invDescId.setSteamId(item.getSteamId());
-//            invMapper.update(invDescId,new LambdaQueryWrapperX<InvDO>()
-//                    .eq(InvDO::getInstanceid, invDescId.getInstanceid())
-//                    .eq(InvDO::getClassid, invDescId.getClassid())
-//                    .eq(InvDO::getSteamId,invDescId.getSteamId()));
-//            invDescIdList.add(invDescIDList.get(0));
-//        }
-//        // 返回每一条 inv 对应的 desc 详情描述信息
-//        return invDescIdList;
-//    }
 
 
     }
