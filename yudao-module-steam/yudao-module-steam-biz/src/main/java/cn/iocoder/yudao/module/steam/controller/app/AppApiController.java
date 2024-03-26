@@ -17,7 +17,9 @@ import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitRespVO;
 import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletMapper;
+import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletTransactionMapper;
 import cn.iocoder.yudao.module.pay.framework.pay.core.WalletPayClient;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
@@ -148,6 +150,9 @@ public class AppApiController {
 
     @Resource
     private UUCommodityMapper uuCommodityMapper;
+
+    @Resource
+    private PayWalletTransactionMapper payWalletTransactionMapper;
 
     @Resource
     private ObjectMapper objectMapper;
@@ -491,7 +496,11 @@ public class AppApiController {
                     //  2....资金流水
                     List<PayWalletDO> payWalletDOS = payWalletMapper.selectList(new LambdaQueryWrapperX<PayWalletDO>()
                             .eq(PayWalletDO::getUserId, userId));
-                    result = JSON.toJSONString(payWalletDOS);
+
+                    List<PayWalletTransactionDO> payWalletTransactionDOS = payWalletTransactionMapper.selectList(new LambdaQueryWrapperX<PayWalletTransactionDO>()
+                            .eq(PayWalletTransactionDO::getWalletId, payWalletDOS.get(0).getId()));
+
+                    result = JSON.toJSONString(payWalletTransactionDOS);
                     break;
                 default:
                     throw new ServiceException(ErrorCodeConstants.YOUYOU_DETAILS_NOT_EXISTS);
