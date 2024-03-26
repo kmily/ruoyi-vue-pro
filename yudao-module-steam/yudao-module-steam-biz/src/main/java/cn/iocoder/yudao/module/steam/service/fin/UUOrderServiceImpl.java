@@ -92,8 +92,6 @@ public class UUOrderServiceImpl implements UUOrderService {
      *
      * 从 [支付管理 -> 应用信息] 里添加
      */
-    private static final Long PAY_APP_ID = 11L;
-    private static final Long PAY_WITHDRAWAL_APP_ID = 12L;
     private static final Long UU_CASH_ACCOUNT_ID = 250L;//UU收款账号ID
     /**
      * 支付单流水的 no 前缀
@@ -144,9 +142,6 @@ public class UUOrderServiceImpl implements UUOrderService {
     public void setYouyouCommodityService(YouyouCommodityService youyouCommodityService) {
         this.youyouCommodityService = youyouCommodityService;
     }
-
-    @Resource
-    private BindUserMapper bindUserMapper;
 
     /**
      * 方法只要用于查询，
@@ -202,19 +197,7 @@ public class UUOrderServiceImpl implements UUOrderService {
                 .setPayAmount(bigDecimal.multiply(new BigDecimal("100")).intValue());
         validateInvOrderCanCreate(youyouOrderDO);
         youyouOrderMapper.insert(youyouOrderDO);
-//        // 2.1 创建支付单
-//        Long payOrderId = payOrderApi.createOrder(new PayOrderCreateReqDTO()
-//                .setAppId(PAY_APP_ID).setUserIp(getClientIP()) // 支付应用
-//                .setMerchantOrderId(youyouOrderDO.getId().toString()) // 业务的订单编号
-//                .setSubject("购买").setBody("出售编号："+reqVo.getCommodityId()).setPrice(youyouOrderDO.getPayAmount()) // 价格信息
-//                .setExpireTime(addTime(Duration.ofHours(2L)))); // 支付的过期时间
-//        youyouOrderDO.setPayOrderId(payOrderId);
-//        // 2.2 更新支付单到 demo 订单
-//        youyouOrderMapper.updateById(new YouyouOrderDO().setId(youyouOrderDO.getId())
-//                .setPayOrderId(payOrderId));
         YouyouCommodityDO youyouCommodityDO = UUCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
-//        //更新库存的标识
-//        youyouCommodityDO.setTransferStatus(InvTransferStatusEnum.INORDER.getStatus());
         UUCommodityMapper.updateById(new YouyouCommodityDO().setId(youyouCommodityDO.getId()).setTransferStatus(InvTransferStatusEnum.INORDER.getStatus()));
         return youyouOrderDO;
     }
@@ -244,16 +227,16 @@ public class UUOrderServiceImpl implements UUOrderService {
         youyouOrderMapper.updateById(new YouyouOrderDO().setId(uuOrder.getId()).setPayPayRet(JacksonUtils.writeValueAsString(payWalletTransactionDOS)).setPayStatus(true)
                 .setPayOrderStatus(PayOrderStatusEnum.SUCCESS.getStatus()));
         YouyouOrderDO uuOrder1 = getUUOrder(loginUser, queryOrderReqVo);
-//        try{
-            YouPingOrder youPingOrder = uploadYY(uuOrder1);
-            //回写数据表
-            youyouOrderMapper.updateById(new YouyouOrderDO().setId(uuOrder1.getId()).
-                    setUuOrderNo(youPingOrder.getOrderNo())
-                    .setUuMerchantOrderNo(youPingOrder.getMerchantOrderNo())
-                    .setUuShippingMode(youPingOrder.getShippingMode())
-                    .setUuOrderStatus(youPingOrder.getOrderStatus())
-                    .setPayOrderStatus(PayOrderStatusEnum.SUCCESS.getStatus())
-            );
+        YouPingOrder youPingOrder = uploadYY(uuOrder1);
+        youyouOrderMapper.updateById(new YouyouOrderDO().setId(uuOrder1.getId()).
+                setUuOrderNo(youPingOrder.getOrderNo())
+                .setUuMerchantOrderNo(youPingOrder.getMerchantOrderNo())
+                .setUuShippingMode(youPingOrder.getShippingMode())
+                .setUuOrderStatus(youPingOrder.getOrderStatus())
+                .setPayOrderStatus(PayOrderStatusEnum.SUCCESS.getStatus())
+                .setPayStatus(true)
+                .setPayTime(LocalDateTime.now())
+        );
         YouyouOrderDO uuOrder2 = getUUOrder(loginUser, queryOrderReqVo);
         return uuOrder2;
     }
@@ -330,14 +313,13 @@ public class UUOrderServiceImpl implements UUOrderService {
             throw exception(OpenApiCode.ERR_5214);
         }
         //新的采购服务费标准为收取开放平台采购成交订单金额的5%，单笔采购服务费最多收取500元。本次调整自2024年3月11日10时起生效。
-        BigDecimal commodityAmount = new BigDecimal(youyouCommodityDO.getCommodityPrice());
-        youyouOrderDO.setCommodityAmount(commodityAmount.multiply(new BigDecimal("100")).intValue());
-        BigDecimal totalAmount = commodityAmount.multiply(new BigDecimal("105"));
-        if(totalAmount.subtract(commodityAmount).intValue()<50000){
-            youyouOrderDO.setPayAmount(totalAmount.intValue());
-            youyouOrderDO.setServiceFee(totalAmount.subtract(commodityAmount).intValue());
+        BigDecimal commodityAmount = new BigDecimal(youyouCommodityDO.getCommodityPrice()).multiply(new BigDecimal("100"));
+        youyouOrderDO.setCommodityAmount(commodityAmount.intValue());
+        BigDecimal serviceFee = commodityAmount.multiply(new BigDecimal("5")).divide(new BigDecimal("100"));
+        if(serviceFee.intValue()<50000){
+            youyouOrderDO.setPayAmount(commodityAmount.add(serviceFee).intValue());
+            youyouOrderDO.setServiceFee(serviceFee.intValue());
             youyouOrderDO.setServiceFeeRate("5");
-            youyouOrderDO.setServiceFee(totalAmount.subtract(commodityAmount).intValue());
         }else{
             youyouOrderDO.setPayAmount(commodityAmount.add(new BigDecimal("50000")).intValue());
             youyouOrderDO.setServiceFeeRate("5");
@@ -367,19 +349,6 @@ public class UUOrderServiceImpl implements UUOrderService {
         if (youyouOrderDO.getPayStatus()) {
             throw exception(ErrorCodeConstants.UU_GOODS_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
-//        //检查用户steamID是否正确只检查bindUser
-//        Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
-//                .eq(BindUserDO::getUserId, invOrderDO.getUserId())
-//                .eq(BindUserDO::getUserType, invOrderDO.getUserType())
-//                .eq(BindUserDO::getSteamId, invOrderDO.getSteamId())
-//        ).stream().findFirst();
-//        if(!first.isPresent()){
-//            throw exception(ErrorCodeConstants.INVORDER_BIND_STEAM_EXCEPT);
-//        }
-//        BindUserDO bindUserDO = first.get();
-//        if(Objects.isNull(bindUserDO.getSteamPassword())){
-//            throw exception(ErrorCodeConstants.INVORDER_BIND_STEAM_EXCEPT);
-//        }
         return youyouOrderDO;
     }
     @Override

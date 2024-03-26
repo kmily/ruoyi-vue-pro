@@ -412,20 +412,6 @@ public class AppApiController {
                 YouyouOrderDO youyouOrderDO = uUOrderService.payInvOrder(loginUser, invOrder.getId());
 
 
-//                //付款
-//                AppPayOrderSubmitReqVO reqVO=new AppPayOrderSubmitReqVO();
-//                reqVO.setChannelCode(PayChannelEnum.WALLET.getCode());
-//                reqVO.setId(invOrder.getPayOrderId());
-//                if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
-//                    Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
-//                            Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
-//                    channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(devAccount.getUserId()));
-//                    channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(devAccount.getUserType()));
-//                    reqVO.setChannelExtras(channelExtras);
-//                }
-//                // 2. 提交支付
-//                PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, ServletUtils.getClientIP());
-//                return ApiResult.success(PayOrderConvert.INSTANCE.convert3(respVO));
 
 
                 CreateByTemplateRespVo ret=new CreateByTemplateRespVo();
