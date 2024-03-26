@@ -102,7 +102,7 @@ public class AppWalletController {
     public CommonResult<PageResult<SellingDoList>> getSellOrderWithPage(@Valid InvOrderPageReqVO reqVo) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         Page<InvOrderDO> page = new Page<>(reqVo.getPageNo(), reqVo.getPageSize());
-        PageResult<SellingDoList> invOrderWithPage = invOrderExtService.getSellOrderWithPage(page,loginUser);
+        PageResult<SellingDoList> invOrderWithPage = invOrderExtService.getSellOrderWithPage(reqVo, page,loginUser);
         return CommonResult.success(invOrderWithPage);
     }
 
