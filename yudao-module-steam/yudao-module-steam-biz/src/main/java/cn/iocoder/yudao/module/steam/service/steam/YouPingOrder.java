@@ -8,100 +8,54 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class YouPingOrder implements Serializable {
 
-    @JsonProperty("code")
-    private Integer code;
-    @JsonProperty("msg")
-    private String msg;
-    @JsonProperty("timestamp")
-    private Long timestamp;
-    @JsonProperty("data")
-    private DataDTO data;
+    @JsonProperty("merchantOrderNo")
+    private String merchantOrderNo;
+    @JsonProperty("orderNo")
+    private String orderNo;
+    @JsonProperty("payAmount")
+    private Double payAmount;
+    @JsonProperty("orderStatus")
+    private Integer orderStatus;
+    @JsonProperty("ShippingMode")
+    private Integer shippingMode;
 
-    public Integer getCode() {
-        return code;
+    public String getMerchantOrderNo() {
+        return merchantOrderNo;
     }
 
-    public void setCode(Integer code) {
-        this.code = code;
+    public void setMerchantOrderNo(String merchantOrderNo) {
+        this.merchantOrderNo = merchantOrderNo;
     }
 
-    public String getMsg() {
-        return msg;
+    public String getOrderNo() {
+        return orderNo;
     }
 
-    public void setMsg(String msg) {
-        this.msg = msg;
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
     }
 
-    public Long getTimestamp() {
-        return timestamp;
+    public Double getPayAmount() {
+        return payAmount;
     }
 
-    public void setTimestamp(Long timestamp) {
-        this.timestamp = timestamp;
+    public void setPayAmount(Double payAmount) {
+        this.payAmount = payAmount;
     }
 
-    public DataDTO getData() {
-        return data;
+    public Integer getOrderStatus() {
+        return orderStatus;
     }
 
-    public void setData(DataDTO data) {
-        this.data = data;
+    public void setOrderStatus(Integer orderStatus) {
+        this.orderStatus = orderStatus;
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class DataDTO {
-        @JsonProperty("merchantOrderNo")
-        private String merchantOrderNo;
-        @JsonProperty("orderNo")
-        private String orderNo;
-        @JsonProperty("payAmount")
-        private Double payAmount;
-        @JsonProperty("orderStatus")
-        private Integer orderStatus;
-        @JsonProperty("ShippingMode")
-        private Integer shippingMode;
+    public Integer getShippingMode() {
+        return shippingMode;
+    }
 
-
-
-        public String getMerchantOrderNo() {
-            return merchantOrderNo;
-        }
-
-        public void setMerchantOrderNo(String merchantOrderNo) {
-            this.merchantOrderNo = merchantOrderNo;
-        }
-
-        public String getOrderNo() {
-            return orderNo;
-        }
-
-        public void setOrderNo(String orderNo) {
-            this.orderNo = orderNo;
-        }
-
-        public Double getPayAmount() {
-            return payAmount;
-        }
-
-        public void setPayAmount(Double payAmount) {
-            this.payAmount = payAmount;
-        }
-
-        public Integer getOrderStatus() {
-            return orderStatus;
-        }
-
-        public void setOrderStatus(Integer orderStatus) {
-            this.orderStatus = orderStatus;
-        }
-
-        public Integer getShippingMode() {
-            return shippingMode;
-        }
-
-        public void setShippingMode(Integer shippingMode) {
-            this.shippingMode = shippingMode;
-        }
+    public void setShippingMode(Integer shippingMode) {
+        this.shippingMode = shippingMode;
     }
 }

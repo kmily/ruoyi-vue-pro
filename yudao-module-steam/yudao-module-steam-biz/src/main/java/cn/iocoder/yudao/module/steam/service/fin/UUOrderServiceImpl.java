@@ -246,46 +246,15 @@ public class UUOrderServiceImpl implements UUOrderService {
         YouyouOrderDO uuOrder1 = getUUOrder(loginUser, queryOrderReqVo);
 //        try{
             YouPingOrder youPingOrder = uploadYY(uuOrder1);
-            if(youPingOrder.getCode().intValue()==0){
-                //回写数据表
-                youyouOrderMapper.updateById(new YouyouOrderDO().setId(uuOrder1.getId()).
-                        setUuOrderNo(youPingOrder.getData().getOrderNo())
-                        .setUuMerchantOrderNo(youPingOrder.getData().getMerchantOrderNo())
-                        .setUuShippingMode(youPingOrder.getData().getShippingMode())
-                        .setUuOrderStatus(youPingOrder.getData().getOrderStatus())
-                        .setPayOrderStatus(PayOrderStatusEnum.SUCCESS.getStatus())
-                );
-            }else{
-                throw new ServiceException(youPingOrder.getCode(),youPingOrder.getMsg());
-            }
+            //回写数据表
+            youyouOrderMapper.updateById(new YouyouOrderDO().setId(uuOrder1.getId()).
+                    setUuOrderNo(youPingOrder.getOrderNo())
+                    .setUuMerchantOrderNo(youPingOrder.getMerchantOrderNo())
+                    .setUuShippingMode(youPingOrder.getShippingMode())
+                    .setUuOrderStatus(youPingOrder.getOrderStatus())
+                    .setPayOrderStatus(PayOrderStatusEnum.SUCCESS.getStatus())
+            );
         YouyouOrderDO uuOrder2 = getUUOrder(loginUser, queryOrderReqVo);
-//            if(youPingOrder.getCode().intValue()==0){
-//                //获取专家钱包并进行打款
-//                PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(youyouOrderDO.getSellUserId(), youyouOrderDO.getSellUserType());
-//                payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(youyouOrderDO.getId()),
-//                        PayWalletBizTypeEnum.STEAM_CASH, youyouOrderDO.getPayAmount());
-//                youyouOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
-//                youyouOrderMapper.updateById(youyouOrderDO);
-//            }else{
-//                throw new ServiceException(-1,"发货失败原因"+youPingOrder.getMsg());
-//            }
-
-
-//        }catch (ServiceException e){
-//            log.error("发货失败，自动退款单号{}",uuOrder1);
-//            DevAccountUtils.tenantExecute(1L,()->{
-//                if(Objects.nonNull(youyouOrderDO)){
-//                    LoginUser loginUser=new LoginUser();
-//                    loginUser.setId(youyouOrderDO.getBuyUserId());
-//                    loginUser.setUserType(youyouOrderDO.getBuyUserType());
-//                    OrderCancelVo orderCancelVo=new OrderCancelVo();
-//                    orderCancelVo.setOrderNo(youyouOrderDO.getOrderNo());
-//                    refundInvOrder(loginUser,orderCancelVo, ServletUtils.getClientIP());
-//                }
-//                return "";
-//            });
-//        }
-
         return uuOrder2;
     }
 
@@ -585,16 +554,14 @@ public class UUOrderServiceImpl implements UUOrderService {
         }
         try{
             YouPingOrder youPingOrder = uploadYY(youyouOrderDO);
-            if(youPingOrder.getCode().intValue()==0){
+
                 //获取专家钱包并进行打款
                 PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(youyouOrderDO.getSellUserId(), youyouOrderDO.getSellUserType());
                 payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(youyouOrderDO.getId()),
                         PayWalletBizTypeEnum.STEAM_CASH, youyouOrderDO.getPayAmount());
                 youyouOrderDO.setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus());
                 youyouOrderMapper.updateById(youyouOrderDO);
-            }else{
-                throw new ServiceException(-1,"发货失败原因"+youPingOrder.getMsg());
-            }
+
 
 
         }catch (ServiceException e){
