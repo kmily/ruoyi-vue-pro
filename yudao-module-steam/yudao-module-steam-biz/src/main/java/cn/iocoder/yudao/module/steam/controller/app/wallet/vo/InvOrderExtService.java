@@ -40,8 +40,7 @@ public class InvOrderExtService {
                 InvTransferStatusEnum.TransferFINISH.getStatus(),
                 InvTransferStatusEnum.INORDER.getStatus(),
                 InvTransferStatusEnum.TransferERROR.getStatus(),
-                InvTransferStatusEnum.CLOSE.getStatus(),
-                InvTransferStatusEnum.INORDER.getStatus());
+                InvTransferStatusEnum.CLOSE.getStatus());
         List<SellingDoList> sellingDoLists = new ArrayList<>();
 
         // 匹配订单状态
@@ -66,6 +65,7 @@ public class InvOrderExtService {
             sellingDoListTemp.setMerchantNo(invOrderDOTemp.getMerchantNo());
             sellingDoListTemp.setMarketName(invOrderDOTemp.getMarketName());
             sellingDoListTemp.setCreateTime(invOrderDOTemp.getCreateTime());
+            sellingDoListTemp.setOrderStatus(String.valueOf(invOrderDOTemp.getTransferStatus()));
 
             List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
                     .eq(InvPreviewDO::getItemName, invOrderDOTemp.getMarketName()));
