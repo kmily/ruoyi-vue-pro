@@ -441,6 +441,9 @@ public class UUOrderServiceImpl implements UUOrderService {
     @Override
     public OrderInfoResp orderInfo(YouyouOrderDO uuOrder) {
         YouyouCommodityDO youyouCommodity = youyouCommodityService.getYouyouCommodity(Integer.valueOf(uuOrder.getRealCommodityId()));
+        if (youyouCommodity == null){
+            throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
+        }
         Optional<YouyouTemplateDO> first = uuTemplateService.getYouyouTemplatePage(new YouyouTemplatePageReqVO().setTemplateId(youyouCommodity.getTemplateId())).getList().stream().findFirst();
         PayOrderDO payOrder = payOrderService.getOrder(uuOrder.getPayOrderId());
         //买家
@@ -456,6 +459,7 @@ public class UUOrderServiceImpl implements UUOrderService {
         }
 
         OrderInfoResp ret = new OrderInfoResp();
+        ret.setOrderId(uuOrder.getId());
         ret.setOrderNo(uuOrder.getOrderNo());
         ret.setCreateOrderTime(uuOrder.getCreateTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
         if(Objects.nonNull(uuOrder.getPayTime())){
@@ -464,8 +468,6 @@ public class UUOrderServiceImpl implements UUOrderService {
         if(Objects.nonNull(payOrder)){
             ret.setPayEndTime(payOrder.getExpireTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
         }
-
-
         ret.setTradeUrl(uuOrder.getBuyTradeLinks());
         ret.setOrderStatus(uuOrder.getUuOrderStatus());
         if(Objects.nonNull(ret.getOrderStatus())){
@@ -482,8 +484,6 @@ public class UUOrderServiceImpl implements UUOrderService {
         }else{
             ret.setBuyerUserIcon("https://img.zcool.cn/community/01a3865ab91314a8012062e3c38ff6.png@1280w_1l_2o_100sh.png");
         }
-
-
 
         ret.setSellerUserId(uuOrder.getSellUserId());
         ret.setSellerUserName(sellUser.getNickname());
@@ -544,7 +544,10 @@ public class UUOrderServiceImpl implements UUOrderService {
         ret.setProductDetail(productDetailDTO);
         if(Objects.nonNull(uuOrder.getRefundPrice())){
             ret.setReturnAmount(new BigDecimal(uuOrder.getRefundPrice()).divide(new BigDecimal("100")).toString());
-            ret.setCancelOrderTime(uuOrder.getRefundTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
+            if(uuOrder.getRefundTime() != null) {
+                ret.setCancelOrderTime(uuOrder.getRefundTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
+            }
+//            ret.setCancelOrderTime(uuOrder.getRefundTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
         }
         return ret;
     }

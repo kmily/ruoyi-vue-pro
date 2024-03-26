@@ -594,7 +594,7 @@ public class AppApiController {
                 ret.setFailCode(uuOrder.getUuFailCode());
                 ret.setFailReason(uuOrder.getUuFailReason());
                 ret.setTradeOfferLinks(uuOrder.getUuTradeOfferLinks());
-                return ApiResult.success(ret);
+                return ApiResult.success(ret,"成功");
             });
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(), e.getMessage(), QueryOrderStatusResp.class);
@@ -610,7 +610,7 @@ public class AppApiController {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
                 YouyouOrderDO uuOrder = uUOrderService.getUUOrder(loginUser, openApiReqVo.getData());
-                return ApiResult.success(uUOrderService.orderInfo(uuOrder));
+                return ApiResult.success(uUOrderService.orderInfo(uuOrder),"成功");
             });
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(), e.getMessage(), OrderInfoResp.class);
