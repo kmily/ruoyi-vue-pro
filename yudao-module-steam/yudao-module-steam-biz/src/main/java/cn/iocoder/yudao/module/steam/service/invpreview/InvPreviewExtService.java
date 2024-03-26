@@ -245,10 +245,188 @@ public class InvPreviewExtService {
                 c5ItemInfo.setRarityColor("");
             }
 
-            c5ItemInfo.setItemSetName(invDescDO.getSelItemset());
-            c5ItemInfo.setTypeName(invDescDO.getSelType());
-            c5ItemInfo.setWeaponName(invDescDO.getSelWeapon());
+            // 样式
+            Map<String, String> typeMap = new HashMap<>();
+            typeMap.put("knife", "匕首");
+            typeMap.put("rifle", "步枪");
+            typeMap.put("pistol", "手枪");
+            typeMap.put("hands", "手套");
+            typeMap.put("smg", "微型冲锋枪");
+            typeMap.put("shotgun", "霰弹枪");
+            typeMap.put("machinegun", "机枪");
+            typeMap.put("sticker", "印花");
+            typeMap.put("other", "其他");
+            typeMap.put("customplayer", "探员");
 
+            String selType = invDescDO.getSelType();
+
+            if (qualityInfo != null) {
+                c5ItemInfo.setTypeName(typeMap.get(selType));
+                c5ItemInfo.setType(selType);
+                invPreviewDO.setSelType(selType);
+            } else {
+                c5ItemInfo.setTypeName("");
+                c5ItemInfo.setType("");
+            }
+
+            // 收藏品
+            //TODO 收藏品
+            Map<String, String> itemSetMap = new HashMap<>();
+            itemSetMap.put("weaponCollection", "武器收藏品");
+            itemSetMap.put("mapCollection", "地图收藏品");
+
+            String selItemSet = invDescDO.getSelItemset();
+
+            if (qualityInfo != null) {
+                c5ItemInfo.setItemSetName(itemSetMap.get(selItemSet));
+                c5ItemInfo.setItemSet(selItemSet);
+                invPreviewDO.setSelItemset(selItemSet);
+            } else {
+                c5ItemInfo.setItemSetName("");
+                c5ItemInfo.setItemSet("");
+            }
+
+            // 武器
+            Map<String, String> weaponMap = new HashMap<>();
+            weaponMap.put("weapon_knife_butterfly", "蝴蝶刀");
+            weaponMap.put("weapon_knife_karambit", "爪子刀");
+            weaponMap.put("weapon_knife_m9_bayonet", "M9 刺刀");
+            weaponMap.put("weapon_knife_skeleton", "骷髅匕首");
+            weaponMap.put("weapon_bayonet", "刺刀");
+            weaponMap.put("weapon_knife_flip", "折叠刀");
+            weaponMap.put("weapon_knife_stiletto", "短剑");
+            weaponMap.put("weapon_knife_widowmaker", "锯齿爪刀");
+            weaponMap.put("weapon_knife_outdoor", "流浪者匕首");
+            weaponMap.put("weapon_knife_ursus", "熊刀");
+            weaponMap.put("weapon_knife_css", "海报短刀");
+            weaponMap.put("weapon_knife_tactical", "猎杀者匕首");
+            weaponMap.put("weapon_knife_cord", "系绳匕首");
+            weaponMap.put("weapon_knife_canis", "求生匕首");
+            weaponMap.put("weapon_knife_falchion", "弯刀");
+            weaponMap.put("weapon_knife_push", "暗影双匕");
+            weaponMap.put("weapon_knife_survival_bowie", "鲍伊猎刀");
+            weaponMap.put("weapon_knife_gut", "穿肠刀");
+            weaponMap.put("weapon_gypsy_jackknife", "折刀");
+            weaponMap.put("weapon_knife_kukri", "廓尔喀刀");
+
+            weaponMap.put("Sport", "运动手套");
+            weaponMap.put("Specialist", "专业手套");
+            weaponMap.put("Moto", "摩托手套");
+            weaponMap.put("Driver", "驾驶手套");
+            weaponMap.put("Hand", "裹手");
+            weaponMap.put("Broken", "狂牙手套");
+            weaponMap.put("Hydra", "九头蛇手套");
+            weaponMap.put("Bloodhound", "血猎手套");
+
+            weaponMap.put("weapon_ak47", "AK-47");
+            weaponMap.put("weapon_awp", "AWP");
+            weaponMap.put("weapon_m4a1_silencer", "M4A1 消音型");
+            weaponMap.put("weapon_m4a1", "M4A4");
+            weaponMap.put("weapon_galilar", "加利尔 AR");
+            weaponMap.put("weapon_famas", "法玛斯");
+            weaponMap.put("weapon_ssg08", "SSG 08");
+            weaponMap.put("weapon_aug", "AUG");
+            weaponMap.put("weapon_sg556", "SG 553");
+            weaponMap.put("weapon_scar20", "SCAR-20");
+            weaponMap.put("weapon_g3sg1", "G3SG1");
+            weaponMap.put("weapon_deagle", "沙漠之鹰");
+            weaponMap.put("weapon_usp_silencer", "USP 消音版");
+            weaponMap.put("weapon_glock", "格洛克 18 型");
+            weaponMap.put("weapon_tec9", "Tec-9");
+            weaponMap.put("weapon_fiveseven", "FN57");
+            weaponMap.put("weapon_p250", "P250");
+            weaponMap.put("weapon_elite", "双持贝瑞塔");
+            weaponMap.put("weapon_cz75a", "CZ75 自动手枪");
+            weaponMap.put("weapon_revolver", "R8 左轮手枪");
+            weaponMap.put("weapon_hkp2000", "P2000");
+            weaponMap.put("weapon_taser", "电击枪");
+            weaponMap.put("weapon_mp9", "MP9");
+            weaponMap.put("weapon_mac10", "MAC-10");
+            weaponMap.put("weapon_p90", "P90");
+            weaponMap.put("weapon_ump45", "UMP-45");
+            weaponMap.put("weapon_mp7", "MP7");
+            weaponMap.put("weapon_bizon", "PP-野牛");
+            weaponMap.put("weapon_mp5sd", "MP5-SD");
+            weaponMap.put("weapon_mag7", "MAG-7");
+            weaponMap.put("weapon_xm1014", "XM1014");
+            weaponMap.put("weapon_sawedoff", "截短霰弹枪");
+            weaponMap.put("weapon_nova", "新星");
+            weaponMap.put("weapon_negev", "内格夫");
+            weaponMap.put("weapon_m249", "M249");
+
+            weaponMap.put("crate_signature_pack_paris2023_group_players_collection", "23巴黎");
+            weaponMap.put("crate_sticker_pack_community2022_capsule_lootlist", "22里约");
+            weaponMap.put("crate_signature_pack_rio2022_group_players_collection", "10周年");
+            weaponMap.put("crate_sticker_pack_csgo10_capsule_lootlist", "21斯德哥尔摩");
+            weaponMap.put("crate_sticker_pack_stockh2021_challengers_collection", "作战室印花");
+            weaponMap.put("crate_sticker_pack_bf2042_capsule_lootlist", "战地2042");
+            weaponMap.put("crate_signature_pack_antwerp2022_group_players_collection", "22安特卫普");
+            weaponMap.put("crate_sticker_pack_riptide_surfshop_lootlist", "激流冲浪店");
+            weaponMap.put("crate_sticker_pack_op_riptide_capsule_lootlist", "激流大行动");
+            weaponMap.put("crate_sticker_pack_community2021_capsule_lootlist", "2021 社区");
+            weaponMap.put("crate_sticker_pack_poorly_drawn_lootlist", "绘制不佳");
+            weaponMap.put("crate_sticker_pack_rmr2020_challengers_collection", "2020 RMR");
+            weaponMap.put("crate_sticker_pack_broken_fang_lootlist", "狂牙");
+            weaponMap.put("crate_sticker_pack_recoil_lootlist", "压枪印花");
+            weaponMap.put("crate_sticker_pack_warhammer_lootlist", "战锤40k");
+            weaponMap.put("crate_sticker_pack_hlalyx_capsule_lootlist", "半衰期：alyx");
+            weaponMap.put("crate_sticker_pack_halo_capsule_lootlist", "光环");
+            weaponMap.put("crate_sticker_pack_shattered_web_lootlist", "裂网");
+            weaponMap.put("crate_sticker_pack_cs20_capsule_lootlist", "CS20");
+            weaponMap.put("crate_sticker_pack_berlin2019_legends_collection", "19柏林");
+            weaponMap.put("crate_sticker_pack_chicken_capsule_lootlist", "小鸡");
+            weaponMap.put("crate_sticker_pack_feral_predators_capsule_lootlist", "猛兽");
+            weaponMap.put("crate_signature_pack_katowice2019_group_players_collection", "19卡托");
+            weaponMap.put("crate_sticker_pack_skillgroup_capsule_lootlist", "段位印花");
+            weaponMap.put("crate_signature_pack_london2018_group_players_collection", "18伦敦");
+            weaponMap.put("crate_sticker_pack_boston2018_legends_collection", "18波士顿");
+            weaponMap.put("crate_sticker_pack_krakow2017_legends_collection", "17年克拉科夫");
+            weaponMap.put("crate_sticker_pack_atlanta2017_legends_collection", "17年亚特兰大");
+            weaponMap.put("crate_sticker_pack_cologne2016_challengers_collection", "16年科隆");
+            weaponMap.put("crate_signature_pack_columbus2016_group_players_collection", "16年哥伦布");
+            weaponMap.put("crate_sticker_pack_cluj2015_legends_collection", "15年 DreamHack");
+            weaponMap.put("crate_signature_pack_eslcologne2015_group_players_collection", "15科隆");
+            weaponMap.put("crate_sticker_pack_eslkatowice2015_02_collection", "15卡托");
+            weaponMap.put("crate_sticker_pack_dhw2014_02", "14年 DreamHack");
+            weaponMap.put("crate_sticker_pack_cologne2014_02", "14科隆");
+            weaponMap.put("crate_sticker_pack_kat2014_02", "14卡托");
+            weaponMap.put("crate_sticker_pack_comm2018_01_capsule_lootlist", "18年社区");
+            weaponMap.put("crate_sticker_pack01", "1号印花");
+            weaponMap.put("crate_sticker_pack02", "2 号印花");
+            weaponMap.put("crate_sticker_pack_enfu_capsule_lootlist", "Enfu");
+            weaponMap.put("crate_sticker_pack_illuminate_capsule_01_lootlist", "中国风1");
+            weaponMap.put("crate_sticker_pack_illuminate_capsule_02_lootlist", "中国风2");
+            weaponMap.put("crate_sticker_pack_community01", "1 号社区");
+            weaponMap.put("crate_sticker_pack_bestiary_capsule_lootlist", "动物寓言");
+            weaponMap.put("crate_sticker_pack_slid3_capsule_lootlist", "Slid3");
+            weaponMap.put("crate_sticker_pack_sugarface_capsule_lootlist", "糖果脸谱");
+            weaponMap.put("crate_sticker_pack_pinups_capsule_lootlist", "海报女郎");
+            weaponMap.put("crate_sticker_pack_team_roles_capsule_lootlist", "团队定位");
+            weaponMap.put("other_sticker", "其他");
+
+            weaponMap.put("CSGO_Type_WeaponCase", "武器箱");
+            weaponMap.put("CSGO_Type_MusicKit", "音乐盒");
+            weaponMap.put("CSGO_Type_Tool", "工具");
+            weaponMap.put("CSGO_Type_Spray", "涂鸦");
+            weaponMap.put("CSGO_Type_Ticket", "通行证");
+            weaponMap.put("CSGO_Type_Collectible", "收藏品/胸章");
+            weaponMap.put("CSGO_Tool_Patch", "布章");
+            weaponMap.put("CSGO_Tool_GiftTag", "礼物");
+            weaponMap.put("CSGO_Tool_Name_TagTag", "标签");
+            weaponMap.put("customplayer_terrorist", "恐怖分子");
+            weaponMap.put("customplayer_counter_strike", "反恐精英");
+
+
+            String selWeapon = invDescDO.getSelItemset();
+
+            if (qualityInfo != null) {
+                c5ItemInfo.setWeaponName(weaponMap.get(selWeapon));
+                c5ItemInfo.setWeapon(selWeapon);
+                invPreviewDO.setSelWeapon(selWeapon);
+            } else {
+                c5ItemInfo.setWeaponName("");
+                c5ItemInfo.setWeapon("");
+            }
 
             invPreviewDO.setMinPrice(sellingDOOptional.isPresent()?sellingDOOptional.get().getPrice(): -1).setExistInv(total>0)
                     .setAutoQuantity(total.toString())
