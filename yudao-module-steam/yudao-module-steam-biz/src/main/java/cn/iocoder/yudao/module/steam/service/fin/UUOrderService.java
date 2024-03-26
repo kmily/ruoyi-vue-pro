@@ -49,14 +49,6 @@ public interface UUOrderService {
      * @return
      */
 //    PageResult<YouyouOrderDO> getInvOrderPageOrder(YouyouOrderPageReqVO youyouOrderPageReqVO);
-    /**
-    /**
-     * 更新示例订单为已支付
-     *
-     * @param id 编号
-     * @param payOrderId 支付订单号
-     */
-    void updateInvOrderPaid(Long id, Long payOrderId);
 
     /**
      * 发起示例订单的退款
@@ -74,13 +66,6 @@ public interface UUOrderService {
      */
     Integer orderCancel(LoginUser loginUser, OrderCancelVo id, String userIp);
 
-    /**
-     * 更新示例订单为已退款
-     *
-     * @param id 编号
-     * @param payRefundId 退款订单号
-     */
-    void updateInvOrderRefunded(Long id, Long payRefundId);
 
     void processNotify(NotifyReq notifyReq);
 
