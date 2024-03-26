@@ -28,6 +28,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodityDO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodityReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.CommodityList;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUSellingList.QueryUUSellingListReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByIdRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByTemplateRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.*;
@@ -239,6 +240,24 @@ public class AppApiController {
 //    public ApiResult<CommodityList> youyouCommodityList(@RequestBody ApiUUCommodityReqVO reqVo) throws JsonProcessingException {
 //
 //    }
+
+
+    /**
+     * 批量查询在售商品详情
+     *
+     * @return saleTemplateByCategoryResponseList
+     */
+
+
+    @PostMapping("/v1/api/queryTemplateSaleByCategory")
+    @Operation(summary = "查询UU商品列表")
+    public ApiResult<QueryUUSellingListReqVO> queryTemplateSaleByCategory(@RequestBody OpenApiReqVo<Serializable> openApiReqVo) {
+
+
+
+        return null;
+    }
+
 
 
 
