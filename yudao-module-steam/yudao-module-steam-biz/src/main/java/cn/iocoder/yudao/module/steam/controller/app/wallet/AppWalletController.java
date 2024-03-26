@@ -97,13 +97,12 @@ public class AppWalletController {
         PageResult<Io661OrderInfoResp> invOrderWithPage = paySteamOrderService.getInvOrderWithPage(reqVo, loginUser);
         return CommonResult.success(invOrderWithPage);
     }
-    @PostMapping("/getSellOrderWithPage")
+    @GetMapping("/getSellOrderWithPage")
     @Operation(summary = "出售列表")
-    @PreAuthenticated
-    public CommonResult<PageResult<SellingDoList>> getSellOrderWithPage(@Valid @RequestBody InvOrderPageReqVO reqVo) {
+    public CommonResult<PageResult<SellingDoList>> getSellOrderWithPage(@Valid InvOrderPageReqVO reqVo) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         Page<InvOrderDO> page = new Page<>(reqVo.getPageNo(), reqVo.getPageSize());
-        PageResult<SellingDoList> invOrderWithPage = invOrderExtService.getSellOrderWithPage(page,loginUser);
+        PageResult<SellingDoList> invOrderWithPage = invOrderExtService.getSellOrderWithPage(reqVo, page,loginUser);
         return CommonResult.success(invOrderWithPage);
     }
 

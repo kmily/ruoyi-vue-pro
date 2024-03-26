@@ -34,22 +34,30 @@ public class InvOrderExtService {
     @Resource
     private InvPreviewMapper invPreviewMapper;
 
-    public PageResult<SellingDoList> getSellOrderWithPage(Page<InvOrderDO> page, LoginUser loginUser) {
+    public PageResult<SellingDoList> getSellOrderWithPage(InvOrderPageReqVO reqVo, Page<InvOrderDO> page, LoginUser loginUser) {
         // 下单状态
-        List<Integer> statusesToMatch = Arrays.asList(
-                InvTransferStatusEnum.TransferFINISH.getStatus(),
-                InvTransferStatusEnum.INORDER.getStatus(),
-                InvTransferStatusEnum.TransferERROR.getStatus(),
-                InvTransferStatusEnum.CLOSE.getStatus(),
-                InvTransferStatusEnum.INORDER.getStatus());
         List<SellingDoList> sellingDoLists = new ArrayList<>();
-
+        LambdaQueryWrapper<InvOrderDO> invOrderDO;
         // 匹配订单状态
-        LambdaQueryWrapper<InvOrderDO> invOrderDO = new LambdaQueryWrapper<InvOrderDO>()
-                .eq(InvOrderDO::getSellUserId, loginUser.getId())
-                .eq(InvOrderDO::getSellUserType, loginUser.getUserType())
-                .in(InvOrderDO::getTransferStatus, statusesToMatch)
-                .orderByDesc(InvOrderDO::getCreateTime);
+        if(reqVo.getTransferStatus() != null){
+            invOrderDO = new LambdaQueryWrapper<InvOrderDO>()
+                    .eq(InvOrderDO::getSellUserId, loginUser.getId())
+                    .eq(InvOrderDO::getSellUserType, loginUser.getUserType())
+                    .eq(InvOrderDO::getTransferStatus, reqVo.getTransferStatus())
+                    .orderByDesc(InvOrderDO::getCreateTime);
+        }else{
+            List<Integer> statusesToMatch = Arrays.asList(
+                    InvTransferStatusEnum.TransferFINISH.getStatus(),
+                    InvTransferStatusEnum.INORDER.getStatus(),
+                    InvTransferStatusEnum.TransferERROR.getStatus(),
+                    InvTransferStatusEnum.CLOSE.getStatus());
+            invOrderDO = new LambdaQueryWrapper<InvOrderDO>()
+                    .eq(InvOrderDO::getSellUserId, loginUser.getId())
+                    .eq(InvOrderDO::getSellUserType, loginUser.getUserType())
+                    .in(InvOrderDO::getTransferStatus, statusesToMatch)
+                    .orderByDesc(InvOrderDO::getCreateTime);
+        }
+
         // 执行分页查询
         IPage<InvOrderDO> invOrderPage = invOrderMapper.selectPage(page, invOrderDO);
 
@@ -66,6 +74,7 @@ public class InvOrderExtService {
             sellingDoListTemp.setMerchantNo(invOrderDOTemp.getMerchantNo());
             sellingDoListTemp.setMarketName(invOrderDOTemp.getMarketName());
             sellingDoListTemp.setCreateTime(invOrderDOTemp.getCreateTime());
+            sellingDoListTemp.setTransferStatus(invOrderDOTemp.getTransferStatus());
 
             List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
                     .eq(InvPreviewDO::getItemName, invOrderDOTemp.getMarketName()));
