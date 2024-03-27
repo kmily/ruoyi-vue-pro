@@ -31,6 +31,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodi
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodityReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.CommodityList;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUSellingList.QueryUUSellingListReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUTemplate.QueryUUTemplateService;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByIdRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByTemplateRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.*;
@@ -120,6 +121,7 @@ public class AppApiController {
     public void setConfigService(ConfigService configService) {
         this.configService = configService;
     }
+
     @Resource
     private YouyouOrderMapper youyouOrderMapper;
     @Resource
@@ -131,10 +133,12 @@ public class AppApiController {
     private UUOrderService uUOrderService;
     @Resource
     private UUService uuService;
+
     @Autowired
     public void setuUOrderService(UUOrderService uUOrderService) {
         this.uUOrderService = uUOrderService;
     }
+
     @Resource
     private UUNotifyService uuNotifyService;
     @Resource
@@ -150,6 +154,9 @@ public class AppApiController {
 
     @Resource
     private YouyouCommodityService youyouCommodityService;
+
+    @Resource
+    private QueryUUTemplateService queryUUTemplateService;
 
 
     /**
@@ -206,57 +213,14 @@ public class AppApiController {
     @PostMapping("/v1/api/queryTemplateSaleByCategory")
     @Operation(summary = "查询UU商品列表")
     public ApiResult<QueryUUSellingListReqVO> queryTemplateSaleByCategory(@RequestBody YouyouTemplatePageReqVO reqVO) {
-        // 获取分页请求参数
-        int currentPage = reqVO.getPageNo();
-        int pageSize = reqVO.getPageSize();
-
-        // 查询模板分页数据
-        PageResult<YouyouTemplateDO> pageResult = uuTemplateService.getYouyouTemplatePage(reqVO);
-        List<YouyouTemplateDO> youyouTemplateDOS = pageResult.getList();
-        QueryUUSellingListReqVO queryUUSellingListReqVO = new QueryUUSellingListReqVO();
-        List<QueryUUSellingListReqVO.SaleTemplateByCategoryResponseList> saleTemplateByCategoryResponseList = new ArrayList<>();
-
-        // 如果模板列表为空,直接返回成功
-        if (CollectionUtils.isEmpty(youyouTemplateDOS)) {
-            queryUUSellingListReqVO.setSaleTemplateByCategoryResponseList(saleTemplateByCategoryResponseList);
-            return ApiResult.success(queryUUSellingListReqVO, "成功");
+        try {
+            return DevAccountUtils.tenantExecute(1L, () -> {
+                ApiResult<QueryUUSellingListReqVO> queryTemplateSaleByCategory = queryUUTemplateService.queryTemplateSaleByCategory(reqVO);
+                return queryTemplateSaleByCategory;
+            });
+        } catch (ServiceException e) {
+            return ApiResult.error(e.getCode(), e.getMessage(), QueryUUSellingListReqVO.class);
         }
-
-        // 遍历每个模板,计算相关指标并构建响应对象
-        for (YouyouTemplateDO youyouTemplateDO : youyouTemplateDOS) {
-            // 构建响应对象
-            QueryUUSellingListReqVO.SaleTemplateByCategoryResponseList item = new QueryUUSellingListReqVO.SaleTemplateByCategoryResponseList();
-            item.setTemplateId(youyouTemplateDO.getTemplateId());
-            item.setTemplateHashName(youyouTemplateDO.getHashName());
-            item.setTemplateName(youyouTemplateDO.getName());
-            item.setIconUrl(youyouTemplateDO.getIconUrl());
-            item.setExteriorName(youyouTemplateDO.getExteriorName());
-            item.setRarityName(youyouTemplateDO.getRarityName());
-            item.setTypeId(youyouTemplateDO.getTypeId());
-            item.setTypeHashName(youyouTemplateDO.getTypeHashName());
-            item.setWeaponId(youyouTemplateDO.getWeaponId());
-            item.setWeaponHashName(youyouTemplateDO.getWeaponHashName());
-            item.setMinSellPrice(youyouTemplateDO.getMinSellPrice());
-            item.setFastShippingMinSellPrice(youyouTemplateDO.getFastShippingMinSellPrice());
-            item.setSellNum(youyouTemplateDO.getSellNum());
-
-            saleTemplateByCategoryResponseList.add(item);
-        }
-
-        // 按照 templateId 升序排列
-        saleTemplateByCategoryResponseList.sort(Comparator.comparingInt(QueryUUSellingListReqVO.SaleTemplateByCategoryResponseList::getTemplateId));
-
-        // 计算总页数
-        int totalCount = Math.toIntExact(pageResult.getTotal());
-        int totalPage = (totalCount + pageSize - 1) / pageSize;
-
-        // 设置响应对象属性
-        queryUUSellingListReqVO.setSaleTemplateByCategoryResponseList(saleTemplateByCategoryResponseList);
-        queryUUSellingListReqVO.setCurrentPage(currentPage);
-        queryUUSellingListReqVO.setTotalPage(totalPage);
-        queryUUSellingListReqVO.setNewPageIsHaveContent(saleTemplateByCategoryResponseList.size() > 1);
-
-        return ApiResult.success(queryUUSellingListReqVO, "成功");
     }
 
     /**
@@ -283,8 +247,10 @@ public class AppApiController {
         )));
         return ret;
     }
+
     /**
      * api余额接口
+     *
      * @return
      */
     @PostMapping("v1/api/getAssetsInfo")
@@ -295,17 +261,19 @@ public class AppApiController {
             return DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 PayWalletDO wallet = payWalletService.getOrCreateWallet(devAccount.getUserId(), devAccount.getUserType());
-                ApiPayWalletRespVO apiPayWalletRespVO=new ApiPayWalletRespVO();
-                apiPayWalletRespVO.setAmount(new BigDecimal(wallet.getBalance().toString()).divide(new BigDecimal("100"),2, RoundingMode.HALF_UP));
+                ApiPayWalletRespVO apiPayWalletRespVO = new ApiPayWalletRespVO();
+                apiPayWalletRespVO.setAmount(new BigDecimal(wallet.getBalance().toString()).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP));
                 apiPayWalletRespVO.setUserId(devAccount.getUserId().intValue());
                 return ApiResult.success(apiPayWalletRespVO);
             });
         } catch (ServiceException e) {
-            return ApiResult.error(e.getCode(),  e.getMessage(),ApiPayWalletRespVO.class);
+            return ApiResult.error(e.getCode(), e.getMessage(), ApiPayWalletRespVO.class);
         }
     }
+
     /**
      * 检查交易链接
+     *
      * @return
      */
     @PostMapping("v1/api/checkTradeUrl")
@@ -321,22 +289,22 @@ public class AppApiController {
                 ConfigDO configPasswd = configService.getConfigByKey("steam.bot.passwd");
 
                 bindUserDO.setSteamPassword(configPasswd.getValue());
-                SteamMaFile steamMaFile = JacksonUtils.readValue(Objects.requireNonNull(configMa.getValue(),()->""), SteamMaFile.class);
+                SteamMaFile steamMaFile = JacksonUtils.readValue(Objects.requireNonNull(configMa.getValue(), () -> ""), SteamMaFile.class);
                 bindUserDO.setMaFile(steamMaFile);
-                if(Objects.nonNull(configCookie)){
-                    bindUserDO.setLoginCookie(Objects.requireNonNull(configCookie.getValue(),()->"登录密码不能为空"));
+                if (Objects.nonNull(configCookie)) {
+                    bindUserDO.setLoginCookie(Objects.requireNonNull(configCookie.getValue(), () -> "登录密码不能为空"));
                 }
-                SteamWeb steamWeb=new SteamWeb(configService);
-                if(steamWeb.checkLogin(bindUserDO)){
-                    ConfigSaveReqVO configSaveReqVO=new ConfigSaveReqVO();
-                    if(Objects.isNull(configCookie)){
+                SteamWeb steamWeb = new SteamWeb(configService);
+                if (steamWeb.checkLogin(bindUserDO)) {
+                    ConfigSaveReqVO configSaveReqVO = new ConfigSaveReqVO();
+                    if (Objects.isNull(configCookie)) {
                         configSaveReqVO.setCategory("steam.bot");
                         configSaveReqVO.setName("steam.bot 机器人cookie");
                         configSaveReqVO.setKey("steam.bot.cookie");
                         configSaveReqVO.setValue(steamWeb.getCookieString());
                         configSaveReqVO.setVisible(false);
                         configService.createConfig(configSaveReqVO);
-                    }else{
+                    } else {
                         configSaveReqVO.setId(configCookie.getId());
                         configSaveReqVO.setCategory("steam.bot");
                         configSaveReqVO.setName("steam.bot 机器人cookie");
@@ -353,18 +321,20 @@ public class AppApiController {
                 Map<String, String> stringStringMap = steamWeb.parseQuery(query);
                 String partner = steamWeb.toCommunityID(stringStringMap.get("partner"));
 
-                ApiCheckTradeUrlReSpVo tradeUrlReSpVo=new ApiCheckTradeUrlReSpVo();
+                ApiCheckTradeUrlReSpVo tradeUrlReSpVo = new ApiCheckTradeUrlReSpVo();
                 tradeUrlReSpVo.setSteamId(partner);
                 tradeUrlReSpVo.setMsg(tradeUrlStatus.getMessage());
                 tradeUrlReSpVo.setStatus(tradeUrlStatus.getStatus());
                 return ApiResult.success(tradeUrlReSpVo);
             });
         } catch (ServiceException e) {
-            return ApiResult.error(e.getCode(),  e.getMessage(),ApiCheckTradeUrlReSpVo.class);
+            return ApiResult.error(e.getCode(), e.getMessage(), ApiCheckTradeUrlReSpVo.class);
         }
     }
+
     /**
      * 指定商品购买
+     *
      * @return
      */
     @PostMapping("v1/api/byGoodsIdCreateOrder")
@@ -374,31 +344,33 @@ public class AppApiController {
         try {
             return DevAccountUtils.tenantExecute(1L, () -> {
 
-                if(Objects.isNull(openApiReqVo.getData().getCommodityId())){
+                if (Objects.isNull(openApiReqVo.getData().getCommodityId())) {
                     throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
                 }
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
                 YouyouOrderDO invOrder = uUOrderService.createInvOrder(loginUser, openApiReqVo.getData());
-                CreateByIdRespVo ret=new CreateByIdRespVo();
-                try{
+                CreateByIdRespVo ret = new CreateByIdRespVo();
+                try {
                     YouyouOrderDO youyouOrderDO = uUOrderService.payInvOrder(loginUser, invOrder.getId());
-                    ret.setPayAmount(Double.valueOf(youyouOrderDO.getPayAmount()/100));
+                    ret.setPayAmount(Double.valueOf(youyouOrderDO.getPayAmount() / 100));
                     ret.setOrderNo(youyouOrderDO.getOrderNo());
                     ret.setMerchantOrderNo(youyouOrderDO.getMerchantOrderNo());
-                    ret.setOrderStatus(PayOrderStatusRespEnum.isSuccess(youyouOrderDO.getPayOrderStatus())?1:0);
-                }catch (ServiceException e){
+                    ret.setOrderStatus(PayOrderStatusRespEnum.isSuccess(youyouOrderDO.getPayOrderStatus()) ? 1 : 0);
+                } catch (ServiceException e) {
                     uUOrderService.releaseInvOrder(invOrder.getId());
                     throw e;
                 }
                 return ApiResult.success(ret);
             });
         } catch (ServiceException e) {
-            return ApiResult.error(e.getCode(),  e.getMessage(),CreateByIdRespVo.class);
+            return ApiResult.error(e.getCode(), e.getMessage(), CreateByIdRespVo.class);
         }
     }
+
     /**
      * 指定模板购买
+     *
      * @return
      */
     @PostMapping("v1/api/byTemplateCreateOrder")
@@ -407,20 +379,20 @@ public class AppApiController {
     public ApiResult<CreateByTemplateRespVo> byTemplateCreateOrder(@RequestBody OpenApiReqVo<CreateCommodityOrderReqVo> openApiReqVo) {
         try {
             ApiResult<CreateByTemplateRespVo> execute = DevAccountUtils.tenantExecute(1L, () -> {
-                if(Objects.isNull(openApiReqVo.getData().getCommodityHashName()) || Objects.isNull(openApiReqVo.getData().getCommodityTemplateId())){
+                if (Objects.isNull(openApiReqVo.getData().getCommodityHashName()) || Objects.isNull(openApiReqVo.getData().getCommodityTemplateId())) {
                     throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
                 }
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
                 YouyouOrderDO invOrder = uUOrderService.createInvOrder(loginUser, openApiReqVo.getData());
-                CreateByTemplateRespVo ret=new CreateByTemplateRespVo();
-                try{
+                CreateByTemplateRespVo ret = new CreateByTemplateRespVo();
+                try {
                     YouyouOrderDO youyouOrderDO = uUOrderService.payInvOrder(loginUser, invOrder.getId());
-                    ret.setPayAmount(Double.valueOf(youyouOrderDO.getPayAmount()/100));
+                    ret.setPayAmount(Double.valueOf(youyouOrderDO.getPayAmount() / 100));
                     ret.setOrderNo(youyouOrderDO.getOrderNo());
                     ret.setMerchantOrderNo(youyouOrderDO.getMerchantOrderNo());
-                    ret.setOrderStatus(PayOrderStatusRespEnum.isSuccess(youyouOrderDO.getPayOrderStatus())?1:0);
-                }catch (ServiceException e){
+                    ret.setOrderStatus(PayOrderStatusRespEnum.isSuccess(youyouOrderDO.getPayOrderStatus()) ? 1 : 0);
+                } catch (ServiceException e) {
                     uUOrderService.releaseInvOrder(invOrder.getId());
                     throw e;
                 }
@@ -428,9 +400,10 @@ public class AppApiController {
             });
             return execute;
         } catch (ServiceException e) {
-            return ApiResult.error(e.getCode(),  e.getMessage(),CreateByTemplateRespVo.class);
+            return ApiResult.error(e.getCode(), e.getMessage(), CreateByTemplateRespVo.class);
         }
     }
+
     /**
      * 申请查询明细
      *
@@ -528,7 +501,6 @@ public class AppApiController {
     }
 
 
-
     /**
      * 买家订单相关接口
      */
@@ -540,7 +512,7 @@ public class AppApiController {
             return DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
-                Integer integer = uUOrderService.orderCancel(loginUser, openApiReqVo.getData(), getClientIP(),"买家调用接口取消");
+                Integer integer = uUOrderService.orderCancel(loginUser, openApiReqVo.getData(), getClientIP(), "买家调用接口取消");
                 OrderCancelResp ret = new OrderCancelResp();
                 ret.setResult(integer);
                 return ApiResult.success(ret);
@@ -567,17 +539,17 @@ public class AppApiController {
                 ret.setTradeOfferId(uuOrder.getUuTradeOfferId());
                 ret.setTradeOfferLinks(uuOrder.getUuTradeOfferLinks());
                 ret.setBigStatus(uuOrder.getUuOrderStatus());
-                if(Objects.nonNull(ret.getBigStatus())){
+                if (Objects.nonNull(ret.getBigStatus())) {
                     ret.setBigStatusMsg(UUOrderStatus.valueOf(ret.getBigStatus()).getMsg());
                 }
                 ret.setSmallStatus(uuOrder.getUuOrderSubStatus());
-                if(Objects.nonNull(ret.getSmallStatus())){
+                if (Objects.nonNull(ret.getSmallStatus())) {
                     ret.setSmallStatusMsg(UUOrderSubStatus.valueOf(ret.getSmallStatus()).getMsg());
                 }
                 ret.setFailCode(uuOrder.getUuFailCode());
                 ret.setFailReason(uuOrder.getUuFailReason());
                 ret.setTradeOfferLinks(uuOrder.getUuTradeOfferLinks());
-                return ApiResult.success(ret,"成功");
+                return ApiResult.success(ret, "成功");
             });
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(), e.getMessage(), QueryOrderStatusResp.class);
@@ -593,7 +565,7 @@ public class AppApiController {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
                 YouyouOrderDO uuOrder = uUOrderService.getUUOrder(loginUser, openApiReqVo.getData());
-                return ApiResult.success(uUOrderService.orderInfo(uuOrder),"成功");
+                return ApiResult.success(uUOrderService.orderInfo(uuOrder), "成功");
             });
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(), e.getMessage(), OrderInfoResp.class);
