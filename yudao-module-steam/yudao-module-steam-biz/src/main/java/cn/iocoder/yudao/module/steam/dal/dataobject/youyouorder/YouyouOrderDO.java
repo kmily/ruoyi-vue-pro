@@ -71,10 +71,6 @@ public class YouyouOrderDO extends BaseDO {
      */
     private String orderNo;
     /**
-     * 商户订单号
-     */
-    private String merchantNo;
-    /**
      * 商品模版ID
      */
     private String commodityTemplateId;
