@@ -438,16 +438,17 @@ public class AppApiController {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
                 YouyouOrderDO invOrder = uUOrderService.createInvOrder(loginUser, openApiReqVo.getData());
-
-                YouyouOrderDO youyouOrderDO = uUOrderService.payInvOrder(loginUser, invOrder.getId());
-
-
-
                 CreateByIdRespVo ret=new CreateByIdRespVo();
-                ret.setPayAmount(Double.valueOf(youyouOrderDO.getPayAmount()/100));
-                ret.setOrderNo(youyouOrderDO.getOrderNo());
-                ret.setMerchantOrderNo(youyouOrderDO.getMerchantOrderNo());
-                ret.setOrderStatus(PayOrderStatusRespEnum.isSuccess(youyouOrderDO.getPayOrderStatus())?1:0);
+                try{
+                    YouyouOrderDO youyouOrderDO = uUOrderService.payInvOrder(loginUser, invOrder.getId());
+                    ret.setPayAmount(Double.valueOf(youyouOrderDO.getPayAmount()/100));
+                    ret.setOrderNo(youyouOrderDO.getOrderNo());
+                    ret.setMerchantOrderNo(youyouOrderDO.getMerchantOrderNo());
+                    ret.setOrderStatus(PayOrderStatusRespEnum.isSuccess(youyouOrderDO.getPayOrderStatus())?1:0);
+                }catch (ServiceException e){
+                    uUOrderService.releaseInvOrder(invOrder.getId());
+                    throw e;
+                }
                 return ApiResult.success(ret);
             });
         } catch (ServiceException e) {
@@ -597,11 +598,10 @@ public class AppApiController {
             return DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
-                Integer integer = uUOrderService.refundInvOrder(loginUser, openApiReqVo.getData(), getClientIP());
+                Integer integer = uUOrderService.orderCancel(loginUser, openApiReqVo.getData(), getClientIP(),"买家调用接口取消");
                 OrderCancelResp ret = new OrderCancelResp();
-                /*ret.setResult(integer);
-                return ApiResult.success(ret);*/
-                return null;
+                ret.setResult(integer);
+                return ApiResult.success(ret);
             });
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(), e.getMessage(), OrderCancelResp.class);

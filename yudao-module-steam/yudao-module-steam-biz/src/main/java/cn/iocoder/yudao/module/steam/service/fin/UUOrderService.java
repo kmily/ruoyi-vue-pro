@@ -65,11 +65,13 @@ public interface UUOrderService {
 
     /**
      * 买家取消订单
-     *
-     * @param id 编号
-     * @param userIp 用户编号
+     * @param loginUser
+     * @param id
+     * @param userIp
+     * @param cancelReason 取消原因
+     * @return
      */
-    Integer orderCancel(LoginUser loginUser, OrderCancelVo id, String userIp);
+    Integer orderCancel(LoginUser loginUser, OrderCancelVo id, String userIp,String cancelReason);
 
 
     void processNotify(NotifyReq notifyReq);

@@ -122,6 +122,11 @@ public class YouyouOrderDO extends BaseDO {
      * 订单支付状态
      */
     private Integer payOrderStatus;
+
+    /**
+     * 取消原因
+     */
+    private String cancelReason;
     /**
      * 提现手续费收款人类型
      */
