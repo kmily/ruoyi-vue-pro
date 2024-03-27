@@ -16,6 +16,8 @@ public class OrderInfoResp {
     private Long orderId;
     @JsonProperty("orderNo")
     private String orderNo;
+    @JsonProperty("shippingMode")
+    private Integer shippingMode;
     @JsonProperty("processStatus")
     private Integer processStatus;
     @JsonProperty("orderStatus")
@@ -48,10 +50,20 @@ public class OrderInfoResp {
     private Long paySuccessTime;
     @JsonProperty("payEndTime")
     private Long payEndTime;
+    @JsonProperty("sendOfferSuccessTime")
+    private Long sendOfferSuccessTime;
     @JsonProperty("sendOfferEndTime")
     private Long sendOfferEndTime;
+    @JsonProperty("confirmOfferEndTime")
+    private Long confirmOfferEndTime;
+    @JsonProperty("pendingEndTime")
+    private Long pendingEndTime;
+    @JsonProperty("delayedTransferEndTime")
+    private Long delayedTransferEndTime;
     @JsonProperty("recordTime")
     private Long recordTime;
+    @JsonProperty("price")
+    private Long price;
     @JsonProperty("discountAmount")
     private String discountAmount;
     @JsonProperty("totalAmount")
@@ -72,10 +84,14 @@ public class OrderInfoResp {
     private String orderSubStatusName;
     @JsonProperty("timeType")
     private Integer timeType;
+    @JsonProperty("time")
+    private String time;
     @JsonProperty("returnAmount")
     private String returnAmount;
     @JsonProperty("serviceFee")
     private String serviceFee;
+    @JsonProperty("serviceFeeRate")
+    private String serviceFeeRate;
     @JsonProperty("commodityAmount")
     private String commodityAmount;
     @JsonProperty("paymentAmount")
@@ -84,8 +100,12 @@ public class OrderInfoResp {
     private Integer buyerSteamRegTime;
     @JsonProperty("sellerSteamRegTime")
     private Integer sellerSteamRegTime;
+    @JsonProperty("tradeOfferId")
+    private Integer tradeOfferId;
     @JsonProperty("cancelOrderTime")
     private Long cancelOrderTime;
+    @JsonProperty("offerSendResult")
+    private Long offerSendResult;
     @JsonProperty("payMethod")
     private Integer payMethod;
     @JsonProperty("steamid")

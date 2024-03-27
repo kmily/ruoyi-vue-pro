@@ -515,24 +515,15 @@ public class UUOrderServiceImpl implements UUOrderService {
         }
 
         OrderInfoResp ret = new OrderInfoResp();
+//        ret.setId()
         ret.setOrderId(uuOrder.getId());
         ret.setOrderNo(uuOrder.getOrderNo());
-        ret.setCreateOrderTime(uuOrder.getCreateTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
-        if(Objects.nonNull(uuOrder.getPayTime())){
-            ret.setPaySuccessTime(uuOrder.getPayTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
-        }
-        if(Objects.nonNull(payOrder)){
-            ret.setPayEndTime(payOrder.getExpireTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
-        }
-        ret.setTradeUrl(uuOrder.getBuyTradeLinks());
+        ret.setShippingMode(uuOrder.getUuShippingMode());
         ret.setOrderStatus(uuOrder.getUuOrderStatus());
-        if(Objects.nonNull(ret.getOrderStatus())){
-            ret.setOrderStatusName(UUOrderStatus.valueOf(ret.getOrderStatus()).getMsg());
-        }
         ret.setOrderSubStatus(uuOrder.getUuOrderSubStatus());
-        if(Objects.nonNull(ret.getOrderSubStatus())){
-            ret.setOrderSubStatusName(UUOrderSubStatus.valueOf(ret.getOrderSubStatus()).getMsg());
-        }
+
+        ret.setOrderType(uuOrder.getUuOrderType());
+        ret.setOrderSubType(uuOrder.getUuOrderSubType());
         ret.setBuyerUserId(uuOrder.getBuyUserId());
         ret.setBuyerUserName(buyUser.getNickname());
         if(StringUtils.hasText(buyUser.getAvatar())){
@@ -540,7 +531,6 @@ public class UUOrderServiceImpl implements UUOrderService {
         }else{
             ret.setBuyerUserIcon("https://img.zcool.cn/community/01a3865ab91314a8012062e3c38ff6.png@1280w_1l_2o_100sh.png");
         }
-
         ret.setSellerUserId(uuOrder.getSellUserId());
         ret.setSellerUserName(sellUser.getNickname());
         if(StringUtils.hasText(sellUser.getAvatar())){
@@ -548,6 +538,50 @@ public class UUOrderServiceImpl implements UUOrderService {
         }else{
             ret.setSellerUserIcon("https://img.zcool.cn/community/01a3865ab91314a8012062e3c38ff6.png@1280w_1l_2o_100sh.png");
         }
+        ret.setCreateOrderTime(uuOrder.getCreateTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
+        if(Objects.nonNull(uuOrder.getPayTime())){
+            ret.setPaySuccessTime(uuOrder.getPayTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
+        }
+        if(Objects.nonNull(payOrder)){
+            ret.setPayEndTime(payOrder.getExpireTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
+        }
+        ret.setFinishOrderTime(null);
+        ret.setPaySuccessTime(null);
+        ret.setPayEndTime(null);
+        ret.setSendOfferSuccessTime(null);
+        ret.setSendOfferEndTime(null);
+        ret.setConfirmOfferEndTime(null);
+        ret.setPendingEndTime(null);
+        ret.setDelayedTransferEndTime(null);
+        ret.setPrice(new BigDecimal(youyouCommodity.getCommodityPrice()).multiply(new BigDecimal("100")).longValue());//TODO 待确认
+        ret.setTotalAmount(String.valueOf(uuOrder.getPayAmount()));
+        ret.setCancelReason(uuOrder.getCancelReason());
+        if(Objects.nonNull(ret.getOrderStatus())){
+            ret.setOrderStatusName(UUOrderStatus.valueOf(ret.getOrderStatus()).getMsg());
+        }
+        if (Objects.nonNull(ret.getOrderStatusName())){
+            String updatedOrderStatusName = ret.getOrderStatusName().replace("-s", "time");
+            ret.setOrderStatusDesc(updatedOrderStatusName);
+        }
+        ret.setOrderStatusColor(null);
+        if(Objects.nonNull(ret.getOrderSubStatus())){
+            ret.setOrderSubStatusName(UUOrderSubStatus.valueOf(ret.getOrderSubStatus()).getMsg());
+        }
+        ret.setTimeType(null);// TODO 待确认
+        ret.setTime(null);// TODO 待确认
+        ret.setReturnAmount(null);// TODO 待确认
+        ret.setServiceFee(uuOrder.getServiceFee().toString());
+        ret.setServiceFeeRate(uuOrder.getServiceFeeRate());
+        ret.setCommodityAmount(youyouCommodity.getCommodityPrice());
+        if(Objects.nonNull(uuOrder.getPayAmount())){
+            ret.setPaymentAmount(new BigDecimal(uuOrder.getPayAmount()).divide(new BigDecimal("100")).toString());
+        }
+        ret.setSellerSteamRegTime(null);// TODO 待确认
+        ret.setTradeOfferId(null);// TODO 待确认
+        ret.setCancelOrderTime(null);// TODO 待确认
+        ret.setOfferSendResult(null);// TODO 待确认
+        ret.setTradeUrl(uuOrder.getBuyTradeLinks());
+
         OrderInfoResp.ProductDetailDTO productDetailDTO = new OrderInfoResp.ProductDetailDTO();
         productDetailDTO.setCommodityId(youyouCommodity.getId());
         productDetailDTO.setCommodityName(youyouCommodity.getCommodityName());
@@ -577,10 +611,7 @@ public class UUOrderServiceImpl implements UUOrderService {
         productDetailDTO.setWeaponHashName(youyouTemplateDO.getWeaponHashName());
         productDetailDTO.setCommodityAbrade(youyouCommodity.getCommodityAbrade());
 
-        ret.setCommodityAmount(youyouCommodity.getCommodityPrice());
-        if(Objects.nonNull(uuOrder.getPayAmount())){
-            ret.setPaymentAmount(new BigDecimal(uuOrder.getPayAmount()).divide(new BigDecimal("100")).toString());
-        }
+
 //        if(Objects.nonNull(uuOrder.getPayChannelCode())){
 //            switch (PayChannelEnum.getByCode(uuOrder.getPayChannelCode())){
 //                case WALLET:
