@@ -43,9 +43,9 @@ public class DevAccountDO extends BaseDO {
      */
     private String apiPublicKey;
     /**
-     * steam用户 ID
+     * 回调地址
      */
-    private String steamId;
+    private String callbackUrl;
     /**
      * 状态
      *

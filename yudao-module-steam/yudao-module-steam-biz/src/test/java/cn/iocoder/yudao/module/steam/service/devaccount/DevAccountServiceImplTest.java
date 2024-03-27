@@ -111,7 +111,7 @@ public class DevAccountServiceImplTest extends BaseDbUnitTest {
        // mock 数据
        DevAccountDO dbDevAccount = randomPojo(DevAccountDO.class, o -> { // 等会查询到
            o.setUserName(null);
-           o.setSteamId(null);
+           o.setCallbackUrl(null);
            o.setStatus(null);
            o.setUserType(null);
        });
@@ -119,7 +119,7 @@ public class DevAccountServiceImplTest extends BaseDbUnitTest {
        // 测试 userName 不匹配
        devAccountMapper.insert(cloneIgnoreId(dbDevAccount, o -> o.setUserName(null)));
        // 测试 steamId 不匹配
-       devAccountMapper.insert(cloneIgnoreId(dbDevAccount, o -> o.setSteamId(null)));
+       devAccountMapper.insert(cloneIgnoreId(dbDevAccount, o -> o.setCallbackUrl(null)));
        // 测试 status 不匹配
        devAccountMapper.insert(cloneIgnoreId(dbDevAccount, o -> o.setStatus(null)));
        // 测试 userType 不匹配
@@ -127,7 +127,7 @@ public class DevAccountServiceImplTest extends BaseDbUnitTest {
        // 准备参数
        DevAccountPageReqVO reqVO = new DevAccountPageReqVO();
        reqVO.setUserName(null);
-       reqVO.setSteamId(null);
+       reqVO.setCallbackUrl(null);
        reqVO.setStatus(null);
        reqVO.setUserType(null);
 
