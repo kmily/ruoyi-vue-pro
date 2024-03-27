@@ -40,17 +40,14 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommod
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoudetails.YouyouDetailsDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
-import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoucommodity.UUCommodityMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoudetails.YouyouDetailsMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.youyoutemplate.UUTemplateMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.UUOrderStatus;
 import cn.iocoder.yudao.module.steam.enums.UUOrderSubStatus;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
-import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
 import cn.iocoder.yudao.module.steam.service.steam.SteamMaFile;
 import cn.iocoder.yudao.module.steam.service.steam.TradeUrlStatus;
@@ -116,54 +113,33 @@ public class AppApiController {
     public void setConfigService(ConfigService configService) {
         this.configService = configService;
     }
-
-    @Resource
-    private BindUserMapper bindUserMapper;
-
     @Resource
     private YouyouOrderMapper youyouOrderMapper;
-
     @Resource
     private PayWalletMapper payWalletMapper;
     @Resource
     private YouyouDetailsMapper youyouDetailsMapper;
     @Resource
     private FileApi fileApi;
-
-    @Resource
-    private PayOrderService payOrderService;
-
     private UUOrderService uUOrderService;
     @Resource
     private UUService uuService;
-
     @Autowired
     public void setuUOrderService(UUOrderService uUOrderService) {
         this.uUOrderService = uUOrderService;
     }
-
-    @Resource
-    private BindUserService bindUserService;
     @Resource
     private UUNotifyService uuNotifyService;
-
-    @Resource
-    private UUCommodityMapper uuCommodityMapper;
-
     @Resource
     private PayWalletTransactionMapper payWalletTransactionMapper;
-
-    @Resource
-    private ObjectMapper objectMapper;
-
-    @Resource
-    private UUTemplateMapper uuTemplateMapper;
-
     @Resource
     private ApiUUCommodeityService apiUUCommodeityService;
 
     @Resource
     private UUTemplateService uuTemplateService;
+
+    @Resource
+    private UUCommodityMapper uuCommodityMapper;
 
 
     /**
@@ -202,8 +178,9 @@ public class AppApiController {
      */
     @PostMapping("/v1/api/batchGetOnSaleCommodityInfo")
     @Operation(summary = "批量查询在售商品价格")
-    public ApiResult<BatchGetCommodity> batchGetOnSaleCommodityInfo(@RequestBody UUBatchGetOnSaleCommodityReqVO reqVo) {
+    public ApiResult<BatchGetCommodity> batchGetOnSaleCommodityInfo(@RequestBody UUBatchGetOnSaleCommodityReqVO reqVo) throws JsonProcessingException {
         ApiResult<BatchGetCommodity> batchGetCommodityApiResult = uuService.batchGetOnSaleCommodity(reqVo);
+        apiUUCommodeityService.insertOnSaleCommodityInfo(batchGetCommodityApiResult);
         return batchGetCommodityApiResult;
     }
 

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo;
 
+import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.*;
 import java.util.*;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -43,9 +44,6 @@ public class YouyouTemplatePageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
-    @Schema(description = "模板ID", example = "1110")
-    private Integer templateId;
-
     @Schema(description = "图片地址", example = "https://www.iocoder.cn")
     private String iconUrl;
 
@@ -58,9 +56,6 @@ public class YouyouTemplatePageReqVO extends PageParam {
     @Schema(description = "模板参考价", example = "25408")
     private String referencePrice;
 
-    @Schema(description = "在售数量")
-    private byte[] sellNum;
-
     @Schema(description = "外观", example = "赵六")
     private String exteriorName;
 
@@ -69,5 +64,12 @@ public class YouyouTemplatePageReqVO extends PageParam {
 
     @Schema(description = "品质", example = "李四")
     private String qualityName;
+
+    @Schema(description = "模板ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "28997")
+    @ExcelProperty("模板ID")
+    private Integer templateId;
+
+    @Schema(description = "在售数量")
+    private String sellNum;
 
 }

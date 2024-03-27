@@ -33,12 +33,6 @@ public class YouyouTemplateSaveReqVO {
     @Schema(description = "武器英文名称", example = "crate_sticker_pack_recoil_lootlist")
     private String weaponHashName;
 
-    @Schema(description = "主键ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "11138")
-    private Integer id;
-
-    @Schema(description = "模板ID", example = "1110")
-    private Integer templateId;
-
     @Schema(description = "图片地址", example = "https://www.iocoder.cn")
     private String iconUrl;
 
@@ -51,9 +45,6 @@ public class YouyouTemplateSaveReqVO {
     @Schema(description = "模板参考价", example = "25408")
     private String referencePrice;
 
-    @Schema(description = "在售数量")
-    private byte[] sellNum;
-
     @Schema(description = "外观", example = "赵六")
     private String exteriorName;
 
@@ -62,5 +53,11 @@ public class YouyouTemplateSaveReqVO {
 
     @Schema(description = "品质", example = "李四")
     private String qualityName;
+
+    @Schema(description = "模板ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "28997")
+    private Integer templateId;
+
+    @Schema(description = "在售数量")
+    private String sellNum;
 
 }

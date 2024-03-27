@@ -37,7 +37,7 @@ public interface YouyouTemplateMapper extends BaseMapperX<YouyouTemplateDO> {
                 .likeIfPresent(YouyouTemplateDO::getExteriorName, reqVO.getExteriorName())
                 .likeIfPresent(YouyouTemplateDO::getRarityName, reqVO.getRarityName())
                 .likeIfPresent(YouyouTemplateDO::getQualityName, reqVO.getQualityName())
-                .orderByDesc(YouyouTemplateDO::getId));
+);
     }
 
 }

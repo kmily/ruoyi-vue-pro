@@ -55,15 +55,6 @@ public class YouyouTemplateDO extends BaseDO {
      */
     private String weaponHashName;
     /**
-     * 主键ID
-     */
-    @TableId
-    private Integer id;
-    /**
-     * 模板ID
-     */
-    private Integer templateId;
-    /**
      * 图片地址
      */
     private String iconUrl;
@@ -80,10 +71,6 @@ public class YouyouTemplateDO extends BaseDO {
      */
     private String referencePrice;
     /**
-     * 在售数量
-     */
-    private byte[] sellNum;
-    /**
      * 外观
      */
     private String exteriorName;
@@ -95,5 +82,14 @@ public class YouyouTemplateDO extends BaseDO {
      * 品质
      */
     private String qualityName;
+    /**
+     * 模板ID
+     */
+    @TableId
+    private Integer templateId;
+    /**
+     * 在售数量
+     */
+    private String sellNum;
 
 }

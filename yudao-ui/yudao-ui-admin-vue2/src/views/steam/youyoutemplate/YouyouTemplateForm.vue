@@ -27,9 +27,6 @@
                     <el-form-item label="武器英文名称" prop="weaponHashName">
                       <el-input v-model="formData.weaponHashName" placeholder="请输入武器英文名称" />
                     </el-form-item>
-                    <el-form-item label="模板ID" prop="templateId">
-                      <el-input v-model="formData.templateId" placeholder="请输入模板ID" />
-                    </el-form-item>
                     <el-form-item label="图片地址" prop="iconUrl">
                       <el-input v-model="formData.iconUrl" placeholder="请输入图片地址" />
                     </el-form-item>
@@ -42,9 +39,6 @@
                     <el-form-item label="模板参考价" prop="referencePrice">
                       <el-input v-model="formData.referencePrice" placeholder="请输入模板参考价" />
                     </el-form-item>
-                    <el-form-item label="在售数量" prop="sellNum">
-                      <el-input v-model="formData.sellNum" placeholder="请输入在售数量" />
-                    </el-form-item>
                     <el-form-item label="外观" prop="exteriorName">
                       <el-input v-model="formData.exteriorName" placeholder="请输入外观" />
                     </el-form-item>
@@ -53,6 +47,9 @@
                     </el-form-item>
                     <el-form-item label="品质" prop="qualityName">
                       <el-input v-model="formData.qualityName" placeholder="请输入品质" />
+                    </el-form-item>
+                    <el-form-item label="在售数量" prop="sellNum">
+                      <el-input v-model="formData.sellNum" placeholder="请输入在售数量" />
                     </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
@@ -87,16 +84,15 @@
                             weaponId: undefined,
                             weaponName: undefined,
                             weaponHashName: undefined,
-                            id: undefined,
-                            templateId: undefined,
                             iconUrl: undefined,
                             minSellPrice: undefined,
                             fastShippingMinSellPrice: undefined,
                             referencePrice: undefined,
-                            sellNum: undefined,
                             exteriorName: undefined,
                             rarityName: undefined,
                             qualityName: undefined,
+                            templateId: undefined,
+                            sellNum: undefined,
         },
         // 表单校验
         formRules: {
@@ -129,7 +125,7 @@
         try {
           const data = this.formData;
                   // 修改的提交
-          if (data.id) {
+          if (data.templateId) {
             await YouyouTemplateApi.updateYouyouTemplate(data);
             this.$modal.msgSuccess("修改成功");
             this.dialogVisible = false;
@@ -156,19 +152,18 @@
                             weaponId: undefined,
                             weaponName: undefined,
                             weaponHashName: undefined,
-                            id: undefined,
-                            templateId: undefined,
                             iconUrl: undefined,
                             minSellPrice: undefined,
                             fastShippingMinSellPrice: undefined,
                             referencePrice: undefined,
-                            sellNum: undefined,
                             exteriorName: undefined,
                             rarityName: undefined,
                             qualityName: undefined,
+                            templateId: undefined,
+                            sellNum: undefined,
         };
         this.resetForm("formRef");
       }
     }
   };
-</script>
+</script>

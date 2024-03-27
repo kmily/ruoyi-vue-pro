@@ -5,28 +5,31 @@ import lombok.Data;
 @Data
 public class UUSaleTemplateRespVO {
 
-    // 商品id
-    private String commodityId;
-
-    // 商品模板id
-    private String templateId;
-
-    // 模板hashName
-    private String templateHashName;
-
-    // 模板图片链接
-    private String iconUrl;
-
-    // 外观名称
-    private String exteriorName;
-
-    // 品质
-    private String rarityName;
-
-    // 类别
-    private String qualityName;
+    private SaleTemplateResponse saleTemplateResponse;
 
     private SaleCommodityResponse saleCommodityResponse;
+
+    @Data
+    public static class SaleTemplateResponse {
+
+        // 商品模板id
+        private String templateId;
+
+        // 模板hashName
+        private String templateHashName;
+
+        // 模板图片链接
+        private String iconUrl;
+
+        // 外观名称
+        private String exteriorName;
+
+        // 品质
+        private String rarityName;
+
+        // 类别
+        private String qualityName;
+    }
 
     @Data
     public static class SaleCommodityResponse{

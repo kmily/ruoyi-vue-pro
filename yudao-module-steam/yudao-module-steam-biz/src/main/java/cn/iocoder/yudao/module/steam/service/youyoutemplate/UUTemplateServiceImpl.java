@@ -32,13 +32,13 @@ public class UUTemplateServiceImpl implements UUTemplateService {
         YouyouTemplateDO youyouTemplate = BeanUtils.toBean(createReqVO, YouyouTemplateDO.class);
         youyouTemplateMapper.insert(youyouTemplate);
         // 返回
-        return youyouTemplate.getId();
+        return youyouTemplate.getTemplateId();
     }
 
     @Override
     public void updateYouyouTemplate(YouyouTemplateSaveReqVO updateReqVO) {
         // 校验存在
-        validateYouyouTemplateExists(updateReqVO.getId());
+        validateYouyouTemplateExists(updateReqVO.getTemplateId());
         // 更新
         YouyouTemplateDO updateObj = BeanUtils.toBean(updateReqVO, YouyouTemplateDO.class);
         youyouTemplateMapper.updateById(updateObj);
