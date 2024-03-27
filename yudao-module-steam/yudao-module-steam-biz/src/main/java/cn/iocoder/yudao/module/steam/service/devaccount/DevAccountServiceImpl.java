@@ -104,6 +104,9 @@ public class DevAccountServiceImpl implements DevAccountService {
             }
             DevAccountDO devAccountDO = devAccountDOS.get(0);
             devAccountDO.setApiPublicKey(createReqVO.getApiPublicKey());
+            if(Objects.nonNull(createReqVO.getCallbackUrl())){
+                devAccountDO.setCallbackUrl(createReqVO.getCallbackUrl());
+            }
             devAccountMapper.updateById(devAccountDO);
             return devAccountDO.getId().toString();
         } else {
