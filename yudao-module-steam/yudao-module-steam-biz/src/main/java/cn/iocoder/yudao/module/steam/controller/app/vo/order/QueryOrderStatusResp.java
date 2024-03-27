@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class QueryOrderStatusResp {
+public class QueryOrderStatusResp implements Serializable {
     /**
      * 订单编号
      */

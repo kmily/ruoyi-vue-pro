@@ -11,6 +11,8 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodi
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.CommodityList;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderStatusResp;
 import cn.iocoder.yudao.module.steam.service.steam.YouPingOrder;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
@@ -120,5 +122,15 @@ public class UUService {
         ApiResult<OrderCancelResp> orderCancelRespApiResult = openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/orderCancel", new OpenApiReqVo<OrderCancelVo>().setData(reqVo), OrderCancelResp.class);
         checkResponse(orderCancelRespApiResult);
         return orderCancelRespApiResult;
+    }
+    /**
+     * 查询订单状态
+     * https://www.yuque.com/yyyoupin/ckahux/xibbw8kpdepkhn04
+     * @return
+     */
+    public ApiResult<QueryOrderStatusResp> orderStatus(QueryOrderReqVo reqVo){
+        ApiResult<QueryOrderStatusResp> queryOrderStatusRespApiResult = openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/orderCancel", new OpenApiReqVo<QueryOrderReqVo>().setData(reqVo), QueryOrderStatusResp.class);
+        checkResponse(queryOrderStatusRespApiResult);
+        return queryOrderStatusRespApiResult;
     }
 }

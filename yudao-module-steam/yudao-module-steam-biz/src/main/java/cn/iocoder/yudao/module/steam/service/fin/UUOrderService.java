@@ -62,5 +62,11 @@ public interface UUOrderService {
 
 
     void processNotify(NotifyReq notifyReq);
-
+    /**
+     * 关闭订单,
+     * 用于未支持的订单进行关闭,并释放库存
+     *
+     * @param invOrderId InvOrderId
+     */
+    void checkTransfer(Long invOrderId);
 }

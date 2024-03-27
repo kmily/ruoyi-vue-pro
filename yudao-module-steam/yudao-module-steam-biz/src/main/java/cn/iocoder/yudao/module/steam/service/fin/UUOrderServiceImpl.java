@@ -17,11 +17,10 @@ import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTemplatePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
-import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelResp;
-import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
-import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderInfoResp;
-import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
@@ -32,8 +31,10 @@ import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.UUOrderStatus;
 import cn.iocoder.yudao.module.steam.enums.UUOrderSubStatus;
 import cn.iocoder.yudao.module.steam.service.SteamService;
+import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
+import cn.iocoder.yudao.module.steam.service.steam.TradeOfferInfo;
 import cn.iocoder.yudao.module.steam.service.steam.YouPingOrder;
 import cn.iocoder.yudao.module.steam.service.uu.UUService;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
@@ -696,54 +697,6 @@ public class UUOrderServiceImpl implements UUOrderService {
         return youyouOrderDO;
     }
 
-//    @Override
-//    @Deprecated
-//    public void updateInvOrderRefunded(Long id, Long payRefundId) {
-//        // 1. 校验并获得退款订单（可退款）
-//        PayRefundRespDTO payRefund = validateInvOrderCanRefunded(id, payRefundId);
-//        // 2.2 更新退款单到 demo 订单
-//        youyouOrderMapper.updateById(new YouyouOrderDO().setId(id)
-//                .setRefundTime(payRefund.getSuccessTime()).setPayOrderStatus(PayOrderStatusEnum.REFUND.getStatus()));
-//    }
-
-//    @Deprecated
-//    private PayRefundRespDTO validateInvOrderCanRefunded(Long id, Long payRefundId) {
-//        // 1.1 校验示例订单
-//        YouyouOrderDO youyouOrderDO = youyouOrderMapper.selectById(id);
-//        if (youyouOrderDO == null) {
-//            throw exception(ErrorCodeConstants.INVORDER_ORDER_NOT_FOUND);
-//        }
-//        // 1.2 校验退款订单匹配
-//        if (Objects.equals(youyouOrderDO.getPayRefundId(), payRefundId)) {
-//            log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！order 数据是：{}]",
-//                    id, payRefundId, toJsonString(youyouOrderDO));
-//            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
-//        }
-//
-//        // 2.1 校验退款订单
-//        PayRefundRespDTO payRefund = payRefundApi.getRefund(payRefundId);
-//        if (payRefund == null) {
-//            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_NOT_FOUND);
-//        }
-//        // 2.2
-//        if (!PayRefundStatusEnum.isSuccess(payRefund.getStatus())) {
-//            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_NOT_SUCCESS);
-//        }
-//        // 2.3 校验退款金额一致
-//        if (notEqual(payRefund.getRefundPrice(), youyouOrderDO.getPayAmount())) {
-//            log.error("[validateDemoOrderCanRefunded][order({}) payRefund({}) 退款金额不匹配，请进行处理！order 数据是：{}，payRefund 数据是：{}]",
-//                    id, payRefundId, toJsonString(youyouOrderDO), toJsonString(payRefund));
-//            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_PRICE_NOT_MATCH);
-//        }
-//        // 2.4 校验退款订单匹配（二次）
-//        if (notEqual(payRefund.getMerchantOrderId(), id.toString())) {
-//            log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！payRefund 数据是：{}]",
-//                    id, payRefundId, toJsonString(payRefund));
-//            throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
-//        }
-//        return payRefund;
-//    }
-
     @Override
     public void processNotify(NotifyReq notifyReq) {
         String callBackInfo = notifyReq.getCallBackInfo();
@@ -774,5 +727,29 @@ public class UUOrderServiceImpl implements UUOrderService {
             }
         }
 
+    }
+    @Override
+    @Transactional(rollbackFor = ServiceException.class)
+    public void checkTransfer(Long invOrderId) {
+        YouyouOrderDO uuOrderById = getUUOrderById(invOrderId);
+        if(Objects.isNull(uuOrderById)){
+            throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
+        }
+        if(!uuOrderById.getPayStatus()){
+            throw new ServiceException(-1,"订单未支付不支持打款");
+        }
+        if(InvTransferStatusEnum.TransferFINISH.getStatus().equals(uuOrderById.getTransferStatus())){
+            //发货完成时
+            ApiResult<QueryOrderStatusResp> queryOrderStatusRespApiResult = uuService.orderStatus(new QueryOrderReqVo().setOrderNo(uuOrderById.getUuOrderNo()));
+            if(queryOrderStatusRespApiResult.getData().getBigStatus()==340){
+                cashInvOrder(invOrderId);
+            }
+            if(queryOrderStatusRespApiResult.getData().getBigStatus()==360){
+                cashInvOrder(invOrderId);
+            }
+            if(queryOrderStatusRespApiResult.getData().getBigStatus()==280){
+                damagesCloseInvOrder(invOrderId,queryOrderStatusRespApiResult.getData().getSmallStatusMsg());
+            }
+        }
     }
 }
