@@ -28,6 +28,11 @@ public interface UUOrderService {
     YouyouOrderDO createInvOrder(LoginUser loginUser, @Valid CreateCommodityOrderReqVo createReqVO);
 
     /**
+     * 释放库存
+     * @param invOrderId
+     */
+    void releaseInvOrder(Long invOrderId);
+    /**
      * 支付订单
      * @param loginUser 前端用户
      * @param invOrderId 订单号

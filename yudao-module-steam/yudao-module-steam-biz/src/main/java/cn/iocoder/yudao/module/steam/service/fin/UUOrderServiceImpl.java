@@ -22,7 +22,6 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
@@ -202,7 +201,8 @@ public class UUOrderServiceImpl implements UUOrderService {
      * 已经支付的订单退还库存
      * 请不要直接调用
      */
-    private void closeInvOrder(Long invOrderId) {
+    @Override
+    public void releaseInvOrder(Long invOrderId) {
         YouyouOrderDO uuOrder = getUUOrderById(invOrderId);
         if(uuOrder.getSellCashStatus().equals(InvSellCashStatusEnum.CASHED.getStatus())){
             throw new ServiceException(-1,"订单已经支付给卖家，不支持操作");
@@ -233,7 +233,7 @@ public class UUOrderServiceImpl implements UUOrderService {
         if(!uuOrderById.getPayStatus()){
             throw new ServiceException(-1,"订单未支付不支持退款");
         }
-        closeInvOrder(invOrderId);
+        releaseInvOrder(invOrderId);
         if (PayOrderStatusEnum.isSuccess(uuOrderById.getPayOrderStatus())) {
             Integer paymentAmount = uuOrderById.getPayAmount();
             BigDecimal divide = new BigDecimal("2").divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
