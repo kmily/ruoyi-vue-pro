@@ -432,7 +432,8 @@ public class AppApiController {
     public ApiResult<CreateByIdRespVo> byGoodsIdCreateOrder(@RequestBody OpenApiReqVo<CreateCommodityOrderReqVo> openApiReqVo) {
         try {
             return DevAccountUtils.tenantExecute(1L, () -> {
-                if(Objects.isNull(openApiReqVo.getData().getCommodityHashName()) || Objects.isNull(openApiReqVo.getData().getCommodityTemplateId())){
+
+                if(Objects.isNull(openApiReqVo.getData().getCommodityId())){
                     throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
                 }
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
@@ -465,7 +466,7 @@ public class AppApiController {
     public ApiResult<CreateByTemplateRespVo> byTemplateCreateOrder(@RequestBody OpenApiReqVo<CreateCommodityOrderReqVo> openApiReqVo) {
         try {
             ApiResult<CreateByTemplateRespVo> execute = DevAccountUtils.tenantExecute(1L, () -> {
-                if(Objects.isNull(openApiReqVo.getData().getCommodityId())){
+                if(Objects.isNull(openApiReqVo.getData().getCommodityHashName()) || Objects.isNull(openApiReqVo.getData().getCommodityTemplateId())){
                     throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
                 }
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
