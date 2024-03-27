@@ -12,10 +12,13 @@ public class QueryUUSellingListReqVO {
     // 下一页是否还有内容
     private Boolean newPageIsHaveContent;
 
-    private List<SaleTemplateByCategoryResponseList> saleTemplateByCategoryResponseList;
+    // 总页数
+    private Integer totalPage;
+
+    public List<SaleTemplateByCategoryResponseList> saleTemplateByCategoryResponseList;
 
     @Data
-    private static class SaleTemplateByCategoryResponseList {
+    public static class SaleTemplateByCategoryResponseList {
 
 
         // 模板ID
