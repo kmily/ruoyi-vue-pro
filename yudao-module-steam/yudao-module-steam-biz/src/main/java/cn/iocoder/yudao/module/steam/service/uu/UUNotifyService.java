@@ -34,7 +34,7 @@ public class UUNotifyService {
         ConfigDO pubKey = configService.getConfigByKey("uu.pubkey");
         Map<String, Object> params = new HashMap<>();
         params.put("messageNo","1265679");
-//注意接收到的callBackInfo是含有双引号转译符"\" 文档上无法体现只需要在验证签名是直接把callBackInfo值当成字符串即可以
+        //注意接收到的callBackInfo是含有双引号转译符"\" 文档上无法体现只需要在验证签名是直接把callBackInfo值当成字符串即可以
         params.put("callBackInfo",notifyReq.getCallBackInfo());
 
         // 第一步：检查参数是否已经排序

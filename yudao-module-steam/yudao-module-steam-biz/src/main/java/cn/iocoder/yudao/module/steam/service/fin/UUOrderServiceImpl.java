@@ -618,31 +618,6 @@ public class UUOrderServiceImpl implements UUOrderService {
         return youPingOrderApiResult.getData();
     }
     @Override
-    @Deprecated
-    public Integer refundInvOrder(LoginUser loginUser, OrderCancelVo orderCancelVo, String userIp) {
-        Optional<YouyouOrderDO> first = youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
-                .eq(YouyouOrderDO::getOrderNo, orderCancelVo.getOrderNo())
-                .eq(YouyouOrderDO::getBuyUserId, loginUser.getId())
-                .eq(YouyouOrderDO::getBuyUserType, loginUser.getUserType())
-        ).stream().findFirst();
-        // 1. 校验订单是否可以退款
-        YouyouOrderDO youyouOrderDO = validateInvOrderCanRefund(first.orElse(null),loginUser);
-        //如果有uu的单子，这里则只发起uu的退款，uu退款后再发起我们的退款
-        if(Objects.nonNull(youyouOrderDO.getUuOrderNo())){
-            //传入uu的单子
-            ApiResult<OrderCancelResp> orderCancelRespApiResult = uuService.orderCancel(new OrderCancelVo().setOrderNo(youyouOrderDO.getUuOrderNo()));
-            log.info("取消UU订单结果{}{}",orderCancelRespApiResult,youyouOrderDO);
-            if(orderCancelRespApiResult.getData().getResult()==1){
-                refundAction(youyouOrderDO,loginUser);
-                return 1;
-            }
-            return orderCancelRespApiResult.getData().getResult();
-        }else{
-            refundAction(youyouOrderDO,loginUser);
-            return 1;
-        }
-    }
-    @Override
     public Integer orderCancel(LoginUser loginUser, OrderCancelVo orderCancelVo, String userIp,String cancelReason) {
         YouyouOrderDO uuOrder = getUUOrder(loginUser, new QueryOrderReqVo().setOrderNo(orderCancelVo.getOrderNo()));
 
