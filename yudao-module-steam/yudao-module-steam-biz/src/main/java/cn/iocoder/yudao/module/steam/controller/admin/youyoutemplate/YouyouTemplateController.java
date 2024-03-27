@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
 
+import javax.validation.constraints.*;
 import javax.validation.*;
 import javax.servlet.http.*;
 import java.util.*;
@@ -26,7 +27,7 @@ import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*
 
 import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
-import cn.iocoder.yudao.module.steam.service.youyoutemplate.UUTemplateService;
+import cn.iocoder.yudao.module.steam.service.youyoutemplate.YouyouTemplateService;
 
 @Tag(name = "管理后台 - 悠悠商品模板")
 @RestController
@@ -35,19 +36,19 @@ import cn.iocoder.yudao.module.steam.service.youyoutemplate.UUTemplateService;
 public class YouyouTemplateController {
 
     @Resource
-    private UUTemplateService youyouTemplateService;
+    private YouyouTemplateService youyouTemplateService;
 
     @PostMapping("/create")
     @Operation(summary = "创建悠悠商品模板")
     @PreAuthorize("@ss.hasPermission('steam:youyou-template:create')")
-    public CommonResult<Integer> createYouyouTemplate(@Valid @RequestBody UUTemplateSaveReqVO createReqVO) {
+    public CommonResult<Integer> createYouyouTemplate(@Valid @RequestBody YouyouTemplateSaveReqVO createReqVO) {
         return success(youyouTemplateService.createYouyouTemplate(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新悠悠商品模板")
     @PreAuthorize("@ss.hasPermission('steam:youyou-template:update')")
-    public CommonResult<Boolean> updateYouyouTemplate(@Valid @RequestBody UUTemplateSaveReqVO updateReqVO) {
+    public CommonResult<Boolean> updateYouyouTemplate(@Valid @RequestBody YouyouTemplateSaveReqVO updateReqVO) {
         youyouTemplateService.updateYouyouTemplate(updateReqVO);
         return success(true);
     }

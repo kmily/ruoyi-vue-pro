@@ -2,8 +2,6 @@ package cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-
-import java.io.Serializable;
 import java.util.*;
 import java.util.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,7 +11,7 @@ import com.alibaba.excel.annotation.*;
 @Schema(description = "管理后台 - 悠悠商品模板 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class YouyouTemplateRespVO implements Serializable {
+public class YouyouTemplateRespVO {
 
     @Schema(description = "武器全称", example = "印花 | Hello 法玛斯")
     @ExcelProperty("武器全称")
@@ -58,5 +56,37 @@ public class YouyouTemplateRespVO implements Serializable {
     @Schema(description = "模板ID", example = "1110")
     @ExcelProperty("模板ID")
     private Integer templateId;
+
+    @Schema(description = "图片地址", example = "https://www.iocoder.cn")
+    @ExcelProperty("图片地址")
+    private String iconUrl;
+
+    @Schema(description = "在售最低价", example = "17990")
+    @ExcelProperty("在售最低价")
+    private String minSellPrice;
+
+    @Schema(description = "极速发货在售最低价", example = "12096")
+    @ExcelProperty("极速发货在售最低价")
+    private String fastShippingMinSellPrice;
+
+    @Schema(description = "模板参考价", example = "25408")
+    @ExcelProperty("模板参考价")
+    private String referencePrice;
+
+    @Schema(description = "在售数量")
+    @ExcelProperty("在售数量")
+    private byte[] sellNum;
+
+    @Schema(description = "外观", example = "赵六")
+    @ExcelProperty("外观")
+    private String exteriorName;
+
+    @Schema(description = "稀有度", example = "张三")
+    @ExcelProperty("稀有度")
+    private String rarityName;
+
+    @Schema(description = "品质", example = "李四")
+    @ExcelProperty("品质")
+    private String qualityName;
 
 }

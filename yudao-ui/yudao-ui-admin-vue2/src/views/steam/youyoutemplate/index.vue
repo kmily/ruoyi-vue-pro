@@ -33,6 +33,30 @@
       <el-form-item label="模板ID" prop="templateId">
         <el-input v-model="queryParams.templateId" placeholder="请输入模板ID" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
+      <el-form-item label="图片地址" prop="iconUrl">
+        <el-input v-model="queryParams.iconUrl" placeholder="请输入图片地址" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="在售最低价" prop="minSellPrice">
+        <el-input v-model="queryParams.minSellPrice" placeholder="请输入在售最低价" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="极速发货在售最低价" prop="fastShippingMinSellPrice">
+        <el-input v-model="queryParams.fastShippingMinSellPrice" placeholder="请输入极速发货在售最低价" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="模板参考价" prop="referencePrice">
+        <el-input v-model="queryParams.referencePrice" placeholder="请输入模板参考价" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="在售数量" prop="sellNum">
+        <el-input v-model="queryParams.sellNum" placeholder="请输入在售数量" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="外观" prop="exteriorName">
+        <el-input v-model="queryParams.exteriorName" placeholder="请输入外观" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="稀有度" prop="rarityName">
+        <el-input v-model="queryParams.rarityName" placeholder="请输入稀有度" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="品质" prop="qualityName">
+        <el-input v-model="queryParams.qualityName" placeholder="请输入品质" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -68,6 +92,14 @@
       </el-table-column>
       <el-table-column label="主键ID" align="center" prop="id" />
       <el-table-column label="模板ID" align="center" prop="templateId" />
+      <el-table-column label="图片地址" align="center" prop="iconUrl" />
+      <el-table-column label="在售最低价" align="center" prop="minSellPrice" />
+      <el-table-column label="极速发货在售最低价" align="center" prop="fastShippingMinSellPrice" />
+      <el-table-column label="模板参考价" align="center" prop="referencePrice" />
+      <el-table-column label="在售数量" align="center" prop="sellNum" />
+      <el-table-column label="外观" align="center" prop="exteriorName" />
+      <el-table-column label="稀有度" align="center" prop="rarityName" />
+      <el-table-column label="品质" align="center" prop="qualityName" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
@@ -125,6 +157,14 @@ export default {
         weaponHashName: null,
         createTime: [],
         templateId: null,
+        iconUrl: null,
+        minSellPrice: null,
+        fastShippingMinSellPrice: null,
+        referencePrice: null,
+        sellNum: null,
+        exteriorName: null,
+        rarityName: null,
+        qualityName: null,
       },
             };
   },

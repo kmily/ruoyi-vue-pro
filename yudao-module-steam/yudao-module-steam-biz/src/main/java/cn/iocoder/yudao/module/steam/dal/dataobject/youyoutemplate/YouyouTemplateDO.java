@@ -63,5 +63,37 @@ public class YouyouTemplateDO extends BaseDO {
      * 模板ID
      */
     private Integer templateId;
+    /**
+     * 图片地址
+     */
+    private String iconUrl;
+    /**
+     * 在售最低价
+     */
+    private String minSellPrice;
+    /**
+     * 极速发货在售最低价
+     */
+    private String fastShippingMinSellPrice;
+    /**
+     * 模板参考价
+     */
+    private String referencePrice;
+    /**
+     * 在售数量
+     */
+    private byte[] sellNum;
+    /**
+     * 外观
+     */
+    private String exteriorName;
+    /**
+     * 稀有度
+     */
+    private String rarityName;
+    /**
+     * 品质
+     */
+    private String qualityName;
 
 }
