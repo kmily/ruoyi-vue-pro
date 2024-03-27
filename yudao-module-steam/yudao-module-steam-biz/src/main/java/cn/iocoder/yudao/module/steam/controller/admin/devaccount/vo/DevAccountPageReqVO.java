@@ -18,8 +18,8 @@ public class DevAccountPageReqVO extends PageParam {
     @Schema(description = "api用户名", example = "张三")
     private String userName;
 
-    @Schema(description = "steam用户 ID", example = "29689")
-    private String steamId;
+    @Schema(description = "回调地址", example = "29689")
+    private String callbackUrl;
 
     @Schema(description = "状态", example = "2")
     private Integer status;
