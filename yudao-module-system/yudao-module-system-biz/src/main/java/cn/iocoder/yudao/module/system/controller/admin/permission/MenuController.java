@@ -48,6 +48,16 @@ public class MenuController {
         return success(true);
     }
 
+
+    @GetMapping("/update-status")
+    @Operation(summary = "修改菜单状态")
+    @PreAuthorize("@ss.hasPermission('system:menu:update')")
+    public CommonResult<Boolean> updateStatus(@RequestParam("id")Long id, @RequestParam("status")Integer status) {
+        menuService.updateStatus(id,status);
+        return success(true);
+    }
+
+
     @DeleteMapping("/delete")
     @Operation(summary = "删除菜单")
     @Parameter(name = "id", description = "菜单编号", required= true, example = "1024")
