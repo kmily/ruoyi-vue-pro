@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.UUSellingList.QueryUUSell
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
 import cn.iocoder.yudao.module.steam.service.youyoutemplate.UUTemplateService;
 import cn.smallbun.screw.core.util.CollectionUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
@@ -15,6 +17,8 @@ import java.util.Comparator;
 import java.util.List;
 
 
+@Service
+@Slf4j
 public class QueryUUTemplateService {
 
     @Resource
