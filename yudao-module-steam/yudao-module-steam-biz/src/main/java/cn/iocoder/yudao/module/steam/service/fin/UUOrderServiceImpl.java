@@ -246,26 +246,33 @@ public class UUOrderServiceImpl implements UUOrderService {
         }
         releaseInvOrder(invOrderId);
         if (PayOrderStatusEnum.isSuccess(uuOrderById.getPayOrderStatus())) {
-            Integer paymentAmount = uuOrderById.getPayAmount();
-            BigDecimal divide = new BigDecimal("2").divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
-            int transferDamagesAmount = divide.multiply(new BigDecimal(paymentAmount.toString())).intValue();
-            int transferRefundAmount = paymentAmount - transferDamagesAmount;
-//            invOrder.setTransferDamagesAmount(transferDamagesAmount);
-//            invOrder.setTransferRefundAmount(transferRefundAmount);
-//            invOrder.setTransferDamagesTime(LocalDateTime.now());
-            //打款违约金-打款到服务费用户,取消订单后卖家应收的违约金由uu代扣，这里只需要将金额扣给平台
-            PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(uuOrderById.getServiceFeeUserId(), uuOrderById.getServiceFeeUserType());
+//            Integer paymentAmount = uuOrderById.getPayAmount();
+//            BigDecimal divide = new BigDecimal("2").divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+//            int transferDamagesAmount = divide.multiply(new BigDecimal(paymentAmount.toString())).intValue();
+//            int transferRefundAmount = paymentAmount - transferDamagesAmount;
+//            //打款违约金-打款到服务费用户,取消订单后卖家应收的违约金由uu代扣，这里只需要将金额扣给平台
+//            PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(uuOrderById.getServiceFeeUserId(), uuOrderById.getServiceFeeUserType());
+//            PayWalletTransactionDO payWalletTransactionDO = payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(uuOrderById.getId()),
+//                    PayWalletBizTypeEnum.INV_DAMAGES, transferDamagesAmount);
+//            //获取买家钱包并进行退款
+//            PayWalletDO orCreateWallet2 = payWalletService.getOrCreateWallet(uuOrderById.getBuyUserId(), uuOrderById.getBuyUserType());
+//            PayWalletTransactionDO payWalletTransactionDO1 = payWalletService.addWalletBalance(orCreateWallet2.getId(), String.valueOf(uuOrderById.getId()),
+//                    PayWalletBizTypeEnum.STEAM_REFUND, transferRefundAmount);
+
+            //不收违约金
+            PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(uuOrderById.getBuyUserId(), uuOrderById.getBuyUserType());
             PayWalletTransactionDO payWalletTransactionDO = payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(uuOrderById.getId()),
-                    PayWalletBizTypeEnum.INV_DAMAGES, transferDamagesAmount);
+                    PayWalletBizTypeEnum.INV_SERVICE_FEE_REFUND, uuOrderById.getServiceFee());
             //获取买家钱包并进行退款
-            PayWalletDO orCreateWallet2 = payWalletService.getOrCreateWallet(uuOrderById.getBuyUserId(), uuOrderById.getBuyUserType());
-            PayWalletTransactionDO payWalletTransactionDO1 = payWalletService.addWalletBalance(orCreateWallet2.getId(), String.valueOf(uuOrderById.getId()),
-                    PayWalletBizTypeEnum.STEAM_REFUND, transferRefundAmount);
+//            PayWalletDO orCreateWallet2 = payWalletService.getOrCreateWallet(uuOrderById.getBuyUserId(), uuOrderById.getBuyUserType());
+            PayWalletTransactionDO payWalletTransactionDO1 = payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(uuOrderById.getId()),
+                    PayWalletBizTypeEnum.STEAM_CASH_REFUND, uuOrderById.getCommodityAmount());
 
             List<PayWalletTransactionDO> payWalletTransactionDOS = Arrays.asList(payWalletTransactionDO, payWalletTransactionDO1);
             youyouOrderMapper.updateById(new YouyouOrderDO().setId(uuOrderById.getId())
-                    .setTransferDamagesAmount(transferDamagesAmount)
-                    .setTransferRefundAmount(transferRefundAmount)
+//                    .setTransferDamagesAmount(transferDamagesAmount)
+//                    .setTransferRefundAmount(transferRefundAmount)
+                    .setTransferRefundAmount(uuOrderById.getPayAmount())//不收手续费
                     .setTransferDamagesTime(LocalDateTime.now())
                     .setTransferDamagesRet(JacksonUtils.writeValueAsString(payWalletTransactionDOS))
                     .setSellCashStatus(InvSellCashStatusEnum.DAMAGES.getStatus())
