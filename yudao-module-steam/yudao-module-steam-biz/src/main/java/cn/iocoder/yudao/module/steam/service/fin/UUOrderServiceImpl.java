@@ -19,8 +19,6 @@ import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTe
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
@@ -31,10 +29,8 @@ import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.UUOrderStatus;
 import cn.iocoder.yudao.module.steam.enums.UUOrderSubStatus;
 import cn.iocoder.yudao.module.steam.service.SteamService;
-import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
-import cn.iocoder.yudao.module.steam.service.steam.TradeOfferInfo;
 import cn.iocoder.yudao.module.steam.service.steam.YouPingOrder;
 import cn.iocoder.yudao.module.steam.service.uu.UUService;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
@@ -55,7 +51,6 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -347,11 +342,10 @@ public class UUOrderServiceImpl implements UUOrderService {
                 .setTransferStatus(InvTransferStatusEnum.TransferING.getStatus())
                 .setTransferText(JacksonUtils.writeValueAsString(youPingOrder))
         );
-        YouyouOrderDO uuOrder2 = getUUOrder(loginUser, queryOrderReqVo);
-        return uuOrder2;
+        return getUUOrder(loginUser, queryOrderReqVo);
     }
 
-    private YouyouOrderDO validateInvOrderCanCreate(YouyouOrderDO youyouOrderDO) {
+    private void validateInvOrderCanCreate(YouyouOrderDO youyouOrderDO) {
         //检测交易链接
         try{
             ApiResult<ApiCheckTradeUrlReSpVo> apiCheckTradeUrlReSpVoApiResult = uuService.checkTradeUrl(new ApiCheckTradeUrlReqVo().setTradeLinks(youyouOrderDO.getBuyTradeLinks()));
@@ -454,7 +448,6 @@ public class UUOrderServiceImpl implements UUOrderService {
         if (youyouOrderDO.getPayStatus()) {
             throw exception(ErrorCodeConstants.UU_GOODS_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID);
         }
-        return youyouOrderDO;
     }
 
     public YouyouOrderDO getUUOrderById(Long orderId) {
@@ -697,17 +690,14 @@ public class UUOrderServiceImpl implements UUOrderService {
      * 退款不正走此方法，
      * @param youyouOrderDO
      */
-    @Deprecated
     private void refundAction(YouyouOrderDO youyouOrderDO,LoginUser loginUser,String reason) {
         validateInvOrderCanRefund(youyouOrderDO,loginUser);
         damagesCloseInvOrder(youyouOrderDO.getId(),reason);
     }
-    @Deprecated
     private void refundAction(YouyouOrderDO youyouOrderDO,LoginUser loginUser) {
         refundAction(youyouOrderDO,loginUser,"用户不想要了主动退款");
     }
 
-    @Deprecated
     private YouyouOrderDO validateInvOrderCanRefund(YouyouOrderDO youyouOrderDO,LoginUser loginUser) {
         // 校验订单是否存在
         if (Objects.isNull(youyouOrderDO)) {
