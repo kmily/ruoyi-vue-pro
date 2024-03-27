@@ -17,7 +17,6 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletMapper;
 import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletTransactionMapper;
-import cn.iocoder.yudao.module.pay.framework.pay.core.WalletPayClient;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTemplatePageReqVO;
@@ -25,12 +24,11 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUBatchGetOnSaleCommodity.BatchGetCommodity;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUBatchGetOnSaleCommodity.UUBatchGetOnSaleCommodityReqVO;
-import cn.iocoder.yudao.module.steam.controller.app.vo.UUBatchGetOnSaleCommodity.UUSaleTemplateRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodeityService;
-import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodityDO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodityReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.CommodityList;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUSellingList.QueryUUSellingListReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUSellingList.QueryUUSellingListReqVO.SaleTemplateByCategoryResponseList;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByIdRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByTemplateRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.*;
@@ -59,17 +57,17 @@ import cn.iocoder.yudao.module.steam.service.steam.TradeUrlStatus;
 import cn.iocoder.yudao.module.steam.service.uu.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.uu.UUNotifyService;
 import cn.iocoder.yudao.module.steam.service.uu.UUService;
-import cn.iocoder.yudao.module.steam.service.uu.vo.*;
+import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
+import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
+import cn.iocoder.yudao.module.steam.service.uu.vo.ApiPayWalletRespVO;
+import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
 import cn.iocoder.yudao.module.steam.service.youyoutemplate.UUTemplateService;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
-import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import cn.smallbun.screw.core.util.CollectionUtils;
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -85,8 +83,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -97,9 +93,6 @@ import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
-
-import cn.iocoder.yudao.module.steam.controller.app.vo.UUSellingList.QueryUUSellingListReqVO.SaleTemplateByCategoryResponseList;
-import cn.iocoder.yudao.module.steam.controller.app.vo.UUSellingList.QueryUUSellingListReqVO;
 
 /**
  * 兼容有品的开放平台接口
