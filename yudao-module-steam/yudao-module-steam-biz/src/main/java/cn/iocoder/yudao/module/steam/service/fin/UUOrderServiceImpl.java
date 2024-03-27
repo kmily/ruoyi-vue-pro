@@ -593,8 +593,15 @@ public class UUOrderServiceImpl implements UUOrderService {
         productDetailDTO.setCommodityId(youyouCommodity.getId());
         productDetailDTO.setCommodityName(youyouCommodity.getCommodityName());
         productDetailDTO.setCommodityHashName(youyouTemplateDO.getHashName());
+
         productDetailDTO.setCommodityTemplateId(youyouCommodity.getTemplateId());
+        productDetailDTO.setAssertId(null);// TODO 待确认
         productDetailDTO.setAbrade(youyouCommodity.getCommodityAbrade());
+        productDetailDTO.setIsDoppler(youyouCommodity.getTemplateisDoppler());
+        productDetailDTO.setDopplerColor(null);// TODO 待确认
+        productDetailDTO.setIsFade(youyouCommodity.getTemplateisFade());
+        productDetailDTO.setFadeName(youyouCommodity.getCommodityFade());
+        //TODO
         productDetailDTO.setPrice(new BigDecimal(youyouCommodity.getCommodityPrice()).multiply(new BigDecimal("100")).intValue());
 //                productDetailDTO.setNum(new BigDecimal(youyouCommodity.get()).multiply(new BigDecimal("100")).intValue());
         productDetailDTO.setPaintIndex(youyouCommodity.getCommodityPaintIndex());
