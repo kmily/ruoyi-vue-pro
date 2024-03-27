@@ -157,6 +157,7 @@ public class ApiUUCommodeityService {
     /**
      *  批量查询在售商品价格插入数据库
      */
+    @Async
     public void insertOnSaleCommodityInfo(@RequestBody ApiResult<BatchGetCommodity> batchGetCommodityApiResult) throws JsonProcessingException {
 
         String onSaleCommodityInfoListJson = objectMapper.writeValueAsString(batchGetCommodityApiResult.getData());
@@ -180,4 +181,33 @@ public class ApiUUCommodeityService {
         uuTemplateMapper.updateBatch(list);
     }
 
+    public Integer getOnSealGoodsId(ApiUUBuyGoodsByIdReqVO apiUUBuyGoodsByIdReqVO) {
+        List<YouyouCommodityDO> youyouCommodityDOS = null;
+        if (apiUUBuyGoodsByIdReqVO.getTemplateId() != null) {
+            youyouCommodityDOS = uuCommodityMapper.selectList(new LambdaQueryWrapperX<YouyouCommodityDO>()
+                    .eq(YouyouCommodityDO::getTemplateId, apiUUBuyGoodsByIdReqVO.getTemplateId())
+                    .orderByAsc(YouyouCommodityDO::getCommodityPrice));
+            // uu价格
+            int num1 = Integer.parseInt(youyouCommodityDOS.get(0).getCommodityPrice());
+            // 买家最大出价
+            int num2 = Integer.parseInt(apiUUBuyGoodsByIdReqVO.getMaxPrice());
+            if(num1 < num2){
+                return youyouCommodityDOS.get(0).getId();
+
+            }
+            return null;
+        }
+        YouyouTemplateDO youyouTemplateDO = uuTemplateMapper.selectOne(new LambdaQueryWrapperX<YouyouTemplateDO>().eq(YouyouTemplateDO::getTemplateId, apiUUBuyGoodsByIdReqVO.getTemplateId()));
+        List<YouyouCommodityDO> youyouCommodityDOS1 = uuCommodityMapper.selectList(new LambdaQueryWrapperX<YouyouCommodityDO>()
+                .eq(YouyouCommodityDO::getTemplateId, youyouTemplateDO.getTemplateId())
+                .orderByAsc(YouyouCommodityDO::getCommodityPrice));
+        // uu价格
+        int num1 = Integer.parseInt(youyouCommodityDOS1.get(0).getCommodityPrice());
+        // 买家最大出价
+        int num2 = Integer.parseInt(apiUUBuyGoodsByIdReqVO.getMaxPrice());
+        if(num1 < num2){
+            return youyouCommodityDOS1.get(0).getId();
+        }
+        return null;
+    }
 }
