@@ -4,18 +4,14 @@ import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
-import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.infra.controller.admin.config.vo.ConfigSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
-import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitRespVO;
-import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletMapper;
@@ -25,6 +21,10 @@ import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUBatchGetOnSaleCommodity.BatchGetCommodity;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUBatchGetOnSaleCommodity.UUBatchGetOnSaleCommodityReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUBatchGetOnSaleCommodity.UUSaleTemplateRespVO;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodeityService;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodityDO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodityReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.CommodityList;
@@ -39,10 +39,12 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoudetails.YouyouDetailsDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoucommodity.UUCommodityMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoudetails.YouyouDetailsMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.youyoutemplate.UUTemplateMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.UUOrderStatus;
@@ -55,18 +57,16 @@ import cn.iocoder.yudao.module.steam.service.steam.TradeUrlStatus;
 import cn.iocoder.yudao.module.steam.service.uu.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.uu.UUNotifyService;
 import cn.iocoder.yudao.module.steam.service.uu.UUService;
-import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
-import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
-import cn.iocoder.yudao.module.steam.service.uu.vo.ApiPayWalletRespVO;
-import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
+import cn.iocoder.yudao.module.steam.service.uu.vo.*;
 import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
+import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -88,10 +88,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
@@ -158,6 +155,12 @@ public class AppApiController {
     @Resource
     private ObjectMapper objectMapper;
 
+    @Resource
+    private UUTemplateMapper uuTemplateMapper;
+
+    @Resource
+    private ApiUUCommodeityService apiUUCommodeityService;
+
 
     /**
      * 下载UU商品模板
@@ -168,31 +171,10 @@ public class AppApiController {
     @Operation(summary = "插入UU商品平台")
     public ApiResult youyouTemplate() throws IOException {
         ApiResult<String> templateId = uuService.getTemplateId();
-        log.info("{}",templateId);
+        apiUUCommodeityService.insertTemplateId(templateId);
         return ApiResult.success(templateId.getData());
-        // 提取下载链接中的商品模板
-//        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-//        builder.method(HttpUtil.Method.GET).url(templateId.getData());
-//        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build(),HttpUtil.getClient());
-//        ArrayList json = sent.json(ArrayList.class);
-//        List<ApiUUTemplateVO> templateVOS = new ArrayList<>();
-//        for (Object item:json){
-//            ApiUUTemplateVO apiUUTemplateVO = objectMapper.readValue(objectMapper.writeValueAsString(item), ApiUUTemplateVO.class);
-//            templateVOS.add(apiUUTemplateVO);
-//        }
-//        for(ApiUUTemplateVO item:templateVOS){
-//            YouyouTemplateDO templateDO = new YouyouTemplateDO();
-//            templateDO.setTemplateId(item.getId());
-//            templateDO.setName(item.getName());
-//            templateDO.setHashName(item.getHashName());
-//            templateDO.setTypeId(item.getTypeId());
-//            templateDO.setTypeHashName(item.getTypeHashName());
-//            templateDO.setWeaponId(item.getWeaponId());
-//            templateDO.setWeaponName(item.getWeaponName());
-//            uuTemplateMapper.insert(templateDO);
-//        }
-//        return ApiResult.success(templateId.getData());
     }
+
 
     /**
      * 查询UU商品列表
@@ -203,43 +185,23 @@ public class AppApiController {
     @Operation(summary = "查询UU商品列表")
     public ApiResult<CommodityList> youyouCommodityList(@RequestBody ApiUUCommodityReqVO reqVo) throws JsonProcessingException {
         ApiResult<CommodityList> commodityList = uuService.getCommodityList(reqVo);
-        String commodityListJson = objectMapper.writeValueAsString(commodityList.getData());
-        List<ApiUUCommodityDO> apiUUCommodityDOS = objectMapper.readValue(commodityListJson, new TypeReference<List<ApiUUCommodityDO>>() {});
-
-        YouyouCommodityDO goods = new YouyouCommodityDO();
-        for (ApiUUCommodityDO apiUUCommodityDO : apiUUCommodityDOS) {
-            goods.setId(apiUUCommodityDO.getId());
-            goods.setTemplateId(apiUUCommodityDO.getTemplateId());
-            goods.setShippingMode(apiUUCommodityDO.getShippingMode());
-            goods.setCommodityName(apiUUCommodityDO.getCommodityName());
-            goods.setCommodityPrice(apiUUCommodityDO.getCommodityPrice());
-            goods.setCommodityAbrade(apiUUCommodityDO.getCommodityAbrade());
-            goods.setCommodityPaintSeed(apiUUCommodityDO.getCommodityPaintSeed());
-            goods.setCommodityPaintIndex(apiUUCommodityDO.getCommodityPaintIndex());
-            goods.setCommodityHaveNameTag(apiUUCommodityDO.getCommodityHaveNameTag());
-            goods.setCommodityHaveBuzhang(apiUUCommodityDO.getCommodityHaveBuzhang());
-            goods.setCommodityHaveSticker(apiUUCommodityDO.getCommodityHaveSticker());
-            goods.setTemplateisFade(apiUUCommodityDO.getTemplateisFade());
-            goods.setTemplateisHardened(apiUUCommodityDO.getTemplateisHardened());
-            goods.setTemplateisDoppler(apiUUCommodityDO.getTemplateisDoppler());
-            goods.setCommodityStickers(apiUUCommodityDO.getCommodityStickers().toString());
-            uuCommodityMapper.insert(goods);
-        }
+        apiUUCommodeityService.insertGoodsQuery(commodityList);
         return commodityList;
     }
 
 
 
-//    /**
-//     * 批量查询在售商品价格
-//     * @param reqVo
-//     * @return CommodityList
-//     */
-//    @PostMapping("/v1/api/goodsQuery")
-//    @Operation(summary = "查询UU商品列表")
-//    public ApiResult<CommodityList> youyouCommodityList(@RequestBody ApiUUCommodityReqVO reqVo) throws JsonProcessingException {
-//
-//    }
+    /**
+     * 批量查询在售商品价格
+     * @param reqVo
+     * @return CommodityList
+     */
+    @PostMapping("/v1/api/batchGetOnSaleCommodityInfo")
+    @Operation(summary = "批量查询在售商品价格")
+    public ApiResult<BatchGetCommodity> batchGetOnSaleCommodityInfo(@RequestBody UUBatchGetOnSaleCommodityReqVO reqVo) {
+        ApiResult<BatchGetCommodity> batchGetCommodityApiResult = uuService.batchGetOnSaleCommodity(reqVo);
+        return batchGetCommodityApiResult;
+    }
 
 
     /**

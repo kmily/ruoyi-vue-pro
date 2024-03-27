@@ -12,11 +12,7 @@ public class UUBatchGetOnSaleCommodityReqVO implements Serializable {
 
     @Data
     private static class List1{
-
         private Integer templateId;
         private String templateHashName;
-
     }
-
-
 }
