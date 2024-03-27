@@ -84,6 +84,12 @@ public class UUOrderServiceImpl implements UUOrderService {
      */
     private static final Long UU_CASH_ACCOUNT_ID = 250L;//UU收款账号ID
     /**
+     * 服务费收费帐号
+     *
+     * 从 [支付管理 -> 应用信息] 里添加
+     */
+    private static final Long UU_CASH_SERVICE_ID = 251L;//UU收款账号ID
+    /**
      * 支付单流水的 no 前缀
      */
     private static final String PAY_NO_PREFIX = "YY";
@@ -162,6 +168,8 @@ public class UUOrderServiceImpl implements UUOrderService {
                 //卖家信息
                 .setSellUserId(UU_CASH_ACCOUNT_ID).setSellUserType(UserTypeEnum.MEMBER.getValue())
                 .setSellCashStatus(InvSellCashStatusEnum.INIT.getStatus())
+                //服务费账号
+                .setServiceFeeUserId(UU_CASH_SERVICE_ID).setServiceFeeUserType(UserTypeEnum.MEMBER.getValue())
                 //订单信息
                 .setOrderNo(noRedisDAO.generate(PAY_NO_PREFIX)).setMerchantOrderNo(reqVo.getMerchantOrderNo())
 
