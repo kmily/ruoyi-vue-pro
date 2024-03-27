@@ -25,7 +25,7 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
 
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.*;
-import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.group.GroupDO;
 import cn.iocoder.yudao.module.im.service.group.ImGroupService;
 
 @Tag(name = "管理后台 - 群")
@@ -66,7 +66,7 @@ public class ImGroupController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('im:group:query')")
     public CommonResult<ImGroupRespVO> getGroup(@RequestParam("id") Long id) {
-        ImGroupDO group = imGroupService.getGroup(id);
+        GroupDO group = imGroupService.getGroup(id);
         return success(BeanUtils.toBean(group, ImGroupRespVO.class));
     }
 
@@ -74,7 +74,7 @@ public class ImGroupController {
     @Operation(summary = "获得群分页")
     @PreAuthorize("@ss.hasPermission('im:group:query')")
     public CommonResult<PageResult<ImGroupRespVO>> getGroupPage(@Valid ImGroupPageReqVO pageReqVO) {
-        PageResult<ImGroupDO> pageResult = imGroupService.getGroupPage(pageReqVO);
+        PageResult<GroupDO> pageResult = imGroupService.getGroupPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, ImGroupRespVO.class));
     }
 
@@ -85,7 +85,7 @@ public class ImGroupController {
     public void exportGroupExcel(@Valid ImGroupPageReqVO pageReqVO,
               HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<ImGroupDO> list = imGroupService.getGroupPage(pageReqVO).getList();
+        List<GroupDO> list = imGroupService.getGroupPage(pageReqVO).getList();
         // 导出 Excel
         ExcelUtils.write(response, "群.xls", "数据", ImGroupRespVO.class,
                         BeanUtils.toBean(list, ImGroupRespVO.class));

@@ -5,7 +5,7 @@ import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
 import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.*;
-import cn.iocoder.yudao.module.im.dal.dataobject.groupmember.GroupMemberDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.group.GroupMemberDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 

@@ -9,7 +9,7 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.ImGroupMemberPageReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.ImGroupMemberRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.ImGroupMemberSaveReqVO;
-import cn.iocoder.yudao.module.im.dal.dataobject.groupmember.GroupMemberDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.group.GroupMemberDO;
 import cn.iocoder.yudao.module.im.service.groupmember.ImGroupMemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

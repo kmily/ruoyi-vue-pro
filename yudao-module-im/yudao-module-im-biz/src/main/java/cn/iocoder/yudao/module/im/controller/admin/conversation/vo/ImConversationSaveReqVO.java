@@ -21,7 +21,7 @@ public class ImConversationSaveReqVO {
 
     @Schema(description = "类型：1 单聊；2 群聊；4 通知会话（预留）", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "类型：1 单聊；2 群聊；4 通知会话（预留）不能为空")
-    private Integer conversationType;
+    private Integer type;
 
     @Schema(description = "单聊时，用户编号；群聊时，群编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "21454")
     @NotEmpty(message = "单聊时，用户编号；群聊时，群编号不能为空")

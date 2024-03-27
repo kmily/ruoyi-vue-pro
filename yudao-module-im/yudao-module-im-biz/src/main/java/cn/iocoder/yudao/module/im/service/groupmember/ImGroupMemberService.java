@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.im.service.groupmember;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.ImGroupMemberPageReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.ImGroupMemberSaveReqVO;
-import cn.iocoder.yudao.module.im.dal.dataobject.groupmember.GroupMemberDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.group.GroupMemberDO;
 import jakarta.validation.Valid;
 
 import java.util.List;

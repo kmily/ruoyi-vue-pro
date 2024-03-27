@@ -5,7 +5,7 @@ import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.*;
-import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.group.GroupDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 
@@ -29,7 +29,7 @@ public class ImGroupServiceImpl implements ImGroupService {
     @Override
     public Long createGroup(ImGroupSaveReqVO createReqVO) {
         // 插入
-        ImGroupDO group = BeanUtils.toBean(createReqVO, ImGroupDO.class);
+        GroupDO group = BeanUtils.toBean(createReqVO, GroupDO.class);
         imGroupMapper.insert(group);
         // 返回
         return group.getId();
@@ -40,7 +40,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         // 校验存在
         validateGroupExists(updateReqVO.getId());
         // 更新
-        ImGroupDO updateObj = BeanUtils.toBean(updateReqVO, ImGroupDO.class);
+        GroupDO updateObj = BeanUtils.toBean(updateReqVO, GroupDO.class);
         imGroupMapper.updateById(updateObj);
     }
 
@@ -59,12 +59,12 @@ public class ImGroupServiceImpl implements ImGroupService {
     }
 
     @Override
-    public ImGroupDO getGroup(Long id) {
+    public GroupDO getGroup(Long id) {
         return imGroupMapper.selectById(id);
     }
 
     @Override
-    public PageResult<ImGroupDO> getGroupPage(ImGroupPageReqVO pageReqVO) {
+    public PageResult<GroupDO> getGroupPage(ImGroupPageReqVO pageReqVO) {
         return imGroupMapper.selectPage(pageReqVO);
     }
 

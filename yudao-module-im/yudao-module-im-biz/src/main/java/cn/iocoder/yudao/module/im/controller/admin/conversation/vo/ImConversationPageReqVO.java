@@ -22,7 +22,7 @@ public class ImConversationPageReqVO extends PageParam {
     private Long userId;
 
     @Schema(description = "类型：1 单聊；2 群聊；4 通知会话（预留）", example = "1")
-    private Integer conversationType;
+    private Integer type;
 
     @Schema(description = "单聊时，用户编号；群聊时，群编号", example = "21454")
     private Long targetId;

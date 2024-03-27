@@ -14,4 +14,11 @@ public interface RedisKeyConstants {
      * VALUE 数据类型： String
      */
     String INBOX_SEQUENCE = "im_inbox_sequence:%s";
+
+    /**
+     * 收件箱的分布式锁
+     * KEY 格式：  im:inbox:lock:{userId}
+     * VALUE 数据类型： String
+     */
+    String INBOX_LOCK = "im_inbox_lock:%s";
 }

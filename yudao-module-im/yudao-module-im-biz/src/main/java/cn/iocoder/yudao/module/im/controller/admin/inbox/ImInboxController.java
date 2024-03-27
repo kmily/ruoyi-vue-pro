@@ -8,8 +8,8 @@ import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.ImInboxPageReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.ImInboxRespVO;
-import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.ImInboxSaveReqVO;
-import cn.iocoder.yudao.module.im.dal.dataobject.inbox.ImInboxDO;
+import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.InboxSaveReqVO;
+import cn.iocoder.yudao.module.im.dal.dataobject.inbox.InboxDO;
 import cn.iocoder.yudao.module.im.service.inbox.ImInboxService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -39,14 +39,14 @@ public class ImInboxController {
     @PostMapping("/create")
     @Operation(summary = "创建收件箱")
     @PreAuthorize("@ss.hasPermission('im:inbox:create')")
-    public CommonResult<Long> createInbox(@Valid @RequestBody ImInboxSaveReqVO createReqVO) {
+    public CommonResult<Long> createInbox(@Valid @RequestBody InboxSaveReqVO createReqVO) {
         return success(imInboxService.createInbox(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新收件箱")
     @PreAuthorize("@ss.hasPermission('im:inbox:update')")
-    public CommonResult<Boolean> updateInbox(@Valid @RequestBody ImInboxSaveReqVO updateReqVO) {
+    public CommonResult<Boolean> updateInbox(@Valid @RequestBody InboxSaveReqVO updateReqVO) {
         imInboxService.updateInbox(updateReqVO);
         return success(true);
     }
@@ -65,7 +65,7 @@ public class ImInboxController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('im:inbox:query')")
     public CommonResult<ImInboxRespVO> getInbox(@RequestParam("id") Long id) {
-        ImInboxDO inbox = imInboxService.getInbox(id);
+        InboxDO inbox = imInboxService.getInbox(id);
         return success(BeanUtils.toBean(inbox, ImInboxRespVO.class));
     }
 
@@ -73,7 +73,7 @@ public class ImInboxController {
     @Operation(summary = "获得收件箱分页")
     @PreAuthorize("@ss.hasPermission('im:inbox:query')")
     public CommonResult<PageResult<ImInboxRespVO>> getInboxPage(@Valid ImInboxPageReqVO pageReqVO) {
-        PageResult<ImInboxDO> pageResult = imInboxService.getInboxPage(pageReqVO);
+        PageResult<InboxDO> pageResult = imInboxService.getInboxPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, ImInboxRespVO.class));
     }
 
@@ -84,7 +84,7 @@ public class ImInboxController {
     public void exportInboxExcel(@Valid ImInboxPageReqVO pageReqVO,
                                  HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<ImInboxDO> list = imInboxService.getInboxPage(pageReqVO).getList();
+        List<InboxDO> list = imInboxService.getInboxPage(pageReqVO).getList();
         // 导出 Excel
         ExcelUtils.write(response, "收件箱.xls", "数据", ImInboxRespVO.class,
                 BeanUtils.toBean(list, ImInboxRespVO.class));
