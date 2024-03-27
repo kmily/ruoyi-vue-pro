@@ -198,6 +198,7 @@ public class AppApiController {
     @PostMapping("/v1/api/batchGetOnSaleCommodityInfo")
     @Operation(summary = "批量查询在售商品价格")
     public ApiResult<BatchGetCommodity> batchGetOnSaleCommodityInfo(@RequestBody UUBatchGetOnSaleCommodityReqVO reqVo) throws JsonProcessingException {
+        // 查询本地库存
         ApiResult<BatchGetCommodity> batchGetCommodityApiResult = uuService.batchGetOnSaleCommodity(reqVo);
         apiUUCommodeityService.insertOnSaleCommodityInfo(batchGetCommodityApiResult);
         return batchGetCommodityApiResult;

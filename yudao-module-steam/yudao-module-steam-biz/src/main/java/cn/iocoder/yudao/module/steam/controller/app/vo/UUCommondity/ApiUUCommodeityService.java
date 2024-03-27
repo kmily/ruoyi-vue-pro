@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity;
 
 
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUBatchGetOnSaleCommodity.BatchGetCommodity;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUBatchGetOnSaleCommodity.UUSaleTemplateRespVO;
@@ -46,7 +47,6 @@ public class ApiUUCommodeityService {
      *  下载UU商品模板
      */
     @Async
-    @Transactional
     public void insertTemplateId(@RequestBody ApiResult<String> templateId) throws JsonProcessingException {
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.method(HttpUtil.Method.GET).url(templateId.getData());
@@ -102,7 +102,6 @@ public class ApiUUCommodeityService {
      *  下载UU商品列表
      */
     @Async
-    @Transactional
     public void insertGoodsQuery(@RequestBody ApiResult<CommodityList> commodityList) throws JsonProcessingException {
         String commodityListJson = objectMapper.writeValueAsString(commodityList.getData());
         List<ApiUUCommodityDO> apiUUCommodityDOS = objectMapper.readValue(commodityListJson, new TypeReference<List<ApiUUCommodityDO>>() {});
@@ -161,12 +160,11 @@ public class ApiUUCommodeityService {
     public void insertOnSaleCommodityInfo(@RequestBody ApiResult<BatchGetCommodity> batchGetCommodityApiResult) throws JsonProcessingException {
 
         String onSaleCommodityInfoListJson = objectMapper.writeValueAsString(batchGetCommodityApiResult.getData());
-
         List<UUSaleTemplateRespVO> uuSaleTemplateRespVOS = objectMapper.readValue(onSaleCommodityInfoListJson, new TypeReference<List<UUSaleTemplateRespVO>>() {});
 
-        YouyouTemplateDO templateDO = new YouyouTemplateDO();
         List<YouyouTemplateDO> list = new ArrayList<>();
         for (UUSaleTemplateRespVO uuSaleTemplateRespVO : uuSaleTemplateRespVOS) {
+            YouyouTemplateDO templateDO = new YouyouTemplateDO();
             templateDO.setTemplateId(Integer.valueOf(uuSaleTemplateRespVO.getSaleTemplateResponse().getTemplateId()));
             templateDO.setTypeHashName(uuSaleTemplateRespVO.getSaleTemplateResponse().getTemplateHashName());
             templateDO.setIconUrl(uuSaleTemplateRespVO.getSaleTemplateResponse().getIconUrl());

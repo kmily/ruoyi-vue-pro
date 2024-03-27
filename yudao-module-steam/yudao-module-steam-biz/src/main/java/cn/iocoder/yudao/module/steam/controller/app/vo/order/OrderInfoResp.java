@@ -162,6 +162,8 @@ public class OrderInfoResp {
         private String dopplerColor;
         @JsonProperty("isFade")
         private Integer isFade;
+        @JsonProperty("fadeName")
+        private String fadeName;
         @JsonProperty("isHardened")
         private Integer isHardened;
         @JsonProperty("haveSticker")
