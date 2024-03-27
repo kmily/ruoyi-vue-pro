@@ -308,7 +308,6 @@ public class UUOrderServiceImpl implements UUOrderService {
         if(Objects.isNull(youyouOrderDO.getRealCommodityId())){
             throw exception(OpenApiCode.ERR_5214);
         }
-        // TODO 如果数据出错  请检查此处 mapper 是否正确
         YouyouCommodityDO youyouCommodityDO = UUCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
 
 

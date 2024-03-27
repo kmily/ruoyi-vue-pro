@@ -132,9 +132,6 @@ public class YouyouOrderServiceImplTest extends BaseDbUnitTest {
            o.setPayAmount(null);
            o.setPayStatus(null);
            o.setPayOrderStatus(null);
-           o.setPayRefundId(null);
-           o.setRefundPrice(null);
-           o.setRefundTime(null);
            o.setServiceFeeUserType(null);
            o.setServiceFee(null);
            o.setMerchantOrderNo(null);
@@ -211,12 +208,6 @@ public class YouyouOrderServiceImplTest extends BaseDbUnitTest {
        youyouOrderMapper.insert(cloneIgnoreId(dbYouyouOrder, o -> o.setPayStatus(null)));
        // 测试 payOrderStatus 不匹配
        youyouOrderMapper.insert(cloneIgnoreId(dbYouyouOrder, o -> o.setPayOrderStatus(null)));
-       // 测试 payRefundId 不匹配
-       youyouOrderMapper.insert(cloneIgnoreId(dbYouyouOrder, o -> o.setPayRefundId(null)));
-       // 测试 refundPrice 不匹配
-       youyouOrderMapper.insert(cloneIgnoreId(dbYouyouOrder, o -> o.setRefundPrice(null)));
-       // 测试 refundTime 不匹配
-       youyouOrderMapper.insert(cloneIgnoreId(dbYouyouOrder, o -> o.setRefundTime(null)));
        // 测试 serviceFeeUserType 不匹配
        youyouOrderMapper.insert(cloneIgnoreId(dbYouyouOrder, o -> o.setServiceFeeUserType(null)));
        // 测试 serviceFee 不匹配
