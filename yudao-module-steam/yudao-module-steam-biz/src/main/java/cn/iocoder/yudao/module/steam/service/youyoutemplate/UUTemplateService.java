@@ -18,14 +18,14 @@ public interface UUTemplateService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Integer createYouyouTemplate(@Valid UUTemplateSaveReqVO createReqVO);
+    Integer createYouyouTemplate(@Valid YouyouTemplateSaveReqVO createReqVO);
 
     /**
      * 更新悠悠商品模板
      *
      * @param updateReqVO 更新信息
      */
-    void updateYouyouTemplate(@Valid UUTemplateSaveReqVO updateReqVO);
+    void updateYouyouTemplate(@Valid YouyouTemplateSaveReqVO updateReqVO);
 
     /**
      * 删除悠悠商品模板

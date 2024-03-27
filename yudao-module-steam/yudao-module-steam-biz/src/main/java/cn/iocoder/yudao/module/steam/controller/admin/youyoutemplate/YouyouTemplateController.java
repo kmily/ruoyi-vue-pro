@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
 
-import javax.validation.constraints.*;
 import javax.validation.*;
 import javax.servlet.http.*;
 import java.util.*;
@@ -27,7 +26,7 @@ import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*
 
 import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
-import cn.iocoder.yudao.module.steam.service.youyoutemplate.YouyouTemplateService;
+import cn.iocoder.yudao.module.steam.service.youyoutemplate.UUTemplateService;
 
 @Tag(name = "管理后台 - 悠悠商品模板")
 @RestController
@@ -36,20 +35,20 @@ import cn.iocoder.yudao.module.steam.service.youyoutemplate.YouyouTemplateServic
 public class YouyouTemplateController {
 
     @Resource
-    private YouyouTemplateService youyouTemplateService;
+    private UUTemplateService UUTemplateService;
 
     @PostMapping("/create")
     @Operation(summary = "创建悠悠商品模板")
     @PreAuthorize("@ss.hasPermission('steam:youyou-template:create')")
     public CommonResult<Integer> createYouyouTemplate(@Valid @RequestBody YouyouTemplateSaveReqVO createReqVO) {
-        return success(youyouTemplateService.createYouyouTemplate(createReqVO));
+        return success(UUTemplateService.createYouyouTemplate(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新悠悠商品模板")
     @PreAuthorize("@ss.hasPermission('steam:youyou-template:update')")
     public CommonResult<Boolean> updateYouyouTemplate(@Valid @RequestBody YouyouTemplateSaveReqVO updateReqVO) {
-        youyouTemplateService.updateYouyouTemplate(updateReqVO);
+        UUTemplateService.updateYouyouTemplate(updateReqVO);
         return success(true);
     }
 
@@ -58,7 +57,7 @@ public class YouyouTemplateController {
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('steam:youyou-template:delete')")
     public CommonResult<Boolean> deleteYouyouTemplate(@RequestParam("id") Integer id) {
-        youyouTemplateService.deleteYouyouTemplate(id);
+        UUTemplateService.deleteYouyouTemplate(id);
         return success(true);
     }
 
@@ -67,7 +66,7 @@ public class YouyouTemplateController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('steam:youyou-template:query')")
     public CommonResult<YouyouTemplateRespVO> getYouyouTemplate(@RequestParam("id") Integer id) {
-        YouyouTemplateDO youyouTemplate = youyouTemplateService.getYouyouTemplate(id);
+        YouyouTemplateDO youyouTemplate = UUTemplateService.getYouyouTemplate(id);
         return success(BeanUtils.toBean(youyouTemplate, YouyouTemplateRespVO.class));
     }
 
@@ -75,7 +74,7 @@ public class YouyouTemplateController {
     @Operation(summary = "获得悠悠商品模板分页")
     @PreAuthorize("@ss.hasPermission('steam:youyou-template:query')")
     public CommonResult<PageResult<YouyouTemplateRespVO>> getYouyouTemplatePage(@Valid YouyouTemplatePageReqVO pageReqVO) {
-        PageResult<YouyouTemplateDO> pageResult = youyouTemplateService.getYouyouTemplatePage(pageReqVO);
+        PageResult<YouyouTemplateDO> pageResult = UUTemplateService.getYouyouTemplatePage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, YouyouTemplateRespVO.class));
     }
 
@@ -86,7 +85,7 @@ public class YouyouTemplateController {
     public void exportYouyouTemplateExcel(@Valid YouyouTemplatePageReqVO pageReqVO,
               HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<YouyouTemplateDO> list = youyouTemplateService.getYouyouTemplatePage(pageReqVO).getList();
+        List<YouyouTemplateDO> list = UUTemplateService.getYouyouTemplatePage(pageReqVO).getList();
         // 导出 Excel
         ExcelUtils.write(response, "悠悠商品模板.xls", "数据", YouyouTemplateRespVO.class,
                         BeanUtils.toBean(list, YouyouTemplateRespVO.class));

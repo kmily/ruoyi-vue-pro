@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.steam.service.youyoutemplate;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import javax.annotation.Resource;
 
@@ -13,31 +12,25 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplat
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoutemplate.YouyouTemplateMapper;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
-import javax.annotation.Resource;
 import org.springframework.context.annotation.Import;
-import java.util.*;
-import java.time.LocalDateTime;
 
-import static cn.hutool.core.util.RandomUtil.*;
 import static cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
- * {@link YouyouTemplateServiceImpl} 的单元测试类
+ * {@link UUTemplateServiceImpl} 的单元测试类
  *
  * @author 管理员
  */
-@Import(YouyouTemplateServiceImpl.class)
-public class YouyouTemplateServiceImplTest extends BaseDbUnitTest {
+@Import(UUTemplateServiceImpl.class)
+public class UUTemplateServiceImplTest extends BaseDbUnitTest {
 
     @Resource
-    private YouyouTemplateServiceImpl youyouTemplateService;
+    private UUTemplateServiceImpl youyouTemplateService;
 
     @Resource
     private YouyouTemplateMapper youyouTemplateMapper;
