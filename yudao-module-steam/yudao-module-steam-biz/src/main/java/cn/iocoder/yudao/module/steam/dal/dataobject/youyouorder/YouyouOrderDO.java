@@ -67,6 +67,14 @@ public class YouyouOrderDO extends BaseDO {
      */
     private String sellSteamId;
     /**
+     * 资金付款信息
+     */
+    private String sellCashRet;
+    /**
+     * 收款状态
+     */
+    private Integer sellCashStatus;
+    /**
      * 订单号，内容生成
      */
     private String orderNo;
@@ -135,9 +143,9 @@ public class YouyouOrderDO extends BaseDO {
      */
     private String transferDamagesRet;
     /**
-     * 收款状态
+     * 违约金
      */
-    private Integer sellCashStatus;
+    private Integer transferDamagesAmount;
     /**
      * 发货状态
      */

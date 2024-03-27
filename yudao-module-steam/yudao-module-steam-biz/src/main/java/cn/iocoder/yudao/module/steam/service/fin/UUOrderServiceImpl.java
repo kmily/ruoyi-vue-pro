@@ -22,6 +22,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
@@ -54,6 +55,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -178,6 +180,11 @@ public class UUOrderServiceImpl implements UUOrderService {
         uUCommodityMapper.updateById(new YouyouCommodityDO().setId(youyouCommodityDO.getId()).setTransferStatus(InvTransferStatusEnum.INORDER.getStatus()));
         return youyouOrderDO;
     }
+
+    /**
+     * 未支付订单取消支付并释放库存
+     * @param invOrderId
+     */
     public void closeUnPayInvOrder(Long invOrderId) {
         YouyouOrderDO uuOrder = getUUOrderById(invOrderId);
         if(uuOrder.getPayStatus()){
@@ -211,6 +218,78 @@ public class UUOrderServiceImpl implements UUOrderService {
         YouyouCommodityDO youyouCommodityDO = uUCommodityMapper.selectById(uuOrder.getRealCommodityId());
         uUCommodityMapper.updateById(new YouyouCommodityDO().setId(youyouCommodityDO.getId()).setTransferStatus(InvTransferStatusEnum.SELL.getStatus()));
     }
+
+    /**
+     * 订单失败后退款
+     * 扣除商品的2%后退还买家
+     * @param invOrderId InvOrderId
+     */
+    @Transactional(rollbackFor = ServiceException.class)
+    public void damagesCloseInvOrder(Long invOrderId) {
+        YouyouOrderDO uuOrderById = getUUOrderById(invOrderId);
+        if(Objects.isNull(uuOrderById)){
+            throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
+        }
+        if(!uuOrderById.getPayStatus()){
+            throw new ServiceException(-1,"订单未支付不支持退款");
+        }
+        closeInvOrder(invOrderId);
+        if (PayOrderStatusEnum.isSuccess(uuOrderById.getPayOrderStatus())) {
+            Integer paymentAmount = uuOrderById.getPayAmount();
+            BigDecimal divide = new BigDecimal("2").divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+            int transferDamagesAmount = divide.multiply(new BigDecimal(paymentAmount.toString())).intValue();
+            int transferRefundAmount = paymentAmount - transferDamagesAmount;
+//            invOrder.setTransferDamagesAmount(transferDamagesAmount);
+//            invOrder.setTransferRefundAmount(transferRefundAmount);
+//            invOrder.setTransferDamagesTime(LocalDateTime.now());
+            //打款违约金-打款到服务费用户,取消订单后卖家应收的违约金由uu代扣，这里只需要将金额扣给平台
+            PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(uuOrderById.getServiceFeeUserId(), uuOrderById.getServiceFeeUserType());
+            PayWalletTransactionDO payWalletTransactionDO = payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(uuOrderById.getId()),
+                    PayWalletBizTypeEnum.INV_DAMAGES, transferDamagesAmount);
+            //获取买家钱包并进行退款
+            PayWalletDO orCreateWallet2 = payWalletService.getOrCreateWallet(uuOrderById.getBuyUserId(), uuOrderById.getBuyUserType());
+            PayWalletTransactionDO payWalletTransactionDO1 = payWalletService.addWalletBalance(orCreateWallet2.getId(), String.valueOf(uuOrderById.getId()),
+                    PayWalletBizTypeEnum.STEAM_REFUND, transferRefundAmount);
+
+            List<PayWalletTransactionDO> payWalletTransactionDOS = Arrays.asList(payWalletTransactionDO, payWalletTransactionDO1);
+            youyouOrderMapper.updateById(new YouyouOrderDO().setId(uuOrderById.getId())
+                    .setTransferDamagesAmount(transferDamagesAmount)
+                    .setTransferRefundAmount(transferRefundAmount)
+                    .setTransferDamagesTime(LocalDateTime.now())
+                    .setTransferDamagesRet(JacksonUtils.writeValueAsString(payWalletTransactionDOS))
+                    .setSellCashStatus(InvSellCashStatusEnum.DAMAGES.getStatus())
+            );
+        }
+    }
+
+    /**
+     * 订单完成后打款
+     * @param invOrderId
+     */
+    @Transactional(rollbackFor = ServiceException.class)
+    public void cashInvOrder(Long invOrderId) {
+        YouyouOrderDO uuOrderById = getUUOrderById(invOrderId);
+        if(Objects.isNull(uuOrderById)){
+            throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
+        }
+        if(!uuOrderById.getPayStatus()){
+            throw new ServiceException(-1,"订单未支付不支持打款");
+        }
+        if (PayOrderStatusEnum.isSuccess(uuOrderById.getPayOrderStatus())) {
+            //打款服务费
+            PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(uuOrderById.getServiceFeeUserId(), uuOrderById.getServiceFeeUserType());
+            PayWalletTransactionDO payWalletTransactionDO = payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(uuOrderById.getId()),
+                    PayWalletBizTypeEnum.INV_SERVICE_FEE, uuOrderById.getServiceFee());
+
+            youyouOrderMapper.updateById(new YouyouOrderDO().setId(invOrderId).setServiceFeeRet(JacksonUtils.writeValueAsString(payWalletTransactionDO)));
+            //获取卖家家钱包并进行打款
+            PayWalletDO orCreateWallet2 = payWalletService.getOrCreateWallet(uuOrderById.getSellUserId(), uuOrderById.getSellUserType());
+            PayWalletTransactionDO payWalletTransactionDO1 = payWalletService.addWalletBalance(orCreateWallet2.getId(), String.valueOf(uuOrderById.getId()),
+                    PayWalletBizTypeEnum.STEAM_CASH, uuOrderById.getCommodityAmount());
+            youyouOrderMapper.updateById(new YouyouOrderDO().setId(invOrderId).setSellCashRet(JacksonUtils.writeValueAsString(payWalletTransactionDO1)).setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus()));
+        }
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public YouyouOrderDO payInvOrder(LoginUser loginUser, Long invOrderId) {
@@ -591,11 +670,11 @@ public class UUOrderServiceImpl implements UUOrderService {
      */
     @Deprecated
     private void refundAction(YouyouOrderDO youyouOrderDO,LoginUser loginUser,String reason) {
-        throw new ServiceException(-1,"方法停用");
-//        validateInvOrderCanRefund(youyouOrderDO,loginUser);
-//        // 2.1 生成退款单号
-//        // 一般来说，用户发起退款的时候，都会单独插入一个售后维权表，然后使用该表的 id 作为 refundId
-//        // 这里我们是个简单的 demo，所以没有售后维权表，直接使用订单 id + "-refund" 来演示
+//        throw new ServiceException(-1,"方法停用");
+        validateInvOrderCanRefund(youyouOrderDO,loginUser);
+        // 2.1 生成退款单号
+        // 一般来说，用户发起退款的时候，都会单独插入一个售后维权表，然后使用该表的 id 作为 refundId
+        // 这里我们是个简单的 demo，所以没有售后维权表，直接使用订单 id + "-refund" 来演示
 //        String refundId = youyouOrderDO.getId() + "-refund";
 //        // 2.2 创建退款单
 //        Long payRefundId = payRefundApi.createRefund(new PayRefundCreateReqDTO()
