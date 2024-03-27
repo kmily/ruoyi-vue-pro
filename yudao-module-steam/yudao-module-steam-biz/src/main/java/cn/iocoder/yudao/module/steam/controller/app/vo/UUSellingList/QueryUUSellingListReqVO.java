@@ -62,7 +62,7 @@ public class QueryUUSellingListReqVO {
         private String referencePrice;
 
         // 销售数量
-        private Integer sellNum;
+        private String sellNum;
 
     }
 

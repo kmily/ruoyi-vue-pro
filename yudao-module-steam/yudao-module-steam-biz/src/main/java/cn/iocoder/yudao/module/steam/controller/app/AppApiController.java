@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletMapper;
 import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletTransactionMapper;
+import cn.iocoder.yudao.module.pay.framework.pay.core.WalletPayClient;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTemplatePageReqVO;
@@ -24,11 +25,12 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUBatchGetOnSaleCommodity.BatchGetCommodity;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUBatchGetOnSaleCommodity.UUBatchGetOnSaleCommodityReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUBatchGetOnSaleCommodity.UUSaleTemplateRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodeityService;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodityDO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodityReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.CommodityList;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUSellingList.QueryUUSellingListReqVO;
-import cn.iocoder.yudao.module.steam.controller.app.vo.UUSellingList.QueryUUSellingListReqVO.SaleTemplateByCategoryResponseList;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByIdRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.buy.CreateByTemplateRespVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.*;
@@ -40,6 +42,7 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommod
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoudetails.YouyouDetailsDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
+import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoucommodity.UUCommodityMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoudetails.YouyouDetailsMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
@@ -48,6 +51,7 @@ import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.UUOrderStatus;
 import cn.iocoder.yudao.module.steam.enums.UUOrderSubStatus;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
+import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
 import cn.iocoder.yudao.module.steam.service.steam.SteamMaFile;
 import cn.iocoder.yudao.module.steam.service.steam.TradeUrlStatus;
@@ -59,10 +63,12 @@ import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiPayWalletRespVO;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
+import cn.iocoder.yudao.module.steam.service.youyoucommodity.YouyouCommodityService;
 import cn.iocoder.yudao.module.steam.service.youyoutemplate.UUTemplateService;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import cn.smallbun.screw.core.util.CollectionUtils;
+import com.alibaba.excel.Empty;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -109,6 +115,7 @@ public class AppApiController {
     private PayWalletService payWalletService;
 
     private ConfigService configService;
+
     @Autowired
     public void setConfigService(ConfigService configService) {
         this.configService = configService;
@@ -141,9 +148,13 @@ public class AppApiController {
     @Resource
     private UUCommodityMapper uuCommodityMapper;
 
+    @Resource
+    private YouyouCommodityService youyouCommodityService;
+
 
     /**
      * 下载UU商品模板
+     *
      * @param
      * @return CommodityList
      */
@@ -158,6 +169,7 @@ public class AppApiController {
 
     /**
      * 查询UU商品列表
+     *
      * @param reqVo
      * @return CommodityList
      */
@@ -170,9 +182,9 @@ public class AppApiController {
     }
 
 
-
     /**
      * 批量查询在售商品价格
+     *
      * @param reqVo
      * @return CommodityList
      */
@@ -202,7 +214,7 @@ public class AppApiController {
         PageResult<YouyouTemplateDO> pageResult = uuTemplateService.getYouyouTemplatePage(reqVO);
         List<YouyouTemplateDO> youyouTemplateDOS = pageResult.getList();
         QueryUUSellingListReqVO queryUUSellingListReqVO = new QueryUUSellingListReqVO();
-        List<SaleTemplateByCategoryResponseList> saleTemplateByCategoryResponseList = new ArrayList<>();
+        List<QueryUUSellingListReqVO.SaleTemplateByCategoryResponseList> saleTemplateByCategoryResponseList = new ArrayList<>();
 
         // 如果模板列表为空,直接返回成功
         if (CollectionUtils.isEmpty(youyouTemplateDOS)) {
@@ -210,71 +222,29 @@ public class AppApiController {
             return ApiResult.success(queryUUSellingListReqVO, "成功");
         }
 
-        // 获取所有模板 ID
-        List<Integer> templateIds = youyouTemplateDOS.stream()
-                .map(YouyouTemplateDO::getTemplateId)
-                .collect(Collectors.toList());
-
-        // 根据模板 ID 查询对应的商品信息,并按模板 ID 分组
-        Map<Integer, List<YouyouCommodityDO>> commodityMap = uuCommodityMapper.selectBatchIds(templateIds)
-                .stream()
-                .collect(Collectors.groupingBy(
-                        YouyouCommodityDO::getTemplateId,
-                        Collectors.toList()
-                ));
-
         // 遍历每个模板,计算相关指标并构建响应对象
         for (YouyouTemplateDO youyouTemplateDO : youyouTemplateDOS) {
-            int templateId = youyouTemplateDO.getTemplateId();
-            List<YouyouCommodityDO> youyouCommodityDOS = commodityMap.getOrDefault(templateId, Collections.emptyList());
-
-            Double minSellPrice = null;
-            Double fastShippingMinSellPrice = null;
-            int sellNum = 0;
-            Set<Integer> templateIdSet = new HashSet<>();
-            for (YouyouCommodityDO youyouCommodityDO : youyouCommodityDOS) {
-                int commodityTemplateId = youyouCommodityDO.getTemplateId();
-                if (!templateIdSet.contains(commodityTemplateId)) {
-                    // 记录不同 templateId 的商品数量
-                    templateIdSet.add(commodityTemplateId);
-                    sellNum++;
-                }
-                double commodityPrice = Double.parseDouble(youyouCommodityDO.getCommodityPrice());
-                if (minSellPrice == null || commodityPrice < minSellPrice) {
-                    minSellPrice = commodityPrice;
-                }
-                if (youyouCommodityDO.getShippingMode() == 1 && (fastShippingMinSellPrice == null || commodityPrice < fastShippingMinSellPrice)) {
-                    fastShippingMinSellPrice = commodityPrice;
-                }
-            }
-
-            // 如果没有找到最低价格,则设置为 0.0
-            if (minSellPrice == null) {
-                minSellPrice = 0.0;
-            }
-
-            if (fastShippingMinSellPrice == null) {
-                fastShippingMinSellPrice = 0.0;
-            }
-
             // 构建响应对象
-            SaleTemplateByCategoryResponseList item = new SaleTemplateByCategoryResponseList();
-            item.setTemplateId(templateId);
+            QueryUUSellingListReqVO.SaleTemplateByCategoryResponseList item = new QueryUUSellingListReqVO.SaleTemplateByCategoryResponseList();
+            item.setTemplateId(youyouTemplateDO.getTemplateId());
             item.setTemplateHashName(youyouTemplateDO.getHashName());
             item.setTemplateName(youyouTemplateDO.getName());
+            item.setIconUrl(youyouTemplateDO.getIconUrl());
+            item.setExteriorName(youyouTemplateDO.getExteriorName());
+            item.setRarityName(youyouTemplateDO.getRarityName());
             item.setTypeId(youyouTemplateDO.getTypeId());
             item.setTypeHashName(youyouTemplateDO.getTypeHashName());
             item.setWeaponId(youyouTemplateDO.getWeaponId());
             item.setWeaponHashName(youyouTemplateDO.getWeaponHashName());
-            item.setMinSellPrice(String.valueOf(minSellPrice));
-            item.setFastShippingMinSellPrice(String.valueOf(fastShippingMinSellPrice));
-            item.setSellNum(sellNum);
+            item.setMinSellPrice(youyouTemplateDO.getMinSellPrice());
+            item.setFastShippingMinSellPrice(youyouTemplateDO.getFastShippingMinSellPrice());
+            item.setSellNum(youyouTemplateDO.getSellNum());
 
             saleTemplateByCategoryResponseList.add(item);
         }
 
         // 按照 templateId 升序排列
-        saleTemplateByCategoryResponseList.sort(Comparator.comparingInt(SaleTemplateByCategoryResponseList::getTemplateId));
+        saleTemplateByCategoryResponseList.sort(Comparator.comparingInt(QueryUUSellingListReqVO.SaleTemplateByCategoryResponseList::getTemplateId));
 
         // 计算总页数
         int totalCount = Math.toIntExact(pageResult.getTotal());
@@ -284,13 +254,14 @@ public class AppApiController {
         queryUUSellingListReqVO.setSaleTemplateByCategoryResponseList(saleTemplateByCategoryResponseList);
         queryUUSellingListReqVO.setCurrentPage(currentPage);
         queryUUSellingListReqVO.setTotalPage(totalPage);
-        queryUUSellingListReqVO.setNewPageIsHaveContent(saleTemplateByCategoryResponseList.size() > 0);
+        queryUUSellingListReqVO.setNewPageIsHaveContent(saleTemplateByCategoryResponseList.size() > 1);
 
         return ApiResult.success(queryUUSellingListReqVO, "成功");
     }
 
     /**
      * UU订单服务器回调
+     *
      * @param notifyReq UU回调接口
      * @return
      */
@@ -298,17 +269,17 @@ public class AppApiController {
     @Operation(summary = "订单") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
     @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
     @PermitAll
-    public CommonResult<Map<String,Object>> uuNotify(@RequestBody NotifyReq notifyReq) {
-        DevAccountUtils.tenantExecute(1L,()->{
+    public CommonResult<Map<String, Object>> uuNotify(@RequestBody NotifyReq notifyReq) {
+        DevAccountUtils.tenantExecute(1L, () -> {
             uuNotifyService.notify(notifyReq);
             return null;
         });
-        CommonResult<Map<String,Object>> ret=new CommonResult<>();
+        CommonResult<Map<String, Object>> ret = new CommonResult<>();
         ret.setCode(200);
         ret.setMsg("成功");
         ret.setData(MapUtils.convertMap(Arrays.asList(
-                new KeyValue<>("messageNo",notifyReq.getMessageNo()),
-                new KeyValue<>("flag",true)
+                new KeyValue<>("messageNo", notifyReq.getMessageNo()),
+                new KeyValue<>("flag", true)
         )));
         return ret;
     }
