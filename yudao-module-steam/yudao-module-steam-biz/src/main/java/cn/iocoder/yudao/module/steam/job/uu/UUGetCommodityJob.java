@@ -16,6 +16,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import java.util.concurrent.*;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Component;
@@ -36,6 +37,8 @@ public class UUGetCommodityJob implements JobHandler {
 
     @Resource
     private UUService uuService;
+    @Resource
+    private RabbitTemplate rabbitTemplate;
 
     @Autowired
     public void setApiUUCommodityService(ApiUUCommodeityService apiUUCommodeityService) {
@@ -48,69 +51,10 @@ public class UUGetCommodityJob implements JobHandler {
             // 查询所有模板 ID
             List<Integer> allTemplateIds = getTemplateIds();
 
-            // 分批次查询商品信息
-            int totalCount = 0;
-            int batchSize = 250; // 每批查询 250 个 ID
-            int threadCount = 10; // 使用 10 个线程
-
-            // 定义一个List，用来存放Future类型的ApiResult<CommodityList>
-            List<Future<ApiResult<CommodityList>>> futures = new ArrayList<>();
-            // 创建一个固定线程数的线程池
-            ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
-
-            // 循环遍历allTemplateIds，分批处理
-            for (int i = 0; i < allTemplateIds.size(); i += batchSize * threadCount) {
-                // 循环threadCount次，每次处理batchSize个数据
-                for (int j = 0; j < threadCount; j++) {
-                    // 计算当前批次的起始位置
-                    int start = i + j * batchSize;
-                    // 计算当前批次的结束位置，并取最小值，防止数组越界
-                    int end = Math.min(start + batchSize, allTemplateIds.size());
-                    // 获取当前批次的数据
-                    List<Integer> batchIds = allTemplateIds.subList(start, end);
-
-                    // 创建ApiUUCommodityReqVO对象，并设置单个templateId
-                    for (Integer batchId : batchIds) {
-                        ApiUUCommodityReqVO reqVO = new ApiUUCommodityReqVO();
-                        reqVO.setTemplateId(String.valueOf(batchId));
-
-                        // 使用线程池执行任务
-                        Future<ApiResult<CommodityList>> future = executorService.submit(() -> {
-                            // 调用uuService的getCommodityList方法获取商品列表
-                            ApiResult<CommodityList> apiResult = uuService.getCommodityList(reqVO);
-
-                            if (apiResult.isSuccess() && apiResult.getData() != null) {
-                                CommodityList commodityList = apiResult.getData();
-                                commodityList.setData(commodityList.getData().subList(0, Math.min(50, commodityList.getData().size())));
-                                return ApiResult.success(commodityList);
-                            } else {
-                                return apiResult;
-                            }
-                        });
-                        futures.add(future);
-                    }
-                }
-
-                for (Future<ApiResult<CommodityList>> future : futures) {
-                    try {
-                        ApiResult<CommodityList> apiResult = future.get(30, TimeUnit.SECONDS); // 设置30秒超时时间
-                        if (apiResult.isSuccess() && apiResult.getData() != null) {
-                            apiUUCommodeityService.insertGoodsQuery(apiResult);
-                            totalCount += apiResult.getData().getData().size();
-                        } else {
-                            log.error("调用 uuService.getCommodityList 方法返回错误: {}", apiResult.getMsg());
-                        }
-                    } catch (TimeoutException e) {
-                        log.error("调用 uuService.getCommodityList 方法超时: {}", e.getMessage(), e);
-                    } catch (Exception e) {
-                        log.error("等待线程任务出错: {}", e.getMessage(), e);
-                    }
-                }
-                futures.clear();
+            for (Integer templateId : allTemplateIds) {
+                rabbitTemplate.convertAndSend("steam", "steam_commodity", templateId);
             }
-
-            executorService.shutdown();
-            return totalCount;
+            return 1;
         });
 
         return String.format("执行关闭成功 %s 个", execute);

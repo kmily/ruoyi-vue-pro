@@ -184,8 +184,12 @@ public class AppApiController {
     @Operation(summary = "查询UU商品列表")
     public ApiResult<CommodityList> youyouCommodityList(@RequestBody ApiUUCommodityReqVO reqVo) throws JsonProcessingException {
         ApiResult<CommodityList> commodityList = uuService.getCommodityList(reqVo);
-        apiUUCommodeityService.insertGoodsQuery(commodityList);
-        return commodityList;
+        if (commodityList.getData().getData().get(0).getTemplateId() == null){
+            return commodityList;
+        }else {
+            apiUUCommodeityService.insertGoodsQuery(commodityList, commodityList.getData().getData().get(0).getTemplateId());
+            return commodityList;
+        }
     }
 
 

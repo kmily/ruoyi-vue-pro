@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.youyoutemplate.YouyouTemplateMapp
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiUUTemplateVO;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -102,9 +104,12 @@ public class ApiUUCommodeityService {
      *  下载UU商品列表
      */
     @Async
-    public void insertGoodsQuery(@RequestBody ApiResult<CommodityList> commodityList) throws JsonProcessingException {
+    public void insertGoodsQuery(@RequestBody ApiResult<CommodityList> commodityList, Integer templateId) throws JsonProcessingException {
         String commodityListJson = objectMapper.writeValueAsString(commodityList.getData());
         List<ApiUUCommodityDO> apiUUCommodityDOS = objectMapper.readValue(commodityListJson, new TypeReference<List<ApiUUCommodityDO>>() {});
+
+        uuCommodityMapper.delete(new LambdaQueryWrapperX<YouyouCommodityDO>().eq(YouyouCommodityDO::getTemplateId,templateId));
+
 
         List<YouyouCommodityDO> youyouCommodityDOS = uuCommodityMapper.selectList(new QueryWrapper<YouyouCommodityDO>().select("id"));
         // 库存已有UU商品ID表
@@ -118,7 +123,6 @@ public class ApiUUCommodeityService {
         for (ApiUUCommodityDO apiUUCommodityDO : apiUUCommodityDOS) {
             YouyouCommodityDO goods = new YouyouCommodityDO();
             UUList.add(apiUUCommodityDO.getId());
-            if(!localList.contains(apiUUCommodityDO.getId())){
                 goods.setId(apiUUCommodityDO.getId());
                 goods.setTemplateId(apiUUCommodityDO.getTemplateId());
                 goods.setShippingMode(apiUUCommodityDO.getShippingMode());
@@ -137,20 +141,20 @@ public class ApiUUCommodeityService {
                 goods.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
                 goods.setStatus(0);
                 goodsList.add(goods);
-            }
+
         }
         if(!goodsList.isEmpty()){
             uuCommodityMapper.insertBatch(goodsList);
         }
-        ArrayList<Integer> list = new ArrayList<>();
+/*        ArrayList<Integer> list = new ArrayList<>();
         for (YouyouCommodityDO youyouCommodityDO : youyouCommodityDOS) {
             if(!UUList.contains(youyouCommodityDO.getTemplateId())){
                 list.add(youyouCommodityDO.getTemplateId());
             }
-        }
-        if(!list.isEmpty()){
+        }*/
+/*        if(!list.isEmpty()){
             uuCommodityMapper.deleteBatchIds(list);
-        }
+        }*/
     }
 
 
