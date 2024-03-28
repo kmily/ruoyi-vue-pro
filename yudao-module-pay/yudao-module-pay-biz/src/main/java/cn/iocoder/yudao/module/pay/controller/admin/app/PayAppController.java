@@ -93,6 +93,9 @@ public class PayAppController {
         Collection<Long> appIds = convertList(pageResult.getList(), PayAppDO::getId);
         List<PayChannelDO> channels = channelService.getChannelListByAppIds(appIds);
 
+        // 解决支付管理配置无法回显的问题
+        channels = channels.stream().filter(c-> c.getStatus().equals(0)).collect(Collectors.toList());
+
         // 拼接后返回
         return success(PayAppConvert.INSTANCE.convertPage(pageResult, channels));
     }
