@@ -71,8 +71,12 @@ public class BpmModelServiceImpl implements BpmModelService {
         if (StrUtil.isNotBlank(pageVO.getCategory())) {
             modelQuery.modelCategory(pageVO.getCategory());
         }
+        // 这里兼容租户开关未开启的情况，tenantId为null则认为租户开关未打开，不做筛选
+        if (StrUtil.isNotBlank(TenantContextHolder.getTenantIdStr())) {
+            modelQuery.modelTenantId(TenantContextHolder.getTenantIdStr());
+        }
         // 执行查询
-        List<Model> models = modelQuery.modelTenantId(TenantContextHolder.getTenantIdStr())
+        List<Model> models = modelQuery
                 .orderByCreateTime().desc()
                 .listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
 
