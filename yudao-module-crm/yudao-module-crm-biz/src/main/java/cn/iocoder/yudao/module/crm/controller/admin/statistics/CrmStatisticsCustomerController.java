@@ -2,6 +2,10 @@ package cn.iocoder.yudao.module.crm.controller.admin.statistics;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.*;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerAreaRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerIndustryRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerLevelRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.analyze.CrmStatisticCustomerSourceRespVO;
 import cn.iocoder.yudao.module.crm.service.statistics.CrmStatisticsCustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -80,6 +84,34 @@ public class CrmStatisticsCustomerController {
     @PreAuthorize("@ss.hasPermission('crm:statistics-customer:query')")
     public CommonResult<List<CrmStatisticsCustomerDealCycleByUserRespVO>> getCustomerDealCycleByUser(@Valid CrmStatisticsCustomerReqVO reqVO) {
         return success(customerService.getCustomerDealCycleByUser(reqVO));
+    }
+
+    @GetMapping("/get-customer-industry-summary")
+    @Operation(summary = "获取客户行业统计数据")
+    @PreAuthorize("@ss.hasPermission('crm:statistics-customer:query')")
+    public CommonResult<List<CrmStatisticCustomerIndustryRespVO>> getCustomerIndustry(@Valid CrmStatisticsCustomerReqVO reqVO) {
+        return success(customerService.getCustomerIndustry(reqVO));
+    }
+
+    @GetMapping("/get-customer-source-summary")
+    @Operation(summary = "获取客户来源统计数据")
+    @PreAuthorize("@ss.hasPermission('crm:statistics-customer:query')")
+    public CommonResult<List<CrmStatisticCustomerSourceRespVO>> getCustomerSource(@Valid CrmStatisticsCustomerReqVO reqVO) {
+        return success(customerService.getCustomerSource(reqVO));
+    }
+
+    @GetMapping("/get-customer-level-summary")
+    @Operation(summary = "获取客户级别统计数据")
+    @PreAuthorize("@ss.hasPermission('crm:statistics-customer:query')")
+    public CommonResult<List<CrmStatisticCustomerLevelRespVO>> getCustomerLevel(@Valid CrmStatisticsCustomerReqVO reqVO) {
+        return success(customerService.getCustomerLevel(reqVO));
+    }
+
+    @GetMapping("/get-customer-area-summary")
+    @Operation(summary = "获取客户地区统计数据")
+    @PreAuthorize("@ss.hasPermission('crm:statistics-customer:query')")
+    public CommonResult<List<CrmStatisticCustomerAreaRespVO>> getCustomerArea(@Valid CrmStatisticsCustomerReqVO reqVO) {
+        return success(customerService.getCustomerArea(reqVO));
     }
 
 }
