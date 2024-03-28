@@ -81,11 +81,8 @@ public class OpenApiService {
     public <T extends Serializable> OpenApiReqVo<T> requestUUSign(OpenApiReqVo<T> openApiReqVo){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         ConfigDO configApiKey = configService.getConfigByKey("uu.appKey");
-        ConfigDO configByKey = configService.getConfigByKey("uu.key1");
-        ConfigDO configByKey2 = configService.getConfigByKey("uu.key2");
-        ConfigDO configByKey3 = configService.getConfigByKey("uu.key3");
-        ConfigDO configByKey4 = configService.getConfigByKey("uu.key4");
-        String key=configByKey.getValue()+configByKey2.getValue()+configByKey3.getValue()+configByKey4.getValue();
+        ConfigDO configByKey = configService.getConfigByKey("uu.prikey");
+        String key=configByKey.getValue();
         openApiReqVo.setTimestamp(simpleDateFormat.format(new Date()));
         openApiReqVo.setAppKey(configApiKey.getValue());
         sign(openApiReqVo,key);
