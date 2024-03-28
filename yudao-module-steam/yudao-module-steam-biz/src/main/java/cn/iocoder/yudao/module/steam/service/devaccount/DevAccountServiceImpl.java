@@ -17,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.security.KeyPair;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import cn.iocoder.yudao.module.steam.controller.admin.devaccount.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
@@ -157,10 +158,11 @@ public class DevAccountServiceImpl implements DevAccountService {
         if(Objects.isNull(loginUser)){
             throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
         }
+
         return devAccountMapper.selectList(new LambdaQueryWrapperX<DevAccountDO>()
                 .eq(DevAccountDO::getUserType, loginUser.getUserType())
                 .eq(DevAccountDO::getUserId, loginUser.getId())
-        );
+        ).stream().map(item->item.setCallbackPrivateKey("")).collect(Collectors.toList());
     }
 
     public DevAccountDO selectByUserName(String userName, UserTypeEnum userTypeEnum) {
