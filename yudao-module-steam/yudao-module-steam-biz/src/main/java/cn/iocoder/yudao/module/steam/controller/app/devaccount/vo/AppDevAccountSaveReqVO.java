@@ -40,4 +40,9 @@ public class AppDevAccountSaveReqVO {
 //    @NotEmpty(message = "申请理由不能为空")
     private String applyReason;
 
+    /**
+     * 是否重头生成回调key
+     */
+    private Boolean genCallbackKey;
+
 }

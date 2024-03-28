@@ -10,10 +10,12 @@ import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.app.devaccount.vo.AppDevAccountSaveReqVO;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
+import cn.iocoder.yudao.module.steam.utils.RSAUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
+import java.security.KeyPair;
 import java.util.*;
 
 import cn.iocoder.yudao.module.steam.controller.admin.devaccount.vo.*;
@@ -104,6 +106,15 @@ public class DevAccountServiceImpl implements DevAccountService {
             }
             DevAccountDO devAccountDO = devAccountDOS.get(0);
             devAccountDO.setApiPublicKey(createReqVO.getApiPublicKey());
+            if(Objects.nonNull(createReqVO.getGenCallbackKey()) && createReqVO.getGenCallbackKey()){
+                try {
+                    KeyPair keyPair = RSAUtils.genKey();
+                    devAccountDO.setCallbackPrivateKey(RSAUtils.encryptBASE64(keyPair.getPrivate().getEncoded()));
+                    devAccountDO.setCallbackPublicKey(RSAUtils.encryptBASE64(keyPair.getPublic().getEncoded()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
             if(Objects.nonNull(createReqVO.getCallbackUrl())){
                 devAccountDO.setCallbackUrl(createReqVO.getCallbackUrl());
             }

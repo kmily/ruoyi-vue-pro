@@ -70,5 +70,13 @@ public class DevAccountDO extends BaseDO {
      * 申请理由
      */
     private String applyReason;
+    /**
+     * 回调公匙
+     */
+    private String callbackPublicKey;
+    /**
+     * 回调地址
+     */
+    private String callbackPrivateKey;
 
 }
