@@ -10,8 +10,8 @@ import cn.iocoder.yudao.module.im.dal.mysql.message.MessageMapper;
 import cn.iocoder.yudao.module.im.enums.conversation.ConversationTypeEnum;
 import cn.iocoder.yudao.module.im.enums.message.MessageSourceEnum;
 import cn.iocoder.yudao.module.im.enums.message.MessageStatusEnum;
-import cn.iocoder.yudao.module.im.service.groupmember.ImGroupMemberService;
-import cn.iocoder.yudao.module.im.service.inbox.ImInboxService;
+import cn.iocoder.yudao.module.im.service.groupmember.GroupMemberService;
+import cn.iocoder.yudao.module.im.service.inbox.InboxService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
@@ -38,20 +38,21 @@ public class MessageServiceImpl implements MessageService {
     @Resource
     private MessageMapper messageMapper;
     @Resource
-    private ImInboxService imInboxService; // IM收件箱服务
+    private InboxService inboxService;
     @Resource
     private AdminUserApi adminUserApi;
     @Resource
-    private ImGroupMemberService imGroupMemberService;
+    private GroupMemberService groupMemberService;
 
     @Override
-    public List<MessageDO> getMessagePage(MessagePageReqVO pageReqVO) {
-        return messageMapper.getMessagePage(pageReqVO);
+    public List<MessageDO> getHistoryMessage(MessagePageReqVO pageReqVO) {
+        return messageMapper.getHistoryMessage(pageReqVO);
     }
 
     @Override
     public List<MessageDO> getMessageListBySequence(Long userId, Long sequence, Integer size) {
-        return messageMapper.getGreaterThanSequenceMessage(userId, sequence, size);
+        List<Long> messageIds = inboxService.selectMessageIdsByUserIdAndSequence(userId, sequence, size);
+        return messageMapper.selectBatchIds(messageIds);
     }
 
     @Override
@@ -61,7 +62,7 @@ public class MessageServiceImpl implements MessageService {
         SendMessageRespVO sendMessageRespVO = saveMessage(fromUserId, message, inboxSaveMessageReqVO);
 
         // 保存收件箱 + 发送消息给用户
-        imInboxService.saveInboxAndSendMessage(inboxSaveMessageReqVO);
+        inboxService.saveInboxAndSendMessage(inboxSaveMessageReqVO);
         return sendMessageRespVO;
     }
 
@@ -112,7 +113,7 @@ public class MessageServiceImpl implements MessageService {
 
         } else if (message.getConversationType().equals(ConversationTypeEnum.GROUP.getType())) {
             //校验群聊是否存在；
-            List<GroupMemberDO> groupMemberDOS = imGroupMemberService.selectByGroupId(message.getReceiverId());
+            List<GroupMemberDO> groupMemberDOS = groupMemberService.selectByGroupId(message.getReceiverId());
             if (groupMemberDOS.isEmpty()) {
                 throw exception(MESSAGE_RECEIVER_NOT_EXISTS);
             }

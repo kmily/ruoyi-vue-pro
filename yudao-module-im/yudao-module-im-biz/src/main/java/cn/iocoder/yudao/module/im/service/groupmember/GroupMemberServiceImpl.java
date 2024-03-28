@@ -23,7 +23,7 @@ import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
  */
 @Service
 @Validated
-public class ImGroupMemberServiceImpl implements ImGroupMemberService {
+public class GroupMemberServiceImpl implements GroupMemberService {
 
     @Resource
     private ImGroupMemberMapper imGroupMemberMapper;

@@ -15,13 +15,12 @@ import java.util.List;
 public interface MessageService {
 
     /**
-     * 获得消息分页
+     * 获得历史消息
      *
      * @param pageReqVO 分页查询
      * @return 消息分页
      */
-    List<MessageDO> getMessagePage(MessagePageReqVO pageReqVO);
-
+    List<MessageDO> getHistoryMessage(MessagePageReqVO pageReqVO);
 
     /**
      * 拉取消息-大于 seq 的消息
