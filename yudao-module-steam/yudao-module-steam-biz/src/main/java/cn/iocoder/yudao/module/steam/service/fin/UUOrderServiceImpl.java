@@ -186,7 +186,7 @@ public class UUOrderServiceImpl implements UUOrderService {
 
     /**
      * 未支付订单取消支付并释放库存
-     * @param invOrderId
+     * @param invOrderId 订单号
      */
     public void closeUnPayInvOrder(Long invOrderId) {
         YouyouOrderDO uuOrder = getUUOrderById(invOrderId);
@@ -278,7 +278,7 @@ public class UUOrderServiceImpl implements UUOrderService {
 
     /**
      * 订单完成后打款
-     * @param invOrderId
+     * @param invOrderId 订单号
      */
     @Transactional(rollbackFor = ServiceException.class)
     public void cashInvOrder(Long invOrderId) {
@@ -462,7 +462,7 @@ public class UUOrderServiceImpl implements UUOrderService {
      * 检查是否有有效订单有魔兽的时候不能再次下单
      * 条件支付订单未关闭且发货状态不是关闭都是有效订单
      *
-     * @param commodityId
+     * @param commodityId 商品ID
      * @return
      */
     public List<YouyouOrderDO> getExpOrder(String commodityId){
