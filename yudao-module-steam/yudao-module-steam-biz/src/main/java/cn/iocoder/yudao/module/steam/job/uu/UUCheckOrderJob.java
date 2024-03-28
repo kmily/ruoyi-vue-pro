@@ -18,8 +18,8 @@ import java.util.List;
  * 订单自动检测发货
  */
 @Slf4j
-@Component
-public class UUCheckTransferOrderJob implements JobHandler {
+@Component("UUCheckOrderJob")
+public class UUCheckOrderJob implements JobHandler {
     @Resource
     private YouyouOrderMapper youyouOrderMapper;
 

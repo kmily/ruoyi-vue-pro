@@ -41,7 +41,7 @@ public class UUNotifyService {
     private RabbitTemplate rabbitTemplate;
 
     public void notify(NotifyReq notifyReq) {
-        ConfigDO priKey = configService.getConfigByKey("uu.pubkey");
+        ConfigDO pubkey = configService.getConfigByKey("uu.pubkey");
         Map<String, String> params = new HashMap<>();
         params.put("messageNo",notifyReq.getMessageNo());
         //注意接收到的callBackInfo是含有双引号转译符"\" 文档上无法体现只需要在验证签名是直接把callBackInfo值当成字符串即可以
@@ -59,7 +59,10 @@ public class UUNotifyService {
             }
         }
         try {
-            boolean flag = RSAUtils.verifyByPublicKey(stringBuilder.toString().getBytes(), priKey.getValue(), notifyReq.getSign());
+            boolean flag = RSAUtils.verifyByPublicKey(stringBuilder.toString().getBytes(), pubkey.getValue(), notifyReq.getSign());
+            if(!flag){
+                return;
+            }
             log.info("stringBuilder:{}",stringBuilder);
             YouyouNotifyDO youyouNotifyDO=new YouyouNotifyDO();
             youyouNotifyDO.setMsg(notifyReq);

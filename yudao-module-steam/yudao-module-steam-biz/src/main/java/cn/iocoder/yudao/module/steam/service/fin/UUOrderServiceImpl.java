@@ -23,10 +23,12 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.order.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.youyounotify.YouyouNotifyDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.devaccount.DevAccountMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoucommodity.UUCommodityMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.youyounotify.YouyouNotifyMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
@@ -125,6 +127,9 @@ public class UUOrderServiceImpl implements UUOrderService {
 
     @Resource
     private YouyouOrderMapper youyouOrderMapper;
+
+    @Resource
+    private YouyouNotifyMapper youyouNotifyMapper;
 
     @Resource
     private UUCommodityMapper uUCommodityMapper;
@@ -813,8 +818,9 @@ public class UUOrderServiceImpl implements UUOrderService {
                     notifyReq.setSign(s);
                     builder.postObject(notifyReq);
                     HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
-                    youyouOrderMapper.updateById(new YouyouOrderDO().setId(youyouOrderDO.getId())
-                            .setPushRemote(true)
+                    YouyouNotifyDO youyouNotifyDO = youyouNotifyMapper.selectOne(new LambdaQueryWrapperX<YouyouNotifyDO>()
+                            .eq(YouyouNotifyDO::getMessageNo, notifyReq.getMessageNo()));
+                    youyouNotifyMapper.updateById(new YouyouNotifyDO().setId(youyouNotifyDO.getId()).setPushRemote(true)
                             .setPushRemoteUrl(devAccountDO.getCallbackUrl())
                             .setPushRemoteResult(sent.html()));
                 }
@@ -840,9 +846,10 @@ public class UUOrderServiceImpl implements UUOrderService {
             if(queryOrderStatusRespApiResult.getData().getBigStatus()==340){
                 cashInvOrder(invOrderId);
             }
-            if(queryOrderStatusRespApiResult.getData().getBigStatus()==360){
-                cashInvOrder(invOrderId);
-            }
+            //只处理340的单子
+//            if(queryOrderStatusRespApiResult.getData().getBigStatus()==360){
+//                cashInvOrder(invOrderId);
+//            }
             if(queryOrderStatusRespApiResult.getData().getBigStatus()==280){
                 damagesCloseInvOrder(invOrderId,queryOrderStatusRespApiResult.getData().getSmallStatusMsg());
             }
