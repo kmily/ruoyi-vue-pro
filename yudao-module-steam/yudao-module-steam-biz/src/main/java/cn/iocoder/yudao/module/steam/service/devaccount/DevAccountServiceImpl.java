@@ -106,7 +106,9 @@ public class DevAccountServiceImpl implements DevAccountService {
                 throw exception(DEV_ACCOUNT_KEY);
             }
             DevAccountDO devAccountDO = devAccountDOS.get(0);
-            devAccountDO.setApiPublicKey(createReqVO.getApiPublicKey());
+            if(StringUtils.hasText(createReqVO.getApiPublicKey())) {
+                devAccountDO.setApiPublicKey(createReqVO.getApiPublicKey());
+            }
             if(Objects.nonNull(createReqVO.getGenCallbackKey()) && createReqVO.getGenCallbackKey()){
                 try {
                     KeyPair keyPair = RSAUtils.genKey();
