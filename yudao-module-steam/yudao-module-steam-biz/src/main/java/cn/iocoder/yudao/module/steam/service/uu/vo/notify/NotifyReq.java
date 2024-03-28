@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @NoArgsConstructor
 @Data
-public class NotifyReq {
+public class NotifyReq implements Serializable {
 
     @JsonProperty("messageNo")
     private String messageNo;

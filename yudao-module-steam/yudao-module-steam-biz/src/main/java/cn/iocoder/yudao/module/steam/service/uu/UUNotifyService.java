@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
 import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
 import cn.iocoder.yudao.module.steam.utils.RSAUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,8 +29,16 @@ public class UUNotifyService {
     private YouyouNotifyMapper youyouNotifyMapper;
     @Resource
     private UUOrderService uuOrderService;
-    @Autowired
+
     private ConfigService configService;
+
+    @Autowired
+    public void setConfigService(ConfigService configService) {
+        this.configService = configService;
+    }
+    @Resource
+    private RabbitTemplate rabbitTemplate;
+
     public void notify(NotifyReq notifyReq) {
         ConfigDO pubKey = configService.getConfigByKey("uu.pubkey");
         Map<String, Object> params = new HashMap<>();
@@ -55,7 +64,8 @@ public class UUNotifyService {
             youyouNotifyDO.setMsg(notifyReq);
             youyouNotifyDO.setMessageNo(notifyReq.getMessageNo());
             youyouNotifyMapper.insert(youyouNotifyDO);
-            uuOrderService.processNotify(notifyReq);
+            rabbitTemplate.convertAndSend("steam","steam_notify",notifyReq);
+
         } catch (InvalidKeySpecException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
