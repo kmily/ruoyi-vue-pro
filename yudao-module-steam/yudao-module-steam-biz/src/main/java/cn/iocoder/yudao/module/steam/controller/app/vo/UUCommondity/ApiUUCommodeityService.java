@@ -115,8 +115,8 @@ public class ApiUUCommodeityService {
             localList.add(youyouCommodityDO.getId());
         }
         List<YouyouCommodityDO> goodsList = new ArrayList<>();
-        YouyouCommodityDO goods = new YouyouCommodityDO();
         for (ApiUUCommodityDO apiUUCommodityDO : apiUUCommodityDOS) {
+            YouyouCommodityDO goods = new YouyouCommodityDO();
             UUList.add(apiUUCommodityDO.getId());
             if(!localList.contains(apiUUCommodityDO.getId())){
                 goods.setId(apiUUCommodityDO.getId());
