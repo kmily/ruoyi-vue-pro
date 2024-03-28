@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.im.enums.conversation;
 
+import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.util.Arrays;
 
 /**
  * IM 会话类型枚举
@@ -11,11 +14,13 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum ConversationTypeEnum {
+public enum ConversationTypeEnum implements IntArrayValuable {
 
     SINGLE(1, "单聊"),
     GROUP(3, "群聊"),
     NOTIFICATION(4, "通知会话");
+
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ConversationTypeEnum::getType).toArray();
 
     /**
      * 类型
@@ -26,6 +31,11 @@ public enum ConversationTypeEnum {
      * 名字
      */
     private final String name;
+
+    @Override
+    public int[] array() {
+        return ARRAYS;
+    }
 
     /**
      * 生成会话编号

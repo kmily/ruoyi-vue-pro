@@ -88,13 +88,15 @@ public class MessageServiceImpl implements MessageService {
         messageMapper.insert(messageDO);
 
         // 设置 InboxSaveMessageReqVO 对象
-        inboxSaveMessageReqVO.setConversationType(message.getConversationType());
-        inboxSaveMessageReqVO.setFromId(fromUserId);
-        inboxSaveMessageReqVO.setReceiverId(message.getReceiverId());
-        inboxSaveMessageReqVO.setMessageId(messageDO.getId());
-        inboxSaveMessageReqVO.setContentType(message.getContentType());
-        inboxSaveMessageReqVO.setContent(message.getContent());
-        inboxSaveMessageReqVO.setSendTime(messageDO.getSendTime());
+        inboxSaveMessageReqVO.setConversationType(message.getConversationType())
+                .setFromId(fromUserId)
+                .setReceiverId(message.getReceiverId())
+                .setMessageId(messageDO.getId())
+                .setContentType(message.getContentType())
+                .setContent(message.getContent())
+                .setSendTime(messageDO.getSendTime())
+                .setSenderNickname(fromUser.getNickname())
+                .setSenderAvatar(fromUser.getAvatar());
 
         // 返回 SendMessageRespVO 对象
         return new SendMessageRespVO(messageDO.getId(), messageDO.getSendTime());

@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.im.dal.redis.inbox.InboxLockRedisDAO;
 import cn.iocoder.yudao.module.im.dal.redis.inbox.SequenceRedisDao;
 import cn.iocoder.yudao.module.im.enums.conversation.ConversationTypeEnum;
 import cn.iocoder.yudao.module.im.service.groupmember.GroupMemberService;
+import cn.iocoder.yudao.module.infra.api.websocket.WebSocketSenderApi;
 import jakarta.annotation.Resource;
 import org.dromara.hutool.core.date.DateUnit;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,7 @@ public class InboxServiceImpl implements InboxService {
     @Resource
     private InboxLockRedisDAO inboxLockRedisDAO; // 收件箱的锁 Redis DAO
     @Resource
-    private WebSocketMessageSender webSocketMessageSender; // WebSocket消息发送器
+    private WebSocketSenderApi webSocketSenderApi;
     @Resource
     private GroupMemberService groupMemberService;
 
@@ -71,7 +72,7 @@ public class InboxServiceImpl implements InboxService {
 
             InboxSendMessageReqVO message = BeanUtils.toBean(inboxSaveMessage, InboxSendMessageReqVO.class);
             message.setSequence(userSequence);
-            webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId, IM_MESSAGE_RECEIVE, message);
+            webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), userId, IM_MESSAGE_RECEIVE, message);
         });
     }
 
