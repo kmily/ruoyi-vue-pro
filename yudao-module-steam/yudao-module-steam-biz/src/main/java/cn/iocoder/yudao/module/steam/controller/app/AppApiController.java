@@ -536,7 +536,7 @@ public class AppApiController {
 
                 QueryOrderStatusResp ret = new QueryOrderStatusResp();
                 ret.setOrderNumber(uuOrder.getOrderNo());
-                ret.setShippingMode(uuOrder.getShippingMode());
+                ret.setShippingMode(uuOrder.getUuShippingMode());
                 ret.setTradeOfferId(uuOrder.getUuTradeOfferId());
                 ret.setTradeOfferLinks(uuOrder.getUuTradeOfferLinks());
                 ret.setBigStatus(uuOrder.getUuOrderStatus());

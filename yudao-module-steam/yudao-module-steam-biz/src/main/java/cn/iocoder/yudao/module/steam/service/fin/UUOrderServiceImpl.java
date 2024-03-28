@@ -590,11 +590,14 @@ public class UUOrderServiceImpl implements UUOrderService {
         productDetailDTO.setCommodityTemplateId(youyouCommodity.getTemplateId());
         productDetailDTO.setAssertId(null);// TODO 待确认
         productDetailDTO.setAbrade(youyouCommodity.getCommodityAbrade());
+
         productDetailDTO.setIsDoppler(youyouCommodity.getTemplateisDoppler());
         productDetailDTO.setDopplerColor(null);// TODO 待确认
         productDetailDTO.setIsFade(youyouCommodity.getTemplateisFade());
         productDetailDTO.setFadeName(youyouCommodity.getCommodityFade());
-        //TODO
+        productDetailDTO.setDopplerColor(youyouCommodity.getCommodityDoppler());
+
+        //TODO 以下属性先这样返回， 目前用不上
         productDetailDTO.setPrice(new BigDecimal(youyouCommodity.getCommodityPrice()).multiply(new BigDecimal("100")).intValue());
 //                productDetailDTO.setNum(new BigDecimal(youyouCommodity.get()).multiply(new BigDecimal("100")).intValue());
         productDetailDTO.setPaintIndex(youyouCommodity.getCommodityPaintIndex());
@@ -619,30 +622,7 @@ public class UUOrderServiceImpl implements UUOrderService {
         productDetailDTO.setCommodityAbrade(youyouCommodity.getCommodityAbrade());
 
 
-//        if(Objects.nonNull(uuOrder.getPayChannelCode())){
-//            switch (PayChannelEnum.getByCode(uuOrder.getPayChannelCode())){
-//                case WALLET:
-//                    ret.setPayMethod(100);
-//                    break;
-//                case ALIPAY_PC:
-//                case ALIPAY_WAP:
-//                case ALIPAY_APP:
-//                case ALIPAY_QR:
-//                case ALIPAY_BAR:
-//                    ret.setPayMethod(200);
-//                    break;
-//                default:
-//            }
-//
-//        }
         ret.setProductDetail(productDetailDTO);
-//        if(Objects.nonNull(uuOrder.getRefundPrice())){
-//            ret.setReturnAmount(new BigDecimal(uuOrder.getRefundPrice()).divide(new BigDecimal("100")).toString());
-//            if(uuOrder.getRefundTime() != null) {
-//                ret.setCancelOrderTime(uuOrder.getRefundTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
-//            }
-//            ret.setCancelOrderTime(uuOrder.getRefundTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
-//        }
         return ret;
     }
 
