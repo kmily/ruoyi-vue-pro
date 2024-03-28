@@ -96,6 +96,9 @@ public class PayAppController {
         // 移除未启用的渠道
         channels.removeIf(channel -> !CommonStatusEnum.ENABLE.getStatus().equals(channel.getStatus()));
 
+        // 解决支付管理配置无法回显的问题
+        channels = channels.stream().filter(c-> c.getStatus().equals(0)).collect(Collectors.toList());
+
         // 拼接后返回
         return success(PayAppConvert.INSTANCE.convertPage(pageResult, channels));
     }
