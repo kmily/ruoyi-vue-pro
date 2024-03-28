@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.security.InvalidKeyException;
@@ -40,9 +41,9 @@ public class UUNotifyService {
     private RabbitTemplate rabbitTemplate;
 
     public void notify(NotifyReq notifyReq) {
-        ConfigDO pubKey = configService.getConfigByKey("uu.pubkey");
-        Map<String, Object> params = new HashMap<>();
-        params.put("messageNo","1265679");
+        ConfigDO priKey = configService.getConfigByKey("uu.pubkey");
+        Map<String, String> params = new HashMap<>();
+        params.put("messageNo",notifyReq.getMessageNo());
         //注意接收到的callBackInfo是含有双引号转译符"\" 文档上无法体现只需要在验证签名是直接把callBackInfo值当成字符串即可以
         params.put("callBackInfo",notifyReq.getCallBackInfo());
 
@@ -52,13 +53,13 @@ public class UUNotifyService {
         // 第二步：把所有参数名和参数值串在一起
         StringBuilder stringBuilder = new StringBuilder();
         for (String key : keys) {
-            Object value = params.get(key);
-            if (Objects.nonNull(value)) {
+            String value = params.get(key);
+            if (StringUtils.hasText(value)) {
                 stringBuilder.append(key).append(value);
             }
         }
         try {
-            boolean flag = RSAUtils.verifyByPublicKey(stringBuilder.toString().getBytes(), pubKey.getValue(), notifyReq.getSign());
+            boolean flag = RSAUtils.verifyByPublicKey(stringBuilder.toString().getBytes(), priKey.getValue(), notifyReq.getSign());
             log.info("stringBuilder:{}",stringBuilder);
             YouyouNotifyDO youyouNotifyDO=new YouyouNotifyDO();
             youyouNotifyDO.setMsg(notifyReq);

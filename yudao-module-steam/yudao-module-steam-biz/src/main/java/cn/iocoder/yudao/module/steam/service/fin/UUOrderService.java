@@ -62,6 +62,7 @@ public interface UUOrderService {
 
 
     void processNotify(NotifyReq notifyReq);
+    void pushRemote(NotifyReq notifyReq);
     /**
      * 关闭订单,
      * 用于未支持的订单进行关闭,并释放库存

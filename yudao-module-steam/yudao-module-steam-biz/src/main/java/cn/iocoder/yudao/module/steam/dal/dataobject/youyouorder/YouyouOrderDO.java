@@ -255,6 +255,17 @@ public class YouyouOrderDO extends BaseDO {
      * 支付接口返回
      */
     private String payPayRet;
-
+    /**
+     * 是否已经推送到远程
+     */
+    private Boolean pushRemote;
+    /**
+     * 远程地址
+     */
+    private String pushRemoteUrl;
+    /**
+     * 远程返回
+     */
+    private String pushRemoteResult;
 
 }
