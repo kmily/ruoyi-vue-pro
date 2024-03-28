@@ -57,6 +57,7 @@ public class QueryUUTemplateService {
             item.setWeaponHashName(youyouTemplateDO.getWeaponHashName());
             item.setMinSellPrice(youyouTemplateDO.getMinSellPrice());
             item.setFastShippingMinSellPrice(youyouTemplateDO.getFastShippingMinSellPrice());
+            item.setReferencePrice(youyouTemplateDO.getReferencePrice());
             item.setSellNum(youyouTemplateDO.getSellNum());
 
             saleTemplateByCategoryResponseList.add(item);
