@@ -19,9 +19,11 @@ import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTe
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoucommodity.YouyouCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyoutemplate.YouyouTemplateDO;
+import cn.iocoder.yudao.module.steam.dal.mysql.devaccount.DevAccountMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoucommodity.UUCommodityMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
@@ -40,7 +42,9 @@ import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
 import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyVo;
 import cn.iocoder.yudao.module.steam.service.youyoucommodity.YouyouCommodityService;
 import cn.iocoder.yudao.module.steam.service.youyoutemplate.UUTemplateService;
+import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
+import cn.iocoder.yudao.module.steam.utils.RSAUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,10 +58,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
@@ -127,6 +128,10 @@ public class UUOrderServiceImpl implements UUOrderService {
     public void setYouyouCommodityService(YouyouCommodityService youyouCommodityService) {
         this.youyouCommodityService = youyouCommodityService;
     }
+    @Resource
+    private DevAccountMapper devAccountMapper;
+
+
 
     /**
      * 方法只要用于查询，
@@ -747,6 +752,58 @@ public class UUOrderServiceImpl implements UUOrderService {
             if(notifyVo.getNotifyType()==4){
                 //订单被取消了，走退款
                 refundAction(youyouOrderDO,new LoginUser().setTenantId(1L).setUserType(youyouOrderDO.getBuyUserType()).setId(youyouOrderDO.getBuyUserId()));
+            }
+        }
+
+    }
+    @Override
+    public void pushRemote(NotifyReq notifyReq) {
+        String callBackInfo = notifyReq.getCallBackInfo();
+        NotifyVo notifyVo = JacksonUtils.readValue(callBackInfo, NotifyVo.class);
+
+        log.info("回调接收的数据{}",notifyVo);
+        List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(new LambdaQueryWrapper<YouyouOrderDO>()
+                .eq(YouyouOrderDO::getUuOrderNo, notifyVo.getOrderNo()));
+        if (!youyouOrderDOS.isEmpty()) {
+            YouyouOrderDO youyouOrderDO = youyouOrderDOS.get(0);
+            //获取用户的devaccount
+            try{
+                DevAccountDO devAccountDO = devAccountMapper.selectOne(new LambdaQueryWrapperX<DevAccountDO>()
+                        .eq(DevAccountDO::getUserId, youyouOrderDO.getBuyUserId())
+                        .eq(DevAccountDO::getUserType, youyouOrderDO.getBuyUserType())
+                );
+                if(StringUtils.hasText(devAccountDO.getCallbackUrl()) && StringUtils.hasText(devAccountDO.getCallbackPrivateKey()) && StringUtils.hasText(devAccountDO.getCallbackPublicKey())){
+                    HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+                    builder.url(devAccountDO.getCallbackUrl());
+                    builder.method(HttpUtil.Method.JSON);
+                    Map<String, String> params = new HashMap<>();
+                    params.put("messageNo",notifyReq.getMessageNo());
+                    //注意接收到的callBackInfo是含有双引号转译符"\" 文档上无法体现只需要在验证签名是直接把callBackInfo值当成字符串即可以
+                    params.put("callBackInfo",notifyReq.getCallBackInfo());
+
+                    // 第一步：检查参数是否已经排序
+                    String[] keys = params.keySet().toArray(new String[0]);
+                    Arrays.sort(keys);
+                    // 第二步：把所有参数名和参数值串在一起
+                    StringBuilder stringBuilder = new StringBuilder();
+                    for (String key : keys) {
+                        String value = params.get(key);
+                        if (!StringUtils.hasText(value)) {
+                            stringBuilder.append(key).append(value);
+                        }
+                    }
+                    log.info("stringBuilder:{}",stringBuilder);
+                    String s = RSAUtils.signByPrivateKey(stringBuilder.toString().getBytes(), devAccountDO.getCallbackPrivateKey());
+                    notifyReq.setSign(s);
+                    builder.postObject(notifyReq);
+                    HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
+                    youyouOrderMapper.updateById(new YouyouOrderDO().setId(youyouOrderDO.getId())
+                            .setPushRemote(true)
+                            .setPushRemoteUrl(devAccountDO.getCallbackUrl())
+                            .setPushRemoteResult(sent.html()));
+                }
+            }catch (Exception e){
+                log.error("消费消息出错{}",e.getMessage());
             }
         }
 
