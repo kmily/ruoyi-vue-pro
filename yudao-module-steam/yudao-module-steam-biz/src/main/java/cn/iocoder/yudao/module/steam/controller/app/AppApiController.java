@@ -338,13 +338,12 @@ public class AppApiController {
      *
      * @return
      */
-    @PostMapping("v1/api/byGoodsIdCreateOrder")
+    @PostMapping(value = {"v1/api/byGoodsIdCreateOrder","v1/api/byGoodsIdAsyncCreateOrder"})
     @Operation(summary = "指定商品购买")
     @PermitAll
     public ApiResult<CreateByIdRespVo> byGoodsIdCreateOrder(@RequestBody OpenApiReqVo<CreateCommodityOrderReqVo> openApiReqVo) {
         try {
             return DevAccountUtils.tenantExecute(1L, () -> {
-
                 if (Objects.isNull(openApiReqVo.getData().getCommodityId())) {
                     throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
                 }
@@ -374,7 +373,7 @@ public class AppApiController {
      *
      * @return
      */
-    @PostMapping("v1/api/byTemplateCreateOrder")
+    @PostMapping(value = {"v1/api/byTemplateCreateOrder","v1/api/byTemplateAsyncCreateOrder"})
     @Operation(summary = "指定模板购买")
     @PermitAll
     public ApiResult<CreateByTemplateRespVo> byTemplateCreateOrder(@RequestBody OpenApiReqVo<CreateCommodityOrderReqVo> openApiReqVo) {

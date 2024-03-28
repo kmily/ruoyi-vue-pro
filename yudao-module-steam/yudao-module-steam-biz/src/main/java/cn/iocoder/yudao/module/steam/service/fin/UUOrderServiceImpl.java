@@ -17,6 +17,8 @@ import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTemplatePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUBuyGoodsByIdReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodeityService;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
@@ -89,6 +91,13 @@ public class UUOrderServiceImpl implements UUOrderService {
      * 支付单流水的 no 前缀
      */
     private static final String PAY_NO_PREFIX = "YY";
+
+    private ApiUUCommodeityService apiUUCommodeityService;
+
+    @Autowired
+    public void setApiUUCommodeityService(ApiUUCommodeityService apiUUCommodeityService) {
+        this.apiUUCommodeityService = apiUUCommodeityService;
+    }
 
     @Resource
     private PayNoRedisDAO noRedisDAO;
@@ -392,10 +401,17 @@ public class UUOrderServiceImpl implements UUOrderService {
         }
         youyouOrderDO.setRealCommodityId(youyouOrderDO.getCommodityId());
         if(Objects.isNull(youyouOrderDO.getCommodityId())){//指定ID购买
-            //todo 查询出一个商品并获取商品ID
-            youyouOrderDO.setRealCommodityId("1");
+            Integer onSealGoodsId = apiUUCommodeityService.getOnSealGoodsId(new ApiUUBuyGoodsByIdReqVO()
+                    .setTemplateId(youyouOrderDO.getCommodityTemplateId())
+                    .setTemplateHashName(youyouOrderDO.getCommodityHashName())
+                    .setShippingMode(String.valueOf(youyouOrderDO.getShippingMode()))
+                    .setMaxPrice(youyouOrderDO.getPurchasePrice())
+            );
+            if(Objects.isNull(onSealGoodsId)){
+                throw exception(OpenApiCode.ERR_5213);
+            }
+            youyouOrderDO.setRealCommodityId(String.valueOf(onSealGoodsId));
             //查询不到则返回
-            throw exception(OpenApiCode.ERR_5213);
         }
         if(Objects.isNull(youyouOrderDO.getRealCommodityId())){
             throw exception(OpenApiCode.ERR_5214);
