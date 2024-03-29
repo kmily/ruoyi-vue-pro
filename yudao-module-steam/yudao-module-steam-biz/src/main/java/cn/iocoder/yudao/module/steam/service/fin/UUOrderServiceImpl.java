@@ -841,7 +841,7 @@ public class UUOrderServiceImpl implements UUOrderService {
         if(!uuOrderById.getPayStatus()){
             throw new ServiceException(-1,"订单未支付不支持打款");
         }
-        if(InvTransferStatusEnum.TransferFINISH.getStatus().equals(uuOrderById.getTransferStatus())){
+        if(InvTransferStatusEnum.TransferING.getStatus().equals(uuOrderById.getTransferStatus())){
             //发货完成时
             ApiResult<QueryOrderStatusResp> queryOrderStatusRespApiResult = uuService.orderStatus(new QueryOrderReqVo().setOrderNo(uuOrderById.getUuOrderNo()));
             if(queryOrderStatusRespApiResult.getData().getBigStatus()==340){
