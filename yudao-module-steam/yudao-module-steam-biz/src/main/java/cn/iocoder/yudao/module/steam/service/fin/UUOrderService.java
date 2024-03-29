@@ -70,4 +70,5 @@ public interface UUOrderService {
      * @param invOrderId InvOrderId
      */
     void checkTransfer(Long invOrderId);
+    void closeUnPayInvOrder(Long invOrderId);
 }

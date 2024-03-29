@@ -362,7 +362,7 @@ public class AppApiController {
                     ret.setMerchantOrderNo(youyouOrderDO.getMerchantOrderNo());
                     ret.setOrderStatus(PayOrderStatusRespEnum.isSuccess(youyouOrderDO.getPayOrderStatus()) ? 1 : 0);
                 } catch (ServiceException e) {
-                    uUOrderService.releaseInvOrder(invOrder.getId());
+                    uUOrderService.closeUnPayInvOrder(invOrder.getId());
                     throw e;
                 }
                 return ApiResult.success(ret);
@@ -397,7 +397,7 @@ public class AppApiController {
                     ret.setMerchantOrderNo(youyouOrderDO.getMerchantOrderNo());
                     ret.setOrderStatus(PayOrderStatusRespEnum.isSuccess(youyouOrderDO.getPayOrderStatus()) ? 1 : 0);
                 } catch (ServiceException e) {
-                    uUOrderService.releaseInvOrder(invOrder.getId());
+                    uUOrderService.closeUnPayInvOrder(invOrder.getId());
                     throw e;
                 }
                 return ApiResult.success(ret);
