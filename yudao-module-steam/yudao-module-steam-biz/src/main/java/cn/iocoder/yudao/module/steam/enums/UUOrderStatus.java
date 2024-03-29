@@ -19,7 +19,9 @@ public enum UUOrderStatus implements IntArrayValuable {
     CODE140(140,"交货中。"),
     CODE360(360,"结算中。"),
     CODE340(340,"已完成。"),
-    CODE280(280,"已取消。");
+    CODE280(280,"已取消。"),
+    CODE0(0,"成功"),
+    CODE2(2,"失败");
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(UUOrderStatus::getCode).toArray();
 

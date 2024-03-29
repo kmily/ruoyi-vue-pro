@@ -543,11 +543,11 @@ public class AppApiController {
                 ret.setTradeOfferId(uuOrder.getUuTradeOfferId());
                 ret.setTradeOfferLinks(uuOrder.getUuTradeOfferLinks());
                 ret.setBigStatus(uuOrder.getUuOrderStatus());
-                if (Objects.nonNull(ret.getBigStatus())) {
+                if (Objects.nonNull(ret.getBigStatus()) && Objects.nonNull(UUOrderStatus.valueOf(ret.getBigStatus()))) {
                     ret.setBigStatusMsg(UUOrderStatus.valueOf(ret.getBigStatus()).getMsg());
                 }
                 ret.setSmallStatus(uuOrder.getUuOrderSubStatus());
-                if (Objects.nonNull(ret.getSmallStatus())) {
+                if (Objects.nonNull(ret.getSmallStatus()) && Objects.nonNull(UUOrderSubStatus.valueOf(ret.getSmallStatus()))) {
                     ret.setSmallStatusMsg(UUOrderSubStatus.valueOf(ret.getSmallStatus()).getMsg());
                 }
                 ret.setFailCode(uuOrder.getUuFailCode());
@@ -569,7 +569,7 @@ public class AppApiController {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
                 YouyouOrderDO uuOrder = uUOrderService.getUUOrder(loginUser, openApiReqVo.getData());
-                return ApiResult.success(uUOrderService.orderInfo(uuOrder), "成功");
+                 return ApiResult.success(uUOrderService.orderInfo(uuOrder), "成功");
             });
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(), e.getMessage(), OrderInfoResp.class);
