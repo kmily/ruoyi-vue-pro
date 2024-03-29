@@ -71,6 +71,7 @@ import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import cn.smallbun.screw.core.util.CollectionUtils;
 import com.alibaba.excel.Empty;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -157,6 +158,7 @@ public class AppApiController {
 
     @Resource
     private QueryUUTemplateService queryUUTemplateService;
+
 
 
     /**
@@ -420,17 +422,14 @@ public class AppApiController {
         try {
             ApiResult<String> execute = DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
-                List<YouyouDetailsDO> detailsDOS = youyouDetailsMapper.selectList(new LambdaQueryWrapperX<YouyouDetailsDO>()
-                        .eq(YouyouDetailsDO::getAppkey, devAccount.getUserName()));
                 Long userId = devAccount.getUserId();
-                if (detailsDOS.isEmpty()) {
-                    return ApiResult.error(404, "没有数据", String.class);
-                }
+                YouyouDetailsDO youyouDetailsDO = new YouyouDetailsDO();
+                youyouDetailsDO.setAppkey(devAccount.getUserName());
+                youyouDetailsMapper.insert(youyouDetailsDO);
                 String fileName = RandomStringUtils.random(32,
                         new char[]{'a', 'b', 'c', 'd', 'e', 'f', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'});
                 Integer dataType = openApiReqVo.getData().getDataType();
-                jusDataType(userId, fileName + ".txt", dataType);
-                YouyouDetailsDO youyouDetailsDO = new YouyouDetailsDO();
+                jusDataType(userId, fileName + ".txt", dataType, youyouDetailsDO);
                 youyouDetailsDO.setApplyCode(fileName);
                 youyouDetailsDO.setDataType(openApiReqVo.getData().getDataType());
                 youyouDetailsMapper.updateBatch(youyouDetailsDO);
@@ -445,7 +444,7 @@ public class AppApiController {
     //TODO  异步优化到其他层
     @Async
     @OperateLog(type = EXPORT)
-    protected void jusDataType(Long userId, String fileName, Integer dataType) {
+    protected void jusDataType(Long userId, String fileName, Integer dataType, YouyouDetailsDO youyouDetailsDO) {
         switch (dataType) {
             case 1:
                 // 1....订单明细
@@ -453,8 +452,7 @@ public class AppApiController {
                         .eq(YouyouOrderDO::getBuyUserId, userId));
                 String result = JSON.toJSONString(youyouOrderDOS);
                 byte[] byte1 = result.getBytes();
-                String url = fileApi.createFile(fileName + ".txt", "", byte1);
-                YouyouDetailsDO youyouDetailsDO = new YouyouDetailsDO();
+                String url = fileApi.createFile(fileName, "", byte1);
                 youyouDetailsDO.setData(url);
                 youyouDetailsMapper.updateBatch(youyouDetailsDO);
                 break;
@@ -466,8 +464,7 @@ public class AppApiController {
                         .eq(PayWalletTransactionDO::getWalletId, payWalletDOS.get(0).getId()));
                 result = JSON.toJSONString(payWalletTransactionDOS);
                 byte1 = result.getBytes();
-                url = fileApi.createFile(fileName + ".txt", "", byte1);
-                youyouDetailsDO = new YouyouDetailsDO();
+                url = fileApi.createFile(fileName, "", byte1);
                 youyouDetailsDO.setData(url);
                 youyouDetailsMapper.updateBatch(youyouDetailsDO);
                 break;
