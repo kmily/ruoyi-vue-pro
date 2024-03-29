@@ -846,6 +846,7 @@ public class UUOrderServiceImpl implements UUOrderService {
             ApiResult<QueryOrderStatusResp> queryOrderStatusRespApiResult = uuService.orderStatus(new QueryOrderReqVo().setOrderNo(uuOrderById.getUuOrderNo()));
             if(queryOrderStatusRespApiResult.getData().getBigStatus()==340){
                 cashInvOrder(invOrderId);
+                youyouOrderMapper.updateById(new YouyouOrderDO().setId(invOrderId).setTransferStatus(InvTransferStatusEnum.TransferFINISH.getStatus()));
             }
             //只处理340的单子
 //            if(queryOrderStatusRespApiResult.getData().getBigStatus()==360){
@@ -853,6 +854,7 @@ public class UUOrderServiceImpl implements UUOrderService {
 //            }
             if(queryOrderStatusRespApiResult.getData().getBigStatus()==280){
                 damagesCloseInvOrder(invOrderId,queryOrderStatusRespApiResult.getData().getSmallStatusMsg());
+                youyouOrderMapper.updateById(new YouyouOrderDO().setId(invOrderId).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus()));
             }
         }
     }

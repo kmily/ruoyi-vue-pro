@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.steam.service.uu;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
-import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTemplateRespVO;
-import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTemplatedownloadRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUBatchGetOnSaleCommodity.BatchGetCommodity;
@@ -18,7 +16,6 @@ import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiPayWalletRespVO;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -129,7 +126,9 @@ public class UUService {
      * @return
      */
     public ApiResult<QueryOrderStatusResp> orderStatus(QueryOrderReqVo reqVo){
-        ApiResult<QueryOrderStatusResp> queryOrderStatusRespApiResult = openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/orderCancel", new OpenApiReqVo<QueryOrderReqVo>().setData(reqVo), QueryOrderStatusResp.class);
+        reqVo.setPageNo(null);
+        reqVo.setPageSize(null);
+        ApiResult<QueryOrderStatusResp> queryOrderStatusRespApiResult = openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/orderStatus", new OpenApiReqVo<QueryOrderReqVo>().setData(reqVo), QueryOrderStatusResp.class);
         checkResponse(queryOrderStatusRespApiResult);
         return queryOrderStatusRespApiResult;
     }
