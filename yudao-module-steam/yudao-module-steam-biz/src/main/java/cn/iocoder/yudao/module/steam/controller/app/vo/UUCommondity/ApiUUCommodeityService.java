@@ -108,17 +108,18 @@ public class ApiUUCommodeityService {
         String commodityListJson = objectMapper.writeValueAsString(commodityList.getData());
         List<ApiUUCommodityDO> apiUUCommodityDOS = objectMapper.readValue(commodityListJson, new TypeReference<List<ApiUUCommodityDO>>() {});
 
-        uuCommodityMapper.delete(new LambdaQueryWrapperX<YouyouCommodityDO>().eq(YouyouCommodityDO::getTemplateId,templateId));
+        uuCommodityMapper.delete(new LambdaQueryWrapperX<YouyouCommodityDO>().eq(YouyouCommodityDO::getTemplateId,templateId)
+                .eq(YouyouCommodityDO::getTransferStatus,InvTransferStatusEnum.SELL.getStatus()));
 
 
-        List<YouyouCommodityDO> youyouCommodityDOS = uuCommodityMapper.selectList(new QueryWrapper<YouyouCommodityDO>().select("id"));
+//        List<YouyouCommodityDO> youyouCommodityDOS = uuCommodityMapper.selectList(new QueryWrapper<YouyouCommodityDO>().select("id"));
         // 库存已有UU商品ID表
-        ArrayList<Integer> localList = new ArrayList<>();
+//        ArrayList<Integer> localList = new ArrayList<>();
         // UU商品ID表
         ArrayList<Integer> UUList = new ArrayList<>();
-        for (YouyouCommodityDO youyouCommodityDO : youyouCommodityDOS) {
-            localList.add(youyouCommodityDO.getId());
-        }
+//        for (YouyouCommodityDO youyouCommodityDO : youyouCommodityDOS) {
+//            localList.add(youyouCommodityDO.getId());
+//        }
         List<YouyouCommodityDO> goodsList = new ArrayList<>();
         for (ApiUUCommodityDO apiUUCommodityDO : apiUUCommodityDOS) {
             YouyouCommodityDO goods = new YouyouCommodityDO();
