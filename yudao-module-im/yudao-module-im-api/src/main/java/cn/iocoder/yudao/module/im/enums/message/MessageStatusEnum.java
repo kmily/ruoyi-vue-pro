@@ -6,6 +6,15 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
+// TODO @anhaohao：IM 前缀还是要的哈
+// TODO TODO 状态是这些哈，客户端的视角：
+//
+//- 草稿（预留） 0
+//- 发送中 1
+//- 发送成功 2
+//- 发送失败 3
+//- 已删除 4
+//- 已撤回 5
 /**
  * IM 消息的状态枚举
  */

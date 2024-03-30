@@ -36,6 +36,7 @@ public class MessageController {
         return success(messageService.sendMessage(getLoginUserId(), message));
     }
 
+    // TODO @anhaohao：我在想，这个接口，改成叫 pullMessageList，会不会更好理解？拉取消息列表
     @GetMapping("/list-by-sequence")
     @Operation(summary = "拉取大于 sequence 的消息列表")
     @Parameter(name = "sequence", description = "序号", required = true, example = "1")
@@ -46,6 +47,7 @@ public class MessageController {
         return success(BeanUtils.toBean(messages, MessageReqVO.class));
     }
 
+    // TODO @anhaohao：直接叫 getMessageList，不叫历史哈；因为它只是给用户叫历史，对系统来说，就是消息列表
     @GetMapping("/history")
     @Operation(summary = "查询聊天记录-根据会话标志和发送时间进行分页查询")
     public CommonResult<List<MessageReqVO>> getHistoryMessage(@Valid MessagePageReqVO pageReqVO) {

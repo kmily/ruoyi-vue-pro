@@ -7,6 +7,10 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+// TODO @anhaohao：MessageSendReqVO，消息发送
+
+// TODO @anhaohao：不应该有 excel 相关的注解
+
 @Schema(description = "管理后台 - 发送消息 Request VO")
 @Data
 @ExcelIgnoreUnannotated

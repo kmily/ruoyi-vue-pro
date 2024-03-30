@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.im.service.inbox;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.InboxSaveMessageReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.InboxSendMessageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.GroupMemberDO;
@@ -43,6 +42,7 @@ public class InboxServiceImpl implements InboxService {
     @Resource
     private GroupMemberService groupMemberService;
 
+    // TODO @anhaohao：下面的逻辑，最好是，1. 保存收件箱 + 发送消息给用户； 2. xxx；这样看的人，会更有感觉哈；
     @Override
     public void saveInboxAndSendMessage(InboxSaveMessageReqVO inboxSaveMessage) {
         // 保存收件箱 + 发送消息给用户
@@ -64,12 +64,15 @@ public class InboxServiceImpl implements InboxService {
     private void saveInboxAndSendMessageForUser(Long userId, InboxSaveMessageReqVO inboxSaveMessage) {
         inboxLockRedisDAO.lock(userId, INBOX_LOCK_TIMEOUT, () -> {
             Long userSequence = sequenceRedisDao.generateSequence(userId);
+            // TODO @anhaohao：链式调用；
             InboxDO inbox = new InboxDO();
             inbox.setUserId(userId);
             inbox.setMessageId(inboxSaveMessage.getMessageId());
             inbox.setSequence(userSequence);
             inboxMapper.insert(inbox);
 
+            // TODO @anhaohao：是不是 send 不用在加锁里面哈？！
+            // TODO @anhaohao：再进一步，是不是用 spring @async 可以并发推送噢
             InboxSendMessageReqVO message = BeanUtils.toBean(inboxSaveMessage, InboxSendMessageReqVO.class);
             message.setSequence(userSequence);
             webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), userId, IM_MESSAGE_RECEIVE, message);

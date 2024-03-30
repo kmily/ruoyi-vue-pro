@@ -12,6 +12,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+// TODO @anhaohao：还是要有 IM
 /**
  * IM 消息 DO
  *
@@ -63,15 +64,21 @@ public class MessageDO extends BaseDO {
      */
     private Integer conversationType;
     /**
-     * 会话标志 {@link ConversationTypeEnum} 的generateConversationNo() 方法生成
+     * 会话标志
+     *
+     * 生成规则：{@link ConversationTypeEnum#generateConversationNo(Long, Long, Integer)} 方法
      */
     private String conversationNo;
     /**
-     * 消息类型 枚举 {@link MessageContentTypeEnum}
+     * 消息类型
+     *
+     * 枚举 {@link MessageContentTypeEnum}
      */
     private Integer contentType;
     /**
-     * 消息内容 JSON 格式 对应 dal/dataobject/message/content 包
+     * 消息内容
+     *
+     * JSON 格式 对应 dal/dataobject/message/content 包
      */
     private String content;
     /**
@@ -79,11 +86,15 @@ public class MessageDO extends BaseDO {
      */
     private LocalDateTime sendTime;
     /**
-     * 消息来源 枚举 {@link MessageSourceEnum}
+     * 消息来源
+     *
+     * 枚举 {@link MessageSourceEnum}
      */
     private Integer sendFrom;
     /**
-     * 消息状态 枚举 {@link MessageStatusEnum}
+     * 消息状态
+     *
+     * 枚举 {@link MessageStatusEnum}
      */
     private Integer messageStatus;
 

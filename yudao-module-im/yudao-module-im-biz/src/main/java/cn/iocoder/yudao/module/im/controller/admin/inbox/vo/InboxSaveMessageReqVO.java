@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+// TODO @anhaohao：im 前缀哈
 @Schema(description = "管理后台 - 收件箱保存消息 Request VO")
 @Data
 public class InboxSaveMessageReqVO {
@@ -20,7 +21,7 @@ public class InboxSaveMessageReqVO {
 
     @Schema(description = "发送人头像", requiredMode = Schema.RequiredMode.REQUIRED)
     private String senderAvatar;
-    
+
     @Schema(description = "接收人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "32494")
     private Long receiverId;
 

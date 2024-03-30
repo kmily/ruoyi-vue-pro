@@ -28,6 +28,7 @@ import cn.iocoder.yudao.module.im.controller.admin.group.vo.*;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.GroupDO;
 import cn.iocoder.yudao.module.im.service.group.ImGroupService;
 
+// TODO @芋艿：得看看 create、update、delete、get、page 这几个接口，要保留哪些
 @Tag(name = "管理后台 - 群")
 @RestController
 @RequestMapping("/im/group")
@@ -78,6 +79,7 @@ public class ImGroupController {
         return success(BeanUtils.toBean(pageResult, ImGroupRespVO.class));
     }
 
+    // TODO @anhaohao：导出可以先不做哈；
     @GetMapping("/export-excel")
     @Operation(summary = "导出群 Excel")
     @PreAuthorize("@ss.hasPermission('im:group:export')")

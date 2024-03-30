@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
+// TODO @anhaohao：还是要有 IM
 /**
  * IM 群信息 DO
  *

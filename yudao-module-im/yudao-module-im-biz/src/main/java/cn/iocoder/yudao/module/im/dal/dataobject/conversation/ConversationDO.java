@@ -9,6 +9,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+// TODO @anhaohao：还是有 IM 前缀哈
 /**
  * IM 会话 DO
  *
@@ -44,15 +45,19 @@ public class ConversationDO extends BaseDO {
     /**
      * 聊天对象编号
      * <p>
-     * 1. 单聊时，用户编号；群聊时，群编号
+     * 1. 单聊时，用户编号；
+     * 2. 群聊时，群编号
      */
     private Long targetId;
     /**
-     * 会话标志 单聊：s_{userId}_{targetId}，需要排序 userId 和 targetId 群聊：g_groupId
+     * 会话标志
+     *
+     * 1. 单聊：s_{userId}_{targetId}，需要排序 userId 和 targetId
+     * 2. 群聊：g_groupId
      */
     private String no;
     /**
-     * 是否置顶 0否 1是
+     * 是否置顶
      */
     private Boolean pinned;
     /**

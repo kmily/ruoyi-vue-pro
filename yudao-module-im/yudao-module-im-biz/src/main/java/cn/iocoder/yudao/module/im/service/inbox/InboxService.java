@@ -27,4 +27,5 @@ public interface InboxService {
      * @return 消息编号列表
      */
     List<Long> selectMessageIdsByUserIdAndSequence(Long userId, Long sequence, Integer size);
+
 }

@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+// TODO @anhaohao：MessageRespVO 消息响应 Response VO
+// TODO @anahaohao：每个 example 都写下；啊哈，漏了地方，要补下；因为 http mock 的时候，可以根据它去生成
 @Schema(description = "管理后台 - 消息 Request VO")
 @Data
 public class MessageReqVO {
@@ -22,6 +24,7 @@ public class MessageReqVO {
     @Schema(description = "会话类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer conversationType; // 对应 ImConversationTypeEnum 枚举
 
+    // TODO @anhaohao：这个应该是 senderId
     @Schema(description = "发送人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long fromId;  // 根据 conversationType 区分
 

@@ -18,6 +18,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
+// TODO @anhaohao：im 前缀少啦
 @Tag(name = "管理后台 - IM 会话")
 @RestController
 @RequestMapping("/im/conversation")
@@ -41,7 +42,6 @@ public class ConversationController {
         conversationService.updatePinned(updateReqVO);
         return success(true);
     }
-
 
     // TODO @hao：这个接口，需要单独的 VO 哈；
     @PostMapping("/update-last-read-time")

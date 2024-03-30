@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
+// TODO @anhaohao：IM 前缀还是要的哈
 /**
  * IM 会话类型枚举
  * 参考 <a href="https://doc.rentsoft.cn/zh-Hans/sdks/enum/conversationType">“会话类型”</a> 文档
@@ -38,7 +39,7 @@ public enum ConversationTypeEnum implements IntArrayValuable {
     }
 
     /**
-     * 生成会话编号
+     * 生成会话编号 TODO @anhaohao：方法注释，和下面参数之间，要有空格
      * @param fromUserId 发送者编号
      * @param receiverId 接收者编号
      * @param conversationType 会话类型

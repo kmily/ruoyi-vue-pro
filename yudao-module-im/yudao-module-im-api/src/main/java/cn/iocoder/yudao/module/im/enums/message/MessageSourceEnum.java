@@ -6,8 +6,9 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
+// TODO @anhaohao：IM 前缀还是要的哈
 /**
- * IM 消息的消息来源 100-用户发送；200-系统发送（一般是通知）；不能为空
+ * IM 消息的消息来源
  */
 @RequiredArgsConstructor
 @Getter
@@ -18,11 +19,11 @@ public enum MessageSourceEnum implements IntArrayValuable {
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(MessageSourceEnum::getStatus).toArray();
 
+    // TODO @anhaohao：应该是 source
     /**
      * 状态
      */
     private final Integer status;
-
     /**
      * 名字
      */

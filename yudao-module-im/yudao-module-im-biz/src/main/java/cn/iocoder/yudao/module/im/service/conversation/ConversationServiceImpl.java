@@ -12,8 +12,6 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-
 /**
  * IM 会话 Service 实现类
  *
@@ -43,6 +41,7 @@ public class ConversationServiceImpl implements ConversationService {
         ConversationDO conversation = conversationMapper.selectByNo(updateReqVO.getNo());
         if (conversation == null) {
             ConversationDO conversationDO = new ConversationDO();
+            // TODO @hao：no 不是前端传递哈，后端生成；另外，其实可以把 insert 写成一个公用方法；get会话，拿不到就 insert；接着处理 update 操作；首次多 update 一次，无所谓的；没多少量的
             conversationDO.setNo(updateReqVO.getNo());
             conversationDO.setPinned(updateReqVO.getPinned());
             conversationDO.setUserId(updateReqVO.getUserId());
@@ -50,11 +49,10 @@ public class ConversationServiceImpl implements ConversationService {
             conversationDO.setType(updateReqVO.getType());
             conversationMapper.insert(conversationDO);
         } else {
-            // 更新
+            // 更新 TODO @anhaohao：这里不要 toBean，因为这里逻辑偏 toc，new ConversationDO 对象，然后逐个 set 需要的值；
             ConversationDO updateObj = BeanUtils.toBean(updateReqVO, ConversationDO.class);
             conversationMapper.updateById(updateObj);
         }
-
     }
 
     @Override

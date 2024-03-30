@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.im.dal.dataobject.inbox;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.MessageDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
+// TODO @anhaohao：还是要有 IM
 // TODO 我们要不要改成 ImMessageQueue 队列？从理解上，概念上，可能都更清晰一点哈。每个用户一个消息队列；
 /**
  * IM 收件箱 DO
@@ -35,6 +37,8 @@ public class InboxDO extends BaseDO {
     private Long userId;
     /**
      * 消息编号
+     *
+     * 关联 {@link MessageDO#getId()}
      */
     private Long messageId;
     /**

@@ -4,6 +4,7 @@ import lombok.*;
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
+// TODO @anhaohao：还是要有 IM
 /**
  * IM 群成员 DO
  *

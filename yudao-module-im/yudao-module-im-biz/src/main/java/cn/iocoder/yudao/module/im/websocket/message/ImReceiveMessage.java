@@ -15,6 +15,7 @@ public class ImReceiveMessage {
     @InEnum(ConversationTypeEnum.class)
     private Integer conversationType;
 
+    // TODO @anhaohao：我们应该是 senderId；因为它和 receiverId 是相对应的哈。
     @Schema(description = "发送人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long fromId;  // 根据 conversationType 区分
 

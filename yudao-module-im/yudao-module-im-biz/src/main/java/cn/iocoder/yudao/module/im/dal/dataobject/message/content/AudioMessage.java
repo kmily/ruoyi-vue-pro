@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// TODO @anhaohao：要有 IM；
+// TODO @芋艿：后续要挪到 api 包下，主要是给外部接口使用
 /**
  * 语音消息的 {@link MessageDO 字段 content} 的内容
  *

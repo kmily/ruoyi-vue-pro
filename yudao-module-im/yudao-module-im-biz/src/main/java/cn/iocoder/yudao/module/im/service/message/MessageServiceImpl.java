@@ -58,20 +58,25 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public SendMessageRespVO sendMessage(Long fromUserId, SendMessageReqVO message) {
         // 保存消息
+        // TODO @anhaohao：InboxSaveMessageReqVO 不用 new 出来传递到 saveMessage 方法里；
         InboxSaveMessageReqVO inboxSaveMessageReqVO = new InboxSaveMessageReqVO();
         SendMessageRespVO sendMessageRespVO = saveMessage(fromUserId, message, inboxSaveMessageReqVO);
 
         // 保存收件箱 + 发送消息给用户
+        // TODO @anhaohao：考虑到少定义一些 VO，直接传递 MessageDO 就完事了；反正这两者也是强耦合的；
         inboxService.saveInboxAndSendMessage(inboxSaveMessageReqVO);
         return sendMessageRespVO;
     }
 
+    // TODO @anhaohao：这个方法，是不是定义成 private 哈；然后返回是 MessageDO 对象，设置最上面的 sendMessage 也是这个。最终 controller 转成 SendMessageRespVO
     public SendMessageRespVO saveMessage(Long fromUserId, SendMessageReqVO message, InboxSaveMessageReqVO inboxSaveMessageReqVO) {
-        //需要校验 receiverId 存在
+        // 需要校验 receiverId 存在
         validateReceiverIdExists(message);
         // 查询发送人昵称和发送人头像
         AdminUserRespDTO fromUser = adminUserApi.getUser(fromUserId);
         // 使用链式调用创建 MessageDO 对象
+        // TODO @anhaohao：一部分字段，可以 beanutils tobean 搞定；
+        // TODO @anhaohao：链式 set 的时候，要把相同的放在一行；例如说，setSenderNickname、setSenderAvatar；本质上，就是为了“同类”在一行，阅读起来简单；
         MessageDO messageDO = new MessageDO()
                 .setClientMessageId(message.getClientMessageId())
                 .setSenderId(fromUserId)
@@ -102,17 +107,19 @@ public class MessageServiceImpl implements MessageService {
         return new SendMessageRespVO(messageDO.getId(), messageDO.getSendTime());
     }
 
+    // TODO @anhaohao：validateReceiver，更简单一点哈；不仅仅校验存在，未来还可以校验，自己是不是有好友关系、群聊是否在群聊里面等等
     private void validateReceiverIdExists(SendMessageReqVO message) {
+        // TODO @anhaohao：这个不要这里校验，交给 validator 校验掉
         if (message.getReceiverId() == null) {
             throw exception(MESSAGE_RECEIVER_NOT_EXISTS);
         }
         if (message.getConversationType().equals(ConversationTypeEnum.SINGLE.getType())) {
+            // TODO @anhaohao：// 之后要空一个空格，中英文协作习惯，中文和英文之间，不能连着；最后也不用 ；哈
             //校验用户是否存在；
             AdminUserRespDTO receiverUser = adminUserApi.getUser(message.getReceiverId());
             if (receiverUser == null) {
                 throw exception(MESSAGE_RECEIVER_NOT_EXISTS);
             }
-
         } else if (message.getConversationType().equals(ConversationTypeEnum.GROUP.getType())) {
             //校验群聊是否存在；
             List<GroupMemberDO> groupMemberDOS = groupMemberService.selectByGroupId(message.getReceiverId());

@@ -15,12 +15,13 @@ import java.util.List;
 @Mapper
 public interface InboxMapper extends BaseMapperX<InboxDO> {
 
+    // TODO @anhaohao：返回 List<InboxDO> ，转换成 messageId 交给上层；dao 尽量通用
     default List<Long> selectMessageIdsByUserIdAndSequence(Long userId, Long sequence, Integer size) {
         return selectList(new LambdaQueryWrapperX<InboxDO>()
                 .gt(InboxDO::getUserId, userId)
                 .gt(InboxDO::getSequence, sequence)
                 .orderByAsc(InboxDO::getSequence)
-                .last("limit 0," + size))
+                .last("limit 0," + size)) // TODO @anhaohao：这里 limit 就可以了，不用从 limit 0 开始；
                 .stream()
                 .map(InboxDO::getMessageId)
                 .toList();
