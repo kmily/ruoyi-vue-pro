@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.im.service.group;
 
 import jakarta.validation.*;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.*;
-import cn.iocoder.yudao.module.im.dal.dataobject.group.GroupDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 /**
@@ -10,7 +10,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
  *
  * @author 芋道源码
  */
-public interface ImGroupService {
+public interface GroupService {
 
     /**
      * 创建群
@@ -40,7 +40,7 @@ public interface ImGroupService {
      * @param id 编号
      * @return 群
      */
-    GroupDO getGroup(Long id);
+    ImGroupDO getGroup(Long id);
 
     /**
      * 获得群分页
@@ -48,6 +48,6 @@ public interface ImGroupService {
      * @param pageReqVO 分页查询
      * @return 群分页
      */
-    PageResult<GroupDO> getGroupPage(ImGroupPageReqVO pageReqVO);
+    PageResult<ImGroupDO> getGroupPage(ImGroupPageReqVO pageReqVO);
 
 }

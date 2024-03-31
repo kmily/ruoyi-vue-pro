@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.im.service.groupmember;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.ImGroupMemberPageReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.ImGroupMemberSaveReqVO;
-import cn.iocoder.yudao.module.im.dal.dataobject.group.GroupMemberDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -43,7 +43,7 @@ public interface GroupMemberService {
      * @param id 编号
      * @return 群成员
      */
-    GroupMemberDO getGroupMember(Long id);
+    ImGroupMemberDO getGroupMember(Long id);
 
     /**
      * 获得群成员分页
@@ -51,7 +51,7 @@ public interface GroupMemberService {
      * @param pageReqVO 分页查询
      * @return 群成员分页
      */
-    PageResult<GroupMemberDO> getGroupMemberPage(ImGroupMemberPageReqVO pageReqVO);
+    PageResult<ImGroupMemberDO> getGroupMemberPage(ImGroupMemberPageReqVO pageReqVO);
 
     /**
      * 根据群组id查询群成员
@@ -59,5 +59,5 @@ public interface GroupMemberService {
      * @param groupId 群组id
      * @return 群成员列表
      */
-    List<GroupMemberDO> selectByGroupId(Long groupId);
+    List<ImGroupMemberDO> selectByGroupId(Long groupId);
 }

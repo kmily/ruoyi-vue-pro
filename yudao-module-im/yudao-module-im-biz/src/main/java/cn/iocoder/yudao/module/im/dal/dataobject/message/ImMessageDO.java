@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.im.dal.dataobject.message;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.im.enums.conversation.ConversationTypeEnum;
-import cn.iocoder.yudao.module.im.enums.message.MessageContentTypeEnum;
-import cn.iocoder.yudao.module.im.enums.message.MessageSourceEnum;
-import cn.iocoder.yudao.module.im.enums.message.MessageStatusEnum;
+import cn.iocoder.yudao.module.im.enums.conversation.ImConversationTypeEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageContentTypeEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageSourceEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -12,7 +12,6 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-// TODO @anhaohao：还是要有 IM
 /**
  * IM 消息 DO
  *
@@ -26,7 +25,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MessageDO extends BaseDO {
+public class ImMessageDO extends BaseDO {
 
     /**
      * 编号
@@ -60,24 +59,24 @@ public class MessageDO extends BaseDO {
      */
     private String senderAvatar;
     /**
-     * 会话类型 枚举 {@link ConversationTypeEnum}
+     * 会话类型 枚举 {@link ImConversationTypeEnum}
      */
     private Integer conversationType;
     /**
      * 会话标志
-     *
-     * 生成规则：{@link ConversationTypeEnum#generateConversationNo(Long, Long, Integer)} 方法
+     * <p>
+     * 生成规则：{@link ImConversationTypeEnum#generateConversationNo(Long, Long, Integer)} 方法
      */
     private String conversationNo;
     /**
      * 消息类型
-     *
-     * 枚举 {@link MessageContentTypeEnum}
+     * <p>
+     * 枚举 {@link ImMessageContentTypeEnum}
      */
     private Integer contentType;
     /**
      * 消息内容
-     *
+     * <p>
      * JSON 格式 对应 dal/dataobject/message/content 包
      */
     private String content;
@@ -87,14 +86,14 @@ public class MessageDO extends BaseDO {
     private LocalDateTime sendTime;
     /**
      * 消息来源
-     *
-     * 枚举 {@link MessageSourceEnum}
+     * <p>
+     * 枚举 {@link ImMessageSourceEnum}
      */
     private Integer sendFrom;
     /**
      * 消息状态
-     *
-     * 枚举 {@link MessageStatusEnum}
+     * <p>
+     * 枚举 {@link ImMessageStatusEnum}
      */
     private Integer messageStatus;
 

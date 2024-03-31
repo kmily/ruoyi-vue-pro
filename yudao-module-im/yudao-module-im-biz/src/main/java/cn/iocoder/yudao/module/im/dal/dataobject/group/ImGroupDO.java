@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-// TODO @anhaohao：还是要有 IM
 /**
  * IM 群信息 DO
  *
@@ -20,7 +19,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GroupDO extends BaseDO {
+public class ImGroupDO extends BaseDO {
 
     /**
      * 编号

@@ -9,7 +9,7 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.ImGroupMemberPageReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.ImGroupMemberRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.ImGroupMemberSaveReqVO;
-import cn.iocoder.yudao.module.im.dal.dataobject.group.GroupMemberDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.service.groupmember.GroupMemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -66,7 +66,7 @@ public class ImGroupMemberController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('im:group-member:query')")
     public CommonResult<ImGroupMemberRespVO> getGroupMember(@RequestParam("id") Long id) {
-        GroupMemberDO groupMember = groupMemberService.getGroupMember(id);
+        ImGroupMemberDO groupMember = groupMemberService.getGroupMember(id);
         return success(BeanUtils.toBean(groupMember, ImGroupMemberRespVO.class));
     }
 
@@ -74,7 +74,7 @@ public class ImGroupMemberController {
     @Operation(summary = "获得群成员分页")
     @PreAuthorize("@ss.hasPermission('im:group-member:query')")
     public CommonResult<PageResult<ImGroupMemberRespVO>> getGroupMemberPage(@Valid ImGroupMemberPageReqVO pageReqVO) {
-        PageResult<GroupMemberDO> pageResult = groupMemberService.getGroupMemberPage(pageReqVO);
+        PageResult<ImGroupMemberDO> pageResult = groupMemberService.getGroupMemberPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, ImGroupMemberRespVO.class));
     }
 
@@ -85,7 +85,7 @@ public class ImGroupMemberController {
     public void exportGroupMemberExcel(@Valid ImGroupMemberPageReqVO pageReqVO,
                                        HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<GroupMemberDO> list = groupMemberService.getGroupMemberPage(pageReqVO).getList();
+        List<ImGroupMemberDO> list = groupMemberService.getGroupMemberPage(pageReqVO).getList();
         // 导出 Excel
         ExcelUtils.write(response, "群成员.xls", "数据", ImGroupMemberRespVO.class,
                 BeanUtils.toBean(list, ImGroupMemberRespVO.class));

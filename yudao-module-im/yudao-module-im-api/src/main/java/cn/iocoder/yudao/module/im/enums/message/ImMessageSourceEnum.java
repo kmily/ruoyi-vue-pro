@@ -6,24 +6,22 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
-// TODO @anhaohao：IM 前缀还是要的哈
 /**
  * IM 消息的消息来源
  */
 @RequiredArgsConstructor
 @Getter
-public enum MessageSourceEnum implements IntArrayValuable {
+public enum ImMessageSourceEnum implements IntArrayValuable {
 
     USER_SEND(100, "用户发送"),
     SYSTEM_SEND(200, "系统发送");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(MessageSourceEnum::getStatus).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ImMessageSourceEnum::getSource).toArray();
 
-    // TODO @anhaohao：应该是 source
     /**
      * 状态
      */
-    private final Integer status;
+    private final Integer source;
     /**
      * 名字
      */

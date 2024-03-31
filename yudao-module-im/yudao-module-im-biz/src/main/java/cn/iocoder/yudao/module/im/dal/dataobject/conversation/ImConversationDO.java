@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.im.dal.dataobject.conversation;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.im.enums.conversation.ConversationTypeEnum;
+import cn.iocoder.yudao.module.im.enums.conversation.ImConversationTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -9,7 +9,6 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-// TODO @anhaohao：还是有 IM 前缀哈
 /**
  * IM 会话 DO
  *
@@ -23,7 +22,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConversationDO extends BaseDO {
+public class ImConversationDO extends BaseDO {
 
     /**
      * 编号
@@ -39,7 +38,7 @@ public class ConversationDO extends BaseDO {
     /**
      * 会话类型
      * <p>
-     * 枚举 {@link ConversationTypeEnum}
+     * 枚举 {@link ImConversationTypeEnum}
      */
     private Integer type;
     /**

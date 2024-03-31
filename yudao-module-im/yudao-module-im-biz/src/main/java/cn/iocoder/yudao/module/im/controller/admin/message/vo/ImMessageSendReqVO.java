@@ -1,40 +1,36 @@
 package cn.iocoder.yudao.module.im.controller.admin.message.vo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.im.enums.message.MessageContentTypeEnum;
-import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
-import com.alibaba.excel.annotation.ExcelProperty;
+import cn.iocoder.yudao.module.im.enums.conversation.ImConversationTypeEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageContentTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-// TODO @anhaohao：MessageSendReqVO，消息发送
-
-// TODO @anhaohao：不应该有 excel 相关的注解
 
 @Schema(description = "管理后台 - 发送消息 Request VO")
 @Data
-@ExcelIgnoreUnannotated
-public class SendMessageReqVO {
+public class ImMessageSendReqVO {
 
     @Schema(description = "客户端消息编号 uuid，用于排重", requiredMode = Schema.RequiredMode.REQUIRED, example = "3331")
-    @ExcelProperty("客户端消息编号 uuid，用于排重")
+    @NotNull(message = "客户端消息编号不能为空")
     private String clientMessageId;
 
     @Schema(description = "接收人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "32494")
-    @ExcelProperty("接收人编号")
+    @NotNull(message = "接收人编号不能为空")
     private Long receiverId;
 
     @Schema(description = "会话类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @ExcelProperty("会话类型")
+    @InEnum(value = ImConversationTypeEnum.class)
+    @NotNull(message = "会话类型不能为空")
     private Integer conversationType;
 
     @Schema(description = "消息类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @ExcelProperty("消息类型")
-    @InEnum(MessageContentTypeEnum.class)
+    @InEnum(ImMessageContentTypeEnum.class)
+    @NotNull(message = "消息类型不能为空")
     private Integer contentType;
 
-    @Schema(description = "消息内容", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("消息内容")
+    @Schema(description = "消息内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "你好")
+    @NotNull(message = "消息内容不能为空")
     private String content;
 
 }

@@ -5,11 +5,11 @@ import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
 import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.*;
-import cn.iocoder.yudao.module.im.dal.dataobject.group.GroupMemberDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 
-import cn.iocoder.yudao.module.im.dal.mysql.groupmember.ImGroupMemberMapper;
+import cn.iocoder.yudao.module.im.dal.mysql.groupmember.GroupMemberMapper;
 
 import java.util.List;
 
@@ -26,13 +26,13 @@ import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 public class GroupMemberServiceImpl implements GroupMemberService {
 
     @Resource
-    private ImGroupMemberMapper imGroupMemberMapper;
+    private GroupMemberMapper groupMemberMapper;
 
     @Override
     public Long createGroupMember(ImGroupMemberSaveReqVO createReqVO) {
         // 插入
-        GroupMemberDO groupMember = BeanUtils.toBean(createReqVO, GroupMemberDO.class);
-        imGroupMemberMapper.insert(groupMember);
+        ImGroupMemberDO groupMember = BeanUtils.toBean(createReqVO, ImGroupMemberDO.class);
+        groupMemberMapper.insert(groupMember);
         // 返回
         return groupMember.getId();
     }
@@ -42,8 +42,8 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         // 校验存在
         validateGroupMemberExists(updateReqVO.getId());
         // 更新
-        GroupMemberDO updateObj = BeanUtils.toBean(updateReqVO, GroupMemberDO.class);
-        imGroupMemberMapper.updateById(updateObj);
+        ImGroupMemberDO updateObj = BeanUtils.toBean(updateReqVO, ImGroupMemberDO.class);
+        groupMemberMapper.updateById(updateObj);
     }
 
     @Override
@@ -51,28 +51,28 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         // 校验存在
         validateGroupMemberExists(id);
         // 删除
-        imGroupMemberMapper.deleteById(id);
+        groupMemberMapper.deleteById(id);
     }
 
     private void validateGroupMemberExists(Long id) {
-        if (imGroupMemberMapper.selectById(id) == null) {
+        if (groupMemberMapper.selectById(id) == null) {
             throw exception(GROUP_MEMBER_NOT_EXISTS);
         }
     }
 
     @Override
-    public GroupMemberDO getGroupMember(Long id) {
-        return imGroupMemberMapper.selectById(id);
+    public ImGroupMemberDO getGroupMember(Long id) {
+        return groupMemberMapper.selectById(id);
     }
 
     @Override
-    public PageResult<GroupMemberDO> getGroupMemberPage(ImGroupMemberPageReqVO pageReqVO) {
-        return imGroupMemberMapper.selectPage(pageReqVO);
+    public PageResult<ImGroupMemberDO> getGroupMemberPage(ImGroupMemberPageReqVO pageReqVO) {
+        return groupMemberMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public List<GroupMemberDO> selectByGroupId(Long groupId) {
-        return imGroupMemberMapper.selectListByGroupId(groupId);
+    public List<ImGroupMemberDO> selectByGroupId(Long groupId) {
+        return groupMemberMapper.selectListByGroupId(groupId);
     }
 
 }

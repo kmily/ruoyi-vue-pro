@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.im.dal.redis.inbox;
 
 import jakarta.annotation.Resource;
-import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +14,7 @@ import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.INBOX_SEQUE
  * @author anhaohao
  */
 @Repository
-public class SequenceRedisDao {
+public class SequenceRedisDAO {
 
     @Resource
     private RedisTemplate<String, Long> redisTemplate;

@@ -6,27 +6,21 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
-// TODO @anhaohao：IM 前缀还是要的哈
-// TODO TODO 状态是这些哈，客户端的视角：
-//
-//- 草稿（预留） 0
-//- 发送中 1
-//- 发送成功 2
-//- 发送失败 3
-//- 已删除 4
-//- 已撤回 5
 /**
  * IM 消息的状态枚举
  */
 @RequiredArgsConstructor
 @Getter
-public enum MessageStatusEnum implements IntArrayValuable {
+public enum ImMessageStatusEnum implements IntArrayValuable {
 
+    DRAFT(0, "草稿"),
     SENDING(1, "发送中"),
-    SUCCEED(2, "发送成功"),
-    FAILED(3, "发送失败");
+    SUCCESS(2, "发送成功"),
+    FAILURE(3, "发送失败"),
+    DELETED(4, "已删除"),
+    RECALL(5, "已撤回");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(MessageStatusEnum::getStatus).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ImMessageStatusEnum::getStatus).toArray();
 
     /**
      * 状态

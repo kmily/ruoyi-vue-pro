@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.im.service.conversation;
 
-import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ConversationLastTimeReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ConversationPinnedReqVO;
-import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ConversationDO;
+import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationUpdateLastReadTimeReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationUpdatePinnedReqVO;
+import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationDO;
 
 import java.util.List;
 
@@ -18,20 +18,22 @@ public interface ConversationService {
      *
      * @return 会话列表
      */
-    List<ConversationDO> getConversationList();
+    List<ImConversationDO> getConversationList();
 
     /**
      * 置顶会话
      *
+     * @param loginUserId 登录用户编号
      * @param updateReqVO 更新信息
      */
-    void updatePinned(ConversationPinnedReqVO updateReqVO);
+    void updatePinned(Long loginUserId, ImConversationUpdatePinnedReqVO updateReqVO);
 
     /**
      * 更新最后已读时间
      *
+     * @param loginUserId 登录用户编号
      * @param updateReqVO 更新信息
      */
-    void updateLastReadTime(ConversationLastTimeReqVO updateReqVO);
+    void updateLastReadTime(Long loginUserId, ImConversationUpdateLastReadTimeReqVO updateReqVO);
 
 }

@@ -6,7 +6,6 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
-// TODO @anhaohao：IM 前缀还是要的哈
 /**
  * IM 消息的类型枚举
  * <p>
@@ -16,7 +15,7 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum MessageContentTypeEnum implements IntArrayValuable {
+public enum ImMessageContentTypeEnum implements IntArrayValuable {
 
     TEXT(101, "文本消息"),
     PICTURE(102, "图片消息"),
@@ -57,7 +56,7 @@ public enum MessageContentTypeEnum implements IntArrayValuable {
     BURN_CHANGE(1701, "阅后即焚开启或关闭通知"),
     REVOKE(2101, "撤回消息通知");;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(MessageContentTypeEnum::getType).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ImMessageContentTypeEnum::getType).toArray();
 
     /**
      * 类型

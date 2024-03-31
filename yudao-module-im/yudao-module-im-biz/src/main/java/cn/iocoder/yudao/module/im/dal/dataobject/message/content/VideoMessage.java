@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.im.dal.dataobject.message.content;
 
-import cn.iocoder.yudao.module.im.dal.dataobject.message.MessageDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
 import lombok.Data;
 
 /**
- * 视频消息的 {@link MessageDO 字段 content} 的内容
+ * 视频消息的 {@link ImMessageDO 字段 content} 的内容
  *
  * @author 芋道源码
  */

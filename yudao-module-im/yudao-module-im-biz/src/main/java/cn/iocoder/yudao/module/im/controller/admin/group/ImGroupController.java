@@ -25,8 +25,8 @@ import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
 
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.*;
-import cn.iocoder.yudao.module.im.dal.dataobject.group.GroupDO;
-import cn.iocoder.yudao.module.im.service.group.ImGroupService;
+import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
+import cn.iocoder.yudao.module.im.service.group.GroupService;
 
 // TODO @芋艿：得看看 create、update、delete、get、page 这几个接口，要保留哪些
 @Tag(name = "管理后台 - 群")
@@ -36,20 +36,20 @@ import cn.iocoder.yudao.module.im.service.group.ImGroupService;
 public class ImGroupController {
 
     @Resource
-    private ImGroupService imGroupService;
+    private GroupService groupService;
 
     @PostMapping("/create")
     @Operation(summary = "创建群")
     @PreAuthorize("@ss.hasPermission('im:group:create')")
     public CommonResult<Long> createGroup(@Valid @RequestBody ImGroupSaveReqVO createReqVO) {
-        return success(imGroupService.createGroup(createReqVO));
+        return success(groupService.createGroup(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新群")
     @PreAuthorize("@ss.hasPermission('im:group:update')")
     public CommonResult<Boolean> updateGroup(@Valid @RequestBody ImGroupSaveReqVO updateReqVO) {
-        imGroupService.updateGroup(updateReqVO);
+        groupService.updateGroup(updateReqVO);
         return success(true);
     }
 
@@ -58,7 +58,7 @@ public class ImGroupController {
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('im:group:delete')")
     public CommonResult<Boolean> deleteGroup(@RequestParam("id") Long id) {
-        imGroupService.deleteGroup(id);
+        groupService.deleteGroup(id);
         return success(true);
     }
 
@@ -67,7 +67,7 @@ public class ImGroupController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('im:group:query')")
     public CommonResult<ImGroupRespVO> getGroup(@RequestParam("id") Long id) {
-        GroupDO group = imGroupService.getGroup(id);
+        ImGroupDO group = groupService.getGroup(id);
         return success(BeanUtils.toBean(group, ImGroupRespVO.class));
     }
 
@@ -75,22 +75,8 @@ public class ImGroupController {
     @Operation(summary = "获得群分页")
     @PreAuthorize("@ss.hasPermission('im:group:query')")
     public CommonResult<PageResult<ImGroupRespVO>> getGroupPage(@Valid ImGroupPageReqVO pageReqVO) {
-        PageResult<GroupDO> pageResult = imGroupService.getGroupPage(pageReqVO);
+        PageResult<ImGroupDO> pageResult = groupService.getGroupPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, ImGroupRespVO.class));
-    }
-
-    // TODO @anhaohao：导出可以先不做哈；
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出群 Excel")
-    @PreAuthorize("@ss.hasPermission('im:group:export')")
-    @OperateLog(type = EXPORT)
-    public void exportGroupExcel(@Valid ImGroupPageReqVO pageReqVO,
-              HttpServletResponse response) throws IOException {
-        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<GroupDO> list = imGroupService.getGroupPage(pageReqVO).getList();
-        // 导出 Excel
-        ExcelUtils.write(response, "群.xls", "数据", ImGroupRespVO.class,
-                        BeanUtils.toBean(list, ImGroupRespVO.class));
     }
 
 }

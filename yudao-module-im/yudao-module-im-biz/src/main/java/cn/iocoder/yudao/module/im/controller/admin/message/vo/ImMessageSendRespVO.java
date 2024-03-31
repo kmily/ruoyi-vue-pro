@@ -10,13 +10,11 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-// TODO @anhaohao：MessageSendRespVO，消息发送结果
-
 @Schema(description = "管理后台 - 发送消息 Response VO")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SendMessageRespVO {
+public class ImMessageSendRespVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "12")
     private Long id;

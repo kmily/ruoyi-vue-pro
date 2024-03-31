@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.im.dal.dataobject.message.content;
 
-import cn.iocoder.yudao.module.im.dal.dataobject.message.MessageDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 // TODO @anhaohao：要有 IM；
 // TODO @芋艿：后续要挪到 api 包下，主要是给外部接口使用
 /**
- * 语音消息的 {@link MessageDO 字段 content} 的内容
+ * 语音消息的 {@link ImMessageDO 字段 content} 的内容
  *
  * @author 芋道源码
  */

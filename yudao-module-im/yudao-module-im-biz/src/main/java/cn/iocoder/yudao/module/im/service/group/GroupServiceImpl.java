@@ -5,11 +5,11 @@ import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.*;
-import cn.iocoder.yudao.module.im.dal.dataobject.group.GroupDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 
-import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMapper;
+import cn.iocoder.yudao.module.im.dal.mysql.group.GroupMapper;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
@@ -21,16 +21,16 @@ import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
  */
 @Service
 @Validated
-public class ImGroupServiceImpl implements ImGroupService {
+public class GroupServiceImpl implements GroupService {
 
     @Resource
-    private ImGroupMapper imGroupMapper;
+    private GroupMapper groupMapper;
 
     @Override
     public Long createGroup(ImGroupSaveReqVO createReqVO) {
         // 插入
-        GroupDO group = BeanUtils.toBean(createReqVO, GroupDO.class);
-        imGroupMapper.insert(group);
+        ImGroupDO group = BeanUtils.toBean(createReqVO, ImGroupDO.class);
+        groupMapper.insert(group);
         // 返回
         return group.getId();
     }
@@ -40,8 +40,8 @@ public class ImGroupServiceImpl implements ImGroupService {
         // 校验存在
         validateGroupExists(updateReqVO.getId());
         // 更新
-        GroupDO updateObj = BeanUtils.toBean(updateReqVO, GroupDO.class);
-        imGroupMapper.updateById(updateObj);
+        ImGroupDO updateObj = BeanUtils.toBean(updateReqVO, ImGroupDO.class);
+        groupMapper.updateById(updateObj);
     }
 
     @Override
@@ -49,23 +49,23 @@ public class ImGroupServiceImpl implements ImGroupService {
         // 校验存在
         validateGroupExists(id);
         // 删除
-        imGroupMapper.deleteById(id);
+        groupMapper.deleteById(id);
     }
 
     private void validateGroupExists(Long id) {
-        if (imGroupMapper.selectById(id) == null) {
+        if (groupMapper.selectById(id) == null) {
             throw exception(GROUP_NOT_EXISTS);
         }
     }
 
     @Override
-    public GroupDO getGroup(Long id) {
-        return imGroupMapper.selectById(id);
+    public ImGroupDO getGroup(Long id) {
+        return groupMapper.selectById(id);
     }
 
     @Override
-    public PageResult<GroupDO> getGroupPage(ImGroupPageReqVO pageReqVO) {
-        return imGroupMapper.selectPage(pageReqVO);
+    public PageResult<ImGroupDO> getGroupPage(ImGroupPageReqVO pageReqVO) {
+        return groupMapper.selectPage(pageReqVO);
     }
 
 }

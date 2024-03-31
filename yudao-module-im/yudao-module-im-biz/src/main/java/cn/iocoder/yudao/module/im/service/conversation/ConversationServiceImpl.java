@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.im.service.conversation;
 
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ConversationLastTimeReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ConversationPinnedReqVO;
-import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ConversationDO;
+import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationUpdateLastReadTimeReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationUpdatePinnedReqVO;
+import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationDO;
 import cn.iocoder.yudao.module.im.dal.mysql.conversation.ConversationMapper;
+import cn.iocoder.yudao.module.im.enums.conversation.ImConversationTypeEnum;
 import cn.iocoder.yudao.module.im.service.inbox.InboxService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -27,50 +27,50 @@ public class ConversationServiceImpl implements ConversationService {
     private InboxService inboxService;
 
     @Override
-    public List<ConversationDO> getConversationList() {
+    public List<ImConversationDO> getConversationList() {
         return conversationMapper.selectList();
     }
 
     @Override
-    public void updatePinned(ConversationPinnedReqVO updateReqVO) {
-        // TODO @hao：updateTop 和 updateLastReadTime 使用独立的逻辑实现，不使用统一的 ImConversationSaveReqVO；
-        // TODO 大体步骤建议：
-        // 1. 先 getOrderCreateConversation，查询会话，不存在则插入；
-        // 2. 更新对应的字段
-        // 3. 做对应更新的 notify 推送
-        ConversationDO conversation = conversationMapper.selectByNo(updateReqVO.getNo());
+    public void updatePinned(Long loginUserId, ImConversationUpdatePinnedReqVO updateReqVO) {
+        // 1. 获得会话编号
+        String no = ImConversationTypeEnum.generateConversationNo(loginUserId, updateReqVO.getTargetId(), updateReqVO.getType());
+        // 2. 查询会话
+        ImConversationDO conversation = conversationMapper.selectByNo(no);
         if (conversation == null) {
-            ConversationDO conversationDO = new ConversationDO();
-            // TODO @hao：no 不是前端传递哈，后端生成；另外，其实可以把 insert 写成一个公用方法；get会话，拿不到就 insert；接着处理 update 操作；首次多 update 一次，无所谓的；没多少量的
-            conversationDO.setNo(updateReqVO.getNo());
-            conversationDO.setPinned(updateReqVO.getPinned());
-            conversationDO.setUserId(updateReqVO.getUserId());
-            conversationDO.setTargetId(updateReqVO.getTargetId());
-            conversationDO.setType(updateReqVO.getType());
-            conversationMapper.insert(conversationDO);
-        } else {
-            // 更新 TODO @anhaohao：这里不要 toBean，因为这里逻辑偏 toc，new ConversationDO 对象，然后逐个 set 需要的值；
-            ConversationDO updateObj = BeanUtils.toBean(updateReqVO, ConversationDO.class);
-            conversationMapper.updateById(updateObj);
+            // 2.1. 不存在，则插入
+            conversation = insertConversation(no, loginUserId, updateReqVO.getTargetId(), updateReqVO.getType());
         }
+        // 3. 更新会话
+        conversation.setPinned(updateReqVO.getPinned());
+        conversationMapper.updateById(conversation);
+        // 4. 做对应更新的 notify 推送
+    }
+
+    private ImConversationDO insertConversation(String no, Long userId, Long targetId, Integer type) {
+        ImConversationDO imConversationDO = new ImConversationDO();
+        imConversationDO.setNo(no);
+        imConversationDO.setUserId(userId);
+        imConversationDO.setTargetId(targetId);
+        imConversationDO.setType(type);
+        conversationMapper.insert(imConversationDO);
+        return imConversationDO;
     }
 
     @Override
-    public void updateLastReadTime(ConversationLastTimeReqVO updateReqVO) {
-        ConversationDO conversation = conversationMapper.selectByNo(updateReqVO.getNo());
+    public void updateLastReadTime(Long loginUserId, ImConversationUpdateLastReadTimeReqVO updateReqVO) {
+        // 1. 获得会话编号
+        String no = ImConversationTypeEnum.generateConversationNo(loginUserId, updateReqVO.getTargetId(), updateReqVO.getType());
+        // 2. 查询会话
+        ImConversationDO conversation = conversationMapper.selectByNo(no);
         if (conversation == null) {
-            ConversationDO conversationDO = new ConversationDO();
-            conversationDO.setNo(updateReqVO.getNo());
-            conversationDO.setLastReadTime(updateReqVO.getLastReadTime());
-            conversationDO.setUserId(updateReqVO.getUserId());
-            conversationDO.setTargetId(updateReqVO.getTargetId());
-            conversationDO.setType(updateReqVO.getType());
-            conversationMapper.insert(conversationDO);
-        } else {
-            // 更新
-            ConversationDO updateObj = BeanUtils.toBean(updateReqVO, ConversationDO.class);
-            conversationMapper.updateById(updateObj);
+            // 2.1. 不存在，则插入
+            conversation = insertConversation(no, loginUserId, updateReqVO.getTargetId(), updateReqVO.getType());
         }
+        // 3. 更新会话
+        conversation.setLastReadTime(updateReqVO.getLastReadTime());
+        conversationMapper.updateById(conversation);
+        // 4. 做对应更新的 notify 推送
     }
 
 }

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.im.service.inbox;
 
-import cn.iocoder.yudao.module.im.controller.admin.inbox.vo.InboxSaveMessageReqVO;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
 
 import java.util.List;
 
@@ -14,9 +14,9 @@ public interface InboxService {
     /**
      * 保存收件箱和发送消息
      *
-     * @param inboxSaveMessageReqVO 收件箱保存消息 Request VO
+     * @param imMessageDO 收件箱保存消息 Request VO
      */
-    void saveInboxAndSendMessage(InboxSaveMessageReqVO inboxSaveMessageReqVO);
+    void saveInboxAndSendMessage(ImMessageDO imMessageDO);
 
     /**
      * 获得大于 sequence 的消息ids
