@@ -88,7 +88,11 @@ public class InvPreviewExtService {
     public PageResult<ItemResp> getInvPreviewPage(InvPreviewPageReqVO pageReqVO) {
         HotWordsDO hotWordsDO = hotWordsMapper.selectOne(new LambdaQueryWrapper<HotWordsDO>()
                 .eq(HotWordsDO::getHotWords, pageReqVO.getItemName()));
-        pageReqVO.setItemName(hotWordsDO.getMarketName());
+
+        if (hotWordsDO!=null){
+            pageReqVO.setItemName(hotWordsDO.getMarketName());
+        }
+
         PageResult<InvPreviewDO> invPreviewDOPageResult = invPreviewMapper.selectPage(pageReqVO);
         List<ItemResp> ret = new ArrayList<>();
         for (InvPreviewDO item : invPreviewDOPageResult.getList()) {
