@@ -144,5 +144,9 @@ public class InvDescDO extends BaseDO {
      * steamId
      */
     private String steamId;
+    /**
+     * 更新批次号
+     */
+    private String batchNo;
 
 }

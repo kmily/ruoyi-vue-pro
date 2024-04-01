@@ -89,5 +89,9 @@ public class InvDO extends BaseDO {
      * 库存详情表id
      */
     private Long invDescId;
+    /**
+     * 更新批次号
+     */
+    private String batchNo;
 
 }
