@@ -9,6 +9,8 @@ import cn.iocoder.yudao.module.steam.controller.admin.selrarity.vo.SelRarityPage
 import cn.iocoder.yudao.module.steam.controller.admin.seltype.vo.SelTypePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppDropListRespVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.seltype.SelTypeDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.seltype.SelWeaponDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.seltype.SelWeaponMapper;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewService;
 import cn.iocoder.yudao.module.steam.service.selexterior.SelExteriorService;
@@ -88,7 +90,12 @@ public class AppDevApiController {
         SelTypePageReqVO type = new SelTypePageReqVO();
         type.setPageSize(200);
         type.setPageNo(1);
-        appDropListRespVO.setType(selTypeService.getSelTypePage(type).getList());
+        List<SelTypeDO> list = selTypeService.getSelTypePage(type).getList();
+        list.forEach(selType -> {
+            List<SelWeaponDO> selWeaponDOS = selWeaponMapper.selectList("type_id",selType.getId());
+           selType.setWeaponList(selWeaponDOS);
+        });
+        appDropListRespVO.setType(list);
         return CommonResult.success(appDropListRespVO);
     }
 

@@ -525,12 +525,17 @@ public class UUOrderServiceImpl implements UUOrderService {
     }
 
     @Override
-    public OrderInfoResp orderInfo(YouyouOrderDO uuOrder, OpenApiReqVo<QueryOrderReqVo> openApiReqVo) throws JsonProcessingException {
+    public OrderInfoResp orderInfo(YouyouOrderDO uuOrder, OpenApiReqVo<QueryOrderReqVo> openApiReqVo)  {
         ObjectMapper objectMapper = new ObjectMapper();
-        if (uuOrder!= null){
+        if (uuOrder != null && uuOrder.getOrderInformReturnJason() == null){
             openApiReqVo.getData().setOrderNo(uuOrder.getUuOrderNo());
             ApiResult<OrderInfoResp> orderInfoRespApiResult = uuService.orderInfo(openApiReqVo.getData());
-            String json = objectMapper.writeValueAsString(orderInfoRespApiResult.getData());
+            String json = null;
+            try {
+                json = objectMapper.writeValueAsString(orderInfoRespApiResult.getData());
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("JSON 转换出错: " + e.getMessage(), e);
+            }
             if (json != null){
                 YouyouOrderDO youyouOrderDO = new YouyouOrderDO();
                 youyouOrderDO.setId(uuOrder.getId());
@@ -563,39 +568,39 @@ public class UUOrderServiceImpl implements UUOrderService {
         ret.setId(uuOrder.getOrderNo());
         ret.setOrderId(uuOrder.getId());
         ret.setOrderNo(uuOrder.getOrderNo());
-        LambdaQueryWrapper<YouyouOrderDO> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(YouyouOrderDO::getOrderNo,ret.getOrderNo());
-        YouyouOrderDO youyouOrderDO = youyouOrderMapper.selectOne(lambdaQueryWrapper);
 
-        if (youyouOrderDO != null){
-            OrderInfoResp orderInfoResp = objectMapper.readValue(youyouOrderDO.getOrderInformReturnJason(), OrderInfoResp.class);
-            ret.setProcessStatus(orderInfoResp.getProcessStatus());
-            ret.setOrderSubStatus(orderInfoResp.getOrderSubStatus());
-            ret.setOrderSubStatusName(orderInfoResp.getOrderSubStatusName());
-            ret.setOrderType(orderInfoResp.getOrderType());
-            ret.setOrderSubType(orderInfoResp.getOrderSubType());
-            ret.setTimeType(orderInfoResp.getTimeType());
-//        ret.setTime(null);// TODO 待确认
-            ret.setReturnAmount(orderInfoResp.getReturnAmount());
-            ret.setServiceFee(uuOrder.getServiceFee().toString());
-//        ret.setServiceFeeRate(uuOrder.getServiceFeeRate());
-            ret.setCommodityAmount(youyouCommodity.getCommodityPrice());
-            if(Objects.nonNull(uuOrder.getPayAmount())){
-                ret.setPaymentAmount(new BigDecimal(uuOrder.getPayAmount()).divide(new BigDecimal("100")).toString());
-            }
-            ret.setSellerSteamRegTime(orderInfoResp.getSellerSteamRegTime());
-//        ret.setTradeOfferId(null);// TODO 待确认
-            ret.setCancelOrderTime(orderInfoResp.getCancelOrderTime());
-//        ret.setOfferSendResult(null);// TODO 待确认
-            ret.setTradeUrl(uuOrder.getBuyTradeLinks());
-            ret.setFinishOrderTime(orderInfoResp.getFinishOrderTime());
-            ret.setPaySuccessTime(orderInfoResp.getPaySuccessTime());
-            ret.setPayEndTime(orderInfoResp.getPayEndTime());
-//        ret.setSendOfferSuccessTime(null);
-            ret.setSendOfferEndTime(orderInfoResp.getSendOfferEndTime());
-            ret.setOrderStatusColor(orderInfoResp.getOrderStatusColor());
-            ret.setOrderSubStatus(orderInfoResp.getOrderSubStatus());
+        OrderInfoResp orderInfoResp = null;
+        try {
+            orderInfoResp = objectMapper.readValue(uuOrder.getOrderInformReturnJason(), OrderInfoResp.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JSON 转换出错: " + e.getMessage(), e);
         }
+        ret.setProcessStatus(orderInfoResp.getProcessStatus());
+        ret.setOrderSubStatus(orderInfoResp.getOrderSubStatus());
+        ret.setOrderSubStatusName(orderInfoResp.getOrderSubStatusName());
+        ret.setOrderType(orderInfoResp.getOrderType());
+        ret.setOrderSubType(orderInfoResp.getOrderSubType());
+        ret.setTimeType(orderInfoResp.getTimeType());
+//        ret.setTime(null);// TODO 待确认
+        ret.setReturnAmount(orderInfoResp.getReturnAmount());
+        ret.setServiceFee(uuOrder.getServiceFee().toString());
+//        ret.setServiceFeeRate(uuOrder.getServiceFeeRate());
+        ret.setCommodityAmount(youyouCommodity.getCommodityPrice());
+        if(Objects.nonNull(uuOrder.getPayAmount())){
+            ret.setPaymentAmount(new BigDecimal(uuOrder.getPayAmount()).divide(new BigDecimal("100")).toString());
+        }
+        ret.setSellerSteamRegTime(orderInfoResp.getSellerSteamRegTime());
+//        ret.setTradeOfferId(null);// TODO 待确认
+        ret.setCancelOrderTime(orderInfoResp.getCancelOrderTime());
+//        ret.setOfferSendResult(null);// TODO 待确认
+        ret.setTradeUrl(uuOrder.getBuyTradeLinks());
+        ret.setFinishOrderTime(orderInfoResp.getFinishOrderTime());
+        ret.setPaySuccessTime(orderInfoResp.getPaySuccessTime());
+        ret.setPayEndTime(orderInfoResp.getPayEndTime());
+//        ret.setSendOfferSuccessTime(null);
+        ret.setSendOfferEndTime(orderInfoResp.getSendOfferEndTime());
+        ret.setOrderStatusColor(orderInfoResp.getOrderStatusColor());
+        ret.setOrderSubStatus(orderInfoResp.getOrderSubStatus());
 
 //        ret.setShippingMode(uuOrder.getUuShippingMode());
         ret.setOrderStatus(uuOrder.getUuOrderStatus());
