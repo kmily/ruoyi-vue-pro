@@ -39,5 +39,10 @@ public class SelTypeDO extends BaseDO {
      * 字体颜色
      */
     private String color;
+    /**
+     *
+     */
+
+    private transient List<SelWeaponDO> weaponList;
 
 }
