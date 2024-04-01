@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.steam.service.fin;
 
 import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
@@ -9,6 +10,7 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import javax.validation.Valid;
 
@@ -47,7 +49,7 @@ public interface UUOrderService {
      * @return 买家的订单
      */
     YouyouOrderDO getUUOrder(LoginUser loginUser, QueryOrderReqVo queryOrderReqVo);
-    OrderInfoResp orderInfo(YouyouOrderDO youyouOrderDO);
+    OrderInfoResp orderInfo(YouyouOrderDO youyouOrderDO, OpenApiReqVo<QueryOrderReqVo> openApiReqVo) throws JsonProcessingException;
 
 
     /**

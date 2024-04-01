@@ -7,10 +7,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.UUBatchGetOnSaleCommodity
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUBatchGetOnSaleCommodity.UUBatchGetOnSaleCommodityReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodityReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.CommodityList;
-import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelResp;
-import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
-import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
-import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderStatusResp;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.*;
 import cn.iocoder.yudao.module.steam.service.steam.YouPingOrder;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
@@ -131,5 +128,19 @@ public class UUService {
         ApiResult<QueryOrderStatusResp> queryOrderStatusRespApiResult = openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/orderStatus", new OpenApiReqVo<QueryOrderReqVo>().setData(reqVo), QueryOrderStatusResp.class);
         checkResponse(queryOrderStatusRespApiResult);
         return queryOrderStatusRespApiResult;
+    }
+    /**
+     * 查询订单详情
+     *
+
+     */
+    public ApiResult<OrderInfoResp> orderInfo(QueryOrderReqVo reqVo){
+        reqVo.setPageNo(null);
+        reqVo.setPageSize(null);
+        reqVo.setMerchantNo(null);
+        ApiResult<OrderInfoResp> queryOrderInforRespApiResult = openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/orderInfo",
+                new OpenApiReqVo<QueryOrderReqVo>().setData(reqVo), OrderInfoResp.class);
+        checkResponse(queryOrderInforRespApiResult);
+        return queryOrderInforRespApiResult;
     }
 }

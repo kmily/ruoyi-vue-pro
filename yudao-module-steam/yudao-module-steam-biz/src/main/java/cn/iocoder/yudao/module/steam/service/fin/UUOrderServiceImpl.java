@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTemplatePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
+import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUBuyGoodsByIdReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodeityService;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.*;
@@ -50,6 +51,8 @@ import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import cn.iocoder.yudao.module.steam.utils.RSAUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -502,7 +505,7 @@ public class UUOrderServiceImpl implements UUOrderService {
     @Override
     public YouyouOrderDO getUUOrder(LoginUser loginUser, QueryOrderReqVo queryOrderReqVo) {
         LambdaQueryWrapperX<YouyouOrderDO> uuOrderDOLambdaQueryWrapperX = new LambdaQueryWrapperX<YouyouOrderDO>()
-                .eqIfPresent(YouyouOrderDO::getBuyUserId, loginUser.getId())
+                .eqIfPresent(YouyouOrderDO::getBuyUserId, 313)
                 .eqIfPresent(YouyouOrderDO::getBuyUserType, loginUser.getUserType());
         if (Objects.isNull(queryOrderReqVo.getOrderNo()) && Objects.isNull(queryOrderReqVo.getMerchantNo()) && Objects.isNull(queryOrderReqVo.getId())){
             throw exception(OpenApiCode.JACKSON_EXCEPTION);
@@ -522,8 +525,23 @@ public class UUOrderServiceImpl implements UUOrderService {
     }
 
     @Override
-    public OrderInfoResp orderInfo(YouyouOrderDO uuOrder) {
-        YouyouCommodityDO youyouCommodity = youyouCommodityService.getYouyouCommodity(Integer.valueOf(uuOrder.getRealCommodityId()));
+    public OrderInfoResp orderInfo(YouyouOrderDO uuOrder, OpenApiReqVo<QueryOrderReqVo> openApiReqVo) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        if (uuOrder!= null){
+            openApiReqVo.getData().setOrderNo(uuOrder.getUuOrderNo());
+            ApiResult<OrderInfoResp> orderInfoRespApiResult = uuService.orderInfo(openApiReqVo.getData());
+            String json = objectMapper.writeValueAsString(orderInfoRespApiResult.getData());
+            if (json != null){
+                YouyouOrderDO youyouOrderDO = new YouyouOrderDO();
+                youyouOrderDO.setId(uuOrder.getId());
+                youyouOrderDO.setOrderInformReturnJason(json);
+                youyouOrderMapper.updateById(youyouOrderDO);
+            }
+        }
+        YouyouCommodityDO youyouCommodity = null;
+        if (uuOrder != null) {
+            youyouCommodity = youyouCommodityService.getYouyouCommodity(Integer.valueOf(uuOrder.getRealCommodityId()));
+        }
         if (youyouCommodity == null){
             throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
         }
@@ -542,15 +560,45 @@ public class UUOrderServiceImpl implements UUOrderService {
         }
 
         OrderInfoResp ret = new OrderInfoResp();
-//        ret.setId()
+        ret.setId(uuOrder.getOrderNo());
         ret.setOrderId(uuOrder.getId());
         ret.setOrderNo(uuOrder.getOrderNo());
-        ret.setShippingMode(uuOrder.getUuShippingMode());
-        ret.setOrderStatus(uuOrder.getUuOrderStatus());
-        ret.setOrderSubStatus(uuOrder.getUuOrderSubStatus());
+        LambdaQueryWrapper<YouyouOrderDO> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(YouyouOrderDO::getOrderNo,ret.getOrderNo());
+        YouyouOrderDO youyouOrderDO = youyouOrderMapper.selectOne(lambdaQueryWrapper);
 
-        ret.setOrderType(uuOrder.getUuOrderType());
-        ret.setOrderSubType(uuOrder.getUuOrderSubType());
+        if (youyouOrderDO != null){
+            OrderInfoResp orderInfoResp = objectMapper.readValue(youyouOrderDO.getOrderInformReturnJason(), OrderInfoResp.class);
+            ret.setProcessStatus(orderInfoResp.getProcessStatus());
+            ret.setOrderSubStatus(orderInfoResp.getOrderSubStatus());
+            ret.setOrderSubStatusName(orderInfoResp.getOrderSubStatusName());
+            ret.setOrderType(orderInfoResp.getOrderType());
+            ret.setOrderSubType(orderInfoResp.getOrderSubType());
+            ret.setTimeType(orderInfoResp.getTimeType());
+//        ret.setTime(null);// TODO 待确认
+            ret.setReturnAmount(orderInfoResp.getReturnAmount());
+            ret.setServiceFee(uuOrder.getServiceFee().toString());
+//        ret.setServiceFeeRate(uuOrder.getServiceFeeRate());
+            ret.setCommodityAmount(youyouCommodity.getCommodityPrice());
+            if(Objects.nonNull(uuOrder.getPayAmount())){
+                ret.setPaymentAmount(new BigDecimal(uuOrder.getPayAmount()).divide(new BigDecimal("100")).toString());
+            }
+            ret.setSellerSteamRegTime(orderInfoResp.getSellerSteamRegTime());
+//        ret.setTradeOfferId(null);// TODO 待确认
+            ret.setCancelOrderTime(orderInfoResp.getCancelOrderTime());
+//        ret.setOfferSendResult(null);// TODO 待确认
+            ret.setTradeUrl(uuOrder.getBuyTradeLinks());
+            ret.setFinishOrderTime(orderInfoResp.getFinishOrderTime());
+            ret.setPaySuccessTime(orderInfoResp.getPaySuccessTime());
+            ret.setPayEndTime(orderInfoResp.getPayEndTime());
+//        ret.setSendOfferSuccessTime(null);
+            ret.setSendOfferEndTime(orderInfoResp.getSendOfferEndTime());
+            ret.setOrderStatusColor(orderInfoResp.getOrderStatusColor());
+            ret.setOrderSubStatus(orderInfoResp.getOrderSubStatus());
+        }
+
+//        ret.setShippingMode(uuOrder.getUuShippingMode());
+        ret.setOrderStatus(uuOrder.getUuOrderStatus());
         ret.setBuyerUserId(uuOrder.getBuyUserId());
         ret.setBuyerUserName(buyUser.getNickname());
         if(StringUtils.hasText(buyUser.getAvatar())){
@@ -572,15 +620,11 @@ public class UUOrderServiceImpl implements UUOrderService {
         if(Objects.nonNull(payOrder)){
             ret.setPayEndTime(payOrder.getExpireTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
         }
-        ret.setFinishOrderTime(null);
-        ret.setPaySuccessTime(null);
-        ret.setPayEndTime(null);
-        ret.setSendOfferSuccessTime(null);
-        ret.setSendOfferEndTime(null);
-        ret.setConfirmOfferEndTime(null);
-        ret.setPendingEndTime(null);
-        ret.setDelayedTransferEndTime(null);
-        ret.setPrice(new BigDecimal(youyouCommodity.getCommodityPrice()).multiply(new BigDecimal("100")).longValue());//TODO 待确认
+
+//        ret.setConfirmOfferEndTime(null);
+//        ret.setPendingEndTime(null);
+//        ret.setDelayedTransferEndTime(null);
+//        ret.setPrice(new BigDecimal(youyouCommodity.getCommodityPrice()).multiply(new BigDecimal("100")).longValue());//TODO 待确认
         ret.setTotalAmount(String.valueOf(uuOrder.getPayAmount()));
         ret.setCancelReason(uuOrder.getCancelReason());
         if(Objects.nonNull(ret.getOrderStatus())){
@@ -590,24 +634,6 @@ public class UUOrderServiceImpl implements UUOrderService {
             String updatedOrderStatusName = ret.getOrderStatusName().replace("-s", "time");
             ret.setOrderStatusDesc(updatedOrderStatusName);
         }
-        ret.setOrderStatusColor(null);
-        if(Objects.nonNull(ret.getOrderSubStatus())){
-            ret.setOrderSubStatusName(UUOrderSubStatus.valueOf(ret.getOrderSubStatus()).getMsg());
-        }
-        ret.setTimeType(null);// TODO 待确认
-        ret.setTime(null);// TODO 待确认
-        ret.setReturnAmount(null);// TODO 待确认
-        ret.setServiceFee(uuOrder.getServiceFee().toString());
-        ret.setServiceFeeRate(uuOrder.getServiceFeeRate());
-        ret.setCommodityAmount(youyouCommodity.getCommodityPrice());
-        if(Objects.nonNull(uuOrder.getPayAmount())){
-            ret.setPaymentAmount(new BigDecimal(uuOrder.getPayAmount()).divide(new BigDecimal("100")).toString());
-        }
-        ret.setSellerSteamRegTime(null);// TODO 待确认
-        ret.setTradeOfferId(null);// TODO 待确认
-        ret.setCancelOrderTime(null);// TODO 待确认
-        ret.setOfferSendResult(null);// TODO 待确认
-        ret.setTradeUrl(uuOrder.getBuyTradeLinks());
 
         OrderInfoResp.ProductDetailDTO productDetailDTO = new OrderInfoResp.ProductDetailDTO();
         productDetailDTO.setCommodityId(youyouCommodity.getId());
@@ -621,7 +647,7 @@ public class UUOrderServiceImpl implements UUOrderService {
         productDetailDTO.setIsDoppler(youyouCommodity.getTemplateisDoppler());
         productDetailDTO.setDopplerColor(null);// TODO 待确认
         productDetailDTO.setIsFade(youyouCommodity.getTemplateisFade());
-        productDetailDTO.setFadeName(youyouCommodity.getCommodityFade());
+//        productDetailDTO.setFadeName(youyouCommodity.getCommodityFade());
         productDetailDTO.setDopplerColor(youyouCommodity.getCommodityDoppler());
 
         //TODO 以下属性先这样返回， 目前用不上
@@ -647,7 +673,6 @@ public class UUOrderServiceImpl implements UUOrderService {
         productDetailDTO.setWeaponId(youyouTemplateDO.getWeaponId());
         productDetailDTO.setWeaponHashName(youyouTemplateDO.getWeaponHashName());
         productDetailDTO.setCommodityAbrade(youyouCommodity.getCommodityAbrade());
-
 
         ret.setProductDetail(productDetailDTO);
         return ret;
