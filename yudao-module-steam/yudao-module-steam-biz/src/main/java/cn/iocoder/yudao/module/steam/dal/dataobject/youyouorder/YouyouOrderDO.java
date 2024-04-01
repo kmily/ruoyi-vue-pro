@@ -1,12 +1,9 @@
 package cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder;
 
 import lombok.*;
-import java.util.*;
+
 import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
+
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
@@ -255,5 +252,9 @@ public class YouyouOrderDO extends BaseDO {
      * 支付接口返回
      */
     private String payPayRet;
+    /**
+     * 订单详情接口返回json
+     */
+    private String orderInformReturnJason;
 
 }
