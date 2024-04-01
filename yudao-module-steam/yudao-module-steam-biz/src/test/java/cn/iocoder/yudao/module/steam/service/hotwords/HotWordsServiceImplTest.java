@@ -102,7 +102,7 @@ public class HotWordsServiceImplTest extends BaseDbUnitTest {
         /*Integer id = randomIntegerId();*/
 
         // 调用, 并断言异常
-        assertServiceException(() -> hotWordsService.deleteHotWords(id), HOT_WORDS_NOT_EXISTS);
+        assertServiceException(() -> hotWordsService.deleteHotWords(1), HOT_WORDS_NOT_EXISTS);
     }
 
     @Test

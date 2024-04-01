@@ -1,29 +1,31 @@
 package cn.iocoder.yudao.module.steam.service.inv;
 
 import cn.hutool.core.io.IoUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
+import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 用户库存储 Service 实现类
@@ -42,20 +44,12 @@ public class InvExtService {
 
     @Resource
     private PayNoRedisDAO noRedisDAO;
+    @Resource
+    private SellingMapper sellingMapper;
+    @Resource
+    private PaySteamOrderService paySteamOrderService;
 
     public void fetchInv(BindUserDO bindUserDO){
-//        File file = new File("text.json");
-//        FileOutputStream fileOutputStream = null;
-//        try {
-//            fileOutputStream = new FileOutputStream(file);
-//            fileOutputStream.write("aa".getBytes(StandardCharsets.UTF_8));
-//            fileOutputStream.close();
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        ;
         InventoryDto inventoryDto = gitInvFromSteam3(bindUserDO);
         log.info("inv{}",inventoryDto);
         String batchNo = noRedisDAO.generate("INV" + bindUserDO.getSteamId());
@@ -169,9 +163,46 @@ public class InvExtService {
             }else{
                 invMapper.updateById(invDO);
             }
-
         }
+        //处理过时的数据，以下数据为失效的库存
 
+        List<InvDO> invDOList = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
+                .eq(InvDO::getSteamId, bindUserDO.getSteamId())
+                .ne(InvDO::getBatchNo, batchNo)
+        );
+        List<Long> invIds = invDOList.stream().map(InvDO::getId).collect(Collectors.toList());
+        if(invIds.size()>0){
+            List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
+                    .in(SellingDO::getInvId, invIds)
+            );
+            invDOList.forEach(invDO -> {
+                Optional<SellingDO> first = sellingDOS.stream().filter(i -> i.getInvId().equals(invDO.getId())).findFirst();
+                if(!first.isPresent()){
+                    invMapper.deleteById(invDO.getId());
+                    return;
+                }
+                SellingDO sellingDO = first.get();
+                if (paySteamOrderService.getExpOrder(sellingDO.getId()).size() > 0) {
+                    invMapper.updateById(new InvDO().setId(invDO.getId()).setStatus(CommonStatusEnum.DISABLE.getStatus()));
+                    return;
+                }
+                if(sellingDO.getTransferStatus().equals(InvTransferStatusEnum.INIT.getStatus())){
+                    sellingMapper.deleteById(sellingDO.getId());
+                    invMapper.deleteById(invDO.getId());
+                }
+                if(sellingDO.getTransferStatus().equals(InvTransferStatusEnum.SELL.getStatus())){
+                    sellingMapper.deleteById(sellingDO.getId());
+                    invMapper.deleteById(invDO.getId());
+                }
+            });
+        }
+        List<InvDescDO> invDescDOList = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+                .eq(InvDescDO::getSteamId, bindUserDO.getSteamId())
+                .ne(InvDescDO::getBatchNo, batchNo)
+        );
+        invDescDOList.forEach(invDescDO -> {
+            invDescMapper.updateById(new InvDescDO().setId(invDescDO.getId()).setTradable(0));
+        });
     }
     // 从steam获取用户库存信息
     public InventoryDto gitInvFromSteam (BindUserDO bindUserDO)  {
