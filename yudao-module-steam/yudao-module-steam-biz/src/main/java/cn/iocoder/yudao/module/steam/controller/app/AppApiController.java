@@ -566,7 +566,6 @@ public class AppApiController {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
                 YouyouOrderDO uuOrder = uUOrderService.getUUOrder(loginUser, openApiReqVo.getData());
-
                   return ApiResult.success(uUOrderService.orderInfo(uuOrder,openApiReqVo), "成功");
             });
         } catch (ServiceException e) {
