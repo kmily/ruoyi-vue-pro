@@ -36,9 +36,9 @@ public class SellingDoList extends PageParam implements Serializable {
      */
     private LocalDateTime createTime;
     /**
-     * 商品价格，单位：分
+     * 价格，单位：分
      */
-    private Integer commodityAmount;
+    private Integer paymentAmount;
     /**
      * 订单号
      */
@@ -56,6 +56,9 @@ public class SellingDoList extends PageParam implements Serializable {
      */
     private String marketHashName;
 
+    /**
+     * 商品状态
+     */
     private Integer transferStatus;
 
     /**

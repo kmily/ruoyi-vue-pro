@@ -838,7 +838,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             throw new ServiceException(-1,"订单已经支付违约金，不支持操作");
         }
         if(!invOrder.getPayStatus()){
-            throw new ServiceException(-1,"不支付未支付的订单关闭");
+            throw new ServiceException(-1,"不支持未支付的订单关闭");
         }
         invOrderMapper.updateById(new InvOrderDO().setId(invOrderId).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus()));
         //释放库存

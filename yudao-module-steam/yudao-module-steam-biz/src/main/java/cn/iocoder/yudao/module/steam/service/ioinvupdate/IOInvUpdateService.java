@@ -161,12 +161,7 @@ public class IOInvUpdateService {
             }
             invDescDOList.add(invDescDO);
         }
-//        // 为空  批量插入 desc
-//        if((invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>().eq(InvDescDO::getSteamId, invDescDOList.get(0).getSteamId()))).isEmpty()){
-//            invDescMapper.insertBatch(invDescDOList);
-//        }
         // 插入desc
-
         invDescMapper.insertBatch(invDescDOList);
         List<InvDescDO> invDescIdList = new ArrayList<>();
         // 给inv表绑定descID
@@ -201,23 +196,22 @@ public class IOInvUpdateService {
         invDO.setSteamId(bindUserDO.getSteamId());
         invDO.setUserId(bindUserDO.getUserId());
         invDO.setBindUserId(bindUserDO.getId());
+        // 查找未上架的库存并删除
+        List<InvDO> invDOS = invMapper.selectList((new LambdaQueryWrapperX<InvDO>()
+                .eq(InvDO::getSteamId, invDO.getSteamId()))
+                .eq(InvDO::getTransferStatus, 0));
 
-        List<InvDO> invDOS = invMapper.selectList((new LambdaQueryWrapperX<InvDO>().eq(InvDO::getSteamId, invDO.getSteamId())));
         List<Long> invDescIdList = new ArrayList<>();
         List<Long> invIdList = new ArrayList<>();
 
         for (InvDO inv : invDOS) {
-            // 将没有上架的库存删除
-            if(inv.getTransferStatus() == 0){
-                invIdList.add(inv.getId());
-                invDescIdList.add(inv.getInvDescId());
-            }
+             invIdList.add(inv.getId());
+             invDescIdList.add(inv.getInvDescId());
         }
         if(!invIdList.isEmpty()){
             invMapper.deleteBatchIds(invIdList);
             invDescMapper.deleteBatchIds(invDescIdList);
         }
-
     }
 
 

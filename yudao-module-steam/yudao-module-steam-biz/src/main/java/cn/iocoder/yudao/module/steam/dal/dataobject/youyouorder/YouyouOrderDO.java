@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
+import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
@@ -30,13 +31,73 @@ public class YouyouOrderDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 价格，单位：分 
+     * 用户编号
      */
-    private Integer payAmount;
+    private Long buyUserId;
     /**
-     * 是否已支付：[0:未支付 1:已经支付过]
+     * 用户类型
      */
-    private Boolean payStatus;
+    private Integer buyUserType;
+    /**
+     * 买方绑定用户
+     */
+    private Long buyBindUserId;
+    /**
+     * 购买的steamId
+     */
+    private String buySteamId;
+    /**
+     *  收货方的Steam交易链接
+     */
+    private String buyTradeLinks;
+    /**
+     * 卖家用户ID
+     */
+    private Long sellUserId;
+    /**
+     * 卖家用户类型
+     */
+    private Integer sellUserType;
+    /**
+     * 卖方绑定用户ID
+     */
+    private Long sellBindUserId;
+    /**
+     * 卖家steamId
+     */
+    private String sellSteamId;
+    /**
+     * 资金付款信息
+     */
+    private String sellCashRet;
+    /**
+     * 收款状态
+     */
+    private Integer sellCashStatus;
+    /**
+     * 订单号，内容生成
+     */
+    private String orderNo;
+    /**
+     * 商品模版ID
+     */
+    private String commodityTemplateId;
+    /**
+     * 实际商品ID
+     */
+    private String realCommodityId;
+    /**
+     * 商品ID
+     */
+    private String commodityId;
+    /**
+     * 商品总额
+     */
+    private Integer commodityAmount;
+    /**
+     * 极速发货购买模式0：优先购买极速发货；1：只购买极速发货
+     */
+    private Integer fastShipping;
     /**
      * 支付订单编号
      */
@@ -50,119 +111,130 @@ public class YouyouOrderDO extends BaseDO {
      */
     private LocalDateTime payTime;
     /**
-     * 退款金额，单位：分
+     * 价格，单位：分 
      */
-    private Integer refundPrice;
+    private Integer payAmount;
     /**
-     * 退款订单编号
+     * 是否已支付：[0:未支付 1:已经支付过]
      */
-    private Long payRefundId;
-    /**
-     * 退款时间
-     */
-    private LocalDateTime refundTime;
-    /**
-     * 用户编号
-     */
-    private Long userId;
-    /**
-     * 用户类型
-     *
-     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.UserTypeEnum 对应的类}
-     */
-    private Integer userType;
-    /**
-     * 发货信息 json
-     */
-    private String transferText;
-    /**
-     * 发货状态
-     */
-    private Integer transferStatus;
+    private Boolean payStatus;
     /**
      * 订单支付状态
-     *
-     * 枚举 {@link cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum 对应的类}
      */
     private Integer payOrderStatus;
+
+    /**
+     * 取消原因
+     */
+    private String cancelReason;
+    /**
+     * 提现手续费收款人类型
+     */
+    private Integer serviceFeeUserType;
+    /**
+     * 服务费，单位分
+     */
+    private Integer serviceFee;
     /**
      * 商户订单号
      */
     private String merchantOrderNo;
     /**
-     * 订单号，内容生成
-     */
-    private String orderNo;
-    /**
-     * 发货模式 0,卖家直发；1,极速发货
-     */
-    private Integer shippingMode;
-    /**
-     *  收货方的Steam交易链接
-     */
-    private String tradeLinks;
-    /**
-     * 商品模版ID
-     */
-    private String commodityTemplateId;
-    /**
      * 模板hashname
      */
     private String commodityHashName;
     /**
-     * 商品ID
+     * 违约付款接口返回
      */
-    private String commodityId;
+    private String transferDamagesRet;
+    /**
+     * 违约金
+     */
+    private Integer transferDamagesAmount;
+    /**
+     * 发货状态
+     */
+    private Integer transferStatus;
+    /**
+     * 交易失败时退还
+     */
+    private Integer transferRefundAmount;
+    /**
+     * 服务费率
+     */
+    private String serviceFeeRate;
+    /**
+     * 提现手续费收款钱包
+     */
+    private Long serviceFeeUserId;
+    /**
+     * 交易违约判定时间
+     */
+    private LocalDateTime transferDamagesTime;
+    /**
+     * 商品名称
+     */
+    private String marketName;
+    /**
+     * 发货信息 json
+     */
+    private String transferText;
     /**
      * 购买最高价,单价元
      */
     private String purchasePrice;
     /**
-     * 实际商品ID
+     * 转帐接口返回
      */
-    private String realCommodityId;
+    private String serviceFeeRet;
     /**
-     * 极速发货购买模式0：优先购买极速发货；1：只购买极速发货
+     * 发货模式 0,卖家直发；1,极速发货
      */
-    private Integer fastShipping;
-    /**
-     * 有品订单号
-     */
-    private String uuOrderNo;
+    private Integer shippingMode;
     /**
      * 有品商户订单号
      */
     private String uuMerchantOrderNo;
     /**
+     * 购买用户编号。
+     */
+    private Integer uuBuyerUserId;
+    /**
+     * 订单失败原因编号。
+     */
+    private Integer uuFailCode;
+    /**
+     * 订单失败原因提示信息。
+     */
+    private String uuFailReason;
+    /**
+     * 有品订单号
+     */
+    private String uuOrderNo;
+    /**
+     * 通知类型描述(等待发货，等待收货，购买成功，订单取消)。
+     */
+    private String uuNotifyDesc;
+    /**
+     * 通知类型(1:等待发货，2:等待收货，3:购买成功，4:订单取消)。
+     */
+    private Integer uuNotifyType;
+    /**
      * 交易状态 0,成功；2,失败。
      */
     private Integer uuOrderStatus;
     /**
-     * 收款状态
+     * 订单小状态。
      */
-    private Integer sellCashStatus;
-    /**
-     * 卖家用户ID
-     */
-    private Long sellUserId;
-    /**
-     * 卖家用户类型
-     *
-     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.UserTypeEnum 对应的类}
-     */
-    private Integer sellUserType;
-    /**
-     * 预留字段
-     */
-    private Integer uuOrderType;
+    private Integer uuOrderSubStatus;
     /**
      * 预留字段
      */
     private Integer uuOrderSubType;
     /**
-     * 订单小状态。
+     * 预留字段
      */
-    private Integer uuOrderSubStatus;
+    private Integer uuOrderType;
     /**
      * 发货模式：0,卖家直发；1,极速发货
      */
@@ -176,28 +248,12 @@ public class YouyouOrderDO extends BaseDO {
      */
     private String uuTradeOfferLinks;
     /**
-     * 购买用户编号。
+     * 支付退款结果
      */
-    private Integer uuBuyerUserId;
+    private String payRefundRet;
     /**
-     * 订单失败原因提示信息。
+     * 支付接口返回
      */
-    private String uuFailReason;
-    /**
-     * 订单失败原因编号。
-     */
-    private Integer uuFailCode;
-    /**
-     * 通知类型(1:等待发货，2:等待收货，3:购买成功，4:订单取消)。
-     */
-    private Integer uuNotifyType;
-    /**
-     * 通知类型描述(等待发货，等待收货，购买成功，订单取消)。
-     */
-    private String uuNotifyDesc;
-    /**
-     * 商户订单号
-     */
-    private String merchantNo;
+    private String payPayRet;
 
 }

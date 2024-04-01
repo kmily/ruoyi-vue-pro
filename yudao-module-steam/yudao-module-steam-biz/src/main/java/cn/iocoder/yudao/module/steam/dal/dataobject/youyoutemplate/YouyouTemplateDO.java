@@ -55,13 +55,41 @@ public class YouyouTemplateDO extends BaseDO {
      */
     private String weaponHashName;
     /**
-     * 主键ID
+     * 图片地址
      */
-    @TableId
-    private Integer id;
+    private String iconUrl;
+    /**
+     * 在售最低价
+     */
+    private String minSellPrice;
+    /**
+     * 极速发货在售最低价
+     */
+    private String fastShippingMinSellPrice;
+    /**
+     * 模板参考价
+     */
+    private String referencePrice;
+    /**
+     * 外观
+     */
+    private String exteriorName;
+    /**
+     * 稀有度
+     */
+    private String rarityName;
+    /**
+     * 品质
+     */
+    private String qualityName;
     /**
      * 模板ID
      */
+    @TableId
     private Integer templateId;
+    /**
+     * 在售数量
+     */
+    private String sellNum;
 
 }

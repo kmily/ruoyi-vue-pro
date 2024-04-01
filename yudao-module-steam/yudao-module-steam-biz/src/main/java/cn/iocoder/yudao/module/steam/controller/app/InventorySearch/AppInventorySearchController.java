@@ -19,6 +19,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.SteamInvService;
 import cn.iocoder.yudao.module.steam.service.inv.InvService;
 import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
+import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,8 +53,7 @@ public class AppInventorySearchController {
 
     @Resource
     private SteamInvService steamInvService;
-    @Resource
-    private InvService invService;
+
     @Resource
     private BindUserMapper bindUserMapper;
     @Resource
@@ -61,12 +61,12 @@ public class AppInventorySearchController {
 
     @Resource
     private InvDescMapper invDescMapper;
+
     @Resource
     private SellingMapper sellingMapper;
 
     @Resource
     private IOInvUpdateService ioInvUpdateService;
-
 
     /**
      * 用户手动查询自己的 steam_inv 库存（从数据库中获取数据）
@@ -156,7 +156,6 @@ public class AppInventorySearchController {
             user.setSteamId(bindUserDO.getSteamId());
             user.setUserId(bindUserDO.getUserId());
             user.setId(bindUserDO.getId());
-            // 返回出售中的库存id
             ioInvUpdateService.deleteInventory(user);
             // 插入库存 返回库存绑定的descId TODO 后期优化思路 copy插入库存方法在插入的时候比对Selling表中相同账户下的 AssetId ，有重复就不插入
             ioInvUpdateService.firstInsertInventory(inventoryDto, bindUserDO);
@@ -169,8 +168,10 @@ public class AppInventorySearchController {
             // 删除重复的数据
             for(SellingDO invDO : sellingDOS){
                 // 筛选重复的一条（新插入的重复数据 TransferStatus = 0）
-                List<InvDO> invDOS1 = invMapper.selectList(new LambdaQueryWrapperX<InvDO>().eq(InvDO::getAssetid, invDO.getAssetid())
+                List<InvDO> invDOS1 = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
+                        .eq(InvDO::getAssetid, invDO.getAssetid())
                         .eq(InvDO::getTransferStatus, 0));
+
                 invMapper.deleteById(invDOS1.get(0).getId());
                 invDescMapper.deleteById(invDOS1.get(0).getInvDescId());
             }
@@ -180,5 +181,49 @@ public class AppInventorySearchController {
         }
         return success(new ArrayList<>());
     }
+//
+//
+//
+//    //================================================================
+//                    // TODO 库存更新重写版
+//    //================================================================
+//
+//    @GetMapping("/updateFromSteam")
+//    @Operation(summary = "更新库存 入参steamid")
+//    @ResponseBody
+//    public CommonResult<List<String>> updateFromSteam2(@RequestParam String steamId) throws JsonProcessingException {
+//        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+//        List<BindUserDO> collect = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+//                .eq(BindUserDO::getUserId, loginUser.getId())
+//                .eq(BindUserDO::getUserType, loginUser.getUserType())
+//                .eq(BindUserDO::getSteamId, steamId));
+//        if(Objects.isNull(collect) || collect.isEmpty()){
+//            throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
+//        }
+//        BindUserDO bindUserDO = new BindUserDO();
+//        bindUserDO.setSteamId(steamId);
+//        // 获取线上 steam 库存
+//        InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
+//        if(inventoryDto.getAssets() != null){
+//            // TODO 后期优化思路 copy插入库存方法在插入的时候比对Selling表中相同账户下的 AssetId ，有重复就不插入
+//            ioInvUpdateService.updateInventory(inventoryDto, bindUserDO);
+//            List<InvDO> invDOS = invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
+//                    .eq(InvDO::getSteamId, steamId)
+//                    .eq(InvDO::getBindUserId, bindUserDO.getId())
+//                    .eq(InvDO::getUserId, bindUserDO.getUserId())
+//                    .eq(InvDO::getTransferStatus, 1));
+//            if (invDOS.isEmpty()){
+//                return success(new ArrayList<>());
+//            }
+//            // 删除重复的数据
+//            for(InvDO invDO : invDOS){
+//                invMapper.delete(new LambdaQueryWrapperX<InvDO>().eq(InvDO::getAssetid,invDO.getAssetid()).eq(InvDO::getTransferStatus,0));
+//            }
+//
+//        } else {
+//            throw new ServiceException(-1,"未获取到新的库存信息");
+//        }
+//        return success(new ArrayList<>());
+//    }
 }
 

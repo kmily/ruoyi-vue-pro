@@ -21,59 +21,54 @@ public interface UUOrderService {
     /**
      * 创建示例订单
      *
-     * @param loginUser      用户
+     * @param loginUser   用户
      * @param createReqVO 创建信息
      * @return 编号
      */
     YouyouOrderDO createInvOrder(LoginUser loginUser, @Valid CreateCommodityOrderReqVo createReqVO);
+
+    /**
+     * 释放库存
+     * @param invOrderId
+     */
+    void releaseInvOrder(Long invOrderId);
+    /**
+     * 支付订单
+     * @param loginUser 前端用户
+     * @param invOrderId 订单号
+     * @return
+     */
+    YouyouOrderDO payInvOrder(LoginUser loginUser, @Valid Long invOrderId);
     /**
      * 获得订单详情
      * 订单是以买家身份进行查询
      * @param loginUser 订单用户
      * @param queryOrderReqVo 订单号
-     * @return 示例订单
+     * @return 买家的订单
      */
     YouyouOrderDO getUUOrder(LoginUser loginUser, QueryOrderReqVo queryOrderReqVo);
     OrderInfoResp orderInfo(YouyouOrderDO youyouOrderDO);
-    /**
-     * 获得示例订单列表
-     * @param youyouOrderPageReqVO
-     * @return
-     */
-//    PageResult<YouyouOrderDO> getInvOrderPageOrder(YouyouOrderPageReqVO youyouOrderPageReqVO);
-    /**
-    /**
-     * 更新示例订单为已支付
-     *
-     * @param id 编号
-     * @param payOrderId 支付订单号
-     */
-    void updateInvOrderPaid(Long id, Long payOrderId);
 
-    /**
-     * 发起示例订单的退款
-     *
-     * @param id 编号
-     * @param userIp 用户编号
-     */
-    Integer refundInvOrder(LoginUser loginUser, OrderCancelVo id, String userIp);
 
     /**
      * 买家取消订单
-     *
-     * @param id 编号
-     * @param userIp 用户编号
+     * @param loginUser
+     * @param id
+     * @param userIp
+     * @param cancelReason 取消原因
+     * @return
      */
-    Integer orderCancel(LoginUser loginUser, OrderCancelVo id, String userIp);
+    Integer orderCancel(LoginUser loginUser, OrderCancelVo id, String userIp,String cancelReason);
 
-    /**
-     * 更新示例订单为已退款
-     *
-     * @param id 编号
-     * @param payRefundId 退款订单号
-     */
-    void updateInvOrderRefunded(Long id, Long payRefundId);
 
     void processNotify(NotifyReq notifyReq);
-
+    void pushRemote(NotifyReq notifyReq);
+    /**
+     * 关闭订单,
+     * 用于未支持的订单进行关闭,并释放库存
+     *
+     * @param invOrderId InvOrderId
+     */
+    void checkTransfer(Long invOrderId);
+    void closeUnPayInvOrder(Long invOrderId);
 }

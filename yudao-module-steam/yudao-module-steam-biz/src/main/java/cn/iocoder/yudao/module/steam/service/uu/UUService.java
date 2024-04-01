@@ -3,16 +3,19 @@ package cn.iocoder.yudao.module.steam.service.uu;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUBatchGetOnSaleCommodity.BatchGetCommodity;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUBatchGetOnSaleCommodity.UUBatchGetOnSaleCommodityReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodityReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.CommodityList;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderStatusResp;
 import cn.iocoder.yudao.module.steam.service.steam.YouPingOrder;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiPayWalletRespVO;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -84,7 +87,7 @@ public class UUService {
 
     /**
      * 商品模板ID下载
-     * @return ApiResult<String>
+     * @return
      */
     public ApiResult<String> getTemplateId(){
         return openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/templateQuery",new OpenApiReqVo<>(), String.class);
@@ -95,9 +98,18 @@ public class UUService {
      *
      * @return ApiResult<ApiUUCommodityRespVO>
      */
-    public ApiResult<CommodityList> getCommodityList(ApiUUCommodityReqVO reqVo) throws JsonProcessingException {
-        return openApiService.requestUUTest("https://gw-openapi.youpin898.com/open/v1/api/goodsQuery",new OpenApiReqVo<ApiUUCommodityReqVO>().setData(reqVo),CommodityList.class);
+    public ApiResult<CommodityList> getCommodityList(ApiUUCommodityReqVO reqVo){
+        return openApiService.requestUUCommodity("https://gw-openapi.youpin898.com/open/v1/api/goodsQuery",new OpenApiReqVo<ApiUUCommodityReqVO>().setData(reqVo),CommodityList.class);
     }
+
+    /**
+     * 批量查询在售商品价格
+     * @return ApiResult<ApiUUCommodityRespVO>
+     */
+    public ApiResult<BatchGetCommodity> batchGetOnSaleCommodity(UUBatchGetOnSaleCommodityReqVO reqVo){
+        return openApiService.requestUUCommodity("https://gw-openapi.youpin898.com/open/v1/api/batchGetOnSaleCommodityInfo",new OpenApiReqVo<UUBatchGetOnSaleCommodityReqVO>().setData(reqVo), BatchGetCommodity.class);
+    }
+
     /**
      * 买家取消订单
      * https://www.yuque.com/yyyoupin/ckahux/zmemsgmf9trt8fz8
@@ -107,5 +119,17 @@ public class UUService {
         ApiResult<OrderCancelResp> orderCancelRespApiResult = openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/orderCancel", new OpenApiReqVo<OrderCancelVo>().setData(reqVo), OrderCancelResp.class);
         checkResponse(orderCancelRespApiResult);
         return orderCancelRespApiResult;
+    }
+    /**
+     * 查询订单状态
+     * https://www.yuque.com/yyyoupin/ckahux/xibbw8kpdepkhn04
+     * @return
+     */
+    public ApiResult<QueryOrderStatusResp> orderStatus(QueryOrderReqVo reqVo){
+        reqVo.setPageNo(null);
+        reqVo.setPageSize(null);
+        ApiResult<QueryOrderStatusResp> queryOrderStatusRespApiResult = openApiService.requestUU("https://gw-openapi.youpin898.com/open/v1/api/orderStatus", new OpenApiReqVo<QueryOrderReqVo>().setData(reqVo), QueryOrderStatusResp.class);
+        checkResponse(queryOrderStatusRespApiResult);
+        return queryOrderStatusRespApiResult;
     }
 }

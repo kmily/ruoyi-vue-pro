@@ -8,8 +8,10 @@ import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
 import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
 import cn.iocoder.yudao.module.steam.utils.RSAUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.security.InvalidKeyException;
@@ -28,13 +30,21 @@ public class UUNotifyService {
     private YouyouNotifyMapper youyouNotifyMapper;
     @Resource
     private UUOrderService uuOrderService;
-    @Autowired
+
     private ConfigService configService;
+
+    @Autowired
+    public void setConfigService(ConfigService configService) {
+        this.configService = configService;
+    }
+    @Resource
+    private RabbitTemplate rabbitTemplate;
+
     public void notify(NotifyReq notifyReq) {
-        ConfigDO pubKey = configService.getConfigByKey("uu.pubkey");
-        Map<String, Object> params = new HashMap<>();
-        params.put("messageNo","1265679");
-//注意接收到的callBackInfo是含有双引号转译符"\" 文档上无法体现只需要在验证签名是直接把callBackInfo值当成字符串即可以
+        ConfigDO pubkey = configService.getConfigByKey("uu.pubkey");
+        Map<String, String> params = new HashMap<>();
+        params.put("messageNo",notifyReq.getMessageNo());
+        //注意接收到的callBackInfo是含有双引号转译符"\" 文档上无法体现只需要在验证签名是直接把callBackInfo值当成字符串即可以
         params.put("callBackInfo",notifyReq.getCallBackInfo());
 
         // 第一步：检查参数是否已经排序
@@ -43,19 +53,23 @@ public class UUNotifyService {
         // 第二步：把所有参数名和参数值串在一起
         StringBuilder stringBuilder = new StringBuilder();
         for (String key : keys) {
-            Object value = params.get(key);
-            if (Objects.nonNull(value)) {
+            String value = params.get(key);
+            if (StringUtils.hasText(value)) {
                 stringBuilder.append(key).append(value);
             }
         }
         try {
-            boolean flag = RSAUtils.verifyByPublicKey(stringBuilder.toString().getBytes(), pubKey.getValue(), notifyReq.getSign());
+            boolean flag = RSAUtils.verifyByPublicKey(stringBuilder.toString().getBytes(), pubkey.getValue(), notifyReq.getSign());
+            if(!flag){
+                return;
+            }
             log.info("stringBuilder:{}",stringBuilder);
             YouyouNotifyDO youyouNotifyDO=new YouyouNotifyDO();
             youyouNotifyDO.setMsg(notifyReq);
             youyouNotifyDO.setMessageNo(notifyReq.getMessageNo());
             youyouNotifyMapper.insert(youyouNotifyDO);
-            uuOrderService.processNotify(notifyReq);
+            rabbitTemplate.convertAndSend("steam","steam_notify",notifyReq);
+
         } catch (InvalidKeySpecException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {

@@ -22,8 +22,8 @@ public class AppDevAccountSaveReqVO {
     @Schema(description = "公匙")
     private String apiPublicKey;
 
-    @Schema(description = "steam用户 ID", example = "29689")
-    private String steamId;
+    @Schema(description = "回调地址", example = "29689")
+    private String callbackUrl;
 
     @Schema(description = "状态", example = "2")
     private Integer status;
@@ -39,5 +39,10 @@ public class AppDevAccountSaveReqVO {
     @Schema(description = "申请理由", example = "1")
 //    @NotEmpty(message = "申请理由不能为空")
     private String applyReason;
+
+    /**
+     * 是否重头生成回调key
+     */
+    private Boolean genCallbackKey;
 
 }

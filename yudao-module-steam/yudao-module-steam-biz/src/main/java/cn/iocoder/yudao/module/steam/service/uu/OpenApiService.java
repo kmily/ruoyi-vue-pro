@@ -81,11 +81,8 @@ public class OpenApiService {
     public <T extends Serializable> OpenApiReqVo<T> requestUUSign(OpenApiReqVo<T> openApiReqVo){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         ConfigDO configApiKey = configService.getConfigByKey("uu.appKey");
-        ConfigDO configByKey = configService.getConfigByKey("uu.key1");
-        ConfigDO configByKey2 = configService.getConfigByKey("uu.key2");
-        ConfigDO configByKey3 = configService.getConfigByKey("uu.key3");
-        ConfigDO configByKey4 = configService.getConfigByKey("uu.key4");
-        String key=configByKey.getValue()+configByKey2.getValue()+configByKey3.getValue()+configByKey4.getValue();
+        ConfigDO configByKey = configService.getConfigByKey("uu.prikey");
+        String key=configByKey.getValue();
         openApiReqVo.setTimestamp(simpleDateFormat.format(new Date()));
         openApiReqVo.setAppKey(configApiKey.getValue());
         sign(openApiReqVo,key);
@@ -222,6 +219,7 @@ public class OpenApiService {
     }
 
 
+
     /**
      *
      * @param url
@@ -231,7 +229,7 @@ public class OpenApiService {
      * @param <T>
      * @param <E>
      */
-    public <T extends Serializable,E extends Serializable> ApiResult<E> requestUUTest(String url, OpenApiReqVo<T> openApiReqVo, Class<E> classic){
+    public <T extends Serializable,E extends Serializable> ApiResult<E> requestUUCommodity(String url, OpenApiReqVo<T> openApiReqVo, Class<E> classic){
 
         OpenApiReqVo<T> tOpenApiReqVo = requestUUSign(openApiReqVo);
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();

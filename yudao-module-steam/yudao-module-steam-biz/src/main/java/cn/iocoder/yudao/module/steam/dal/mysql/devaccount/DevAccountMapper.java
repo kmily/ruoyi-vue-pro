@@ -20,7 +20,7 @@ public interface DevAccountMapper extends BaseMapperX<DevAccountDO> {
     default PageResult<DevAccountDO> selectPage(DevAccountPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<DevAccountDO>()
                 .likeIfPresent(DevAccountDO::getUserName, reqVO.getUserName())
-                .eqIfPresent(DevAccountDO::getSteamId, reqVO.getSteamId())
+                .eqIfPresent(DevAccountDO::getCallbackUrl, reqVO.getCallbackUrl())
                 .eqIfPresent(DevAccountDO::getStatus, reqVO.getStatus())
                 .eqIfPresent(DevAccountDO::getUserType, reqVO.getUserType())
                 .orderByDesc(DevAccountDO::getId));

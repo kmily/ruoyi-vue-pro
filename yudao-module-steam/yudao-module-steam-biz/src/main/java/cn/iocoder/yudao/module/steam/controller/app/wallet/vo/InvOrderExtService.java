@@ -41,20 +41,21 @@ public class InvOrderExtService {
         // 匹配订单状态
         if(reqVo.getTransferStatus() != null){
             invOrderDO = new LambdaQueryWrapper<InvOrderDO>()
-                .eq(InvOrderDO::getSellUserId, loginUser.getId())
-                .eq(InvOrderDO::getSellUserType, loginUser.getUserType())
-                .eq(InvOrderDO::getTransferStatus, reqVo.getTransferStatus())
-                .orderByDesc(InvOrderDO::getCreateTime);
+                    .eq(InvOrderDO::getSellUserId, loginUser.getId())
+                    .eq(InvOrderDO::getSellUserType, loginUser.getUserType())
+                    .eq(InvOrderDO::getTransferStatus, reqVo.getTransferStatus())
+                    .orderByDesc(InvOrderDO::getCreateTime);
         }else{
             List<Integer> statusesToMatch = Arrays.asList(
                     InvTransferStatusEnum.TransferFINISH.getStatus(),
+                    InvTransferStatusEnum.INORDER.getStatus(),
                     InvTransferStatusEnum.TransferERROR.getStatus(),
                     InvTransferStatusEnum.CLOSE.getStatus());
             invOrderDO = new LambdaQueryWrapper<InvOrderDO>()
-                .eq(InvOrderDO::getSellUserId, loginUser.getId())
-                .eq(InvOrderDO::getSellUserType, loginUser.getUserType())
-                .in(InvOrderDO::getTransferStatus, statusesToMatch)
-                .orderByDesc(InvOrderDO::getCreateTime);
+                    .eq(InvOrderDO::getSellUserId, loginUser.getId())
+                    .eq(InvOrderDO::getSellUserType, loginUser.getUserType())
+                    .in(InvOrderDO::getTransferStatus, statusesToMatch)
+                    .orderByDesc(InvOrderDO::getCreateTime);
         }
 
         // 执行分页查询
@@ -69,7 +70,7 @@ public class InvOrderExtService {
             SellingDoList sellingDoListTemp = new SellingDoList();
             sellingDoListTemp.setOrderNo(invOrderDOTemp.getOrderNo());
             sellingDoListTemp.setPayTime(invOrderDOTemp.getPayTime());
-            sellingDoListTemp.setCommodityAmount(invOrderDOTemp.getCommodityAmount());
+            sellingDoListTemp.setPaymentAmount(invOrderDOTemp.getPaymentAmount());
             sellingDoListTemp.setMerchantNo(invOrderDOTemp.getMerchantNo());
             sellingDoListTemp.setMarketName(invOrderDOTemp.getMarketName());
             sellingDoListTemp.setCreateTime(invOrderDOTemp.getCreateTime());

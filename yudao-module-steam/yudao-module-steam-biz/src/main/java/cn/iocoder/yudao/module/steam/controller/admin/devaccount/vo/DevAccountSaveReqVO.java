@@ -19,7 +19,7 @@ public class DevAccountSaveReqVO {
     private String userName;
 
     @Schema(description = "公匙")
-    @NotEmpty(message = "公钥不能为空")
+//    @NotEmpty(message = "公钥不能为空")
     private String apiPublicKey;
 
     @Schema(description = "steam用户 ID", example = "29689")

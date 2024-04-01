@@ -39,4 +39,18 @@ public class YouyouNotifyDO extends BaseDO {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private NotifyReq msg;
 
+
+    /**
+     * 是否已经推送到远程
+     */
+    private Boolean pushRemote;
+    /**
+     * 远程地址
+     */
+    private String pushRemoteUrl;
+    /**
+     * 远程返回
+     */
+    private String pushRemoteResult;
+
 }
