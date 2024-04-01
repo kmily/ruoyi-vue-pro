@@ -103,6 +103,8 @@ public interface ErrorCodeConstants {
     // ========== 签约ISV用户  ==========
     ErrorCode ALIPAY_ISV_NOT_EXISTS = new ErrorCode(1_600_010_01, "签约ISV用户不存在");
 
-
+    // TODO 待办：请将下面的错误码复制到 yudao-module-steam-api 模块的 ErrorCodeConstants 类中。注意，请给“TODO 补充编号”设置一个错误码编号！！！
+// ========== 热词搜索 TODO 补充编号 ==========
+    ErrorCode HOT_WORDS_NOT_EXISTS = new ErrorCode(1_700_010_01, "热词搜索不存在");
 
 }

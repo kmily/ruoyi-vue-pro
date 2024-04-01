@@ -8,14 +8,17 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.ItemResp;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.PreviewReqVO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.hotwords.HotWordsDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
+import cn.iocoder.yudao.module.steam.dal.mysql.hotwords.HotWordsMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.scheduling.annotation.Async;
@@ -42,6 +45,8 @@ public class InvPreviewExtService {
     private SellingMapper sellingMapper;
     @Resource
     InvPreviewService invPreviewService;
+    @Resource
+    private HotWordsMapper hotWordsMapper;
 
     public ItemResp getInvPreview(PreviewReqVO reqVO) {
 
@@ -81,6 +86,9 @@ public class InvPreviewExtService {
     }
 
     public PageResult<ItemResp> getInvPreviewPage(InvPreviewPageReqVO pageReqVO) {
+        HotWordsDO hotWordsDO = hotWordsMapper.selectOne(new LambdaQueryWrapper<HotWordsDO>()
+                .eq(HotWordsDO::getHotWords, pageReqVO.getItemName()));
+        pageReqVO.setItemName(hotWordsDO.getMarketName());
         PageResult<InvPreviewDO> invPreviewDOPageResult = invPreviewMapper.selectPage(pageReqVO);
         List<ItemResp> ret = new ArrayList<>();
         for (InvPreviewDO item : invPreviewDOPageResult.getList()) {
