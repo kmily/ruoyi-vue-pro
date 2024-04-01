@@ -33,26 +33,20 @@ public class AppDevAccountController {
     @Resource
     private DevAccountService devAccountService;
 
-//    @Resource
-//    private AppAuthSmsValidateReqVO appAuthSmsValidateReqVO;
     @Resource
     private MemberAuthService authService;
 
     @Resource
     private MemberUserMapper memberUserMapper;
 
-//    @Resource
-//    private SecurityFrameworkUtils securityFrameworkUtils ;
 
-
-
-
-    @PostMapping("/create")
-    @Operation(summary = "创建开放平台用户")
-    public CommonResult<String> createDevAccount(@RequestBody @Valid AppDevAccountSaveReqVO reqVO) {
-        reqVO.setUserName("open_" + IdUtil.simpleUUID());
-        return success(devAccountService.apply(reqVO));
-    }
+//
+//    @PostMapping("/create")
+//    @Operation(summary = "创建开放平台用户")
+//    public CommonResult<String> createDevAccount(@RequestBody @Valid AppDevAccountSaveReqVO reqVO) {
+//        reqVO.setUserName("open_" + IdUtil.simpleUUID());
+//        return success(devAccountService.apply(reqVO));
+//    }
 
     @PostMapping("/update")
     @Operation(summary = "开放平台用户修改RSA")
