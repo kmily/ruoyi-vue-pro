@@ -27,7 +27,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Tag(name = "steam后台 - devApi")
 @RestController
@@ -91,10 +95,15 @@ public class AppDevApiController {
         type.setPageSize(200);
         type.setPageNo(1);
         List<SelTypeDO> list = selTypeService.getSelTypePage(type).getList();
-        list.forEach(selType -> {
-            List<SelWeaponDO> selWeaponDOS = selWeaponMapper.selectList("type_id",selType.getId());
-           selType.setWeaponList(selWeaponDOS);
-        });
+
+        List<Long> typeIdList = list.stream().map(SelTypeDO::getId).collect(Collectors.toList());
+        Map<Long, List<SelWeaponDO>> weaponMap = new HashMap<>();
+        List<SelWeaponDO> selWeaponDOS = selWeaponMapper.selectList("type_id", typeIdList);
+        Map<Long, List<SelWeaponDO>> weaponGroupByType = selWeaponDOS.stream().collect(Collectors.groupingBy(SelWeaponDO::getTypeId));
+        typeIdList.forEach(typeId -> weaponMap.put(typeId, weaponGroupByType.getOrDefault(typeId, new ArrayList<>())));
+        for (SelTypeDO selType : list) {
+            selType.setWeaponList(weaponMap.get(selType.getId()));
+        }
         appDropListRespVO.setType(list);
         return CommonResult.success(appDropListRespVO);
     }

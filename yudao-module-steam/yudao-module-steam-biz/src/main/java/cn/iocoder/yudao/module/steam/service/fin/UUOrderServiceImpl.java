@@ -533,8 +533,8 @@ public class UUOrderServiceImpl implements UUOrderService {
             String json = null;
             try {
                 json = objectMapper.writeValueAsString(orderInfoRespApiResult.getData());
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException("JSON 转换出错: " + e.getMessage(), e);
+            } catch (Exception e) {
+                throw exception(ErrorCodeConstants.YOUYOU_DETAILS_NOT_EXISTS);
             }
             if (json != null){
                 YouyouOrderDO youyouOrderDO = new YouyouOrderDO();
@@ -572,8 +572,8 @@ public class UUOrderServiceImpl implements UUOrderService {
         OrderInfoResp orderInfoResp = null;
         try {
             orderInfoResp = objectMapper.readValue(uuOrder.getOrderInformReturnJason(), OrderInfoResp.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("JSON 转换出错: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw exception(ErrorCodeConstants.YOUYOU_DETAILS_NOT_EXISTS);
         }
         ret.setProcessStatus(orderInfoResp.getProcessStatus());
         ret.setOrderSubStatus(orderInfoResp.getOrderSubStatus());
