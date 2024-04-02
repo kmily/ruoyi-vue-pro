@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
+import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
@@ -48,6 +49,8 @@ public class InvExtService {
     private SellingMapper sellingMapper;
     @Resource
     private PaySteamOrderService paySteamOrderService;
+    @Resource
+    private SteamService steamService;
 
     public void fetchInv(BindUserDO bindUserDO){
         InventoryDto inventoryDto = gitInvFromSteam(bindUserDO);
@@ -150,8 +153,11 @@ public class InvExtService {
             invDO.setAmount(item.getAmount());
             invDO.setSteamId(bindUserDO.getSteamId());
 //            invDO.setStatus(0);   // 默认为0
-            invDO.setPrice(0);
-            invDO.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
+            invDO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+            if(Objects.isNull(invDO.getId())){
+                invDO.setPrice(0);
+                invDO.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
+            }
             invDO.setUserId(bindUserDO.getUserId());
             invDO.setUserType(bindUserDO.getUserType());
             invDO.setBindUserId(bindUserDO.getId());
@@ -168,6 +174,10 @@ public class InvExtService {
                 .eq(InvDO::getSteamId, bindUserDO.getSteamId())
                 .ne(InvDO::getBatchNo, batchNo)
         );
+        invDOList.addAll(invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
+                .eq(InvDO::getSteamId, bindUserDO.getSteamId())
+                .isNull(InvDO::getBatchNo)
+        ));
         List<Long> invIds = invDOList.stream().map(InvDO::getId).collect(Collectors.toList());
         if(invIds.size()>0){
             List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
@@ -198,6 +208,10 @@ public class InvExtService {
                 .eq(InvDescDO::getSteamId, bindUserDO.getSteamId())
                 .ne(InvDescDO::getBatchNo, batchNo)
         );
+        invDescDOList.addAll(invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+                .eq(InvDescDO::getSteamId, bindUserDO.getSteamId())
+                .isNull(InvDescDO::getBatchNo)
+        ));
         invDescDOList.forEach(invDescDO -> invDescMapper.updateById(new InvDescDO().setId(invDescDO.getId()).setTradable(0)));
     }
     // 从steam获取用户库存信息
@@ -211,7 +225,8 @@ public class InvExtService {
         pathVar.put("steamId", bindUserDO.getSteamId());
         pathVar.put("app", "730");
         builder.pathVar(pathVar);
-        HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
+
+        HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),steamService.getBindUserIp(bindUserDO));
         if (Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus() != 200) {
             throw new ServiceException(-1, "初始化steam失败");
         }

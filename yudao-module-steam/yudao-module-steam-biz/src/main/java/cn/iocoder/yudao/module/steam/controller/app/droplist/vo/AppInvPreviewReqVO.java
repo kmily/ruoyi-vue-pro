@@ -8,16 +8,26 @@ import javax.validation.constraints.NotNull;
 
 @Data
 public class AppInvPreviewReqVO extends PageParam {
-//    @NotNull(message = "品质不能为空")
     private String selRarity;
-    @Schema(description = "最高价格", example = "2")
-//    @NotNull(message = "类别不能为空")
+
     private String selQuality;
-    @Schema(description = "最低价格", example = "1")
-//    @NotNull(message = "外观不能为空")
+
     private String selExterior;
-//    @NotNull(message = "收藏品不能为空")
+
     private String selItemset;
+
     @NotNull(message = "搜索词不能为空不能为空")
     private String itemName;
+
+    @Schema(description = "最低价格", example = "1")
+    private Integer minPrice;
+
+    @Schema(description = "最高价格", example = "2")
+    private  Integer maxPrice;
+
+    @Schema(description = "排序字段autoPrice 传0,1,2 分别代表默认排序,升序，降序")
+    private String sort;
+
+    private String type;
+
 }

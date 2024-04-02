@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewService;
 import cn.iocoder.yudao.module.steam.service.selexterior.SelExteriorService;
 import cn.iocoder.yudao.module.steam.service.selitemset.SelItemsetService;
+import cn.iocoder.yudao.module.steam.service.selling.SellingHotDO;
 import cn.iocoder.yudao.module.steam.service.selling.SellingService;
 import cn.iocoder.yudao.module.steam.service.selling.SellingsearchService;
 import cn.iocoder.yudao.module.steam.service.selquality.SelQualityService;
@@ -182,12 +183,15 @@ public class AppDropListController {
         reqVO1.setExistInv(true);
         reqVO1.setPageSize(reqVO.getPageSize());
         reqVO1.setPageNo(reqVO.getPageNo());
+        reqVO1.setMinPrice(reqVO.getMinPrice());
+        reqVO1.setMaxPrice(reqVO.getMaxPrice());
+        reqVO1.setSort(reqVO.getSort());
+        reqVO1.setType(reqVO.getType());
         return success(invPreviewExtService.getInvPreviewPage(reqVO1));
     }
     @GetMapping("items/730/getHot")
     @Operation(summary = "热门在售卖")
-    public CommonResult<PageResult<ItemResp>> getHot(@Valid InvPreviewPageReqVO sellingPageReqVO) {
-        sellingPageReqVO.setExistInv(true);
+    public CommonResult<PageResult<SellingHotDO>> getHot(@Valid SellingPageReqVO sellingPageReqVO) {
         return success(invPreviewExtService.getHot(sellingPageReqVO));
     }
     @GetMapping("items/730/header")

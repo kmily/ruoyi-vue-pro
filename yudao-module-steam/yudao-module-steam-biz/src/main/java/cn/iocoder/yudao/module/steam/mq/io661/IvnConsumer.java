@@ -22,6 +22,11 @@ public class IvnConsumer {
     @RabbitHandler // 重点：添加 @RabbitHandler 注解，实现消息的消费
     public void onMessage(Long message) {
         log.info("[onMessage][消息内容({})]", message);
+        try {
+            Thread.sleep(2000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         BindUserDO bindUser = bindUserService.getBindUser(message);
         if(Objects.isNull(bindUser)){
             return;
