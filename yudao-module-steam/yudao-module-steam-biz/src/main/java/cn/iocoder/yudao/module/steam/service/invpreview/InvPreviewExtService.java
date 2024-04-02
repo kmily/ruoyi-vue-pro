@@ -156,11 +156,11 @@ public class InvPreviewExtService {
         List<SellingDO> resultList = sortedList.subList(startIndex, endIndex);
 
         // 价格单位转换:分 -> 元
-        resultList.forEach(item -> {
-            if (Objects.nonNull(item.getPrice())) {
-                item.setPrice(new BigDecimal(item.getPrice()).divide(new BigDecimal("100")).intValue());
-            }
-        });
+//        resultList.forEach(item -> {
+//            if (Objects.nonNull(item.getPrice())) {
+//                item.setPrice(new BigDecimal(item.getPrice()).divide(new BigDecimal("100")).intValue());
+//            }
+//        });
 
         List<SellingHotDO> sellingHotDOList = new ArrayList<>();
 
