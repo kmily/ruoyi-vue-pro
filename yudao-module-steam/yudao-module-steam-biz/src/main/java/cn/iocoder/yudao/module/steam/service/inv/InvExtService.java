@@ -150,8 +150,11 @@ public class InvExtService {
             invDO.setAmount(item.getAmount());
             invDO.setSteamId(bindUserDO.getSteamId());
 //            invDO.setStatus(0);   // 默认为0
-            invDO.setPrice(0);
-            invDO.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
+            invDO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+            if(Objects.isNull(invDO.getId())){
+                invDO.setPrice(0);
+                invDO.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
+            }
             invDO.setUserId(bindUserDO.getUserId());
             invDO.setUserType(bindUserDO.getUserType());
             invDO.setBindUserId(bindUserDO.getId());
@@ -168,6 +171,10 @@ public class InvExtService {
                 .eq(InvDO::getSteamId, bindUserDO.getSteamId())
                 .ne(InvDO::getBatchNo, batchNo)
         );
+        invDOList.addAll(invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
+                .eq(InvDO::getSteamId, bindUserDO.getSteamId())
+                .isNull(InvDO::getBatchNo)
+        ));
         List<Long> invIds = invDOList.stream().map(InvDO::getId).collect(Collectors.toList());
         if(invIds.size()>0){
             List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
@@ -198,6 +205,10 @@ public class InvExtService {
                 .eq(InvDescDO::getSteamId, bindUserDO.getSteamId())
                 .ne(InvDescDO::getBatchNo, batchNo)
         );
+        invDescDOList.addAll(invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+                .eq(InvDescDO::getSteamId, bindUserDO.getSteamId())
+                .isNull(InvDescDO::getBatchNo)
+        ));
         invDescDOList.forEach(invDescDO -> invDescMapper.updateById(new InvDescDO().setId(invDescDO.getId()).setTradable(0)));
     }
     // 从steam获取用户库存信息
