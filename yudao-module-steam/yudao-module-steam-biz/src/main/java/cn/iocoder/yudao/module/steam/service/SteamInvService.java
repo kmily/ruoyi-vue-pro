@@ -152,10 +152,10 @@ public class SteamInvService {
                 appInvPageReqVO.setMarketName(map.get(item.getInvDescId()).getMarketName());
                 appInvPageReqVO.setMarketHashName(map.get(item.getInvDescId()).getMarketHashName());
                 if(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName())==null){
-                    appInvPageReqVO.setC5Price("0.00");
+                    appInvPageReqVO.setPrice(0);
                     appInvPageReqVO.setItemInfo(new C5ItemInfo());
                 } else {
-                    appInvPageReqVO.setC5Price(String.valueOf(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getMinPrice()));
+                    appInvPageReqVO.setPrice(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getMinPrice());
                     appInvPageReqVO.setItemInfo(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getItemInfo());
                 }
                 appInvPageReqVO.setInvId(Collections.emptyList());
@@ -211,8 +211,6 @@ public class SteamInvService {
             mapInvPreview = invPreviewDOS.stream().collect(Collectors.toMap(InvPreviewDO::getMarketHashName, i -> i, (v1, v2) -> v1));
         }
 
-
-
         // 合并显示库存
 //        List<AppInvPageReqVO> appInvPageReqVO = new ArrayList<>();
         Map<Long, AppInvPageReqVO> stringAppInvPageReqVOMap = new HashMap<>();
@@ -227,10 +225,10 @@ public class SteamInvService {
                 appInvPageReqVO.setMarketName(map.get(item.getInvDescId()).getMarketName());
                 appInvPageReqVO.setMarketHashName(map.get(item.getInvDescId()).getMarketHashName());
                 if(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName())==null){
-                    appInvPageReqVO.setC5Price("0.00");
+                    appInvPageReqVO.setPrice(0);
                     appInvPageReqVO.setItemInfo(new C5ItemInfo());
                 } else {
-                    appInvPageReqVO.setC5Price(String.valueOf(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getMinPrice()));
+                    appInvPageReqVO.setPrice(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getMinPrice());
                     appInvPageReqVO.setItemInfo(mapInvPreview.get(map.get(item.getInvDescId()).getMarketHashName()).getItemInfo());
                 }
 
