@@ -160,11 +160,18 @@ public class InvPreviewExtService {
         qualityMap.put("unusual", new MutablePair<>("★", "#8650ac"));
         qualityMap.put("unusual_strange", new MutablePair<>("★ StatTrak™", "#8650ac"));
 
-        // 统计每个 market_hash_name 的数量
+        // 统计每个 market_hash_name 的数量和最低价格
         Map<String, Integer> sellNumMap = new HashMap<>();
+        Map<String, Integer> minPriceMap = new HashMap<>();
         for (SellingDO item : sellingDOS) {
             String marketHashName = item.getMarketHashName();
-            sellNumMap.put(marketHashName, sellNumMap.getOrDefault(marketHashName, 0) + 1);
+            int sellNum = sellNumMap.getOrDefault(marketHashName, 0) + 1;
+            sellNumMap.put(marketHashName, sellNum);
+
+            int price = item.getPrice() != null ? item.getPrice() : Integer.MIN_VALUE;
+            if (!minPriceMap.containsKey(marketHashName) || price < minPriceMap.get(marketHashName)) {
+                minPriceMap.put(marketHashName, price);
+            }
         }
 
         for (SellingDO item : resultList) {
@@ -198,7 +205,7 @@ public class InvPreviewExtService {
             }
 
             sellingHotDO.setIconUrl(item.getIconUrl());
-            sellingHotDO.setPrice(item.getPrice());
+            sellingHotDO.setPrice(minPriceMap.get(item.getMarketHashName()));
             sellingHotDO.setItemInfo(c5ItemInfo);
             sellingHotDO.setDisplayWeight(item.getDisplayWeight());
             sellingHotDO.setMarketName(item.getMarketName());
@@ -211,7 +218,6 @@ public class InvPreviewExtService {
         long totalCount = sellingDOS.size();
         return new PageResult<>(sellingHotDOList, totalCount);
     }
-
     /**
      * 增加库存标识,上架构和下架构 都可以进行调用
      *
