@@ -16,7 +16,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 public class BindIpaddressPageReqVO extends PageParam {
 
     @Schema(description = "端口")
-    private Long port;
+    private Integer port;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
