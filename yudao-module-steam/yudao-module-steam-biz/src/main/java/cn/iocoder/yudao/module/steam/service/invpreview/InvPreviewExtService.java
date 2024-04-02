@@ -129,12 +129,12 @@ public class InvPreviewExtService {
                 .sorted(Comparator.comparingInt(SellingDO::getDisplayWeight))
                 .collect(Collectors.toList());
 
-        // 取前 pageSize 个
+        // 分页处理
         int pageSize = pageReqVO.getPageSize();
-        if (pageSize > sortedList.size()) {
-            pageSize = sortedList.size();
-        }
-        List<SellingDO> resultList = sortedList.subList(0, pageSize);
+        int pageNum = pageReqVO.getPageNo();
+        int startIndex = (pageNum - 1) * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, sortedList.size());
+        List<SellingDO> resultList = sortedList.subList(startIndex, endIndex);
 
         // 价格单位转换:分 -> 元
         resultList.forEach(item -> {
@@ -159,6 +159,13 @@ public class InvPreviewExtService {
         qualityMap.put("tournament", new MutablePair<>("纪念品", "#ffb100"));
         qualityMap.put("unusual", new MutablePair<>("★", "#8650ac"));
         qualityMap.put("unusual_strange", new MutablePair<>("★ StatTrak™", "#8650ac"));
+
+        // 统计每个 market_hash_name 的数量
+        Map<String, Integer> sellNumMap = new HashMap<>();
+        for (SellingDO item : sellingDOS) {
+            String marketHashName = item.getMarketHashName();
+            sellNumMap.put(marketHashName, sellNumMap.getOrDefault(marketHashName, 0) + 1);
+        }
 
         for (SellingDO item : resultList) {
             SellingHotDO sellingHotDO = new SellingHotDO();
@@ -196,10 +203,13 @@ public class InvPreviewExtService {
             sellingHotDO.setDisplayWeight(item.getDisplayWeight());
             sellingHotDO.setMarketName(item.getMarketName());
             sellingHotDO.setMarketHashName(item.getMarketHashName());
+            sellingHotDO.setSellNum(sellNumMap.get(item.getMarketHashName()));
 
             sellingHotDOList.add(sellingHotDO);
         }
-        return new PageResult<>(sellingHotDOList, (long) sellingDOS.size());
+
+        long totalCount = sellingDOS.size();
+        return new PageResult<>(sellingHotDOList, totalCount);
     }
 
     /**

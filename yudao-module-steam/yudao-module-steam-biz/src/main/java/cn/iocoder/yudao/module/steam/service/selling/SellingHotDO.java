@@ -10,6 +10,10 @@ import lombok.*;
 @AllArgsConstructor
 public class SellingHotDO {
     /**
+     * 在售数量
+     */
+    private Integer sellNum;
+    /**
      * 出售价格单价分
      */
     private Integer price;
