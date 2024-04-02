@@ -314,13 +314,16 @@ public class HttpUtil {
     }
     public static ProxyResponseVo sentToSteamByProxy(ProxyRequestVo proxyRequestVo, Optional<BindIpaddressDO> bindIpaddressDOOptional) {
         HttpRequest.HttpRequestBuilder builder = HttpRequest.builder();
-        builder.url("http://192.168.0.106/proxy/endpoint");
+        builder.url("http://8.217.234.84/proxy/endpoint");
         builder.apiKey("L79OrZkhXuK8jC3jVUVOpcFlt1TTVEpN");
         builder.method(Method.JSON);
-        builder.postObject(proxyRequestVo);
         if(bindIpaddressDOOptional.isPresent()){
-            builder.proxyIp(bindIpaddressDOOptional.get().getIpAddress()).proxyPort(bindIpaddressDOOptional.get().getPort());
+            proxyRequestVo.setProxyIp(bindIpaddressDOOptional.get().getIpAddress());
+            proxyRequestVo.setProxyPort(bindIpaddressDOOptional.get().getPort());
+            proxyRequestVo.setApiKey("L79OrZkhXuK8jC3jVUVOpcFlt1TTVEpN");
         }
+        builder.postObject(proxyRequestVo);
+        log.info("发送到服务器信息{}",JacksonUtils.writeValueAsString(builder.build()));
         HttpResponse sent = sent(builder.build(), getClient(true, 1000));
         return sent.json(ProxyResponseVo.class);
     }
