@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import java.util.*;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -107,4 +108,11 @@ public class InvPreviewPageReqVO extends PageParam {
     @Schema(description = "最低价格", example = "1")
     private Integer minPrice;
 
+    @Schema(description = "排序字段autoPrice 传0,1,2 分别代表默认排序,升序，降序")
+    @JsonIgnore
+    private String sort;
+
+    @Schema(description = "武器类型 (包括武器的大类和小类)")
+    @JsonIgnore
+    private String type;
 }

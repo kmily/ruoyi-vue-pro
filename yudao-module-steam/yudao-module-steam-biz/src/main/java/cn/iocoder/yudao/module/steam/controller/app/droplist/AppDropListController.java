@@ -182,6 +182,10 @@ public class AppDropListController {
         reqVO1.setExistInv(true);
         reqVO1.setPageSize(reqVO.getPageSize());
         reqVO1.setPageNo(reqVO.getPageNo());
+        reqVO1.setMinPrice(reqVO.getMinPrice());
+        reqVO1.setMaxPrice(reqVO.getMaxPrice());
+        reqVO1.setSort(reqVO.getSort());
+        reqVO1.setType(reqVO.getType());
         return success(invPreviewExtService.getInvPreviewPage(reqVO1));
     }
     @GetMapping("items/730/getHot")
