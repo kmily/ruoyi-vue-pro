@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.hotwords.HotWordsMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
+import cn.iocoder.yudao.module.steam.service.selling.SellingHotDO;
 import cn.iocoder.yudao.module.steam.service.selling.SellingService;
 import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
@@ -96,7 +97,7 @@ public class InvPreviewExtService {
         HotWordsDO hotWordsDO = hotWordsMapper.selectOne(new LambdaQueryWrapper<HotWordsDO>()
                 .eq(HotWordsDO::getHotWords, pageReqVO.getItemName()));
 
-        if (hotWordsDO!=null){
+        if (hotWordsDO != null) {
             pageReqVO.setItemName(hotWordsDO.getMarketName());
         }
 
@@ -119,10 +120,9 @@ public class InvPreviewExtService {
         return new PageResult<>(ret, invPreviewDOPageResult.getTotal());
     }
 
-    public PageResult<SellingDO> getHot(SellingPageReqVO pageReqVO) {
+    public PageResult<SellingHotDO> getHot(SellingPageReqVO pageReqVO) {
         // 获取所有数据
         List<SellingDO> sellingDOS = sellingMapper.selectList();
-
 
         // 按 display_weight 字段进行排序,数字越小权重越大
         List<SellingDO> sortedList = sellingDOS.stream()
@@ -142,8 +142,66 @@ public class InvPreviewExtService {
                 item.setPrice(new BigDecimal(item.getPrice()).divide(new BigDecimal("100")).intValue());
             }
         });
-        return new PageResult<>(resultList, (long) sellingDOS.size());
+
+        List<SellingHotDO> sellingHotDOList = new ArrayList<>();
+
+        Map<String, Pair<String, String>> exteriorMap = new HashMap<>();
+        exteriorMap.put("WearCategoryNA", new MutablePair<>("无涂装", ""));
+        exteriorMap.put("WearCategory0", new MutablePair<>("崭新出厂", "#228149"));
+        exteriorMap.put("WearCategory1", new MutablePair<>("略有磨损", "#64b02b"));
+        exteriorMap.put("WearCategory2", new MutablePair<>("久经沙场", "#efad4d"));
+        exteriorMap.put("WearCategory3", new MutablePair<>("破损不堪", "#b7625f"));
+        exteriorMap.put("WearCategory4", new MutablePair<>("战痕累累", "#993a38"));
+
+        Map<String, Pair<String, String>> qualityMap = new HashMap<>();
+        qualityMap.put("normal", new MutablePair<>("普通", ""));
+        qualityMap.put("strange", new MutablePair<>("StatTrak™", "#cf6a32"));
+        qualityMap.put("tournament", new MutablePair<>("纪念品", "#ffb100"));
+        qualityMap.put("unusual", new MutablePair<>("★", "#8650ac"));
+        qualityMap.put("unusual_strange", new MutablePair<>("★ StatTrak™", "#8650ac"));
+
+        for (SellingDO item : resultList) {
+            SellingHotDO sellingHotDO = new SellingHotDO();
+            C5ItemInfo c5ItemInfo = new C5ItemInfo();
+
+            String selExterior = item.getSelExterior();
+            Pair<String, String> exteriorInfo = exteriorMap.get(selExterior);
+            if (exteriorInfo != null) {
+                c5ItemInfo.setExteriorName(exteriorInfo.getLeft());
+                c5ItemInfo.setExterior(exteriorInfo.getKey());
+                sellingHotDO.setSelExterior(exteriorInfo.getKey());
+                c5ItemInfo.setExteriorColor(exteriorInfo.getRight());
+            } else {
+                c5ItemInfo.setExteriorName("");
+                c5ItemInfo.setExterior("");
+                c5ItemInfo.setExteriorColor("");
+            }
+
+            String selQuality = item.getSelQuality();
+            Pair<String, String> qualityInfo = qualityMap.get(selQuality);
+            if (qualityInfo != null) {
+                c5ItemInfo.setQualityName(qualityInfo.getLeft());
+                c5ItemInfo.setQuality(qualityInfo.getKey());
+                sellingHotDO.setSelQuality(qualityInfo.getKey());
+                c5ItemInfo.setQualityColor(qualityInfo.getRight());
+            } else {
+                c5ItemInfo.setQualityName("");
+                c5ItemInfo.setQuality("");
+                c5ItemInfo.setQualityColor("");
+            }
+
+            sellingHotDO.setIconUrl(item.getIconUrl());
+            sellingHotDO.setPrice(item.getPrice());
+            sellingHotDO.setItemInfo(c5ItemInfo);
+            sellingHotDO.setDisplayWeight(item.getDisplayWeight());
+            sellingHotDO.setMarketName(item.getMarketName());
+            sellingHotDO.setMarketHashName(item.getMarketHashName());
+
+            sellingHotDOList.add(sellingHotDO);
+        }
+        return new PageResult<>(sellingHotDOList, (long) sellingDOS.size());
     }
+
     /**
      * 增加库存标识,上架构和下架构 都可以进行调用
      *
