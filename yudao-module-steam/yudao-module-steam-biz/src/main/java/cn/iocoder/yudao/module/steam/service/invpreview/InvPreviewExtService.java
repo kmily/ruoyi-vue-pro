@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.hotwords.HotWordsMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapperExt;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
@@ -28,6 +29,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 饰品在售预览 Service 实现类
@@ -47,6 +49,8 @@ public class InvPreviewExtService {
     InvPreviewService invPreviewService;
     @Resource
     private HotWordsMapper hotWordsMapper;
+    @Resource
+    private InvPreviewMapperExt invPreviewMapperExt;
 
     public ItemResp getInvPreview(PreviewReqVO reqVO) {
 
@@ -93,7 +97,7 @@ public class InvPreviewExtService {
             pageReqVO.setItemName(hotWordsDO.getMarketName());
         }
 
-        PageResult<InvPreviewDO> invPreviewDOPageResult = invPreviewMapper.selectPage(pageReqVO);
+        PageResult<InvPreviewDO> invPreviewDOPageResult = invPreviewMapperExt.selectPage(pageReqVO);
         List<ItemResp> ret = new ArrayList<>();
         for (InvPreviewDO item : invPreviewDOPageResult.getList()) {
 
@@ -109,6 +113,22 @@ public class InvPreviewExtService {
             }
             ret.add(itemResp);
         }
+        String sort = pageReqVO.getSort();
+        if(sort != null && !sort.equals("0")){
+            if (sort.equals("1")){
+                List<ItemResp> sortedList = ret.stream()
+                        .sorted((o1, o2) -> Double.compare(o2.getAutoPrice(), o1.getAutoPrice())) // 根据 AutoPrice 字段降序排序
+                        .collect(Collectors.toList());
+                return new PageResult<>(sortedList, invPreviewDOPageResult.getTotal());
+            }
+            if (sort.equals("2")){
+                List<ItemResp> sortedList = ret.stream()
+                        .sorted(Comparator.comparingDouble(ItemResp::getAutoPrice)) // 根据 AutoPrice 字段升序排序
+                        .collect(Collectors.toList());
+                return new PageResult<>(sortedList, invPreviewDOPageResult.getTotal());
+            }
+        }
+
         return new PageResult<>(ret, invPreviewDOPageResult.getTotal());
     }
 

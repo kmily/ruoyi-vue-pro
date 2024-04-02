@@ -29,4 +29,11 @@ public class ItemResp implements Serializable {
      * 最低价
      */
     private Integer minPrice;
+    private String selQuality; // 类别选择
+    private String selItemset; // 收藏品选择
+    private String selWeapon; // 武器选择
+    private String selExterior; // 外观选择
+    private String selRarity; // 品质选择
+    private String selType; // 类型选择
+    private Boolean existInv; // 是否存在库存
 }
