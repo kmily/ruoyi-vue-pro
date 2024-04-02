@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.steam.controller.app;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.infra.controller.admin.config.vo.ConfigSaveReqVO;
@@ -27,11 +26,13 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.bindipaddress.BindIpaddressDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
+import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
@@ -105,6 +106,9 @@ public class AppIo661ApiController {
     public void setInvPreviewExtService(InvPreviewExtService invPreviewExtService) {
         this.invPreviewExtService = invPreviewExtService;
     }
+    @Resource
+    private SteamService steamService;
+
     /**
      * api余额接口
      * @return
@@ -149,7 +153,8 @@ public class AppIo661ApiController {
                     bindUserDO.setLoginCookie(Objects.requireNonNull(configCookie.getValue(),()->"登录密码不能为空"));
                 }
                 SteamWeb steamWeb=new SteamWeb(configService);
-                if(steamWeb.checkLogin(bindUserDO)){
+                Optional<BindIpaddressDO> bindUserIp = steamService.getBindUserIp(bindUserDO);
+                if(steamWeb.checkLogin(bindUserDO,bindUserIp)){
                     ConfigSaveReqVO configSaveReqVO=new ConfigSaveReqVO();
                     if(Objects.isNull(configCookie)){
                         configSaveReqVO.setCategory("steam.bot");

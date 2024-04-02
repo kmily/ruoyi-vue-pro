@@ -310,16 +310,16 @@ public class HttpUtil {
      * @return
      */
     public static ProxyResponseVo sentToSteamByProxy(ProxyRequestVo proxyRequestVo) {
-        return sentToSteamByProxy(proxyRequestVo,null);
+        return sentToSteamByProxy(proxyRequestVo,Optional.empty());
     }
-    public static ProxyResponseVo sentToSteamByProxy(ProxyRequestVo proxyRequestVo, BindIpaddressDO bindIpaddressDO) {
+    public static ProxyResponseVo sentToSteamByProxy(ProxyRequestVo proxyRequestVo, Optional<BindIpaddressDO> bindIpaddressDOOptional) {
         HttpRequest.HttpRequestBuilder builder = HttpRequest.builder();
         builder.url("http://192.168.0.106/proxy/endpoint");
         builder.apiKey("L79OrZkhXuK8jC3jVUVOpcFlt1TTVEpN");
         builder.method(Method.JSON);
         builder.postObject(proxyRequestVo);
-        if(Objects.nonNull(bindIpaddressDO) && Objects.nonNull(bindIpaddressDO.getIpAddress()) && Objects.nonNull(bindIpaddressDO.getPort())){
-            builder.proxyIp(bindIpaddressDO.getIpAddress()).proxyPort(bindIpaddressDO.getPort());
+        if(bindIpaddressDOOptional.isPresent()){
+            builder.proxyIp(bindIpaddressDOOptional.get().getIpAddress()).proxyPort(bindIpaddressDOOptional.get().getPort());
         }
         HttpResponse sent = sent(builder.build(), getClient(true, 1000));
         return sent.json(ProxyResponseVo.class);

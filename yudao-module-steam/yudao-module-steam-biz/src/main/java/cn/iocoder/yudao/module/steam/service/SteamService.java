@@ -11,8 +11,10 @@ import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppBindUserApiKe
 import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppBindUserMaFileReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppUnBindUserReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
+import cn.iocoder.yudao.module.steam.dal.dataobject.bindipaddress.BindIpaddressDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
+import cn.iocoder.yudao.module.steam.dal.mysql.bindipaddress.BindIpaddressMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
@@ -69,6 +71,10 @@ public class SteamService {
 
     @Resource
     private RabbitTemplate rabbitTemplate;
+
+
+    @Resource
+    private BindIpaddressMapper bindIpaddressMapper;
 
 
 
@@ -259,7 +265,8 @@ public class SteamService {
         SteamWeb steamWeb=new SteamWeb(configService);
         bindUserDO.setSteamPassword(password);
         bindUserDO.setMaFile(steamMaFile);
-        if(steamWeb.checkLogin(bindUserDO)){
+        Optional<BindIpaddressDO> bindUserIp = getBindUserIp(bindUserDO);
+        if(steamWeb.checkLogin(bindUserDO,bindUserIp)){
             bindUserDO.setLoginCookie(steamWeb.getCookieString());
         }
         steamWeb.initTradeUrl();
@@ -424,4 +431,22 @@ public class SteamService {
     private String getSteamId(String identity){
         return identity.replace("https://steamcommunity.com/openid/id/","");
     }
+
+    /**
+     * 获取用户的ip池
+     * @param bindUserDO
+     * @return
+     */
+    public  Optional<BindIpaddressDO> getBindUserIp(BindUserDO bindUserDO) {
+        if(bindUserDO.getIsTempAccount()){
+            return Optional.empty();
+        }
+        BindIpaddressDO bindIpaddressDO = bindIpaddressMapper.selectById(bindUserDO.getAddressId());
+        if(Objects.isNull(bindIpaddressDO)){
+            return Optional.empty();
+        }else{
+            return Optional.of(bindIpaddressDO);
+        }
+    }
+
 }

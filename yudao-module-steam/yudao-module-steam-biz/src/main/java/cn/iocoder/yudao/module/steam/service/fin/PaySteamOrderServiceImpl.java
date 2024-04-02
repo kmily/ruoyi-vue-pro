@@ -38,6 +38,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.bindipaddress.BindIpaddressDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
@@ -954,7 +955,8 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             }
             //发货
             SteamWeb steamWeb=new SteamWeb(configService);
-            if(steamWeb.checkLogin(bindUserDO1)){
+            Optional<BindIpaddressDO> bindUserIp = steamService.getBindUserIp(bindUserDO);
+            if(steamWeb.checkLogin(bindUserDO1,bindUserIp)){
                 if(steamWeb.getWebApiKey().isPresent()){
                     bindUserDO1.setApiKey(steamWeb.getWebApiKey().get());
                 }
@@ -1062,7 +1064,8 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             }
             if(Objects.isNull(bindUserDO.getApiKey())){
                 SteamWeb steamWeb=new SteamWeb(configService);
-                if(steamWeb.checkLogin(bindUserDO)){
+                Optional<BindIpaddressDO> bindUserIp = steamService.getBindUserIp(bindUserDO);
+                if(steamWeb.checkLogin(bindUserDO,bindUserIp)){
                     if(steamWeb.getWebApiKey().isPresent()){
                         bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
                     }
@@ -1106,7 +1109,8 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     private TradeOfferInfo getTradeOffInfo(BindUserDO bindUserDO,String tradeOfferId) {
         try{
             SteamWeb steamWeb=new SteamWeb(configService);
-            if(steamWeb.checkLogin(bindUserDO)){
+            Optional<BindIpaddressDO> bindUserIp = steamService.getBindUserIp(bindUserDO);
+            if(steamWeb.checkLogin(bindUserDO,bindUserIp)){
                 if(steamWeb.getWebApiKey().isPresent()){
                     bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
                 }
@@ -1124,7 +1128,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             builder.url("https://api.steampowered.com/IEconService/GetTradeOffer/v1");
             builder.query(post);
 
-            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
+            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),bindUserIp);
             log.error("steam返回{}",proxyResponseVo);
             if(Objects.nonNull(proxyResponseVo.getStatus()) && proxyResponseVo.getStatus()==200){
                 String html = proxyResponseVo.getHtml();
