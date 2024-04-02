@@ -171,6 +171,10 @@ public class InvExtService {
                 .eq(InvDO::getSteamId, bindUserDO.getSteamId())
                 .ne(InvDO::getBatchNo, batchNo)
         );
+        invDOList.addAll(invMapper.selectList(new LambdaQueryWrapperX<InvDO>()
+                .eq(InvDO::getSteamId, bindUserDO.getSteamId())
+                .isNull(InvDO::getBatchNo)
+        ));
         List<Long> invIds = invDOList.stream().map(InvDO::getId).collect(Collectors.toList());
         if(invIds.size()>0){
             List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
@@ -201,6 +205,10 @@ public class InvExtService {
                 .eq(InvDescDO::getSteamId, bindUserDO.getSteamId())
                 .ne(InvDescDO::getBatchNo, batchNo)
         );
+        invDescDOList.addAll(invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+                .eq(InvDescDO::getSteamId, bindUserDO.getSteamId())
+                .isNull(InvDescDO::getBatchNo)
+        ));
         invDescDOList.forEach(invDescDO -> invDescMapper.updateById(new InvDescDO().setId(invDescDO.getId()).setTradable(0)));
     }
     // 从steam获取用户库存信息
