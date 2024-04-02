@@ -2,23 +2,14 @@ package cn.iocoder.yudao.module.steam.utils;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.steam.dal.dataobject.bindipaddress.BindIpaddressDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
-import cn.iocoder.yudao.module.steam.dal.mysql.bindipaddress.BindIpaddressMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
-import cn.iocoder.yudao.module.steam.service.bindipaddress.BindIpaddressService;
-import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.deploy.net.proxy.ProxyInfo;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
-import org.omg.CORBA.PRIVATE_MEMBER;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.Resource;
 import javax.net.ssl.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -40,15 +31,6 @@ import java.util.regex.Pattern;
 @Slf4j
 
 public class HttpUtil {
-    @Resource
-    private static BindUserService bindUserService;
-    @Resource
-    private static BindUserMapper bindUserMapper;
-    @Resource
-    private static BindIpaddressService bindIpaddressService;
-    @Resource
-    private static BindIpaddressMapper bindIpaddressMapper;
-
     private static final String URL_START = "?";
     private static final String URL_SPLIT = "&";
     private static final String SCHEME_FILE = "file://";
@@ -328,11 +310,17 @@ public class HttpUtil {
      * @return
      */
     public static ProxyResponseVo sentToSteamByProxy(ProxyRequestVo proxyRequestVo) {
+        return sentToSteamByProxy(proxyRequestVo,null);
+    }
+    public static ProxyResponseVo sentToSteamByProxy(ProxyRequestVo proxyRequestVo, BindIpaddressDO bindIpaddressDO) {
         HttpRequest.HttpRequestBuilder builder = HttpRequest.builder();
         builder.url("http://192.168.0.106/proxy/endpoint");
         builder.apiKey("L79OrZkhXuK8jC3jVUVOpcFlt1TTVEpN");
         builder.method(Method.JSON);
         builder.postObject(proxyRequestVo);
+        if(Objects.nonNull(bindIpaddressDO) && Objects.nonNull(bindIpaddressDO.getIpAddress()) && Objects.nonNull(bindIpaddressDO.getPort())){
+            builder.proxyIp(bindIpaddressDO.getIpAddress()).proxyPort(bindIpaddressDO.getPort());
+        }
         HttpResponse sent = sent(builder.build(), getClient(true, 1000));
         return sent.json(ProxyResponseVo.class);
     }
@@ -417,6 +405,14 @@ public class HttpUtil {
         private HttpAuth auth;
         private Function<HttpAuth, HttpAuthReturn> authFunction;
         private Map<String, String> headers;
+        /**
+         * 代理服务IP
+         */
+        private String proxyIp;
+        /**
+         * 代理服务
+         */
+        private Integer proxyPort;
     }
 
     @Data

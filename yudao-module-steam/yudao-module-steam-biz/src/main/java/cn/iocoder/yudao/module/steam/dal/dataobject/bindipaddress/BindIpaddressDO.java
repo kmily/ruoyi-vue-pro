@@ -30,7 +30,7 @@ public class BindIpaddressDO extends BaseDO {
     /**
      * 端口
      */
-    private Long port;
+    private Integer port;
     /**
      * 地址池id
      */
