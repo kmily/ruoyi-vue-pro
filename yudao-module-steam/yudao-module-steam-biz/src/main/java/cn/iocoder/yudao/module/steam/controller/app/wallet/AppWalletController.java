@@ -21,6 +21,7 @@ import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderExtService
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.SellingDoList;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
@@ -118,10 +119,25 @@ public class AppWalletController {
     @Operation(summary = "成交记录查询")
     @PostMapping("/getSoldInfo")
     @PermitAll
-    public ApiResult<SellingDO> getSoldInfo(@RequestBody SellingPageReqVO reqVO) {
-        SellingDO soldInfo = invOrderExtService.getSoldInfo(reqVO);
+    public ApiResult<List<SellingDO>> getSoldInfo(@RequestBody SellingPageReqVO reqVO) {
+        List<SellingDO> soldInfo = invOrderExtService.getSoldInfo(reqVO);
         return ApiResult.success(soldInfo);
     }
+
+
+    /**
+     * 查询订单详情
+     * @param reqVO marketHashName marketName
+     * @Descriptons 订单的 markethashname   marketname itemInfo 卖家信息 售出价格
+     */
+    @Operation(summary = "磨损度选择")
+    @PostMapping("/getAbrasion")
+    @PermitAll
+    public ApiResult<List<SellingDO>> getAbrasion(@RequestBody SellingPageReqVO reqVO) {
+        List<SellingDO> soldInfo = invOrderExtService.getSoldInfo(reqVO);
+        return ApiResult.success(soldInfo);
+    }
+
 
     @PostMapping("/update-paid")
     @Operation(summary = "更新示例订单为已支付") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob

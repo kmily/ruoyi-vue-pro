@@ -112,14 +112,15 @@ public class InvOrderExtService {
      * @param reqVO
      * @return 成交记录查询
      */
-    public SellingDO getSoldInfo(@RequestBody @Valid SellingPageReqVO reqVO) {
+    public List<SellingDO> getSoldInfo(@RequestBody @Valid SellingPageReqVO reqVO) {
         List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
                 .eqIfPresent(SellingDO::getMarketHashName, reqVO.getMarketHashName())
                 .eqIfPresent(SellingDO::getMarketName, reqVO.getMarketName())
                 .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.TransferFINISH.getStatus())
-                .last("limit 40"));
-        SellingDO sellingDO = new SellingDO();
+                .last("limit 10"));
+        ArrayList<SellingDO> list = new ArrayList<>();
         for (SellingDO aDo : sellingDOS) {
+            SellingDO sellingDO = new SellingDO();
             sellingDO.setMarketHashName(aDo.getMarketHashName());
             sellingDO.setMarketName(aDo.getMarketName());
             // 价格
@@ -128,7 +129,8 @@ public class InvOrderExtService {
             sellingDO.setUpdateTime(aDo.getUpdateTime());
             // 图片
             sellingDO.setIconUrl(aDo.getIconUrl());
+            list.add(sellingDO);
         }
-        return sellingDO;
+        return list;
     }
 }
