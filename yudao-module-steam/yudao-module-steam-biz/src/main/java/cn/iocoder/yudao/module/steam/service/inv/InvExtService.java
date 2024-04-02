@@ -50,7 +50,7 @@ public class InvExtService {
     private PaySteamOrderService paySteamOrderService;
 
     public void fetchInv(BindUserDO bindUserDO){
-        InventoryDto inventoryDto = gitInvFromSteam3(bindUserDO);
+        InventoryDto inventoryDto = gitInvFromSteam(bindUserDO);
         log.info("inv{}",inventoryDto);
         String batchNo = noRedisDAO.generate("INV" + bindUserDO.getSteamId());
 
