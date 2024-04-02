@@ -21,6 +21,7 @@ import cn.iocoder.yudao.module.steam.service.selling.SellingService;
 import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.scheduling.annotation.Async;
@@ -120,8 +121,8 @@ public class InvPreviewExtService {
 
     public PageResult<SellingDO> getHot(SellingPageReqVO pageReqVO) {
         // 获取所有数据
-        PageResult<SellingDO> sellingDOPageResult = sellingMapper.selectPage(pageReqVO);
-        List<SellingDO> sellingDOS = sellingDOPageResult.getList();
+        List<SellingDO> sellingDOS = sellingMapper.selectList();
+
 
         // 按 display_weight 字段进行排序,数字越小权重越大
         List<SellingDO> sortedList = sellingDOS.stream()
@@ -141,8 +142,7 @@ public class InvPreviewExtService {
                 item.setPrice(new BigDecimal(item.getPrice()).divide(new BigDecimal("100")).intValue());
             }
         });
-
-        return new PageResult<>(resultList, sellingDOPageResult.getTotal());
+        return new PageResult<>(resultList, (long) sellingDOS.size());
     }
     /**
      * 增加库存标识,上架构和下架构 都可以进行调用
