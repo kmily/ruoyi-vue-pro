@@ -110,7 +110,7 @@ public class InvOrderExtService {
 
     /**
      * @param reqVO
-     * @return 已出售订单查询
+     * @return 成交记录查询
      */
     public SellingDO getSoldInfo(@RequestBody @Valid SellingPageReqVO reqVO) {
         List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()

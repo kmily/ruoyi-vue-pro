@@ -115,7 +115,7 @@ public class AppWalletController {
      * @param reqVO marketHashName marketName
      * @Descriptons 订单的 markethashname   marketname itemInfo 卖家信息 售出价格
      */
-    @Operation(summary = "已售信息")
+    @Operation(summary = "成交记录查询")
     @PostMapping("/getSoldInfo")
     @PermitAll
     public ApiResult<SellingDO> getSoldInfo(@RequestBody SellingPageReqVO reqVO) {
