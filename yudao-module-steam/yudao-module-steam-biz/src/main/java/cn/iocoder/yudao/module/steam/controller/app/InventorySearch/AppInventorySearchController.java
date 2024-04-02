@@ -129,23 +129,6 @@ public class AppInventorySearchController {
         return success(steamInvService.mergeInv(invToMerge));
     }
 
-    @GetMapping("/updateFromSteam")
-    @Operation(summary = "更新库存 入参steamid")
-    @ResponseBody
-    @Deprecated
-    public CommonResult<List<String>> updateFromSteam(@RequestParam String steamId) throws JsonProcessingException {
-        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
-                .eq(BindUserDO::getUserId, loginUser.getId())
-                .eq(BindUserDO::getUserType, loginUser.getUserType())
-                .eq(BindUserDO::getSteamId, steamId)).stream().findFirst();
-        if(!first.isPresent()){
-            throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
-        }
-        rabbitTemplate.convertAndSend("steam","steam_inv",first.get());
-        return success(new ArrayList<>());
-    }
-
     @GetMapping("/updateFromSteam2")
     @Operation(summary = "更新库存 入参steamid")
     @ResponseBody
@@ -195,6 +178,22 @@ public class AppInventorySearchController {
         } else {
             throw new ServiceException(-1,"未获取到新的库存信息");
         }
+        return success(new ArrayList<>());
+    }
+    @GetMapping("/updateFromSteam")
+    @Operation(summary = "更新库存 入参steamid")
+    @ResponseBody
+    @Deprecated
+    public CommonResult<List<String>> updateFromSteam(@RequestParam String steamId) throws JsonProcessingException {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+                .eq(BindUserDO::getUserId, loginUser.getId())
+                .eq(BindUserDO::getUserType, loginUser.getUserType())
+                .eq(BindUserDO::getSteamId, steamId)).stream().findFirst();
+        if(!first.isPresent()){
+            throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
+        }
+        rabbitTemplate.convertAndSend("steam","steam_inv",first.get());
         return success(new ArrayList<>());
     }
 }
