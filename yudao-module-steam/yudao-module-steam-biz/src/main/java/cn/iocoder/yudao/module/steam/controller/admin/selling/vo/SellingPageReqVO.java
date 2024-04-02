@@ -100,4 +100,9 @@ public class SellingPageReqVO extends PageParam {
     @Schema(description = "最低价格", example = "1")
     private Integer minPrice;
 
+    @Schema(description = "在售展示权重", example = "1")
+    private Integer displayWeight;
+    @Schema(description = "short_name", example = "王五")
+    private String shortName;
+
 }

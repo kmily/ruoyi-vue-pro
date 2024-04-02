@@ -55,7 +55,43 @@ public class SellingSaveReqVO {
     @Schema(description = "发货状态(0代表未出售，1代表出售中，2代表已出售 )", example = "1")
     private Integer transferStatus;
 
-    @Schema(description = "库存表id", example = "23726")
+    @Schema(description = "库存表id", example = "28431")
     private Long invId;
+
+    @Schema(description = "商品名称", example = "王五")
+    private String marketName;
+
+    @Schema(description = "图片地址", example = "https://www.iocoder.cn")
+    private String iconUrl;
+
+    @Schema(description = "类别选择")
+    private String selQuality;
+
+    @Schema(description = "收藏品选择")
+    private String selItemset;
+
+    @Schema(description = "武器选择")
+    private String selWeapon;
+
+    @Schema(description = "外观选择")
+    private String selExterior;
+
+    @Schema(description = "品质选择")
+    private String selRarity;
+
+    @Schema(description = "类型选择", example = "1")
+    private String selType;
+
+    @Schema(description = "marketHashName", example = "王五")
+    private String marketHashName;
+
+    @Schema(description = "在售展示权重", example = "1")
+    private Integer displayWeight;
+
+    @Schema(description = "itemInfo")
+    private String itemInfo;
+
+    @Schema(description = "short_name", example = "王五")
+    private String shortName;
 
 }

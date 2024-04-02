@@ -28,6 +28,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 饰品在售预览 Service 实现类
@@ -47,6 +48,7 @@ public class InvPreviewExtService {
     InvPreviewService invPreviewService;
     @Resource
     private HotWordsMapper hotWordsMapper;
+
 
     public ItemResp getInvPreview(PreviewReqVO reqVO) {
 
@@ -89,7 +91,7 @@ public class InvPreviewExtService {
         HotWordsDO hotWordsDO = hotWordsMapper.selectOne(new LambdaQueryWrapper<HotWordsDO>()
                 .eq(HotWordsDO::getHotWords, pageReqVO.getItemName()));
 
-        if (hotWordsDO!=null){
+        if (hotWordsDO != null) {
             pageReqVO.setItemName(hotWordsDO.getMarketName());
         }
 

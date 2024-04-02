@@ -52,6 +52,44 @@
                     <el-form-item label="库存表id" prop="invId">
                       <el-input v-model="formData.invId" placeholder="请输入库存表id" />
                     </el-form-item>
+                    <el-form-item label="商品名称" prop="marketName">
+                      <el-input v-model="formData.marketName" placeholder="请输入商品名称" />
+                    </el-form-item>
+                    <el-form-item label="图片地址" prop="iconUrl">
+                      <el-input v-model="formData.iconUrl" placeholder="请输入图片地址" />
+                    </el-form-item>
+                    <el-form-item label="类别选择" prop="selQuality">
+                      <el-input v-model="formData.selQuality" placeholder="请输入类别选择" />
+                    </el-form-item>
+                    <el-form-item label="收藏品选择" prop="selItemset">
+                      <el-input v-model="formData.selItemset" placeholder="请输入收藏品选择" />
+                    </el-form-item>
+                    <el-form-item label="武器选择" prop="selWeapon">
+                      <el-input v-model="formData.selWeapon" placeholder="请输入武器选择" />
+                    </el-form-item>
+                    <el-form-item label="外观选择" prop="selExterior">
+                      <el-input v-model="formData.selExterior" placeholder="请输入外观选择" />
+                    </el-form-item>
+                    <el-form-item label="品质选择" prop="selRarity">
+                      <el-input v-model="formData.selRarity" placeholder="请输入品质选择" />
+                    </el-form-item>
+                    <el-form-item label="类型选择" prop="selType">
+                      <el-select v-model="formData.selType" placeholder="请选择类型选择">
+                            <el-option label="请选择字典生成" value="" />
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item label="marketHashName" prop="marketHashName">
+                      <el-input v-model="formData.marketHashName" placeholder="请输入marketHashName" />
+                    </el-form-item>
+                    <el-form-item label="在售展示权重" prop="displayWeight">
+                      <el-input v-model="formData.displayWeight" placeholder="请输入在售展示权重" />
+                    </el-form-item>
+                    <el-form-item label="itemInfo" prop="itemInfo">
+                      <el-input v-model="formData.itemInfo" placeholder="请输入itemInfo" />
+                    </el-form-item>
+                    <el-form-item label="short_name" prop="shortName">
+                      <el-input v-model="formData.shortName" placeholder="请输入short_name" />
+                    </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm" :disabled="formLoading">确 定</el-button>
@@ -93,6 +131,18 @@
                             invDescId: undefined,
                             transferStatus: undefined,
                             invId: undefined,
+                            marketName: undefined,
+                            iconUrl: undefined,
+                            selQuality: undefined,
+                            selItemset: undefined,
+                            selWeapon: undefined,
+                            selExterior: undefined,
+                            selRarity: undefined,
+                            selType: undefined,
+                            marketHashName: undefined,
+                            displayWeight: undefined,
+                            itemInfo: undefined,
+                            shortName: undefined,
         },
         // 表单校验
         formRules: {
@@ -161,9 +211,21 @@
                             invDescId: undefined,
                             transferStatus: undefined,
                             invId: undefined,
+                            marketName: undefined,
+                            iconUrl: undefined,
+                            selQuality: undefined,
+                            selItemset: undefined,
+                            selWeapon: undefined,
+                            selExterior: undefined,
+                            selRarity: undefined,
+                            selType: undefined,
+                            marketHashName: undefined,
+                            displayWeight: undefined,
+                            itemInfo: undefined,
+                            shortName: undefined,
         };
         this.resetForm("formRef");
       }
     }
   };
-</script>
+</script>

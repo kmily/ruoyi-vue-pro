@@ -110,74 +110,70 @@ public class SellingServiceImplTest extends BaseDbUnitTest {
     public void testGetSellingPage() {
        // mock 数据
        SellingDO dbSelling = randomPojo(SellingDO.class, o -> { // 等会查询到
-           o.setAppid(null);
+           o.setId(null);
            o.setAssetid(null);
-           o.setClassid(null);
-           o.setInstanceid(null);
-           o.setAmount(null);
-           o.setCreateTime(null);
            o.setSteamId(null);
            o.setStatus(null);
-           o.setPrice(null);
-           o.setUserId(null);
-           o.setUserType(null);
-           o.setBindUserId(null);
-           o.setContextid(null);
-           o.setInvDescId(null);
-           o.setTransferStatus(null);
-           o.setInvId(null);
+           o.setIconUrl(null);
+           o.setSelQuality(null);
+           o.setSelItemset(null);
+           o.setSelWeapon(null);
+           o.setSelExterior(null);
+           o.setSelRarity(null);
+           o.setSelType(null);
+           o.setMarketHashName(null);
+           o.setDisplayWeight(null);
+           o.setItemInfo(null);
+           o.setShortName(null);
        });
        sellingMapper.insert(dbSelling);
-       // 测试 appid 不匹配
-       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setAppid(null)));
+       // 测试 id 不匹配
+       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setId(null)));
        // 测试 assetid 不匹配
        sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setAssetid(null)));
-       // 测试 classid 不匹配
-       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setClassid(null)));
-       // 测试 instanceid 不匹配
-       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setInstanceid(null)));
-       // 测试 amount 不匹配
-       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setAmount(null)));
-       // 测试 createTime 不匹配
-       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setCreateTime(null)));
        // 测试 steamId 不匹配
        sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setSteamId(null)));
        // 测试 status 不匹配
        sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setStatus(null)));
-       // 测试 price 不匹配
-       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setPrice(null)));
-       // 测试 userId 不匹配
-       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setUserId(null)));
-       // 测试 userType 不匹配
-       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setUserType(null)));
-       // 测试 bindUserId 不匹配
-       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setBindUserId(null)));
-       // 测试 contextid 不匹配
-       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setContextid(null)));
-       // 测试 invDescId 不匹配
-       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setInvDescId(null)));
-       // 测试 transferStatus 不匹配
-       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setTransferStatus(null)));
-       // 测试 invId 不匹配
-       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setInvId(null)));
+       // 测试 iconUrl 不匹配
+       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setIconUrl(null)));
+       // 测试 selQuality 不匹配
+       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setSelQuality(null)));
+       // 测试 selItemset 不匹配
+       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setSelItemset(null)));
+       // 测试 selWeapon 不匹配
+       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setSelWeapon(null)));
+       // 测试 selExterior 不匹配
+       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setSelExterior(null)));
+       // 测试 selRarity 不匹配
+       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setSelRarity(null)));
+       // 测试 selType 不匹配
+       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setSelType(null)));
+       // 测试 marketHashName 不匹配
+       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setMarketHashName(null)));
+       // 测试 displayWeight 不匹配
+       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setDisplayWeight(null)));
+       // 测试 itemInfo 不匹配
+       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setItemInfo(null)));
+       // 测试 shortName 不匹配
+       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setShortName(null)));
        // 准备参数
        SellingPageReqVO reqVO = new SellingPageReqVO();
-       reqVO.setAppid(null);
+       reqVO.setId(null);
        reqVO.setAssetid(null);
-       reqVO.setClassid(null);
-       reqVO.setInstanceid(null);
-       reqVO.setAmount(null);
-       reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
        reqVO.setSteamId(null);
        reqVO.setStatus(null);
-       reqVO.setPrice(null);
-       reqVO.setUserId(null);
-       reqVO.setUserType(null);
-       reqVO.setBindUserId(null);
-       reqVO.setContextid(null);
-       reqVO.setInvDescId(null);
-       reqVO.setTransferStatus(null);
-       reqVO.setInvId(null);
+       reqVO.setIconUrl(null);
+       reqVO.setSelQuality(null);
+       reqVO.setSelItemset(null);
+       reqVO.setSelWeapon(null);
+       reqVO.setSelExterior(null);
+       reqVO.setSelRarity(null);
+       reqVO.setSelType(null);
+       reqVO.setMarketHashName(null);
+       reqVO.setDisplayWeight(null);
+       reqVO.setItemInfo(null);
+       reqVO.setShortName(null);
 
        // 调用
        PageResult<SellingDO> pageResult = sellingService.getSellingPage(reqVO);

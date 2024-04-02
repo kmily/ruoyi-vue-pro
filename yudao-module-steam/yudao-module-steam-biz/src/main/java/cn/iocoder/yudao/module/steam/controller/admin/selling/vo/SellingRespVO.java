@@ -2,8 +2,6 @@ package cn.iocoder.yudao.module.steam.controller.admin.selling.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-
-import java.io.Serializable;
 import java.util.*;
 import java.util.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,7 +11,7 @@ import com.alibaba.excel.annotation.*;
 @Schema(description = "管理后台 - 在售饰品 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class SellingRespVO implements Serializable {
+public class SellingRespVO {
 
     @Schema(description = "Primary Key", requiredMode = Schema.RequiredMode.REQUIRED, example = "27975")
     @ExcelProperty("Primary Key")
@@ -79,45 +77,56 @@ public class SellingRespVO implements Serializable {
     @ExcelProperty("发货状态(0代表未出售，1代表出售中，2代表已出售 )")
     private Integer transferStatus;
 
-    @Schema(description = "库存表id", example = "23726")
+    @Schema(description = "库存表id", example = "28431")
     @ExcelProperty("库存表id")
     private Long invId;
 
-    @Schema(description = "market_hash_name", example = "23726")
-    @ExcelProperty("market_hash_name")
-    private String marketHashName;
+    @Schema(description = "商品名称", example = "王五")
+    @ExcelProperty("商品名称")
+    private String marketName;
 
-    @Schema(description = "selQuality", example = "23726")
-    @ExcelProperty("selQuality")
-    private String selQuality;
-
-    @Schema(description = "selItemset", example = "23726")
-    @ExcelProperty("selItemset")
-    private String selItemset;
-
-    @Schema(description = "selWeapon", example = "23726")
-    @ExcelProperty("selWeapon")
-    private String selWeapon;
-
-    @Schema(description = "selExterior", example = "23726")
-    @ExcelProperty("selExterior")
-    private String selExterior;
-
-    @Schema(description = "selRarity", example = "23726")
-    @ExcelProperty("selRarity")
-    private String selRarity;
-
-    @Schema(description = "selType", example = "23726")
-    @ExcelProperty("selType")
-    private String selType;
-
-    @Schema(description = "商品图片", example = "23726")
-    @ExcelProperty("图片")
+    @Schema(description = "图片地址", example = "https://www.iocoder.cn")
+    @ExcelProperty("图片地址")
     private String iconUrl;
 
+    @Schema(description = "类别选择")
+    @ExcelProperty("类别选择")
+    private String selQuality;
 
-    @Schema(description = "武器名称", example = "23726")
-    @ExcelProperty("武器名称")
-    private String marketName;
+    @Schema(description = "收藏品选择")
+    @ExcelProperty("收藏品选择")
+    private String selItemset;
+
+    @Schema(description = "武器选择")
+    @ExcelProperty("武器选择")
+    private String selWeapon;
+
+    @Schema(description = "外观选择")
+    @ExcelProperty("外观选择")
+    private String selExterior;
+
+    @Schema(description = "品质选择")
+    @ExcelProperty("品质选择")
+    private String selRarity;
+
+    @Schema(description = "类型选择", example = "1")
+    @ExcelProperty("类型选择")
+    private String selType;
+
+    @Schema(description = "marketHashName", example = "王五")
+    @ExcelProperty("marketHashName")
+    private String marketHashName;
+
+    @Schema(description = "在售展示权重", example = "1")
+    @ExcelProperty("在售展示权重")
+    private Integer displayWeight;
+
+    @Schema(description = "itemInfo")
+    @ExcelProperty("itemInfo")
+    private String itemInfo;
+
+    @Schema(description = "short_name", example = "王五")
+    @ExcelProperty("short_name")
+    private String shortName;
 
 }

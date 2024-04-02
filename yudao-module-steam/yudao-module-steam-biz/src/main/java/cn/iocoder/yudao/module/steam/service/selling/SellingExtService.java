@@ -133,6 +133,7 @@ public class SellingExtService {
             sellingDO.setIconUrl(invDescDO.get().getIconUrl());
             sellingDO.setMarketHashName(invDescDO.get().getMarketHashName());
             sellingDO.setInvId(item.getId());
+
             if (itemPriceInfo.getPrice() == null || itemPriceInfo.getPrice() <= 0) {
                 throw new ServiceException(-1, "未设置价格");
             }
