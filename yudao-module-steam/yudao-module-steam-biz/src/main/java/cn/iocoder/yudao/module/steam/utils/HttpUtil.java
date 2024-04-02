@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.steam.utils;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.module.steam.dal.dataobject.bindipaddress.BindIpaddressDO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +29,7 @@ import java.util.regex.Pattern;
 
 
 @Slf4j
+
 public class HttpUtil {
     private static final String URL_START = "?";
     private static final String URL_SPLIT = "&";
@@ -302,16 +304,23 @@ public class HttpUtil {
                 return builder.get();
         }
     }
-    /**
-     * 调用steam接口
-     * @param proxyRequestVo
-     * @return
-     */
+//    /**
+//     * 调用steam接口
+//     * @param proxyRequestVo
+//     * @return
+//     */
     public static ProxyResponseVo sentToSteamByProxy(ProxyRequestVo proxyRequestVo) {
+        return sentToSteamByProxy(proxyRequestVo,Optional.empty());
+    }
+    public static ProxyResponseVo sentToSteamByProxy(ProxyRequestVo proxyRequestVo, Optional<BindIpaddressDO> bindIpaddressDOOptional) {
         HttpRequest.HttpRequestBuilder builder = HttpRequest.builder();
-        builder.url("http://8.217.234.84/proxy/endpoint");
+        builder.url("http://192.168.0.106/proxy/endpoint");
+        builder.apiKey("L79OrZkhXuK8jC3jVUVOpcFlt1TTVEpN");
         builder.method(Method.JSON);
         builder.postObject(proxyRequestVo);
+        if(bindIpaddressDOOptional.isPresent()){
+            builder.proxyIp(bindIpaddressDOOptional.get().getIpAddress()).proxyPort(bindIpaddressDOOptional.get().getPort());
+        }
         HttpResponse sent = sent(builder.build(), getClient(true, 1000));
         return sent.json(ProxyResponseVo.class);
     }
@@ -387,6 +396,7 @@ public class HttpUtil {
     public static class HttpRequest {
         private Method method;
         private String url;
+        private String apiKey;
         private Map<String, String> query;
         private Map<String, String> pathVar;
         private Map<String, String> form;
@@ -395,6 +405,14 @@ public class HttpUtil {
         private HttpAuth auth;
         private Function<HttpAuth, HttpAuthReturn> authFunction;
         private Map<String, String> headers;
+        /**
+         * 代理服务IP
+         */
+        private String proxyIp;
+        /**
+         * 代理服务
+         */
+        private Integer proxyPort;
     }
 
     @Data
@@ -466,6 +484,7 @@ public class HttpUtil {
     public static class ProxyResponseVo {
         String html;
         Integer status;
+        String apiKey;
         Map<String,String> cookies;
         Map<String,List<String>> headers;
     }
@@ -497,6 +516,10 @@ public class HttpUtil {
          * 代理服务
          */
         private Integer proxyPort;
+        /**
+         * APIKEY
+         */
+        private String apiKey;
     }
 
 }

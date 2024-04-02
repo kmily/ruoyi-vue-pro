@@ -16,6 +16,35 @@
           <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
+      <el-form-item label="图片地址" prop="iconUrl">
+        <el-input v-model="queryParams.iconUrl" placeholder="请输入图片地址" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="类别选择" prop="selQuality">
+        <el-input v-model="queryParams.selQuality" placeholder="请输入类别选择" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="收藏品选择" prop="selItemset">
+        <el-input v-model="queryParams.selItemset" placeholder="请输入收藏品选择" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="武器选择" prop="selWeapon">
+        <el-input v-model="queryParams.selWeapon" placeholder="请输入武器选择" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="外观选择" prop="selExterior">
+        <el-input v-model="queryParams.selExterior" placeholder="请输入外观选择" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="品质选择" prop="selRarity">
+        <el-input v-model="queryParams.selRarity" placeholder="请输入品质选择" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="类型选择" prop="selType">
+        <el-select v-model="queryParams.selType" placeholder="请选择类型选择" clearable size="small">
+          <el-option label="请选择字典生成" value="" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="marketHashName" prop="marketHashName">
+        <el-input v-model="queryParams.marketHashName" placeholder="请输入marketHashName" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="在售展示权重" prop="displayWeight">
+        <el-input v-model="queryParams.displayWeight" placeholder="请输入在售展示权重" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -57,8 +86,16 @@
       <el-table-column label="inv_desc_id" align="center" prop="invDescId" />
       <el-table-column label="发货状态(0代表未出售，1代表出售中，2代表已出售 )" align="center" prop="transferStatus" />
       <el-table-column label="库存表id" align="center" prop="invId" />
-      <el-table-column label="图片地址" align="center" prop="pictureUrl" />
       <el-table-column label="商品名称" align="center" prop="marketName" />
+      <el-table-column label="图片地址" align="center" prop="iconUrl" />
+      <el-table-column label="类别选择" align="center" prop="selQuality" />
+      <el-table-column label="收藏品选择" align="center" prop="selItemset" />
+      <el-table-column label="武器选择" align="center" prop="selWeapon" />
+      <el-table-column label="外观选择" align="center" prop="selExterior" />
+      <el-table-column label="品质选择" align="center" prop="selRarity" />
+      <el-table-column label="类型选择" align="center" prop="selType" />
+      <el-table-column label="marketHashName" align="center" prop="marketHashName" />
+      <el-table-column label="在售展示权重" align="center" prop="displayWeight" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
@@ -110,6 +147,15 @@ export default {
         assetid: null,
         steamId: null,
         status: null,
+        iconUrl: null,
+        selQuality: null,
+        selItemset: null,
+        selWeapon: null,
+        selExterior: null,
+        selRarity: null,
+        selType: null,
+        marketHashName: null,
+        displayWeight: null,
       },
             };
   },
@@ -166,4 +212,4 @@ export default {
     },
               }
 };
-</script>
+</script>

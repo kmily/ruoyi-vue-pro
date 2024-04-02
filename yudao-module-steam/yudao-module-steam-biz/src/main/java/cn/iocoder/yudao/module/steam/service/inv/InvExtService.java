@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
+import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
@@ -48,6 +49,8 @@ public class InvExtService {
     private SellingMapper sellingMapper;
     @Resource
     private PaySteamOrderService paySteamOrderService;
+    @Resource
+    private SteamService steamService;
 
     public void fetchInv(BindUserDO bindUserDO){
         InventoryDto inventoryDto = gitInvFromSteam(bindUserDO);
@@ -222,7 +225,8 @@ public class InvExtService {
         pathVar.put("steamId", bindUserDO.getSteamId());
         pathVar.put("app", "730");
         builder.pathVar(pathVar);
-        HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
+
+        HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),steamService.getBindUserIp(bindUserDO));
         if (Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus() != 200) {
             throw new ServiceException(-1, "初始化steam失败");
         }

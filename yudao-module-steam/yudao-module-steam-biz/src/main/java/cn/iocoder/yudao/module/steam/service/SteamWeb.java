@@ -3,7 +3,10 @@ package cn.iocoder.yudao.module.steam.service;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
+import cn.iocoder.yudao.module.steam.dal.dataobject.bindipaddress.BindIpaddressDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
+import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
+import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.steam.*;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -80,9 +83,10 @@ public class SteamWeb {
     private Optional<String> browserid;
 
     private SteamMaFile steamMaFile;
-
-    public SteamWeb(ConfigService configService) {
+    private Optional<BindIpaddressDO> bindIpaddressDOOptional;
+    public SteamWeb(ConfigService configService,Optional<BindIpaddressDO> bindIpaddressDOOptional) {
         this.configService = configService;
+        this.bindIpaddressDOOptional=bindIpaddressDOOptional;
     }
 
     /**
@@ -90,14 +94,14 @@ public class SteamWeb {
      * @param bindUserDO 登录用户信息
      * @return true 用户cookie有更新， falsecookie没有更新   有更新需要及时保存起
      */
-    public boolean checkLogin(BindUserDO bindUserDO){
+    public boolean checkLogin(BindUserDO bindUserDO, Optional<BindIpaddressDO> bindIpaddressDOOptional){
         this.cookieString=bindUserDO.getLoginCookie();
         try{
             steamMaFile = bindUserDO.getMaFile();
             initApiKey();
         }catch (ServiceException e){
             if(Objects.nonNull(bindUserDO.getSteamPassword()) && Objects.nonNull(bindUserDO.getMaFile())){
-                login(bindUserDO.getSteamPassword(),bindUserDO.getMaFile());
+                login(bindUserDO.getSteamPassword(),bindUserDO,bindIpaddressDOOptional);
             }else{
                 throw new ServiceException(-1,"登录失败");
             }
@@ -112,12 +116,12 @@ public class SteamWeb {
     }
     /**
      * 登录steam网站
-     *
-     * @param passwd 密码
-     * @param maFile ma文件结构
+     * @param passwd  密码
+     * @param bindUserDO
+     * @param bindIpaddressDOOptional
      */
-    private void login(String passwd, SteamMaFile maFile) {
-        steamMaFile = maFile;
+    private void login(String passwd, BindUserDO bindUserDO, Optional<BindIpaddressDO> bindIpaddressDOOptional) {
+        steamMaFile = bindUserDO.getMaFile();
         //steam登录代理
         ConfigDO configByKey = configService.getConfigByKey("steam.proxy");
         HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
@@ -132,7 +136,7 @@ public class SteamWeb {
         stringStringHashMap.put("token_code", steamMaFile.getSharedSecret());
         builder.form(stringStringHashMap);
         try{
-            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
+            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),bindIpaddressDOOptional);
             if(Objects.nonNull(proxyResponseVo.getStatus()) && proxyResponseVo.getStatus()==200){
                 SteamCookie steamCookie = objectMapper.readValue(proxyResponseVo.getHtml(), SteamCookie.class);
                 if (steamCookie.getCode() != 0) {
@@ -253,6 +257,10 @@ public class SteamWeb {
         Matcher matcher = pattern.matcher(proxyResponseVo.getHtml());
         if (matcher.find()) {
             treadUrl = Optional.of(matcher.group(1));
+/*            BindUserDO bindUserDO = new BindUserDO();
+            bindUserDO.setAddressId();
+
+            bindUserService.updateBindUser(bindUserDO);*/
         } else {
             log.error("获取tradeUrl失败steamId{}", steamId);
             throw new ServiceException(-1, "获取tradeUrl失败");
@@ -422,7 +430,7 @@ public class SteamWeb {
             header.put("Referer", tradeUrl);
             builder.headers(header);
             log.info("发送到对方服务器数据{}", objectMapper.writeValueAsString(builder.build()));
-            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
+            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),bindIpaddressDOOptional);
             log.info("交易结果{}", proxyResponseVo);
             if(Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus()!=200){
                 throw new ServiceException(-1, "交易失败");
@@ -512,7 +520,7 @@ public class SteamWeb {
             e.printStackTrace();
         }
         builder.query(query);
-        HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
+        HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),bindIpaddressDOOptional);
         if(Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus()!=200){
             throw new ServiceException(-1, "确认订单失败");
         }
@@ -564,7 +572,7 @@ public class SteamWeb {
         MobileConfList json;
         try {
             log.info("发送到对方服务器数据{}", objectMapper.writeValueAsString(builder.build()));
-            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
+            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),bindIpaddressDOOptional);
             log.info("交易结果{}", proxyResponseVo);
             if(Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus()!=200){
                 throw new ServiceException(-1, "交易失败");

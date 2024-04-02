@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
+import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
@@ -45,6 +46,8 @@ public class IOInvUpdateService {
     @Resource
     private SellingMapper sellingMapper;
 
+    @Resource
+    private SteamService steamService;
 
 
 //    @Async
@@ -60,7 +63,7 @@ public class IOInvUpdateService {
         pathVar.put("steamId", bindUserDO.getSteamId());
         pathVar.put("app", "730");
         builder.pathVar(pathVar);
-        HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
+        HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),steamService.getBindUserIp(bindUserDO));
         if (Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus() != 200) {
             throw new ServiceException(-1, "初始化steam失败");
         }

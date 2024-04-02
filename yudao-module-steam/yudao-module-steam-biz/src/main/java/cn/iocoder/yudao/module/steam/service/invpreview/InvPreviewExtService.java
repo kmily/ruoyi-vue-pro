@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.ItemResp;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.PreviewReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.hotwords.HotWordsDO;
@@ -17,9 +18,12 @@ import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapperExt;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
+import cn.iocoder.yudao.module.steam.service.selling.SellingHotDO;
+import cn.iocoder.yudao.module.steam.service.selling.SellingService;
 import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.scheduling.annotation.Async;
@@ -51,6 +55,9 @@ public class InvPreviewExtService {
     private HotWordsMapper hotWordsMapper;
     @Resource
     private InvPreviewMapperExt invPreviewMapperExt;
+
+    @Resource
+    private SellingService sellingService;
 
     public ItemResp getInvPreview(PreviewReqVO reqVO) {
 
@@ -93,7 +100,7 @@ public class InvPreviewExtService {
         HotWordsDO hotWordsDO = hotWordsMapper.selectOne(new LambdaQueryWrapper<HotWordsDO>()
                 .eq(HotWordsDO::getHotWords, pageReqVO.getItemName()));
 
-        if (hotWordsDO!=null){
+        if (hotWordsDO != null) {
             pageReqVO.setItemName(hotWordsDO.getMarketName());
         }
 
@@ -132,26 +139,104 @@ public class InvPreviewExtService {
         return new PageResult<>(ret, invPreviewDOPageResult.getTotal());
     }
 
-    public PageResult<ItemResp> getHot(InvPreviewPageReqVO pageReqVO) {
-        PageResult<InvPreviewDO> invPreviewDOPageResult = invPreviewMapper.hotPage(pageReqVO);
-        List<ItemResp> ret = new ArrayList<>();
-        for (InvPreviewDO item : invPreviewDOPageResult.getList()) {
+    public PageResult<SellingHotDO> getHot(SellingPageReqVO pageReqVO) {
+        // 获取所有数据
+        List<SellingDO> sellingDOS = sellingMapper.selectList();
 
-            ItemResp itemResp = BeanUtils.toBean(item, ItemResp.class);
-            if (Objects.nonNull(item.getAutoPrice())) {
-                itemResp.setAutoPrice(new BigDecimal(item.getAutoPrice()).multiply(new BigDecimal("100")).intValue());
+        // 按 display_weight 字段进行排序,数字越小权重越大
+        List<SellingDO> sortedList = sellingDOS.stream()
+                .sorted(Comparator.comparingInt(SellingDO::getDisplayWeight))
+                .collect(Collectors.toList());
+
+        // 分页处理
+        int pageSize = pageReqVO.getPageSize();
+        int pageNum = pageReqVO.getPageNo();
+        int startIndex = (pageNum - 1) * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, sortedList.size());
+        List<SellingDO> resultList = sortedList.subList(startIndex, endIndex);
+
+        // 价格单位转换:分 -> 元
+        resultList.forEach(item -> {
+            if (Objects.nonNull(item.getPrice())) {
+                item.setPrice(new BigDecimal(item.getPrice()).divide(new BigDecimal("100")).intValue());
             }
-            if (Objects.nonNull(item.getSalePrice())) {
-                itemResp.setSalePrice(new BigDecimal(item.getSalePrice()).multiply(new BigDecimal("100")).intValue());
+        });
+
+        List<SellingHotDO> sellingHotDOList = new ArrayList<>();
+
+        Map<String, Pair<String, String>> exteriorMap = new HashMap<>();
+        exteriorMap.put("WearCategoryNA", new MutablePair<>("无涂装", ""));
+        exteriorMap.put("WearCategory0", new MutablePair<>("崭新出厂", "#228149"));
+        exteriorMap.put("WearCategory1", new MutablePair<>("略有磨损", "#64b02b"));
+        exteriorMap.put("WearCategory2", new MutablePair<>("久经沙场", "#efad4d"));
+        exteriorMap.put("WearCategory3", new MutablePair<>("破损不堪", "#b7625f"));
+        exteriorMap.put("WearCategory4", new MutablePair<>("战痕累累", "#993a38"));
+
+        Map<String, Pair<String, String>> qualityMap = new HashMap<>();
+        qualityMap.put("normal", new MutablePair<>("普通", ""));
+        qualityMap.put("strange", new MutablePair<>("StatTrak™", "#cf6a32"));
+        qualityMap.put("tournament", new MutablePair<>("纪念品", "#ffb100"));
+        qualityMap.put("unusual", new MutablePair<>("★", "#8650ac"));
+        qualityMap.put("unusual_strange", new MutablePair<>("★ StatTrak™", "#8650ac"));
+
+        // 统计每个 market_hash_name 的数量和最低价格
+        Map<String, Integer> sellNumMap = new HashMap<>();
+        Map<String, Integer> minPriceMap = new HashMap<>();
+        for (SellingDO item : sellingDOS) {
+            String marketHashName = item.getMarketHashName();
+            int sellNum = sellNumMap.getOrDefault(marketHashName, 0) + 1;
+            sellNumMap.put(marketHashName, sellNum);
+
+            int price = item.getPrice() != null ? item.getPrice() : Integer.MIN_VALUE;
+            if (!minPriceMap.containsKey(marketHashName) || price < minPriceMap.get(marketHashName)) {
+                minPriceMap.put(marketHashName, price);
             }
-            if (Objects.nonNull(item.getReferencePrice())) {
-                itemResp.setReferencePrice(new BigDecimal(item.getReferencePrice()).multiply(new BigDecimal("100")).intValue());
-            }
-            ret.add(itemResp);
         }
-        return new PageResult<>(ret, invPreviewDOPageResult.getTotal());
-    }
 
+        for (SellingDO item : resultList) {
+            SellingHotDO sellingHotDO = new SellingHotDO();
+            C5ItemInfo c5ItemInfo = new C5ItemInfo();
+
+            String selExterior = item.getSelExterior();
+            Pair<String, String> exteriorInfo = exteriorMap.get(selExterior);
+            if (exteriorInfo != null) {
+                c5ItemInfo.setExteriorName(exteriorInfo.getLeft());
+                c5ItemInfo.setExterior(exteriorInfo.getKey());
+                sellingHotDO.setSelExterior(exteriorInfo.getKey());
+                c5ItemInfo.setExteriorColor(exteriorInfo.getRight());
+            } else {
+                c5ItemInfo.setExteriorName("");
+                c5ItemInfo.setExterior("");
+                c5ItemInfo.setExteriorColor("");
+            }
+
+            String selQuality = item.getSelQuality();
+            Pair<String, String> qualityInfo = qualityMap.get(selQuality);
+            if (qualityInfo != null) {
+                c5ItemInfo.setQualityName(qualityInfo.getLeft());
+                c5ItemInfo.setQuality(qualityInfo.getKey());
+                sellingHotDO.setSelQuality(qualityInfo.getKey());
+                c5ItemInfo.setQualityColor(qualityInfo.getRight());
+            } else {
+                c5ItemInfo.setQualityName("");
+                c5ItemInfo.setQuality("");
+                c5ItemInfo.setQualityColor("");
+            }
+
+            sellingHotDO.setIconUrl(item.getIconUrl());
+            sellingHotDO.setPrice(minPriceMap.get(item.getMarketHashName()));
+            sellingHotDO.setItemInfo(c5ItemInfo);
+            sellingHotDO.setDisplayWeight(item.getDisplayWeight());
+            sellingHotDO.setMarketName(item.getMarketName());
+            sellingHotDO.setMarketHashName(item.getMarketHashName());
+            sellingHotDO.setSellNum(sellNumMap.get(item.getMarketHashName()));
+
+            sellingHotDOList.add(sellingHotDO);
+        }
+
+        long totalCount = sellingDOS.size();
+        return new PageResult<>(sellingHotDOList, totalCount);
+    }
     /**
      * 增加库存标识,上架构和下架构 都可以进行调用
      *
