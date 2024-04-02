@@ -21,7 +21,6 @@ public interface BindIpaddressMapper extends BaseMapperX<BindIpaddressDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<BindIpaddressDO>()
                 .eqIfPresent(BindIpaddressDO::getPort, reqVO.getPort())
                 .betweenIfPresent(BindIpaddressDO::getCreateTime, reqVO.getCreateTime())
-                .eqIfPresent(BindIpaddressDO::getAddressId, reqVO.getAddressId())
                 .eqIfPresent(BindIpaddressDO::getIpAddress, reqVO.getIpAddress())
                 .orderByDesc(BindIpaddressDO::getId));
     }

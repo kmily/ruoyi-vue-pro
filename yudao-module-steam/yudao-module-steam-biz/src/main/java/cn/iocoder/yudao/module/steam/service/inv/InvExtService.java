@@ -217,7 +217,7 @@ public class InvExtService {
     // 从steam获取用户库存信息
     public InventoryDto gitInvFromSteam (BindUserDO bindUserDO)  {
         HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
-        builder.url("https://steamcommunity.com/inventory/:steamId/:app/2?l=schinese&count=1000");
+        builder.url("https://steamcommunity.com/inventory/"+bindUserDO.getSteamId()+"/730/2?l=schinese&count=1000");
         Map<String, String> header = new HashMap<>();
         header.put("Accept-Language", "zh-CN,zh;q=0.9");
         builder.headers(header);
@@ -225,7 +225,6 @@ public class InvExtService {
         pathVar.put("steamId", bindUserDO.getSteamId());
         pathVar.put("app", "730");
         builder.pathVar(pathVar);
-
         HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),steamService.getBindUserIp(bindUserDO));
         if (Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus() != 200) {
             throw new ServiceException(-1, "初始化steam失败");
