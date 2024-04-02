@@ -119,17 +119,19 @@ public class InvOrderExtService {
                 .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.TransferFINISH.getStatus())
                 .last("limit 10"));
         ArrayList<SellingDO> list = new ArrayList<>();
-        for (SellingDO aDo : sellingDOS) {
-            SellingDO sellingDO = new SellingDO();
-            sellingDO.setMarketHashName(aDo.getMarketHashName());
-            sellingDO.setMarketName(aDo.getMarketName());
-            // 价格
-            sellingDO.setPrice(aDo.getPrice());
-            // 出售时间
-            sellingDO.setUpdateTime(aDo.getUpdateTime());
-            // 图片
-            sellingDO.setIconUrl(aDo.getIconUrl());
-            list.add(sellingDO);
+        if(!sellingDOS.isEmpty()){
+            for (SellingDO aDo : sellingDOS) {
+                SellingDO sellingDO = new SellingDO();
+                sellingDO.setMarketHashName(aDo.getMarketHashName());
+                sellingDO.setMarketName(aDo.getMarketName());
+                // 价格
+                sellingDO.setPrice(aDo.getPrice());
+                // 出售时间
+                sellingDO.setUpdateTime(aDo.getUpdateTime());
+                // 图片
+                sellingDO.setIconUrl(aDo.getIconUrl());
+                list.add(sellingDO);
+            }
         }
         return list;
     }
