@@ -21,6 +21,7 @@ import cn.iocoder.yudao.module.steam.service.inv.InvService;
 import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
+import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.Data;
@@ -193,7 +194,7 @@ public class AppInventorySearchController {
         if(!first.isPresent()){
             throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
         }
-        rabbitTemplate.convertAndSend("steam","steam_inv",first.get());
+        rabbitTemplate.convertAndSend("steam","steam_inv", first.get().getId());
         return success(new ArrayList<>());
     }
 }

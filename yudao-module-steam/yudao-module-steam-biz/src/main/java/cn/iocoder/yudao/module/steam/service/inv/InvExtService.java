@@ -150,8 +150,11 @@ public class InvExtService {
             invDO.setAmount(item.getAmount());
             invDO.setSteamId(bindUserDO.getSteamId());
 //            invDO.setStatus(0);   // 默认为0
-            invDO.setPrice(0);
-            invDO.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
+            invDO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+            if(Objects.isNull(invDO.getId())){
+                invDO.setPrice(0);
+                invDO.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
+            }
             invDO.setUserId(bindUserDO.getUserId());
             invDO.setUserType(bindUserDO.getUserType());
             invDO.setBindUserId(bindUserDO.getId());

@@ -4,9 +4,8 @@ import cn.iocoder.yudao.framework.mybatis.core.type.EncryptTypeHandler;
 import cn.iocoder.yudao.module.steam.service.steam.SteamMaFile;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
+
+import java.io.Serializable;
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
@@ -23,7 +22,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BindUserDO extends BaseDO {
+public class BindUserDO extends BaseDO implements Serializable {
 
     /**
      * steam名称
