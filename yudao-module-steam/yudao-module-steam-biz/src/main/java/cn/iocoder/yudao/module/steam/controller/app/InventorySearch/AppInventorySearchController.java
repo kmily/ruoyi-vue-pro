@@ -25,6 +25,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,10 +33,7 @@ import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
 import java.sql.Array;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -67,6 +65,8 @@ public class AppInventorySearchController {
 
     @Resource
     private IOInvUpdateService ioInvUpdateService;
+    @Resource
+    private RabbitTemplate rabbitTemplate;
 
     /**
      * 用户手动查询自己的 steam_inv 库存（从数据库中获取数据）
@@ -129,12 +129,28 @@ public class AppInventorySearchController {
         return success(steamInvService.mergeInv(invToMerge));
     }
 
-
-
     @GetMapping("/updateFromSteam")
     @Operation(summary = "更新库存 入参steamid")
     @ResponseBody
-    public CommonResult<List<String>> updateFromSteam(@RequestParam String steamId ,Long id) throws JsonProcessingException {
+    @Deprecated
+    public CommonResult<List<String>> updateFromSteam(@RequestParam String steamId) throws JsonProcessingException {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+                .eq(BindUserDO::getUserId, loginUser.getId())
+                .eq(BindUserDO::getUserType, loginUser.getUserType())
+                .eq(BindUserDO::getSteamId, steamId)).stream().findFirst();
+        if(!first.isPresent()){
+            throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
+        }
+        rabbitTemplate.convertAndSend("steam","steam_inv",first.get());
+        return success(new ArrayList<>());
+    }
+
+    @GetMapping("/updateFromSteam2")
+    @Operation(summary = "更新库存 入参steamid")
+    @ResponseBody
+    @Deprecated
+    public CommonResult<List<String>> updateFromSteam2(@RequestParam String steamId ,Long id) throws JsonProcessingException {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         List<BindUserDO> collect = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                 .eq(BindUserDO::getUserId, loginUser.getId())
