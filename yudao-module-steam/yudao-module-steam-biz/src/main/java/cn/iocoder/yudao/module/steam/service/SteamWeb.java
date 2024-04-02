@@ -4,6 +4,8 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
+import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
+import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.steam.*;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -80,6 +82,10 @@ public class SteamWeb {
     private Optional<String> browserid;
 
     private SteamMaFile steamMaFile;
+
+    private BindUserService bindUserService;
+
+    private BindUserMapper bindUserMapper;
 
     public SteamWeb(ConfigService configService) {
         this.configService = configService;
@@ -253,6 +259,10 @@ public class SteamWeb {
         Matcher matcher = pattern.matcher(proxyResponseVo.getHtml());
         if (matcher.find()) {
             treadUrl = Optional.of(matcher.group(1));
+/*            BindUserDO bindUserDO = new BindUserDO();
+            bindUserDO.setAddressId();
+
+            bindUserService.updateBindUser(bindUserDO);*/
         } else {
             log.error("获取tradeUrl失败steamId{}", steamId);
             throw new ServiceException(-1, "获取tradeUrl失败");

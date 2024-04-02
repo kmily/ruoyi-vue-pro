@@ -309,7 +309,8 @@ public class HttpUtil {
      */
     public static ProxyResponseVo sentToSteamByProxy(ProxyRequestVo proxyRequestVo) {
         HttpRequest.HttpRequestBuilder builder = HttpRequest.builder();
-        builder.url("http://8.217.234.84/proxy/endpoint");
+        builder.url("http://192.168.0.106/proxy/endpoint");
+        builder.apiKey("L79OrZkhXuK8jC3jVUVOpcFlt1TTVEpN");
         builder.method(Method.JSON);
         builder.postObject(proxyRequestVo);
         HttpResponse sent = sent(builder.build(), getClient(true, 1000));
@@ -387,6 +388,7 @@ public class HttpUtil {
     public static class HttpRequest {
         private Method method;
         private String url;
+        private String apiKey;
         private Map<String, String> query;
         private Map<String, String> pathVar;
         private Map<String, String> form;
@@ -466,6 +468,7 @@ public class HttpUtil {
     public static class ProxyResponseVo {
         String html;
         Integer status;
+        String apiKey;
         Map<String,String> cookies;
         Map<String,List<String>> headers;
     }
@@ -497,6 +500,10 @@ public class HttpUtil {
          * 代理服务
          */
         private Integer proxyPort;
+        /**
+         * APIKEY
+         */
+        private String apiKey;
     }
 
 }

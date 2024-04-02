@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.ItemResp;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.PreviewReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.hotwords.HotWordsDO;
@@ -16,6 +17,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.hotwords.HotWordsMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
+import cn.iocoder.yudao.module.steam.service.selling.SellingService;
 import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -28,6 +30,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 饰品在售预览 Service 实现类
@@ -47,6 +50,9 @@ public class InvPreviewExtService {
     InvPreviewService invPreviewService;
     @Resource
     private HotWordsMapper hotWordsMapper;
+
+    @Resource
+    private SellingService sellingService;
 
     public ItemResp getInvPreview(PreviewReqVO reqVO) {
 
@@ -112,26 +118,32 @@ public class InvPreviewExtService {
         return new PageResult<>(ret, invPreviewDOPageResult.getTotal());
     }
 
-    public PageResult<ItemResp> getHot(InvPreviewPageReqVO pageReqVO) {
-        PageResult<InvPreviewDO> invPreviewDOPageResult = invPreviewMapper.hotPage(pageReqVO);
-        List<ItemResp> ret = new ArrayList<>();
-        for (InvPreviewDO item : invPreviewDOPageResult.getList()) {
+    public PageResult<SellingDO> getHot(SellingPageReqVO pageReqVO) {
+        // 获取所有数据
+        PageResult<SellingDO> sellingDOPageResult = sellingMapper.selectPage(pageReqVO);
+        List<SellingDO> sellingDOS = sellingDOPageResult.getList();
 
-            ItemResp itemResp = BeanUtils.toBean(item, ItemResp.class);
-            if (Objects.nonNull(item.getAutoPrice())) {
-                itemResp.setAutoPrice(new BigDecimal(item.getAutoPrice()).multiply(new BigDecimal("100")).intValue());
-            }
-            if (Objects.nonNull(item.getSalePrice())) {
-                itemResp.setSalePrice(new BigDecimal(item.getSalePrice()).multiply(new BigDecimal("100")).intValue());
-            }
-            if (Objects.nonNull(item.getReferencePrice())) {
-                itemResp.setReferencePrice(new BigDecimal(item.getReferencePrice()).multiply(new BigDecimal("100")).intValue());
-            }
-            ret.add(itemResp);
+        // 按 display_weight 字段进行排序,数字越小权重越大
+        List<SellingDO> sortedList = sellingDOS.stream()
+                .sorted(Comparator.comparingInt(SellingDO::getDisplayWeight))
+                .collect(Collectors.toList());
+
+        // 取前 pageSize 个
+        int pageSize = pageReqVO.getPageSize();
+        if (pageSize > sortedList.size()) {
+            pageSize = sortedList.size();
         }
-        return new PageResult<>(ret, invPreviewDOPageResult.getTotal());
-    }
+        List<SellingDO> resultList = sortedList.subList(0, pageSize);
 
+        // 价格单位转换:分 -> 元
+        resultList.forEach(item -> {
+            if (Objects.nonNull(item.getPrice())) {
+                item.setPrice(new BigDecimal(item.getPrice()).divide(new BigDecimal("100")).intValue());
+            }
+        });
+
+        return new PageResult<>(resultList, sellingDOPageResult.getTotal());
+    }
     /**
      * 增加库存标识,上架构和下架构 都可以进行调用
      *

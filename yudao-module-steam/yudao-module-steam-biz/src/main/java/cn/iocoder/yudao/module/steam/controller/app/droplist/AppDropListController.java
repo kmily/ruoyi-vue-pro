@@ -186,8 +186,7 @@ public class AppDropListController {
     }
     @GetMapping("items/730/getHot")
     @Operation(summary = "热门在售卖")
-    public CommonResult<PageResult<ItemResp>> getHot(@Valid InvPreviewPageReqVO sellingPageReqVO) {
-        sellingPageReqVO.setExistInv(true);
+    public CommonResult<PageResult<SellingDO>> getHot(@Valid SellingPageReqVO sellingPageReqVO) {
         return success(invPreviewExtService.getHot(sellingPageReqVO));
     }
     @GetMapping("items/730/header")

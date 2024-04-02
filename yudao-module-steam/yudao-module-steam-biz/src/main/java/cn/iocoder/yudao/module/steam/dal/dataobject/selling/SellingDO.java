@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.steam.dal.dataobject.selling;
 
-import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 import java.util.*;
 import java.time.LocalDateTime;
@@ -83,13 +81,20 @@ public class SellingDO extends BaseDO {
     private Long invDescId;
     /**
      * 发货状态(0代表未出售，1代表出售中，2代表已出售 )
-     * 枚举 {@link cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum 对应的类}
      */
     private Integer transferStatus;
     /**
      * 库存表id
      */
     private Long invId;
+    /**
+     * 商品名称
+     */
+    private String marketName;
+    /**
+     * 图片地址
+     */
+    private String iconUrl;
     /**
      * 类别选择
      */
@@ -115,16 +120,12 @@ public class SellingDO extends BaseDO {
      */
     private String selType;
     /**
-     * market_name
-     */
-    private String marketName;
-    /**
-     * icon_url
-     */
-    private String iconUrl;
-    /**
-     * market_hash_name
+     * marketHashName
      */
     private String marketHashName;
+    /**
+     * 在售展示权重
+     */
+    private Integer displayWeight;
 
 }
