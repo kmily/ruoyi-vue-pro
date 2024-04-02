@@ -1,14 +1,24 @@
 package cn.iocoder.yudao.module.steam.utils;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.module.steam.dal.dataobject.bindipaddress.BindIpaddressDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
+import cn.iocoder.yudao.module.steam.dal.mysql.bindipaddress.BindIpaddressMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
+import cn.iocoder.yudao.module.steam.service.bindipaddress.BindIpaddressService;
+import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.deploy.net.proxy.ProxyInfo;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
+import org.omg.CORBA.PRIVATE_MEMBER;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
 import javax.net.ssl.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -28,7 +38,17 @@ import java.util.regex.Pattern;
 
 
 @Slf4j
+
 public class HttpUtil {
+    @Resource
+    private static BindUserService bindUserService;
+    @Resource
+    private static BindUserMapper bindUserMapper;
+    @Resource
+    private static BindIpaddressService bindIpaddressService;
+    @Resource
+    private static BindIpaddressMapper bindIpaddressMapper;
+
     private static final String URL_START = "?";
     private static final String URL_SPLIT = "&";
     private static final String SCHEME_FILE = "file://";
