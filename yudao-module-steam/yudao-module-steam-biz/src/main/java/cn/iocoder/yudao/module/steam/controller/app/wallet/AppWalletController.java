@@ -13,13 +13,17 @@ import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderExtService;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.SellingDoList;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
@@ -105,6 +109,35 @@ public class AppWalletController {
         PageResult<SellingDoList> invOrderWithPage = invOrderExtService.getSellOrderWithPage(reqVo, page,loginUser);
         return CommonResult.success(invOrderWithPage);
     }
+
+
+    /**
+     * 查询订单详情
+     * @param reqVO marketHashName marketName
+     * @Descriptons 订单的 markethashname   marketname itemInfo 卖家信息 售出价格
+     */
+    @Operation(summary = "成交记录查询")
+    @PostMapping("/getSoldInfo")
+    @PermitAll
+    public ApiResult<List<SellingDO>> getSoldInfo(@RequestBody SellingPageReqVO reqVO) {
+        List<SellingDO> soldInfo = invOrderExtService.getSoldInfo(reqVO);
+        return ApiResult.success(soldInfo);
+    }
+
+
+    /**
+     * 查询订单详情
+     * @param reqVO marketHashName marketName
+     * @Descriptons 订单的 markethashname   marketname itemInfo 卖家信息 售出价格
+     */
+    @Operation(summary = "磨损度选择")
+    @PostMapping("/getAbrasion")
+    @PermitAll
+    public ApiResult<List<SellingDO>> getAbrasion(@RequestBody SellingPageReqVO reqVO) {
+        List<SellingDO> soldInfo = invOrderExtService.getSoldInfo(reqVO);
+        return ApiResult.success(soldInfo);
+    }
+
 
     @PostMapping("/update-paid")
     @Operation(summary = "更新示例订单为已支付") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob

@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
@@ -19,8 +20,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,6 +36,10 @@ public class InvOrderExtService {
     private InvOrderMapper invOrderMapper;
     @Resource
     private InvPreviewMapper invPreviewMapper;
+    @Resource
+    private SellingMapper sellingMapper;
+
+
 
     public PageResult<SellingDoList> getSellOrderWithPage(InvOrderPageReqVO reqVo, Page<InvOrderDO> page, LoginUser loginUser) {
         // 下单状态
@@ -98,5 +105,32 @@ public class InvOrderExtService {
             sellingDoLists.add(sellingDoListTemp);
         }
         return new PageResult<>(sellingDoLists, invOrderPage.getTotal());
+    }
+
+
+    /**
+     * @param reqVO
+     * @return 成交记录查询
+     */
+    public List<SellingDO> getSoldInfo(@RequestBody @Valid SellingPageReqVO reqVO) {
+        List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
+                .eqIfPresent(SellingDO::getMarketHashName, reqVO.getMarketHashName())
+                .eqIfPresent(SellingDO::getMarketName, reqVO.getMarketName())
+                .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.TransferFINISH.getStatus())
+                .last("limit 10"));
+        ArrayList<SellingDO> list = new ArrayList<>();
+        for (SellingDO aDo : sellingDOS) {
+            SellingDO sellingDO = new SellingDO();
+            sellingDO.setMarketHashName(aDo.getMarketHashName());
+            sellingDO.setMarketName(aDo.getMarketName());
+            // 价格
+            sellingDO.setPrice(aDo.getPrice());
+            // 出售时间
+            sellingDO.setUpdateTime(aDo.getUpdateTime());
+            // 图片
+            sellingDO.setIconUrl(aDo.getIconUrl());
+            list.add(sellingDO);
+        }
+        return list;
     }
 }
