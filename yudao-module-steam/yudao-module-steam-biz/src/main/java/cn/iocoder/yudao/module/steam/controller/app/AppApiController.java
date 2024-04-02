@@ -292,8 +292,8 @@ public class AppApiController {
                 if (Objects.nonNull(configCookie)) {
                     bindUserDO.setLoginCookie(Objects.requireNonNull(configCookie.getValue(), () -> "登录密码不能为空"));
                 }
-                SteamWeb steamWeb = new SteamWeb(configService);
                 Optional<BindIpaddressDO> bindUserIp = steamService.getBindUserIp(bindUserDO);
+                SteamWeb steamWeb = new SteamWeb(configService,bindUserIp);
                 if (steamWeb.checkLogin(bindUserDO,bindUserIp)) {
                     ConfigSaveReqVO configSaveReqVO = new ConfigSaveReqVO();
                     if (Objects.isNull(configCookie)) {

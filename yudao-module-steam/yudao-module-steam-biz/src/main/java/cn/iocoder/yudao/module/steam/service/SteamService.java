@@ -262,7 +262,7 @@ public class SteamService {
             log.error("读取maFile失败{}",e);
             throw new ServiceException(-1,"读取maFile失败，请检查后再试。");
         }
-        SteamWeb steamWeb=new SteamWeb(configService);
+        SteamWeb steamWeb=new SteamWeb(configService,getBindUserIp(bindUserDO));
         bindUserDO.setSteamPassword(password);
         bindUserDO.setMaFile(steamMaFile);
         Optional<BindIpaddressDO> bindUserIp = getBindUserIp(bindUserDO);

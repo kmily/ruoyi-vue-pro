@@ -83,9 +83,10 @@ public class SteamWeb {
     private Optional<String> browserid;
 
     private SteamMaFile steamMaFile;
-
-    public SteamWeb(ConfigService configService) {
+    private Optional<BindIpaddressDO> bindIpaddressDOOptional;
+    public SteamWeb(ConfigService configService,Optional<BindIpaddressDO> bindIpaddressDOOptional) {
         this.configService = configService;
+        this.bindIpaddressDOOptional=bindIpaddressDOOptional;
     }
 
     /**
@@ -429,7 +430,7 @@ public class SteamWeb {
             header.put("Referer", tradeUrl);
             builder.headers(header);
             log.info("发送到对方服务器数据{}", objectMapper.writeValueAsString(builder.build()));
-            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
+            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),bindIpaddressDOOptional);
             log.info("交易结果{}", proxyResponseVo);
             if(Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus()!=200){
                 throw new ServiceException(-1, "交易失败");
@@ -519,7 +520,7 @@ public class SteamWeb {
             e.printStackTrace();
         }
         builder.query(query);
-        HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
+        HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),bindIpaddressDOOptional);
         if(Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus()!=200){
             throw new ServiceException(-1, "确认订单失败");
         }
@@ -571,7 +572,7 @@ public class SteamWeb {
         MobileConfList json;
         try {
             log.info("发送到对方服务器数据{}", objectMapper.writeValueAsString(builder.build()));
-            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
+            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),bindIpaddressDOOptional);
             log.info("交易结果{}", proxyResponseVo);
             if(Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus()!=200){
                 throw new ServiceException(-1, "交易失败");
