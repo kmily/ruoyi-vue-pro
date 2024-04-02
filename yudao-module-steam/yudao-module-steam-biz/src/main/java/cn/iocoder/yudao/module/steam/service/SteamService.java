@@ -16,8 +16,6 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
-import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
-import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
 import cn.iocoder.yudao.module.steam.service.steam.SteamMaFile;
 import cn.iocoder.yudao.module.steam.service.uu.UUService;
@@ -28,6 +26,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -65,10 +64,11 @@ public class SteamService {
 
 
     @Resource
-    private IOInvUpdateService ioInvUpdateService;
+    private UUService uuService;
+
 
     @Resource
-    private UUService uuService;
+    private RabbitTemplate rabbitTemplate;
 
 
 
@@ -293,10 +293,11 @@ public class SteamService {
             invMapper.delete(new QueryWrapper<InvDO>().eq("steam_id",bindUserDO.getSteamId()).eq("user_id",bindUserDO.getUserId()));
         }
         bindUserMapper.updateById(bindUserDO);
-        InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
-        if(inventoryDto.getAssets() != null){
-            ioInvUpdateService.firstInsertInventory(inventoryDto,bindUserDO);
-        }
+        rabbitTemplate.convertAndSend("steam","steam_ivn",bindUserDO);
+//        InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
+//        if(inventoryDto.getAssets() != null){
+//            ioInvUpdateService.firstInsertInventory(inventoryDto,bindUserDO);
+//        }
 //        // 删除之前绑定的所有库存  TODO 有问题 没有删除inv_desc
 //        if(!(invMapper.selectPage(invPageReqVO)).getList().isEmpty()){
 //            invMapper.delete(new QueryWrapper<InvDO>().eq("steam_id",bindUserDO.getSteamId()).eq("user_id",bindUserDO.getUserId()));
@@ -362,10 +363,11 @@ public class SteamService {
             invMapper.delete(new QueryWrapper<InvDO>().eq("steam_id",bindUserDO.getSteamId()).eq("user_id",bindUserDO.getUserId()));
         }
         bindUserMapper.updateById(bindUserDO);
-        InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
-        if(inventoryDto != null){
-            ioInvUpdateService.firstInsertInventory(inventoryDto,bindUserDO);
-        }
+        rabbitTemplate.convertAndSend("steam","steam_ivn",bindUserDO);
+//        InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
+//        if(inventoryDto != null){
+//            ioInvUpdateService.firstInsertInventory(inventoryDto,bindUserDO);
+//        }
     }
     /**
      * 验证用户是否已经被绑定
