@@ -157,6 +157,21 @@ public class InvExtService {
             if(Objects.isNull(invDO.getId())){
                 invDO.setPrice(0);
                 invDO.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
+            }else{
+                List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
+                        .eq(SellingDO::getInvId, invDO.getId())
+                );
+
+                long count1 = sellingDOS.stream().filter(i -> Arrays.asList(
+                        InvTransferStatusEnum.INORDER.getStatus(),
+                        InvTransferStatusEnum.TransferFINISH.getStatus(),
+                        InvTransferStatusEnum.OFF_SALE.getStatus(),
+                        InvTransferStatusEnum.TransferERROR.getStatus()).contains(i.getTransferStatus())).count();
+                if(count1>0){
+                    invDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
+                }else{
+                    invDO.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
+                }
             }
             invDO.setUserId(bindUserDO.getUserId());
             invDO.setUserType(bindUserDO.getUserType());
@@ -233,6 +248,7 @@ public class InvExtService {
         if (json == null) {
             throw new ServiceException(-1, "访问steam库存过于频繁，请稍后再试/或当前库存为空");
         }
+
         return json;
     }
     @SuppressWarnings("unused")
