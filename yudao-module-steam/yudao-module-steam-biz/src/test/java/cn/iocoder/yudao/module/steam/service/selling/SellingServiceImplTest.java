@@ -123,6 +123,8 @@ public class SellingServiceImplTest extends BaseDbUnitTest {
            o.setSelType(null);
            o.setMarketHashName(null);
            o.setDisplayWeight(null);
+           o.setItemInfo(null);
+           o.setShortName(null);
        });
        sellingMapper.insert(dbSelling);
        // 测试 id 不匹配
@@ -151,8 +153,13 @@ public class SellingServiceImplTest extends BaseDbUnitTest {
        sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setMarketHashName(null)));
        // 测试 displayWeight 不匹配
        sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setDisplayWeight(null)));
+       // 测试 itemInfo 不匹配
+       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setItemInfo(null)));
+       // 测试 shortName 不匹配
+       sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setShortName(null)));
        // 准备参数
        SellingPageReqVO reqVO = new SellingPageReqVO();
+       reqVO.setId(null);
        reqVO.setAssetid(null);
        reqVO.setSteamId(null);
        reqVO.setStatus(null);
@@ -165,6 +172,8 @@ public class SellingServiceImplTest extends BaseDbUnitTest {
        reqVO.setSelType(null);
        reqVO.setMarketHashName(null);
        reqVO.setDisplayWeight(null);
+       reqVO.setItemInfo(null);
+       reqVO.setShortName(null);
 
        // 调用
        PageResult<SellingDO> pageResult = sellingService.getSellingPage(reqVO);

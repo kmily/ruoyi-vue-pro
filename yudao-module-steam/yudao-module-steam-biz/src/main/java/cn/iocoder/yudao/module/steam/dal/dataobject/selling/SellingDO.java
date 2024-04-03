@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.steam.dal.dataobject.selling;
 
-import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 import java.util.*;
 import java.time.LocalDateTime;
@@ -132,6 +130,10 @@ public class SellingDO extends BaseDO {
     /**
      * itemInfo
      */
-    private C5ItemInfo itemInfo;
+    private String itemInfo;
+    /**
+     * short_name
+     */
+    private String shortName;
 
 }

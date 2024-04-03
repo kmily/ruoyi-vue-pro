@@ -59,6 +59,7 @@ public class InvPreviewExtService {
     @Resource
     private SellingService sellingService;
 
+
     public ItemResp getInvPreview(PreviewReqVO reqVO) {
 
         Optional<InvPreviewDO> first = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>().eq(InvPreviewDO::getMarketHashName, reqVO.getMarketHashName())).stream().findFirst();

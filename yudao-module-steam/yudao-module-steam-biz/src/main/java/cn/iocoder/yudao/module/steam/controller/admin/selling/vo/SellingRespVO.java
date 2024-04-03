@@ -121,4 +121,12 @@ public class SellingRespVO {
     @ExcelProperty("在售展示权重")
     private Integer displayWeight;
 
+    @Schema(description = "itemInfo")
+    @ExcelProperty("itemInfo")
+    private String itemInfo;
+
+    @Schema(description = "short_name", example = "王五")
+    @ExcelProperty("short_name")
+    private String shortName;
+
 }

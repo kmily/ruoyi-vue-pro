@@ -45,6 +45,12 @@
       <el-form-item label="在售展示权重" prop="displayWeight">
         <el-input v-model="queryParams.displayWeight" placeholder="请输入在售展示权重" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
+      <el-form-item label="itemInfo" prop="itemInfo">
+        <el-input v-model="queryParams.itemInfo" placeholder="请输入itemInfo" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="short_name" prop="shortName">
+        <el-input v-model="queryParams.shortName" placeholder="请输入short_name" clearable @keyup.enter.native="handleQuery"/>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -96,6 +102,8 @@
       <el-table-column label="类型选择" align="center" prop="selType" />
       <el-table-column label="marketHashName" align="center" prop="marketHashName" />
       <el-table-column label="在售展示权重" align="center" prop="displayWeight" />
+      <el-table-column label="itemInfo" align="center" prop="itemInfo" />
+      <el-table-column label="short_name" align="center" prop="shortName" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template v-slot="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="openForm(scope.row.id)"
@@ -156,6 +164,8 @@ export default {
         selType: null,
         marketHashName: null,
         displayWeight: null,
+        itemInfo: null,
+        shortName: null,
       },
             };
   },

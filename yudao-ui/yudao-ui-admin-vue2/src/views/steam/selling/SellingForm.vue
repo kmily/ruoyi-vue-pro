@@ -84,6 +84,12 @@
                     <el-form-item label="在售展示权重" prop="displayWeight">
                       <el-input v-model="formData.displayWeight" placeholder="请输入在售展示权重" />
                     </el-form-item>
+                    <el-form-item label="itemInfo" prop="itemInfo">
+                      <el-input v-model="formData.itemInfo" placeholder="请输入itemInfo" />
+                    </el-form-item>
+                    <el-form-item label="short_name" prop="shortName">
+                      <el-input v-model="formData.shortName" placeholder="请输入short_name" />
+                    </el-form-item>
       </el-form>
               <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm" :disabled="formLoading">确 定</el-button>
@@ -135,6 +141,8 @@
                             selType: undefined,
                             marketHashName: undefined,
                             displayWeight: undefined,
+                            itemInfo: undefined,
+                            shortName: undefined,
         },
         // 表单校验
         formRules: {
@@ -213,6 +221,8 @@
                             selType: undefined,
                             marketHashName: undefined,
                             displayWeight: undefined,
+                            itemInfo: undefined,
+                            shortName: undefined,
         };
         this.resetForm("formRef");
       }
