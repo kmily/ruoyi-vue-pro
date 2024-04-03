@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.steam.service.inv.InvExtService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -19,6 +20,9 @@ public class IvnConsumer {
     private InvExtService invExtService;
     @Resource
     private BindUserService bindUserService;
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
     @RabbitHandler // 重点：添加 @RabbitHandler 注解，实现消息的消费
     public void onMessage(Long message) {
         log.info("[onMessage][消息内容({})]", message);
@@ -41,5 +45,6 @@ public class IvnConsumer {
             return;
         }
         invExtService.fetchInv(bindUser);
+        stringRedisTemplate.delete("IVN_Fetch"+message);
     }
 }

@@ -106,7 +106,7 @@ public class SellingExtService {
                 throw new ServiceException(-1, "物品描述信息未查找到");
             }
             Long l = sellingMapper.selectCount(new LambdaQueryWrapperX<SellingDO>()
-                    .eq(SellingDO::getId, item.getId())
+                    .eq(SellingDO::getInvId, item.getId())
             );
             if (l > 0) {
                 throw new ServiceException(-1, "该物品已上架");

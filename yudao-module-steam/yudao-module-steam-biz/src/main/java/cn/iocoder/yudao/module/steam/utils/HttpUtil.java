@@ -315,13 +315,13 @@ public class HttpUtil {
     public static ProxyResponseVo sentToSteamByProxy(ProxyRequestVo proxyRequestVo, Optional<BindIpaddressDO> bindIpaddressDOOptional) {
         HttpRequest.HttpRequestBuilder builder = HttpRequest.builder();
         builder.url("http://8.217.234.84/proxy/endpoint");
-        builder.apiKey("L79OrZkhXuK8jC3jVUVOpcFlt1TTVEpN");
+//        builder.apiKey("L79OrZkhXuK8jC3jVUVOpcFlt1TTVEpN");
         builder.method(Method.JSON);
         if(bindIpaddressDOOptional.isPresent()){
             proxyRequestVo.setProxyIp(bindIpaddressDOOptional.get().getIpAddress());
             proxyRequestVo.setProxyPort(bindIpaddressDOOptional.get().getPort());
-            proxyRequestVo.setApiKey("L79OrZkhXuK8jC3jVUVOpcFlt1TTVEpN");
         }
+        proxyRequestVo.setApiKey("L79OrZkhXuK8jC3jVUVOpcFlt1TTVEpN");
         builder.postObject(proxyRequestVo);
         log.info("发送到服务器信息{}",JacksonUtils.writeValueAsString(builder.build()));
         HttpResponse sent = sent(builder.build(), getClient(true, 1000));
@@ -399,7 +399,6 @@ public class HttpUtil {
     public static class HttpRequest {
         private Method method;
         private String url;
-        private String apiKey;
         private Map<String, String> query;
         private Map<String, String> pathVar;
         private Map<String, String> form;
@@ -408,14 +407,6 @@ public class HttpUtil {
         private HttpAuth auth;
         private Function<HttpAuth, HttpAuthReturn> authFunction;
         private Map<String, String> headers;
-        /**
-         * 代理服务IP
-         */
-        private String proxyIp;
-        /**
-         * 代理服务
-         */
-        private Integer proxyPort;
     }
 
     @Data

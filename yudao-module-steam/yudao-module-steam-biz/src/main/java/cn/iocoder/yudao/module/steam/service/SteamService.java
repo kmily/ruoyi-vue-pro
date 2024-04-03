@@ -2,10 +2,12 @@ package cn.iocoder.yudao.module.steam.service;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
+import cn.iocoder.yudao.module.steam.controller.admin.binduser.vo.BindUserSaveReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppBindUserApiKeyReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.binduser.vo.AppBindUserMaFileReqVO;
@@ -18,6 +20,8 @@ import cn.iocoder.yudao.module.steam.dal.mysql.bindipaddress.BindIpaddressMapper
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
+import cn.iocoder.yudao.module.steam.service.bindipaddress.BindIpaddressService;
+import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.steam.OpenApi;
 import cn.iocoder.yudao.module.steam.service.steam.SteamMaFile;
 import cn.iocoder.yudao.module.steam.service.uu.UUService;
@@ -36,6 +40,7 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Steam相关接口
@@ -75,6 +80,12 @@ public class SteamService {
 
     @Resource
     private BindIpaddressMapper bindIpaddressMapper;
+
+    @Resource
+    private BindUserService bindUserService;
+
+    @Resource
+    private BindIpaddressService bindIpaddressService;
 
 
 
@@ -243,6 +254,18 @@ public class SteamService {
             throw new ServiceException(OpenApiCode.ID_ERROR);
         }
         BindUserDO bindUserDO = bindUserMapper.selectById(bindUserId);
+        // 判断addressId是否为空 为空就分配IP
+        if (bindUserDO.getAddressId()==null){
+            List<Long> idList = bindIpaddressMapper.selectList(new QueryWrapperX<BindIpaddressDO>().select("id")).stream()
+                    .map(BindIpaddressDO::getId) // 假设BindIpaddressDO有一个getId()方法
+                    .collect(Collectors.toList());
+            Random random = new Random();
+            int randomIndex = random.nextInt(idList.size());
+            int randomId = Math.toIntExact(idList.get(randomIndex));
+            // 创建BindUserDO对象并设置addressId
+            bindUserDO.setAddressId((long) randomId);
+            // 调用服务更新BindUserDO对象
+        }
         if(Objects.isNull(bindUserDO)){
             throw new ServiceException(-1,"绑定失败，请检查后再试。");
         }
@@ -265,8 +288,7 @@ public class SteamService {
         SteamWeb steamWeb=new SteamWeb(configService,getBindUserIp(bindUserDO));
         bindUserDO.setSteamPassword(password);
         bindUserDO.setMaFile(steamMaFile);
-        Optional<BindIpaddressDO> bindUserIp = getBindUserIp(bindUserDO);
-        if(steamWeb.checkLogin(bindUserDO,bindUserIp)){
+        if(steamWeb.checkLogin(bindUserDO)){
             bindUserDO.setLoginCookie(steamWeb.getCookieString());
         }
         steamWeb.initTradeUrl();
@@ -300,7 +322,7 @@ public class SteamService {
             invMapper.delete(new QueryWrapper<InvDO>().eq("steam_id",bindUserDO.getSteamId()).eq("user_id",bindUserDO.getUserId()));
         }
         bindUserMapper.updateById(bindUserDO);
-        rabbitTemplate.convertAndSend("steam","steam_ivn",bindUserDO);
+        rabbitTemplate.convertAndSend("steam","steam_ivn",bindUserDO.getId());
 //        InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
 //        if(inventoryDto.getAssets() != null){
 //            ioInvUpdateService.firstInsertInventory(inventoryDto,bindUserDO);
@@ -321,6 +343,17 @@ public class SteamService {
             throw new ServiceException(OpenApiCode.ID_ERROR);
         }
         BindUserDO bindUserDO = bindUserMapper.selectById(reqVO.getBindUserId());
+        // 判断addressId是否为空 为空就分配IP
+        if (bindUserDO.getAddressId()==null){
+            List<Long> idList = bindIpaddressMapper.selectList(new QueryWrapperX<BindIpaddressDO>().select("id")).stream()
+                    .map(BindIpaddressDO::getId) // 假设BindIpaddressDO有一个getId()方法
+                    .collect(Collectors.toList());
+            Random random = new Random();
+            int randomIndex = random.nextInt(idList.size());
+            int randomId = Math.toIntExact(idList.get(randomIndex));
+            // 创建BindUserDO对象并设置addressId
+            bindUserDO.setAddressId((long) randomId);
+        }
         if(Objects.isNull(bindUserDO)){
             throw new ServiceException(-1,"绑定失败，请检查后再试。");
         }
@@ -370,7 +403,7 @@ public class SteamService {
             invMapper.delete(new QueryWrapper<InvDO>().eq("steam_id",bindUserDO.getSteamId()).eq("user_id",bindUserDO.getUserId()));
         }
         bindUserMapper.updateById(bindUserDO);
-        rabbitTemplate.convertAndSend("steam","steam_ivn",bindUserDO);
+        rabbitTemplate.convertAndSend("steam","steam_ivn",bindUserDO.getId());
 //        InventoryDto inventoryDto = ioInvUpdateService.gitInvFromSteam(bindUserDO);
 //        if(inventoryDto != null){
 //            ioInvUpdateService.firstInsertInventory(inventoryDto,bindUserDO);
@@ -399,10 +432,9 @@ public class SteamService {
             post.put("openid.assoc_handle",openApi.getAssocHandle());
             post.put("openid.signed",openApi.getSigned());
             post.put("openid.sig",openApi.getSig());
-//            builder.form(post);
             HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
-            builder.url(configByKey.getValue() + "/openid/login");
             builder.form(post);
+            builder.url(configByKey.getValue() + "/openid/login");
 
             HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
             log.error("steam返回{}",proxyResponseVo);

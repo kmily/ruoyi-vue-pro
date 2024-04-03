@@ -871,12 +871,13 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
 //            invOrder.setTransferDamagesAmount(transferDamagesAmount);
 //            invOrder.setTransferRefundAmount(transferRefundAmount);
 //            invOrder.setTransferDamagesTime(LocalDateTime.now());
-            //打款违约金-打款到服务费用户
-            PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(invOrder.getServiceFeeUserId(), invOrder.getServiceFeeUserType());
-            PayWalletTransactionDO payWalletTransactionDO = payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(invOrder.getId()),
+            //打款违约金-打款到服务费用户--不收服务费，全额退款
+//            PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(invOrder.getServiceFeeUserId(), invOrder.getServiceFeeUserType());
+            PayWalletDO orCreateWallet2 = payWalletService.getOrCreateWallet(invOrder.getUserId(), invOrder.getUserType());
+            PayWalletTransactionDO payWalletTransactionDO = payWalletService.addWalletBalance(orCreateWallet2.getId(), String.valueOf(invOrder.getId()),
                     PayWalletBizTypeEnum.INV_DAMAGES, transferDamagesAmount);
             //获取买家钱包并进行退款
-            PayWalletDO orCreateWallet2 = payWalletService.getOrCreateWallet(invOrder.getUserId(), invOrder.getUserType());
+//            PayWalletDO orCreateWallet2 = payWalletService.getOrCreateWallet(invOrder.getUserId(), invOrder.getUserType());
             PayWalletTransactionDO payWalletTransactionDO1 = payWalletService.addWalletBalance(orCreateWallet2.getId(), String.valueOf(invOrder.getId()),
                     PayWalletBizTypeEnum.STEAM_REFUND, transferRefundAmount);
 
@@ -956,7 +957,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             //发货
             Optional<BindIpaddressDO> bindUserIp = steamService.getBindUserIp(bindUserDO1);
             SteamWeb steamWeb=new SteamWeb(configService,bindUserIp);
-            if(steamWeb.checkLogin(bindUserDO1,bindUserIp)){
+            if(steamWeb.checkLogin(bindUserDO1)){
                 if(steamWeb.getWebApiKey().isPresent()){
                     bindUserDO1.setApiKey(steamWeb.getWebApiKey().get());
                 }
@@ -1065,7 +1066,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             if(Objects.isNull(bindUserDO.getApiKey())){
                 Optional<BindIpaddressDO> bindUserIp = steamService.getBindUserIp(bindUserDO);
                 SteamWeb steamWeb=new SteamWeb(configService,bindUserIp);
-                if(steamWeb.checkLogin(bindUserDO,bindUserIp)){
+                if(steamWeb.checkLogin(bindUserDO)){
                     if(steamWeb.getWebApiKey().isPresent()){
                         bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
                     }
@@ -1089,7 +1090,10 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 //打款
                 cashInvOrder(invOrderId);
             }else if(tradeOffInfo.getResponse().getOffer().getTradeOfferState() ==7){
-                //打款
+                //买家取消
+                damagesCloseInvOrder(invOrderId);
+            }else if(tradeOffInfo.getResponse().getOffer().getTradeOfferState() ==6){
+                //卖家取消息
                 damagesCloseInvOrder(invOrderId);
             }else{
                 LocalDateTime plus = invOrder.getPayTime().plus(Duration.ofHours(12));
@@ -1110,7 +1114,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         try{
             Optional<BindIpaddressDO> bindUserIp = steamService.getBindUserIp(bindUserDO);
             SteamWeb steamWeb=new SteamWeb(configService,bindUserIp);
-            if(steamWeb.checkLogin(bindUserDO,bindUserIp)){
+            if(steamWeb.checkLogin(bindUserDO)){
                 if(steamWeb.getWebApiKey().isPresent()){
                     bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
                 }

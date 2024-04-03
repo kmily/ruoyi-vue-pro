@@ -5,8 +5,6 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.steam.dal.dataobject.bindipaddress.BindIpaddressDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
-import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
-import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.steam.*;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,6 +13,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Cookie;
 
+import javax.annotation.Resource;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
@@ -30,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * steam机器人
@@ -94,7 +94,7 @@ public class SteamWeb {
      * @param bindUserDO 登录用户信息
      * @return true 用户cookie有更新， falsecookie没有更新   有更新需要及时保存起
      */
-    public boolean checkLogin(BindUserDO bindUserDO, Optional<BindIpaddressDO> bindIpaddressDOOptional){
+    public boolean checkLogin(BindUserDO bindUserDO){
         this.cookieString=bindUserDO.getLoginCookie();
         try{
             steamMaFile = bindUserDO.getMaFile();
@@ -134,9 +134,14 @@ public class SteamWeb {
         stringStringHashMap.put("username", steamMaFile.getAccountName());
         stringStringHashMap.put("password", passwd);
         stringStringHashMap.put("token_code", steamMaFile.getSharedSecret());
+        if(bindIpaddressDOOptional.isPresent()){
+            stringStringHashMap.put("ip", bindIpaddressDOOptional.get().getIpAddress()+":"+bindIpaddressDOOptional.get().getPort());
+        }else{
+            stringStringHashMap.put("ip", "");
+        }
         builder.form(stringStringHashMap);
         try{
-            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),bindIpaddressDOOptional);
+            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),Optional.empty());
             if(Objects.nonNull(proxyResponseVo.getStatus()) && proxyResponseVo.getStatus()==200){
                 SteamCookie steamCookie = objectMapper.readValue(proxyResponseVo.getHtml(), SteamCookie.class);
                 if (steamCookie.getCode() != 0) {
@@ -257,10 +262,6 @@ public class SteamWeb {
         Matcher matcher = pattern.matcher(proxyResponseVo.getHtml());
         if (matcher.find()) {
             treadUrl = Optional.of(matcher.group(1));
-/*            BindUserDO bindUserDO = new BindUserDO();
-            bindUserDO.setAddressId();
-
-            bindUserService.updateBindUser(bindUserDO);*/
         } else {
             log.error("获取tradeUrl失败steamId{}", steamId);
             throw new ServiceException(-1, "获取tradeUrl失败");
