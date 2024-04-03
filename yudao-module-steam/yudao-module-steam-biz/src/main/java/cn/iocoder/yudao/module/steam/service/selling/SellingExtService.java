@@ -133,7 +133,7 @@ public class SellingExtService {
             sellingDO.setIconUrl(invDescDO.get().getIconUrl());
             sellingDO.setMarketHashName(invDescDO.get().getMarketHashName());
             sellingDO.setInvId(item.getId());
-
+            sellingDO.setShortName(invDescDO.get().getName());
             if (itemPriceInfo.getPrice() == null || itemPriceInfo.getPrice() <= 0) {
                 throw new ServiceException(-1, "未设置价格");
             }
@@ -378,6 +378,12 @@ public class SellingExtService {
             return new PageResult<>(sellingMergePage, (long) sellingDOS.size());
         }
 
+    }
+
+
+    public void showGoodsWithMarketName(GoodsWithMarketHashNameReqVO sellingPageReqVO) {
+        List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
+                .eq(SellingDO::getMarketHashName, sellingPageReqVO.getMarketHashName()));
     }
 }
 
