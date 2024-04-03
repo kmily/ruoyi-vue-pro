@@ -265,8 +265,7 @@ public class SteamService {
         SteamWeb steamWeb=new SteamWeb(configService,getBindUserIp(bindUserDO));
         bindUserDO.setSteamPassword(password);
         bindUserDO.setMaFile(steamMaFile);
-        Optional<BindIpaddressDO> bindUserIp = getBindUserIp(bindUserDO);
-        if(steamWeb.checkLogin(bindUserDO,bindUserIp)){
+        if(steamWeb.checkLogin(bindUserDO)){
             bindUserDO.setLoginCookie(steamWeb.getCookieString());
         }
         steamWeb.initTradeUrl();

@@ -4,7 +4,9 @@ import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.bindipaddress.BindIpaddressDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
@@ -13,6 +15,8 @@ import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.SteamService;
+import cn.iocoder.yudao.module.steam.service.SteamWeb;
+import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
@@ -51,6 +55,10 @@ public class InvExtService {
     private PaySteamOrderService paySteamOrderService;
     @Resource
     private SteamService steamService;
+    @Resource
+    private ConfigService configService;
+    @Resource
+    private BindUserService bindUserService;
 
     public void fetchInv(BindUserDO bindUserDO){
         InventoryDto inventoryDto = gitInvFromSteam(bindUserDO);
@@ -233,6 +241,16 @@ public class InvExtService {
     }
     // 从steam获取用户库存信息
     public InventoryDto gitInvFromSteam (BindUserDO bindUserDO)  {
+        SteamWeb steamWeb=new SteamWeb(configService,steamService.getBindUserIp(bindUserDO));
+        if(steamWeb.checkLogin(bindUserDO)){
+            if(steamWeb.getWebApiKey().isPresent()){
+                bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
+            }
+            if(Objects.nonNull(steamWeb.getCookieString())){
+                bindUserDO.setLoginCookie(steamWeb.getCookieString());
+            }
+            bindUserService.changeBindUserCookie(new BindUserDO().setId(bindUserDO.getId()).setLoginCookie(steamWeb.getCookieString()).setApiKey(bindUserDO.getApiKey()));
+        }
         HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
         builder.url("https://steamcommunity.com/inventory/"+bindUserDO.getSteamId()+"/730/2?l=schinese&count=1000");
         Map<String, String> header = new HashMap<>();
@@ -242,6 +260,7 @@ public class InvExtService {
         pathVar.put("steamId", bindUserDO.getSteamId());
         pathVar.put("app", "730");
         builder.pathVar(pathVar);
+        builder.cookieString(bindUserDO.getLoginCookie());
         HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),steamService.getBindUserIp(bindUserDO));
         if (Objects.isNull(proxyResponseVo.getStatus()) || proxyResponseVo.getStatus() != 200) {
             throw new ServiceException(-1, "初始化steam失败");

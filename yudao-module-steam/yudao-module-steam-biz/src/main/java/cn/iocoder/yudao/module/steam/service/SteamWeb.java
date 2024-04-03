@@ -94,7 +94,7 @@ public class SteamWeb {
      * @param bindUserDO 登录用户信息
      * @return true 用户cookie有更新， falsecookie没有更新   有更新需要及时保存起
      */
-    public boolean checkLogin(BindUserDO bindUserDO, Optional<BindIpaddressDO> bindIpaddressDOOptional){
+    public boolean checkLogin(BindUserDO bindUserDO){
         this.cookieString=bindUserDO.getLoginCookie();
         try{
             steamMaFile = bindUserDO.getMaFile();

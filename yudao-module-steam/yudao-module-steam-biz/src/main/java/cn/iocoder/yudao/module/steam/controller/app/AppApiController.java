@@ -294,7 +294,7 @@ public class AppApiController {
                 }
                 Optional<BindIpaddressDO> bindUserIp = steamService.getBindUserIp(bindUserDO);
                 SteamWeb steamWeb = new SteamWeb(configService,bindUserIp);
-                if (steamWeb.checkLogin(bindUserDO,bindUserIp)) {
+                if (steamWeb.checkLogin(bindUserDO)) {
                     ConfigSaveReqVO configSaveReqVO = new ConfigSaveReqVO();
                     if (Objects.isNull(configCookie)) {
                         configSaveReqVO.setCategory("steam.bot");

@@ -956,7 +956,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             //发货
             Optional<BindIpaddressDO> bindUserIp = steamService.getBindUserIp(bindUserDO1);
             SteamWeb steamWeb=new SteamWeb(configService,bindUserIp);
-            if(steamWeb.checkLogin(bindUserDO1,bindUserIp)){
+            if(steamWeb.checkLogin(bindUserDO1)){
                 if(steamWeb.getWebApiKey().isPresent()){
                     bindUserDO1.setApiKey(steamWeb.getWebApiKey().get());
                 }
@@ -1065,7 +1065,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             if(Objects.isNull(bindUserDO.getApiKey())){
                 Optional<BindIpaddressDO> bindUserIp = steamService.getBindUserIp(bindUserDO);
                 SteamWeb steamWeb=new SteamWeb(configService,bindUserIp);
-                if(steamWeb.checkLogin(bindUserDO,bindUserIp)){
+                if(steamWeb.checkLogin(bindUserDO)){
                     if(steamWeb.getWebApiKey().isPresent()){
                         bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
                     }
@@ -1110,7 +1110,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         try{
             Optional<BindIpaddressDO> bindUserIp = steamService.getBindUserIp(bindUserDO);
             SteamWeb steamWeb=new SteamWeb(configService,bindUserIp);
-            if(steamWeb.checkLogin(bindUserDO,bindUserIp)){
+            if(steamWeb.checkLogin(bindUserDO)){
                 if(steamWeb.getWebApiKey().isPresent()){
                     bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
                 }
