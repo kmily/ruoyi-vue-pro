@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.service.seltype;
 
+import cn.iocoder.yudao.module.steam.dal.mysql.seltype.SelTypeMapperExt;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -32,6 +33,8 @@ public class SelTypeServiceImpl implements SelTypeService {
     private SelTypeMapper selTypeMapper;
     @Resource
     private SelWeaponMapper selWeaponMapper;
+    @Resource
+    private SelTypeMapperExt selTypeMapperExt;
 
     @Override
     public Long createSelType(SelTypeSaveReqVO createReqVO) {
@@ -76,7 +79,7 @@ public class SelTypeServiceImpl implements SelTypeService {
 
     @Override
     public PageResult<SelTypeDO> getSelTypePage(SelTypePageReqVO pageReqVO) {
-        return selTypeMapper.selectPage(pageReqVO);
+        return selTypeMapperExt.selectPage(pageReqVO);
     }
 
     // ==================== 子表（武器选择） ====================
