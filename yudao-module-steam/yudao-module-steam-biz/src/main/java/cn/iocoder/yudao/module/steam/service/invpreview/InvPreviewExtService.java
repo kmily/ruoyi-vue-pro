@@ -145,7 +145,7 @@ public class InvPreviewExtService {
         List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>().isNotNull(SellingDO::getDisplayWeight));
 
         // 按 display_weight 字段进行排序,数字越小权重越大
-        List<SellingDO> sortedList = sellingDOS.stream()
+        List<SellingDO> sortedList = sellingDOS.parallelStream()
                 .sorted(Comparator.comparingInt(SellingDO::getDisplayWeight))
                 .collect(Collectors.toList());
 
@@ -156,12 +156,6 @@ public class InvPreviewExtService {
         int endIndex = Math.min(startIndex + pageSize, sortedList.size());
         List<SellingDO> resultList = sortedList.subList(startIndex, endIndex);
 
-        // 价格单位转换:分 -> 元
-        resultList.forEach(item -> {
-            if (Objects.nonNull(item.getPrice())) {
-                item.setPrice(new BigDecimal(item.getPrice()).divide(new BigDecimal("100")).intValue());
-            }
-        });
 
         List<SellingHotDO> sellingHotDOList = new ArrayList<>();
 
@@ -182,16 +176,11 @@ public class InvPreviewExtService {
 
         // 统计每个 market_hash_name 的数量和最低价格
         Map<String, Integer> sellNumMap = new HashMap<>();
-        Map<String, Integer> minPriceMap = new HashMap<>();
         for (SellingDO item : sellingDOS) {
             String marketHashName = item.getMarketHashName();
             int sellNum = sellNumMap.getOrDefault(marketHashName, 0) + 1;
             sellNumMap.put(marketHashName, sellNum);
 
-            int price = item.getPrice() != null ? item.getPrice() : Integer.MIN_VALUE;
-            if (!minPriceMap.containsKey(marketHashName) || price < minPriceMap.get(marketHashName)) {
-                minPriceMap.put(marketHashName, price);
-            }
         }
 
         for (SellingDO item : resultList) {
@@ -225,7 +214,7 @@ public class InvPreviewExtService {
             }
 
             sellingHotDO.setIconUrl(item.getIconUrl());
-            sellingHotDO.setPrice(minPriceMap.get(item.getMarketHashName()));
+            sellingHotDO.setPrice(item.getPrice());
             sellingHotDO.setItemInfo(c5ItemInfo);
             sellingHotDO.setDisplayWeight(item.getDisplayWeight());
             sellingHotDO.setMarketName(item.getMarketName());
