@@ -106,7 +106,7 @@ public class SellingExtService {
                 throw new ServiceException(-1, "物品描述信息未查找到");
             }
             Long l = sellingMapper.selectCount(new LambdaQueryWrapperX<SellingDO>()
-                    .eq(SellingDO::getId, item.getId())
+                    .eq(SellingDO::getInvId, item.getId())
             );
             if (l > 0) {
                 throw new ServiceException(-1, "该物品已上架");
@@ -382,9 +382,31 @@ public class SellingExtService {
     }
 
 
-    public void showGoodsWithMarketName(GoodsWithMarketHashNameReqVO sellingPageReqVO) {
+    /**
+     *   WearCategory0  崭新出厂
+     *   WearCategory1  略有磨损
+     *   WearCategory2  久经沙场
+     *   WearCategory3  破损不堪
+     *   WearCategory4  战痕累累
+     * @param sellingPageReqVO
+     */
+    public Map<String, Integer> showGoodsWithMarketName(GoodsWithMarketHashNameReqVO sellingPageReqVO) {
         List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
-                .eq(SellingDO::getMarketHashName, sellingPageReqVO.getMarketHashName()));
+                .eq(SellingDO::getShortName,sellingPageReqVO.getShortName()));
+
+//        List<SellingDO> list = new ArrayList<>();
+        Map<String, Integer> map = new HashMap<>();
+        for (SellingDO sellingDO : sellingDOS) {
+            if(!map.containsKey(sellingDO.getSelExterior())){
+                map.put(sellingDO.getSelExterior(),sellingDO.getPrice());
+            }
+            for(Map.Entry<String, Integer> element : map.entrySet()){
+                if(element.getKey().equals(sellingDO.getSelExterior()) && element.getValue() > sellingDO.getPrice()){
+                    map.put(sellingDO.getSelExterior(),sellingDO.getPrice());
+                }
+            }
+        }
+        return map;
     }
 }
 
