@@ -398,10 +398,9 @@ public class SteamService {
             post.put("openid.assoc_handle",openApi.getAssocHandle());
             post.put("openid.signed",openApi.getSigned());
             post.put("openid.sig",openApi.getSig());
-//            builder.form(post);
             HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
-            builder.url(configByKey.getValue() + "/openid/login");
             builder.form(post);
+            builder.url(configByKey.getValue() + "/openid/login");
 
             HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build());
             log.error("steam返回{}",proxyResponseVo);

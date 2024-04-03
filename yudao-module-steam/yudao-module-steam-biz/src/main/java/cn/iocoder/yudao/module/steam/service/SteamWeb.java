@@ -134,9 +134,14 @@ public class SteamWeb {
         stringStringHashMap.put("username", steamMaFile.getAccountName());
         stringStringHashMap.put("password", passwd);
         stringStringHashMap.put("token_code", steamMaFile.getSharedSecret());
+        if(bindIpaddressDOOptional.isPresent()){
+            stringStringHashMap.put("ip", bindIpaddressDOOptional.get().getIpAddress()+":"+bindIpaddressDOOptional.get().getPort());
+        }else{
+            stringStringHashMap.put("ip", "");
+        }
         builder.form(stringStringHashMap);
         try{
-            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),bindIpaddressDOOptional);
+            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),Optional.empty());
             if(Objects.nonNull(proxyResponseVo.getStatus()) && proxyResponseVo.getStatus()==200){
                 SteamCookie steamCookie = objectMapper.readValue(proxyResponseVo.getHtml(), SteamCookie.class);
                 if (steamCookie.getCode() != 0) {
