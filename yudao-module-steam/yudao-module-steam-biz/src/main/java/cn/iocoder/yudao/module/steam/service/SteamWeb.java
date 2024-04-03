@@ -1,18 +1,10 @@
 package cn.iocoder.yudao.module.steam.service;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
-import cn.iocoder.yudao.module.steam.controller.admin.binduser.vo.BindUserSaveReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.bindipaddress.BindIpaddressDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
-import cn.iocoder.yudao.module.steam.dal.mysql.bindipaddress.BindIpaddressMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
-import cn.iocoder.yudao.module.steam.service.bindipaddress.BindIpaddressService;
-import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.steam.*;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -247,12 +239,6 @@ public class SteamWeb {
     /**
      * 初始化交易链接
      */
-    @Resource
-    private BindIpaddressMapper bindIpaddressMapper;
-    @Resource
-    private BindUserService bindUserService;
-    @Resource
-    private BindIpaddressService bindIpaddressService;
     public void initTradeUrl() {
         if (!steamId.isPresent()) {
             initApiKey();
@@ -276,21 +262,6 @@ public class SteamWeb {
         Matcher matcher = pattern.matcher(proxyResponseVo.getHtml());
         if (matcher.find()) {
             treadUrl = Optional.of(matcher.group(1));
-
-            List<Long> idList = bindIpaddressMapper.selectList(new QueryWrapperX<BindIpaddressDO>().select("id")).stream()
-                    .map(BindIpaddressDO::getId) // 假设BindIpaddressDO有一个getId()方法
-                    .collect(Collectors.toList());
-
-            Random random = new Random();
-            int randomIndex = random.nextInt(idList.size());
-            int randomId = Math.toIntExact(idList.get(randomIndex));
-
-            // 创建BindUserDO对象并设置addressId
-            BindUserSaveReqVO bindUserDO = new BindUserSaveReqVO();
-            bindUserDO.setAddressId((long) randomId);
-
-            // 调用服务更新BindUserDO对象
-            bindUserService.updateBindUser(bindUserDO);
         } else {
             log.error("获取tradeUrl失败steamId{}", steamId);
             throw new ServiceException(-1, "获取tradeUrl失败");
