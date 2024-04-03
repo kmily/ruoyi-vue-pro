@@ -10,33 +10,29 @@ import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.AppMergeToSell
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPageReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.SteamInvService;
-import cn.iocoder.yudao.module.steam.service.inv.InvService;
 import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
-import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
-import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
-import lombok.Data;
+import jodd.time.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
-import java.sql.Array;
-import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -68,6 +64,9 @@ public class AppInventorySearchController {
     private IOInvUpdateService ioInvUpdateService;
     @Resource
     private RabbitTemplate rabbitTemplate;
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
     /**
      * 用户手动查询自己的 steam_inv 库存（从数据库中获取数据）
@@ -194,7 +193,15 @@ public class AppInventorySearchController {
         if(!first.isPresent()){
             throw new ServiceException(-1,"您没有权限获取该用户的库存信息");
         }
+        stringRedisTemplate.opsForValue().set("IVN_Fetch"+first.get().getId(),"OK", 60, TimeUnit.SECONDS);
         rabbitTemplate.convertAndSend("steam","steam_inv", first.get().getId());
+        while (Objects.nonNull(stringRedisTemplate.opsForValue().get("IVN_Fetch"+first.get().getId()))){
+            try {
+                Thread.sleep(200l);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         return success(new ArrayList<>());
     }
 }
