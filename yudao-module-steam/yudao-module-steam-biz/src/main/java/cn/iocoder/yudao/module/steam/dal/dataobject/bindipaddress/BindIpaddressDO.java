@@ -32,10 +32,6 @@ public class BindIpaddressDO extends BaseDO {
      */
     private Integer port;
     /**
-     * 地址池id
-     */
-    private Long addressId;
-    /**
      * ip地址
      */
     private String ipAddress;

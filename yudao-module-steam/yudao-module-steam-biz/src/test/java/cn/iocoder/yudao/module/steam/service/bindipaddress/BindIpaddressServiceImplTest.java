@@ -111,7 +111,6 @@ public class BindIpaddressServiceImplTest extends BaseDbUnitTest {
        BindIpaddressDO dbBindIpaddress = randomPojo(BindIpaddressDO.class, o -> { // 等会查询到
            o.setPort(null);
            o.setCreateTime(null);
-           o.setAddressId(null);
            o.setIpAddress(null);
        });
        bindIpaddressMapper.insert(dbBindIpaddress);
@@ -119,8 +118,6 @@ public class BindIpaddressServiceImplTest extends BaseDbUnitTest {
        bindIpaddressMapper.insert(cloneIgnoreId(dbBindIpaddress, o -> o.setPort(null)));
        // 测试 createTime 不匹配
        bindIpaddressMapper.insert(cloneIgnoreId(dbBindIpaddress, o -> o.setCreateTime(null)));
-       // 测试 addressId 不匹配
-       bindIpaddressMapper.insert(cloneIgnoreId(dbBindIpaddress, o -> o.setAddressId(null)));
        // 测试 ipAddress 不匹配
        bindIpaddressMapper.insert(cloneIgnoreId(dbBindIpaddress, o -> o.setIpAddress(null)));
        // 准备参数
