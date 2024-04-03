@@ -119,9 +119,9 @@ public class AppWalletController {
     @Operation(summary = "成交记录查询")
     @PostMapping("/getSoldInfo")
     @PermitAll
-    public ApiResult<List<SellingDO>> getSoldInfo(@RequestBody SellingPageReqVO reqVO) {
+    public CommonResult<List<SellingDO>> getSoldInfo(@RequestBody SellingPageReqVO reqVO) {
         List<SellingDO> soldInfo = invOrderExtService.getSoldInfo(reqVO);
-        return ApiResult.success(soldInfo);
+        return CommonResult.success(soldInfo);
     }
 
 
