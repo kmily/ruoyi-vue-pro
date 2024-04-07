@@ -159,7 +159,6 @@ public class SellingServiceImplTest extends BaseDbUnitTest {
        sellingMapper.insert(cloneIgnoreId(dbSelling, o -> o.setShortName(null)));
        // 准备参数
        SellingPageReqVO reqVO = new SellingPageReqVO();
-       reqVO.setId(null);
        reqVO.setAssetid(null);
        reqVO.setSteamId(null);
        reqVO.setStatus(null);
