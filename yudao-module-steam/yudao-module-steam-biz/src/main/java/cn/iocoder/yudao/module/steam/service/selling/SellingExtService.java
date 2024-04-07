@@ -390,23 +390,80 @@ public class SellingExtService {
      *   WearCategory4  战痕累累
      * @param sellingPageReqVO
      */
-    public Map<String, Integer> showGoodsWithMarketName(GoodsWithMarketHashNameReqVO sellingPageReqVO) {
+    public  List<GoodsAbrasionDTO> showGoodsWithMarketName(GoodsWithMarketHashNameReqVO sellingPageReqVO) {
         List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
                 .eq(SellingDO::getShortName,sellingPageReqVO.getShortName()));
+        if(sellingDOS.isEmpty()){
+            List<GoodsAbrasionDTO> list = new  ArrayList<>();
+            return list;
+        }
 
-//        List<SellingDO> list = new ArrayList<>();
-        Map<String, Integer> map = new HashMap<>();
+        List<GoodsAbrasionDTO> list = new  ArrayList<>();
         for (SellingDO sellingDO : sellingDOS) {
-            if(!map.containsKey(sellingDO.getSelExterior())){
-                map.put(sellingDO.getSelExterior(),sellingDO.getPrice());
-            }
-            for(Map.Entry<String, Integer> element : map.entrySet()){
-                if(element.getKey().equals(sellingDO.getSelExterior()) && element.getValue() > sellingDO.getPrice()){
-                    map.put(sellingDO.getSelExterior(),sellingDO.getPrice());
-                }
+            switch (sellingDO.getSelExterior()){
+                case "WearCategory0":
+                    GoodsAbrasionDTO goodsAbrasionDTO = new GoodsAbrasionDTO();
+                    goodsAbrasionDTO.setSelExterior("崭新出厂");
+                    goodsAbrasionDTO.setShortName(sellingDO.getShortName());
+                    goodsAbrasionDTO.setPrice(sellingDO.getPrice());
+                    goodsAbrasionDTO.setMarketHashName(sellingDO.getMarketHashName());
+                    if(!list.contains(goodsAbrasionDTO) ){
+                        list.add(goodsAbrasionDTO);
+                    }
+                    break;
+                case "WearCategory1":
+                    GoodsAbrasionDTO goodsAbrasionDTO1 = new GoodsAbrasionDTO();
+                    goodsAbrasionDTO1.setSelExterior("略有磨损");
+                    goodsAbrasionDTO1.setShortName(sellingDO.getShortName());
+                    goodsAbrasionDTO1.setPrice(sellingDO.getPrice());
+                    goodsAbrasionDTO1.setMarketHashName(sellingDO.getMarketHashName());
+                    if(!list.contains(goodsAbrasionDTO1)){
+                        list.add(goodsAbrasionDTO1);
+                    }
+                    break;
+                case "WearCategory2":
+                    GoodsAbrasionDTO goodsAbrasionDTO2 = new GoodsAbrasionDTO();
+                    goodsAbrasionDTO2.setSelExterior("久经沙场");
+                    goodsAbrasionDTO2.setShortName(sellingDO.getShortName());
+                    goodsAbrasionDTO2.setPrice(sellingDO.getPrice());
+                    goodsAbrasionDTO2.setMarketHashName(sellingDO.getMarketHashName());
+                    if(!list.contains(goodsAbrasionDTO2)){
+                        list.add(goodsAbrasionDTO2);
+                    }
+                    break;
+                case "WearCategory3":
+                    GoodsAbrasionDTO goodsAbrasionDTO3 = new GoodsAbrasionDTO();
+                    goodsAbrasionDTO3.setSelExterior("破损不堪");
+                    goodsAbrasionDTO3.setShortName(sellingDO.getShortName());
+                    goodsAbrasionDTO3.setPrice(sellingDO.getPrice());
+                    goodsAbrasionDTO3.setMarketHashName(sellingDO.getMarketHashName());
+                    if(!list.contains(goodsAbrasionDTO3)){
+                        list.add(goodsAbrasionDTO3);
+                    }
+                    break;
+                case "WearCategory4":
+                    GoodsAbrasionDTO goodsAbrasionDTO4 = new GoodsAbrasionDTO();
+                    goodsAbrasionDTO4.setSelExterior("战痕累累");
+                    goodsAbrasionDTO4.setShortName(sellingDO.getShortName());
+                    goodsAbrasionDTO4.setPrice(sellingDO.getPrice());
+                    goodsAbrasionDTO4.setMarketHashName(sellingDO.getMarketHashName());
+                    if(!list.contains(goodsAbrasionDTO4)){
+                        list.add(goodsAbrasionDTO4);
+                    }
+                    break;
+                case "WearCategoryNA":
+                    GoodsAbrasionDTO goodsAbrasionDTONA = new GoodsAbrasionDTO();
+                    goodsAbrasionDTONA.setSelExterior("无涂装");
+                    goodsAbrasionDTONA.setShortName(sellingDO.getShortName());
+                    goodsAbrasionDTONA.setPrice(sellingDO.getPrice());
+                    goodsAbrasionDTONA.setMarketHashName(sellingDO.getMarketHashName());
+                    if(!list.contains(goodsAbrasionDTONA)){
+                        list.add(goodsAbrasionDTONA);
+                    }
             }
         }
-        return map;
+
+        return list;
     }
 }
 
