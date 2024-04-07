@@ -69,6 +69,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,6 +83,7 @@ import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static cn.hutool.core.util.ObjectUtil.notEqual;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -181,6 +183,9 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
     public void setUuService(UUService uuService) {
         this.uuService = uuService;
     }
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
     public PaySteamOrderServiceImpl() {
     }
@@ -1063,39 +1068,19 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
         if(InvTransferStatusEnum.TransferFINISH.getStatus().equals(invOrder.getTransferStatus())){
             //发货完成时
             BindUserDO bindUserDO = bindUserService.getBindUser(sellingDO.getBindUserId());
-            if(Objects.isNull(bindUserDO)){
-                throw new ServiceException(-1,"绑定用户已失效，无法检测。");
-            }
-            if(Objects.isNull(bindUserDO.getApiKey())){
-                Optional<BindIpaddressDO> bindUserIp = steamService.getBindUserIp(bindUserDO);
-                SteamWeb steamWeb=new SteamWeb(configService,bindUserIp);
-                if(steamWeb.checkLogin(bindUserDO)){
-                    if(steamWeb.getWebApiKey().isPresent()){
-                        bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
-                    }
-                    bindUserService.changeBindUserCookie(new BindUserDO().setId(bindUserDO.getId()).setLoginCookie(steamWeb.getCookieString()).setApiKey(bindUserDO.getApiKey()));
-                }else{
-                    if(steamWeb.getWebApiKey().isPresent()){
-                        bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
-                    }
-                }
-            }
-            if(Objects.isNull(bindUserDO.getApiKey())){
-                throw new ServiceException(-1,"无法获取用户apikey。");
-            }
-            TradeOfferInfo tradeOffInfo = getTradeOffInfoV2(bindUserDO, invOrder.getTransferText().getTradeofferid());
+            Integer tradeOffInfoV2 = getTradeOffInfoV2(bindUserDO, invOrder.getTransferText().getTradeofferid());
             //steam返回HttpUtil.ProxyResponseVo(html={"response":{"offer":{"tradeofferid":"6840142603","accountid_other":1447022566,"message":"io661 订单号:INV202403161428161商户号:WEBINV202403161428161 时间2024-03-16T14:28:21.581","expiration_time":1711780108,"trade_offer_state":2,"items_to_give":[{"appid":730,"contextid":"2","assetid":"35965233242","classid":"4901046679","instanceid":"302028390","amount":"1","missing":false,"est_usd":"19"}],"is_our_offer":true,"time_created":1710570508,"time_updated":1710570511,"from_real_time_trade":false,"escrow_end_date":0,"confirmation_method":2,"eresult":1}}}, status=200, cookies={}, headers={connection=[keep-alive], content-type=[application/json; charset=UTF-8], date=[Sat, 16 Mar 2024 07:26:34 GMT], expires=[Sat, 16 Mar 2024 07:26:34 GMT], server=[nginx], vary=[Accept-Encoding], x-eresult=[1]})
             //TradeOfferInfo(response=TradeOfferInfo.ResponseDTO(offer=TradeOfferInfo.ResponseDTO.OfferDTO(tradeofferid=6840143366, accountidOther=1447022566, message=io661 订单号:INV202403161428451商户号:WEBINV202403161428451 时间2024-03-16T14:28:46.093, expirationTime=1711780130, tradeOfferState=2, itemsToGive=[TradeOfferInfo.ResponseDTO.OfferDTO.ItemsToGiveDTO(appid=730, contextid=2, assetid=35965237262, classid=4901046679, instanceid=302028390, amount=1, missing=false, estUsd=19)], isOurOffer=true, timeCreated=1710570530, timeUpdated=1710570531, fromRealTimeTrade=false, escrowEndDate=0, confirmationMethod=2, eresult=1)))
             //| TradeOfferInfo(response=TradeOfferInfo.ResponseDTO(offer=TradeOfferInfo.ResponseDTO.OfferDTO(tradeofferid=6840179532, accountidOther=1447022566, message=io661 订单号:INV202403161444071商户号:WEBINV202403161444071 时间2024-03-16T14:44:46.077, expirationTime=1711781090, tradeOfferState=3, itemsToGive=[TradeOfferInfo.ResponseDTO.OfferDTO.ItemsToGiveDTO(appid=730, contextid=2, assetid=35932930022, classid=4428807494, instanceid=188530170, amount=1, missing=true, estUsd=30)], isOurOffer=true, timeCreated=1710571490, timeUpdated=1710573937, fromRealTimeTrade=false, escrowEndDate=0, confirmationMethod=2, eresult=1)))
             // | TradeOfferInfo(response=TradeOfferInfo.ResponseDTO(offer=TradeOfferInfo.ResponseDTO.OfferDTO(tradeofferid=6840143840, accountidOther=1447022566, message=io661 订单号:INV202403161429001商户号:WEBINV202403161429001 时间2024-03-16T14:29:01.417, expirationTime=1711780145, tradeOfferState=7, itemsToGive=[TradeOfferInfo.ResponseDTO.OfferDTO.ItemsToGiveDTO(appid=730, contextid=2, assetid=35681966414, classid=4901046679, instanceid=302028390, amount=1, missing=false, estUsd=19)], isOurOffer=true, timeCreated=1710570545, timeUpdated=1710573962, fromRealTimeTrade=false, escrowEndDate=0, confirmationMethod=2, eresult=1)))
-            log.info("{}",tradeOffInfo);
-            if(tradeOffInfo.getResponse().getOffer().getTradeOfferState() ==3){
+            log.info("tradeOffInfoV2 {}",tradeOffInfoV2);
+            if(tradeOffInfoV2 ==3){
                 //打款
                 cashInvOrder(invOrderId);
-            }else if(tradeOffInfo.getResponse().getOffer().getTradeOfferState() ==7){
+            }else if(tradeOffInfoV2 ==7){
                 //买家取消
                 damagesCloseInvOrder(invOrderId);
-            }else if(tradeOffInfo.getResponse().getOffer().getTradeOfferState() ==6){
+            }else if(tradeOffInfoV2 ==6){
                 //卖家取消息
                 damagesCloseInvOrder(invOrderId);
             }else{
@@ -1107,7 +1092,15 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             }
         }
     }
-    private TradeOfferInfo getTradeOffInfoV2(BindUserDO bindUserDO,String tradeOfferId) {
+
+    /**
+     * 返回订单状态
+     *
+     * @param bindUserDO
+     * @param tradeOfferId
+     * @return  3交易成功，7，6 交易失败
+     */
+    private Integer getTradeOffInfoV2(BindUserDO bindUserDO,String tradeOfferId) {
         try{
             Optional<BindIpaddressDO> bindUserIp = steamService.getBindUserIp(bindUserDO);
             SteamWeb steamWeb=new SteamWeb(configService,bindUserIp);
@@ -1117,26 +1110,45 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
                 }
                 bindUserService.changeBindUserCookie(new BindUserDO().setId(bindUserDO.getId()).setLoginCookie(steamWeb.getCookieString()).setApiKey(bindUserDO.getApiKey()));
             }
+            String s1 = stringRedisTemplate.opsForValue().get("steam_order" + bindUserDO.getSteamId());
+            if(Objects.isNull(s1)){
+                HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
+                Map<String, String> header = new HashMap<>();
+                header.put("Accept-Language", "zh-CN,zh;q=0.9");
+                builder.headers(header);
+                builder.url("https://steamcommunity.com/profiles/:steamId/tradeoffers/sent/");
+                Map<String, String> pathVar = new HashMap<>();
+                pathVar.put("steamId", bindUserDO.getSteamId());
+                builder.pathVar(pathVar);
+                builder.cookieString(bindUserDO.getLoginCookie());
 
-            HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
-            Map<String, String> header = new HashMap<>();
-            header.put("Accept-Language", "zh-CN,zh;q=0.9");
-            builder.headers(header);
-            builder.url("https://steamcommunity.com/profiles/:steamId/tradeoffers/sent/");
-            Map<String, String> pathVar = new HashMap<>();
-            pathVar.put("steamId", bindUserDO.getSteamId());
-            builder.pathVar(pathVar);
-            builder.cookieString(bindUserDO.getLoginCookie());
+                HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),bindUserIp);
 
-            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),bindUserIp);
+                log.error("steam返回{}",proxyResponseVo);
+                if(Objects.nonNull(proxyResponseVo.getStatus()) && proxyResponseVo.getStatus()==200){
+                    s1=proxyResponseVo.getHtml();
+                    stringRedisTemplate.opsForValue().set("steam_order" + bindUserDO.getSteamId(),s1,5, TimeUnit.MINUTES);
+                }
+            }
+            log.error("steam返回{}",s1);
+            if(Objects.nonNull(s1)){
+                Document parse = Jsoup.parse(s1);
+                Element tradeofferInfo = parse.body().getElementById("tradeofferid_"+tradeOfferId);
+                if(Objects.nonNull(tradeofferInfo)){
+                    String s = tradeofferInfo.toString();
+                    if(s.contains("取消交易报价")){//还未确认
+                        return 2;
+                    }
+                    if(s.contains("接受了交易")){//接受了交易
+                        return 3;
+                    }
+                    if(s.contains("交易于") && s.contains("拒绝")){//还未确认
+                        return 6;
+                    }
+                }
 
-            log.error("steam返回{}",proxyResponseVo);
-            if(Objects.nonNull(proxyResponseVo.getStatus()) && proxyResponseVo.getStatus()==200){
-                String html = proxyResponseVo.getHtml();
-                Document parse = Jsoup.parse(html);
-                Element tradeofferid_6902922077 = parse.body().getElementById("tradeofferid_6902922077");
 
-                return objectMapper.readValue(html, TradeOfferInfo.class);
+                return 2;
             }else{
                 throw new ServiceException(-1,"Steam openid 接口验证异常");
             }
