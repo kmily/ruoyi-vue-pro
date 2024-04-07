@@ -65,6 +65,9 @@ import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -1080,7 +1083,7 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             if(Objects.isNull(bindUserDO.getApiKey())){
                 throw new ServiceException(-1,"无法获取用户apikey。");
             }
-            TradeOfferInfo tradeOffInfo = getTradeOffInfo(bindUserDO, invOrder.getTransferText().getTradeofferid());
+            TradeOfferInfo tradeOffInfo = getTradeOffInfoV2(bindUserDO, invOrder.getTransferText().getTradeofferid());
             //steam返回HttpUtil.ProxyResponseVo(html={"response":{"offer":{"tradeofferid":"6840142603","accountid_other":1447022566,"message":"io661 订单号:INV202403161428161商户号:WEBINV202403161428161 时间2024-03-16T14:28:21.581","expiration_time":1711780108,"trade_offer_state":2,"items_to_give":[{"appid":730,"contextid":"2","assetid":"35965233242","classid":"4901046679","instanceid":"302028390","amount":"1","missing":false,"est_usd":"19"}],"is_our_offer":true,"time_created":1710570508,"time_updated":1710570511,"from_real_time_trade":false,"escrow_end_date":0,"confirmation_method":2,"eresult":1}}}, status=200, cookies={}, headers={connection=[keep-alive], content-type=[application/json; charset=UTF-8], date=[Sat, 16 Mar 2024 07:26:34 GMT], expires=[Sat, 16 Mar 2024 07:26:34 GMT], server=[nginx], vary=[Accept-Encoding], x-eresult=[1]})
             //TradeOfferInfo(response=TradeOfferInfo.ResponseDTO(offer=TradeOfferInfo.ResponseDTO.OfferDTO(tradeofferid=6840143366, accountidOther=1447022566, message=io661 订单号:INV202403161428451商户号:WEBINV202403161428451 时间2024-03-16T14:28:46.093, expirationTime=1711780130, tradeOfferState=2, itemsToGive=[TradeOfferInfo.ResponseDTO.OfferDTO.ItemsToGiveDTO(appid=730, contextid=2, assetid=35965237262, classid=4901046679, instanceid=302028390, amount=1, missing=false, estUsd=19)], isOurOffer=true, timeCreated=1710570530, timeUpdated=1710570531, fromRealTimeTrade=false, escrowEndDate=0, confirmationMethod=2, eresult=1)))
             //| TradeOfferInfo(response=TradeOfferInfo.ResponseDTO(offer=TradeOfferInfo.ResponseDTO.OfferDTO(tradeofferid=6840179532, accountidOther=1447022566, message=io661 订单号:INV202403161444071商户号:WEBINV202403161444071 时间2024-03-16T14:44:46.077, expirationTime=1711781090, tradeOfferState=3, itemsToGive=[TradeOfferInfo.ResponseDTO.OfferDTO.ItemsToGiveDTO(appid=730, contextid=2, assetid=35932930022, classid=4428807494, instanceid=188530170, amount=1, missing=true, estUsd=30)], isOurOffer=true, timeCreated=1710571490, timeUpdated=1710573937, fromRealTimeTrade=false, escrowEndDate=0, confirmationMethod=2, eresult=1)))
@@ -1104,12 +1107,52 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
             }
         }
     }
+    private TradeOfferInfo getTradeOffInfoV2(BindUserDO bindUserDO,String tradeOfferId) {
+        try{
+            Optional<BindIpaddressDO> bindUserIp = steamService.getBindUserIp(bindUserDO);
+            SteamWeb steamWeb=new SteamWeb(configService,bindUserIp);
+            if(steamWeb.checkLogin(bindUserDO)){
+                if(steamWeb.getWebApiKey().isPresent()){
+                    bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
+                }
+                bindUserService.changeBindUserCookie(new BindUserDO().setId(bindUserDO.getId()).setLoginCookie(steamWeb.getCookieString()).setApiKey(bindUserDO.getApiKey()));
+            }
+
+            HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
+            Map<String, String> header = new HashMap<>();
+            header.put("Accept-Language", "zh-CN,zh;q=0.9");
+            builder.headers(header);
+            builder.url("https://steamcommunity.com/profiles/:steamId/tradeoffers/sent/");
+            Map<String, String> pathVar = new HashMap<>();
+            pathVar.put("steamId", bindUserDO.getSteamId());
+            builder.pathVar(pathVar);
+            builder.cookieString(bindUserDO.getLoginCookie());
+
+            HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),bindUserIp);
+
+            log.error("steam返回{}",proxyResponseVo);
+            if(Objects.nonNull(proxyResponseVo.getStatus()) && proxyResponseVo.getStatus()==200){
+                String html = proxyResponseVo.getHtml();
+                Document parse = Jsoup.parse(html);
+                Element tradeofferid_6902922077 = parse.body().getElementById("tradeofferid_6902922077");
+
+                return objectMapper.readValue(html, TradeOfferInfo.class);
+            }else{
+                throw new ServiceException(-1,"Steam openid 接口验证异常");
+            }
+        }catch (Exception e){
+            log.error("解析出错原因{}",e.getMessage());
+            throw new ServiceException(-1,"Steam openid1 接口验证异常");
+        }
+    }
     /**
      * 获取订单信息
+     * 方法已废弃，接口不可用
      * @param bindUserDO
      * @param tradeOfferId
      * @return
      */
+    @Deprecated
     private TradeOfferInfo getTradeOffInfo(BindUserDO bindUserDO,String tradeOfferId) {
         try{
             Optional<BindIpaddressDO> bindUserIp = steamService.getBindUserIp(bindUserDO);
