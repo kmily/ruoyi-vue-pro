@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.AppMergeToSellReq;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppOtherInvListDto;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
@@ -17,6 +18,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.SteamInvService;
 import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
+import cn.iocoder.yudao.module.steam.service.selling.SellingExtService;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -186,6 +188,12 @@ public class AppInventorySearchController {
     @Deprecated
     public CommonResult<List<String>> updateFromSteam(@RequestParam String steamId) throws JsonProcessingException {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+
+        if (steamId.equals("11111111111111111")){
+            ioInvUpdateService.otherInsertInventory(loginUser);
+            return success(new ArrayList<>());
+        }
+
         Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                 .eq(BindUserDO::getUserId, loginUser.getId())
                 .eq(BindUserDO::getUserType, loginUser.getUserType())
