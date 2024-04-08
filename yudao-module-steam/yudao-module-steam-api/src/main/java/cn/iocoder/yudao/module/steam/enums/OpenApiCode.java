@@ -31,4 +31,6 @@ public interface OpenApiCode {
     ErrorCode ERR_5406 = new ErrorCode(5406, "代购对象Steam被封禁，无法交易");
     ErrorCode ERR_5407 = new ErrorCode(5407, "不可输入本人交易链接");
     ErrorCode ERR_5408 = new ErrorCode(5408, "代购对象的交易链接格式错误");
+    //----open api
+    ErrorCode TO_MANY_ITEM = new ErrorCode(8001, "查询数据过多");
 }
