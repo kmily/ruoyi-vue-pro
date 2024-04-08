@@ -142,10 +142,14 @@ public class InvPreviewExtService {
 
     public PageResult<SellingHotDO> getHot(SellingPageReqVO pageReqVO) {
         // 获取所有数据
-        List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>().eq(SellingDO::getDisplayWeight,1));
+        List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
+                .isNotNull(SellingDO::getDisplayWeight));
+
 
         // 按 display_weight 字段进行排序,数字越小权重越大
         List<SellingDO> sortedList = sellingDOS.parallelStream()
+                .limit(30)
+                .sorted(Comparator.comparingInt(SellingDO::getDisplayWeight))
                 .collect(Collectors.toList());
 
         // 分页处理

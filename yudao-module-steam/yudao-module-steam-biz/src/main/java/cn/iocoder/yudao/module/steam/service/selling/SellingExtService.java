@@ -94,14 +94,23 @@ public class SellingExtService {
                 log.error("价格信息未查找到{},{}", item, reqVo.getItems());
                 throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
             }
+
             BatchSellReqVo.Item itemPriceInfo = first.get();
             item.setPrice(itemPriceInfo.getPrice());
             item.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
             invMapper.updateById(item);
-            Optional<InvDescDO> invDescDO = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
-                    .eq(InvDescDO::getClassid, item.getClassid())
-                    .eq(InvDescDO::getSteamId, item.getSteamId())
-                    .eq(InvDescDO::getInstanceid, item.getInstanceid())).stream().findFirst();
+            Optional<InvDescDO> invDescDO;
+            String tempSteamId = "11111111111111111";
+            if(!item.getSteamId().equals(tempSteamId)){
+                invDescDO = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+                        .eq(InvDescDO::getClassid, item.getClassid())
+                        .eq(InvDescDO::getSteamId, item.getSteamId())
+                        .eq(InvDescDO::getInstanceid, item.getInstanceid())).stream().findFirst();
+            }else{
+                invDescDO = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+                        .eq(InvDescDO::getId, item.getInvDescId())).stream().findFirst();
+            }
+
             if (!invDescDO.isPresent()) {
                 throw new ServiceException(-1, "物品描述信息未查找到");
             }

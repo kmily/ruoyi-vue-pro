@@ -2,8 +2,12 @@ package cn.iocoder.yudao.module.steam.service.ioinvupdate;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppOtherInvListDto;
+import cn.iocoder.yudao.module.steam.controller.app.selling.vo.BatchSellReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodityDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
@@ -13,20 +17,29 @@ import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.SteamService;
+import cn.iocoder.yudao.module.steam.service.selling.SellingExtService;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
+import cn.iocoder.yudao.module.steam.service.steam.OtherSellingStatusEnum;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
+import com.alipay.api.domain.Product;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.scheduling.annotation.Async;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class IOInvUpdateService {
@@ -48,6 +61,8 @@ public class IOInvUpdateService {
 
     @Resource
     private SteamService steamService;
+    @Resource
+    private SellingExtService sellingExtService;
 
 
 //    @Async
@@ -306,5 +321,92 @@ public class IOInvUpdateService {
         }
 
 
+    // 其他平台饰品入库
+    @Transactional
+    public void otherInsertInventory(LoginUser loginUser) {
+        int page = 1;
+        String tempSteamId = "11111111111111111";
+        String classId = "1111111111";
+        String instanceId = "111111111";
+        String assetId = "11111111111";
+        invDescMapper.delete(new LambdaQueryWrapperX<InvDescDO>().eq(InvDescDO::getSteamId, tempSteamId));
+        invMapper.delete(new LambdaQueryWrapperX<InvDO>().eq(InvDO::getSteamId, tempSteamId));
+        sellingMapper.delete(new LambdaQueryWrapperX<SellingDO>().eq(SellingDO::getSteamId, tempSteamId));
+        do {
+            OkHttpClient client = new OkHttpClient();
+
+            String url = "https://app.zbt.com/open/product/v2/search?appId=730&language=zh-CN&app-key=3453fd2c502c51bcd6a7a68c6e812f85&limit=10000&page=" + Integer.toString(page++);
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    throw new IOException("Unexpected code " + response);
+                } else {
+                    String responseBody = response.body().string();
+                    AppOtherInvListDto response_ = objectMapper.readValue(responseBody, new TypeReference<AppOtherInvListDto>() {
+                    });
+                    List<BatchSellReqVo.Item> sellList = new ArrayList<BatchSellReqVo.Item>();
+                    for (AppOtherInvListDto.Data_.GoodsInfo item : response_.getData().getList()) {
+                        // 跳過
+                        if (item.getPriceInfo().getAutoDeliverQuantity() <= 0) {
+                            continue;
+                        }
+                        // inv_desc 表入库
+                        InvDescDO invDescDO = new InvDescDO();
+                        invDescDO.setSteamId(tempSteamId);
+                        invDescDO.setAppid(730);
+                        invDescDO.setClassid(classId);
+                        invDescDO.setInstanceid(instanceId);
+                        invDescDO.setCurrency(0);
+                        invDescDO.setBackgroundColor("");
+                        invDescDO.setIconUrl(item.getImageUrl());
+                        invDescDO.setIconUrlLarge(item.getImageUrl());
+                        invDescDO.setTradable(1);
+                        invDescDO.setName(item.getShortName());
+                        invDescDO.setNameColor("D2D2D2");
+                        invDescDO.setType(item.getType());
+                        invDescDO.setMarketName(item.getItemName());
+                        invDescDO.setMarketHashName(item.getMarketHashName());
+                        invDescDO.setCommodity(1);
+                        invDescDO.setMarketTradableRestriction(7);
+                        invDescDO.setMarketable(1);
+                        invDescDO.setPlatformIdentity(OtherSellingStatusEnum.C5.getStatus());
+                        invDescMapper.insert(invDescDO);
+                        // inv 表入库
+                        InvDO invDO = new InvDO();
+                        invDO.setInvDescId(invDescDO.getId());
+                        invDO.setClassid(classId);
+                        invDO.setInstanceid(instanceId);
+                        invDO.setAppid(730);
+                        invDO.setAssetid(assetId);
+                        invDO.setAmount("1");
+                        invDO.setSteamId(tempSteamId);
+                        invDO.setPrice(0);
+                        invDO.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
+                        invDO.setUserId(328L);
+                        invDO.setUserType(1);
+                        invDO.setBindUserId(114L);
+                        invDO.setContextid("2");
+                        invDO.setPlatformIdentity(OtherSellingStatusEnum.C5.getStatus());
+                        invMapper.insert(invDO);
+
+                        BatchSellReqVo.Item sellInfo = new BatchSellReqVo.Item();
+                        sellInfo.setId(invDO.getId());
+                        sellInfo.setPrice((int) (item.getPriceInfo().getAutoDeliverPrice() * 6.5 * 100));
+                        sellList.add(sellInfo);
+                    }
+                    BatchSellReqVo reqVo = new BatchSellReqVo();
+                    reqVo.setItems(sellList);
+                    sellingExtService.batchSale(reqVo,loginUser);
+                    if(page >= response_.getData().getPages()){
+                        break;
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }while (true);
     }
+}
 
