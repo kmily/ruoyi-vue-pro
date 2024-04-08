@@ -384,7 +384,7 @@ public class IOInvUpdateService {
                         invDO.setSteamId(tempSteamId);
                         invDO.setPrice(0);
                         invDO.setTransferStatus(InvTransferStatusEnum.INIT.getStatus());
-                        invDO.setUserId(328L);
+                        invDO.setUserId(304L);
                         invDO.setUserType(1);
                         invDO.setBindUserId(114L);
                         invDO.setContextid("2");
