@@ -200,7 +200,7 @@ public class AppIo661ApiController {
         List<AppBatchGetOnSaleCommodityInfoRespVO> ret=new ArrayList<>();
         try {
             return DevAccountUtils.tenantExecute(1L, () -> {
-//                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 if(Objects.isNull(openApiReqVo.getData().getRequestList()) || openApiReqVo.getData().getRequestList().size()<=0){
                     throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
                 }
