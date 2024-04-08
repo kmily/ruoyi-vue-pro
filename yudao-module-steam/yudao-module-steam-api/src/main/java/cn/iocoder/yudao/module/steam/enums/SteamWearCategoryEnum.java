@@ -17,4 +17,16 @@ public enum SteamWearCategoryEnum {
         this.name = name;
         this.color = color;
     }
+
+    public String getCode() {
+        return code;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getColor() {
+        return color;
+    }
 }
