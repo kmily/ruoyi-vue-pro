@@ -16,10 +16,16 @@ import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppSellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.SellListItemResp;
+import cn.iocoder.yudao.module.steam.controller.app.vo.api.AppBatchGetOnSaleCommodityInfoRespVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingExtMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingHashSummary;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
+import cn.iocoder.yudao.module.steam.enums.SteamQualityEnum;
+import cn.iocoder.yudao.module.steam.enums.SteamRarityEnum;
+import cn.iocoder.yudao.module.steam.enums.SteamWearCategoryEnum;
 import cn.iocoder.yudao.module.steam.service.invdesc.InvDescService;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
@@ -51,6 +57,9 @@ public class SellingsearchService {
     private InvDescService invDescService;
     @Resource
     private MemberUserApi memberUserApi;
+
+    @Resource
+    private SellingExtMapper sellingExtMapper;
     //TODO 导航栏搜索
     public PageResult<SellListItemResp> sellList(AppSellingPageReqVO pageReqVO){
         PageResult<SellingDO> sellingDOPageResult = sellingMapper.selectPage(pageReqVO, new LambdaQueryWrapperX<SellingDO>()
@@ -136,5 +145,34 @@ public class SellingsearchService {
                 .like(SellingDO::getMarketName, pageReqVO.getMarketName()));
             invPage.setTotal(Long.valueOf(sellingDOS.size()));
         return new PageResult<>(sellingDOS, invPage.getTotal());
+    }
+
+    /**
+     * 根据hashnaem进行统计
+     * @param marketHashName
+     */
+    public List<AppBatchGetOnSaleCommodityInfoRespVO> summaryByHashName(List<String> marketHashName) {
+        List<SellingHashSummary> sellingHashSummaries = sellingExtMapper.SelectByHashName(marketHashName);
+        return sellingHashSummaries.stream().map(item->{
+            AppBatchGetOnSaleCommodityInfoRespVO appBatchGetOnSaleCommodityInfoRespVO = new AppBatchGetOnSaleCommodityInfoRespVO();
+            AppBatchGetOnSaleCommodityInfoRespVO.SaleCommodityResponseDTO saleCommodityResponseDTO = new AppBatchGetOnSaleCommodityInfoRespVO.SaleCommodityResponseDTO();
+            saleCommodityResponseDTO.setSellNum(item.getSellNum());
+            saleCommodityResponseDTO.setMinSellPrice(item.getMinSellPrice());
+            appBatchGetOnSaleCommodityInfoRespVO.setSaleCommodityResponse(saleCommodityResponseDTO);
+            AppBatchGetOnSaleCommodityInfoRespVO.SaleTemplateResponseDTO saleTemplateResponseDTO = new AppBatchGetOnSaleCommodityInfoRespVO.SaleTemplateResponseDTO();
+            saleTemplateResponseDTO.setTemplateHashName(item.getMarketHashName());
+            saleTemplateResponseDTO.setIconUrl(item.getIconUrl());
+            if(Objects.nonNull(item.getSelRarity())){
+                saleTemplateResponseDTO.setRarityName(SteamRarityEnum.valueOf(item.getSelRarity()).getName());
+            }
+            if(Objects.nonNull(item.getSelQuality())){
+                saleTemplateResponseDTO.setQualityName(SteamQualityEnum.valueOf(item.getSelQuality()).getName());
+            }
+            if(Objects.nonNull(item.getSelExterior())){
+                saleTemplateResponseDTO.setExteriorName(SteamWearCategoryEnum.valueOf(item.getSelExterior()).getName());
+            }
+            appBatchGetOnSaleCommodityInfoRespVO.setSaleTemplateResponse(saleTemplateResponseDTO);
+            return appBatchGetOnSaleCommodityInfoRespVO;
+        }).collect(Collectors.toList());
     }
 }
