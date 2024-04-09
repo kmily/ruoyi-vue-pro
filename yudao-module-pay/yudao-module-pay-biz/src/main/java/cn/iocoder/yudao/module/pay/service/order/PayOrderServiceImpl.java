@@ -51,10 +51,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
@@ -174,13 +171,14 @@ public class PayOrderServiceImpl implements PayOrderService {
                 .setStatus(PayOrderStatusEnum.WAITING.getStatus());
         orderExtensionMapper.insert(orderExtension);
 
-        ConfigDO configAlipayName = configService.getConfigByKey("alipay.name");
-        ConfigDO configAlipayUserId = configService.getConfigByKey("alipay.ALIPAY_USER_ID");
-        reqVO.getChannelExtras().put("configAlipayName",configAlipayName.getValue());
-        reqVO.getChannelExtras().put("configAlipayUserId",configAlipayUserId.getValue());
-
-
         if(Objects.equals(channel.getCode(), PayChannelEnum.ALIPAY_AQF.getCode())){
+            if(Objects.isNull(reqVO.getChannelExtras())){
+                reqVO.setChannelExtras(new HashMap<>());
+            }
+            ConfigDO configAlipayName = configService.getConfigByKey("alipay.name");
+            ConfigDO configAlipayUserId = configService.getConfigByKey("alipay.ALIPAY_USER_ID");
+            reqVO.getChannelExtras().put("configAlipayName",configAlipayName.getValue());
+            reqVO.getChannelExtras().put("configAlipayUserId",configAlipayUserId.getValue());
             Long userId = getLoginUserId();
             String agreementNo=reqVO.getChannelExtras().get("book_agreement_no");
             SteamAlipayAqfSignDO steamAlipayAqfSignDO=steamAlipayAqfSignMapper.selectOne(new QueryWrapper<SteamAlipayAqfSignDO>()
