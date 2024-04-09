@@ -28,6 +28,8 @@ public enum PayChannelEnum {
     ALIPAY_APP("alipay_app", "支付宝App 支付", AlipayPayClientConfig.class),
     ALIPAY_QR("alipay_qr", "支付宝扫码支付", AlipayPayClientConfig.class),
     ALIPAY_BAR("alipay_bar", "支付宝条码支付", AlipayPayClientConfig.class),
+    ALIPAY_PLFKDYMZH("alipay_plfkdymzh","支付宝批量付款到户有密",AlipayPayClientConfig.class),
+    ALIPAY_AQF("alipay_aqf","支付宝安全发-服务商模式(单笔转账到支付宝账户)",AlipayPayClientConfig.class),
     MOCK("mock", "模拟支付", NonePayClientConfig.class),
 
     WALLET("wallet", "钱包支付", NonePayClientConfig.class);

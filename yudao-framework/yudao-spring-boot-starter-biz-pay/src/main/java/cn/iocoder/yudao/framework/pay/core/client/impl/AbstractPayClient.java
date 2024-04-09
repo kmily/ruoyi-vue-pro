@@ -12,6 +12,7 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferRespDT
 import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.exception.PayException;
 import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
+import com.alipay.api.AlipayApiException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -54,6 +55,10 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     public final void init() {
         doInit();
         log.debug("[init][客户端({}) 初始化完成]", getId());
+    }
+    @Override
+    public Map<String, String> doParseNotify(Map<String, String> params, String body) throws AlipayApiException {
+        return null;
     }
 
     /**

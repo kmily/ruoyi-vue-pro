@@ -32,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -55,6 +56,20 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
 
     public AbstractAlipayPayClient(Long channelId, String channelCode, AlipayPayClientConfig config) {
         super(channelId, channelCode, config);
+    }
+    @Override
+    public Map<String, String> doParseNotify(Map<String, String> params, String body) throws AlipayApiException {
+        // 1. 校验回调数据
+        Map<String, String> bodyObj = HttpUtil.decodeParamMap(body, StandardCharsets.UTF_8);
+        Map<String,String> newParams=new HashMap<String,String>(){{
+            putAll(bodyObj);
+            putAll(params);
+        }};
+//        AlipaySignature.certVerifyV2(newParams, config.getAlipayPublicKey(),
+//                StandardCharsets.UTF_8.name(), config.getSignType());
+        return newParams;
+        // 2. 解析订单的状态
+        // 额外说明：支付宝不仅仅支付成功会回调，再各种触发支付单数据变化时，都会进行回调，所以这里 status 的解析会写的比较复杂
     }
 
     @Override
