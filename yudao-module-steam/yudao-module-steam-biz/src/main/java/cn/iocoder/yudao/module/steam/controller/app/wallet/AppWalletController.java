@@ -25,6 +25,7 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
+import cn.iocoder.yudao.module.steam.service.fin.IoGenOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
@@ -51,6 +52,8 @@ public class AppWalletController {
 
     @Resource
     private PaySteamOrderService paySteamOrderService;
+    @Resource
+    private IoGenOrderService ioGenOrderService;
 
     @Resource
     private UUOrderService uUOrderService;
@@ -70,7 +73,7 @@ public class AppWalletController {
     @Idempotent(timeout = 60, timeUnit = TimeUnit.SECONDS, message = "操作太快，请稍后再试")
     public CommonResult<CreateOrderResult> createWithdrawal(@Valid @RequestBody PayWithdrawalOrderCreateReqVO createReqVO) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        CreateOrderResult withdrawalOrder = paySteamOrderService.createWithdrawalOrder(loginUser, createReqVO);
+        CreateOrderResult withdrawalOrder = ioGenOrderService.createWithdrawalOrder(loginUser, createReqVO);
         //自动支付
         return CommonResult.success(withdrawalOrder);
     }
@@ -79,7 +82,7 @@ public class AppWalletController {
     @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
     @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
     public CommonResult<Boolean> withdrawalUpdateOrderPaid(@RequestBody PayOrderNotifyReqDTO notifyReqDTO) {
-        paySteamOrderService.updateWithdrawalOrderPaid(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
+        ioGenOrderService.updateWithdrawalOrderPaid(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
                 notifyReqDTO.getPayOrderId());
         return success(true);
     }

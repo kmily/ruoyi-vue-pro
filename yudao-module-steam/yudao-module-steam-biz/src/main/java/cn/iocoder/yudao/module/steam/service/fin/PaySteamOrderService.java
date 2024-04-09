@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
-import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 
@@ -18,21 +17,6 @@ import java.util.List;
  * @author glzaboy
  */
 public interface PaySteamOrderService {
-    /**
-     * 创建提现订单
-     *
-     * @param loginUser      用户
-     * @param createReqVO 创建信息
-     * @return 编号
-     */
-    CreateOrderResult createWithdrawalOrder(LoginUser loginUser, @Valid PayWithdrawalOrderCreateReqVO createReqVO);
-    /**
-     * 更新提现订单为已支付
-     *
-     * @param id 编号
-     * @param payOrderId 支付订单号
-     */
-    void updateWithdrawalOrderPaid(Long id, Long payOrderId);
     /**
      * 创建示例订单
      *
