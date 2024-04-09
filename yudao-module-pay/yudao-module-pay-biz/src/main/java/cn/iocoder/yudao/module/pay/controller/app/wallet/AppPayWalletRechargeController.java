@@ -50,7 +50,7 @@ public class AppPayWalletRechargeController {
 
     @PostMapping("/create")
     @Operation(summary = "创建钱包充值记录（发起充值）")
-    @Idempotent(timeout = 60, timeUnit = TimeUnit.SECONDS, message = "操作太快，请稍后再试")
+//    @Idempotent(timeout = 60, timeUnit = TimeUnit.SECONDS, message = "操作太快，请稍后再试")
     public CommonResult<AppPayWalletRechargeCreateRespVO> createWalletRecharge(
             @Valid @RequestBody  AppPayWalletRechargeCreateReqVO reqVO) {
         PayWalletRechargeDO walletRecharge = walletRechargeService.createWalletRecharge(

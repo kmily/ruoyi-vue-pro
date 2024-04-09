@@ -4,14 +4,19 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipaySafePayClient;
+import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
+import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
+import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderPageReqVO;
@@ -22,8 +27,10 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.sign.SteamAlipayAqfSignDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderExtensionMapper;
 import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderMapper;
+import cn.iocoder.yudao.module.pay.dal.mysql.sign.SteamAlipayAqfSignMapper;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
@@ -31,6 +38,11 @@ import cn.iocoder.yudao.module.pay.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
+import com.alipay.api.AlipayApiException;
+import com.alipay.api.response.AlipayFundAccountbookCreateResponse;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,13 +51,11 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
+import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 
 /**
@@ -74,6 +84,10 @@ public class PayOrderServiceImpl implements PayOrderService {
     private PayChannelService channelService;
     @Resource
     private PayNotifyService notifyService;
+    @Resource
+    private ConfigService configService;
+    @Resource
+    private SteamAlipayAqfSignMapper steamAlipayAqfSignMapper;
 
     @Override
     public PayOrderDO getOrder(Long id) {
@@ -133,6 +147,13 @@ public class PayOrderServiceImpl implements PayOrderService {
         orderMapper.insert(order);
         return order.getId();
     }
+    @Override
+    public String AliPayYHSQXYQY() {
+        // 根据指定类型的管道构建支付对象
+        PayClient client=channelService.getPayClient(15L);
+
+        return null;
+    }
 
     @Override // 注意，这里不能添加事务注解，避免调用支付渠道失败时，将 PayOrderExtensionDO 回滚了
     public PayOrderSubmitRespVO submitOrder(PayOrderSubmitReqVO reqVO, String userIp) {
@@ -150,6 +171,52 @@ public class PayOrderServiceImpl implements PayOrderService {
                 .setStatus(PayOrderStatusEnum.WAITING.getStatus());
         orderExtensionMapper.insert(orderExtension);
 
+        if(Objects.equals(channel.getCode(), PayChannelEnum.ALIPAY_AQF.getCode())){
+            if(Objects.isNull(reqVO.getChannelExtras())){
+                reqVO.setChannelExtras(new HashMap<>());
+            }
+            ConfigDO configAlipayName = configService.getConfigByKey("alipay.name");
+            ConfigDO configAlipayUserId = configService.getConfigByKey("alipay.ALIPAY_USER_ID");
+            reqVO.getChannelExtras().put("configAlipayName",configAlipayName.getValue());
+            reqVO.getChannelExtras().put("configAlipayUserId",configAlipayUserId.getValue());
+            Long userId = getLoginUserId();
+            String agreementNo=reqVO.getChannelExtras().get("book_agreement_no");
+            SteamAlipayAqfSignDO steamAlipayAqfSignDO=steamAlipayAqfSignMapper.selectOne(new QueryWrapper<SteamAlipayAqfSignDO>()
+                    .eq("create_user_id",userId)
+                    .eq("agreement_no",agreementNo));
+            if(!ObjectUtil.isEmpty(steamAlipayAqfSignDO)){
+                if(ObjectUtil.isEmpty(steamAlipayAqfSignDO.getAccountBookId())){
+                    AlipaySafePayClient safePayClient=(AlipaySafePayClient)client;
+                    AlipayFundAccountbookCreateResponse response= null;
+                    try {
+                        response = safePayClient.alipayFundAccountbookCreate(String.valueOf(userId),agreementNo);
+                    } catch (AlipayApiException e) {
+                        throw new RuntimeException(e);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                    if(response.isSuccess()){
+                        steamAlipayAqfSignMapper.update(
+                                new UpdateWrapper<SteamAlipayAqfSignDO>()
+                                        .eq("create_user_id",userId)
+                                        .eq("agreement_no",agreementNo)
+                                        .set("account_book_id",response.getAccountBookId())
+                                        .set("is_accountbook",1)
+                        );
+                        reqVO.getChannelExtras().put("account_book_id",response.getAccountBookId());
+                    }else{
+                        throw new ServiceException(400001,"创建记账本失败");
+                    }
+                }else{
+                    reqVO.getChannelExtras().put("account_book_id",steamAlipayAqfSignDO.getAccountBookId());
+                }
+
+
+            }else{
+                throw new ServiceException(400000,"签约协议不存在");
+            }
+
+        }
         // 3. 调用三方接口
         PayOrderUnifiedReqDTO unifiedOrderReqDTO = PayOrderConvert.INSTANCE.convert2(reqVO, userIp)
                 // 商户相关的字段

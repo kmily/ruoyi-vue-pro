@@ -99,6 +99,34 @@
             </el-button>
           </template>
         </el-table-column>
+
+        <!-- 新增支付宝支付 -->
+        <el-table-column :label="payChannelEnum.ALIPAY_AQF.name" align="center">
+          <template v-slot="scope">
+            <el-button type="success" icon="el-icon-check" circle
+                       v-if="isChannelExists(scope.row.channelCodes, payChannelEnum.ALIPAY_AQF.code)"
+                       @click="handleChannel(scope.row,payChannelEnum.ALIPAY_AQF.code)">
+            </el-button>
+            <el-button v-else type="danger" icon="el-icon-close" circle
+                       @click="handleChannel(scope.row, payChannelEnum.ALIPAY_AQF.code)">
+            </el-button>
+          </template>
+        </el-table-column>
+
+                <!-- 新增支付宝支付 -->
+                <el-table-column :label="payChannelEnum.ALIPAY_PLFKDYMZH.name" align="center">
+          <template v-slot="scope">
+            <el-button type="success" icon="el-icon-check" circle
+                       v-if="isChannelExists(scope.row.channelCodes, payChannelEnum.ALIPAY_PLFKDYMZH.code)"
+                       @click="handleChannel(scope.row,payChannelEnum.ALIPAY_PLFKDYMZH.code)">
+            </el-button>
+            <el-button v-else type="danger" icon="el-icon-close" circle
+                       @click="handleChannel(scope.row, payChannelEnum.ALIPAY_PLFKDYMZH.code)">
+            </el-button>
+          </template>
+        </el-table-column>
+
+
       </el-table-column>
       <el-table-column label="微信配置" align="center">
         <el-table-column :label="payChannelEnum.WX_LITE.name" align="center">
