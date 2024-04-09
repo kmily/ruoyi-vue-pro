@@ -6,19 +6,24 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.steam.controller.admin.otherselling.vo.OtherSellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.otherselling.OtherSellingDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.otherselling.OtherSellingMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
+import cn.iocoder.yudao.module.steam.service.otherselling.OtherSellingService;
+import cn.iocoder.yudao.module.steam.service.otherselling.vo.OtherSellingListDo;
 import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 
@@ -54,6 +59,12 @@ public class SellingExtService {
     private PaySteamOrderService paySteamOrderService;
     @Resource
     private InvPreviewMapper invPreviewMapper;
+
+    @Resource
+    private OtherSellingService otherSellingService;
+
+    @Resource
+    private OtherSellingMapper otherSellingMapper;
 
     @Transactional(rollbackFor = ServiceException.class)
     public void batchSale(BatchSellReqVo reqVo, LoginUser loginUser) {
@@ -417,5 +428,33 @@ public class SellingExtService {
         }
         return map;
     }
+
+    public PageResult<OtherSellingPageReqVO> otherSale(SellingDO sellingDO) {
+
+        List<OtherSellingDO> otherSellingDO = otherSellingMapper.selectList(new LambdaQueryWrapperX<OtherSellingDO>()
+                .eq(OtherSellingDO::getMarketHashName, sellingDO.getMarketHashName()));
+
+        List<OtherSellingListDo> otherSellingPageReqVOS = new ArrayList<>();
+        for (OtherSellingDO element : otherSellingDO){
+            OtherSellingListDo otherSellingListDo = new OtherSellingListDo();
+            otherSellingListDo.setMarketHashName(element.getMarketHashName());
+            otherSellingListDo.setPrice(element.getPrice());
+            otherSellingListDo.setIconUrl(element.getIconUrl());
+            otherSellingListDo.setSellingAvator(element.getSellingAvator());
+            otherSellingListDo.setSellingUserName(element.getSellingUserName());
+            otherSellingListDo.setSelType(element.getSelType());
+            otherSellingListDo.setSelExterior(element.getSelExterior());
+            otherSellingListDo.setSelQuality(element.getSelQuality());
+            otherSellingListDo.setSelRarity(element.getSelRarity());
+            otherSellingListDo.setAppid(element.getAppid());
+            otherSellingListDo.setMarketName(element.getMarketName());
+            otherSellingListDo.setPlatformIdentity(element.getPlatformIdentity());
+            otherSellingPageReqVOS.add(otherSellingListDo);
+
+        }
+
+        return new PageResult(otherSellingPageReqVOS, (long) otherSellingDO.size());
+    }
+
 }
 

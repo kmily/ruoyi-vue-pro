@@ -6,8 +6,11 @@ import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.steam.controller.admin.otherselling.vo.OtherSellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.*;
+import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
+import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
 import cn.iocoder.yudao.module.steam.service.selling.SellingExtService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -30,6 +32,8 @@ public class AppSellingController {
 
     @Resource
     private SellingExtService sellingExtService;
+    @Resource
+    private IOInvUpdateService ioInvUpdateService;
 
     @PostMapping("/batchSale")
     @Operation(summary = "批量上架")
@@ -76,6 +80,18 @@ public class AppSellingController {
     public CommonResult<Map<String, Integer>> showGoodsWithMarketHashName(@RequestBody @Valid GoodsWithMarketHashNameReqVO reqVO) {
         Map<String, Integer> map = sellingExtService.showGoodsWithMarketName(reqVO);
         return CommonResult.success(map);
+    }
+
+    @PostMapping("/otherSale")
+    @Operation(summary = "其他平台在售")
+    @Idempotent(timeout = 30, timeUnit = TimeUnit.SECONDS, message = "操作太快，请稍后再试")
+    @PreAuthenticated
+    public CommonResult<PageResult<OtherSellingPageReqVO>> otherSale(@RequestBody @Valid SellingDO sellingDO) {
+
+
+        PageResult<OtherSellingPageReqVO> otherSellingDO = sellingExtService.otherSale(sellingDO);
+
+        return CommonResult.success(otherSellingDO);
     }
 }
 
