@@ -1,13 +1,17 @@
 package cn.iocoder.yudao.module.steam.service.selling;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.steam.controller.admin.otherselling.vo.OtherSellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.SellListItemResp;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
@@ -34,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -65,6 +70,8 @@ public class SellingExtService {
 
     @Resource
     private OtherSellingMapper otherSellingMapper;
+
+    private MemberUserApi memberUserApi;
 
     @Transactional(rollbackFor = ServiceException.class)
     public void batchSale(BatchSellReqVo reqVo, LoginUser loginUser) {
@@ -112,12 +119,12 @@ public class SellingExtService {
             invMapper.updateById(item);
             Optional<InvDescDO> invDescDO;
             String tempSteamId = "11111111111111111";
-            if(!item.getSteamId().equals(tempSteamId)){
+            if (!item.getSteamId().equals(tempSteamId)) {
                 invDescDO = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
                         .eq(InvDescDO::getClassid, item.getClassid())
                         .eq(InvDescDO::getSteamId, item.getSteamId())
                         .eq(InvDescDO::getInstanceid, item.getInstanceid())).stream().findFirst();
-            }else{
+            } else {
                 invDescDO = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
                         .eq(InvDescDO::getId, item.getInvDescId())).stream().findFirst();
             }
@@ -403,26 +410,27 @@ public class SellingExtService {
 
 
     /**
-     *   WearCategory0  崭新出厂
-     *   WearCategory1  略有磨损
-     *   WearCategory2  久经沙场
-     *   WearCategory3  破损不堪
-     *   WearCategory4  战痕累累
+     * WearCategory0  崭新出厂
+     * WearCategory1  略有磨损
+     * WearCategory2  久经沙场
+     * WearCategory3  破损不堪
+     * WearCategory4  战痕累累
+     *
      * @param sellingPageReqVO
      */
     public Map<String, Integer> showGoodsWithMarketName(GoodsWithMarketHashNameReqVO sellingPageReqVO) {
         List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
-                .eq(SellingDO::getShortName,sellingPageReqVO.getShortName()));
+                .eq(SellingDO::getShortName, sellingPageReqVO.getShortName()));
 
 //        List<SellingDO> list = new ArrayList<>();
         Map<String, Integer> map = new HashMap<>();
         for (SellingDO sellingDO : sellingDOS) {
-            if(!map.containsKey(sellingDO.getSelExterior())){
-                map.put(sellingDO.getSelExterior(),sellingDO.getPrice());
+            if (!map.containsKey(sellingDO.getSelExterior())) {
+                map.put(sellingDO.getSelExterior(), sellingDO.getPrice());
             }
-            for(Map.Entry<String, Integer> element : map.entrySet()){
-                if(element.getKey().equals(sellingDO.getSelExterior()) && element.getValue() > sellingDO.getPrice()){
-                    map.put(sellingDO.getSelExterior(),sellingDO.getPrice());
+            for (Map.Entry<String, Integer> element : map.entrySet()) {
+                if (element.getKey().equals(sellingDO.getSelExterior()) && element.getValue() > sellingDO.getPrice()) {
+                    map.put(sellingDO.getSelExterior(), sellingDO.getPrice());
                 }
             }
         }
@@ -435,13 +443,11 @@ public class SellingExtService {
                 .eq(OtherSellingDO::getMarketHashName, sellingDO.getMarketHashName()));
 
         List<OtherSellingListDo> otherSellingPageReqVOS = new ArrayList<>();
-        for (OtherSellingDO element : otherSellingDO){
+        for (OtherSellingDO element : otherSellingDO) {
             OtherSellingListDo otherSellingListDo = new OtherSellingListDo();
             otherSellingListDo.setMarketHashName(element.getMarketHashName());
             otherSellingListDo.setPrice(element.getPrice());
             otherSellingListDo.setIconUrl(element.getIconUrl());
-            otherSellingListDo.setSellingAvator(element.getSellingAvator());
-            otherSellingListDo.setSellingUserName(element.getSellingUserName());
             otherSellingListDo.setSelType(element.getSelType());
             otherSellingListDo.setSelExterior(element.getSelExterior());
             otherSellingListDo.setSelQuality(element.getSelQuality());
@@ -450,11 +456,19 @@ public class SellingExtService {
             otherSellingListDo.setMarketName(element.getMarketName());
             otherSellingListDo.setPlatformIdentity(element.getPlatformIdentity());
             otherSellingPageReqVOS.add(otherSellingListDo);
-
+            for (OtherSellingListDo item : otherSellingPageReqVOS) {
+                MemberUserRespDTO memberUserRespDTO = new MemberUserRespDTO();
+                memberUserRespDTO.setNickname(element.getSellingUserName());
+                memberUserRespDTO.setAvatar(element.getSellingAvator());
+                memberUserRespDTO.setMobile("");
+                memberUserRespDTO.setStatus(999);
+                memberUserRespDTO.setPoint(999);
+                memberUserRespDTO.setCreateTime(LocalDateTime.now());
+                memberUserRespDTO.setLevelId(999l);
+                item.setMemberUserRespDTO(memberUserRespDTO);
+            }
         }
-
         return new PageResult(otherSellingPageReqVOS, (long) otherSellingDO.size());
     }
-
 }
 

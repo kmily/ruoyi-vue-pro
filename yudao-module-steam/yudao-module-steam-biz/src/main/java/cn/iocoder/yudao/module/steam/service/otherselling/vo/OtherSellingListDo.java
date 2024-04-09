@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.steam.service.otherselling.vo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -39,12 +40,8 @@ public class OtherSellingListDo extends PageParam {
     @Schema(description = "marketHashName", example = "赵六")
     private String marketHashName;
 
-    @Schema(description = "出售用户名字", example = "李四")
-    private String sellingUserName;
-
-    @Schema(description = "出售用户头像")
-    private String sellingAvator;
-
     @Schema(description = "出售平台id")
     private Integer platformIdentity;
+
+    private MemberUserRespDTO memberUserRespDTO;
 }
