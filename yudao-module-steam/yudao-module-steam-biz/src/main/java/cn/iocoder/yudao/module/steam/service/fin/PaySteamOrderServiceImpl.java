@@ -118,8 +118,6 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
 
     @Resource
     private InvOrderMapper invOrderMapper;
-    @Resource
-    private WithdrawalMapper withdrawalMapper;
 
     @Resource
     private BindUserMapper bindUserMapper;
@@ -135,9 +133,6 @@ public class PaySteamOrderServiceImpl implements PaySteamOrderService {
 
     @Resource
     private ConfigService configService;
-
-    @Resource
-    private PayChannelService channelService;
 
 
     private PayOrderService payOrderService;
