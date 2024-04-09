@@ -443,6 +443,7 @@ public class SellingExtService {
                 .eq(OtherSellingDO::getMarketHashName, sellingDO.getMarketHashName()));
 
         List<OtherSellingListDo> otherSellingPageReqVOS = new ArrayList<>();
+
         for (OtherSellingDO element : otherSellingDO) {
             OtherSellingListDo otherSellingListDo = new OtherSellingListDo();
             otherSellingListDo.setMarketHashName(element.getMarketHashName());
@@ -455,20 +456,20 @@ public class SellingExtService {
             otherSellingListDo.setAppid(element.getAppid());
             otherSellingListDo.setMarketName(element.getMarketName());
             otherSellingListDo.setPlatformIdentity(element.getPlatformIdentity());
+
+            MemberUserRespDTO memberUserRespDTO = new MemberUserRespDTO();
+            memberUserRespDTO.setNickname(element.getSellingUserName());
+            memberUserRespDTO.setAvatar(element.getSellingAvator());
+            memberUserRespDTO.setMobile("");
+            memberUserRespDTO.setStatus(999);
+            memberUserRespDTO.setPoint(999);
+            memberUserRespDTO.setCreateTime(LocalDateTime.now());
+            memberUserRespDTO.setLevelId(999l);
+            otherSellingListDo.setMemberUserRespDTO(memberUserRespDTO);
             otherSellingPageReqVOS.add(otherSellingListDo);
-            for (OtherSellingListDo item : otherSellingPageReqVOS) {
-                MemberUserRespDTO memberUserRespDTO = new MemberUserRespDTO();
-                memberUserRespDTO.setNickname(element.getSellingUserName());
-                memberUserRespDTO.setAvatar(element.getSellingAvator());
-                memberUserRespDTO.setMobile("");
-                memberUserRespDTO.setStatus(999);
-                memberUserRespDTO.setPoint(999);
-                memberUserRespDTO.setCreateTime(LocalDateTime.now());
-                memberUserRespDTO.setLevelId(999l);
-                item.setMemberUserRespDTO(memberUserRespDTO);
-            }
         }
         return new PageResult(otherSellingPageReqVOS, (long) otherSellingDO.size());
     }
+
 }
 

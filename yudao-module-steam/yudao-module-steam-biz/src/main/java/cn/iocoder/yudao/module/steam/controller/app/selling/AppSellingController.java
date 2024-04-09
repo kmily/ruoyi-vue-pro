@@ -84,7 +84,6 @@ public class AppSellingController {
 
     @PostMapping("/otherSale")
     @Operation(summary = "其他平台在售")
-    @Idempotent(timeout = 30, timeUnit = TimeUnit.SECONDS, message = "操作太快，请稍后再试")
     @PreAuthenticated
     public CommonResult<PageResult<OtherSellingPageReqVO>> otherSale(@RequestBody @Valid SellingDO sellingDO) {
 
