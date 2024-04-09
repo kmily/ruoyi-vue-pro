@@ -79,7 +79,7 @@ public class AlipayPLFKDHYMController {
         // 执行成功
         if (response.isSuccess()){
             // 租户id
-            jsonNode.put("tenantId",SecurityFrameworkUtils.getLoginUserId());
+//            jsonNode.put("tenantId",SecurityFrameworkUtils.getLoginUserId());
             // 用户ID
             jsonNode.put("systemUserId",SecurityFrameworkUtils.getLoginUserId());
             // 用户类型

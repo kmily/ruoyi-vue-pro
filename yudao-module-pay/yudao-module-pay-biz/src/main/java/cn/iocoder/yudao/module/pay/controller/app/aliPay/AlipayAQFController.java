@@ -127,7 +127,8 @@ public class AlipayAQFController {
         // 在数据库中创建订单
         steamAlipayAqfSignMapper.delete(new QueryWrapper<SteamAlipayAqfSignDO>().eq("create_user_id",userId));
         steamAlipayAqfSignMapper.insertOrUpdate(
-                new SteamAlipayAqfSignDO(userId,userId,contractNumber)
+                new SteamAlipayAqfSignDO().setCreateUserId(userId).setExternalAgreementNo(contractNumber)
+//                new SteamAlipayAqfSignDO(userId,userId,contractNumber)
         );
         // 拿到支付配置信息
         PayChannelDO channel = channelService.getChannel(58L);
