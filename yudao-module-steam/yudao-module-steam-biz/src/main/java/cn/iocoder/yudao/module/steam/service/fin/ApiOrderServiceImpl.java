@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.steam.service.fin;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -18,7 +17,6 @@ import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTemplatePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
-import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUBuyGoodsByIdReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodeityService;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
@@ -32,10 +30,10 @@ import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.devaccount.DevAccountMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoucommodity.UUCommodityMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyounotify.YouyouNotifyMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.*;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiBuyItemRespVo;
+import cn.iocoder.yudao.module.steam.service.fin.vo.ApiCommodityRespVo;
 import cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.YouPingOrder;
@@ -205,7 +203,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
                 //设置购买信息
                 .setBuyInfo(reqVo)
                 ;
-        validateInvOrderCanCreate(orderDO);
+        validateInvOrderCanCreate(loginUser,orderDO);
         apiOrderMapper.insert(orderDO);
         return orderDO;
 
@@ -242,8 +240,8 @@ public class ApiOrderServiceImpl implements ApiOrderService {
      * @param invOrderId 订单号
      */
     public void closeUnPayInvOrder(Long invOrderId) {
-        YouyouOrderDO uuOrder = getUUOrderById(invOrderId);
-        if(uuOrder.getPayStatus()){
+        ApiOrderDO uuOrder = getUUOrderById(invOrderId);
+        if (PayOrderStatusEnum.isSuccess(uuOrder.getPayOrderStatus())) {
             throw new ServiceException(-1,"订单已支付不支持关闭");
         }
 
@@ -260,20 +258,20 @@ public class ApiOrderServiceImpl implements ApiOrderService {
      */
     @Override
     public void releaseInvOrder(Long invOrderId) {
-        YouyouOrderDO uuOrder = getUUOrderById(invOrderId);
-        if(uuOrder.getSellCashStatus().equals(InvSellCashStatusEnum.CASHED.getStatus())){
+        ApiOrderDO uuOrder = getUUOrderById(invOrderId);
+        if(uuOrder.getCashStatus().equals(InvSellCashStatusEnum.CASHED.getStatus())){
             throw new ServiceException(-1,"订单已经支付给卖家，不支持操作");
         }
-        if(uuOrder.getSellCashStatus().equals(InvSellCashStatusEnum.DAMAGES.getStatus())){
+        if(uuOrder.getCashStatus().equals(InvSellCashStatusEnum.DAMAGES.getStatus())){
             throw new ServiceException(-1,"订单已经支付违约金，不支持操作");
         }
-        if(!uuOrder.getPayStatus()){
+        if (!PayOrderStatusEnum.isSuccess(uuOrder.getPayOrderStatus())) {
             throw new ServiceException(-1,"不支持未支付的订单关闭");
         }
-        youyouOrderMapper.updateById(new YouyouOrderDO().setId(invOrderId).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus()));
+        apiOrderMapper.updateById(new ApiOrderDO().setId(invOrderId).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus()));
         //释放库存
-        YouyouCommodityDO youyouCommodityDO = uUCommodityMapper.selectById(uuOrder.getRealCommodityId());
-        uUCommodityMapper.updateById(new YouyouCommodityDO().setId(youyouCommodityDO.getId()).setTransferStatus(InvTransferStatusEnum.SELL.getStatus()));
+//        YouyouCommodityDO youyouCommodityDO = uUCommodityMapper.selectById(uuOrder.getRealCommodityId());
+//        uUCommodityMapper.updateById(new YouyouCommodityDO().setId(youyouCommodityDO.getId()).setTransferStatus(InvTransferStatusEnum.SELL.getStatus()));
     }
 
 
@@ -285,11 +283,11 @@ public class ApiOrderServiceImpl implements ApiOrderService {
      */
     @Transactional(rollbackFor = ServiceException.class)
     public void damagesCloseInvOrder(Long invOrderId,String reason) {
-        YouyouOrderDO uuOrderById = getUUOrderById(invOrderId);
+        ApiOrderDO uuOrderById = getUUOrderById(invOrderId);
         if(Objects.isNull(uuOrderById)){
             throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
         }
-        if(!uuOrderById.getPayStatus()){
+        if (!PayOrderStatusEnum.isSuccess(uuOrderById.getPayOrderStatus())) {
             throw new ServiceException(-1,"订单未支付不支持退款");
         }
         releaseInvOrder(invOrderId);
@@ -317,7 +315,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
                     PayWalletBizTypeEnum.STEAM_CASH_REFUND, uuOrderById.getCommodityAmount());
 
             List<PayWalletTransactionDO> payWalletTransactionDOS = Arrays.asList(payWalletTransactionDO, payWalletTransactionDO1);
-            youyouOrderMapper.updateById(new YouyouOrderDO().setId(uuOrderById.getId())
+            apiOrderMapper.updateById(new ApiOrderDO().setId(uuOrderById.getId())
 //                    .setTransferDamagesAmount(transferDamagesAmount)
 //                    .setTransferRefundAmount(transferRefundAmount)
                     .setTransferRefundAmount(uuOrderById.getPayAmount())//不收手续费
@@ -335,12 +333,9 @@ public class ApiOrderServiceImpl implements ApiOrderService {
      */
     @Transactional(rollbackFor = ServiceException.class)
     public void cashInvOrder(Long invOrderId) {
-        YouyouOrderDO uuOrderById = getUUOrderById(invOrderId);
+        ApiOrderDO uuOrderById = getUUOrderById(invOrderId);
         if(Objects.isNull(uuOrderById)){
             throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
-        }
-        if(!uuOrderById.getPayStatus()){
-            throw new ServiceException(-1,"订单未支付不支持打款");
         }
         if (PayOrderStatusEnum.isSuccess(uuOrderById.getPayOrderStatus())) {
             //打款服务费
@@ -348,12 +343,12 @@ public class ApiOrderServiceImpl implements ApiOrderService {
             PayWalletTransactionDO payWalletTransactionDO = payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(uuOrderById.getId()),
                     PayWalletBizTypeEnum.INV_SERVICE_FEE, uuOrderById.getServiceFee());
 
-            youyouOrderMapper.updateById(new YouyouOrderDO().setId(invOrderId).setServiceFeeRet(JacksonUtils.writeValueAsString(payWalletTransactionDO)));
+            apiOrderMapper.updateById(new ApiOrderDO().setId(invOrderId).setServiceFeeRet(JacksonUtils.writeValueAsString(payWalletTransactionDO)));
             //获取卖家家钱包并进行打款
             PayWalletDO orCreateWallet2 = payWalletService.getOrCreateWallet(uuOrderById.getSellUserId(), uuOrderById.getSellUserType());
             PayWalletTransactionDO payWalletTransactionDO1 = payWalletService.addWalletBalance(orCreateWallet2.getId(), String.valueOf(uuOrderById.getId()),
                     PayWalletBizTypeEnum.STEAM_CASH, uuOrderById.getCommodityAmount());
-            youyouOrderMapper.updateById(new YouyouOrderDO().setId(invOrderId).setSellCashRet(JacksonUtils.writeValueAsString(payWalletTransactionDO1)).setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus()));
+            apiOrderMapper.updateById(new ApiOrderDO().setId(invOrderId).setSellCashRet(JacksonUtils.writeValueAsString(payWalletTransactionDO1)).setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus()));
         }
     }
 
@@ -406,7 +401,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         return getUUOrder(loginUser, queryOrderReqVo);
     }
 
-    private void validateInvOrderCanCreate(ApiOrderDO orderDO) {
+    private void validateInvOrderCanCreate(LoginUser loginUser,ApiOrderDO orderDO) {
         //检测交易链接
         try{
             ApiResult<ApiCheckTradeUrlReSpVo> apiCheckTradeUrlReSpVoApiResult = uuService.checkTradeUrl(new ApiCheckTradeUrlReqVo().setTradeLinks(orderDO.getBuyTradeLinks()));
@@ -433,6 +428,21 @@ public class ApiOrderServiceImpl implements ApiOrderService {
             }
         }catch (ServiceException e){
             throw exception(OpenApiCode.ERR_5408);
+        }
+        ApiCommodityRespVo query=null;
+        for (PlatCodeEnum value : PlatCodeEnum.values()) {
+            Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByPlatCode(value);
+            if(!apiThreeByOrder.isPresent()){
+                continue;
+            }
+            ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
+            query = apiThreeOrderService.query(loginUser, orderDO.getBuyInfo());
+            if(Objects.nonNull(query)){
+                break;
+            }
+        }
+        if(Objects.isNull(query)){
+            throw new ServiceException(OpenApiCode.ERR_5301);
         }
         //检测交易链接是否是自己
 //        Long aLong = bindUserMapper.selectCount(new LambdaQueryWrapperX<BindUserDO>()
@@ -468,7 +478,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
 
 
         //校验商品是否存在
-        if (Objects.isNull(youyouCommodityDO)) {
+        if (Objects.isNull(query)) {
             throw exception(ErrorCodeConstants.UU_GOODS_NOT_FOUND);
         }
         if(PayOrderStatusEnum.isSuccess(orderDO.getPayOrderStatus())){
@@ -481,13 +491,13 @@ public class ApiOrderServiceImpl implements ApiOrderService {
 //            throw exception(ErrorCodeConstants.INVORDER_ORDERUSER_EXCEPT);
 //        }
 //        //库存状态为没有订单
-        if(!InvTransferStatusEnum.SELL.getStatus().equals(youyouCommodityDO.getTransferStatus())){
-            throw exception(OpenApiCode.ERR_5214);
-        }
+//        if(!InvTransferStatusEnum.SELL.getStatus().equals(youyouCommodityDO.getTransferStatus())){
+//            throw exception(OpenApiCode.ERR_5214);
+//        }
         //新的采购服务费标准为收取开放平台采购成交订单金额的5%，单笔采购服务费最多收取500元。本次调整自2024年3月11日10时起生效。
-        BigDecimal commodityAmount = new BigDecimal(youyouCommodityDO.getCommodityPrice()).multiply(new BigDecimal("100"));
-        youyouOrderDO.setCommodityAmount(commodityAmount.intValue());
-        BigDecimal serviceFee = commodityAmount.multiply(new BigDecimal("5")).divide(new BigDecimal("100"));
+        BigDecimal commodityAmount = new BigDecimal(query.getPrice());
+        orderDO.setCommodityAmount(commodityAmount.intValue());
+        BigDecimal serviceFee = commodityAmount.multiply(new BigDecimal("2")).divide(new BigDecimal("100"));
         if(serviceFee.intValue()<50000){
             orderDO.setPayAmount(commodityAmount.add(serviceFee).intValue());
             orderDO.setServiceFee(serviceFee.intValue());
@@ -534,11 +544,12 @@ public class ApiOrderServiceImpl implements ApiOrderService {
      * @param commodityId 商品ID
      * @return
      */
-    public List<YouyouOrderDO> getExpOrder(String commodityId){
-        return youyouOrderMapper.selectList(new LambdaQueryWrapperX<YouyouOrderDO>()
-                .eq(YouyouOrderDO::getCommodityId, commodityId)
-                .neIfPresent(YouyouOrderDO::getPayOrderStatus,PayOrderStatusEnum.CLOSED.getStatus())
-                .ne(YouyouOrderDO::getTransferStatus, InvTransferStatusEnum.CLOSE.getStatus())
+    @Deprecated
+    public List<ApiOrderDO> getExpOrder(String commodityId){
+        return apiOrderMapper.selectList(new LambdaQueryWrapperX<ApiOrderDO>()
+//                .eq(YouyouOrderDO::getCommodityId, commodityId)
+//                .neIfPresent(YouyouOrderDO::getPayOrderStatus,PayOrderStatusEnum.CLOSED.getStatus())
+//                .ne(YouyouOrderDO::getTransferStatus, InvTransferStatusEnum.CLOSE.getStatus())
         );
     }
     @Override
