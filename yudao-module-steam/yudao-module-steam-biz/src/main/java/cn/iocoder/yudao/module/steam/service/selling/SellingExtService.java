@@ -1,39 +1,45 @@
 package cn.iocoder.yudao.module.steam.service.selling;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
-import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
-import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
+import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
+import cn.iocoder.yudao.module.steam.controller.admin.otherselling.vo.OtherSellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.SellListItemResp;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.*;
-import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.otherselling.OtherSellingDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
-import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.otherselling.OtherSellingMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
+import cn.iocoder.yudao.module.steam.service.otherselling.OtherSellingService;
+import cn.iocoder.yudao.module.steam.service.otherselling.vo.OtherSellingListDo;
 import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 
-import jdk.management.resource.ResourceType;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,10 +58,6 @@ public class SellingExtService {
     @Resource
     private InvMapper invMapper;
     @Resource
-    private MemberUserMapper memberUserMapper;
-    @Resource
-    private BindUserMapper bindUserMapper;
-    @Resource
     private InvDescMapper invDescMapper;
     @Resource
     private InvPreviewExtService invPreviewExtService;
@@ -63,6 +65,14 @@ public class SellingExtService {
     private PaySteamOrderService paySteamOrderService;
     @Resource
     private InvPreviewMapper invPreviewMapper;
+
+    @Resource
+    private OtherSellingService otherSellingService;
+
+    @Resource
+    private OtherSellingMapper otherSellingMapper;
+
+    private MemberUserApi memberUserApi;
 
     @Transactional(rollbackFor = ServiceException.class)
     public void batchSale(BatchSellReqVo reqVo, LoginUser loginUser) {
@@ -103,14 +113,23 @@ public class SellingExtService {
                 log.error("价格信息未查找到{},{}", item, reqVo.getItems());
                 throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
             }
+
             BatchSellReqVo.Item itemPriceInfo = first.get();
             item.setPrice(itemPriceInfo.getPrice());
             item.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
             invMapper.updateById(item);
-            Optional<InvDescDO> invDescDO = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
-                    .eq(InvDescDO::getClassid, item.getClassid())
-                    .eq(InvDescDO::getSteamId, item.getSteamId())
-                    .eq(InvDescDO::getInstanceid, item.getInstanceid())).stream().findFirst();
+            Optional<InvDescDO> invDescDO;
+            String tempSteamId = "11111111111111111";
+            if (!item.getSteamId().equals(tempSteamId)) {
+                invDescDO = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+                        .eq(InvDescDO::getClassid, item.getClassid())
+                        .eq(InvDescDO::getSteamId, item.getSteamId())
+                        .eq(InvDescDO::getInstanceid, item.getInstanceid())).stream().findFirst();
+            } else {
+                invDescDO = invDescMapper.selectList(new LambdaQueryWrapperX<InvDescDO>()
+                        .eq(InvDescDO::getId, item.getInvDescId())).stream().findFirst();
+            }
+
             if (!invDescDO.isPresent()) {
                 throw new ServiceException(-1, "物品描述信息未查找到");
             }
@@ -392,16 +411,17 @@ public class SellingExtService {
 
 
     /**
-     *   WearCategory0  崭新出厂
-     *   WearCategory1  略有磨损
-     *   WearCategory2  久经沙场
-     *   WearCategory3  破损不堪
-     *   WearCategory4  战痕累累
+     * WearCategory0  崭新出厂
+     * WearCategory1  略有磨损
+     * WearCategory2  久经沙场
+     * WearCategory3  破损不堪
+     * WearCategory4  战痕累累
+     *
      * @param sellingPageReqVO
      */
     public  List<GoodsAbrasionDTO> showGoodsWithMarketName(GoodsWithMarketHashNameReqVO sellingPageReqVO) {
         List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
-                .eq(SellingDO::getShortName,sellingPageReqVO.getShortName()));
+                .eq(SellingDO::getShortName, sellingPageReqVO.getShortName()));
         if(sellingDOS.isEmpty()){
             List<GoodsAbrasionDTO> list = new  ArrayList<>();
             return list;
@@ -409,6 +429,13 @@ public class SellingExtService {
 
         List<GoodsAbrasionDTO> list = new  ArrayList<>();
         for (SellingDO sellingDO : sellingDOS) {
+            if (!map.containsKey(sellingDO.getSelExterior())) {
+                map.put(sellingDO.getSelExterior(), sellingDO.getPrice());
+            }
+            for (Map.Entry<String, Integer> element : map.entrySet()) {
+                if (element.getKey().equals(sellingDO.getSelExterior()) && element.getValue() > sellingDO.getPrice()) {
+                    map.put(sellingDO.getSelExterior(), sellingDO.getPrice());
+                }
             switch (sellingDO.getSelExterior()){
                 case "WearCategory0":
                     GoodsAbrasionDTO goodsAbrasionDTO = new GoodsAbrasionDTO();
@@ -473,6 +500,60 @@ public class SellingExtService {
         }
 
         return list;
+    }
+
+    public PageResult<OtherSellingPageReqVO> otherSale(SellingDO sellingDO) {
+        List<OtherSellingDO> otherSellingDO = otherSellingMapper.selectList(new LambdaQueryWrapperX<OtherSellingDO>()
+                .eq(OtherSellingDO::getMarketHashName, sellingDO.getMarketHashName()));
+
+        List<OtherSellingListDo> otherSellingPageReqVOS = new ArrayList<>();
+
+        for (OtherSellingDO element : otherSellingDO) {
+            String text = "园有静观动观之分这一点我们在造园之先首要考虑何谓静观就是园中予游者多驻足的观赏点动观就是要有较长的游览线二者说来小园应以静观为主动观为辅庭院专主静观大园则以动观为主静观为辅前者如苏州网师园后者则苏州拙政园差可似之人们进入网师园宜坐宜留之建筑多绕池一周有槛前细数游鱼有亭中待月迎风而轩外花影移墙峰峦当窗宛然如画静中生趣至于拙政园径缘池转廊引人随与日午画船桥下过衣香人影太匆匆的瘦西湖相仿佛妙在移步换影这是动观立意在先文循意出动静之分有关园林性质与园林面积大小象上海正在建造的盆景园则宜以静观为主即为一例中国园林是由建筑山水花木等组合而成的一个综合艺术品富有诗情画意叠山理水要造成虽由人作宛自天开的境界山与水的关系究竟如何呢简言之模山范水用局部之景而非缩小网师园水池仿虎丘白莲池极妙处理原则悉符画本山贵有脉水贵有源脉源贯通全园生动我曾经用水随山转山因水活与溪水因山成曲折山蹊随地作低平来说明山水之间的关系也就是从真山真水中所得到的启示明末清初叠山家张南垣主张用平冈小陂陵阜陂阪也就是要使园林山水接近自然如果我们能初步理解这个道理就不至于离自然太远多少能呈现水石交融的美妙境界";
+
+            Random random = new Random();
+            Set<Character> selectedChars = new HashSet<>();
+
+            while (selectedChars.size() < 4) {
+                int index = random.nextInt(text.length());
+                char ch = text.charAt(index);
+
+                // 确保字符不是空格，并且之前没有被选过
+                if (ch != ' ' && !selectedChars.contains(ch)) {
+                    selectedChars.add(ch);
+                }
+            }
+
+            // 将选中的字符转换为字符串
+            StringBuilder randomFourChars = new StringBuilder();
+            for (Character ch : selectedChars) {
+                randomFourChars.append(ch);
+            }
+            String nickName = "IO661用户" + randomFourChars;
+
+            OtherSellingListDo otherSellingListDo = new OtherSellingListDo();
+            otherSellingListDo.setMarketHashName(element.getMarketHashName());
+            otherSellingListDo.setPrice(element.getPrice());
+            otherSellingListDo.setIconUrl(element.getIconUrl());
+            otherSellingListDo.setSelType(element.getSelType());
+            otherSellingListDo.setSelExterior(element.getSelExterior());
+            otherSellingListDo.setSelQuality(element.getSelQuality());
+            otherSellingListDo.setSelRarity(element.getSelRarity());
+            otherSellingListDo.setAppid(element.getAppid());
+            otherSellingListDo.setMarketName(element.getMarketName());
+            otherSellingListDo.setPlatformIdentity(element.getPlatformIdentity());
+            MemberUserRespDTO memberUserRespDTO = new MemberUserRespDTO();
+            memberUserRespDTO.setNickname(nickName);
+            memberUserRespDTO.setAvatar("https://s3.io661.com/1b4d8182f422382339114e2a80bfe4fc2482722f7cc787da88e45a9d720ee058.jpg");
+            memberUserRespDTO.setMobile("");
+            memberUserRespDTO.setStatus(999);
+            memberUserRespDTO.setPoint(999);
+            memberUserRespDTO.setCreateTime(LocalDateTime.now());
+            memberUserRespDTO.setLevelId(999l);
+            otherSellingListDo.setMemberUserRespDTO(memberUserRespDTO);
+            otherSellingPageReqVOS.add(otherSellingListDo);
+        }
+        return new PageResult(otherSellingPageReqVOS, (long) otherSellingDO.size());
     }
 
 //    public SellerGoodsOnSellingRespVO getSellerGoods(String userId){

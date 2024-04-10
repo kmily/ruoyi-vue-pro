@@ -23,6 +23,8 @@ import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.ItemResp;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.SellListItemResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.api.AppBatchGetOnSaleCommodityInfoReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.vo.api.AppBatchGetOnSaleCommodityInfoRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
@@ -31,6 +33,8 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingHashSummary;
+import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
@@ -63,9 +67,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URI;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 兼容有品的开放平台接口
@@ -89,16 +92,12 @@ public class AppIo661ApiController {
         this.configService = configService;
     }
 
-    @Resource
-    private BindUserMapper bindUserMapper;
 
     @Resource
     private PaySteamOrderService paySteamOrderService;
     @Resource
     private PayOrderService payOrderService;
 
-    @Resource
-    private BindUserService bindUserService;
     @Autowired
     private SellingsearchService sellingsearchService;
     private InvPreviewExtService invPreviewExtService;
@@ -188,6 +187,32 @@ public class AppIo661ApiController {
             });
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(),  e.getMessage(),ApiCheckTradeUrlReSpVo.class);
+        }
+    }
+    /**
+     * 根据模板hash查询在售商品
+     * @return
+     */
+    @PostMapping("v1/api/batchGetPriceByTemplate")
+    @Operation(summary = "根据模板hash查询在售商品")
+    @PermitAll
+    public ApiResult<List<AppBatchGetOnSaleCommodityInfoRespVO>> batchGetPriceByTemplate(@RequestBody OpenApiReqVo<AppBatchGetOnSaleCommodityInfoReqVO> openApiReqVo) {
+        List<AppBatchGetOnSaleCommodityInfoRespVO> ret=new ArrayList<>();
+        try {
+            return DevAccountUtils.tenantExecute(1L, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+                if(Objects.isNull(openApiReqVo.getData().getRequestList()) || openApiReqVo.getData().getRequestList().size()<=0){
+                    throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
+                }
+                List<AppBatchGetOnSaleCommodityInfoReqVO.RequestListDTO> requestList = openApiReqVo.getData().getRequestList();
+                if(requestList.size()>=20){
+                    throw new ServiceException(OpenApiCode.TO_MANY_ITEM);
+                }
+                List<String> collect = openApiReqVo.getData().getRequestList().stream().map(AppBatchGetOnSaleCommodityInfoReqVO.RequestListDTO::getMarketHashName).collect(Collectors.toList());
+                return ApiResult.success(sellingsearchService.summaryByHashName(collect));
+            });
+        } catch (ServiceException e) {
+            return ApiResult.error(e.getCode(),  e.getMessage(), ret);
         }
     }
     /**

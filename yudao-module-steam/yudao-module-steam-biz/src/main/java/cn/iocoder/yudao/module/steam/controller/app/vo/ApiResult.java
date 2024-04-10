@@ -20,6 +20,13 @@ public class ApiResult<T> extends CommonResult<T> {
         result.setMsg(message);
         return result;
     }
+    public static <T> ApiResult<T> error(Integer code, String message,T t) {
+        Assert.isTrue(!GlobalErrorCodeConstants.SUCCESS.getCode().equals(code), "code 必须是错误的！");
+        ApiResult<T> result = new ApiResult<>();
+        result.setCode(code);
+        result.setMsg(message);
+        return result;
+    }
     public static <T> ApiResult<T> success(T data,String msg) {
         ApiResult<T> result = new ApiResult<>();
         result.setCode(GlobalErrorCodeConstants.SUCCESS.getCode());

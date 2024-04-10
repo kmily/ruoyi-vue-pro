@@ -148,5 +148,9 @@ public class InvDescDO extends BaseDO {
      * 更新批次号
      */
     private String batchNo;
+    /**
+     * 平台标识
+     */
+    private Integer platformIdentity;
 
 }

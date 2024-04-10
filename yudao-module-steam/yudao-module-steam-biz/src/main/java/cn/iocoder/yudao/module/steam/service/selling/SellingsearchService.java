@@ -15,11 +15,20 @@ import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqV
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppSellingPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.OtherSellListItemResp;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.SellListItemResp;
+import cn.iocoder.yudao.module.steam.controller.app.vo.api.AppBatchGetOnSaleCommodityInfoRespVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.otherselling.OtherSellingDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.otherselling.OtherSellingMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingExtMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingHashSummary;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
+import cn.iocoder.yudao.module.steam.enums.SteamQualityEnum;
+import cn.iocoder.yudao.module.steam.enums.SteamRarityEnum;
+import cn.iocoder.yudao.module.steam.enums.SteamWearCategoryEnum;
 import cn.iocoder.yudao.module.steam.service.invdesc.InvDescService;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
@@ -51,6 +60,11 @@ public class SellingsearchService {
     private InvDescService invDescService;
     @Resource
     private MemberUserApi memberUserApi;
+
+    @Resource
+    private SellingExtMapper sellingExtMapper;
+    @Resource
+    private OtherSellingMapper otherSellingMapper;
     //TODO 导航栏搜索
     public PageResult<SellListItemResp> sellList(AppSellingPageReqVO pageReqVO){
         PageResult<SellingDO> sellingDOPageResult = sellingMapper.selectPage(pageReqVO, new LambdaQueryWrapperX<SellingDO>()
@@ -136,5 +150,84 @@ public class SellingsearchService {
                 .like(SellingDO::getMarketName, pageReqVO.getMarketName()));
             invPage.setTotal(Long.valueOf(sellingDOS.size()));
         return new PageResult<>(sellingDOS, invPage.getTotal());
+    }
+
+    /**
+     * 根据hashnaem进行统计
+     * @param marketHashName
+     */
+    public List<AppBatchGetOnSaleCommodityInfoRespVO> summaryByHashName(List<String> marketHashName) {
+        List<SellingHashSummary> sellingHashSummaries = sellingExtMapper.SelectByHashName(marketHashName);
+        return sellingHashSummaries.stream().map(item->{
+            AppBatchGetOnSaleCommodityInfoRespVO appBatchGetOnSaleCommodityInfoRespVO = new AppBatchGetOnSaleCommodityInfoRespVO();
+            AppBatchGetOnSaleCommodityInfoRespVO.SaleCommodityResponseDTO saleCommodityResponseDTO = new AppBatchGetOnSaleCommodityInfoRespVO.SaleCommodityResponseDTO();
+            saleCommodityResponseDTO.setSellNum(item.getSellNum());
+            saleCommodityResponseDTO.setMinSellPrice(item.getMinSellPrice());
+            appBatchGetOnSaleCommodityInfoRespVO.setSaleCommodityResponse(saleCommodityResponseDTO);
+            AppBatchGetOnSaleCommodityInfoRespVO.SaleTemplateResponseDTO saleTemplateResponseDTO = new AppBatchGetOnSaleCommodityInfoRespVO.SaleTemplateResponseDTO();
+            saleTemplateResponseDTO.setTemplateHashName(item.getMarketHashName());
+            saleTemplateResponseDTO.setIconUrl(item.getIconUrl());
+            if(Objects.nonNull(item.getSelRarity())){
+                saleTemplateResponseDTO.setRarityName(SteamRarityEnum.valueOf(item.getSelRarity()).getName());
+            }
+            if(Objects.nonNull(item.getSelQuality())){
+                saleTemplateResponseDTO.setQualityName(SteamQualityEnum.valueOf(item.getSelQuality()).getName());
+            }
+            if(Objects.nonNull(item.getSelExterior())){
+                saleTemplateResponseDTO.setExteriorName(SteamWearCategoryEnum.valueOf(item.getSelExterior()).getName());
+            }
+            appBatchGetOnSaleCommodityInfoRespVO.setSaleTemplateResponse(saleTemplateResponseDTO);
+            return appBatchGetOnSaleCommodityInfoRespVO;
+        }).collect(Collectors.toList());
+    }
+
+    public PageResult<SellListItemResp> allSaleList(AppSellingPageReqVO pageReqVO){
+        PageResult<SellingDO> sellingDOPageResult = sellingMapper.selectPage(pageReqVO, new LambdaQueryWrapperX<SellingDO>()
+                .eq(SellingDO::getMarketHashName,pageReqVO.getMarketHashName())
+                .eq(SellingDO::getStatus,CommonStatusEnum.ENABLE.getStatus())
+                .eq(SellingDO::getUserType, UserTypeEnum.MEMBER.getValue())
+                .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
+                .geIfPresent(SellingDO::getPrice,pageReqVO.getMinPrice())
+                .leIfPresent(SellingDO::getPrice,pageReqVO.getMaxPrice())
+                .orderByAsc(SellingDO::getPrice)
+        );
+        PageResult<OtherSellingDO> otherSellingDOPageResult = otherSellingMapper.selectPage(pageReqVO, new LambdaQueryWrapperX<OtherSellingDO>()
+                .eq(OtherSellingDO::getMarketHashName,pageReqVO.getMarketHashName())
+                .eq(OtherSellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
+                .orderByAsc(OtherSellingDO::getPrice));
+
+
+        PageResult<SellListItemResp> sellingPageReqVOPageResult = BeanUtils.toBean(sellingDOPageResult, SellListItemResp.class);
+
+        PageResult<OtherSellListItemResp> otherSellingPageReqVOPageResult= BeanUtils.toBean(otherSellingDOPageResult, OtherSellListItemResp.class);
+
+        List<Long> collect = sellingDOPageResult.getList().stream().map(SellingDO::getUserId).distinct().collect(Collectors.toList());
+
+        List<Long> collect2 = otherSellingPageReqVOPageResult.getList().stream().map(OtherSellingDO::getSellingUserId).distinct().collect(Collectors.toList());
+
+        Map<Long, MemberUserRespDTO> memberUserRespDTOMap = memberUserApi.getUserList(collect).stream().collect(Collectors.toMap(MemberUserRespDTO::getId, item -> item));
+        Map<Long, MemberUserRespDTO> memberUserRespDTOMap2 = memberUserApi.getUserList(collect2).stream().collect(Collectors.toMap(MemberUserRespDTO::getId, item -> item));
+
+
+        for (SellListItemResp item:sellingPageReqVOPageResult.getList()) {
+            MemberUserRespDTO memberUserRespDTO = memberUserRespDTOMap.get(item.getUserId());
+            memberUserRespDTO.setMobile("");
+            memberUserRespDTO.setStatus(999);
+            memberUserRespDTO.setPoint(999);
+            memberUserRespDTO.setCreateTime(LocalDateTime.now());
+            memberUserRespDTO.setLevelId(999l);
+            item.setMemberUserRespDTO(memberUserRespDTO);
+        }
+        for (OtherSellListItemResp item:otherSellingPageReqVOPageResult.getList()) {
+            MemberUserRespDTO memberUserRespDTO = memberUserRespDTOMap2.get(item.getMemberUserRespDTO().getId());
+            memberUserRespDTO.setMobile("");
+            memberUserRespDTO.setStatus(999);
+            memberUserRespDTO.setPoint(999);
+            memberUserRespDTO.setCreateTime(LocalDateTime.now());
+            memberUserRespDTO.setLevelId(999l);
+            item.setMemberUserRespDTO(memberUserRespDTO);
+        }
+
+        return sellingPageReqVOPageResult;
     }
 }
