@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.steam.service.ioinvupdate;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.otherselling.vo.OtherSellingPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.othertemplate.vo.OtherTemplatePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppOtherInvDetailListVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppOtherInvListDto;
@@ -327,12 +330,13 @@ public class IOInvUpdateService {
 
 
     // 其他平台饰品模板入库
-    public void otherTemplateInsert() {
+    public PageResult<OtherTemplatePageReqVO> otherTemplateInsert() {
+        List returnList = new ArrayList<>();
         int page = 1;
         do {
             OkHttpClient client = new OkHttpClient();
 
-            String url = "https://app.zbt.com/open/product/v2/search?appId=730&language=zh-CN&app-key=3453fd2c502c51bcd6a7a68c6e812f85&limit=10000&page=" + Integer.toString(page++);
+            String url = "https://app.zbt.com/open/product/v2/search?appId=730&language=zh-CN&app-key=3453fd2c502c51bcd6a7a68c6e812f85&page=" + Integer.toString(page++);
             Request request = new Request.Builder()
                     .url(url)
                     .build();
@@ -353,10 +357,10 @@ public class IOInvUpdateService {
                         otherTemplateDO.setExterior(item.getExterior());
                         otherTemplateDO.setExteriorName(item.getExteriorName());
                         otherTemplateDO.setImageUrl(item.getImageUrl());
-                        otherTemplateDO.setItemId(item.getItemId());
+                        otherTemplateDO.setItemId(Math.toIntExact(item.getItemId()));
                         otherTemplateDO.setItemName(item.getItemName());
                         otherTemplateDO.setMarketHashName(item.getMarketHashName());
-                        otherTemplateDO.setAutoDeliverPrice(Double.valueOf(item.getPriceInfo().getAutoDeliverPrice()));
+                        otherTemplateDO.setAutoDeliverPrice(item.getPriceInfo().getAutoDeliverPrice());
                         otherTemplateDO.setAutoDeliverQuantity(item.getPriceInfo().getAutoDeliverQuantity());
                         otherTemplateDO.setQuality(item.getQuality());
                         otherTemplateDO.setQualityName(item.getQualityName());
@@ -368,6 +372,7 @@ public class IOInvUpdateService {
                         otherTemplateDO.setType(item.getType());
                         otherTemplateDO.setTypeName(item.getTypeName());
                         list.add(otherTemplateDO);
+                        returnList.add(otherTemplateDO);
                         otherTemplateMapper.insertBatch(list);
                     }
                 }
@@ -378,10 +383,13 @@ public class IOInvUpdateService {
                 break;
             }
         } while (true);
+
+        return new PageResult<>(returnList, (long) returnList.size());
     }
 
     // 其他平台自动在售入库
-    public void otherSellingInsert(Integer itemId) {
+    public PageResult<OtherSellingPageReqVO> otherSellingInsert(Integer itemId) {
+        List returnList = new ArrayList<>();
         int page = 1;
         do {
             OkHttpClient client = new OkHttpClient();
@@ -404,9 +412,6 @@ public class IOInvUpdateService {
                         });
                         List<OtherSellingDO> list = new ArrayList<>();
                         for (AppOtherInvDetailListVO.Data__.CommodityInfo items : response_List.getData().getList()) {
-                            if (items.getAcceptBargain() <= 0) {
-                                continue;
-                            }
                             OtherSellingDO otherSellingDO = new OtherSellingDO();
                             otherSellingDO.setAppid(730);
                             otherSellingDO.setIconUrl(items.getImageUrl());
@@ -422,6 +427,7 @@ public class IOInvUpdateService {
                             otherSellingDO.setSellingUserName(items.getSellerInfo().getNickname());
                             otherSellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
                             list.add(otherSellingDO);
+                            returnList.add(otherSellingDO);
                         }
                         otherSellingMapper.insertBatch(list);
                     }
@@ -429,11 +435,12 @@ public class IOInvUpdateService {
                     e.printStackTrace();
                 }
 
-                if (page >= 1) {
+                if (page >= 4) {
                     break;
                 }
             }
             while (true) ;
+            return new PageResult<>(returnList, (long) returnList.size());
     }
 }
 

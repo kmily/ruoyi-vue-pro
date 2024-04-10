@@ -54,7 +54,7 @@ public class OtherTemplateDO extends BaseDO {
     /**
      * 自动发货在售最低价
      */
-    private Double autoDeliverPrice;
+    private Float autoDeliverPrice;
     /**
      * 品质
      */

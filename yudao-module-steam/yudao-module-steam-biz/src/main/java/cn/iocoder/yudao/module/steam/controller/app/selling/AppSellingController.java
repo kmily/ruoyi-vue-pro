@@ -3,14 +3,19 @@ package cn.iocoder.yudao.module.steam.controller.app.selling;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.otherselling.vo.OtherSellingPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.othertemplate.vo.OtherTemplatePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.*;
+import cn.iocoder.yudao.module.steam.dal.dataobject.othertemplate.OtherTemplateDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
+import cn.iocoder.yudao.module.steam.dal.mysql.othertemplate.OtherTemplateMapper;
 import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
+import cn.iocoder.yudao.module.steam.service.othertemplate.OtherTemplateService;
 import cn.iocoder.yudao.module.steam.service.selling.SellingExtService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -34,6 +41,10 @@ public class AppSellingController {
     private SellingExtService sellingExtService;
     @Resource
     private IOInvUpdateService ioInvUpdateService;
+    @Resource
+    private OtherTemplateMapper otherTemplateMapper;
+    @Resource
+    private OtherTemplateService otherTemplateService;
 
     @PostMapping("/batchSale")
     @Operation(summary = "批量上架")
@@ -91,6 +102,28 @@ public class AppSellingController {
         PageResult<OtherSellingPageReqVO> otherSellingDO = sellingExtService.otherSale(sellingDO);
 
         return CommonResult.success(otherSellingDO);
+    }
+    @PostMapping("/otherTemplateInsert")
+    @Operation(summary = "其他平台在售模板")
+    public CommonResult<PageResult<OtherTemplatePageReqVO>> insertOtherItemId() {
+
+
+        PageResult<OtherTemplatePageReqVO> otherTemplateInsert = ioInvUpdateService.otherTemplateInsert();
+
+        return CommonResult.success(otherTemplateInsert);
+    }
+    @PostMapping("/otherSellingInsert")
+    @Operation(summary = "其他平台在售入库")
+    public CommonResult<List> otherSellingInsert() {
+
+        List<OtherTemplateDO> otherTemplateDOS = otherTemplateMapper.selectList(new LambdaQueryWrapperX<OtherTemplateDO>().select(OtherTemplateDO::getItemId));
+
+        List list = new ArrayList<>();
+        for (OtherTemplateDO otherTemplateDO : otherTemplateDOS) {
+            PageResult<OtherSellingPageReqVO> otherTemplateInsert = ioInvUpdateService.otherSellingInsert(otherTemplateDO.getItemId());
+            list.add(otherTemplateInsert);
+        }
+        return CommonResult.success(list);
     }
 }
 
