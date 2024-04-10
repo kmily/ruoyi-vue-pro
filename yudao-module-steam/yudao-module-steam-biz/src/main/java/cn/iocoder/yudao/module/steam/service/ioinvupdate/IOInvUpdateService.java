@@ -368,7 +368,7 @@ public class IOInvUpdateService {
                     });
                     for (AppOtherInvListDto.Data_.GoodsInfo item : response_.getData().getList()) {
                         List<OtherTemplateDO> list = new ArrayList<>();
-                        if (item.getPriceInfo().getAutoDeliverQuantity() <= 0) {
+                        if (item.getPriceInfo().getAutoDeliverQuantity() <= 0 || item.getPriceInfo().getAutoDeliverQuantity()== null) {
                             continue;
                         }
                         OtherTemplateDO otherTemplateDO = new OtherTemplateDO();
