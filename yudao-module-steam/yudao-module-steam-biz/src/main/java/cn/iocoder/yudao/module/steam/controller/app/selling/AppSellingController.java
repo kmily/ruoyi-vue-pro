@@ -82,17 +82,16 @@ public class AppSellingController {
         PageResult<SellingMergeListReqVo> invPage = sellingExtService.sellingMerge(sellingPageReqVO);
         return CommonResult.success(invPage);
     }
-
+/*
     @GetMapping("/user/showGoodsWithMarketHashName")
     @Operation(summary = "按MarketHashName展示在售")
     public CommonResult<List<GoodsAbrasionDTO>> showGoodsWithMarketHashName(@RequestBody @Valid GoodsWithMarketHashNameReqVO reqVO) {
         List<GoodsAbrasionDTO> goodsAbrasionDTOS = sellingExtService.showGoodsWithMarketName(reqVO);
         return CommonResult.success(goodsAbrasionDTOS);
-    }
+    }*/
 
     @PostMapping("/otherSale")
     @Operation(summary = "其他平台在售")
-    @PreAuthenticated
     public CommonResult<PageResult<OtherSellingPageReqVO>> otherSale(@RequestBody @Valid SellingDO sellingDO) {
 
 
