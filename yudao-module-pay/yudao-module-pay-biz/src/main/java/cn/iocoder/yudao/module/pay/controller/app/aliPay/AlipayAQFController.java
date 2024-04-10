@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.pay.controller.app.aliPay;
 
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.pay.core.client.impl.PayClientFactoryImpl;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipaySafePayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
@@ -125,7 +126,7 @@ public class AlipayAQFController {
         String contractNumber = generateContractNumber();
         int userId = Objects.requireNonNull(SecurityFrameworkUtils.getLoginUserId()).intValue();
         // 在数据库中创建订单
-        steamAlipayAqfSignMapper.delete(new QueryWrapper<SteamAlipayAqfSignDO>().eq("create_user_id",userId));
+        steamAlipayAqfSignMapper.delete(new LambdaQueryWrapperX<SteamAlipayAqfSignDO>().eq(SteamAlipayAqfSignDO::getCreateUserId,userId));
         steamAlipayAqfSignMapper.insertOrUpdate(
                 new SteamAlipayAqfSignDO().setCreateUserId(userId).setExternalAgreementNo(contractNumber)
 //                new SteamAlipayAqfSignDO(userId,userId,contractNumber)
