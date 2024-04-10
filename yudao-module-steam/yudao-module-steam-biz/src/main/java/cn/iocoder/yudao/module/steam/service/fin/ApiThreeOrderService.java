@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiBuyItemRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiCommodityRespVo;
+import cn.iocoder.yudao.module.steam.service.fin.vo.ApiOrderCancelRespVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -65,5 +66,13 @@ public interface ApiThreeOrderService {
      * @param orderId  主订单ID
      * @return  1,进行中，2完成，3作废
      */
-    OrderInfoResp getOrderSimpleStatus(LoginUser loginUser, String orderNo,Long orderId);
+    Integer getOrderSimpleStatus(LoginUser loginUser, String orderNo,Long orderId);
+    /**
+     * 订单取消
+     * @param orderNo  第三方 订单号
+     * @param orderId  主订单ID
+     * @return  1,进行中，2完成，3作废
+     */
+    ApiOrderCancelRespVo orderCancel(LoginUser loginUser, String orderNo, Long orderId);
+
 }

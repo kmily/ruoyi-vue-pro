@@ -756,75 +756,83 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         ApiOrderDO uuOrder = getUUOrder(loginUser, new QueryOrderReqVo().setOrderNo(orderCancelVo.getOrderNo()));
 
         // 1. 校验订单是否可以退款
-        YouyouOrderDO youyouOrderDO = validateInvOrderCanRefund(uuOrder,loginUser);
+        ApiOrderDO orderDO = validateInvOrderCanRefund(uuOrder, loginUser);
+
+
+        Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByOrder(orderDO);
+        if(apiThreeByOrder.isPresent()){
+            orderCancel
+        }
+
+
         //如果有uu的单子，这里则只发起uu的退款，uu退款后再发起我们的退款
-        if(Objects.nonNull(youyouOrderDO.getUuOrderNo())){
+        if(Objects.nonNull(orderDO.getUuOrderNo())){
             //传入uu的单子
-            ApiResult<OrderCancelResp> orderCancelRespApiResult = uuService.orderCancel(new OrderCancelVo().setOrderNo(youyouOrderDO.getUuOrderNo()));
+            ApiResult<OrderCancelResp> orderCancelRespApiResult = uuService.orderCancel(new OrderCancelVo().setOrderNo(orderDO.getUuOrderNo()));
             log.info("取消UU订单结果{}{}",orderCancelRespApiResult,youyouOrderDO);
             if(orderCancelRespApiResult.getData().getResult()==1){
-                refundAction(youyouOrderDO,loginUser,cancelReason);
+                refundAction(orderDO,loginUser,cancelReason);
                 return 1;
             }
             return orderCancelRespApiResult.getData().getResult();
         }else{
-            refundAction(youyouOrderDO,loginUser);
+            refundAction(orderDO,loginUser);
             return 1;
         }
     }
     /**
      * 执行退款
      * 退款不正走此方法，
-     * @param youyouOrderDO
+     * @param uuOrder
      */
-    private void refundAction(YouyouOrderDO youyouOrderDO,LoginUser loginUser,String reason) {
-        validateInvOrderCanRefund(youyouOrderDO,loginUser);
-        damagesCloseInvOrder(youyouOrderDO.getId(),reason);
+    private void refundAction(ApiOrderDO uuOrder,LoginUser loginUser,String reason) {
+        validateInvOrderCanRefund(uuOrder,loginUser);
+        damagesCloseInvOrder(uuOrder.getId(),reason);
     }
-    private void refundAction(YouyouOrderDO youyouOrderDO,LoginUser loginUser) {
-        refundAction(youyouOrderDO,loginUser,"用户不想要了主动退款");
+    private void refundAction(ApiOrderDO uuOrder,LoginUser loginUser) {
+        refundAction(uuOrder,loginUser,"用户不想要了主动退款");
     }
 
-    private YouyouOrderDO validateInvOrderCanRefund(YouyouOrderDO youyouOrderDO,LoginUser loginUser) {
+    private ApiOrderDO validateInvOrderCanRefund(ApiOrderDO uuOrder,LoginUser loginUser) {
         // 校验订单是否存在
-        if (Objects.isNull(youyouOrderDO)) {
+        if (Objects.isNull(uuOrder)) {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_NOT_FOUND);
         }
-        if(youyouOrderDO.getSellCashStatus().equals(InvSellCashStatusEnum.CASHED.getStatus())){
+        if(uuOrder.getCashStatus().equals(InvSellCashStatusEnum.CASHED.getStatus())){
             throw exception(ErrorCodeConstants.INVORDER_ORDER_CASHED_CANNOTREFUND);
         }
-        if(!youyouOrderDO.getBuyUserId().equals(loginUser.getId())){
+        if(!uuOrder.getBuyUserId().equals(loginUser.getId())){
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_USER_ERROR);
         }
-        if(!youyouOrderDO.getBuyUserType().equals(loginUser.getUserType())){
+        if(!uuOrder.getBuyUserType().equals(loginUser.getUserType())){
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_USER_ERROR);
         }
         // 校验订单是否支付
-        if (!youyouOrderDO.getPayStatus()) {
+        if (!PayOrderStatusEnum.isSuccess(uuOrder.getPayOrderStatus())) {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_NOT_PAID);
         }
         //检查是否已发货
-        if(InvSellCashStatusEnum.DAMAGES.getStatus().equals(youyouOrderDO.getSellCashStatus())){
+        if(InvSellCashStatusEnum.DAMAGES.getStatus().equals(uuOrder.getCashStatus())){
             throw exception(ErrorCodeConstants.UU_GOODS_ORDER_TRANSFER_CASHED);
         }
         //检查是否已发货
-        if(InvSellCashStatusEnum.CASHED.getStatus().equals(youyouOrderDO.getSellCashStatus())){
+        if(InvSellCashStatusEnum.CASHED.getStatus().equals(uuOrder.getCashStatus())){
             throw exception(ErrorCodeConstants.UU_GOODS_ORDER_TRANSFER_CASHED);
         }
         //通过此接口可取消符合取消规则「创单成功后30min后卖家未发送交易报价」的代购订单。
-        if(Objects.nonNull(youyouOrderDO.getUuOrderNo())){
+        if(Objects.nonNull(uuOrder.getUuOrderNo())){
             //orderStatus,140的除 1101外其它状态不能取消，不能取消的还有340，280，360
             if(Arrays.asList(UUOrderStatus.CODE140.getCode(),UUOrderStatus.CODE340.getCode(),UUOrderStatus.CODE280.getCode(),UUOrderStatus.CODE360.getCode()).contains(youyouOrderDO.getUuOrderStatus())){
-                if(!youyouOrderDO.getUuOrderStatus().equals(UUOrderSubStatus.SUB_CODE1104.getCode())){
+                if(!uuOrder.getUuOrderStatus().equals(UUOrderSubStatus.SUB_CODE1104.getCode())){
                     throw exception(ErrorCodeConstants.UU_GOODS_ORDER_CAN_NOT_CANCEL);
                 }
             }
-            Duration between = Duration.between(youyouOrderDO.getCreateTime(), LocalDateTime.now());
+            Duration between = Duration.between(uuOrder.getCreateTime(), LocalDateTime.now());
             if(between.getSeconds()<=30*60){//小于30分钟不能取消
                 throw exception(ErrorCodeConstants.UU_GOODS_ORDER_MIN_TIME);
             }
         }
-        return youyouOrderDO;
+        return uuOrder;
     }
 
     @Override
