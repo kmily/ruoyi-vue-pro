@@ -122,7 +122,7 @@ public class OtherSellingDO extends BaseDO {
     /**
      * 出售用户id
      */
-    private Integer sellingUserId;
+    private Long sellingUserId;
     /**
      * 出售平台id
      */
