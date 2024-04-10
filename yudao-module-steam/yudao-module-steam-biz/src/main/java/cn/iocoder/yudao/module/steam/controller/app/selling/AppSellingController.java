@@ -93,7 +93,6 @@ public class AppSellingController {
 
     @PostMapping("/otherSale")
     @Operation(summary = "其他平台在售")
-    @PreAuthenticated
     public CommonResult<PageResult<OtherSellingPageReqVO>> otherSale(@RequestBody @Valid SellingDO sellingDO) {
 
 
