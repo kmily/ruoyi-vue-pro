@@ -340,18 +340,29 @@ public class IOInvUpdateService {
     public PageResult<OtherTemplatePageReqVO> otherTemplateInsert() {
         List returnList = new ArrayList<>();
         int page = 1;
-        do {
-            OkHttpClient client = new OkHttpClient();
-
-            String url = "https://app.zbt.com/open/product/v2/search?appId=730&language=zh-CN&app-key=3453fd2c502c51bcd6a7a68c6e812f85&page=" + Integer.toString(page++);
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
-            log.info("startTime" + LocalDateTime.now());
-            try (Response response = client.newCall(request).execute()) {
-                if (!response.isSuccessful()) {
-                    throw new IOException("Unexpected code " + response);
-                } else {
+        String[] types = {
+                "CSGO_Type_Knife",
+                "Type_Hands",
+                "CSGO_Type_Rifle",
+                "CSGO_Type_Pistol",
+                "CSGO_Type_SMG",
+                "CSGO_Type_Shotgun",
+                "CSGO_Type_Machinegun",
+                "CSGO_Tool_Sticker",
+                "CSGO_Type_other",
+                "type_customplayer"
+        };
+        for (String type : types) {
+            while (true) {
+                OkHttpClient client = new OkHttpClient();
+                String url = "https://app.zbt.com/open/product/v2/search?appId=730&language=zh-CN&type=" + type + "&app-key=3453fd2c502c51bcd6a7a68c6e812f85&page=" + Integer.toString(page++);
+                Request request = new Request.Builder()
+                        .url(url)
+                        .build();
+                try (Response response = client.newCall(request).execute()) {
+                    if (!response.isSuccessful()) {
+                        throw new IOException("Unexpected code " + response);
+                    }
                     String responseBody = response.body().string();
                     AppOtherInvListDto response_ = objectMapper.readValue(responseBody, new TypeReference<AppOtherInvListDto>() {
                     });
@@ -383,26 +394,25 @@ public class IOInvUpdateService {
                         returnList.add(otherTemplateDO);
                         otherTemplateMapper.insertBatch(list);
                     }
+                    if (page >= response_.getData().getPages()) {
+                        break;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    break;
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
             }
-            if (page >= 10) {
-                break;
-            }
-            log.info("endTime" + LocalDateTime.now());
-        } while (true);
-
-
+        }
         return new PageResult<>(returnList, (long) returnList.size());
     }
+
 
     // 其他平台自动在售入库
     public PageResult<OtherSellingDO> otherSellingInsert() {
         List<OtherSellingDO> returnList = new ArrayList<>();
         List<Long> itemIdList = new ArrayList<>();
         OkHttpClient client = new OkHttpClient();
-        String details = "https://app.zbt.com/open/product/v1/sell/list?appId=730&language=zh-CN&app-key=3453fd2c502c51bcd6a7a68c6e812f85&delivery=2&itemId=";
+        String details = "https://app.zbt.com/open/product/v1/sell/list?appId=730&language=zh-CN&app-key=3453fd2c502c51bcd6a7a68c6e812f85&delivery=2&limit=200&itemId=";
 
         // 获取所有 itemId 的数据
         for (OtherTemplateDO otherTemplateDO : otherTemplateMapper.selectList(new LambdaQueryWrapperX<OtherTemplateDO>().select(OtherTemplateDO::getItemId))) {
