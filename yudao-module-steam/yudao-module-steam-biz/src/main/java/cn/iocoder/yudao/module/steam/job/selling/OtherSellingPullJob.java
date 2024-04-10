@@ -9,9 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.List;
-
 @Slf4j
 @Component
 public class OtherSellingPullJob implements JobHandler {
@@ -19,7 +16,6 @@ public class OtherSellingPullJob implements JobHandler {
     private IOInvUpdateService ioInvUpdateService;
     @Resource
     private RabbitTemplate rabbitTemplate;
-
 
     @Autowired
     public void setOtherInsertInventory(IOInvUpdateService ioInvUpdateService) {
@@ -29,18 +25,11 @@ public class OtherSellingPullJob implements JobHandler {
     @Override
     public String execute(String param) {
         Integer execute = TenantUtils.execute(1L, () -> {
-            // 查询所有模板 ID
 
-
-            /*List list = Collections.singletonList(ioInvUpdateService.otherInsertInventory());*/
-
-           /* for (Object l : list) {
-                rabbitTemplate.convertAndSend("steam", "steam_other_selling", l);
-            }*/
+            ioInvUpdateService.otherSellingInsert();
+            rabbitTemplate.convertAndSend("steam", "steam_other_selling");
             return 1;
         });
-
         return String.format("执行关闭成功 %s 个", execute);
     }
-
 }

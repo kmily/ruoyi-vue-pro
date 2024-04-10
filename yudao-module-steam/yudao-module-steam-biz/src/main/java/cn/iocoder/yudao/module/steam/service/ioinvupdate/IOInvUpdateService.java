@@ -319,8 +319,77 @@ public class IOInvUpdateService {
     }
 
 
-    // 其他平台饰品入库
-    public void otherInsertInventory() {
+    // 其他平台饰品模板入库
+    public void otherTemplateInsert() {
+        int page = 1;
+        do {
+            OkHttpClient client = new OkHttpClient();
+
+            String url = "https://app.zbt.com/open/product/v2/search?appId=730&language=zh-CN&app-key=3453fd2c502c51bcd6a7a68c6e812f85&limit=10000&page=" + Integer.toString(page++);
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    throw new IOException("Unexpected code " + response);
+                } else {
+                    String responseBody = response.body().string();
+                    AppOtherInvListDto response_ = objectMapper.readValue(responseBody, new TypeReference<AppOtherInvListDto>() {
+                    });
+                    for (AppOtherInvListDto.Data_.GoodsInfo item : response_.getData().getList()) {
+                        String details = "https://app.zbt.com/open/product/v1/sell/list?appId=730&language=zh-CN&app-key=3453fd2c502c51bcd6a7a68c6e812f85&delivery=2&itemId="
+                                + item.getItemId();
+                        Request detailList = new Request.Builder()
+                                .url(details)
+                                .build();
+                        try (Response responseList = client.newCall(detailList).execute()) {
+                            if (!responseList.isSuccessful()) {
+                                throw new IOException("Unexpected code " + responseList);
+                            } else {
+                                String detailsList = responseList.body().string();
+                                ObjectMapper objectMapper = new ObjectMapper();
+                                objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+                                AppOtherInvDetailListVO response_List = objectMapper.readValue(detailsList, new TypeReference<AppOtherInvDetailListVO>() {
+                                });
+                                List<OtherSellingDO> list = new ArrayList<>();
+                                for (AppOtherInvDetailListVO.Data__.CommodityInfo items : response_List.getData().getList()) {
+                                    if (items.getAcceptBargain() <= 0) {
+                                        continue;
+                                    }
+                                    OtherSellingDO otherSellingDO = new OtherSellingDO();
+                                    otherSellingDO.setAppid(730);
+                                    otherSellingDO.setIconUrl(item.getImageUrl());
+                                    otherSellingDO.setMarketName(item.getItemName());
+                                    otherSellingDO.setMarketHashName(item.getMarketHashName());
+                                    otherSellingDO.setPlatformIdentity(OtherSellingStatusEnum.C5.getStatus());
+                                    otherSellingDO.setPrice((int) (items.getPrice() * 6.75 * 100));
+                                    otherSellingDO.setSelExterior(item.getExteriorName());
+                                    otherSellingDO.setSelQuality(item.getQualityName());
+                                    otherSellingDO.setSelRarity(item.getRarityName());
+                                    otherSellingDO.setSelType(item.getTypeName());
+                                    otherSellingDO.setSellingAvator(items.getSellerInfo().getAvatar());
+                                    otherSellingDO.setSellingUserName(items.getSellerInfo().getNickname());
+                                    otherSellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
+                                    list.add(otherSellingDO);
+                                }
+                                otherSellingMapper.insertBatch(list);
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    if (page >= 1) {
+                        break;
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } while (true);
+    }
+
+    // 其他平台自动在售入库
+    public void otherSellingInsert() {
         int page = 1;
         do {
             OkHttpClient client = new OkHttpClient();

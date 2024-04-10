@@ -110,4 +110,9 @@ public interface ErrorCodeConstants {
 // ========== 其他平台在售 TODO 补充编号 ==========
     ErrorCode OTHER_SELLING_NOT_EXISTS = new ErrorCode(1_800_010_01, "其他平台在售不存在");
 
+    // TODO 待办：请将下面的错误码复制到 yudao-module-steam-api 模块的 ErrorCodeConstants 类中。注意，请给“TODO 补充编号”设置一个错误码编号！！！
+// ========== 其他平台模板 TODO 补充编号 ==========
+    ErrorCode OTHER_TEMPLATE_NOT_EXISTS = new ErrorCode(1_900_010_01, "其他平台模板不存在");
+
+
 }
