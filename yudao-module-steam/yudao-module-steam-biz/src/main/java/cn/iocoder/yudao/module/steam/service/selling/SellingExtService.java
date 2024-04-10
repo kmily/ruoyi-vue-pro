@@ -33,7 +33,6 @@ import cn.iocoder.yudao.module.steam.service.otherselling.vo.OtherSellingListDo;
 import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 
-import jdk.management.resource.ResourceType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,10 +59,6 @@ public class SellingExtService {
     private SellingMapper sellingMapper;
     @Resource
     private InvMapper invMapper;
-    @Resource
-    private MemberUserMapper memberUserMapper;
-    @Resource
-    private BindUserMapper bindUserMapper;
     @Resource
     private InvDescMapper invDescMapper;
     @Resource
@@ -417,33 +412,33 @@ public class SellingExtService {
     }
 
 
-    /**
-     * WearCategory0  崭新出厂
-     * WearCategory1  略有磨损
-     * WearCategory2  久经沙场
-     * WearCategory3  破损不堪
-     * WearCategory4  战痕累累
-     *
-     * @param sellingPageReqVO
-     */
-    public  List<GoodsAbrasionDTO> showGoodsWithMarketName(GoodsWithMarketHashNameReqVO sellingPageReqVO) {
-        List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
-                .eq(SellingDO::getShortName, sellingPageReqVO.getShortName()));
-
-        List<GoodsAbrasionDTO> list = new  ArrayList<>();
-        for (SellingDO sellingDO : sellingDOS) {
-            if (!map.containsKey(sellingDO.getSelExterior())) {
-                map.put(sellingDO.getSelExterior(), sellingDO.getPrice());
-            }
-            for (Map.Entry<String, Integer> element : map.entrySet()) {
-                if (element.getKey().equals(sellingDO.getSelExterior()) && element.getValue() > sellingDO.getPrice()) {
-                    map.put(sellingDO.getSelExterior(), sellingDO.getPrice());
-                }
-            }
-        }
-
-        return list;
-    }
+//    /**
+//     * WearCategory0  崭新出厂
+//     * WearCategory1  略有磨损
+//     * WearCategory2  久经沙场
+//     * WearCategory3  破损不堪
+//     * WearCategory4  战痕累累
+//     *
+//     * @param sellingPageReqVO
+//     */
+//    public  List<GoodsAbrasionDTO> showGoodsWithMarketName(GoodsWithMarketHashNameReqVO sellingPageReqVO) {
+//        List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
+//                .eq(SellingDO::getShortName, sellingPageReqVO.getShortName()));
+//
+//        List<GoodsAbrasionDTO> list = new  ArrayList<>();
+//        for (SellingDO sellingDO : sellingDOS) {
+//            if (!map.containsKey(sellingDO.getSelExterior())) {
+//                map.put(sellingDO.getSelExterior(), sellingDO.getPrice());
+//            }
+//            for (Map.Entry<String, Integer> element : map.entrySet()) {
+//                if (element.getKey().equals(sellingDO.getSelExterior()) && element.getValue() > sellingDO.getPrice()) {
+//                    map.put(sellingDO.getSelExterior(), sellingDO.getPrice());
+//                }
+//            }
+//        }
+//
+//        return list;
+//    }
 
     public PageResult<OtherSellingPageReqVO> otherSale(SellingDO sellingDO) {
         List<OtherSellingDO> otherSellingDO = otherSellingMapper.selectList(new LambdaQueryWrapperX<OtherSellingDO>()
