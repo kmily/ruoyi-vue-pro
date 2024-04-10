@@ -18,7 +18,10 @@ import cn.iocoder.yudao.module.steam.controller.admin.youyoutemplate.vo.YouyouTe
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.UUCommondity.ApiUUCommodeityService;
-import cn.iocoder.yudao.module.steam.controller.app.vo.order.*;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderInfoResp;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderStatusResp;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
@@ -34,9 +37,9 @@ import cn.iocoder.yudao.module.steam.enums.*;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiBuyItemRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiCommodityRespVo;
+import cn.iocoder.yudao.module.steam.service.fin.vo.ApiOrderCancelRespVo;
 import cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
-import cn.iocoder.yudao.module.steam.service.steam.YouPingOrder;
 import cn.iocoder.yudao.module.steam.service.uu.UUService;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
@@ -125,25 +128,13 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         this.payWalletService = payWalletService;
     }
 
-//    @Resource
-//    private YouyouOrderMapper youyouOrderMapper;
     @Resource
     private ApiOrderMapper apiOrderMapper;
 
     @Resource
     private YouyouNotifyMapper youyouNotifyMapper;
 
-    @Resource
-    private UUCommodityMapper uUCommodityMapper;
 
-    @Resource
-    private UUTemplateService uuTemplateService;
-
-    private YouyouCommodityService youyouCommodityService;
-    @Autowired
-    public void setYouyouCommodityService(YouyouCommodityService youyouCommodityService) {
-        this.youyouCommodityService = youyouCommodityService;
-    }
     @Resource
     private DevAccountMapper devAccountMapper;
 
@@ -732,52 +723,27 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         ret.setProductDetail(productDetailDTO);
         return ret;
     }
-
-    /**
-     * 上传订单到有品
-     * @param youyouOrderDO
-     * @return
-     */
-    private YouPingOrder uploadYY(YouyouOrderDO youyouOrderDO){
-        CreateCommodityOrderReqVo createReqVo = new CreateCommodityOrderReqVo();
-        createReqVo.setMerchantOrderNo("YY"+youyouOrderDO.getMerchantOrderNo());
-        createReqVo.setTradeLinks(youyouOrderDO.getBuyTradeLinks());
-        createReqVo.setCommodityId(youyouOrderDO.getCommodityId());
-        createReqVo.setCommodityHashName(youyouOrderDO.getCommodityHashName());
-        createReqVo.setPurchasePrice(youyouOrderDO.getPurchasePrice());
-        createReqVo.setFastShipping(youyouOrderDO.getFastShipping());
-        createReqVo.setCommodityId(youyouOrderDO.getCommodityId());
-        ApiResult<YouPingOrder> youPingOrderApiResult = uuService.byGoodsIdCreateOrder(createReqVo);
-        uuService.checkResponse(youPingOrderApiResult);
-        return youPingOrderApiResult.getData();
-    }
     @Override
     public Integer orderCancel(LoginUser loginUser, OrderCancelVo orderCancelVo, String userIp,String cancelReason) {
         ApiOrderDO uuOrder = getUUOrder(loginUser, new QueryOrderReqVo().setOrderNo(orderCancelVo.getOrderNo()));
 
         // 1. 校验订单是否可以退款
         ApiOrderDO orderDO = validateInvOrderCanRefund(uuOrder, loginUser);
-
-
+        if(Objects.isNull(orderDO.getThreeOrderNo())){
+            refundAction(orderDO,loginUser);
+            return 1;
+        }
         Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByOrder(orderDO);
         if(apiThreeByOrder.isPresent()){
-            orderCancel
-        }
-
-
-        //如果有uu的单子，这里则只发起uu的退款，uu退款后再发起我们的退款
-        if(Objects.nonNull(orderDO.getUuOrderNo())){
-            //传入uu的单子
-            ApiResult<OrderCancelResp> orderCancelRespApiResult = uuService.orderCancel(new OrderCancelVo().setOrderNo(orderDO.getUuOrderNo()));
-            log.info("取消UU订单结果{}{}",orderCancelRespApiResult,youyouOrderDO);
-            if(orderCancelRespApiResult.getData().getResult()==1){
+            ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
+            ApiOrderCancelRespVo apiOrderCancelRespVo = apiThreeOrderService.orderCancel(loginUser, uuOrder.getThreeOrderNo(), uuOrder.getId());
+            if(apiOrderCancelRespVo.getIsSuccess()){
                 refundAction(orderDO,loginUser,cancelReason);
                 return 1;
             }
-            return orderCancelRespApiResult.getData().getResult();
+            return 3;
         }else{
-            refundAction(orderDO,loginUser);
-            return 1;
+            return 3;
         }
     }
     /**
@@ -820,10 +786,21 @@ public class ApiOrderServiceImpl implements ApiOrderService {
             throw exception(ErrorCodeConstants.UU_GOODS_ORDER_TRANSFER_CASHED);
         }
         //通过此接口可取消符合取消规则「创单成功后30min后卖家未发送交易报价」的代购订单。
-        if(Objects.nonNull(uuOrder.getUuOrderNo())){
+        if(Objects.nonNull(uuOrder.getThreeOrderNo())){
             //orderStatus,140的除 1101外其它状态不能取消，不能取消的还有340，280，360
-            if(Arrays.asList(UUOrderStatus.CODE140.getCode(),UUOrderStatus.CODE340.getCode(),UUOrderStatus.CODE280.getCode(),UUOrderStatus.CODE360.getCode()).contains(youyouOrderDO.getUuOrderStatus())){
-                if(!uuOrder.getUuOrderStatus().equals(UUOrderSubStatus.SUB_CODE1104.getCode())){
+//            if(Arrays.asList(UUOrderStatus.CODE140.getCode(),UUOrderStatus.CODE340.getCode(),UUOrderStatus.CODE280.getCode(),UUOrderStatus.CODE360.getCode()).contains(youyouOrderDO.getUuOrderStatus())){
+//                if(!uuOrder.getUuOrderStatus().equals(UUOrderSubStatus.SUB_CODE1104.getCode())){
+//                    throw exception(ErrorCodeConstants.UU_GOODS_ORDER_CAN_NOT_CANCEL);
+//                }
+//            }
+            Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByOrder(uuOrder);
+            if(apiThreeByOrder.isPresent()) {
+                ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
+                // 1,进行中，2完成，3作废
+                Integer orderSimpleStatus = apiThreeOrderService.getOrderSimpleStatus(loginUser, uuOrder.getThreeOrderNo(), uuOrder.getId());
+                if(orderSimpleStatus.equals(3)){
+
+                }else{
                     throw exception(ErrorCodeConstants.UU_GOODS_ORDER_CAN_NOT_CANCEL);
                 }
             }
@@ -840,29 +817,30 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         String callBackInfo = notifyReq.getCallBackInfo();
         NotifyVo notifyVo = JacksonUtils.readValue(callBackInfo, NotifyVo.class);
         log.info("回调接收的数据{}",notifyVo);
-        List<YouyouOrderDO> youyouOrderDOS = youyouOrderMapper.selectList(new LambdaQueryWrapper<YouyouOrderDO>()
-                .eq(YouyouOrderDO::getUuOrderNo, notifyVo.getOrderNo()));
-        if (!youyouOrderDOS.isEmpty()) {
-            YouyouOrderDO youyouOrderDO = youyouOrderDOS.get(0);
-            youyouOrderMapper.updateById(new YouyouOrderDO().setId(youyouOrderDO.getId())
-                    .setUuOrderType(notifyVo.getOrderType())
-                    .setUuOrderSubType(notifyVo.getOrderSubType())
-                    .setUuShippingMode(notifyVo.getShippingMode())
-                    .setUuTradeOfferId(notifyVo.getTradeOfferId())
-                    .setUuTradeOfferLinks(notifyVo.getTradeOfferLinks())
-                    .setUuBuyerUserId(notifyVo.getBuyerUserId())
-                    .setUuOrderStatus(notifyVo.getOrderStatus())
-                    .setUuOrderSubType(notifyVo.getOrderSubType())
-                    .setUuFailCode(notifyVo.getFailCode())
-                    .setUuFailReason(notifyVo.getFailReason())
-                    .setUuMerchantOrderNo(notifyVo.getMerchantOrderNo())
-                    .setUuNotifyType(notifyVo.getNotifyType())
-                    .setUuNotifyDesc(notifyVo.getNotifyDesc())
-            );
-            if(notifyVo.getNotifyType()==4){
-                //订单被取消了，走退款
-                refundAction(youyouOrderDO,new LoginUser().setTenantId(1L).setUserType(youyouOrderDO.getBuyUserType()).setId(youyouOrderDO.getBuyUserId()));
-            }
+        List<ApiOrderDO> apiOrderDOS = apiOrderMapper.selectList(new LambdaQueryWrapper<ApiOrderDO>()
+                .eq(ApiOrderDO::getThreeOrderNo, notifyVo.getOrderNo()));
+        if (!apiOrderDOS.isEmpty()) {
+            //生成相关回调数据
+//            ApiOrderDO orderDO = apiOrderDOS.get(0);
+//            Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByOrder(orderDO);
+//            if(apiThreeByOrder.isPresent()){
+//                ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
+//                LoginUser loginUser = new LoginUser().setTenantId(1L).setUserType(orderDO.getBuyUserType()).setId(orderDO.getBuyUserId());
+//                // 1,进行中，2完成，3作废
+//                Integer orderSimpleStatus = apiThreeOrderService.getOrderSimpleStatus(loginUser,orderDO.getThreeOrderNo(), orderDO.getId());
+//                switch (orderSimpleStatus){
+//                    case 1://进行中
+//                        break;
+//                    case 2://完成
+////                        apiOrderMapper.updateById(new ApiOrderDO().setId(orderDO.getId())
+////                                .setTransferStatus(InvTransferStatusEnum.TransferFINISH.getStatus()));
+//                        break;
+//                    case 3://作废
+//                        refundAction(orderDO,loginUser);
+//                        break;
+//                    default:
+//                }
+//            }
         }
 
     }
@@ -931,18 +909,27 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         }
         if(InvTransferStatusEnum.TransferING.getStatus().equals(uuOrderById.getTransferStatus())){
             //发货完成时
-            ApiResult<QueryOrderStatusResp> queryOrderStatusRespApiResult = uuService.orderStatus(new QueryOrderReqVo().setOrderNo(uuOrderById.getUuOrderNo()));
-            if(queryOrderStatusRespApiResult.getData().getBigStatus()==340){
-                cashInvOrder(invOrderId);
-                apiOrderMapper.updateById(new ApiOrderDO().setId(invOrderId).setTransferStatus(InvTransferStatusEnum.TransferFINISH.getStatus()));
-            }
-            //只处理340的单子
-//            if(queryOrderStatusRespApiResult.getData().getBigStatus()==360){
-//                cashInvOrder(invOrderId);
-//            }
-            if(queryOrderStatusRespApiResult.getData().getBigStatus()==280){
-                damagesCloseInvOrder(invOrderId,queryOrderStatusRespApiResult.getData().getSmallStatusMsg());
-                apiOrderMapper.updateById(new ApiOrderDO().setId(invOrderId).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus()));
+            Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByOrder(uuOrderById);
+            if(apiThreeByOrder.isPresent()) {
+                ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
+                LoginUser loginUser = new LoginUser().setTenantId(1L).setUserType(uuOrderById.getBuyUserType()).setId(uuOrderById.getBuyUserId());
+                // 1,进行中，2完成，3作废
+                Integer orderSimpleStatus = apiThreeOrderService.getOrderSimpleStatus(loginUser,uuOrderById.getThreeOrderNo(), uuOrderById.getId());
+                switch (orderSimpleStatus){
+                    case 1://进行中
+                        break;
+                    case 2://完成
+                        apiOrderMapper.updateById(new ApiOrderDO().setId(uuOrderById.getId())
+                                .setTransferStatus(InvTransferStatusEnum.TransferFINISH.getStatus()));
+                        cashInvOrder(invOrderId);
+                        apiOrderMapper.updateById(new ApiOrderDO().setId(invOrderId).setTransferStatus(InvTransferStatusEnum.TransferFINISH.getStatus()));
+                        break;
+                    case 3://作废
+                        damagesCloseInvOrder(invOrderId,"订单被第三方取消");
+                        apiOrderMapper.updateById(new ApiOrderDO().setId(invOrderId).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus()));
+                        break;
+                    default:
+                }
             }
         }
     }

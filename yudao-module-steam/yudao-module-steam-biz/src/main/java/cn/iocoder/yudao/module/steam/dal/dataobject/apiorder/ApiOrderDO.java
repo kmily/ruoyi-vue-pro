@@ -127,5 +127,8 @@ public class ApiOrderDO extends BaseDO {
      * 商品信息json
      */
     private String commodityInfo;
-
+    /**
+     * 第三方平台订单
+     */
+    private String threeOrderNo;
 }

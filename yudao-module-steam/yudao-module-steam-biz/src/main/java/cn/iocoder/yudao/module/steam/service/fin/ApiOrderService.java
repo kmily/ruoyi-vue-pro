@@ -52,7 +52,13 @@ public interface ApiOrderService {
 
 
     /**
-     * 买家取消订单
+     * 买家取消订单.
+     *
+     *      * 取消结果：
+     *      * 1、取消成功；
+     *      * 2、处理中；
+     *      * 3、取消失败。
+     *
      * @param loginUser
      * @param id
      * @param userIp
