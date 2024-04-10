@@ -2,9 +2,11 @@ package cn.iocoder.yudao.module.pay.controller.app.aliPay;
 
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.pay.core.client.impl.PayClientFactoryImpl;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayFundBatchPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.sign.SteamAlipayIsvDO;
@@ -12,7 +14,6 @@ import cn.iocoder.yudao.module.pay.dal.mysql.sign.SteamAlipayIsvMapper;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.response.AlipayOpenInviteOrderCreateResponse;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -22,6 +23,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -49,12 +53,17 @@ public class AlipayPLFKDHYMController {
      */
     @GetMapping("/userQueryIsvSign")
     public CommonResult userQueryIsvSign(){
-        SteamAlipayIsvDO isvDO = steamAlipayIsvMapper.selectOne(new QueryWrapper<SteamAlipayIsvDO>()
-                .eq("system_user_id",SecurityFrameworkUtils.getLoginUserId())
-                .isNotNull("app_auth_token")
-                .ne("app_auth_token","")
+        List<SteamAlipayIsvDO> steamAlipayIsvDOS = steamAlipayIsvMapper.selectList(new LambdaQueryWrapperX<SteamAlipayIsvDO>()
+                .eq(SteamAlipayIsvDO::getSystemUserId, SecurityFrameworkUtils.getLoginUserId())
+                .isNotNull(SteamAlipayIsvDO::getAppAuthToken)
+                .ne(SteamAlipayIsvDO::getAppAuthToken, "")
+                .orderByDesc(SteamAlipayIsvDO::getId)
         );
-        return CommonResult.success(isvDO);
+        if(steamAlipayIsvDOS.size()>0){
+            return CommonResult.success(steamAlipayIsvDOS.get(0));
+        }else{
+            return CommonResult.success(Collections.emptyList());
+        }
     }
     /**
      *支付宝个ISV页面签约接口
@@ -63,6 +72,10 @@ public class AlipayPLFKDHYMController {
      */
     @GetMapping("/isvPageSign")
     public CommonResult userAgreementPageSign(SteamAlipayIsvDO steamAlipayIsvDO) throws AlipayApiException, JsonProcessingException {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        if(Objects.isNull(loginUser)){
+            return CommonResult.error(-1,"请重新登录");
+        }
         // json序列化对象
         ObjectMapper objectMapper=new ObjectMapper();
         // 构建参数
@@ -86,6 +99,10 @@ public class AlipayPLFKDHYMController {
             jsonNode.put("systemUserType",SecurityFrameworkUtils.getLoginUser().getUserType());
             isvDO=objectMapper.convertValue(jsonNode, SteamAlipayIsvDO.class);
             // 将签约订单记录持久化到数据库
+            steamAlipayIsvMapper.delete(new LambdaQueryWrapperX<SteamAlipayIsvDO>()
+                    .eqIfPresent(SteamAlipayIsvDO::getSystemUserId,loginUser.getId())
+                    .eqIfPresent(SteamAlipayIsvDO::getSystemUserType,loginUser.getUserType())
+            );
             steamAlipayIsvMapper.insertOrUpdate(isvDO);
         }
         return CommonResult.success(response.getBody());
@@ -150,13 +167,4 @@ public class AlipayPLFKDHYMController {
         // 创建批量付款单据
         return payClient.alipayFundBatchDetailQuery(outBatchNo);
     }
-
-
-
-
-
-
-
-
-
 }

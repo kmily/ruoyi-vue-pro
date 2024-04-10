@@ -8,13 +8,16 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipaySafePayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
+import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
@@ -28,9 +31,11 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.sign.SteamAlipayAqfSignDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.sign.SteamAlipayIsvDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderExtensionMapper;
 import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderMapper;
 import cn.iocoder.yudao.module.pay.dal.mysql.sign.SteamAlipayAqfSignMapper;
+import cn.iocoder.yudao.module.pay.dal.mysql.sign.SteamAlipayIsvMapper;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
@@ -88,6 +93,8 @@ public class PayOrderServiceImpl implements PayOrderService {
     private ConfigService configService;
     @Resource
     private SteamAlipayAqfSignMapper steamAlipayAqfSignMapper;
+    @Resource
+    private SteamAlipayIsvMapper steamAlipayIsvMapper;
 
     @Override
     public PayOrderDO getOrder(Long id) {
@@ -177,6 +184,21 @@ public class PayOrderServiceImpl implements PayOrderService {
         ConfigDO configAlipayUserId = configService.getConfigByKey("alipay.ALIPAY_USER_ID");
         reqVO.getChannelExtras().put("configAlipayName",configAlipayName.getValue());
         reqVO.getChannelExtras().put("configAlipayUserId",configAlipayUserId.getValue());
+
+        if (Objects.equals(channel.getCode(), PayChannelEnum.ALIPAY_PLFKDYMZH.getCode())) {
+            //检查是否签约
+            Long userId = getLoginUserId();
+            Integer loginUserType = WebFrameworkUtils.getLoginUserType();
+            List<SteamAlipayIsvDO> steamAlipayIsvDOS = steamAlipayIsvMapper.selectList(new LambdaQueryWrapperX<SteamAlipayIsvDO>()
+                    .eq(SteamAlipayIsvDO::getSystemUserId, SecurityFrameworkUtils.getLoginUserId())
+                    .isNotNull(SteamAlipayIsvDO::getAppAuthToken)
+                    .ne(SteamAlipayIsvDO::getAppAuthToken, "")
+                    .orderByDesc(SteamAlipayIsvDO::getId)
+            );
+            if(steamAlipayIsvDOS.size()<=0){
+                throw new ServiceException(400001,"用户未签约，请先签约");
+            }
+        }
 
         if(Objects.equals(channel.getCode(), PayChannelEnum.ALIPAY_AQF.getCode())){
 
