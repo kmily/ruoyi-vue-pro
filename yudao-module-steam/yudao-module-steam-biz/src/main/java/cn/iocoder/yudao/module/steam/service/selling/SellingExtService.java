@@ -6,12 +6,16 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
+import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.*;
+import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
+import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
@@ -22,6 +26,7 @@ import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 
+import jdk.management.resource.ResourceType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,6 +51,10 @@ public class SellingExtService {
     private SellingMapper sellingMapper;
     @Resource
     private InvMapper invMapper;
+    @Resource
+    private MemberUserMapper memberUserMapper;
+    @Resource
+    private BindUserMapper bindUserMapper;
     @Resource
     private InvDescMapper invDescMapper;
     @Resource
@@ -465,5 +474,57 @@ public class SellingExtService {
 
         return list;
     }
+
+//    public SellerGoodsOnSellingRespVO getSellerGoods(String userId){
+//        List<BindUserDO> bindUserDOS = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
+//                .eq(BindUserDO::getUserId, userId));
+//        MemberUserDO memberUserDO = memberUserMapper.selectById(userId);
+//        SellerGoodsOnSellingRespVO respVO = new SellerGoodsOnSellingRespVO();
+//        respVO.setNickname(memberUserDO.getNickname());
+//        respVO.setAvatar(memberUserDO.getAvatar());
+//        ArrayList<String> list = new ArrayList<>();
+//        for (BindUserDO bindUserDO : bindUserDOS) {
+//            list.add(bindUserDO.getSteamId());
+//        }
+//        List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
+//                .in(SellingDO::getSteamId, list));
+//        PageResult<SellingDO> sellingList = new PageResult<>();
+//        ArrayList<SellingDO> selling1 = new ArrayList<>();
+//        ArrayList<SellingDO> soldList = new ArrayList<>();
+//        for (SellingDO sellingDO : sellingDOS) {
+//            if(Objects.equals(sellingDO.getTransferStatus(), InvTransferStatusEnum.SELL.getStatus())) {
+//                SellingDO selling = new SellingDO();
+//                selling.setMarketName(sellingDO.getMarketName());
+//                selling.setPrice(sellingDO.getPrice());
+//                selling.setIconUrl(sellingDO.getIconUrl());
+//                selling.setMarketHashName(sellingDO.getMarketHashName());
+//                selling1.add(selling);
+//                sellingList.setList(selling1);
+//            }
+//            if(Objects.equals(sellingDO.getTransferStatus(), InvTransferStatusEnum.TransferFINISH.getStatus())){
+//                SellingDO selling = new SellingDO();
+//                selling.setMarketName(sellingDO.getMarketName());
+//                selling.setPrice(sellingDO.getPrice());
+//                selling.setIconUrl(sellingDO.getIconUrl());
+//                selling.setMarketHashName(sellingDO.getMarketHashName());
+//                soldList.add(selling);
+//            }
+//        }
+//        respVO.setSelling(sellingList);
+//        respVO.setSold(soldList);
+////        PageResult<SellerGoodsOnSellingRespVO> objectPageResult = new PageResult<>();
+////        objectPageResult.setList(respVO);
+//        return respVO;
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//    }
+
 }
 
