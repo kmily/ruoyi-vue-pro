@@ -6,8 +6,11 @@ import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
+import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.*;
+import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.service.selling.SellingExtService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,6 +33,8 @@ public class AppSellingController {
 
     @Resource
     private SellingExtService sellingExtService;
+    @Resource
+    private MemberUserMapper memberUserMapper;
 
     @PostMapping("/batchSale")
     @Operation(summary = "批量上架")
@@ -73,9 +78,19 @@ public class AppSellingController {
 
     @GetMapping("/user/showGoodsWithMarketHashName")
     @Operation(summary = "按MarketHashName展示在售")
-    public CommonResult<Map<String, Integer>> showGoodsWithMarketHashName(@RequestBody @Valid GoodsWithMarketHashNameReqVO reqVO) {
-        Map<String, Integer> map = sellingExtService.showGoodsWithMarketName(reqVO);
-        return CommonResult.success(map);
+    public CommonResult<List<GoodsAbrasionDTO>> showGoodsWithMarketHashName(@RequestBody @Valid GoodsWithMarketHashNameReqVO reqVO) {
+        List<GoodsAbrasionDTO> goodsAbrasionDTOS = sellingExtService.showGoodsWithMarketName(reqVO);
+        return CommonResult.success(goodsAbrasionDTOS);
     }
+
+
+//    @GetMapping("/user/sellerGoodsOnSelling")
+//    @Operation(summary = "卖家上架商品查询")
+//    public CommonResult<SellerGoodsOnSellingRespVO> sellerGoodsOnSelling(@RequestParam String userId) {
+//        SellerGoodsOnSellingRespVO sellerGoods = sellingExtService.getSellerGoods(userId);
+//
+//        return CommonResult.success(sellerGoods);
+//    }
+
 }
 

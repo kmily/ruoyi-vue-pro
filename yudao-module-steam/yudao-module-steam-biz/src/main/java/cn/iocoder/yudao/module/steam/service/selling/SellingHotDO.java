@@ -45,5 +45,8 @@ public class SellingHotDO {
      * itemInfo
      */
     private C5ItemInfo itemInfo;
-
+    /**
+     * itemInfo
+     */
+    private String ShortName;
 }
