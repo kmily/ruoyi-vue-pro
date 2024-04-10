@@ -424,9 +424,11 @@ public class IOInvUpdateService {
                     });
                     int userGoodsNum = (int) (Math.random() * 7) + 3;
                     int userGoodsNumNow = 0;
+                    Float lastPrice = 0f;
                     Map<String, String> UserInfo = randomUserInfo();
                     for (AppOtherInvDetailListVO.Data__.CommodityInfo items : response_List.getData().getList()) {
-                        if (userGoodsNumNow++ >= userGoodsNum) {
+                        if (userGoodsNumNow++ >= userGoodsNum || !Objects.equals(lastPrice, items.getPrice())) {
+                            lastPrice = items.getPrice();
                             userGoodsNum = (int) (Math.random() * 7) + 3;
                             userGoodsNumNow = 0;
                             UserInfo = randomUserInfo();
