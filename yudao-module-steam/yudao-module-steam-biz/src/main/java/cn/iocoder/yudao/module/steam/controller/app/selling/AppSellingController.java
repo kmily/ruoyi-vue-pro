@@ -85,9 +85,9 @@ public class AppSellingController {
 
     @GetMapping("/user/showGoodsWithMarketHashName")
     @Operation(summary = "按MarketHashName展示在售")
-    public CommonResult<Map<String, Integer>> showGoodsWithMarketHashName(@RequestBody @Valid GoodsWithMarketHashNameReqVO reqVO) {
-        Map<String, Integer> map = sellingExtService.showGoodsWithMarketName(reqVO);
-        return CommonResult.success(map);
+    public CommonResult<List<GoodsAbrasionDTO>> showGoodsWithMarketHashName(@RequestBody @Valid GoodsWithMarketHashNameReqVO reqVO) {
+        List<GoodsAbrasionDTO> goodsAbrasionDTOS = sellingExtService.showGoodsWithMarketName(reqVO);
+        return CommonResult.success(goodsAbrasionDTOS);
     }
 
     @PostMapping("/otherSale")

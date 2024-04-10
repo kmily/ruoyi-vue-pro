@@ -13,11 +13,13 @@ import cn.iocoder.yudao.module.steam.controller.admin.otherselling.vo.OtherSelli
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.SellListItemResp;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.*;
+import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.otherselling.OtherSellingDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
+import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
@@ -31,6 +33,7 @@ import cn.iocoder.yudao.module.steam.service.otherselling.vo.OtherSellingListDo;
 import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 
+import jdk.management.resource.ResourceType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +60,10 @@ public class SellingExtService {
     private SellingMapper sellingMapper;
     @Resource
     private InvMapper invMapper;
+    @Resource
+    private MemberUserMapper memberUserMapper;
+    @Resource
+    private BindUserMapper bindUserMapper;
     @Resource
     private InvDescMapper invDescMapper;
     @Resource
@@ -419,12 +426,11 @@ public class SellingExtService {
      *
      * @param sellingPageReqVO
      */
-    public Map<String, Integer> showGoodsWithMarketName(GoodsWithMarketHashNameReqVO sellingPageReqVO) {
+    public  List<GoodsAbrasionDTO> showGoodsWithMarketName(GoodsWithMarketHashNameReqVO sellingPageReqVO) {
         List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
                 .eq(SellingDO::getShortName, sellingPageReqVO.getShortName()));
 
-//        List<SellingDO> list = new ArrayList<>();
-        Map<String, Integer> map = new HashMap<>();
+        List<GoodsAbrasionDTO> list = new  ArrayList<>();
         for (SellingDO sellingDO : sellingDOS) {
             if (!map.containsKey(sellingDO.getSelExterior())) {
                 map.put(sellingDO.getSelExterior(), sellingDO.getPrice());
@@ -435,7 +441,8 @@ public class SellingExtService {
                 }
             }
         }
-        return map;
+
+        return list;
     }
 
     public PageResult<OtherSellingPageReqVO> otherSale(SellingDO sellingDO) {
