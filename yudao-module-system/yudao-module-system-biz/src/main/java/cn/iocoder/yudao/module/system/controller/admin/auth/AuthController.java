@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.compress.utils.Lists;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -108,7 +109,11 @@ public class AuthController {
 
         // 1.3 获得菜单列表
         Set<Long> menuIds = permissionService.getRoleMenuListByRoleId(convertSet(roles, RoleDO::getId));
-        List<MenuDO> menuList = menuService.getMenuList(menuIds);
+        List<MenuDO> menuList = Lists.newArrayList();
+        // menuIds 为空时，会导致MyBatis Plus拼接错误，当前业务也不应该查出数据
+        if (CollUtil.isNotEmpty(menuIds)) {
+            menuList = menuService.getMenuList(menuIds);
+        }
         menuList.removeIf(menu -> !CommonStatusEnum.ENABLE.getStatus().equals(menu.getStatus())); // 移除禁用的菜单
 
         // 2. 拼接结果返回
