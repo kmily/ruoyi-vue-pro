@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.steam.controller.app.selling;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
@@ -11,7 +10,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.otherselling.vo.OtherSelli
 import cn.iocoder.yudao.module.steam.controller.admin.othertemplate.vo.OtherTemplatePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.*;
-import cn.iocoder.yudao.module.steam.dal.dataobject.othertemplate.OtherTemplateDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.otherselling.OtherSellingDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.othertemplate.OtherTemplateMapper;
 import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
@@ -25,8 +24,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -114,16 +111,11 @@ public class AppSellingController {
     }
     @PostMapping("/otherSellingInsert")
     @Operation(summary = "其他平台在售入库")
-    public CommonResult<List> otherSellingInsert() {
+    public CommonResult<PageResult<OtherSellingDO>> otherSellingInsert() {
 
-        List<OtherTemplateDO> otherTemplateDOS = otherTemplateMapper.selectList(new LambdaQueryWrapperX<OtherTemplateDO>().select(OtherTemplateDO::getItemId));
+        PageResult<OtherSellingDO> otherTemplateInsert = ioInvUpdateService.otherSellingInsert();
 
-        List list = new ArrayList<>();
-        for (OtherTemplateDO otherTemplateDO : otherTemplateDOS) {
-            PageResult<OtherSellingPageReqVO> otherTemplateInsert = ioInvUpdateService.otherSellingInsert(otherTemplateDO.getItemId());
-            list.add(otherTemplateInsert);
-        }
-        return CommonResult.success(list);
+        return CommonResult.success(otherTemplateInsert);
     }
 }
 

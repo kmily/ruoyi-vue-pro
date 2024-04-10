@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.steam.service.ioinvupdate;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.otherselling.vo.OtherSellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.othertemplate.vo.OtherTemplatePageReqVO;
@@ -15,7 +14,6 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.otherselling.OtherSellingDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.othertemplate.OtherTemplateDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
@@ -28,7 +26,6 @@ import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.service.steam.OtherSellingStatusEnum;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -388,17 +385,27 @@ public class IOInvUpdateService {
     }
 
     // 其他平台自动在售入库
-    public PageResult<OtherSellingPageReqVO> otherSellingInsert(Integer itemId) {
-        List returnList = new ArrayList<>();
+    public PageResult<OtherSellingDO> otherSellingInsert() {
+        List<OtherSellingDO> returnList = new ArrayList<>();
+        List<Long> itemIdList = new ArrayList<>();
         int page = 1;
-        do {
-            OkHttpClient client = new OkHttpClient();
+        List<OtherTemplateDO> otherTemplateDOS = otherTemplateMapper.selectList(new LambdaQueryWrapperX<OtherTemplateDO>().select(OtherTemplateDO::getItemId));
 
-                String details = "https://app.zbt.com/open/product/v1/sell/list?appId=730&language=zh-CN&app-key=3453fd2c502c51bcd6a7a68c6e812f85&delivery=2&itemId="
-                        + itemId;
+        for (OtherTemplateDO otherTemplateDO : otherTemplateDOS) {
+            itemIdList.add(Long.valueOf(otherTemplateDO.getItemId()));
+        }
+
+        OkHttpClient client = new OkHttpClient();
+
+        String details = "https://app.zbt.com/open/product/v1/sell/list?appId=730&language=zh-CN&app-key=3453fd2c502c51bcd6a7a68c6e812f85&delivery=2&itemId=";
+
+        while (page <= itemIdList.size()) {
+            for (Long itemId : itemIdList) {
+                List<OtherSellingDO> list = new ArrayList<>(); // 创建每个 itemId 的临时列表
+                String itemDetailUrl = details + itemId;
 
                 Request detailList = new Request.Builder()
-                        .url(details)
+                        .url(itemDetailUrl)
                         .build();
 
                 try (Response responseList = client.newCall(detailList).execute()) {
@@ -408,9 +415,7 @@ public class IOInvUpdateService {
                         String detailsList = responseList.body().string();
                         ObjectMapper objectMapper = new ObjectMapper();
                         objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
-                        AppOtherInvDetailListVO response_List = objectMapper.readValue(detailsList, new TypeReference<AppOtherInvDetailListVO>() {
-                        });
-                        List<OtherSellingDO> list = new ArrayList<>();
+                        AppOtherInvDetailListVO response_List = objectMapper.readValue(detailsList, new TypeReference<AppOtherInvDetailListVO>() {});
                         for (AppOtherInvDetailListVO.Data__.CommodityInfo items : response_List.getData().getList()) {
                             OtherSellingDO otherSellingDO = new OtherSellingDO();
                             otherSellingDO.setAppid(730);
@@ -427,20 +432,20 @@ public class IOInvUpdateService {
                             otherSellingDO.setSellingUserName(items.getSellerInfo().getNickname());
                             otherSellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
                             list.add(otherSellingDO);
-                            returnList.add(otherSellingDO);
                         }
-                        otherSellingMapper.insertBatch(list);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
-                if (page >= 4) {
-                    break;
-                }
+                returnList.addAll(list); // 将当前 itemId 的数据添加到 returnList
+                otherSellingMapper.insertBatch(list);
             }
-            while (true) ;
-            return new PageResult<>(returnList, (long) returnList.size());
+
+            page++;
+        }
+
+        return new PageResult<>(returnList, (long) returnList.size());
     }
 }
 
