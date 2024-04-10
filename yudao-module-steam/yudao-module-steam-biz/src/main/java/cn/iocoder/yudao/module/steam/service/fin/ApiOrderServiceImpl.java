@@ -33,11 +33,9 @@ import cn.iocoder.yudao.module.steam.dal.mysql.devaccount.DevAccountMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyoucommodity.UUCommodityMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyounotify.YouyouNotifyMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyouorder.YouyouOrderMapper;
-import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
-import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
-import cn.iocoder.yudao.module.steam.enums.UUOrderStatus;
-import cn.iocoder.yudao.module.steam.enums.UUOrderSubStatus;
+import cn.iocoder.yudao.module.steam.enums.*;
 import cn.iocoder.yudao.module.steam.service.SteamService;
+import cn.iocoder.yudao.module.steam.service.fin.vo.ApiBuyItemRespVo;
 import cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.YouPingOrder;
@@ -151,7 +149,12 @@ public class ApiOrderServiceImpl implements ApiOrderService {
     @Resource
     private DevAccountMapper devAccountMapper;
 
+    List<ApiThreeOrderService> apiThreeOrderServiceList;
 
+    @Autowired
+    public void setApiThreeOrderServiceList(List<ApiThreeOrderService> apiThreeOrderServiceList) {
+        this.apiThreeOrderServiceList = apiThreeOrderServiceList;
+    }
 
     /**
      * 方法只要用于查询，
@@ -164,6 +167,12 @@ public class ApiOrderServiceImpl implements ApiOrderService {
     private MemberUserApi memberUserApi;
 
     public ApiOrderServiceImpl() {
+    }
+    private Optional<ApiThreeOrderService> getApiThreeByOrder(ApiOrderDO apiOrderDO){
+        return apiThreeOrderServiceList.stream().filter(item->item.getPlatCode().equals(apiOrderDO.getPlatformCode())).findFirst();
+    }
+    private Optional<ApiThreeOrderService> getApiThreeByPlatCode(PlatCodeEnum platCodeEnum){
+        return apiThreeOrderServiceList.stream().filter(item->item.getPlatCode().equals(platCodeEnum)).findFirst();
     }
 
     @Override
@@ -350,10 +359,10 @@ public class ApiOrderServiceImpl implements ApiOrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public YouyouOrderDO payInvOrder(LoginUser loginUser, Long invOrderId) {
+    public ApiOrderDO payInvOrder(LoginUser loginUser, Long invOrderId) {
         QueryOrderReqVo queryOrderReqVo=new QueryOrderReqVo();
         queryOrderReqVo.setId(invOrderId);
-        YouyouOrderDO uuOrder = getUUOrder(loginUser, queryOrderReqVo);
+        ApiOrderDO uuOrder = getUUOrder(loginUser, queryOrderReqVo);
         if(Objects.isNull(uuOrder)){
             log.error("订单不存在{}",JacksonUtils.writeValueAsString(invOrderId));
             throw new ServiceException(OpenApiCode.CONCAT_ADMIN);
@@ -370,22 +379,29 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         PayWalletTransactionDO payWalletTransactionDO1 = payWalletService.reduceWalletBalance(orCreateWallet.getId(),uuOrder.getId(),
                 PayWalletBizTypeEnum.SUB_STEAM_CASH, uuOrder.getCommodityAmount());
         List<PayWalletTransactionDO> payWalletTransactionDOS = Arrays.asList(payWalletTransactionDO, payWalletTransactionDO1);
-        youyouOrderMapper.updateById(new YouyouOrderDO().setId(uuOrder.getId()).setPayPayRet(JacksonUtils.writeValueAsString(payWalletTransactionDOS)).setPayStatus(true)
+        apiOrderMapper.updateById(new ApiOrderDO().setId(uuOrder.getId()).setPayPayRet(JacksonUtils.writeValueAsString(payWalletTransactionDOS)).setPayStatus(true)
                 .setPayOrderStatus(PayOrderStatusEnum.SUCCESS.getStatus()));
-        YouyouOrderDO uuOrder1 = getUUOrder(loginUser, queryOrderReqVo);
-        YouPingOrder youPingOrder = uploadYY(uuOrder1);
+        ApiOrderDO uuOrder1 = getUUOrder(loginUser, queryOrderReqVo);
+        Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByOrder(uuOrder1);
+        if(!apiThreeByOrder.isPresent()){
+            throw exception(OpenApiCode.ERR_5212);
+        }
+        ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
+        ApiBuyItemRespVo apiBuyItemRespVo = apiThreeOrderService.buyItem(loginUser, uuOrder1.getBuyInfo());
+        if(!apiBuyItemRespVo.getIsSuccess()){
+            throw new ServiceException(apiBuyItemRespVo.getErrorCode());
+        }
+//        YouPingOrder youPingOrder = uploadYY(uuOrder1);
 
-        youyouOrderMapper.updateById(new YouyouOrderDO().setId(uuOrder1.getId()).
-                setUuOrderNo(youPingOrder.getOrderNo())
-                .setUuMerchantOrderNo(youPingOrder.getMerchantOrderNo())
-                .setUuShippingMode(youPingOrder.getShippingMode())
-                .setUuOrderStatus(youPingOrder.getOrderStatus())
-                .setUuMerchantOrderNo(youPingOrder.getMerchantOrderNo())
+        apiOrderMapper.updateById(new ApiOrderDO().setId(uuOrder1.getId())
+
+//                .setUuMerchantOrderNo(youPingOrder.getMerchantOrderNo())
+//                .setUuShippingMode(youPingOrder.getShippingMode())
+//                .setUuOrderStatus(youPingOrder.getOrderStatus())
+//                .setUuMerchantOrderNo(youPingOrder.getMerchantOrderNo())
                 .setPayOrderStatus(PayOrderStatusEnum.SUCCESS.getStatus())
-                .setPayStatus(true)
-                .setPayTime(LocalDateTime.now())
                 .setTransferStatus(InvTransferStatusEnum.TransferING.getStatus())
-                .setTransferText(JacksonUtils.writeValueAsString(youPingOrder))
+//                .setTransferText(JacksonUtils.writeValueAsString(apiBuyItemRespVo))
         );
         return getUUOrder(loginUser, queryOrderReqVo);
     }

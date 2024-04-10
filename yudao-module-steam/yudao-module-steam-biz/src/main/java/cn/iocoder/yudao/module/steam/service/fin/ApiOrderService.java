@@ -39,7 +39,7 @@ public interface ApiOrderService {
      * @param invOrderId 订单号
      * @return
      */
-    YouyouOrderDO payInvOrder(LoginUser loginUser, @Valid Long invOrderId);
+    ApiOrderDO payInvOrder(LoginUser loginUser, @Valid Long invOrderId);
     /**
      * 获得订单详情
      * 订单是以买家身份进行查询

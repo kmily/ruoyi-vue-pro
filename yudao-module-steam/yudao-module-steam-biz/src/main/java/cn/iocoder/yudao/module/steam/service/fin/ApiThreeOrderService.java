@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
+import cn.iocoder.yudao.module.steam.service.fin.vo.ApiBuyItemRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiCommodityRespVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
@@ -36,10 +37,11 @@ public interface ApiThreeOrderService {
     /**
      * 商品下单
      * 下单并回写steam_api_order_ext
+     * 失败时代码参考  OpenApiCode
      * @param loginUser 前端用户
      * @param createReqVO 购买信息
      */
-    void buyItem(LoginUser loginUser, @Valid CreateCommodityOrderReqVo createReqVO);
+    ApiBuyItemRespVo buyItem(LoginUser loginUser, @Valid CreateCommodityOrderReqVo createReqVO);
     /**
      * 查询订单状态
      * 主要用于更新 steam_api_order_ext，时自动更新相应状态
