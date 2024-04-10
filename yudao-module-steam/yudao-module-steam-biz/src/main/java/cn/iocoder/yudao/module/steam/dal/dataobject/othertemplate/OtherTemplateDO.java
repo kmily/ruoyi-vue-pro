@@ -42,7 +42,7 @@ public class OtherTemplateDO extends BaseDO {
     /**
      * 饰品id
      */
-    private Integer itemId;
+    private Long itemId;
     /**
      * 饰品名称
      */

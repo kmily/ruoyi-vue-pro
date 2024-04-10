@@ -35,17 +35,17 @@ public class OtherSellingPullJob implements JobHandler {
     @Override
     public String execute(String param) {
         Integer execute = TenantUtils.execute(1L, () -> {
-            List<Integer> allItemIds = getItemIds();
-            for (Integer itemId : allItemIds) {
+            List<Long> allItemIds = getItemIds();
+            for (Long itemId : allItemIds) {
                 rabbitTemplate.convertAndSend("steam", "steam_other_selling", itemId);
             }
             return 1;
         });
         return String.format("执行关闭成功 %s 个", execute);
     }
-    private List<Integer> getItemIds() {
+    private List<Long> getItemIds() {
         //创建一个Integer类型的列表
-        List<Integer> itemIds = new ArrayList<>();
+        List<Long> itemIds = new ArrayList<>();
         List<OtherTemplateDO> otherTemplateDOS = otherTemplateMapper.selectList(new QueryWrapper<OtherTemplateDO>().select("item_id"));
         for (OtherTemplateDO otherTemplateDO : otherTemplateDOS) {
             itemIds.add(otherTemplateDO.getItemId());

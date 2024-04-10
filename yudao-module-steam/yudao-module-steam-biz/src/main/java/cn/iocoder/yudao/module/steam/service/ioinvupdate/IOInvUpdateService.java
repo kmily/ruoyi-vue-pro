@@ -344,9 +344,9 @@ public class IOInvUpdateService {
                     String responseBody = response.body().string();
                     AppOtherInvListDto response_ = objectMapper.readValue(responseBody, new TypeReference<AppOtherInvListDto>() {
                     });
-                    for (AppOtherInvListDto.Data_.GoodsInfo item: response_.getData().getList()) {
+                    for (AppOtherInvListDto.Data_.GoodsInfo item : response_.getData().getList()) {
                         List<OtherTemplateDO> list = new ArrayList<>();
-                        if (item.getPriceInfo().getAutoDeliverQuantity() >= 1) {
+                        if (item.getPriceInfo().getAutoDeliverQuantity() <= 0) {
                             continue;
                         }
                         OtherTemplateDO otherTemplateDO = new OtherTemplateDO();
@@ -354,7 +354,7 @@ public class IOInvUpdateService {
                         otherTemplateDO.setExterior(item.getExterior());
                         otherTemplateDO.setExteriorName(item.getExteriorName());
                         otherTemplateDO.setImageUrl(item.getImageUrl());
-                        otherTemplateDO.setItemId(Math.toIntExact(item.getItemId()));
+                        otherTemplateDO.setItemId(item.getItemId());
                         otherTemplateDO.setItemName(item.getItemName());
                         otherTemplateDO.setMarketHashName(item.getMarketHashName());
                         otherTemplateDO.setAutoDeliverPrice(item.getPriceInfo().getAutoDeliverPrice());
@@ -376,7 +376,7 @@ public class IOInvUpdateService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if (page >= 1) {
+            if (page >= 10) {
                 break;
             }
         } while (true);
@@ -388,63 +388,53 @@ public class IOInvUpdateService {
     public PageResult<OtherSellingDO> otherSellingInsert() {
         List<OtherSellingDO> returnList = new ArrayList<>();
         List<Long> itemIdList = new ArrayList<>();
-        int page = 1;
-        List<OtherTemplateDO> otherTemplateDOS = otherTemplateMapper.selectList(new LambdaQueryWrapperX<OtherTemplateDO>().select(OtherTemplateDO::getItemId));
-
-        for (OtherTemplateDO otherTemplateDO : otherTemplateDOS) {
-            itemIdList.add(Long.valueOf(otherTemplateDO.getItemId()));
-        }
-
         OkHttpClient client = new OkHttpClient();
-
         String details = "https://app.zbt.com/open/product/v1/sell/list?appId=730&language=zh-CN&app-key=3453fd2c502c51bcd6a7a68c6e812f85&delivery=2&itemId=";
 
-        while (page <= itemIdList.size()) {
-            for (Long itemId : itemIdList) {
-                List<OtherSellingDO> list = new ArrayList<>(); // 创建每个 itemId 的临时列表
-                String itemDetailUrl = details + itemId;
-
-                Request detailList = new Request.Builder()
-                        .url(itemDetailUrl)
-                        .build();
-
-                try (Response responseList = client.newCall(detailList).execute()) {
-                    if (!responseList.isSuccessful()) {
-                        throw new IOException("Unexpected code " + responseList);
-                    } else {
-                        String detailsList = responseList.body().string();
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
-                        AppOtherInvDetailListVO response_List = objectMapper.readValue(detailsList, new TypeReference<AppOtherInvDetailListVO>() {});
-                        for (AppOtherInvDetailListVO.Data__.CommodityInfo items : response_List.getData().getList()) {
-                            OtherSellingDO otherSellingDO = new OtherSellingDO();
-                            otherSellingDO.setAppid(730);
-                            otherSellingDO.setIconUrl(items.getImageUrl());
-                            otherSellingDO.setMarketName(items.getItemName());
-                            otherSellingDO.setMarketHashName(items.getMarketHashName());
-                            otherSellingDO.setPlatformIdentity(OtherSellingStatusEnum.C5.getStatus());
-                            otherSellingDO.setPrice((int) (items.getPrice() * 6.75 * 100));
-                            otherSellingDO.setSelExterior(items.getItemInfo().getExteriorName());
-                            otherSellingDO.setSelQuality(items.getItemInfo().getQualityName());
-                            otherSellingDO.setSelRarity(items.getItemInfo().getRarityName());
-                            otherSellingDO.setSelType(items.getItemInfo().getTypeName());
-                            otherSellingDO.setSellingAvator(items.getSellerInfo().getAvatar());
-                            otherSellingDO.setSellingUserName(items.getSellerInfo().getNickname());
-                            otherSellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
-                            list.add(otherSellingDO);
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                returnList.addAll(list); // 将当前 itemId 的数据添加到 returnList
-                otherSellingMapper.insertBatch(list);
-            }
-
-            page++;
+        // 获取所有 itemId 的数据
+        for (OtherTemplateDO otherTemplateDO : otherTemplateMapper.selectList(new LambdaQueryWrapperX<OtherTemplateDO>().select(OtherTemplateDO::getItemId))) {
+            itemIdList.add(otherTemplateDO.getItemId());
         }
 
+        // 循环处理每个 itemId 的数据
+        for (Long itemId : itemIdList) {
+            String itemDetailUrl = details + itemId;
+            Request detailList = new Request.Builder()
+                    .url(itemDetailUrl)
+                    .build();
+
+            try (Response responseList = client.newCall(detailList).execute()) {
+                if (!responseList.isSuccessful()) {
+                    throw new IOException("Unexpected code " + responseList);
+                } else {
+                    String detailsList = responseList.body().string();
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+                    AppOtherInvDetailListVO response_List = objectMapper.readValue(detailsList, new TypeReference<AppOtherInvDetailListVO>() {
+                    });
+                    for (AppOtherInvDetailListVO.Data__.CommodityInfo items : response_List.getData().getList()) {
+                        OtherSellingDO otherSellingDO = new OtherSellingDO();
+                        otherSellingDO.setAppid(730);
+                        otherSellingDO.setIconUrl(items.getImageUrl());
+                        otherSellingDO.setMarketName(items.getItemName());
+                        otherSellingDO.setMarketHashName(items.getMarketHashName());
+                        otherSellingDO.setPlatformIdentity(OtherSellingStatusEnum.C5.getStatus());
+                        otherSellingDO.setPrice((int) (items.getPrice() * 6.75 * 100));
+                        otherSellingDO.setSelExterior(items.getItemInfo().getExteriorName());
+                        otherSellingDO.setSelQuality(items.getItemInfo().getQualityName());
+                        otherSellingDO.setSelRarity(items.getItemInfo().getRarityName());
+                        otherSellingDO.setSelType(items.getItemInfo().getTypeName());
+                        otherSellingDO.setSellingAvator(items.getSellerInfo().getAvatar());
+                        otherSellingDO.setSellingUserName(items.getSellerInfo().getNickname());
+                        otherSellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
+                        returnList.add(otherSellingDO);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        otherSellingMapper.insertBatch(returnList);
         return new PageResult<>(returnList, (long) returnList.size());
     }
 }
