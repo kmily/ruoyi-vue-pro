@@ -33,6 +33,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -46,9 +47,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@Slf4j
 public class IOInvUpdateService {
 
     @Resource
@@ -344,6 +347,7 @@ public class IOInvUpdateService {
             Request request = new Request.Builder()
                     .url(url)
                     .build();
+            log.info("startTime" + LocalDateTime.now());
             try (Response response = client.newCall(request).execute()) {
                 if (!response.isSuccessful()) {
                     throw new IOException("Unexpected code " + response);
@@ -386,7 +390,9 @@ public class IOInvUpdateService {
             if (page >= 10) {
                 break;
             }
+            log.info("endTime" + LocalDateTime.now());
         } while (true);
+
 
         return new PageResult<>(returnList, (long) returnList.size());
     }
@@ -409,101 +415,108 @@ public class IOInvUpdateService {
             Request detailList = new Request.Builder()
                     .url(itemDetailUrl)
                     .build();
-            String text = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ靖涵远舟浩润依夫博弘杰洋禹朋昊珂展舟韵辉泽杭彬元雨帆颂鸣文正丰元弘熙翰华君宇依祥升安晓琳德佑智远轩棋彬尚展畅兆栋沐霖世星俊绍晋哲泽辉浩哲家庆延政彬泰棋文泽城智月宇灿彪尊依林翰辰旭泽清乾圣恒涛博宗杰启宸柯依哲舟健瀚韶华棋胜晨杭天淇知国弘琪弘桦荣庭涛文顺楠志毅寒云至海秀楷君谦瀚辰政骏依蓓君冠庸玉弘羽星磊昌德亚亮忆夏风宇君翔棋帆浩天瀚帆锋启博振浩璋博若宇帆韵磊温谨龙升佳妍志鹤弘恒泽韶宇鹤江潮亦升越叶若溪博均晋新博亦苑涛乐彬璐瑶强恒文鹤智翎弘元昊柏经辰宜涵旭豪浩修青林寒霖昌耀源奕亦欣宇栋轩峻鸿润昌信翰轩天迅泽俊昌国知彰弘易博恩棋苑信坤琬琰弘瑜文德柯仁远辰全智霖健奕恺德欢文义尚兴依振鼎茂迅茂宜宏辉轩圣伯弘泰文庭万松祥衡楚阳远丰睿圣常柯棋天棕德曦咏灵芯天佑泰运维新志朋彤逸仲信宏仪荣茂泰恒彬逸达鸣宇承清磊远哲圣瀚文方鸿颜圣德世翰家林嘉乐宇尚晋辰晋拓翰瑞涛瀚宽经浩轩瀚景昌辉天鸣明耀博远鑫亦意隆文峻涛影博奇昌智瀚东品江毅宸韵皓翰宇浩龙智新翰尚辰卫璟妍展轩辉宇德信杰融文盛龙龙睿淇弥茂俊桦文楷圣龙君遥江佑译星圣琪俊翰文林圣楠月华嘉浚智轩光辉旭柏博仁致波晓奇永浚正阳仁顺哲伦明楷志伟文博信永嘉佑旭哲博帆寒远博昌博皓明震咏笑远达文青志材彤玮博辰祖奕懿桐智城鼎辉文语远松云新奕兴柯洁晏逸龙赫宏烁朋良庆浩松建铭煊成源侨秋世秋钧汉亮锡浩玮萧彬同彦伟伟渝世渝辰纶霖廷俊润梦成祖儒磊毅秦凯杉云磊尊榕筱桐辰栋航鸣聪家洋威乐毅磊田宇瀚雄浩兴正浩海启杭坤宗源勤一航喜锦庆硕克亮卓奕司楚勤然楠皓洋瀚嘉祥彦汉锦涛权信海奇思瑜武建瀚瑄海喜宥奇廷隆蓝中霖杰志廷景良晟谦锡喜宥嘉顺经沐林咏亮霆河勤志友政维友宥林书琳兆京颂旭旭森明杜楚立克伟笙夏云宗侨霆品京建源麟宥飞航思雨信然飞镇榕岳隽鸿尊梁龙玮顾诚林宸伟宏霖宁祥新乐天麟浩佳宏兆正劲鸣杜梁天岳杜盛瀚锋明辰基德正廉正鹏楠麟瑞良阳辉昊熙嘉健伊智梁协才骏庆龙杭亦裕隆良颂奕武纶枫勇家田权辉司仕腾瑄宗毅生民宇鑫阳健明家铭明睿成田品启树宽卓译麟良喜霖浩乐铭晟轩友思镇同琛廉郴杭力瑾曦伊振大武勤兴林译祥安道源淑宸信郴衡勇杭衡隆硕杉风辉友毅硕镇鸿正腾瑞维田镇乐广汉亦俊成峰禹晟卫栋森新力烽辰升琛祎涵聪亦心振生崴协杰永森东风皓熙聪亦志阳麟贯建兴冬镇琛轩智健贯源宽轩勇震卫俊兴武航楚俊逸鸿威风羲立仲罡森伦安泽涛尚志超茂浩子诚顺健勤剑宽蓝伦鸿轩辰斌伟锡琦经顺超协同佑友元子滨琛阳源良尊榕盛琛旻瑞广雨喆河晟毅浩浩曦楠曦庆宸仲然梓霖澄瀚海晨良海林杜东传宸传家泰东浩松涛子云海锋维超伟锋越桐曦鸣乐瑞狄杰阳冬兆斌渝伦云雪雄嘉宸林硕纶才驹东辰锋伊樱绮坤勤格蓝新思麟奇传锦品家艺柯明洋腾同哲勇建威广峰岳锡芊荟辰轩树奕勤浩健建劲树羲纶辰昊宁磊滨楚阳宸信基力逸晟京子艺羲旭狄枫卫嘉辰涛宽飞峰祖浩楠道协世毅云烽同兴曦震云伟宇宁锋明杰生驹华彪树建彪龙雷嘉彤廉绍希颂谦霖衡廷崴蓝晟钧铭宇景兴景司嘉亮隆洲河佳祖江佳琦泽旭树谦澄力京隆秦臣霆琛方萌威源勇嘉鸿烽森伊勤雄梁子楚琳传洋喜森聪辉冬家伊明镇格文静龙瀚瑄涛浩新秋智云冬源志斯浩烽彬郴明广佳森凯启渝浚轩振达飞浩汉逸云瑄成冬祥贯震冬智岚楚树云云榕超迅兴民源秦侨雅维枫坤铭霖榕政彦天霖楚浚亦晴岚洋禹伊中良协钧晏楠奕清德禹轩宥郴瀚宥迅洲景彬东瀚旭炎尹忆郴诚尊正建绍宸利哲海中镇奕彤炎永琦洋晏同庆鹏宸朋树朋若华鸣朋勤麟广毅兴航风源森宗冠宇聪景伦仲佑彦楠兴镇谦梁云锦汐哲奇龙政晗伦海绍庆威朗志美茜基树雷镇斌源明飞家勤同新亚洛洋成朋权喜清盛宇新茂浩政小雯宥羲毅家儒锡祖哲毅司基聪筱贝栋旻曦喜冬兆信利隽信希友枫宸健东司仲杰泽健谦杰鑫仲良小贺海祖晏立海钧景宽瑄晟佑成莱夏旭澄隆涛子永亦朗毅景洋译奕熹亦浩协庆朋茂曦宸杰亦升坤伟桐茂衡云盛晏镇毅宏栋镇钧永涵蕴超岳梁洋品顺杭铭协洋骏品贺烨楠云廉永霆辰京硕麟宇新建佳茵家杰玮兴品友鹏嘉毅伊森中俊宇奕品格阳超臣志秋洲庆成坤慧珍曦然凯雷锋彦武冬庆曦瀚志欣远景兴旻浩郴民钧立经旻滨宇晓彤中聪坤志正学协希源锡隽硕歆雯龙迅天瑄俊田杜浩泽中民旭晋嘉曦毅林俊顺弘云霖彦明宽羲桐羽永成生晏建辰才狄磊维民威晗璐勇江顺秋涛辰树霖隆震兴明昶睿建林渝新风洋镇彦海瑞喜烽妤瑶伊生崴希廷新晏鹏宥铭武明健伟钧瑞志华臣诚贤杉兴杰利升泽涛辰翰驹雄译建兆镇佳伟生亮善怡岳曦锋霖旭斌清经同杜源信怡莹乐智宏辰楚茂新晟嘉秦廉盛沐薇旻建腾雷希霆勤兆晗航源坤羽祥品威健新浩晨威剑聪海品旭梓尧佳霆辰成伟硕良心冬品岳洋希文经江学兴廉奕伊经轩飞峰志贺北力鑫奕臣民协宁尊然品栋喜东旭风麟梁景协兆诚锦铭聪权海祖依宥洋宸海中景思仲晗楚浩锦浩渝顺曦杜景清绍铭鸿信旻亚嘉子杰纶硕铭仲渝彬坤铭云东鹏海亚宁辰健俊硕滨杉杜子维卫崴泽清正曦奕岳奕强宥松森良伟琦乐政思铭龙宸勇鸣树腾基才兴林茂锦翎贤林维生卫思勇云辰狄驹克依菲明剑景力浩宽司伟宁宸志信依乐成希毅晏隆雄廷品林逸同浩志悦廉权伦辰奕晏蓝楠大毅立蓝贺宁钧晟道学泽威源郴纶学家传浩瀚彦兴东彬宁勤嘉汉镇坤清崴承露立源远聪经澄钧驹俊广洋嘉祥展彦烽经维镇茂钧志彦枫华狄旭英锋伦翰硕楠鑫廷榕智嘉兆兴锦程尊坤锋翰琛嘉心奇友谦伊林心蕊辰兴庆谦宇锋汉正朋剑武建韵淇辰瀚斌伊源镇威晟秋罡琛侨阳光鑫经冬鹏庆卓钧建家奕庆飞诗卿思琛健臣杜智东明曦乐信兴溪晨钧浩腾世森森聪森乐霖侨洋筱栩勇杰基宽政禹伦涛希锦学道一权宁朗钧麟奇道亮宁宸贤隆杉胤锡秦钧浚顺源正俊建秦辉林晗乔雷侨永卓新格翰浩基琛渝坤榕梓雨宥瑄盛锦华岳良琛勇铭良仲韫迪亚楠亦斌安彦风家骏远聪海锦晟洋玮伟羲永基东喜浩滨新清宏彬晨景喜斌河强旭奕正振升新绮晴正宁力辰卓瀚霖哲新旭生世文豪伦铭秋林硕振轩哲骏瀚宏彦逸川天兴云尊远利明维超道然海楚文磊仲海良启新道新宗冬威琛奕丞景家立升曦剑浚霖硕泽鹏浩晨兮嘉亦贯晏源家成思伟亦晏楠靖扬卫鹏喜麟世然亦勇兴蓝诚麟念承晟旭传权曦楚霖廉浩晨洋锋丽莉乐杰勇升景岳镇源喜驹浚佳沐谦镇海冬硕哲侨飞树贯秦宸俊雨佳浩辰建伟亮轩杰田权志卓嘉庆波旭云儒聪霆志天磊辰克秋建泓杰鸿杰祖轩宽子盛楠琛镇瑞辉怡熠庆航信锋霆杜顺源霖毅宸铭浩天强辰京亦冬炎聪绍逸鹏浩炎梓博飞麟镇羲廉浩锋安颂曦坤安晓慧志奕威才建江仲希蓝鑫朗品哲旭朗琛霖震乐武子建骏浩司锋诗语剑宁升友霖晗侨林河凯臣威诗雯洋钧亦司心森世硕兴信生蓝裕翔景大克宸雷建浩明智权启浩润鑫鑫郴迅宏辰瑞祖中杰航海大佳星海崴协奕杰信秋骏毅宽侨罡紫妍翰家伟郴楚枫明喜玮瑞然曦泽桐明旭瑞顺崴佳涛硕杉辰澄毅翊竣权格渝生锦祥新政盛侨华宇萌淼烽坤狄坤杜亚宥狄浩剑世喜如冰枫伊彦宁树辰田亮宗森廷咏玺文飞烽兴冬狄威琛罡伊杭坤海煜赫兴骏硕锡彬彪勤勤宇景秋旻浩丞新汉亮海瀚云新生诚轩喜源礼辰秦瀚锡兆奕琦俊民铭洲庆天梦霖云浩力天鸣家勇逸华司颂新世轩龙浚健云奇鸣杉良司俊正祥维涛品榕旭乐曦茂绍劲诚政龙风宇豪权曦鹏兴智武道曦祥奕澄洲春雨郴宁志云镇成咏锡朋思兆志南旭洋民浩晏罡海乐明腾哲泽江洋梵毅司咏浚树烽瀚震树海绍宗志宏克成清祖廉诚俊隽玮兆兴锦跃昂瀚峰腾家炎源家协硕家彪诚星林栋亦楚风羲浚泽秋勇凯家尊宏丽希乐兴俊伦广力维铭晟峰永铭川河树奕基兆远建风毅崴咏诚鑫嘉阳冬轩锡麟中逸子辰秦传浩嘉璐海嘉瀚崴兴铭栋家凯鸣东震佳艺信卓航玮建顺毅霖瀚冬辉仲茂臻羲坤良栋洋崴钧宗洋浚超侨依扬杰栋景麟洋凯麟彪道明亦蓝羽汐弘禹绍霖成兴冬顺超新顺辰馨艺辰华兴伟海隽才宸源升宽学家钧麟辰升浩狄晏永钧谦浚学健琛凯志鹏辰楚绍斌尊彦榕思欣言启源超兴烽锋子佳钧祥乐天勤绍智汉飞衡阳彬曦勤依柠琦广然谦道滨贯栋钧信沫言廷克钧浩风宗骏大浚儒怡彤伦佑驹岳祖震咏彬新劲星圆宇仲琛同阳心浩朗振成伊浩栋超冬远鸿子烽景盛曦浩杭锦克隽瀚伦杜驹麟冬浩思浩友希树权勇飞骏景子安杭祥立兴阳腾乐毅榕蓝狄洋伊学伦林宏瀚民嘉岳锋嘉超朋家亦驹伦卓森亚栋嘉生坤峰中弘彦然希崴友超奕乐亦浩汉广廷成廷琦晏亦振龙海超栋炎基贯建朋松渝森新晗宏臣然锋杭智海道启树彦品楚震广浚安安镇渝天旻骏道毅良庆林树琛辰伟玮远绍龙庆茂朋镇家江秦辰杉嘉利栋";
-            Random random = new Random();
-            int charCount = random.nextInt(3) + 2; // 随机生成2-4个字
-            Set<Character> selectedChars = new HashSet<>();
-
-            while (selectedChars.size() < charCount) {
-                int index = random.nextInt(text.length());
-                char ch = text.charAt(index);
-
-                // 确保字符不是空格,并且之前没有被选过
-                if (ch != ' ' && !selectedChars.contains(ch)) {
-                    selectedChars.add(ch);
-                }
-            }
-
-            String[] avatarUrls = {
-                    "https://api.uomg.com/api/rand.avatar?sort=男&format=json",
-                    "https://api.uomg.com/api/rand.avatar?sort=女&format=json",
-                    "https://api.uomg.com/api/rand.avatar?sort=动漫男&format=json",
-                    "https://api.uomg.com/api/rand.avatar?sort=动漫女&format=json"
-            };
-
-            Random randomImg = new Random();
-            int randomIndex = randomImg.nextInt(avatarUrls.length);
-            String selectedAvatarUrl = avatarUrls[randomIndex];
-
-            try {
-                URL url = new URL(selectedAvatarUrl);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-
-                int responseCode = connection.getResponseCode();
-                if (responseCode == HttpURLConnection.HTTP_OK) {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    StringBuilder response = new StringBuilder();
-                    String line;
-
-                    while ((line = reader.readLine()) != null) {
-                        response.append(line);
-                    }
-
-                    reader.close();
-
-                    // 解析 JSON 数据
-                    String json = response.toString();
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    AvatarResponse avatarResponse = objectMapper.readValue(json, AvatarResponse.class);
-                    String avatarUrl = avatarResponse.getImgUrl();
-
-                    // 将选中的字符转换为字符串
-                    StringBuilder randomChars = new StringBuilder();
-                    for (Character ch : selectedChars) {
-                        randomChars.append(ch);
-                    }
-                    String nickName = randomChars.toString();
-
-                    try (Response responseList = client.newCall(detailList).execute()) {
-                        if (responseList.isSuccessful()) {
-                            String detailsList = responseList.body().string();
-                            ObjectMapper objectMappers = new ObjectMapper();
-                            objectMappers.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
-                            AppOtherInvDetailListVO response_List = objectMappers.readValue(detailsList, new TypeReference<AppOtherInvDetailListVO>() {
-                            });
-
-                            for (AppOtherInvDetailListVO.Data__.CommodityInfo items : response_List.getData().getList()) {
-                                OtherSellingDO otherSellingDO = new OtherSellingDO();
-                                otherSellingDO.setAppid(730);
-                                otherSellingDO.setIconUrl(items.getImageUrl());
-                                otherSellingDO.setMarketName(items.getItemName());
-                                otherSellingDO.setMarketHashName(items.getMarketHashName());
-                                otherSellingDO.setPlatformIdentity(OtherSellingStatusEnum.C5.getStatus());
-                                otherSellingDO.setPrice((int) (items.getPrice() * 6.75 * 100));
-                                otherSellingDO.setSelExterior(items.getItemInfo().getExteriorName());
-                                otherSellingDO.setSelQuality(items.getItemInfo().getQualityName());
-                                otherSellingDO.setSelRarity(items.getItemInfo().getRarityName());
-                                otherSellingDO.setSelType(items.getItemInfo().getTypeName());
-                                otherSellingDO.setSellingAvator(avatarUrl);
-                                otherSellingDO.setSellingUserName(nickName);
-                                otherSellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
-                                returnList.add(otherSellingDO);
-                            }
-                        } else {
-                            System.out.println("HTTP request failed with response code: " + responseCode);
+            try (Response responseList = client.newCall(detailList).execute()) {
+                if (responseList.isSuccessful()) {
+                    String detailsList = responseList.body().string();
+                    ObjectMapper objectMappers = new ObjectMapper();
+                    objectMappers.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+                    AppOtherInvDetailListVO response_List = objectMappers.readValue(detailsList, new TypeReference<AppOtherInvDetailListVO>() {
+                    });
+                    int userGoodsNum = (int) (Math.random() * 7) + 3;
+                    int userGoodsNumNow = 0;
+                    Map<String, String> UserInfo = randomUserInfo();
+                    for (AppOtherInvDetailListVO.Data__.CommodityInfo items : response_List.getData().getList()) {
+                        if (userGoodsNumNow++ >= userGoodsNum) {
+                            userGoodsNum = (int) (Math.random() * 7) + 3;
+                            userGoodsNumNow = 0;
+                            UserInfo = randomUserInfo();
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                        OtherSellingDO otherSellingDO = new OtherSellingDO();
+                        otherSellingDO.setAppid(730);
+                        otherSellingDO.setIconUrl(items.getImageUrl());
+                        otherSellingDO.setMarketName(items.getItemName());
+                        otherSellingDO.setMarketHashName(items.getMarketHashName());
+                        otherSellingDO.setPlatformIdentity(OtherSellingStatusEnum.C5.getStatus());
+                        otherSellingDO.setPrice((int) (items.getPrice() * 6.75 * 100));
+                        otherSellingDO.setSelExterior(items.getItemInfo().getExteriorName());
+                        otherSellingDO.setSelQuality(items.getItemInfo().getQualityName());
+                        otherSellingDO.setSelRarity(items.getItemInfo().getRarityName());
+                        otherSellingDO.setSelType(items.getItemInfo().getTypeName());
+                        otherSellingDO.setSellingAvator(UserInfo.get("avatarUrl"));
+                        otherSellingDO.setSellingUserName(UserInfo.get("nickName"));
+                        otherSellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
+                        returnList.add(otherSellingDO);
                     }
                 }
-                connection.disconnect();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         otherSellingMapper.insertBatch(returnList);
         return new PageResult<>(returnList, (long) returnList.size());
+    }
+
+    public Map<String, String> randomUserInfo() {
+        Map<String, String> userInfo = new HashMap<String, String>();
+
+        // 获取随机昵称
+        String text = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ靖涵远舟浩润依夫博弘杰洋禹朋昊珂展舟韵辉泽杭彬元雨帆颂鸣文正丰元弘熙翰华君宇依祥升安晓琳德佑智远轩棋彬尚展畅兆栋沐霖世星俊绍晋哲泽辉浩哲家庆延政彬泰棋文泽城智月宇灿彪尊依林翰辰旭泽清乾圣恒涛博宗杰启宸柯依哲舟健瀚韶华棋胜晨杭天淇知国弘琪弘桦荣庭涛文顺楠志毅寒云至海秀楷君谦瀚辰政骏依蓓君冠庸玉弘羽星磊昌德亚亮忆夏风宇君翔棋帆浩天瀚帆锋启博振浩璋博若宇帆韵磊温谨龙升佳妍志鹤弘恒泽韶宇鹤江潮亦升越叶若溪博均晋新博亦苑涛乐彬璐瑶强恒文鹤智翎弘元昊柏经辰宜涵旭豪浩修青林寒霖昌耀源奕亦欣宇栋轩峻鸿润昌信翰轩天迅泽俊昌国知彰弘易博恩棋苑信坤琬琰弘瑜文德柯仁远辰全智霖健奕恺德欢文义尚兴依振鼎茂迅茂宜宏辉轩圣伯弘泰文庭万松祥衡楚阳远丰睿圣常柯棋天棕德曦咏灵芯天佑泰运维新志朋彤逸仲信宏仪荣茂泰恒彬逸达鸣宇承清磊远哲圣瀚文方鸿颜圣德世翰家林嘉乐宇尚晋辰晋拓翰瑞涛瀚宽经浩轩瀚景昌辉天鸣明耀博远鑫亦意隆文峻涛影博奇昌智瀚东品江毅宸韵皓翰宇浩龙智新翰尚辰卫璟妍展轩辉宇德信杰融文盛龙龙睿淇弥茂俊桦文楷圣龙君遥江佑译星圣琪俊翰文林圣楠月华嘉浚智轩光辉旭柏博仁致波晓奇永浚正阳仁顺哲伦明楷志伟文博信永嘉佑旭哲博帆寒远博昌博皓明震咏笑远达文青志材彤玮博辰祖奕懿桐智城鼎辉文语远松云新奕兴柯洁晏逸龙赫宏烁朋良庆浩松建铭煊成源侨秋世秋钧汉亮锡浩玮萧彬同彦伟伟渝世渝辰纶霖廷俊润梦成祖儒磊毅秦凯杉云磊尊榕筱桐辰栋航鸣聪家洋威乐毅磊田宇瀚雄浩兴正浩海启杭坤宗源勤一航喜锦庆硕克亮卓奕司楚勤然楠皓洋瀚嘉祥彦汉锦涛权信海奇思瑜武建瀚瑄海喜宥奇廷隆蓝中霖杰志廷景良晟谦锡喜宥嘉顺经沐林咏亮霆河勤志友政维友宥林书琳兆京颂旭旭森明杜楚立克伟笙夏云宗侨霆品京建源麟宥飞航思雨信然飞镇榕岳隽鸿尊梁龙玮顾诚林宸伟宏霖宁祥新乐天麟浩佳宏兆正劲鸣杜梁天岳杜盛瀚锋明辰基德正廉正鹏楠麟瑞良阳辉昊熙嘉健伊智梁协才骏庆龙杭亦裕隆良颂奕武纶枫勇家田权辉司仕腾瑄宗毅生民宇鑫阳健明家铭明睿成田品启树宽卓译麟良喜霖浩乐铭晟轩友思镇同琛廉郴杭力瑾曦伊振大武勤兴林译祥安道源淑宸信郴衡勇杭衡隆硕杉风辉友毅硕镇鸿正腾瑞维田镇乐广汉亦俊成峰禹晟卫栋森新力烽辰升琛祎涵聪亦心振生崴协杰永森东风皓熙聪亦志阳麟贯建兴冬镇琛轩智健贯源宽轩勇震卫俊兴武航楚俊逸鸿威风羲立仲罡森伦安泽涛尚志超茂浩子诚顺健勤剑宽蓝伦鸿轩辰斌伟锡琦经顺超协同佑友元子滨琛阳源良尊榕盛琛旻瑞广雨喆河晟毅浩浩曦楠曦庆宸仲然梓霖澄瀚海晨良海林杜东传宸传家泰东浩松涛子云海锋维超伟锋越桐曦鸣乐瑞狄杰阳冬兆斌渝伦云雪雄嘉宸林硕纶才驹东辰锋伊樱绮坤勤格蓝新思麟奇传锦品家艺柯明洋腾同哲勇建威广峰岳锡芊荟辰轩树奕勤浩健建劲树羲纶辰昊宁磊滨楚阳宸信基力逸晟京子艺羲旭狄枫卫嘉辰涛宽飞峰祖浩楠道协世毅云烽同兴曦震云伟宇宁锋明杰生驹华彪树建彪龙雷嘉彤廉绍希颂谦霖衡廷崴蓝晟钧铭宇景兴景司嘉亮隆洲河佳祖江佳琦泽旭树谦澄力京隆秦臣霆琛方萌威源勇嘉鸿烽森伊勤雄梁子楚琳传洋喜森聪辉冬家伊明镇格文静龙瀚瑄涛浩新秋智云冬源志斯浩烽彬郴明广佳森凯启渝浚轩振达飞浩汉逸云瑄成冬祥贯震冬智岚楚树云云榕超迅兴民源秦侨雅维枫坤铭霖榕政彦天霖楚浚亦晴岚洋禹伊中良协钧晏楠奕清德禹轩宥郴瀚宥迅洲景彬东瀚旭炎尹忆郴诚尊正建绍宸利哲海中镇奕彤炎永琦洋晏同庆鹏宸朋树朋若华鸣朋勤麟广毅兴航风源森宗冠宇聪景伦仲佑彦楠兴镇谦梁云锦汐哲奇龙政晗伦海绍庆威朗志美茜基树雷镇斌源明飞家勤同新亚洛洋成朋权喜清盛宇新茂浩政小雯宥羲毅家儒锡祖哲毅司基聪筱贝栋旻曦喜冬兆信利隽信希友枫宸健东司仲杰泽健谦杰鑫仲良小贺海祖晏立海钧景宽瑄晟佑成莱夏旭澄隆涛子永亦朗毅景洋译奕熹亦浩协庆朋茂曦宸杰亦升坤伟桐茂衡云盛晏镇毅宏栋镇钧永涵蕴超岳梁洋品顺杭铭协洋骏品贺烨楠云廉永霆辰京硕麟宇新建佳茵家杰玮兴品友鹏嘉毅伊森中俊宇奕品格阳超臣志秋洲庆成坤慧珍曦然凯雷锋彦武冬庆曦瀚志欣远景兴旻浩郴民钧立经旻滨宇晓彤中聪坤志正学协希源锡隽硕歆雯龙迅天瑄俊田杜浩泽中民旭晋嘉曦毅林俊顺弘云霖彦明宽羲桐羽永成生晏建辰才狄磊维民威晗璐勇江顺秋涛辰树霖隆震兴明昶睿建林渝新风洋镇彦海瑞喜烽妤瑶伊生崴希廷新晏鹏宥铭武明健伟钧瑞志华臣诚贤杉兴杰利升泽涛辰翰驹雄译建兆镇佳伟生亮善怡岳曦锋霖旭斌清经同杜源信怡莹乐智宏辰楚茂新晟嘉秦廉盛沐薇旻建腾雷希霆勤兆晗航源坤羽祥品威健新浩晨威剑聪海品旭梓尧佳霆辰成伟硕良心冬品岳洋希文经江学兴廉奕伊经轩飞峰志贺北力鑫奕臣民协宁尊然品栋喜东旭风麟梁景协兆诚锦铭聪权海祖依宥洋宸海中景思仲晗楚浩锦浩渝顺曦杜景清绍铭鸿信旻亚嘉子杰纶硕铭仲渝彬坤铭云东鹏海亚宁辰健俊硕滨杉杜子维卫崴泽清正曦奕岳奕强宥松森良伟琦乐政思铭龙宸勇鸣树腾基才兴林茂锦翎贤林维生卫思勇云辰狄驹克依菲明剑景力浩宽司伟宁宸志信依乐成希毅晏隆雄廷品林逸同浩志悦廉权伦辰奕晏蓝楠大毅立蓝贺宁钧晟道学泽威源郴纶学家传浩瀚彦兴东彬宁勤嘉汉镇坤清崴承露立源远聪经澄钧驹俊广洋嘉祥展彦烽经维镇茂钧志彦枫华狄旭英锋伦翰硕楠鑫廷榕智嘉兆兴锦程尊坤锋翰琛嘉心奇友谦伊林心蕊辰兴庆谦宇锋汉正朋剑武建韵淇辰瀚斌伊源镇威晟秋罡琛侨阳光鑫经冬鹏庆卓钧建家奕庆飞诗卿思琛健臣杜智东明曦乐信兴溪晨钧浩腾世森森聪森乐霖侨洋筱栩勇杰基宽政禹伦涛希锦学道一权宁朗钧麟奇道亮宁宸贤隆杉胤锡秦钧浚顺源正俊建秦辉林晗乔雷侨永卓新格翰浩基琛渝坤榕梓雨宥瑄盛锦华岳良琛勇铭良仲韫迪亚楠亦斌安彦风家骏远聪海锦晟洋玮伟羲永基东喜浩滨新清宏彬晨景喜斌河强旭奕正振升新绮晴正宁力辰卓瀚霖哲新旭生世文豪伦铭秋林硕振轩哲骏瀚宏彦逸川天兴云尊远利明维超道然海楚文磊仲海良启新道新宗冬威琛奕丞景家立升曦剑浚霖硕泽鹏浩晨兮嘉亦贯晏源家成思伟亦晏楠靖扬卫鹏喜麟世然亦勇兴蓝诚麟念承晟旭传权曦楚霖廉浩晨洋锋丽莉乐杰勇升景岳镇源喜驹浚佳沐谦镇海冬硕哲侨飞树贯秦宸俊雨佳浩辰建伟亮轩杰田权志卓嘉庆波旭云儒聪霆志天磊辰克秋建泓杰鸿杰祖轩宽子盛楠琛镇瑞辉怡熠庆航信锋霆杜顺源霖毅宸铭浩天强辰京亦冬炎聪绍逸鹏浩炎梓博飞麟镇羲廉浩锋安颂曦坤安晓慧志奕威才建江仲希蓝鑫朗品哲旭朗琛霖震乐武子建骏浩司锋诗语剑宁升友霖晗侨林河凯臣威诗雯洋钧亦司心森世硕兴信生蓝裕翔景大克宸雷建浩明智权启浩润鑫鑫郴迅宏辰瑞祖中杰航海大佳星海崴协奕杰信秋骏毅宽侨罡紫妍翰家伟郴楚枫明喜玮瑞然曦泽桐明旭瑞顺崴佳涛硕杉辰澄毅翊竣权格渝生锦祥新政盛侨华宇萌淼烽坤狄坤杜亚宥狄浩剑世喜如冰枫伊彦宁树辰田亮宗森廷咏玺文飞烽兴冬狄威琛罡伊杭坤海煜赫兴骏硕锡彬彪勤勤宇景秋旻浩丞新汉亮海瀚云新生诚轩喜源礼辰秦瀚锡兆奕琦俊民铭洲庆天梦霖云浩力天鸣家勇逸华司颂新世轩龙浚健云奇鸣杉良司俊正祥维涛品榕旭乐曦茂绍劲诚政龙风宇豪权曦鹏兴智武道曦祥奕澄洲春雨郴宁志云镇成咏锡朋思兆志南旭洋民浩晏罡海乐明腾哲泽江洋梵毅司咏浚树烽瀚震树海绍宗志宏克成清祖廉诚俊隽玮兆兴锦跃昂瀚峰腾家炎源家协硕家彪诚星林栋亦楚风羲浚泽秋勇凯家尊宏丽希乐兴俊伦广力维铭晟峰永铭川河树奕基兆远建风毅崴咏诚鑫嘉阳冬轩锡麟中逸子辰秦传浩嘉璐海嘉瀚崴兴铭栋家凯鸣东震佳艺信卓航玮建顺毅霖瀚冬辉仲茂臻羲坤良栋洋崴钧宗洋浚超侨依扬杰栋景麟洋凯麟彪道明亦蓝羽汐弘禹绍霖成兴冬顺超新顺辰馨艺辰华兴伟海隽才宸源升宽学家钧麟辰升浩狄晏永钧谦浚学健琛凯志鹏辰楚绍斌尊彦榕思欣言启源超兴烽锋子佳钧祥乐天勤绍智汉飞衡阳彬曦勤依柠琦广然谦道滨贯栋钧信沫言廷克钧浩风宗骏大浚儒怡彤伦佑驹岳祖震咏彬新劲星圆宇仲琛同阳心浩朗振成伊浩栋超冬远鸿子烽景盛曦浩杭锦克隽瀚伦杜驹麟冬浩思浩友希树权勇飞骏景子安杭祥立兴阳腾乐毅榕蓝狄洋伊学伦林宏瀚民嘉岳锋嘉超朋家亦驹伦卓森亚栋嘉生坤峰中弘彦然希崴友超奕乐亦浩汉广廷成廷琦晏亦振龙海超栋炎基贯建朋松渝森新晗宏臣然锋杭智海道启树彦品楚震广浚安安镇渝天旻骏道毅良庆林树琛辰伟玮远绍龙庆茂朋镇家江秦辰杉嘉利栋";
+        Random random = new Random();
+        int charCount = random.nextInt(3) + 2; // 随机生成2-4个字
+        Set<Character> selectedChars = new HashSet<>();
+        while (selectedChars.size() < charCount) {
+            int index = random.nextInt(text.length());
+            char ch = text.charAt(index);
+
+            // 确保字符不是空格,并且之前没有被选过
+            if (ch != ' ' && !selectedChars.contains(ch)) {
+                selectedChars.add(ch);
+            }
+        }
+        StringBuilder randomChars = new StringBuilder();
+        for (Character ch : selectedChars) {
+            randomChars.append(ch);
+        }
+        String nickName = randomChars.toString();
+        userInfo.put("nickName", nickName);
+
+        // 获取随机头像
+        String[] avatarUrls = {
+                "https://api.uomg.com/api/rand.avatar?sort=男&format=json",
+                "https://api.uomg.com/api/rand.avatar?sort=女&format=json",
+                "https://api.uomg.com/api/rand.avatar?sort=动漫男&format=json",
+                "https://api.uomg.com/api/rand.avatar?sort=动漫女&format=json"
+        };
+        Random randomImg = new Random();
+        int randomIndex = randomImg.nextInt(avatarUrls.length);
+        String selectedAvatarUrl = avatarUrls[randomIndex];
+        String avatarUrl = "";
+        try {
+            URL url = new URL(selectedAvatarUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+
+                // 解析 JSON 数据
+                String json = response.toString();
+                ObjectMapper objectMapper = new ObjectMapper();
+                AvatarResponse avatarResponse = objectMapper.readValue(json, AvatarResponse.class);
+                avatarUrl = avatarResponse.getImgUrl();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        userInfo.put("avatarUrl", avatarUrl);
+        return userInfo;
     }
 }
 
