@@ -170,15 +170,16 @@ public class PayOrderServiceImpl implements PayOrderService {
                 .setChannelId(channel.getId()).setChannelCode(channel.getCode())
                 .setStatus(PayOrderStatusEnum.WAITING.getStatus());
         orderExtensionMapper.insert(orderExtension);
+        if(Objects.isNull(reqVO.getChannelExtras())){
+            reqVO.setChannelExtras(new HashMap<>());
+        }
+        ConfigDO configAlipayName = configService.getConfigByKey("alipay.name");
+        ConfigDO configAlipayUserId = configService.getConfigByKey("alipay.ALIPAY_USER_ID");
+        reqVO.getChannelExtras().put("configAlipayName",configAlipayName.getValue());
+        reqVO.getChannelExtras().put("configAlipayUserId",configAlipayUserId.getValue());
 
         if(Objects.equals(channel.getCode(), PayChannelEnum.ALIPAY_AQF.getCode())){
-            if(Objects.isNull(reqVO.getChannelExtras())){
-                reqVO.setChannelExtras(new HashMap<>());
-            }
-            ConfigDO configAlipayName = configService.getConfigByKey("alipay.name");
-            ConfigDO configAlipayUserId = configService.getConfigByKey("alipay.ALIPAY_USER_ID");
-            reqVO.getChannelExtras().put("configAlipayName",configAlipayName.getValue());
-            reqVO.getChannelExtras().put("configAlipayUserId",configAlipayUserId.getValue());
+
             Long userId = getLoginUserId();
             String agreementNo=reqVO.getChannelExtras().get("book_agreement_no");
             SteamAlipayAqfSignDO steamAlipayAqfSignDO=steamAlipayAqfSignMapper.selectOne(new QueryWrapper<SteamAlipayAqfSignDO>()
