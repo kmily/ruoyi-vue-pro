@@ -223,6 +223,7 @@ public class InvPreviewExtService {
             sellingHotDO.setMarketName(item.getMarketName());
             sellingHotDO.setMarketHashName(item.getMarketHashName());
             sellingHotDO.setSellNum(sellNumMap.get(item.getMarketHashName()));
+            sellingHotDO.setShortName(item.getShortName());
 
             sellingHotDOList.add(sellingHotDO);
         }

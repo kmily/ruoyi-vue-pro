@@ -146,4 +146,6 @@ public interface PayOrderService {
      */
     int expireOrder();
 
+    String AliPayYHSQXYQY();
+
 }
