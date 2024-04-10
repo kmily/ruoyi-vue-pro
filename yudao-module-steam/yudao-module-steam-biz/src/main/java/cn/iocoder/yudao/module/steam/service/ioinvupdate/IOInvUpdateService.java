@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.steam.service.ioinvupdate;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppOtherInvDetailListVO;
@@ -10,10 +11,13 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.otherselling.OtherSellingDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.othertemplate.OtherTemplateDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.inv.InvMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.otherselling.OtherSellingMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.othertemplate.OtherTemplateMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.otherselling.OtherSellingService;
@@ -21,6 +25,7 @@ import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InventoryDto;
 import cn.iocoder.yudao.module.steam.service.steam.OtherSellingStatusEnum;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -61,6 +66,8 @@ public class IOInvUpdateService {
 
     @Resource
     private OtherSellingMapper otherSellingMapper;
+    @Resource
+    private OtherTemplateMapper otherTemplateMapper;
 
 
 //    @Async
@@ -336,125 +343,97 @@ public class IOInvUpdateService {
                     String responseBody = response.body().string();
                     AppOtherInvListDto response_ = objectMapper.readValue(responseBody, new TypeReference<AppOtherInvListDto>() {
                     });
-                    for (AppOtherInvListDto.Data_.GoodsInfo item : response_.getData().getList()) {
-                        String details = "https://app.zbt.com/open/product/v1/sell/list?appId=730&language=zh-CN&app-key=3453fd2c502c51bcd6a7a68c6e812f85&delivery=2&itemId="
-                                + item.getItemId();
-                        Request detailList = new Request.Builder()
-                                .url(details)
-                                .build();
-                        try (Response responseList = client.newCall(detailList).execute()) {
-                            if (!responseList.isSuccessful()) {
-                                throw new IOException("Unexpected code " + responseList);
-                            } else {
-                                String detailsList = responseList.body().string();
-                                ObjectMapper objectMapper = new ObjectMapper();
-                                objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
-                                AppOtherInvDetailListVO response_List = objectMapper.readValue(detailsList, new TypeReference<AppOtherInvDetailListVO>() {
-                                });
-                                List<OtherSellingDO> list = new ArrayList<>();
-                                for (AppOtherInvDetailListVO.Data__.CommodityInfo items : response_List.getData().getList()) {
-                                    if (items.getAcceptBargain() <= 0) {
-                                        continue;
-                                    }
-                                    OtherSellingDO otherSellingDO = new OtherSellingDO();
-                                    otherSellingDO.setAppid(730);
-                                    otherSellingDO.setIconUrl(item.getImageUrl());
-                                    otherSellingDO.setMarketName(item.getItemName());
-                                    otherSellingDO.setMarketHashName(item.getMarketHashName());
-                                    otherSellingDO.setPlatformIdentity(OtherSellingStatusEnum.C5.getStatus());
-                                    otherSellingDO.setPrice((int) (items.getPrice() * 6.75 * 100));
-                                    otherSellingDO.setSelExterior(item.getExteriorName());
-                                    otherSellingDO.setSelQuality(item.getQualityName());
-                                    otherSellingDO.setSelRarity(item.getRarityName());
-                                    otherSellingDO.setSelType(item.getTypeName());
-                                    otherSellingDO.setSellingAvator(items.getSellerInfo().getAvatar());
-                                    otherSellingDO.setSellingUserName(items.getSellerInfo().getNickname());
-                                    otherSellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
-                                    list.add(otherSellingDO);
-                                }
-                                otherSellingMapper.insertBatch(list);
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                    for (AppOtherInvListDto.Data_.GoodsInfo item: response_.getData().getList()) {
+                        List<OtherTemplateDO> list = new ArrayList<>();
+                        if (item.getPriceInfo().getAutoDeliverQuantity() >= 1) {
+                            continue;
                         }
-                    }
-                    if (page >= 1) {
-                        break;
+                        OtherTemplateDO otherTemplateDO = new OtherTemplateDO();
+                        otherTemplateDO.setPlatformIdentity(OtherSellingStatusEnum.C5.getStatus());
+                        otherTemplateDO.setExterior(item.getExterior());
+                        otherTemplateDO.setExteriorName(item.getExteriorName());
+                        otherTemplateDO.setImageUrl(item.getImageUrl());
+                        otherTemplateDO.setItemId(item.getItemId());
+                        otherTemplateDO.setItemName(item.getItemName());
+                        otherTemplateDO.setMarketHashName(item.getMarketHashName());
+                        otherTemplateDO.setAutoDeliverPrice(Double.valueOf(item.getPriceInfo().getAutoDeliverPrice()));
+                        otherTemplateDO.setAutoDeliverQuantity(item.getPriceInfo().getAutoDeliverQuantity());
+                        otherTemplateDO.setQuality(item.getQuality());
+                        otherTemplateDO.setQualityName(item.getQualityName());
+                        otherTemplateDO.setQualityColor(item.getQualityColor());
+                        otherTemplateDO.setRarity(item.getRarity());
+                        otherTemplateDO.setRarityName(item.getRarityName());
+                        otherTemplateDO.setRarityColor(item.getRarityColor());
+                        otherTemplateDO.setShortName(item.getShortName());
+                        otherTemplateDO.setType(item.getType());
+                        otherTemplateDO.setTypeName(item.getTypeName());
+                        list.add(otherTemplateDO);
+                        otherTemplateMapper.insertBatch(list);
                     }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+            if (page >= 1) {
+                break;
             }
         } while (true);
     }
 
     // 其他平台自动在售入库
-    public void otherSellingInsert() {
+    public void otherSellingInsert(Integer itemId) {
         int page = 1;
         do {
             OkHttpClient client = new OkHttpClient();
 
-            String url = "https://app.zbt.com/open/product/v2/search?appId=730&language=zh-CN&app-key=3453fd2c502c51bcd6a7a68c6e812f85&limit=10000&page=" + Integer.toString(page++);
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
-            try (Response response = client.newCall(request).execute()) {
-                if (!response.isSuccessful()) {
-                    throw new IOException("Unexpected code " + response);
-                } else {
-                    String responseBody = response.body().string();
-                    AppOtherInvListDto response_ = objectMapper.readValue(responseBody, new TypeReference<AppOtherInvListDto>() {
-                    });
-                    for (AppOtherInvListDto.Data_.GoodsInfo item : response_.getData().getList()) {
-                        String details = "https://app.zbt.com/open/product/v1/sell/list?appId=730&language=zh-CN&app-key=3453fd2c502c51bcd6a7a68c6e812f85&delivery=2&itemId="
-                                + item.getItemId();
-                        Request detailList = new Request.Builder()
-                                .url(details)
-                                .build();
-                        try (Response responseList = client.newCall(detailList).execute()) {
-                            if (!responseList.isSuccessful()) {
-                                throw new IOException("Unexpected code " + responseList);
-                            } else {
-                                String detailsList = responseList.body().string();
-                                ObjectMapper objectMapper = new ObjectMapper();
-                                objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
-                                AppOtherInvDetailListVO response_List = objectMapper.readValue(detailsList, new TypeReference<AppOtherInvDetailListVO>() {
-                                });
-                                List<OtherSellingDO> list = new ArrayList<>();
-                                for (AppOtherInvDetailListVO.Data__.CommodityInfo items : response_List.getData().getList()) {
-                                    if (items.getAcceptBargain() <= 0) {
-                                        continue;
-                                    }
-                                    OtherSellingDO otherSellingDO = new OtherSellingDO();
-                                    otherSellingDO.setAppid(730);
-                                    otherSellingDO.setIconUrl(item.getImageUrl());
-                                    otherSellingDO.setMarketName(item.getItemName());
-                                    otherSellingDO.setMarketHashName(item.getMarketHashName());
-                                    otherSellingDO.setPlatformIdentity(OtherSellingStatusEnum.C5.getStatus());
-                                    otherSellingDO.setPrice((int) (items.getPrice() * 6.75 * 100));
-                                    otherSellingDO.setSelExterior(item.getExteriorName());
-                                    otherSellingDO.setSelQuality(item.getQualityName());
-                                    otherSellingDO.setSelRarity(item.getRarityName());
-                                    otherSellingDO.setSelType(item.getTypeName());
-                                    otherSellingDO.setSellingAvator(items.getSellerInfo().getAvatar());
-                                    otherSellingDO.setSellingUserName(items.getSellerInfo().getNickname());
-                                    otherSellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
-                                    list.add(otherSellingDO);
-                                }
-                                otherSellingMapper.insertBatch(list);
+                String details = "https://app.zbt.com/open/product/v1/sell/list?appId=730&language=zh-CN&app-key=3453fd2c502c51bcd6a7a68c6e812f85&delivery=2&itemId="
+                        + itemId;
+
+                Request detailList = new Request.Builder()
+                        .url(details)
+                        .build();
+
+                try (Response responseList = client.newCall(detailList).execute()) {
+                    if (!responseList.isSuccessful()) {
+                        throw new IOException("Unexpected code " + responseList);
+                    } else {
+                        String detailsList = responseList.body().string();
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+                        AppOtherInvDetailListVO response_List = objectMapper.readValue(detailsList, new TypeReference<AppOtherInvDetailListVO>() {
+                        });
+                        List<OtherSellingDO> list = new ArrayList<>();
+                        for (AppOtherInvDetailListVO.Data__.CommodityInfo items : response_List.getData().getList()) {
+                            if (items.getAcceptBargain() <= 0) {
+                                continue;
                             }
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                            OtherSellingDO otherSellingDO = new OtherSellingDO();
+                            otherSellingDO.setAppid(730);
+                            otherSellingDO.setIconUrl(items.getImageUrl());
+                            otherSellingDO.setMarketName(items.getItemName());
+                            otherSellingDO.setMarketHashName(items.getMarketHashName());
+                            otherSellingDO.setPlatformIdentity(OtherSellingStatusEnum.C5.getStatus());
+                            otherSellingDO.setPrice((int) (items.getPrice() * 6.75 * 100));
+                            otherSellingDO.setSelExterior(items.getItemInfo().getExteriorName());
+                            otherSellingDO.setSelQuality(items.getItemInfo().getQualityName());
+                            otherSellingDO.setSelRarity(items.getItemInfo().getRarityName());
+                            otherSellingDO.setSelType(items.getItemInfo().getTypeName());
+                            otherSellingDO.setSellingAvator(items.getSellerInfo().getAvatar());
+                            otherSellingDO.setSellingUserName(items.getSellerInfo().getNickname());
+                            otherSellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
+                            list.add(otherSellingDO);
                         }
+                        otherSellingMapper.insertBatch(list);
                     }
-                    if (page >= 1) {
-                        break;
-                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+
+                if (page >= 1) {
+                    break;
+                }
             }
-        } while (true);
+            while (true) ;
     }
 }
 

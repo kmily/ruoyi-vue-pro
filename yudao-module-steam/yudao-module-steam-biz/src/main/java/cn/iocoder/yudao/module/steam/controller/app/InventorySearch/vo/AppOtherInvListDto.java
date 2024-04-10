@@ -29,12 +29,12 @@ public class AppOtherInvListDto {
         private List<GoodsInfo> list;
 
         @Data
-        public static class GoodsInfo{
+        public static class GoodsInfo {
             // 自动发货在售最低价
             private Integer appId;
 
             // 自动发货在售数量
-            private String itemId;
+            private Integer itemId;
 
             private PriceInfo priceInfo;
 
