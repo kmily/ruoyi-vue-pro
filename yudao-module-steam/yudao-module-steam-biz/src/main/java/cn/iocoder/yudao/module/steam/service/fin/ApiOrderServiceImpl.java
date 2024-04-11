@@ -308,7 +308,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
             PayWalletDO orCreateWallet2 = payWalletService.getOrCreateWallet(uuOrderById.getSellUserId(), uuOrderById.getSellUserType());
             PayWalletTransactionDO payWalletTransactionDO1 = payWalletService.addWalletBalance(orCreateWallet2.getId(), String.valueOf(uuOrderById.getId()),
                     PayWalletBizTypeEnum.STEAM_CASH, uuOrderById.getCommodityAmount());
-            apiOrderMapper.updateById(new ApiOrderDO().setId(invOrderId).setSellCashRet(JacksonUtils.writeValueAsString(payWalletTransactionDO1)).setSellCashStatus(InvSellCashStatusEnum.CASHED.getStatus()));
+            apiOrderMapper.updateById(new ApiOrderDO().setId(invOrderId).setCashRet(JacksonUtils.writeValueAsString(payWalletTransactionDO1)).setCashStatus(InvSellCashStatusEnum.CASHED.getStatus()));
         }
     }
 
@@ -710,67 +710,67 @@ public class ApiOrderServiceImpl implements ApiOrderService {
     /**
      * 执行退款
      * 退款不正走此方法，
-     * @param uuOrder
+     * @param apiOrderDO
      */
-    private void refundAction(ApiOrderDO uuOrder,LoginUser loginUser,String reason) {
-        validateInvOrderCanRefund(uuOrder,loginUser);
-        damagesCloseInvOrder(uuOrder.getId(),reason);
+    private void refundAction(ApiOrderDO apiOrderDO,LoginUser loginUser,String reason) {
+        validateInvOrderCanRefund(apiOrderDO,loginUser);
+        damagesCloseInvOrder(apiOrderDO.getId(),reason);
     }
-    private void refundAction(ApiOrderDO uuOrder,LoginUser loginUser) {
-        refundAction(uuOrder,loginUser,"用户不想要了主动退款");
+    private void refundAction(ApiOrderDO apiOrderDO,LoginUser loginUser) {
+        refundAction(apiOrderDO,loginUser,"用户不想要了主动退款");
     }
 
-    private ApiOrderDO validateInvOrderCanRefund(ApiOrderDO uuOrder,LoginUser loginUser) {
+    private ApiOrderDO validateInvOrderCanRefund(ApiOrderDO apiOrderDO,LoginUser loginUser) {
         // 校验订单是否存在
-        if (Objects.isNull(uuOrder)) {
+        if (Objects.isNull(apiOrderDO)) {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_NOT_FOUND);
         }
-        if(uuOrder.getCashStatus().equals(InvSellCashStatusEnum.CASHED.getStatus())){
+        if(apiOrderDO.getCashStatus().equals(InvSellCashStatusEnum.CASHED.getStatus())){
             throw exception(ErrorCodeConstants.INVORDER_ORDER_CASHED_CANNOTREFUND);
         }
-        if(!uuOrder.getBuyUserId().equals(loginUser.getId())){
+        if(!apiOrderDO.getBuyUserId().equals(loginUser.getId())){
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_USER_ERROR);
         }
-        if(!uuOrder.getBuyUserType().equals(loginUser.getUserType())){
+        if(!apiOrderDO.getBuyUserType().equals(loginUser.getUserType())){
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_USER_ERROR);
         }
         // 校验订单是否支付
-        if (!PayOrderStatusEnum.isSuccess(uuOrder.getPayOrderStatus())) {
+        if (!PayOrderStatusEnum.isSuccess(apiOrderDO.getPayOrderStatus())) {
             throw exception(ErrorCodeConstants.INVORDER_ORDER_REFUND_FAIL_NOT_PAID);
         }
         //检查是否已发货
-        if(InvSellCashStatusEnum.DAMAGES.getStatus().equals(uuOrder.getCashStatus())){
+        if(InvSellCashStatusEnum.DAMAGES.getStatus().equals(apiOrderDO.getCashStatus())){
             throw exception(ErrorCodeConstants.UU_GOODS_ORDER_TRANSFER_CASHED);
         }
         //检查是否已发货
-        if(InvSellCashStatusEnum.CASHED.getStatus().equals(uuOrder.getCashStatus())){
+        if(InvSellCashStatusEnum.CASHED.getStatus().equals(apiOrderDO.getCashStatus())){
             throw exception(ErrorCodeConstants.UU_GOODS_ORDER_TRANSFER_CASHED);
         }
         //通过此接口可取消符合取消规则「创单成功后30min后卖家未发送交易报价」的代购订单。
-        if(Objects.nonNull(uuOrder.getThreeOrderNo())){
+        if(Objects.nonNull(apiOrderDO.getThreeOrderNo())){
             //orderStatus,140的除 1101外其它状态不能取消，不能取消的还有340，280，360
 //            if(Arrays.asList(UUOrderStatus.CODE140.getCode(),UUOrderStatus.CODE340.getCode(),UUOrderStatus.CODE280.getCode(),UUOrderStatus.CODE360.getCode()).contains(youyouOrderDO.getUuOrderStatus())){
 //                if(!uuOrder.getUuOrderStatus().equals(UUOrderSubStatus.SUB_CODE1104.getCode())){
 //                    throw exception(ErrorCodeConstants.UU_GOODS_ORDER_CAN_NOT_CANCEL);
 //                }
 //            }
-            Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByOrder(uuOrder);
+            Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByOrder(apiOrderDO);
             if(apiThreeByOrder.isPresent()) {
                 ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
                 // 1,进行中，2完成，3作废
-                Integer orderSimpleStatus = apiThreeOrderService.getOrderSimpleStatus(loginUser, uuOrder.getThreeOrderNo(), uuOrder.getId());
+                Integer orderSimpleStatus = apiThreeOrderService.getOrderSimpleStatus(loginUser, apiOrderDO.getThreeOrderNo(), apiOrderDO.getId());
                 if(orderSimpleStatus.equals(3)){
 
                 }else{
                     throw exception(ErrorCodeConstants.UU_GOODS_ORDER_CAN_NOT_CANCEL);
                 }
             }
-            Duration between = Duration.between(uuOrder.getCreateTime(), LocalDateTime.now());
+            Duration between = Duration.between(apiOrderDO.getCreateTime(), LocalDateTime.now());
             if(between.getSeconds()<=30*60){//小于30分钟不能取消
                 throw exception(ErrorCodeConstants.UU_GOODS_ORDER_MIN_TIME);
             }
         }
-        return uuOrder;
+        return apiOrderDO;
     }
 
     @Override

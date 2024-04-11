@@ -146,4 +146,12 @@ public class ApiOrderDO extends BaseDO {
      * 取消原因
      */
     private String cancelReason;
+    /**
+     * 服务费打款结果
+     */
+    private String serviceFeeRet;
+    /**
+     * 资金付款结果
+     */
+    private String cashRet;
 }
