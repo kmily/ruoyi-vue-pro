@@ -38,7 +38,7 @@ public class ApiOrderDO extends BaseDO {
     /**
      * 商户订单号
      */
-    private String merchantOrderNo;
+    private String merchantNo;
     /**
      * 用户编号
      */

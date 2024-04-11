@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.service.fin.vo;
 
+import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -14,8 +15,8 @@ public class ApiQueryCommodityReqVo implements Serializable {
      * 商户订单号
      * 小于等于59位的字符串
      */
-    @JsonProperty("merchantOrderNo")
-    private String merchantOrderNo;
+    @JsonProperty("merchantNo")
+    private String merchantNo;
     /**
      * 收货方的Steam交易链接
      */
@@ -49,5 +50,9 @@ public class ApiQueryCommodityReqVo implements Serializable {
      */
     @JsonProperty("fastShipping")
     private Integer fastShipping;
+    /**
+     * 购买平台
+     */
+    private PlatFormEnum platform;
 
 }

@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.infra.controller.admin.config.vo.ConfigSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
@@ -28,10 +29,12 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.api.AppBatchGetOnSaleComm
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.bindipaddress.BindIpaddressDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingHashSummary;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
@@ -39,7 +42,9 @@ import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
+import cn.iocoder.yudao.module.steam.service.fin.ApiOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
+import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.selling.SellingsearchService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
@@ -107,6 +112,12 @@ public class AppIo661ApiController {
     }
     @Resource
     private SteamService steamService;
+
+    /**
+     * 新版本接口
+     */
+    @Resource
+    private ApiOrderService apiOrderService;
 
     /**
      * api余额接口
@@ -322,5 +333,35 @@ public class AppIo661ApiController {
 
             return ApiResult.error(e.getCode(),  e.getMessage(),Io661OrderInfoResp.class);
         }
+    }
+    //-----------------v2版本接口
+    @Operation(summary = "创建库存订单")
+    @PostMapping("v2/api/createInvOrder")
+    @PermitAll
+    public ApiResult<AppPayOrderSubmitRespVO> createInvOrderV2(@RequestBody OpenApiReqVo<ApiQueryCommodityReqVo> openApiReqVo) {
+        try {
+            return DevAccountUtils.tenantExecute(1L, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+
+
+                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
+                openApiReqVo.getData().setPlatform(PlatFormEnum.API);
+                ApiOrderDO invOrder = apiOrderService.createInvOrder(loginUser, openApiReqVo.getData());
+                AppPayOrderSubmitRespVO reqVO=new AppPayOrderSubmitRespVO();
+                try {
+                    ApiOrderDO orderDO = apiOrderService.payInvOrder(loginUser, invOrder.getId());
+                    reqVO.setOrderNo(invOrder.getOrderNo());
+                    reqVO.setMerchantNo(invOrder.getMerchantNo());
+                    return ApiResult.success(reqVO);
+                } catch (ServiceException e) {
+                    apiOrderService.closeUnPayInvOrder(invOrder.getId());
+                    throw e;
+                }
+            });
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return ApiResult.error(e.getCode(),  e.getMessage(),AppPayOrderSubmitRespVO.class);
+        }
+
     }
 }

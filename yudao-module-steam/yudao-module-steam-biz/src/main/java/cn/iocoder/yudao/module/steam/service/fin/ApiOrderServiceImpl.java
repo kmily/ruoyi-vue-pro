@@ -167,7 +167,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
                 .setServiceFeeUserId(UU_CASH_SERVICE_ID).setServiceFeeUserType(UserTypeEnum.MEMBER.getValue())
                 .setCashStatus(InvSellCashStatusEnum.INIT.getStatus())
                 //订单信息
-                .setOrderNo(noRedisDAO.generate(PAY_NO_PREFIX)).setMerchantOrderNo(reqVo.getMerchantOrderNo())
+                .setOrderNo(noRedisDAO.generate(PAY_NO_PREFIX)).setMerchantNo(reqVo.getMerchantNo())
                 //设置支付信息
                 .setPayOrderStatus(PayOrderStatusEnum.WAITING.getStatus())
                 //设置购买信息
@@ -490,7 +490,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
             throw exception(OpenApiCode.JACKSON_EXCEPTION);
         }
         uuOrderDOLambdaQueryWrapperX.eqIfPresent(ApiOrderDO::getOrderNo, queryOrderReqVo.getOrderNo());
-        uuOrderDOLambdaQueryWrapperX.eqIfPresent(ApiOrderDO::getMerchantOrderNo, queryOrderReqVo.getMerchantNo());
+        uuOrderDOLambdaQueryWrapperX.eqIfPresent(ApiOrderDO::getMerchantNo, queryOrderReqVo.getMerchantNo());
         uuOrderDOLambdaQueryWrapperX.eqIfPresent(ApiOrderDO::getId, queryOrderReqVo.getId());
         if(Objects.nonNull(queryOrderReqVo.getId())){
             uuOrderDOLambdaQueryWrapperX.eqIfPresent(ApiOrderDO::getId, queryOrderReqVo.getId());
