@@ -24,6 +24,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.otherselling.OtherSellingMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
+import cn.iocoder.yudao.module.steam.enums.SteamWearCategoryEnum;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.otherselling.OtherSellingService;
@@ -410,33 +411,39 @@ public class SellingExtService {
     }
 
 
-//    /**
-//     * WearCategory0  崭新出厂
-//     * WearCategory1  略有磨损
-//     * WearCategory2  久经沙场
-//     * WearCategory3  破损不堪
-//     * WearCategory4  战痕累累
-//     *
-//     * @param sellingPageReqVO
-//     */
-//    public  List<GoodsAbrasionDTO> showGoodsWithMarketName(GoodsWithMarketHashNameReqVO sellingPageReqVO) {
-//        List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
-//                .eq(SellingDO::getShortName, sellingPageReqVO.getShortName()));
-//
-//        List<GoodsAbrasionDTO> list = new  ArrayList<>();
-//        for (SellingDO sellingDO : sellingDOS) {
-//            if (!map.containsKey(sellingDO.getSelExterior())) {
-//                map.put(sellingDO.getSelExterior(), sellingDO.getPrice());
-//            }
-//            for (Map.Entry<String, Integer> element : map.entrySet()) {
-//                if (element.getKey().equals(sellingDO.getSelExterior()) && element.getValue() > sellingDO.getPrice()) {
-//                    map.put(sellingDO.getSelExterior(), sellingDO.getPrice());
-//                }
-//            }
-//        }
-//
-//        return list;
-//    }
+    /**
+     * WearCategory0  崭新出厂
+     * WearCategory1  略有磨损
+     * WearCategory2  久经沙场
+     * WearCategory3  破损不堪
+     * WearCategory4  战痕累累
+     *
+     * @param sellingPageReqVO
+     */
+    public  List<GoodsAbrasionDTO> showGoodsWithMarketName(GoodsWithMarketHashNameReqVO sellingPageReqVO) {
+        List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
+                .eq(SellingDO::getShortName, sellingPageReqVO.getShortName()));
+        if(sellingDOS.isEmpty()){
+            List<GoodsAbrasionDTO> list = new ArrayList<>();
+            return list;
+        }
+        List<GoodsAbrasionDTO> list = new ArrayList<>();
+        for (SellingDO sellingDO : sellingDOS) {
+            GoodsAbrasionDTO abrasion = new GoodsAbrasionDTO();
+            if(Objects.nonNull(sellingDO.getSelExterior())){
+                abrasion.setSelExterior(SteamWearCategoryEnum.valueOf(sellingDO.getSelExterior()).getName());
+            }
+            abrasion.setShortName(sellingDO.getShortName());
+            abrasion.setPrice(sellingDO.getPrice());
+            abrasion.setMarketHashName(sellingDO.getMarketHashName());
+            if(!list.contains(abrasion) ){
+                list.add(abrasion);
+            }
+        }
+        return list;
+    }
+
+
 
     public PageResult<OtherSellingPageReqVO> otherSale(SellingDO sellingDO) {
         List<OtherSellingDO> otherSellingDO = otherSellingMapper.selectList(new LambdaQueryWrapperX<OtherSellingDO>()
@@ -511,15 +518,6 @@ public class SellingExtService {
 ////        PageResult<SellerGoodsOnSellingRespVO> objectPageResult = new PageResult<>();
 ////        objectPageResult.setList(respVO);
 //        return respVO;
-//
-//
-//
-//
-//
-//
-//
-//
-//
 //    }
 
 }
