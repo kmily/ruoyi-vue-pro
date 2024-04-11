@@ -410,8 +410,10 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         ApiCommodityRespVo buyItem = null;
         for (ApiThreeOrderService apiThreeOrderService : apiThreeOrderServiceList) {
             buyItem = apiThreeOrderService.query(loginUser, orderDO.getBuyInfo());
-            if(buyItem.getPrice()<=orderDO.getBuyInfo().getPurchasePrice()){
-                break;
+            if(buyItem.getIsSuccess() && Objects.nonNull(buyItem.getPrice())){
+                if(buyItem.getPrice()<=orderDO.getBuyInfo().getPurchasePrice()){
+                    break;
+                }
             }
         }
         //校验商品是否存在
