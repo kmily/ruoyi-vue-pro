@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.steam.service.fin.vo.ApiCommodityRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiOrderCancelRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -50,11 +51,13 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             V5ProductPriceInfoRes.V5ProductPriceInfoResponse.V5ProductData productData = data.get(0);
             apiCommodityRespVo.setPrice(BigDecimal.valueOf(productData.getMinSellPrice()).multiply(BigDecimal.valueOf(100)).intValue());
             apiCommodityRespVo.setIsSuccess(true);
+            apiCommodityRespVo.setPlatCode(PlatCodeEnum.V5);
+            return apiCommodityRespVo;
         } else {
             apiCommodityRespVo.setIsSuccess(false);
+            return apiCommodityRespVo;
         }
-        apiCommodityRespVo.setPlatCode(PlatCodeEnum.V5);
-        return null;
+
     }
     private static void checkLoginUser(Object loginUser) {
         if (Objects.isNull(loginUser)) {
@@ -63,7 +66,9 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ApiBuyItemRespVo buyItem(LoginUser loginUser, ApiQueryCommodityReqVo createReqVO) {
+
         return null;
     }
 
