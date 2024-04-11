@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.service.fin.ApiThreeOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.c5.res.ProductPriceInfoRes;
 import cn.iocoder.yudao.module.steam.service.fin.c5.utils.C5ApiUtils;
+import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductPriceInfoRes;
 import cn.iocoder.yudao.module.steam.service.fin.v5.utils.V5ApiUtils;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiBuyItemRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiCommodityRespVo;
@@ -32,24 +33,22 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     public ApiCommodityRespVo query(LoginUser loginUser, ApiQueryCommodityReqVo createReqVO) {
         checkLoginUser(loginUser);
         //获取v5平台商品最低价
-        ProductPriceInfoRes.ProductPriceInfoResponse productPriceInfo =
-                C5ApiUtils.getProductPriceInfo(Collections.singletonList(createReqVO.getCommodityHashName()));
+        V5ProductPriceInfoRes.V5ProductPriceInfoResponse productPriceInfo =
+                V5ApiUtils.getV5ProductLowestPrice(Collections.singletonList(createReqVO.getCommodityHashName()));
         ApiCommodityRespVo apiCommodityRespVo = new ApiCommodityRespVo();
-        List<ProductPriceInfoRes.ProductPriceInfoResponse.ProductData> data = null;
+        List<V5ProductPriceInfoRes.V5ProductPriceInfoResponse.V5ProductData> data = null;
         if (productPriceInfo != null) {
             data = productPriceInfo.getData();
         }
         if (data != null && !data.isEmpty()) {
             // 获取第一个 ProductData 对象
-            ProductPriceInfoRes.ProductPriceInfoResponse.ProductData productData = data.get(0);
-            apiCommodityRespVo.setPrice(BigDecimal.valueOf(productData.getPrice()).multiply(BigDecimal.valueOf(100)).intValue());
+            V5ProductPriceInfoRes.V5ProductPriceInfoResponse.V5ProductData productData = data.get(0);
+            apiCommodityRespVo.setPrice(BigDecimal.valueOf(productData.getMinSellPrice()).multiply(BigDecimal.valueOf(100)).intValue());
             apiCommodityRespVo.setIsSuccess(true);
-
         } else {
             apiCommodityRespVo.setIsSuccess(false);
         }
-        apiCommodityRespVo.setPlatCode(PlatCodeEnum.C5);
-
+        apiCommodityRespVo.setPlatCode(PlatCodeEnum.V5);
         return null;
     }
     private static void checkLoginUser(Object loginUser) {
