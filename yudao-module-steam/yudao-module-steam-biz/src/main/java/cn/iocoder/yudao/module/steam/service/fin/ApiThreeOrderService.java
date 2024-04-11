@@ -59,7 +59,7 @@ public interface ApiThreeOrderService {
      * @param orderId  主订单ID
      * @return 买家的订单
      */
-    ApiOrderDO queryCommodityDetail(LoginUser loginUser, String orderNo,Long orderId);
+    String queryCommodityDetail(LoginUser loginUser, String orderNo,Long orderId);
 
     /**
      * 查询订单简状态

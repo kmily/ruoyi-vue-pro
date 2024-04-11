@@ -13,9 +13,11 @@ import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.service.fin.ApiThreeOrderService;
+import cn.iocoder.yudao.module.steam.service.fin.v5.utils.V5Login;
 import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductBuyRes;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5BuyProductVo;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5cancelOrderRespVO;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5queryCommodityDetailRespVO;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5queryOrderStatusReqVO;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5queryOrderStatusRespVO;
 import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductPriceInfoRes;
@@ -26,6 +28,7 @@ import cn.iocoder.yudao.module.steam.service.fin.vo.ApiOrderCancelRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
+import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,9 +36,7 @@ import javax.annotation.Resource;
 
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
@@ -45,9 +46,16 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     @Resource
     private ApiOrderExtMapper apiOrderExtMapper;
 
-    private static final String MERCHANTKEY = "529606f226e6461ca5bac93047976177";
+    private static final String MERCHANT_KEY = "529606f226e6461ca5bac93047976177";
     private static final String Query_Order_Status_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
     private static final String Cancel_Order_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
+    private static final String Query_Commodity_Detail = "https://delivery.v5item.com/open/api/queryOrderDetailInfo";
+    private static final String Trade_Token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VyVHlwZSI6Im1lcmNoYW50IiwiZ" +
+            "XhwIjoxNzEzNzAzMTA2LCJ1c2VyaWQiOiIxMTU3MTAifQ.fdEFISpapbYXYlbST_M-jTwB4Fc9bFNxA8Ch4XnOnb4NkHaTikkPy3o13q-G" +
+            "fGzTyqli65DbRh_gsRBxB9vKzj2iJv7x39-ZAX7pLY75No9JLtK3E_GXtWIvtAt7EO0x4nkqoe0QFslMRPTf88azod0ODCSr-CjDRBwI_l5" +
+            "muMvjQl6dDEYlmIPbWUWG802FogW8hrSMyQQaUamnPqNN9vzA6ag4pgcbQCp-qAiWx1x832M9YsTQbaVh2vQ-keqhBeDk2UodZOPeB0tP3jk" +
+            "R68--zqjz73Sij5ctEY-6hYxtX3Yg-Z65tGj5erMNDGjbjGU7a_Caa7rnrtSG-K1Esw";
+
 
 
 
@@ -89,7 +97,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     @Transactional(rollbackFor = Exception.class)
     public ApiBuyItemRespVo buyItem(LoginUser loginUser, ApiQueryCommodityReqVo createReqVO) {
         V5BuyProductVo v5BuyProductVo = new V5BuyProductVo(createReqVO.getCommodityHashName(),createReqVO.getPurchasePrice(),
-                createReqVO.getTradeLinks(),createReqVO.getMerchantNo(),MERCHANTKEY,0);
+                createReqVO.getTradeLinks(),createReqVO.getMerchantNo(),MERCHANT_KEY,0);
         V5ProductBuyRes v5ProductBuyRes = V5ApiUtils.buyV5Product(v5BuyProductVo);
 
         ApiBuyItemRespVo apiBuyItemRespVo = new ApiBuyItemRespVo();
@@ -156,8 +164,30 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
      * @return 买家的订单
      */
     @Override
-    public ApiOrderDO queryCommodityDetail(LoginUser loginUser, String orderNo, Long orderId) {
-        return null;
+    public String queryCommodityDetail(LoginUser loginUser, String orderNo, Long orderId) {
+
+        V5queryOrderStatusReqVO reqVO = new V5queryOrderStatusReqVO();
+        reqVO.setMerchantKey(MERCHANT_KEY); // 商户密钥
+        reqVO.setOrderNo(orderNo); // V5订单号
+        reqVO.setMerchantOrderNo(String.valueOf(orderId)); // 商户订单号
+        // 查询
+        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+        builder.url(Query_Commodity_Detail);
+        HashMap<String,String> headers = new HashMap<>();
+        headers.put("Authorization",Trade_Token);
+        builder.headers(headers);
+        builder.method(HttpUtil.Method.JSON);
+        builder.postObject(reqVO);
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
+        V5queryCommodityDetailRespVO json = sent.json(V5queryCommodityDetailRespVO.class);
+        V5queryCommodityDetailRespVO.OrderDetailInfo data = json.getData();
+        V5queryCommodityDetailRespVO.OrderDetailInfo readValue = JacksonUtils.readValue(JacksonUtils.writeValueAsString(data), V5queryCommodityDetailRespVO.OrderDetailInfo.class);
+        ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
+        apiOrderExtDO.setOrderId(orderId);
+        apiOrderExtDO.setOrderInfo(JacksonUtils.writeValueAsString(data));
+        apiOrderExtDO.setCommodityInfo(JacksonUtils.writeValueAsString(readValue.getItemInfo()));
+        apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderId,orderId));
+        return JacksonUtils.writeValueAsString(data);
     }
 
 
@@ -170,7 +200,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     @Override
     public Integer getOrderSimpleStatus(LoginUser loginUser, String orderNo, Long orderId) {
         V5queryOrderStatusReqVO reqVO = new V5queryOrderStatusReqVO();
-        reqVO.setMerchantKey(MERCHANTKEY); // 商户密钥
+        reqVO.setMerchantKey(MERCHANT_KEY); // 商户密钥
         reqVO.setOrderNo(orderNo); // V5订单号
         reqVO.setMerchantOrderNo(String.valueOf(orderId)); // 商户订单号
         // 查询
@@ -178,10 +208,14 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         builder.url(Query_Order_Status_URL);
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(reqVO);
+        HashMap<String,String> headers = new HashMap<>();
+        headers.put("Authorization",Trade_Token);
+        builder.headers(headers);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         ApiResult json = sent.json(ApiResult.class);
         Object data = json.getData();
         V5queryOrderStatusRespVO respVO = JacksonUtils.readValue(JacksonUtils.writeValueAsString(data), V5queryOrderStatusRespVO.class);
+        return respVO.getStatus();
 //        // 更新订单状态
 //        ApiOrderDO apiOrderDO = new ApiOrderDO();
 //        apiOrderDO.setId(orderId);
@@ -198,8 +232,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 //        }
 //        // 更新订单状态
 //        apiOrderMapper.updateById(apiOrderDO);
-//        apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderId,orderId));
-        return respVO.getStatus();
+//        apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderId,orderId))
     }
 
     /**
@@ -211,7 +244,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     @Override
     public ApiOrderCancelRespVo orderCancel(LoginUser loginUser, String orderNo, Long orderId) {
         V5queryOrderStatusReqVO reqVO = new V5queryOrderStatusReqVO();
-        reqVO.setMerchantKey(MERCHANTKEY); // 商户密钥
+        reqVO.setMerchantKey(MERCHANT_KEY); // 商户密钥
         reqVO.setOrderNo(orderNo); // V5订单号
         reqVO.setMerchantOrderNo(String.valueOf(orderId)); // 商户订单号
         // 查询
@@ -219,6 +252,9 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         builder.url(Cancel_Order_URL);
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(reqVO);
+        HashMap<String,String> headers = new HashMap<>();
+        headers.put("Authorization",Trade_Token);
+        builder.headers(headers);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         ApiResult json = sent.json(ApiResult.class);
         Object data = json.getData();

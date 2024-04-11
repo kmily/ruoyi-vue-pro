@@ -96,7 +96,7 @@ public class C5ApiThreeOrderService implements ApiThreeOrderService {
     }
 
     @Override
-    public ApiOrderDO queryCommodityDetail(LoginUser loginUser, String orderNo, Long orderId) {
+    public String queryCommodityDetail(LoginUser loginUser, String orderNo, Long orderId) {
         return null;
     }
 
