@@ -228,6 +228,7 @@ public class SellingsearchService {
             otherSellingListDo1.setMarketName(element.getMarketName());
             MemberUserRespDTO memberUserRespDTO1 = new MemberUserRespDTO();
             memberUserRespDTO1.setNickname(element.getSellingUserName());
+            memberUserRespDTO1.setId(1L);
             memberUserRespDTO1.setAvatar(element.getSellingAvator());
             memberUserRespDTO1.setMobile("");
             memberUserRespDTO1.setStatus(999);
@@ -279,8 +280,7 @@ public class SellingsearchService {
         if ((PageNo - 1) * pageSize > dataSize) {
             resultList.setList(new ArrayList<SellListItemResp>());
         } else {
-            returnList.subList(Math.max(0, (PageNo - 1) * pageSize), Math.min(dataSize, PageNo * pageSize));
-            resultList.setList(returnList);
+            resultList.setList(returnList.subList(Math.max(0, (PageNo - 1) * pageSize), Math.min(dataSize, PageNo * pageSize)));
         }
         return resultList;
     }

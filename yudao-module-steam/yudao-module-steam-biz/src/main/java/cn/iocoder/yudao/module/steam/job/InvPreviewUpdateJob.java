@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.steam.job;
 
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
+import cn.iocoder.yudao.framework.tenant.core.job.TenantJob;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +22,8 @@ public class InvPreviewUpdateJob implements JobHandler {
         this.invPreviewExtService = invPreviewExtService;
     }
 
+/*    @TenantJob*/
     @Override
-//    @TenantJob
     public String execute(String param) {
 
         Integer execute = TenantUtils.execute(1L, () -> invPreviewExtService.updateIvnFlag());

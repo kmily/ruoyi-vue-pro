@@ -7,12 +7,11 @@ import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.otherselling.vo.OtherSellingPageReqVO;
-import cn.iocoder.yudao.module.steam.controller.admin.othertemplate.vo.OtherTemplatePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.*;
-import cn.iocoder.yudao.module.steam.dal.dataobject.otherselling.OtherSellingDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.othertemplate.OtherTemplateMapper;
+import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
 import cn.iocoder.yudao.module.steam.service.othertemplate.OtherTemplateService;
 import cn.iocoder.yudao.module.steam.service.selling.SellingExtService;
@@ -24,9 +23,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.List;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -44,6 +40,8 @@ public class AppSellingController {
     private OtherTemplateMapper otherTemplateMapper;
     @Resource
     private OtherTemplateService otherTemplateService;
+    @Resource
+    private InvPreviewExtService invPreviewExtService;
 
     @PostMapping("/batchSale")
     @Operation(summary = "批量上架")
@@ -84,13 +82,13 @@ public class AppSellingController {
         PageResult<SellingMergeListReqVo> invPage = sellingExtService.sellingMerge(sellingPageReqVO);
         return CommonResult.success(invPage);
     }
-
+/*
     @GetMapping("/user/showGoodsWithMarketHashName")
     @Operation(summary = "按MarketHashName展示在售")
     public CommonResult<List<GoodsAbrasionDTO>> showGoodsWithMarketHashName(@RequestBody @Valid GoodsWithMarketHashNameReqVO reqVO) {
         List<GoodsAbrasionDTO> goodsAbrasionDTOS = sellingExtService.showGoodsWithMarketName(reqVO);
         return CommonResult.success(goodsAbrasionDTOS);
-    }
+    }*/
 
     @PostMapping("/otherSale")
     @Operation(summary = "其他平台在售")
@@ -103,24 +101,21 @@ public class AppSellingController {
     }
     @PostMapping("/otherTemplateInsert")
     @Operation(summary = "其他平台在售模板")
-    public CommonResult<PageResult<OtherTemplatePageReqVO>> insertOtherItemId() {
+    public CommonResult<String> insertOtherItemId() {
 
+        ioInvUpdateService.otherTemplateInsert();
 
-        PageResult<OtherTemplatePageReqVO> otherTemplateInsert = ioInvUpdateService.otherTemplateInsert();
-
-        return CommonResult.success(otherTemplateInsert);
-    }
-    @PostMapping("/otherSellingInsert")
-    @Operation(summary = "其他平台在售入库")
-    public CommonResult<PageResult<OtherSellingDO>> otherSellingInsert() {
-
-        PageResult<OtherSellingDO> otherTemplateInsert = ioInvUpdateService.otherSellingInsert();
-
-        return CommonResult.success(otherTemplateInsert);
+        return CommonResult.success("");
     }
 
+    @PostMapping("/updateIvnFlag")
+    @Operation(summary = "其他平台在售模板")
+    public CommonResult<String> updateIvnFlag() {
 
+        invPreviewExtService.updateIvnFlag();
 
+        return CommonResult.success("");
+    }
 
 }
 
