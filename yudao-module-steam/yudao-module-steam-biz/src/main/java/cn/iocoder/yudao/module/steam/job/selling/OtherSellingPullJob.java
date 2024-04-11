@@ -22,10 +22,6 @@ public class OtherSellingPullJob implements JobHandler {
 
     @Resource
     private IOInvUpdateService ioInvUpdateService;
-    @Resource
-    private RabbitTemplate rabbitTemplate;
-    @Resource
-    private OtherTemplateMapper otherTemplateMapper;
 
     @Autowired
     public void setOtherInsertInventory(IOInvUpdateService ioInvUpdateService) {
@@ -34,23 +30,11 @@ public class OtherSellingPullJob implements JobHandler {
 
     @Override
     public String execute(String param) {
-        Integer execute = TenantUtils.execute(1L, () -> {
-            List<Long> allItemIds = getItemIds();
-            for (Long itemId : allItemIds) {
-                rabbitTemplate.convertAndSend("steam", "steam_other_selling", itemId);
-            }
-            return 1;
-        });
-        return String.format("执行关闭成功 %s 个", execute);
-    }
-    private List<Long> getItemIds() {
-        //创建一个Integer类型的列表
-        List<Long> itemIds = new ArrayList<>();
-        List<OtherTemplateDO> otherTemplateDOS = otherTemplateMapper.selectList(new QueryWrapper<OtherTemplateDO>().select("item_id"));
-        for (OtherTemplateDO otherTemplateDO : otherTemplateDOS) {
-            itemIds.add(otherTemplateDO.getItemId());
-        }
-        //返回templateIds列表
-        return itemIds;
+
+        TenantUtils.execute(1L, () ->ioInvUpdateService.otherTemplateInsert());
+
+        TenantUtils.execute(1L, () ->ioInvUpdateService.otherTemplateInsertV5());
+
+        return "已完成";
     }
 }
