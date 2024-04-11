@@ -39,10 +39,10 @@ public class ApiQueryCommodityReqVo implements Serializable {
     private String commodityId;
     /**
      * 购买最高价
-     * 不可为0
+     * 单价为分
      */
     @JsonProperty("purchasePrice")
-    private String purchasePrice;
+    private Integer purchasePrice;
     /**
      * 极速发货购买模式
      * 0：优先购买极速发货；1：只购买极速发货
