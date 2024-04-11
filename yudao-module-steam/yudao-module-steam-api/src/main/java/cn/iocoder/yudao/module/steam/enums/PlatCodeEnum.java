@@ -3,7 +3,8 @@ package cn.iocoder.yudao.module.steam.enums;
 public enum PlatCodeEnum {
     UNSUPPORTED("UNSUPPORTED","unsupported"),
     C5("C5","C5"),
-    IG("IG","接口");
+    V5("V5","V5"),
+    IG("IG","IG");
 
     PlatCodeEnum(String code, String name) {
         this.code = code;
