@@ -14,14 +14,18 @@ import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderExtDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyounotify.YouyouNotifyDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
+import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.devaccount.DevAccountMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyounotify.YouyouNotifyMapper;
@@ -116,6 +120,9 @@ public class ApiOrderServiceImpl implements ApiOrderService {
 
     @Resource
     private ApiOrderMapper apiOrderMapper;
+
+    @Resource
+    private ApiOrderExtMapper apiOrderExtMapper;
 
     @Resource
     private YouyouNotifyMapper youyouNotifyMapper;
@@ -499,164 +506,63 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         }
     }
 
+    /**
+     * 获取子订单
+     * @param orderNo
+     * @param orderId
+     * @return
+     */
+    private ApiOrderExtDO getOrderExt(String orderNo,Long orderId){
+        return apiOrderExtMapper.selectOne(new LambdaQueryWrapperX<ApiOrderExtDO>()
+                .eq(ApiOrderExtDO::getOrderId, orderId)
+                .eq(ApiOrderExtDO::getOrderNo, orderNo)
+        );
+    }
     @Override
-    public OrderInfoResp orderInfo(YouyouOrderDO uuOrder, OpenApiReqVo<QueryOrderReqVo> openApiReqVo)  {
-        return null;
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        if (uuOrder != null && uuOrder.getOrderInformReturnJason() == null){
-//            openApiReqVo.getData().setOrderNo(uuOrder.getUuOrderNo());
-//            ApiResult<OrderInfoResp> orderInfoRespApiResult = uuService.orderInfo(openApiReqVo.getData());
-//            String json = null;
-//            try {
-//                json = objectMapper.writeValueAsString(orderInfoRespApiResult.getData());
-//            } catch (Exception e) {
-//                throw exception(ErrorCodeConstants.YOUYOU_DETAILS_NOT_EXISTS);
-//            }
-//            if (json != null){
-//                YouyouOrderDO youyouOrderDO = new YouyouOrderDO();
-//                youyouOrderDO.setId(uuOrder.getId());
-//                youyouOrderDO.setOrderInformReturnJason(json);
-//                youyouOrderMapper.updateById(youyouOrderDO);
-//            }
-//        }
-//        YouyouCommodityDO youyouCommodity = null;
-//        if (uuOrder != null) {
-//            youyouCommodity = youyouCommodityService.getYouyouCommodity(Integer.valueOf(uuOrder.getRealCommodityId()));
-//        }
-//        if (youyouCommodity == null){
-//            throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
-//        }
-//        Optional<YouyouTemplateDO> first = uuTemplateService.getYouyouTemplatePage(new YouyouTemplatePageReqVO().setTemplateId(youyouCommodity.getTemplateId())).getList().stream().findFirst();
-//        PayOrderDO payOrder = payOrderService.getOrder(uuOrder.getPayOrderId());
-//        //买家
-//        MemberUserRespDTO buyUser = memberUserApi.getUser(uuOrder.getBuyUserId());
-//        //卖家
-//        MemberUserRespDTO sellUser = memberUserApi.getUser(uuOrder.getSellUserId());
-//
-//        YouyouTemplateDO youyouTemplateDO;
-//        if(first.isPresent()){
-//            youyouTemplateDO = first.get();
-//        }else{
-//            throw new ServiceException(OpenApiCode.CONCAT_ADMIN);
-//        }
-//
-//        OrderInfoResp ret = new OrderInfoResp();
-//        ret.setId(uuOrder.getOrderNo());
-//        ret.setOrderId(uuOrder.getId());
-//        ret.setOrderNo(uuOrder.getOrderNo());
-//
-//        OrderInfoResp orderInfoResp = null;
-//        try {
-//            orderInfoResp = objectMapper.readValue(uuOrder.getOrderInformReturnJason(), OrderInfoResp.class);
-//        } catch (Exception e) {
-//            throw exception(ErrorCodeConstants.YOUYOU_DETAILS_NOT_EXISTS);
-//        }
-//        ret.setProcessStatus(orderInfoResp.getProcessStatus());
-//        ret.setOrderSubStatus(orderInfoResp.getOrderSubStatus());
-//        ret.setOrderSubStatusName(orderInfoResp.getOrderSubStatusName());
-//        ret.setOrderType(orderInfoResp.getOrderType());
-//        ret.setOrderSubType(orderInfoResp.getOrderSubType());
-//        ret.setTimeType(orderInfoResp.getTimeType());
-////        ret.setTime(null);// TODO 待确认
-//        ret.setReturnAmount(orderInfoResp.getReturnAmount());
-//        ret.setServiceFee(uuOrder.getServiceFee().toString());
-////        ret.setServiceFeeRate(uuOrder.getServiceFeeRate());
-//        ret.setCommodityAmount(youyouCommodity.getCommodityPrice());
-//        if(Objects.nonNull(uuOrder.getPayAmount())){
-//            ret.setPaymentAmount(new BigDecimal(uuOrder.getPayAmount()).divide(new BigDecimal("100")).toString());
-//        }
-//        ret.setSellerSteamRegTime(orderInfoResp.getSellerSteamRegTime());
-////        ret.setTradeOfferId(null);// TODO 待确认
-//        ret.setCancelOrderTime(orderInfoResp.getCancelOrderTime());
-////        ret.setOfferSendResult(null);// TODO 待确认
-//        ret.setTradeUrl(uuOrder.getBuyTradeLinks());
-//        ret.setFinishOrderTime(orderInfoResp.getFinishOrderTime());
-//        ret.setPaySuccessTime(orderInfoResp.getPaySuccessTime());
-//        ret.setPayEndTime(orderInfoResp.getPayEndTime());
-////        ret.setSendOfferSuccessTime(null);
-//        ret.setSendOfferEndTime(orderInfoResp.getSendOfferEndTime());
-//        ret.setOrderStatusColor(orderInfoResp.getOrderStatusColor());
-//        ret.setOrderSubStatus(orderInfoResp.getOrderSubStatus());
-//
-////        ret.setShippingMode(uuOrder.getUuShippingMode());
-//        ret.setOrderStatus(uuOrder.getUuOrderStatus());
-//        ret.setBuyerUserId(uuOrder.getBuyUserId());
-//        ret.setBuyerUserName(buyUser.getNickname());
-//        if(StringUtils.hasText(buyUser.getAvatar())){
-//            ret.setBuyerUserIcon(buyUser.getAvatar());
-//        }else{
-//            ret.setBuyerUserIcon("https://img.zcool.cn/community/01a3865ab91314a8012062e3c38ff6.png@1280w_1l_2o_100sh.png");
-//        }
-//        ret.setSellerUserId(uuOrder.getSellUserId());
-//        ret.setSellerUserName(sellUser.getNickname());
-//        if(StringUtils.hasText(sellUser.getAvatar())){
-//            ret.setSellerUserIcon(sellUser.getAvatar());
-//        }else{
-//            ret.setSellerUserIcon("https://img.zcool.cn/community/01a3865ab91314a8012062e3c38ff6.png@1280w_1l_2o_100sh.png");
-//        }
-//        ret.setCreateOrderTime(uuOrder.getCreateTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
-//        if(Objects.nonNull(uuOrder.getPayTime())){
-//            ret.setPaySuccessTime(uuOrder.getPayTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
-//        }
-//        if(Objects.nonNull(payOrder)){
-//            ret.setPayEndTime(payOrder.getExpireTime().toInstant(ZoneOffset.of("+8")).toEpochMilli());
-//        }
-//
-////        ret.setConfirmOfferEndTime(null);
-////        ret.setPendingEndTime(null);
-////        ret.setDelayedTransferEndTime(null);
-////        ret.setPrice(new BigDecimal(youyouCommodity.getCommodityPrice()).multiply(new BigDecimal("100")).longValue());//TODO 待确认
-//        ret.setTotalAmount(String.valueOf(uuOrder.getPayAmount()));
-//        ret.setCancelReason(uuOrder.getCancelReason());
-//        if(Objects.nonNull(ret.getOrderStatus())){
-//            ret.setOrderStatusName(UUOrderStatus.valueOf(ret.getOrderStatus()).getMsg());
-//        }
-//        if (Objects.nonNull(ret.getOrderStatusName())){
-//            String updatedOrderStatusName = ret.getOrderStatusName().replace("-s", "time");
-//            ret.setOrderStatusDesc(updatedOrderStatusName);
-//        }
-//
-//        OrderInfoResp.ProductDetailDTO productDetailDTO = new OrderInfoResp.ProductDetailDTO();
-//        productDetailDTO.setCommodityId(youyouCommodity.getId());
-//        productDetailDTO.setCommodityName(youyouCommodity.getCommodityName());
-//        productDetailDTO.setCommodityHashName(youyouTemplateDO.getHashName());
-//
-//        productDetailDTO.setCommodityTemplateId(youyouCommodity.getTemplateId());
-//        productDetailDTO.setAssertId(null);// TODO 待确认
-//        productDetailDTO.setAbrade(youyouCommodity.getCommodityAbrade());
-//
-//        productDetailDTO.setIsDoppler(youyouCommodity.getTemplateisDoppler());
-//        productDetailDTO.setDopplerColor(null);// TODO 待确认
-//        productDetailDTO.setIsFade(youyouCommodity.getTemplateisFade());
-////        productDetailDTO.setFadeName(youyouCommodity.getCommodityFade());
-//        productDetailDTO.setDopplerColor(youyouCommodity.getCommodityDoppler());
-//
-//        //TODO 以下属性先这样返回， 目前用不上
-//        productDetailDTO.setPrice(new BigDecimal(youyouCommodity.getCommodityPrice()).multiply(new BigDecimal("100")).intValue());
-////                productDetailDTO.setNum(new BigDecimal(youyouCommodity.get()).multiply(new BigDecimal("100")).intValue());
-//        productDetailDTO.setPaintIndex(youyouCommodity.getCommodityPaintIndex());
-//        productDetailDTO.setPaintSeed(youyouCommodity.getCommodityPaintSeed());
-//        productDetailDTO.setHaveNameTag(youyouCommodity.getCommodityHaveNameTag());
-////                productDetailDTO.setNameTag(youyouCommodity.getn());
-//        productDetailDTO.setHaveClothSeal(youyouCommodity.getCommodityHaveBuzhang());
-////                productDetailDTO.setDopplerColor(youyouCommodity.getd());
-////                productDetailDTO.setd(youyouCommodity.get());
-//        productDetailDTO.setHaveSticker(String.valueOf(youyouCommodity.getCommodityHaveSticker()));
-//
-//        productDetailDTO.setTypeId(youyouTemplateDO.getTypeId());
-//        productDetailDTO.setTypeHashName(youyouTemplateDO.getTypeHashName());
-////                productDetailDTO.setRarityName(youyouTemplateDO.get());
-//
-//        productDetailDTO.setTypeId(youyouTemplateDO.getTypeId());
-//        productDetailDTO.setTypeHashName(youyouTemplateDO.getTypeHashName());
-//        productDetailDTO.setTypeName(youyouTemplateDO.getTypeName());
-//        productDetailDTO.setWeaponName(youyouTemplateDO.getWeaponName());
-//        productDetailDTO.setWeaponId(youyouTemplateDO.getWeaponId());
-//        productDetailDTO.setWeaponHashName(youyouTemplateDO.getWeaponHashName());
-//        productDetailDTO.setCommodityAbrade(youyouCommodity.getCommodityAbrade());
-//
-//        ret.setProductDetail(productDetailDTO);
-//        return ret;
+    public Io661OrderInfoResp getOrderInfo(QueryOrderReqVo reqVo, LoginUser loginUser) {
+        ApiOrderDO apiOrderDO = null;
+        if(Objects.nonNull(reqVo.getOrderNo())){
+            apiOrderDO = apiOrderMapper.selectOne(new LambdaQueryWrapperX<ApiOrderDO>()
+                    .eq(ApiOrderDO::getBuyUserId, loginUser.getId())
+                    .eq(ApiOrderDO::getBuyUserType, loginUser.getUserType())
+                    .eq(ApiOrderDO::getOrderNo, reqVo.getOrderNo())
+            );
+        }else{
+            if(Objects.nonNull(reqVo.getMerchantNo())){
+                apiOrderDO = apiOrderMapper.selectOne(new LambdaQueryWrapperX<ApiOrderDO>()
+                        .eq(ApiOrderDO::getBuyUserId,loginUser.getId())
+                        .eq(ApiOrderDO::getBuyUserType,loginUser.getUserType())
+                        .eq(ApiOrderDO::getMerchantNo,reqVo.getMerchantNo())
+                );
+            }
+        }
+        ApiOrderExtDO orderExt = getOrderExt(apiOrderDO.getOrderNo(), apiOrderDO.getId());
+        if(Objects.isNull(apiOrderDO)){
+            throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
+        }
+        Io661OrderInfoResp.Io661OrderInfoRespBuilder builder = Io661OrderInfoResp.builder();
+        //基础信息
+        builder.orderNo(apiOrderDO.getOrderNo()).merchantNo(apiOrderDO.getMerchantNo());
+        builder.steamId(apiOrderDO.getBuySteamId());
+        builder.platformName(PlatFormEnum.valueOf(apiOrderDO.getBuyMethod()).getName());
+//        builder.marketName(apiOrderDO.ge());
+        builder.commodityAmount(apiOrderDO.getCommodityAmount());
+        //支付信息
+        builder.payTime(apiOrderDO.getCreateTime()).payStatus(PayOrderStatusEnum.isSuccess(apiOrderDO.getPayOrderStatus())).paymentAmount(apiOrderDO.getPayAmount());
+//        builder.payRefundId(invOrderDO.getPayRefundId()).refundAmount(invOrderDO.getRefundAmount()).refundTime(invOrderDO.getRefundTime());
+        //卖家信息
+        builder.sellSteamId(apiOrderDO.getSellSteamId());
+        //发货信息
+        if(Objects.nonNull(orderExt.getTradeOfferId())){
+            builder.tradeOfferId(orderExt.getTradeOfferId().toString());
+        }
+        builder.transferStatus(apiOrderDO.getTransferStatus());
+        //资金去向信息
+        builder.sellCashStatus(apiOrderDO.getCashStatus());
+        builder.transferDamagesAmount(apiOrderDO.getTransferDamagesAmount());
+        builder.transferRefundAmount(apiOrderDO.getTransferRefundAmount());
+
+        return builder.build();
     }
     @Override
     public Integer orderCancel(LoginUser loginUser, OrderCancelVo orderCancelVo, String userIp,String cancelReason) {

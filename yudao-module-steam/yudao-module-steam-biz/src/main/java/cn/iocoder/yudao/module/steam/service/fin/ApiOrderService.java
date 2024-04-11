@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.steam.service.fin;
 
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
@@ -49,8 +50,13 @@ public interface ApiOrderService {
      * @return 买家的订单
      */
     ApiOrderDO getOrder(LoginUser loginUser, QueryOrderReqVo queryOrderReqVo);
-    OrderInfoResp orderInfo(YouyouOrderDO youyouOrderDO, OpenApiReqVo<QueryOrderReqVo> openApiReqVo) throws JsonProcessingException;
-
+    /**
+     * 获取订单详情
+     * @param reqVo 订单入参
+     * @param loginUser 用户
+     * @return
+     */
+    Io661OrderInfoResp getOrderInfo(QueryOrderReqVo reqVo, LoginUser loginUser);
 
     /**
      * 买家取消订单.
