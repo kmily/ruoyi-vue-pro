@@ -6,7 +6,6 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
 import cn.iocoder.yudao.module.infra.service.config.ConfigService;
-import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
@@ -136,9 +135,6 @@ public class ApiOrderServiceImpl implements ApiOrderService {
     }
 
 
-    @Resource
-    private MemberUserApi memberUserApi;
-
     public ApiOrderServiceImpl() {
     }
     private Optional<ApiThreeOrderService> getApiThreeByOrder(ApiOrderDO apiOrderDO){
@@ -166,7 +162,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
                 //设置买家
                 .setBuyBindUserId(loginUser.getId()).setBuyUserType(loginUser.getUserType())
                 .setBuyBindUserId(buyBindUserDO.getId()).setBuySteamId(buyBindUserDO.getSteamId()).setBuyTradeLinks(buyBindUserDO.getTradeUrl())
-                //设置专家信息
+                //设置卖家信息
                 //服务费账号
                 .setServiceFeeUserId(UU_CASH_SERVICE_ID).setServiceFeeUserType(UserTypeEnum.MEMBER.getValue())
                 .setCashStatus(InvSellCashStatusEnum.INIT.getStatus())
@@ -175,8 +171,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
                 //设置支付信息
                 .setPayOrderStatus(PayOrderStatusEnum.WAITING.getStatus())
                 //设置购买信息
-                .setBuyInfo(reqVo)
-                ;
+                .setBuyInfo(reqVo);
         validateInvOrderCanCreate(loginUser,orderDO);
         apiOrderMapper.insert(orderDO);
         return orderDO;
@@ -194,9 +189,18 @@ public class ApiOrderServiceImpl implements ApiOrderService {
 
         apiOrderMapper.updateById(new ApiOrderDO().setId(invOrderId).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus())
                     .setPayOrderStatus(PayOrderStatusEnum.CLOSED.getStatus()));
-            //释放库存
-//        YouyouCommodityDO youyouCommodityDO = uUCommodityMapper.selectById(uuOrder.getRealCommodityId());
-//        uUCommodityMapper.updateById(new YouyouCommodityDO().setId(youyouCommodityDO.getId()).setTransferStatus(InvTransferStatusEnum.SELL.getStatus()));
+        //释放库存
+        if(Objects.nonNull(uuOrder.getThreeOrderNo())){
+            Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByOrder(uuOrder);
+            if(apiThreeByOrder.isPresent()){
+                ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
+                LoginUser loginUser = new LoginUser().setId(uuOrder.getBuyUserId()).setUserType(uuOrder.getBuyUserType());
+                ApiOrderCancelRespVo apiOrderCancelRespVo = apiThreeOrderService.releaseIvn(loginUser, uuOrder.getThreeOrderNo(), uuOrder.getId());
+                if(!apiOrderCancelRespVo.getIsSuccess()) {
+                    throw new ServiceException(apiOrderCancelRespVo.getErrorCode());
+                }
+            }
+        }
     }
     /**
      * 释放库存
@@ -217,8 +221,17 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         }
         apiOrderMapper.updateById(new ApiOrderDO().setId(invOrderId).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus()));
         //释放库存
-//        YouyouCommodityDO youyouCommodityDO = uUCommodityMapper.selectById(uuOrder.getRealCommodityId());
-//        uUCommodityMapper.updateById(new YouyouCommodityDO().setId(youyouCommodityDO.getId()).setTransferStatus(InvTransferStatusEnum.SELL.getStatus()));
+        if(Objects.nonNull(uuOrder.getThreeOrderNo())){
+            Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByOrder(uuOrder);
+            if(apiThreeByOrder.isPresent()){
+                ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
+                LoginUser loginUser = new LoginUser().setId(uuOrder.getBuyUserId()).setUserType(uuOrder.getBuyUserType());
+                ApiOrderCancelRespVo apiOrderCancelRespVo = apiThreeOrderService.releaseIvn(loginUser, uuOrder.getThreeOrderNo(), uuOrder.getId());
+                if(!apiOrderCancelRespVo.getIsSuccess()) {
+                    throw new ServiceException(apiOrderCancelRespVo.getErrorCode());
+                }
+            }
+        }
     }
 
 
@@ -408,27 +421,6 @@ public class ApiOrderServiceImpl implements ApiOrderService {
                 break;
             }
         }
-
-//        youyouOrderDO.setRealCommodityId(youyouOrderDO.getCommodityId());
-//        if(Objects.isNull(youyouOrderDO.getCommodityId())){//指定ID购买
-//            Integer onSealGoodsId = apiUUCommodeityService.getOnSealGoodsId(new ApiUUBuyGoodsByIdReqVO()
-//                    .setTemplateId(youyouOrderDO.getCommodityTemplateId())
-//                    .setTemplateHashName(youyouOrderDO.getCommodityHashName())
-//                    .setShippingMode(String.valueOf(youyouOrderDO.getShippingMode()))
-//                    .setMaxPrice(youyouOrderDO.getPurchasePrice())
-//            );
-//            if(Objects.isNull(onSealGoodsId)){
-//                throw exception(OpenApiCode.ERR_5213);
-//            }
-//            youyouOrderDO.setRealCommodityId(String.valueOf(onSealGoodsId));
-//            //查询不到则返回
-//        }
-//        if(Objects.isNull(youyouOrderDO.getRealCommodityId())){
-//            throw exception(OpenApiCode.ERR_5214);
-//        }
-//        YouyouCommodityDO youyouCommodityDO = uUCommodityMapper.selectById(youyouOrderDO.getRealCommodityId());
-
-
         //校验商品是否存在
         if (Objects.isNull(buyItem)) {
             throw exception(ErrorCodeConstants.UU_GOODS_NOT_FOUND);
@@ -436,7 +428,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         if(PayOrderStatusEnum.isSuccess(orderDO.getPayOrderStatus())){
             throw exception(OpenApiCode.ERR_5299);
         }
-        orderDO.setPlatformCode(buyItem.getPlatCode().getCode());
+        orderDO.setPlatCode(buyItem.getPlatCode().getCode());
         orderDO.setCommodityAmount(buyItem.getPrice());
         ConfigDO serviceFeeLimit = configService.getConfigByKey("steam.inv.serviceFeeLimit");
         ConfigDO serviceFeeRateConfigByKey = configService.getConfigByKey("steam.inv.serviceFeeRate");
