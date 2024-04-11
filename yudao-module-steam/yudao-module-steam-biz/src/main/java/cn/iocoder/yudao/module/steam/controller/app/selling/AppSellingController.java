@@ -120,13 +120,7 @@ public class AppSellingController {
     }
 
 
-//    @GetMapping("/user/sellerGoodsOnSelling")
-//    @Operation(summary = "卖家上架商品查询")
-//    public CommonResult<SellerGoodsOnSellingRespVO> sellerGoodsOnSelling(@RequestParam String userId) {
-//        SellerGoodsOnSellingRespVO sellerGoods = sellingExtService.getSellerGoods(userId);
-//
-//        return CommonResult.success(sellerGoods);
-//    }
+
 
 }
 

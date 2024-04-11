@@ -478,47 +478,6 @@ public class SellingExtService {
         return new PageResult(otherSellingPageReqVOS, (long) otherSellingDO.size());
     }
 
-//    public SellerGoodsOnSellingRespVO getSellerGoods(String userId){
-//        List<BindUserDO> bindUserDOS = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
-//                .eq(BindUserDO::getUserId, userId));
-//        MemberUserDO memberUserDO = memberUserMapper.selectById(userId);
-//        SellerGoodsOnSellingRespVO respVO = new SellerGoodsOnSellingRespVO();
-//        respVO.setNickname(memberUserDO.getNickname());
-//        respVO.setAvatar(memberUserDO.getAvatar());
-//        ArrayList<String> list = new ArrayList<>();
-//        for (BindUserDO bindUserDO : bindUserDOS) {
-//            list.add(bindUserDO.getSteamId());
-//        }
-//        List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
-//                .in(SellingDO::getSteamId, list));
-//        PageResult<SellingDO> sellingList = new PageResult<>();
-//        ArrayList<SellingDO> selling1 = new ArrayList<>();
-//        ArrayList<SellingDO> soldList = new ArrayList<>();
-//        for (SellingDO sellingDO : sellingDOS) {
-//            if(Objects.equals(sellingDO.getTransferStatus(), InvTransferStatusEnum.SELL.getStatus())) {
-//                SellingDO selling = new SellingDO();
-//                selling.setMarketName(sellingDO.getMarketName());
-//                selling.setPrice(sellingDO.getPrice());
-//                selling.setIconUrl(sellingDO.getIconUrl());
-//                selling.setMarketHashName(sellingDO.getMarketHashName());
-//                selling1.add(selling);
-//                sellingList.setList(selling1);
-//            }
-//            if(Objects.equals(sellingDO.getTransferStatus(), InvTransferStatusEnum.TransferFINISH.getStatus())){
-//                SellingDO selling = new SellingDO();
-//                selling.setMarketName(sellingDO.getMarketName());
-//                selling.setPrice(sellingDO.getPrice());
-//                selling.setIconUrl(sellingDO.getIconUrl());
-//                selling.setMarketHashName(sellingDO.getMarketHashName());
-//                soldList.add(selling);
-//            }
-//        }
-//        respVO.setSelling(sellingList);
-//        respVO.setSold(soldList);
-////        PageResult<SellerGoodsOnSellingRespVO> objectPageResult = new PageResult<>();
-////        objectPageResult.setList(respVO);
-//        return respVO;
-//    }
 
 }
 
