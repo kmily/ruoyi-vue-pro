@@ -93,17 +93,13 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         V5ProductBuyRes v5ProductBuyRes = V5ApiUtils.buyV5Product(v5BuyProductVo);
 
         ApiBuyItemRespVo apiBuyItemRespVo = new ApiBuyItemRespVo();
-        apiBuyItemRespVo.setIsSuccess(true);
-        if (v5ProductBuyRes != null) {
+        if (v5ProductBuyRes != null && v5ProductBuyRes.getCode() == 0) {//返回成功
+            apiBuyItemRespVo.setIsSuccess(true);
             apiBuyItemRespVo.setOrderNo(v5ProductBuyRes.getData().getOrderNo());
+            apiBuyItemRespVo.setTradeLink(createReqVO.getTradeLinks());
+            apiBuyItemRespVo.setTradeOfferId(null);// TODO
         }
-        apiBuyItemRespVo.setTradeLink(createReqVO.getTradeLinks());
-        apiBuyItemRespVo.setTradeOfferId(null);// TODO
 
-        //下单成功
-        if (apiBuyItemRespVo.getIsSuccess()){
-
-        }
         //
 //        apiOrderExtMapper.selectOne(ApiOrderExtDO::)
         return apiBuyItemRespVo;

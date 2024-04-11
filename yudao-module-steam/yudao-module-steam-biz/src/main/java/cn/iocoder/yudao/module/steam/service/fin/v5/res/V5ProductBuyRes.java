@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+
 @Data
 public class V5ProductBuyRes implements Serializable {
     private int code;
@@ -12,7 +14,7 @@ public class V5ProductBuyRes implements Serializable {
     private PaymentData data;
     @Data
     public static class PaymentData {
-        private int payAmount;
+        private BigDecimal payAmount;
         private ReceiverInfo receiverInfo;
         private String merchantOrderNo;
         private String orderNo;
