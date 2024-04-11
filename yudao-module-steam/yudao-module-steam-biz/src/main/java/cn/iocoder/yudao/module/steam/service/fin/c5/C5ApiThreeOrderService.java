@@ -46,7 +46,8 @@ public class C5ApiThreeOrderService implements ApiThreeOrderService {
         if (data != null && !data.isEmpty()) {
             // 获取第一个 ProductData 对象
             ProductPriceInfoRes.ProductPriceInfoResponse.ProductData productData = data.get(0);
-            apiCommodityRespVo.setPrice(BigDecimal.valueOf(productData.getPrice()).multiply(BigDecimal.valueOf(100)).intValue());
+            apiCommodityRespVo.setPrice(BigDecimal.valueOf(productData.getPrice()).multiply(BigDecimal.valueOf(675)).intValue());
+            apiCommodityRespVo.setIsSuccess(true);
         } else {
             apiCommodityRespVo.setIsSuccess(false);
         }

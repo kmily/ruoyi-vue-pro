@@ -43,6 +43,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             // 获取第一个 ProductData 对象
             ProductPriceInfoRes.ProductPriceInfoResponse.ProductData productData = data.get(0);
             apiCommodityRespVo.setPrice(BigDecimal.valueOf(productData.getPrice()).multiply(BigDecimal.valueOf(100)).intValue());
+            apiCommodityRespVo.setIsSuccess(true);
         } else {
             apiCommodityRespVo.setIsSuccess(false);
         }
@@ -69,6 +70,9 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         //获取订单详情
         String v5OrderInfo = V5ApiUtils.getV5OrderInfo(null, String.valueOf(orderNo));
         ApiOrderExtDO apiOrderExtDO = apiOrderExtMapper.selectOne(ApiOrderExtDO::getOrderId, orderId);
+        if (apiOrderExtDO == null){
+            throw new ServiceException()
+        }
         return v5OrderInfo;//TODO 待调试
     }
 
