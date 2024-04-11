@@ -206,7 +206,6 @@ public class AppDropListController {
     }
     @PostMapping("sell/allSaleList")
     @Operation(summary = "在售商品列表")
-    @PreAuthenticated
     public CommonResult<PageResult<SellListItemResp>> allSaleList(@RequestBody @Valid AppSellingPageReqVO reqVO) {
         PageResult<SellListItemResp> sellingDOPageResult = sellingsearchService.allSaleList(reqVO);
         return success(sellingDOPageResult);

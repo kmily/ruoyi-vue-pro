@@ -160,6 +160,14 @@ export const PayChannelEnum = {
     "code": "alipay_bar",
     "name": "支付宝条码支付"
   },
+  ALIPAY_AQF: {
+    "code": "alipay_aqf",
+    "name": "支付宝安全发(服务商版)"
+  },
+  ALIPAY_PLFKDYMZH: {
+    "code": "alipay_plfkdymzh",
+    "name": "支付宝批量付款到有密"
+  },
   MOCK : {
     "code": "mock",
     "name": "模拟支付"

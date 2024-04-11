@@ -50,6 +50,10 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     public AbstractWxPayClient(Long channelId, String channelCode, WxPayClientConfig config) {
         super(channelId, channelCode, config);
     }
+    @Override
+    public Map<String, String> doParseNotify(Map<String, String> params, String body) {
+        return null;
+    }
 
     /**
      * 初始化 client 客户端
