@@ -42,6 +42,7 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingHashSummary;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
+import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
@@ -396,9 +397,10 @@ public class AppIo661ApiController {
     @Operation(summary = "订单") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
     @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
     @PermitAll
-    public CommonResult<Map<String, Object>> uuNotify(@RequestBody NotifyReq notifyReq, @PathVariable String platCode) {
+    public CommonResult<Map<String, Object>> uuNotify(@RequestBody Object notifyReq, @PathVariable String platCode) {
         DevAccountUtils.tenantExecute(1L, () -> {
-            uuNotifyService.notify(notifyReq);
+            PlatCodeEnum platCodeEnum = PlatCodeEnum.valueOf(platCode);
+            apiOrderService.processNotify(JacksonUtils.writeValueAsString(notifyReq),platCodeEnum);
             return null;
         });
         CommonResult<Map<String, Object>> ret = new CommonResult<>();

@@ -29,7 +29,7 @@ public class ApiOrderExtDO extends BaseDO {
     /**
      * 购买平台代码
      */
-    private Integer platformCode;
+    private Integer platCode;
     /**
      * 第三方平台订单号
      */
