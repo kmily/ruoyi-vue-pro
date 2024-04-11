@@ -397,9 +397,10 @@ public class ApiOrderServiceImpl implements ApiOrderService {
                 continue;
             }
             ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
-            query = apiThreeOrderService.query(loginUser, orderDO.getBuyInfo());
-            if(Objects.nonNull(query) && Objects.nonNull(query.getIsSuccess()) && query.getIsSuccess()){
-                if(query.getPrice()<=orderDO.getBuyInfo().getPurchasePrice()){
+            ApiCommodityRespVo tmpQuery = apiThreeOrderService.query(loginUser, orderDO.getBuyInfo());
+            if(Objects.nonNull(tmpQuery) && Objects.nonNull(tmpQuery.getIsSuccess()) && tmpQuery.getIsSuccess()){
+                if(tmpQuery.getPrice()<=orderDO.getBuyInfo().getPurchasePrice()){
+                    query=tmpQuery;
                     break;
                 }
             }
