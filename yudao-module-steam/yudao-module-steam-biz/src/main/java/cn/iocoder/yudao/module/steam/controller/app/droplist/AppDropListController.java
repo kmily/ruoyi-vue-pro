@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.steam.controller.app.droplist;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selexterior.vo.SelExteriorPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selitemset.vo.SelItemsetListReqVO;
@@ -29,9 +30,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -203,6 +202,12 @@ public class AppDropListController {
     @Operation(summary = "在售商品列表")
     public CommonResult<PageResult<SellListItemResp>> sellList(@Valid AppSellingPageReqVO reqVO) {
         PageResult<SellListItemResp> sellingDOPageResult = sellingsearchService.sellList(reqVO);
+        return success(sellingDOPageResult);
+    }
+    @PostMapping("sell/allSaleList")
+    @Operation(summary = "在售商品列表")
+    public CommonResult<PageResult<SellListItemResp>> allSaleList(@RequestBody @Valid AppSellingPageReqVO reqVO) {
+        PageResult<SellListItemResp> sellingDOPageResult = sellingsearchService.allSaleList(reqVO);
         return success(sellingDOPageResult);
     }
 

@@ -188,12 +188,6 @@ public class AppInventorySearchController {
     @Deprecated
     public CommonResult<List<String>> updateFromSteam(@RequestParam String steamId) throws JsonProcessingException {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-
-        if (steamId.equals("11111111111111111")){
-            ioInvUpdateService.otherInsertInventory(loginUser);
-            return success(new ArrayList<>());
-        }
-
         Optional<BindUserDO> first = bindUserMapper.selectList(new LambdaQueryWrapperX<BindUserDO>()
                 .eq(BindUserDO::getUserId, loginUser.getId())
                 .eq(BindUserDO::getUserType, loginUser.getUserType())
