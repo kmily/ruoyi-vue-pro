@@ -276,11 +276,10 @@ public class ApiOrderServiceImpl implements ApiOrderService {
 
             List<PayWalletTransactionDO> payWalletTransactionDOS = Arrays.asList(payWalletTransactionDO, payWalletTransactionDO1);
             apiOrderMapper.updateById(new ApiOrderDO().setId(uuOrderById.getId())
-//                    .setTransferDamagesAmount(transferDamagesAmount)
-//                    .setTransferRefundAmount(transferRefundAmount)
-//                    .setTransferRefundAmount(uuOrderById.getPayAmount())//不收手续费
-//                    .setTransferDamagesTime(LocalDateTime.now())
-//                    .setTransferDamagesRet(JacksonUtils.writeValueAsString(payWalletTransactionDOS))
+                    .setTransferDamagesAmount(0)
+                    .setTransferRefundAmount(uuOrderById.getPayAmount())//不收手续费
+                    .setTransferDamagesTime(LocalDateTime.now())
+                    .setTransferDamagesRet(JacksonUtils.writeValueAsString(payWalletTransactionDOS))
                     .setCashStatus(InvSellCashStatusEnum.DAMAGES.getStatus())
                     .setCancelReason(reason)
             );
@@ -408,7 +407,6 @@ public class ApiOrderServiceImpl implements ApiOrderService {
 //        if(aLong>0){
 //            throw exception(OpenApiCode.ERR_5407);
 //        }
-        //todo 查询 一个商品
         ApiCommodityRespVo buyItem = null;
         for (ApiThreeOrderService apiThreeOrderService : apiThreeOrderServiceList) {
             buyItem = apiThreeOrderService.query(loginUser, orderDO.getBuyInfo());
@@ -482,21 +480,6 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         }else{
             return orderDO;
         }
-    }
-    /**
-     * 检查是否有有效订单有魔兽的时候不能再次下单
-     * 条件支付订单未关闭且发货状态不是关闭都是有效订单
-     *
-     * @param commodityId 商品ID
-     * @return
-     */
-    @Deprecated
-    public List<ApiOrderDO> getExpOrder(String commodityId){
-        return apiOrderMapper.selectList(new LambdaQueryWrapperX<ApiOrderDO>()
-//                .eq(YouyouOrderDO::getCommodityId, commodityId)
-//                .neIfPresent(YouyouOrderDO::getPayOrderStatus,PayOrderStatusEnum.CLOSED.getStatus())
-//                .ne(YouyouOrderDO::getTransferStatus, InvTransferStatusEnum.CLOSE.getStatus())
-        );
     }
     @Override
     public ApiOrderDO getOrder(LoginUser loginUser, QueryOrderReqVo queryOrderReqVo) {

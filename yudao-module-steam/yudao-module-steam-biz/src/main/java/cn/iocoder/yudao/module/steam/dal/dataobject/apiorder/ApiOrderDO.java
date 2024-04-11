@@ -9,6 +9,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 /**
  * 新版订单 DO
  *
@@ -154,4 +156,20 @@ public class ApiOrderDO extends BaseDO {
      * 资金付款结果
      */
     private String cashRet;
+    /**
+     * 违约金
+     */
+    private Integer transferDamagesAmount;
+    /**
+     * 违约付款接口返回
+     */
+    private String transferDamagesRet;
+    /**
+     * 交易违约判定时间
+     */
+    private LocalDateTime transferDamagesTime;
+    /**
+     * 交易失败时退还
+     */
+    private Integer transferRefundAmount;
 }
