@@ -61,7 +61,7 @@ public class ApiOrderDO extends BaseDO {
      * 购买方式
      *    枚举 {@link cn.iocoder.yudao.module.steam.enums.PlatFormEnum 对应的类}
      */
-    private String buyMethod;
+    private Integer buyMethod;
 
     /**
      * 卖家用户ID
