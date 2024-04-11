@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.steam.service.fin.v5;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderExtDO;
+import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.service.fin.ApiThreeOrderService;
@@ -13,9 +15,9 @@ import cn.iocoder.yudao.module.steam.service.fin.vo.ApiBuyItemRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiCommodityRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiOrderCancelRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
-import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +26,8 @@ import java.util.Objects;
 @Service
 public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
+    @Resource
+    private ApiOrderExtMapper apiOrderExtMapper;
     @Override
     public ApiCommodityRespVo query(LoginUser loginUser, ApiQueryCommodityReqVo createReqVO) {
         checkLoginUser(loginUser);
@@ -40,7 +44,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             ProductPriceInfoRes.ProductPriceInfoResponse.ProductData productData = data.get(0);
             apiCommodityRespVo.setPrice(BigDecimal.valueOf(productData.getPrice()).multiply(BigDecimal.valueOf(100)).intValue());
         } else {
-            apiCommodityRespVo.setPrice(null);
+            apiCommodityRespVo.setIsSuccess(false);
         }
         apiCommodityRespVo.setPlatCode(PlatCodeEnum.C5);
 
@@ -63,7 +67,9 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             throw new ServiceException(OpenApiCode.ID_ERROR);
         }
         //获取订单详情
-        return V5ApiUtils.getV5OrderInfo(null, String.valueOf(orderNo));//TODO 待调试
+        String v5OrderInfo = V5ApiUtils.getV5OrderInfo(null, String.valueOf(orderNo));
+        ApiOrderExtDO apiOrderExtDO = apiOrderExtMapper.selectOne(ApiOrderExtDO::getOrderId, orderId);
+        return v5OrderInfo;//TODO 待调试
     }
 
 
