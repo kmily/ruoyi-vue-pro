@@ -25,7 +25,7 @@ import javax.validation.Valid;
  */
 public interface ApiThreeOrderService {
     default PlatCodeEnum getPlatCode(){
-        return PlatCodeEnum.V5;
+        return PlatCodeEnum.UNSUPPORTED;
     }
     /**
      * 商品价格查询
