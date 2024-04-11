@@ -48,7 +48,7 @@ public class C5ApiThreeOrderService implements ApiThreeOrderService {
             ProductPriceInfoRes.ProductPriceInfoResponse.ProductData productData = data.get(0);
             apiCommodityRespVo.setPrice(BigDecimal.valueOf(productData.getPrice()).multiply(BigDecimal.valueOf(100)).intValue());
         } else {
-            apiCommodityRespVo.setPrice(null);
+            apiCommodityRespVo.setIsSuccess(false);
         }
         apiCommodityRespVo.setPlatCode(PlatCodeEnum.C5);
         return apiCommodityRespVo;
