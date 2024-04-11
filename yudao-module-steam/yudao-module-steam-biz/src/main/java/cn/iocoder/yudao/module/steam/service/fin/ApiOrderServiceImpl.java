@@ -167,7 +167,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
 
         ApiOrderDO orderDO=new ApiOrderDO()
                 //设置买家
-                .setBuyBindUserId(loginUser.getId()).setBuyUserType(loginUser.getUserType())
+                .setBuyUserId(loginUser.getId()).setBuyUserType(loginUser.getUserType())
                 .setBuyBindUserId(buyBindUserDO.getId()).setBuySteamId(buyBindUserDO.getSteamId()).setBuyTradeLinks(buyBindUserDO.getTradeUrl())
                 //设置卖家信息
                 //服务费账号
