@@ -391,11 +391,16 @@ public class ApiOrderServiceImpl implements ApiOrderService {
             }
             ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
             query = apiThreeOrderService.query(loginUser, orderDO.getBuyInfo());
-            if(Objects.nonNull(query)){
-                break;
+            if(Objects.nonNull(query) && Objects.nonNull(query.getIsSuccess()) && query.getIsSuccess()){
+                if(query.getPrice()<=orderDO.getBuyInfo().getPurchasePrice()){
+                    break;
+                }
             }
         }
-        if(Objects.isNull(query)){
+        if (Objects.isNull(query)) {
+            throw exception(ErrorCodeConstants.UU_GOODS_NOT_FOUND);
+        }
+        if(Objects.nonNull(query) && Objects.nonNull(query.getIsSuccess()) && query.getIsSuccess()){
             throw new ServiceException(OpenApiCode.ERR_5301);
         }
         //检测交易链接是否是自己
@@ -407,24 +412,13 @@ public class ApiOrderServiceImpl implements ApiOrderService {
 //        if(aLong>0){
 //            throw exception(OpenApiCode.ERR_5407);
 //        }
-        ApiCommodityRespVo buyItem = null;
-        for (ApiThreeOrderService apiThreeOrderService : apiThreeOrderServiceList) {
-            buyItem = apiThreeOrderService.query(loginUser, orderDO.getBuyInfo());
-            if(buyItem.getIsSuccess() && Objects.nonNull(buyItem.getPrice())){
-                if(buyItem.getPrice()<=orderDO.getBuyInfo().getPurchasePrice()){
-                    break;
-                }
-            }
-        }
         //校验商品是否存在
-        if (Objects.isNull(buyItem)) {
-            throw exception(ErrorCodeConstants.UU_GOODS_NOT_FOUND);
-        }
+
         if(PayOrderStatusEnum.isSuccess(orderDO.getPayOrderStatus())){
             throw exception(OpenApiCode.ERR_5299);
         }
-        orderDO.setPlatCode(buyItem.getPlatCode().getCode());
-        orderDO.setCommodityAmount(buyItem.getPrice());
+        orderDO.setPlatCode(query.getPlatCode().getCode());
+        orderDO.setCommodityAmount(query.getPrice());
         ConfigDO serviceFeeLimit = configService.getConfigByKey("steam.inv.serviceFeeLimit");
         ConfigDO serviceFeeRateConfigByKey = configService.getConfigByKey("steam.inv.serviceFeeRate");
         if(PlatFormEnum.WEB.getCode().equals(orderDO.getBuyMethod()) || Objects.isNull(serviceFeeRateConfigByKey)){
