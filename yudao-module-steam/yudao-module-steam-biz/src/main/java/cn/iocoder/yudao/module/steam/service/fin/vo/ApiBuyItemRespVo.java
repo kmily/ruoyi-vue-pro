@@ -17,6 +17,7 @@ public class ApiBuyItemRespVo implements Serializable {
      *  枚举 {@link cn.iocoder.yudao.module.steam.enums.OpenApiCode 对应的类}
      */
     private ErrorCode errorCode;
+
     /**
      * 第三方单据号
      */
