@@ -86,10 +86,8 @@ public class C5ApiUtils {
         return "未获取到订单详情";
     }
     public static ProductBuyRes buyC5Product(C5FastPayVo payVo) {
-        C5FastPayVo c5FastPayVo = new C5FastPayVo(payVo.getAppId(), 1, payVo.getItemId(),
-                payVo.getLowPrice(), payVo.getMarketHashName(), payVo.getMaxPrice(), payVo.getOutTradeNo(),
-                payVo.getTradeUrl());
-        String requestBodyJson = gson.toJson(c5FastPayVo);
+
+        String requestBodyJson = gson.toJson(payVo);
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url(API_BUY_C5_PRODUCT_URL)

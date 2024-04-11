@@ -4,7 +4,9 @@ import cn.iocoder.yudao.module.steam.service.fin.c5.res.ProductBuyRes;
 import cn.iocoder.yudao.module.steam.service.fin.c5.res.ProductPriceInfoRes;
 import cn.iocoder.yudao.module.steam.service.fin.c5.vo.C5FastPayVo;
 import cn.iocoder.yudao.module.steam.service.fin.c5.vo.C5ProductVo;
+import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductBuyRes;
 import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductPriceInfoRes;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5BuyProductVo;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5OrderInfo;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5queryOnSaleInfoReqVO;
 import com.google.gson.Gson;
@@ -23,7 +25,7 @@ public class V5ApiUtils {
     public static final String API_POST_V5_PRODUCT_PRICE_URL = "https://delivery.v5item.com/open/api/queryOnSaleInfo";
 
     private static final String API_POST_V5_ORDER_INFO_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
-    private static final String API_BUY_C5_PRODUCT_URL = "https://app.zbt.com/open/trade/v2/quick-buy?language=zh-CN&app-key=";
+    private static final String API_POST_BUY_V5_PRODUCT_URL = "https://delivery.v5item.com/open/api/createOrderByMarketHashName";
 
     private static final OkHttpClient client = new OkHttpClient();
     private static final Gson gson = new Gson();
@@ -82,14 +84,11 @@ public class V5ApiUtils {
         }
         return "未获取到订单详情";
     }
-    public static ProductBuyRes buyV5Product(C5FastPayVo payVo) {
-        C5FastPayVo c5FastPayVo = new C5FastPayVo(payVo.getAppId(), 1, payVo.getItemId(),
-                payVo.getLowPrice(), payVo.getMarketHashName(), payVo.getMaxPrice(), payVo.getOutTradeNo(),
-                payVo.getTradeUrl());
-        String requestBodyJson = gson.toJson(c5FastPayVo);
-        OkHttpClient client = new OkHttpClient();
+    public static V5ProductBuyRes buyV5Product(V5BuyProductVo buyVo) {
+
+        String requestBodyJson = gson.toJson(buyVo);
         Request request = new Request.Builder()
-                .url(API_BUY_C5_PRODUCT_URL)
+                .url(API_POST_BUY_V5_PRODUCT_URL)
                 .post(RequestBody.create(MediaType.parse(JSON), requestBodyJson))
                 .build();
         // 发送请求并处理响应
@@ -104,7 +103,7 @@ public class V5ApiUtils {
                 // 关闭响应体
                 response.body().close();
                 // 使用 Gson 将 JSON 字符串转换为对象
-                return gson.fromJson(responseData, ProductBuyRes.class);
+                return gson.fromJson(responseData, V5ProductBuyRes.class);
             }
         } catch (IOException e) {
             log.error("请求购买指定商品时发生异常", e);

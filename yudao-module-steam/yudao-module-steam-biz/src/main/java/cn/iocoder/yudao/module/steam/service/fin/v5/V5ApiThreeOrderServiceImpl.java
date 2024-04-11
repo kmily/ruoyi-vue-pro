@@ -2,43 +2,36 @@ package cn.iocoder.yudao.module.steam.service.fin.v5;
 
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderExtDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderMapper;
-import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
-import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderExtDO;
-import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
+
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.service.fin.ApiThreeOrderService;
+import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductBuyRes;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5BuyProductVo;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5cancelOrderRespVO;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5queryOrderStatusReqVO;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5queryOrderStatusRespVO;
-import cn.iocoder.yudao.module.steam.service.fin.c5.res.ProductPriceInfoRes;
-import cn.iocoder.yudao.module.steam.service.fin.c5.utils.C5ApiUtils;
 import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductPriceInfoRes;
 import cn.iocoder.yudao.module.steam.service.fin.v5.utils.V5ApiUtils;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiBuyItemRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiCommodityRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiOrderCancelRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
-import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
-import javax.annotation.Resource;
+
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
@@ -95,8 +88,21 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ApiBuyItemRespVo buyItem(LoginUser loginUser, ApiQueryCommodityReqVo createReqVO) {
+        V5BuyProductVo v5BuyProductVo = new V5BuyProductVo(createReqVO.getCommodityHashName(),createReqVO.getPurchasePrice(),
+                createReqVO.getTradeLinks(),createReqVO.getMerchantNo(),MERCHANTKEY,0);
+        V5ProductBuyRes v5ProductBuyRes = V5ApiUtils.buyV5Product(v5BuyProductVo);
 
-        return null;
+        ApiBuyItemRespVo apiBuyItemRespVo = new ApiBuyItemRespVo();
+        apiBuyItemRespVo.setIsSuccess(true);
+        if (v5ProductBuyRes != null) {
+            apiBuyItemRespVo.setOrderNo(v5ProductBuyRes.getData().getOrderNo());
+        }
+        apiBuyItemRespVo.setTradeLink(createReqVO.getTradeLinks());
+        apiBuyItemRespVo.setTradeOfferId(null);// TODO
+
+        //
+//        apiOrderExtMapper.selectOne(ApiOrderExtDO::)
+        return apiBuyItemRespVo;
     }
 
     @Override
