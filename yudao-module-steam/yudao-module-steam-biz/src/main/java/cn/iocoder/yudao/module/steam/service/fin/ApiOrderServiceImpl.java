@@ -142,7 +142,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
     public ApiOrderServiceImpl() {
     }
     private Optional<ApiThreeOrderService> getApiThreeByOrder(ApiOrderDO apiOrderDO){
-        return apiThreeOrderServiceList.stream().filter(item->item.getPlatCode().equals(apiOrderDO.getPlatCode())).findFirst();
+        return apiThreeOrderServiceList.stream().filter(item->item.getPlatCode().getCode().equals(apiOrderDO.getPlatCode())).findFirst();
     }
     private Optional<ApiThreeOrderService> getApiThreeByPlatCode(PlatCodeEnum platCodeEnum){
         return apiThreeOrderServiceList.stream().filter(item->item.getPlatCode().equals(platCodeEnum)).findFirst();
