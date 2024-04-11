@@ -419,7 +419,7 @@ public class SellingExtService {
      * WearCategory4  战痕累累
      *
      * @param
-     *//*
+     */
     public  List<GoodsAbrasionDTO> showGoodsWithMarketName(GoodsWithMarketHashNameReqVO sellingPageReqVO) {
         List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
                 .eq(SellingDO::getShortName, sellingPageReqVO.getShortName()));
@@ -441,7 +441,7 @@ public class SellingExtService {
             }
         }
         return list;
-    }*/
+    }
 
 
 
