@@ -58,6 +58,12 @@ public class ApiOrderDO extends BaseDO {
      */
     private String buySteamId;
     /**
+     * 购买方式
+     *    枚举 {@link cn.iocoder.yudao.module.steam.enums.PlatFormEnum 对应的类}
+     */
+    private String buyMethod;
+
+    /**
      * 卖家用户ID
      */
     private Long sellUserId;
@@ -82,6 +88,10 @@ public class ApiOrderDO extends BaseDO {
      */
     private Integer payAmount;
     /**
+     * 价格，单位：分
+     */
+    private String payPayRet;
+    /**
      * 服务费，单位分
      */
     private Integer serviceFee;
@@ -99,8 +109,9 @@ public class ApiOrderDO extends BaseDO {
     private Integer serviceFeeUserType;
     /**
      * 购买平台代码
+     * 枚举 {@link cn.iocoder.yudao.module.steam.enums.PlatCodeEnum 对应的类}
      */
-    private Integer platformCode;
+    private String platCode;
     /**
      * 商品总额
      */
@@ -131,4 +142,8 @@ public class ApiOrderDO extends BaseDO {
      * 第三方平台订单
      */
     private String threeOrderNo;
+    /**
+     * 取消原因
+     */
+    private String cancelReason;
 }

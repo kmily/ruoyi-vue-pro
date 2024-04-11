@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
+import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -26,7 +27,7 @@ public interface ApiOrderService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    ApiOrderDO createInvOrder(LoginUser loginUser, @Valid CreateCommodityOrderReqVo createReqVO);
+    ApiOrderDO createInvOrder(LoginUser loginUser, @Valid ApiQueryCommodityReqVo createReqVO);
 
     /**
      * 释放库存
