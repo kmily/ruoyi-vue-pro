@@ -13,18 +13,14 @@ import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
-import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
-import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderExtDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyounotify.YouyouNotifyDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.devaccount.DevAccountMapper;
@@ -349,7 +345,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         }
         //购买
         ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
-        ApiBuyItemRespVo apiBuyItemRespVo = apiThreeOrderService.buyItem(loginUser, uuOrder1.getBuyInfo());
+        ApiBuyItemRespVo apiBuyItemRespVo = apiThreeOrderService.buyItem(loginUser, uuOrder1.getBuyInfo(),uuOrder1.getId());
         if(!apiBuyItemRespVo.getIsSuccess()){
             throw new ServiceException(apiBuyItemRespVo.getErrorCode());
         }
@@ -655,12 +651,12 @@ public class ApiOrderServiceImpl implements ApiOrderService {
     }
 
     @Override
-    public void processNotify(String jsonData,PlatCodeEnum platCodeEnum) {
+    public void processNotify(String jsonData,PlatCodeEnum platCodeEnum,String msgNo) {
         log.info("回调接收的数据{}",jsonData);
         Optional<ApiThreeOrderService> apiThreeByPlatCode = getApiThreeByPlatCode(platCodeEnum);
         if(apiThreeByPlatCode.isPresent()){
             ApiThreeOrderService apiThreeOrderService = apiThreeByPlatCode.get();
-            apiThreeOrderService.processNotify(jsonData);
+            apiThreeOrderService.processNotify(jsonData,msgNo);
         }
     }
     @Override

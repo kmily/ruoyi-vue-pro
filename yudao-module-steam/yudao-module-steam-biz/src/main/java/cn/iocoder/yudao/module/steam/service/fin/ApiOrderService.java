@@ -76,7 +76,7 @@ public interface ApiOrderService {
     Integer orderCancel(LoginUser loginUser, OrderCancelVo id, String userIp,String cancelReason);
 
 
-    void processNotify(String jsonData, PlatCodeEnum platCodeEnum);
+    void processNotify(String jsonData, PlatCodeEnum platCodeEnum,String msgNo);
     void pushRemote(NotifyReq notifyReq);
     /**
      * 关闭订单,

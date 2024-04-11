@@ -89,5 +89,5 @@ public interface ApiThreeOrderService {
      * @param orderNo  第三方 订单号
      * @param orderId  主订单ID
      */
-    void processNotify(String jsonData);
+    void processNotify(String jsonData,String msgNo);
 }

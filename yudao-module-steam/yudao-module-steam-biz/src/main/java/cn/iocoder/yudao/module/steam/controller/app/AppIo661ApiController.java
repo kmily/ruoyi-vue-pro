@@ -49,6 +49,8 @@ import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.fin.ApiOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.CallBackInfoVO;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5callBackResult;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.selling.SellingsearchService;
@@ -388,7 +390,7 @@ public class AppIo661ApiController {
         }
     }
     /**
-     * UU订单服务器回调
+     * 订单服务器回调
      *
      * @param notifyReq UU回调接口
      * @return
@@ -397,10 +399,17 @@ public class AppIo661ApiController {
     @Operation(summary = "订单") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
     @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
     @PermitAll
-    public CommonResult<Map<String, Object>> uuNotify(@RequestBody Object notifyReq, @PathVariable String platCode) {
+    public CommonResult<Map<String, Object>> notify(@RequestBody String notifyReq, @PathVariable String platCode) {
         DevAccountUtils.tenantExecute(1L, () -> {
             PlatCodeEnum platCodeEnum = PlatCodeEnum.valueOf(platCode);
-            apiOrderService.processNotify(JacksonUtils.writeValueAsString(notifyReq),platCodeEnum);
+            switch(platCodeEnum){
+                case C5:
+                    break;
+                case V5:
+                    V5callBackResult v5callBackResult = JacksonUtils.readValue(notifyReq, V5callBackResult.class);
+                    apiOrderService.processNotify(JacksonUtils.writeValueAsString(notifyReq),platCodeEnum,v5callBackResult.getNotifyMsgNo());
+                default:
+            }
             return null;
         });
         CommonResult<Map<String, Object>> ret = new CommonResult<>();
