@@ -101,25 +101,26 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         V5ProductBuyRes v5ProductBuyRes = V5ApiUtils.buyV5Product(v5BuyProductVo);
 
         ApiBuyItemRespVo apiBuyItemRespVo = new ApiBuyItemRespVo();
+        if (v5ProductBuyRes != null && v5ProductBuyRes.getData() != null) {
+            apiBuyItemRespVo.setOrderNo(v5ProductBuyRes.getData().getOrderNo());
+        }
         if (v5ProductBuyRes != null && v5ProductBuyRes.getCode() == 0) {//返回成功
             apiBuyItemRespVo.setIsSuccess(true);
-            apiBuyItemRespVo.setOrderNo(v5ProductBuyRes.getData().getOrderNo());
             apiBuyItemRespVo.setTradeLink(createReqVO.getTradeLinks());
             apiBuyItemRespVo.setErrorCode(OpenApiCode.OK);
             apiBuyItemRespVo.setTradeOfferId(null);// TODO
             return apiBuyItemRespVo;
+
         }
         if (v5ProductBuyRes != null && v5ProductBuyRes.getCode() == 1){
             apiBuyItemRespVo.setIsSuccess(false);
-            apiBuyItemRespVo.setOrderNo(v5ProductBuyRes.getData().getOrderNo());
             apiBuyItemRespVo.setTradeLink(createReqVO.getTradeLinks());
             apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1);
             apiBuyItemRespVo.setTradeOfferId(null);// TODO
-            return apiBuyItemRespVo;
+            throw new ServiceException(1,v5ProductBuyRes.getMsg());
         }
         if (v5ProductBuyRes != null && v5ProductBuyRes.getCode() == 1001){
             apiBuyItemRespVo.setIsSuccess(false);
-            apiBuyItemRespVo.setOrderNo(v5ProductBuyRes.getData().getOrderNo());
             apiBuyItemRespVo.setTradeLink(createReqVO.getTradeLinks());
             apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1001);
             apiBuyItemRespVo.setTradeOfferId(null);// TODO
@@ -127,7 +128,6 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         }
         if (v5ProductBuyRes != null && v5ProductBuyRes.getCode() == 1002){
             apiBuyItemRespVo.setIsSuccess(false);
-            apiBuyItemRespVo.setOrderNo(v5ProductBuyRes.getData().getOrderNo());
             apiBuyItemRespVo.setTradeLink(createReqVO.getTradeLinks());
             apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1002);
             apiBuyItemRespVo.setTradeOfferId(null);// TODO
