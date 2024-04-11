@@ -25,9 +25,16 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
+import cn.iocoder.yudao.module.steam.service.fin.ApiThreeOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.IoGenOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.UUOrderService;
+import cn.iocoder.yudao.module.steam.service.fin.v5.V5ApiThreeOrderServiceImpl;
+import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductPriceInfoRes;
+import cn.iocoder.yudao.module.steam.service.fin.v5.utils.V5ApiUtils;
+import cn.iocoder.yudao.module.steam.service.fin.vo.ApiBuyItemRespVo;
+import cn.iocoder.yudao.module.steam.service.fin.vo.ApiCommodityRespVo;
+import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,6 +46,7 @@ import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -62,6 +70,8 @@ public class AppWalletController {
     @Resource
     private InvOrderExtService invOrderExtService;
 
+    @Resource
+    private V5ApiThreeOrderServiceImpl v5ApiThreeOrderService;
     /**
      * 创建提现订单
      * @param createReqVO
@@ -170,5 +180,15 @@ public class AppWalletController {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         paySteamOrderService.refundInvOrder(loginUser,id, ServletUtils.getClientIP());
         return success(true);
+    }
+
+    @PostMapping("/create/apiOrder")
+    @Operation(summary = "创建库存订单")
+    @PreAuthenticated
+    public CommonResult<ApiBuyItemRespVo> create(@RequestBody ApiQueryCommodityReqVo reqVo) {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        ApiBuyItemRespVo apiBuyItemRespVo = v5ApiThreeOrderService.buyItem(loginUser, reqVo);
+
+        return CommonResult.success(apiBuyItemRespVo);
     }
 }

@@ -97,7 +97,33 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             apiBuyItemRespVo.setIsSuccess(true);
             apiBuyItemRespVo.setOrderNo(v5ProductBuyRes.getData().getOrderNo());
             apiBuyItemRespVo.setTradeLink(createReqVO.getTradeLinks());
+            apiBuyItemRespVo.setErrorCode(OpenApiCode.OK);
             apiBuyItemRespVo.setTradeOfferId(null);// TODO
+            return apiBuyItemRespVo;
+        }
+        if (v5ProductBuyRes != null && v5ProductBuyRes.getCode() == 1){
+            apiBuyItemRespVo.setIsSuccess(false);
+            apiBuyItemRespVo.setOrderNo(v5ProductBuyRes.getData().getOrderNo());
+            apiBuyItemRespVo.setTradeLink(createReqVO.getTradeLinks());
+            apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1);
+            apiBuyItemRespVo.setTradeOfferId(null);// TODO
+            return apiBuyItemRespVo;
+        }
+        if (v5ProductBuyRes != null && v5ProductBuyRes.getCode() == 1001){
+            apiBuyItemRespVo.setIsSuccess(false);
+            apiBuyItemRespVo.setOrderNo(v5ProductBuyRes.getData().getOrderNo());
+            apiBuyItemRespVo.setTradeLink(createReqVO.getTradeLinks());
+            apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1001);
+            apiBuyItemRespVo.setTradeOfferId(null);// TODO
+            return apiBuyItemRespVo;
+        }
+        if (v5ProductBuyRes != null && v5ProductBuyRes.getCode() == 1002){
+            apiBuyItemRespVo.setIsSuccess(false);
+            apiBuyItemRespVo.setOrderNo(v5ProductBuyRes.getData().getOrderNo());
+            apiBuyItemRespVo.setTradeLink(createReqVO.getTradeLinks());
+            apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1002);
+            apiBuyItemRespVo.setTradeOfferId(null);// TODO
+            return apiBuyItemRespVo;
         }
 
         //
