@@ -1,13 +1,25 @@
 package cn.iocoder.yudao.module.steam.service.fin.v5;
 
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderExtDO;
+import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderMapper;
+import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderExtDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.service.fin.ApiThreeOrderService;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5cancelOrderRespVO;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5queryOrderStatusReqVO;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5queryOrderStatusRespVO;
 import cn.iocoder.yudao.module.steam.service.fin.c5.res.ProductPriceInfoRes;
 import cn.iocoder.yudao.module.steam.service.fin.c5.utils.C5ApiUtils;
 import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductPriceInfoRes;
@@ -16,7 +28,14 @@ import cn.iocoder.yudao.module.steam.service.fin.vo.ApiBuyItemRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiCommodityRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiOrderCancelRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
+import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
+import cn.iocoder.yudao.module.steam.utils.HttpUtil;
+import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -28,7 +47,15 @@ import java.util.Objects;
 public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
     @Resource
+    private ApiOrderMapper apiOrderMapper;
+    @Resource
     private ApiOrderExtMapper apiOrderExtMapper;
+
+    private static final String MERCHANTKEY = "529606f226e6461ca5bac93047976177";
+    private static final String Query_Order_Status_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
+    private static final String Cancel_Order_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
+
+
 
     @Override
     public PlatCodeEnum getPlatCode() {
@@ -105,20 +132,80 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
      */
     @Override
     public Integer getOrderSimpleStatus(LoginUser loginUser, String orderNo, Long orderId) {
-
-
-
-        return null;
+        V5queryOrderStatusReqVO reqVO = new V5queryOrderStatusReqVO();
+        reqVO.setMerchantKey(MERCHANTKEY); // 商户密钥
+        reqVO.setOrderNo(orderNo); // V5订单号
+        reqVO.setMerchantOrderNo(String.valueOf(orderId)); // 商户订单号
+        // 查询
+        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+        builder.url(Query_Order_Status_URL);
+        builder.method(HttpUtil.Method.JSON);
+        builder.postObject(reqVO);
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
+        ApiResult json = sent.json(ApiResult.class);
+        Object data = json.getData();
+        V5queryOrderStatusRespVO respVO = JacksonUtils.readValue(JacksonUtils.writeValueAsString(data), V5queryOrderStatusRespVO.class);
+//        // 更新订单状态
+//        ApiOrderDO apiOrderDO = new ApiOrderDO();
+//        apiOrderDO.setId(orderId);
+//        apiOrderDO.setOrderStatus(respVO.getStatus());
+//        apiOrderDO.setOrderSubStatus(respVO.getStatus());
+//        ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
+//        apiOrderExtDO.setOrderId(orderId);
+//        apiOrderExtDO.setOrderSubStatus(respVO.getStatus());
+//        if(respVO.getStatus() == 0){
+//            apiOrderExtDO.setOrderStatus(3);
+//        }
+//        if(respVO.getStatus() == 0){
+//            apiOrderExtDO.setOrderStatus(3);
+//        }
+//        // 更新订单状态
+//        apiOrderMapper.updateById(apiOrderDO);
+//        apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderId,orderId));
+        return respVO.getStatus();
     }
 
     /**
-     * 订单取消
+     * 订单取消   卖家未发送报价的订单才能取消
      * @param orderNo  第三方 订单号
      * @param orderId  主订单ID
+     * @Description     0-取消订单成功   1-取消订单正在处理中   2-取消订单失败
      */
     @Override
     public ApiOrderCancelRespVo orderCancel(LoginUser loginUser, String orderNo, Long orderId) {
+        V5queryOrderStatusReqVO reqVO = new V5queryOrderStatusReqVO();
+        reqVO.setMerchantKey(MERCHANTKEY); // 商户密钥
+        reqVO.setOrderNo(orderNo); // V5订单号
+        reqVO.setMerchantOrderNo(String.valueOf(orderId)); // 商户订单号
+        // 查询
+        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+        builder.url(Cancel_Order_URL);
+        builder.method(HttpUtil.Method.JSON);
+        builder.postObject(reqVO);
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
+        ApiResult json = sent.json(ApiResult.class);
+        Object data = json.getData();
+        V5cancelOrderRespVO respVO = JacksonUtils.readValue(JacksonUtils.writeValueAsString(data), V5cancelOrderRespVO.class);
+        ApiOrderCancelRespVo respVo = new ApiOrderCancelRespVo();
+        // 此处接收字段开发文档不一致  Status 或者 cancelStatus
+        respVo.setIsSuccess(respVO.getStatus().equals("1"));
+        if(!respVo.getIsSuccess()){
+            respVo.setErrorCode(new ErrorCode(Integer.valueOf(respVO.getStatus()),respVO.getStatusMsg()));
+        }
 
-        return null;
+        ApiOrderDO apiOrderDO = new ApiOrderDO();
+        apiOrderDO.setId(orderId);
+        apiOrderDO.setOrderStatus(Integer.valueOf(respVO.getStatus()));
+        apiOrderDO.setOrderSubStatus(Integer.valueOf(respVO.getStatus()));
+        ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
+        apiOrderExtDO.setOrderId(orderId);
+        apiOrderExtDO.setOrderSubStatus(Integer.valueOf(respVO.getStatus()));
+        if(Integer.parseInt(respVO.getStatus()) == 0){
+            apiOrderExtDO.setOrderStatus(3);
+        }
+        // 更新订单状态
+        apiOrderMapper.updateById(apiOrderDO);
+        apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderId,orderId));
+        return respVo;
     }
 }
