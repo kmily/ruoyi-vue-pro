@@ -1,8 +1,12 @@
 package cn.iocoder.yudao.module.steam.controller.app;
 
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
@@ -54,6 +58,7 @@ import cn.iocoder.yudao.module.steam.service.uu.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiPayWalletRespVO;
+import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import com.google.common.collect.Maps;
@@ -61,10 +66,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
@@ -383,5 +385,29 @@ public class AppIo661ApiController {
 
             return ApiResult.error(e.getCode(),  e.getMessage(),Io661OrderInfoResp.class);
         }
+    }
+    /**
+     * UU订单服务器回调
+     *
+     * @param notifyReq UU回调接口
+     * @return
+     */
+    @PostMapping("/notify/{platCode}")
+    @Operation(summary = "订单") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
+    @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
+    @PermitAll
+    public CommonResult<Map<String, Object>> uuNotify(@RequestBody NotifyReq notifyReq, @PathVariable String platCode) {
+        DevAccountUtils.tenantExecute(1L, () -> {
+            uuNotifyService.notify(notifyReq);
+            return null;
+        });
+        CommonResult<Map<String, Object>> ret = new CommonResult<>();
+        ret.setCode(200);
+        ret.setMsg("成功");
+        ret.setData(MapUtils.convertMap(Arrays.asList(
+                new KeyValue<>("messageNo", notifyReq.getMessageNo()),
+                new KeyValue<>("flag", true)
+        )));
+        return ret;
     }
 }
