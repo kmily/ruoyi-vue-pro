@@ -10,7 +10,8 @@ public enum OtherSellingStatusEnum {
     IG(1, "IG"),
     C5(2, "C5"),
     UU(3, "UU"),
-    BUFF(4, "BUFF");
+    BUFF(4, "BUFF"),
+    V5(5, "V5");
     /**
      * 状态值
      */

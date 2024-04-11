@@ -7,10 +7,8 @@ import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.steam.controller.admin.otherselling.vo.OtherSellingPageReqVO;
-import cn.iocoder.yudao.module.steam.controller.admin.othertemplate.vo.OtherTemplatePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.*;
-import cn.iocoder.yudao.module.steam.dal.dataobject.otherselling.OtherSellingDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.othertemplate.OtherTemplateMapper;
 import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
@@ -24,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -101,20 +98,12 @@ public class AppSellingController {
     }
     @PostMapping("/otherTemplateInsert")
     @Operation(summary = "其他平台在售模板")
-    public CommonResult<PageResult<OtherTemplatePageReqVO>> insertOtherItemId() {
+    public CommonResult<String> insertOtherItemId() {
 
+        ioInvUpdateService.otherTemplateInsert();
 
-        PageResult<OtherTemplatePageReqVO> otherTemplateInsert = ioInvUpdateService.otherTemplateInsert();
-
-        return CommonResult.success(otherTemplateInsert);
+        return CommonResult.success("");
     }
-    @PostMapping("/otherSellingInsert")
-    @Operation(summary = "其他平台在售入库")
-    public CommonResult<PageResult<OtherSellingDO>> otherSellingInsert() {
 
-        PageResult<OtherSellingDO> otherTemplateInsert = ioInvUpdateService.otherSellingInsert();
-
-        return CommonResult.success(otherTemplateInsert);
-    }
 }
 

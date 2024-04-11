@@ -34,7 +34,7 @@ public class AppOtherInvListDto {
             private Integer appId;
 
             // 自动发货在售数量
-            private Long itemId;
+            private String itemId;
 
             private PriceInfo priceInfo;
 

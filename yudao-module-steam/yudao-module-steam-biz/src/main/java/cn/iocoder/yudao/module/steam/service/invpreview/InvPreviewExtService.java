@@ -12,12 +12,15 @@ import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.PreviewReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.hotwords.HotWordsDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.otherselling.OtherSellingDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.hotwords.HotWordsMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invdesc.InvDescMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapperExt;
+import cn.iocoder.yudao.module.steam.dal.mysql.otherselling.OtherSellingMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
+import cn.iocoder.yudao.module.steam.service.otherselling.OtherSellingService;
 import cn.iocoder.yudao.module.steam.service.selling.SellingHotDO;
 import cn.iocoder.yudao.module.steam.service.selling.SellingService;
 import cn.iocoder.yudao.module.steam.service.steam.C5ItemInfo;
@@ -27,6 +30,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -41,6 +45,7 @@ import java.util.stream.Collectors;
  * @author LeeAm
  */
 @Service
+@Component
 public class InvPreviewExtService {
 
     @Resource
@@ -55,6 +60,10 @@ public class InvPreviewExtService {
     private HotWordsMapper hotWordsMapper;
     @Resource
     private InvPreviewMapperExt invPreviewMapperExt;
+    @Resource
+    private OtherSellingMapper otherSellingMapper;
+    @Resource
+    private OtherSellingService otherSellingService;
 
     @Resource
     private SellingService sellingService;
@@ -122,14 +131,14 @@ public class InvPreviewExtService {
             ret.add(itemResp);
         }
         String sort = pageReqVO.getSort();
-        if(sort != null && !sort.equals("0")){
-            if (sort.equals("1")){
+        if (sort != null && !sort.equals("0")) {
+            if (sort.equals("1")) {
                 List<ItemResp> sortedList = ret.stream()
                         .sorted((o1, o2) -> Double.compare(o2.getAutoPrice(), o1.getAutoPrice())) // 根据 AutoPrice 字段降序排序
                         .collect(Collectors.toList());
                 return new PageResult<>(sortedList, invPreviewDOPageResult.getTotal());
             }
-            if (sort.equals("2")){
+            if (sort.equals("2")) {
                 List<ItemResp> sortedList = ret.stream()
                         .sorted(Comparator.comparingDouble(ItemResp::getAutoPrice)) // 根据 AutoPrice 字段升序排序
                         .collect(Collectors.toList());
@@ -231,6 +240,7 @@ public class InvPreviewExtService {
         long totalCount = sellingDOS.size();
         return new PageResult<>(sellingHotDOList, totalCount);
     }
+
     /**
      * 增加库存标识,上架构和下架构 都可以进行调用
      *
@@ -573,33 +583,39 @@ public class InvPreviewExtService {
 
     @Async
     public Integer updateIvnFlag() {
-        List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
-                .eqIfPresent(InvPreviewDO::getExistInv, true));
-        Integer count = 0;
-        if (Objects.nonNull(invPreviewDOS)) {
-            for (InvPreviewDO item : invPreviewDOS) {
-                count++;
-                PageParam pageParam = new PageParam();
-                pageParam.setPageNo(1);
-                pageParam.setPageSize(1);
-                PageResult<SellingDO> sellingDOPageResult = sellingMapper.selectPage(pageParam, new LambdaQueryWrapperX<SellingDO>()
-                        .eq(SellingDO::getMarketHashName, item.getMarketHashName())
-                        .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
-                        .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
-                        .orderByAsc(SellingDO::getPrice)
-                );
-                Optional<SellingDO> sellingDOOptional = sellingDOPageResult.getList().stream().findFirst();
-                C5ItemInfo itemInfo = item.getItemInfo();
-                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(sellingDOPageResult.getTotal() > 0).setAutoQuantity(sellingDOPageResult.getTotal().toString())
-                        .setMinPrice(sellingDOOptional.isPresent() ? sellingDOOptional.get().getPrice() : -1)
-                        .setSelExterior(itemInfo.getExteriorName())
-                        .setSelQuality(itemInfo.getQualityName())
-                        .setSelRarity(itemInfo.getRarityName())
-                        .setSelWeapon(itemInfo.getWeaponName())
-                        .setSelType(itemInfo.getTypeName())
-                        .setSelItemset(itemInfo.getItemSetName()));
-            }
+        List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<>());
+        if (Objects.isNull(invPreviewDOS)) {
+            return 0;
         }
-        return count;
+        for (InvPreviewDO item : invPreviewDOS) {
+            SellingDO sellingDOPageResult = sellingMapper.selectOne(new LambdaQueryWrapperX<SellingDO>()
+                    .eq(SellingDO::getMarketHashName, item.getMarketHashName())
+                    .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
+                    .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
+                    .orderByAsc(SellingDO::getPrice)
+            );
+
+            OtherSellingDO otherSellingDOPageResult = otherSellingMapper.selectOne(new LambdaQueryWrapperX<OtherSellingDO>()
+                    .eq(OtherSellingDO::getMarketHashName, item.getMarketHashName())
+                    .eq(OtherSellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
+                    .orderByAsc(OtherSellingDO::getPrice));
+
+            int minPrice = sellingDOPageResult != null ?
+                    otherSellingDOPageResult != null ? Math.min(sellingDOPageResult.getPrice(), otherSellingDOPageResult.getPrice()) : sellingDOPageResult.getPrice() :
+                    otherSellingDOPageResult != null ? otherSellingDOPageResult.getPrice() : -1;
+
+            item.setMinPrice(minPrice);
+            item.setExistInv(minPrice != -1);
+
+            C5ItemInfo itemInfo = item.getItemInfo();
+            item.setSelExterior(itemInfo.getExteriorName())
+                    .setSelQuality(itemInfo.getQualityName())
+                    .setSelRarity(itemInfo.getRarityName())
+                    .setSelWeapon(itemInfo.getWeaponName())
+                    .setSelType(itemInfo.getTypeName())
+                    .setSelItemset(itemInfo.getItemSetName());
+            invPreviewMapper.insertOrUpdate(item);
+        }
+        return invPreviewDOS.size();
     }
 }
