@@ -58,7 +58,7 @@ public class C5ApiThreeOrderService implements ApiThreeOrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ApiBuyItemRespVo buyItem(LoginUser loginUser, ApiQueryCommodityReqVo createReqVO) {
+    public ApiBuyItemRespVo buyItem(LoginUser loginUser, ApiQueryCommodityReqVo createReqVO,Long orderId) {
         //买家身份检测
         BindUserDO buyBindUserDO=null;
         if(StringUtils.hasText(createReqVO.getTradeLinks())){
@@ -109,6 +109,12 @@ public class C5ApiThreeOrderService implements ApiThreeOrderService {
     public ApiOrderCancelRespVo orderCancel(LoginUser loginUser, String orderNo, Long orderId) {
         return null;
     }
+
+    @Override
+    public void processNotify(String jsonData, String msgNo) {
+
+    }
+
     private static void checkLoginUser(Object loginUser) {
         if (Objects.isNull(loginUser)) {
             throw new ServiceException(OpenApiCode.ID_ERROR);
