@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
+import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
@@ -75,7 +76,7 @@ public interface ApiOrderService {
     Integer orderCancel(LoginUser loginUser, OrderCancelVo id, String userIp,String cancelReason);
 
 
-    void processNotify(NotifyReq notifyReq);
+    void processNotify(String jsonData, PlatCodeEnum platCodeEnum);
     void pushRemote(NotifyReq notifyReq);
     /**
      * 关闭订单,

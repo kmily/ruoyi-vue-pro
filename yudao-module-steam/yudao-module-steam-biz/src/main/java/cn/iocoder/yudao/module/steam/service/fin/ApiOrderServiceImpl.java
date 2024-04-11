@@ -655,36 +655,13 @@ public class ApiOrderServiceImpl implements ApiOrderService {
     }
 
     @Override
-    public void processNotify(NotifyReq notifyReq) {
-        String callBackInfo = notifyReq.getCallBackInfo();
-        NotifyVo notifyVo = JacksonUtils.readValue(callBackInfo, NotifyVo.class);
-        log.info("回调接收的数据{}",notifyVo);
-        List<ApiOrderDO> apiOrderDOS = apiOrderMapper.selectList(new LambdaQueryWrapper<ApiOrderDO>()
-                .eq(ApiOrderDO::getThreeOrderNo, notifyVo.getOrderNo()));
-        if (!apiOrderDOS.isEmpty()) {
-            //生成相关回调数据
-//            ApiOrderDO orderDO = apiOrderDOS.get(0);
-//            Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByOrder(orderDO);
-//            if(apiThreeByOrder.isPresent()){
-//                ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
-//                LoginUser loginUser = new LoginUser().setTenantId(1L).setUserType(orderDO.getBuyUserType()).setId(orderDO.getBuyUserId());
-//                // 1,进行中，2完成，3作废
-//                Integer orderSimpleStatus = apiThreeOrderService.getOrderSimpleStatus(loginUser,orderDO.getThreeOrderNo(), orderDO.getId());
-//                switch (orderSimpleStatus){
-//                    case 1://进行中
-//                        break;
-//                    case 2://完成
-////                        apiOrderMapper.updateById(new ApiOrderDO().setId(orderDO.getId())
-////                                .setTransferStatus(InvTransferStatusEnum.TransferFINISH.getStatus()));
-//                        break;
-//                    case 3://作废
-//                        refundAction(orderDO,loginUser);
-//                        break;
-//                    default:
-//                }
-//            }
+    public void processNotify(String jsonData,PlatCodeEnum platCodeEnum) {
+        log.info("回调接收的数据{}",jsonData);
+        Optional<ApiThreeOrderService> apiThreeByPlatCode = getApiThreeByPlatCode(platCodeEnum);
+        if(apiThreeByPlatCode.isPresent()){
+            ApiThreeOrderService apiThreeOrderService = apiThreeByPlatCode.get();
+            apiThreeOrderService.processNotify(jsonData);
         }
-
     }
     @Override
     public void pushRemote(NotifyReq notifyReq) {
