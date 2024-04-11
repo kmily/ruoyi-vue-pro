@@ -416,7 +416,7 @@ public class AppIo661ApiController {
         ret.setCode(200);
         ret.setMsg("成功");
         ret.setData(MapUtils.convertMap(Arrays.asList(
-                new KeyValue<>("messageNo", notifyReq.getMessageNo()),
+//                new KeyValue<>("messageNo", notifyReq.getMessageNo()),
                 new KeyValue<>("flag", true)
         )));
         return ret;
