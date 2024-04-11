@@ -70,8 +70,8 @@ public class AppWalletController {
     @Resource
     private InvOrderExtService invOrderExtService;
 
-    @Resource
-    private V5ApiThreeOrderServiceImpl v5ApiThreeOrderService;
+//    @Resource
+//    private V5ApiThreeOrderServiceImpl v5ApiThreeOrderService;
     /**
      * 创建提现订单
      * @param createReqVO
@@ -182,13 +182,13 @@ public class AppWalletController {
         return success(true);
     }
 
-    @PostMapping("/create/apiOrder")
-    @Operation(summary = "创建库存订单")
-    @PreAuthenticated
-    public CommonResult<ApiBuyItemRespVo> create(@RequestBody ApiQueryCommodityReqVo reqVo) {
-        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        ApiBuyItemRespVo apiBuyItemRespVo = v5ApiThreeOrderService.buyItem(loginUser, reqVo);
-
-        return CommonResult.success(apiBuyItemRespVo);
-    }
+//    @PostMapping("/create/apiOrder")
+//    @Operation(summary = "创建库存订单")
+//    @PreAuthenticated
+//    public CommonResult<ApiBuyItemRespVo> create(@RequestBody ApiQueryCommodityReqVo reqVo) {
+//        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+//        ApiBuyItemRespVo apiBuyItemRespVo = v5ApiThreeOrderService.buyItem(loginUser, reqVo);
+//
+//        return CommonResult.success(apiBuyItemRespVo);
+//    }
 }
