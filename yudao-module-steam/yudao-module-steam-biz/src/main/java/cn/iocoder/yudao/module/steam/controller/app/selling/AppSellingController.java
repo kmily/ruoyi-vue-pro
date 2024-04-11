@@ -104,6 +104,7 @@ public class AppSellingController {
     public CommonResult<String> insertOtherItemId() {
 
         ioInvUpdateService.otherTemplateInsert();
+        ioInvUpdateService.otherTemplateInsertV5();
 
         return CommonResult.success("");
     }
@@ -116,6 +117,7 @@ public class AppSellingController {
 
         return CommonResult.success("");
     }
+
 
 }
 

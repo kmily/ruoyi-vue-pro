@@ -11,6 +11,9 @@ import cn.iocoder.yudao.module.steam.controller.admin.othertemplate.vo.OtherTemp
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppInvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppOtherInvDetailListVO;
 import cn.iocoder.yudao.module.steam.controller.app.InventorySearch.vo.AppOtherInvListDto;
+import cn.iocoder.yudao.module.steam.controller.app.selling.vo.OtherSellingV5DetailListVDo;
+import cn.iocoder.yudao.module.steam.controller.app.selling.vo.OtherSellingV5ListDo;
+import cn.iocoder.yudao.module.steam.controller.app.selling.vo.OtherSellingV5WeaponDo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
@@ -38,6 +41,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -351,9 +355,10 @@ public class IOInvUpdateService {
     }
 
 
+    @Async
     // 其他平台饰品模板入库
     public void otherTemplateInsert() {
-        otherSellingMapper.delete(null);
+        otherSellingMapper.delete(new LambdaQueryWrapperX<OtherSellingDO>().eq(OtherSellingDO::getPlatformIdentity,OtherSellingStatusEnum.C5.getStatus()));
         IOInvUpdateService bean = applicationContext.getBean(IOInvUpdateService.class);
         int page = 1;
         String[] types = {
@@ -515,5 +520,127 @@ public class IOInvUpdateService {
         userInfo.put("avatarUrl", avatarUrl);
         return userInfo;
     }
+
+
+    @Async
+    public void otherTemplateInsertV5() {
+        otherSellingMapper.delete(new LambdaQueryWrapperX<OtherSellingDO>().eq(OtherSellingDO::getPlatformIdentity,OtherSellingStatusEnum.V5.getStatus()));
+        IOInvUpdateService bean = applicationContext.getBean(IOInvUpdateService.class);
+        int page = 1;
+            while (true) {
+                OkHttpClient client = new OkHttpClient();
+                String url = "https://v5item.com/api/market/weaponList";
+
+                JSONObject paramObject = new JSONObject();
+                paramObject.put("marketType", 0);
+                paramObject.put("pageIndex", page++);
+                paramObject.put("pageNum", 42);
+
+                Request request = new Request.Builder()
+                        .url(url)
+                        .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.12")
+                        .addHeader("Accept","application/json, text/plain, */*")
+                        .post(okhttp3.RequestBody.create(MediaType.parse("application/json; charset=utf-8"), paramObject.toString()))
+                        .build();
+
+                try (Response response = client.newCall(request).execute()) {
+                    if (!response.isSuccessful()) {
+                        throw new IOException("Unexpected code " + response);
+                    }
+                    String responseBody = response.body().string();
+                    OtherSellingV5ListDo response_ = objectMapper.readValue(responseBody, new TypeReference<OtherSellingV5ListDo>() {
+                    });
+                    for (OtherSellingV5ListDo.Data_ item : response_.getData()) {
+                        if (item == null ||  item.getOnSaleCount() <= 0) {
+                            continue;
+                        }
+                        int getNum = (int) Math.ceil(200 * Math.min(7, Math.log(item.getOnSaleCount())) / 7 * (Math.random() * 0.2 + 0.7));
+                        bean.otherSellingInsertV5(item, getNum);
+                    }
+                    if (page >= response_.getTotalCount() / 42) {
+                        break;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    break;
+                }
+        }
+    }
+
+    @Async
+    public void otherSellingInsertV5(OtherSellingV5ListDo.Data_ goodsInfo, Integer getNum) {
+        OkHttpClient client = new OkHttpClient();
+        String url = "https://v5item.com/api/market/onSaleList";
+
+        JSONObject paramObject = new JSONObject();
+        paramObject.put("marketHashName", goodsInfo.getMarketHashName());
+        paramObject.put("pageIndex", 1);
+        paramObject.put("pageNum", getNum);
+
+        Request detailList = new Request.Builder()
+                .url(url)
+                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.12")
+                .addHeader("Accept","application/json, text/plain, */*")
+                .post(okhttp3.RequestBody.create(MediaType.parse("application/json; charset=utf-8"), paramObject.toString()))
+                .build();
+
+        OkHttpClient client2 = new OkHttpClient();
+        String url2 = "https://v5item.com/api/market/weaponDetail";
+
+        JSONObject paramObject2 = new JSONObject();
+        paramObject2.put("marketHashName", goodsInfo.getMarketHashName());
+
+        Request detailList2 = new Request.Builder()
+                .url(url2)
+                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.12")
+                .addHeader("Accept","application/json, text/plain, */*")
+                .post(okhttp3.RequestBody.create(MediaType.parse("application/json; charset=utf-8"), paramObject2.toString()))
+                .build();
+
+        try (Response response = client.newCall(detailList).execute();Response response2 = client2.newCall(detailList2).execute()) {
+            if (response.isSuccessful()) {
+                String responseBody = response.body().string();String responseBody2 = response2.body().string();
+                ObjectMapper objectMappers = new ObjectMapper();
+                objectMappers.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+                OtherSellingV5DetailListVDo response_ = objectMappers.readValue(responseBody, new TypeReference<OtherSellingV5DetailListVDo>() {
+                });
+                OtherSellingV5WeaponDo response2_ = objectMappers.readValue(responseBody2, new TypeReference<OtherSellingV5WeaponDo>() {
+                });
+                int userGoodsNum = (int) (Math.random() * 7) + 3;
+                int userGoodsNumNow = 0;
+                Float lastPrice = 0f;
+                Map<String, String> UserInfo = randomUserInfo();
+
+                for (OtherSellingV5DetailListVDo.Data_ items : response_.getData()) {
+                    if (userGoodsNumNow++ >= userGoodsNum || !Objects.equals(lastPrice, items.getSalePrice())) {
+                        if (items == null) {
+                            continue;
+                        }
+                        lastPrice = items.getSalePrice();
+                        userGoodsNumNow = 0;
+                        UserInfo = randomUserInfo();
+                    }
+                    OtherSellingDO otherSellingDO = new OtherSellingDO();
+                    otherSellingDO.setAppid(730);
+                    otherSellingDO.setIconUrl(items.getWeaponInfo().getItemImg());
+                    otherSellingDO.setMarketName(items.getWeaponInfo().getItemName());
+                    otherSellingDO.setMarketHashName(items.getWeaponInfo().getMarketHashName());
+                    otherSellingDO.setPlatformIdentity(OtherSellingStatusEnum.V5.getStatus());
+                    otherSellingDO.setPrice((int) (items.getSalePrice() * 1.11 * 100));
+                    otherSellingDO.setSelExterior(response2_.getData().getItemInfo().getItemExteriorName());
+                    otherSellingDO.setSelQuality(response2_.getData().getItemInfo().getItemQualityName());
+                    otherSellingDO.setSelRarity(response2_.getData().getItemInfo().getItemRarityName());
+                    otherSellingDO.setSelType(response2_.getData().getItemInfo().getItemTypeName());
+                    otherSellingDO.setSellingAvator(UserInfo.get("avatarUrl"));
+                    otherSellingDO.setSellingUserName(UserInfo.get("nickName"));
+                    otherSellingDO.setTransferStatus(InvTransferStatusEnum.SELL.getStatus());
+                    otherSellingMapper.insert(otherSellingDO);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
 
