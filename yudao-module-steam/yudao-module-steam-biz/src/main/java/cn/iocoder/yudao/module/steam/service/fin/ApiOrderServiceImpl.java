@@ -317,7 +317,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
     public ApiOrderDO payInvOrder(LoginUser loginUser, Long invOrderId) {
         QueryOrderReqVo queryOrderReqVo=new QueryOrderReqVo();
         queryOrderReqVo.setId(invOrderId);
-        ApiOrderDO uuOrder = getUUOrder(loginUser, queryOrderReqVo);
+        ApiOrderDO uuOrder = getOrder(loginUser, queryOrderReqVo);
         if(Objects.isNull(uuOrder)){
             log.error("订单不存在{}",JacksonUtils.writeValueAsString(invOrderId));
             throw new ServiceException(OpenApiCode.CONCAT_ADMIN);
@@ -336,29 +336,24 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         List<PayWalletTransactionDO> payWalletTransactionDOS = Arrays.asList(payWalletTransactionDO, payWalletTransactionDO1);
         apiOrderMapper.updateById(new ApiOrderDO().setId(uuOrder.getId()).setPayPayRet(JacksonUtils.writeValueAsString(payWalletTransactionDOS))
                 .setPayOrderStatus(PayOrderStatusEnum.SUCCESS.getStatus()));
-        ApiOrderDO uuOrder1 = getUUOrder(loginUser, queryOrderReqVo);
+        ApiOrderDO uuOrder1 = getOrder(loginUser, queryOrderReqVo);
         Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByOrder(uuOrder1);
         if(!apiThreeByOrder.isPresent()){
-            throw exception(OpenApiCode.ERR_5212);
+            throw exception(OpenApiCode.ERR_5213);
         }
+        //购买
         ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
         ApiBuyItemRespVo apiBuyItemRespVo = apiThreeOrderService.buyItem(loginUser, uuOrder1.getBuyInfo());
         if(!apiBuyItemRespVo.getIsSuccess()){
             throw new ServiceException(apiBuyItemRespVo.getErrorCode());
         }
-//        YouPingOrder youPingOrder = uploadYY(uuOrder1);
 
         apiOrderMapper.updateById(new ApiOrderDO().setId(uuOrder1.getId())
-
-//                .setUuMerchantOrderNo(youPingOrder.getMerchantOrderNo())
-//                .setUuShippingMode(youPingOrder.getShippingMode())
-//                .setUuOrderStatus(youPingOrder.getOrderStatus())
-//                .setUuMerchantOrderNo(youPingOrder.getMerchantOrderNo())
+                .setThreeOrderNo(apiBuyItemRespVo.getOrderNo())
                 .setPayOrderStatus(PayOrderStatusEnum.SUCCESS.getStatus())
                 .setTransferStatus(InvTransferStatusEnum.TransferING.getStatus())
-//                .setTransferText(JacksonUtils.writeValueAsString(apiBuyItemRespVo))
         );
-        return getUUOrder(loginUser, queryOrderReqVo);
+        return getOrder(loginUser, queryOrderReqVo);
     }
 
     private void validateInvOrderCanCreate(LoginUser loginUser,ApiOrderDO orderDO) {
@@ -504,7 +499,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         );
     }
     @Override
-    public ApiOrderDO getUUOrder(LoginUser loginUser, QueryOrderReqVo queryOrderReqVo) {
+    public ApiOrderDO getOrder(LoginUser loginUser, QueryOrderReqVo queryOrderReqVo) {
         LambdaQueryWrapperX<ApiOrderDO> uuOrderDOLambdaQueryWrapperX = new LambdaQueryWrapperX<ApiOrderDO>()
                 .eqIfPresent(ApiOrderDO::getBuyUserId, loginUser.getId())
                 .eqIfPresent(ApiOrderDO::getBuyUserType, loginUser.getUserType());
@@ -686,7 +681,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
     }
     @Override
     public Integer orderCancel(LoginUser loginUser, OrderCancelVo orderCancelVo, String userIp,String cancelReason) {
-        ApiOrderDO uuOrder = getUUOrder(loginUser, new QueryOrderReqVo().setOrderNo(orderCancelVo.getOrderNo()));
+        ApiOrderDO uuOrder = getOrder(loginUser, new QueryOrderReqVo().setOrderNo(orderCancelVo.getOrderNo()));
 
         // 1. 校验订单是否可以退款
         ApiOrderDO orderDO = validateInvOrderCanRefund(uuOrder, loginUser);

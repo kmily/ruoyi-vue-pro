@@ -48,7 +48,7 @@ public interface ApiOrderService {
      * @param queryOrderReqVo 订单号
      * @return 买家的订单
      */
-    ApiOrderDO getUUOrder(LoginUser loginUser, QueryOrderReqVo queryOrderReqVo);
+    ApiOrderDO getOrder(LoginUser loginUser, QueryOrderReqVo queryOrderReqVo);
     OrderInfoResp orderInfo(YouyouOrderDO youyouOrderDO, OpenApiReqVo<QueryOrderReqVo> openApiReqVo) throws JsonProcessingException;
 
 
