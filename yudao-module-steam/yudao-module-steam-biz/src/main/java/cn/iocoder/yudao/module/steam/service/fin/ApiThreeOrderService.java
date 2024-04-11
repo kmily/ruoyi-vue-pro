@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiBuyItemRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiCommodityRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiOrderCancelRespVo;
+import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,7 +34,7 @@ public interface ApiThreeOrderService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    ApiCommodityRespVo query(LoginUser loginUser, @Valid CreateCommodityOrderReqVo createReqVO);
+    ApiCommodityRespVo query(LoginUser loginUser, @Valid ApiQueryCommodityReqVo createReqVO);
 
     /**
      * 商品下单
@@ -42,7 +43,7 @@ public interface ApiThreeOrderService {
      * @param loginUser 前端用户
      * @param createReqVO 购买信息
      */
-    ApiBuyItemRespVo buyItem(LoginUser loginUser, @Valid CreateCommodityOrderReqVo createReqVO);
+    ApiBuyItemRespVo buyItem(LoginUser loginUser, @Valid ApiQueryCommodityReqVo createReqVO);
     /**
      * 查询订单状态
      * 主要用于更新 steam_api_order_ext，时自动更新相应状态

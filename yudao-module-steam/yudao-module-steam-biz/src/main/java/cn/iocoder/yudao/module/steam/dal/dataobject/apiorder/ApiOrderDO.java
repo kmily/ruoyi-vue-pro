@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.steam.dal.dataobject.apiorder;
 
-import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
  * 新版订单 DO
@@ -122,7 +122,7 @@ public class ApiOrderDO extends BaseDO {
      */
     private Integer cashStatus;
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private CreateCommodityOrderReqVo buyInfo;
+    private ApiQueryCommodityReqVo buyInfo;
     /**
      * 商品信息json
      */
