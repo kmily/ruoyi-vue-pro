@@ -100,6 +100,10 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         apiBuyItemRespVo.setTradeLink(createReqVO.getTradeLinks());
         apiBuyItemRespVo.setTradeOfferId(null);// TODO
 
+        //下单成功
+        if (apiBuyItemRespVo.getIsSuccess()){
+
+        }
         //
 //        apiOrderExtMapper.selectOne(ApiOrderExtDO::)
         return apiBuyItemRespVo;

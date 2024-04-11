@@ -31,10 +31,10 @@ public class V5ProductPriceInfoRes {
             private String itemQuality;
             private String itemQualityName;
             private Integer onSaleStock;
-            private Integer minSellPrice;
+            private Double minSellPrice;
             private String itemIcon;
-            private Integer selfPrice;
-            private Integer playerPrice;
+            private Double selfPrice;
+            private Double playerPrice;
 
         }
     }
