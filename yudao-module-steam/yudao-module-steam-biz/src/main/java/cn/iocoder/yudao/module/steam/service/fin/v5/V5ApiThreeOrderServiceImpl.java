@@ -44,6 +44,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             ProductPriceInfoRes.ProductPriceInfoResponse.ProductData productData = data.get(0);
             apiCommodityRespVo.setPrice(BigDecimal.valueOf(productData.getPrice()).multiply(BigDecimal.valueOf(100)).intValue());
             apiCommodityRespVo.setIsSuccess(true);
+
         } else {
             apiCommodityRespVo.setIsSuccess(false);
         }
@@ -71,8 +72,9 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         String v5OrderInfo = V5ApiUtils.getV5OrderInfo(null, String.valueOf(orderNo));
         ApiOrderExtDO apiOrderExtDO = apiOrderExtMapper.selectOne(ApiOrderExtDO::getOrderId, orderId);
         if (apiOrderExtDO == null){
-            throw new ServiceException()
+            throw new ServiceException(-1,"该订单不存在，请检查订单号");
         }
+        apiOrderExtMapper.updateById(apiOrderExtDO.setOrderInfo(v5OrderInfo));
         return v5OrderInfo;//TODO 待调试
     }
 
