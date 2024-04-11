@@ -51,7 +51,7 @@ public interface ApiThreeOrderService {
      * @param orderNo 第三方 订单号
      * @return 返回json格式
      */
-    String queryOrderDetail(LoginUser loginUser, @Valid Long orderNo);
+    String queryOrderDetail(LoginUser loginUser, @Valid Long orderNo,Long orderId);
     /**
      * 查询商品信息
      * @param loginUser 订单用户

@@ -85,7 +85,7 @@ public class C5ApiThreeOrderService implements ApiThreeOrderService {
     }
 
     @Override
-    public String queryOrderDetail(LoginUser loginUser, Long orderNo) {
+    public String queryOrderDetail(LoginUser loginUser, Long orderNo,Long orderId) {
         if(Objects.isNull(loginUser)){
             throw new ServiceException(OpenApiCode.ID_ERROR);
         }

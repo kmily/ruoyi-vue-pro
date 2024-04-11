@@ -1,9 +1,14 @@
 package cn.iocoder.yudao.module.steam.service.fin.v5;
 
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
+import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.service.fin.ApiThreeOrderService;
+import cn.iocoder.yudao.module.steam.service.fin.c5.res.ProductPriceInfoRes;
+import cn.iocoder.yudao.module.steam.service.fin.c5.utils.C5ApiUtils;
+import cn.iocoder.yudao.module.steam.service.fin.v5.utils.V5ApiUtils;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiBuyItemRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiCommodityRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiOrderCancelRespVo;
@@ -11,12 +16,40 @@ import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+
 @Service
 public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
     @Override
     public ApiCommodityRespVo query(LoginUser loginUser, ApiQueryCommodityReqVo createReqVO) {
+        checkLoginUser(loginUser);
+        //获取v5平台商品最低价
+        ProductPriceInfoRes.ProductPriceInfoResponse productPriceInfo =
+                C5ApiUtils.getProductPriceInfo(Collections.singletonList(createReqVO.getCommodityHashName()));
+        ApiCommodityRespVo apiCommodityRespVo = new ApiCommodityRespVo();
+        List<ProductPriceInfoRes.ProductPriceInfoResponse.ProductData> data = null;
+        if (productPriceInfo != null) {
+            data = productPriceInfo.getData();
+        }
+        if (data != null && !data.isEmpty()) {
+            // 获取第一个 ProductData 对象
+            ProductPriceInfoRes.ProductPriceInfoResponse.ProductData productData = data.get(0);
+            apiCommodityRespVo.setPrice(BigDecimal.valueOf(productData.getPrice()).multiply(BigDecimal.valueOf(100)).intValue());
+        } else {
+            apiCommodityRespVo.setPrice(null);
+        }
+        apiCommodityRespVo.setPlatCode(PlatCodeEnum.C5);
+
         return null;
+    }
+    private static void checkLoginUser(Object loginUser) {
+        if (Objects.isNull(loginUser)) {
+            throw new ServiceException(OpenApiCode.ID_ERROR);
+        }
     }
 
     @Override
@@ -25,8 +58,12 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     }
 
     @Override
-    public String queryOrderDetail(LoginUser loginUser, Long orderNo) {
-        return null;
+    public String queryOrderDetail(LoginUser loginUser, Long orderNo,Long orderId) {
+        if(Objects.isNull(loginUser)){
+            throw new ServiceException(OpenApiCode.ID_ERROR);
+        }
+        //获取订单详情
+        return V5ApiUtils.getV5OrderInfo(null, String.valueOf(orderNo));//TODO 待调试
     }
 
 
