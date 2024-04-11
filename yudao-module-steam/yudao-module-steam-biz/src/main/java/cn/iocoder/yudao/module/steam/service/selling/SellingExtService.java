@@ -410,16 +410,16 @@ public class SellingExtService {
 
     }
 
-
-    /**
+/*
+    *//**
      * WearCategory0  崭新出厂
      * WearCategory1  略有磨损
      * WearCategory2  久经沙场
      * WearCategory3  破损不堪
      * WearCategory4  战痕累累
      *
-     * @param sellingPageReqVO
-     */
+     * @param
+     *//*
     public  List<GoodsAbrasionDTO> showGoodsWithMarketName(GoodsWithMarketHashNameReqVO sellingPageReqVO) {
         List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
                 .eq(SellingDO::getShortName, sellingPageReqVO.getShortName()));
@@ -441,7 +441,7 @@ public class SellingExtService {
             }
         }
         return list;
-    }
+    }*/
 
 
 

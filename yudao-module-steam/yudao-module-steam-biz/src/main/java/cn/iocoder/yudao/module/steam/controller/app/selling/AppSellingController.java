@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -84,12 +85,12 @@ public class AppSellingController {
         return CommonResult.success(invPage);
     }
 
-//    @GetMapping("/user/showGoodsWithMarketHashName")
-//    @Operation(summary = "按MarketHashName展示在售")
-//    public CommonResult<List<GoodsAbrasionDTO>> showGoodsWithMarketHashName(@RequestBody @Valid GoodsWithMarketHashNameReqVO reqVO) {
-//        List<GoodsAbrasionDTO> goodsAbrasionDTOS = sellingExtService.showGoodsWithMarketName(reqVO);
-//        return CommonResult.success(goodsAbrasionDTOS);
-//    }
+    @GetMapping("/user/showGoodsWithMarketHashName")
+    @Operation(summary = "按MarketHashName展示在售")
+    public CommonResult<List<GoodsAbrasionDTO>> showGoodsWithMarketHashName(@RequestBody @Valid GoodsWithMarketHashNameReqVO reqVO) {
+        List<GoodsAbrasionDTO> goodsAbrasionDTOS = sellingExtService.showGoodsWithMarketName(reqVO);
+        return CommonResult.success(goodsAbrasionDTOS);
+    }
 
     @PostMapping("/otherSale")
     @Operation(summary = "其他平台在售")
