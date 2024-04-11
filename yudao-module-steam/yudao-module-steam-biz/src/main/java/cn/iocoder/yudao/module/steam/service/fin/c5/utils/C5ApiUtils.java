@@ -1,20 +1,15 @@
-package cn.iocoder.yudao.module.steam.service.fin.c5;
+package cn.iocoder.yudao.module.steam.service.fin.c5.utils;
 
-import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.inv.InvDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
-import cn.iocoder.yudao.module.steam.service.fin.vo.C5FastPayVo;
-import cn.iocoder.yudao.module.steam.service.fin.vo.C5ProductVo;
-import cn.iocoder.yudao.module.steam.service.fin.vo.ProductBuyRes;
-import cn.iocoder.yudao.module.steam.service.fin.vo.ProductPriceInfoRes;
-import cn.iocoder.yudao.module.steam.service.steam.OtherSellingStatusEnum;
+import cn.iocoder.yudao.module.steam.service.fin.c5.vo.C5FastPayVo;
+import cn.iocoder.yudao.module.steam.service.fin.c5.vo.C5ProductVo;
+import cn.iocoder.yudao.module.steam.service.fin.c5.res.ProductBuyRes;
+import cn.iocoder.yudao.module.steam.service.fin.c5.res.ProductPriceInfoRes;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 public class C5ApiUtils {

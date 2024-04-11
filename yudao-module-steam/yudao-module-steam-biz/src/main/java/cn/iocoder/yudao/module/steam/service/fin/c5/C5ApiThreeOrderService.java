@@ -8,6 +8,8 @@ import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.fin.ApiThreeOrderService;
+import cn.iocoder.yudao.module.steam.service.fin.c5.res.ProductPriceInfoRes;
+import cn.iocoder.yudao.module.steam.service.fin.c5.utils.C5ApiUtils;
 import cn.iocoder.yudao.module.steam.service.fin.vo.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

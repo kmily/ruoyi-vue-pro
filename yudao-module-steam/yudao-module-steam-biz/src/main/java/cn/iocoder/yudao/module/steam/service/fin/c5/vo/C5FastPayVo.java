@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.steam.service.fin.vo;
+package cn.iocoder.yudao.module.steam.service.fin.c5.vo;
 
 import lombok.Data;
 
