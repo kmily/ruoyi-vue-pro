@@ -364,4 +364,24 @@ public class AppIo661ApiController {
         }
 
     }
+    /**
+     * 查询订单详情
+     * @param openApiReqVo
+     * @return
+     */
+    @Operation(summary = "查询订单详情")
+    @PostMapping("v2/api/orderStatus")
+    @PermitAll
+    public ApiResult<Io661OrderInfoResp> orderStatusV2(@RequestBody OpenApiReqVo<QueryOrderReqVo> openApiReqVo) {
+        try {
+            return DevAccountUtils.tenantExecute(1L, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
+                return ApiResult.success(apiOrderService.getOrderInfo(openApiReqVo.getData(), loginUser));
+            });
+        } catch (ServiceException e) {
+
+            return ApiResult.error(e.getCode(),  e.getMessage(),Io661OrderInfoResp.class);
+        }
+    }
 }
