@@ -13,7 +13,6 @@ import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.service.fin.ApiThreeOrderService;
-import cn.iocoder.yudao.module.steam.service.fin.v5.utils.V5Login;
 import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductBuyRes;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5BuyProductVo;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5cancelOrderRespVO;
@@ -28,7 +27,6 @@ import cn.iocoder.yudao.module.steam.service.fin.vo.ApiOrderCancelRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
-import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -297,4 +295,10 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderId,orderId));
         return respVo;
     }
+
+    @Override
+    public void processNotify(String jsonData, String msgNo) {
+
+    }
+
 }
