@@ -22,7 +22,7 @@ public class InvPreviewUpdateJob implements JobHandler {
         this.invPreviewExtService = invPreviewExtService;
     }
 
-    @TenantJob
+/*    @TenantJob*/
     @Override
     public String execute(String param) {
 

@@ -4,6 +4,7 @@ import cn.hutool.json.JSONObject;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.steam.controller.admin.inv.vo.InvPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.otherselling.vo.OtherSellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.othertemplate.vo.OtherTemplatePageReqVO;
@@ -352,6 +353,7 @@ public class IOInvUpdateService {
 
     // 其他平台饰品模板入库
     public void otherTemplateInsert() {
+        otherSellingMapper.delete(null);
         IOInvUpdateService bean = applicationContext.getBean(IOInvUpdateService.class);
         int page = 1;
         String[] types = {

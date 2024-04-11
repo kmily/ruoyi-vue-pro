@@ -45,7 +45,6 @@ import java.util.stream.Collectors;
  * @author LeeAm
  */
 @Service
-@Component
 public class InvPreviewExtService {
 
     @Resource
@@ -581,31 +580,36 @@ public class InvPreviewExtService {
 
     }
 
-    @Async
+
     public Integer updateIvnFlag() {
         List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<>());
         if (Objects.isNull(invPreviewDOS)) {
             return 0;
         }
         for (InvPreviewDO item : invPreviewDOS) {
-            SellingDO sellingDOPageResult = sellingMapper.selectOne(new LambdaQueryWrapperX<SellingDO>()
+            List<SellingDO> sellingDOPageResult = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
                     .eq(SellingDO::getMarketHashName, item.getMarketHashName())
                     .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
                     .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
-                    .orderByAsc(SellingDO::getPrice)
-            );
+                    .orderByAsc(SellingDO::getPrice));
 
-            OtherSellingDO otherSellingDOPageResult = otherSellingMapper.selectOne(new LambdaQueryWrapperX<OtherSellingDO>()
+            List<OtherSellingDO> otherSellingDOPageResult = otherSellingMapper.selectList(new LambdaQueryWrapperX<OtherSellingDO>()
                     .eq(OtherSellingDO::getMarketHashName, item.getMarketHashName())
-                    .eq(OtherSellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
                     .orderByAsc(OtherSellingDO::getPrice));
 
-            int minPrice = sellingDOPageResult != null ?
-                    otherSellingDOPageResult != null ? Math.min(sellingDOPageResult.getPrice(), otherSellingDOPageResult.getPrice()) : sellingDOPageResult.getPrice() :
-                    otherSellingDOPageResult != null ? otherSellingDOPageResult.getPrice() : -1;
 
+            int minPrice = !sellingDOPageResult.isEmpty() ?
+                    !otherSellingDOPageResult.isEmpty() ? Math.min(sellingDOPageResult.get(0).getPrice(), otherSellingDOPageResult.get(0).getPrice()) : sellingDOPageResult.get(0).getPrice() :
+                    !otherSellingDOPageResult.isEmpty() ? otherSellingDOPageResult.get(0).getPrice() : -1;
             item.setMinPrice(minPrice);
+            if(!item.getExistInv() && minPrice == -1){
+                continue;
+            }
             item.setExistInv(minPrice != -1);
+
+
+            int sellNum = (!sellingDOPageResult.isEmpty() ? sellingDOPageResult.size() : 0) + (!otherSellingDOPageResult.isEmpty() ? otherSellingDOPageResult.size() : 0);
+            item.setAutoQuantity(String.valueOf(sellNum));
 
             C5ItemInfo itemInfo = item.getItemInfo();
             item.setSelExterior(itemInfo.getExteriorName())

@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqV
 import cn.iocoder.yudao.module.steam.controller.app.selling.vo.*;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.othertemplate.OtherTemplateMapper;
+import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.ioinvupdate.IOInvUpdateService;
 import cn.iocoder.yudao.module.steam.service.othertemplate.OtherTemplateService;
 import cn.iocoder.yudao.module.steam.service.selling.SellingExtService;
@@ -39,6 +40,8 @@ public class AppSellingController {
     private OtherTemplateMapper otherTemplateMapper;
     @Resource
     private OtherTemplateService otherTemplateService;
+    @Resource
+    private InvPreviewExtService invPreviewExtService;
 
     @PostMapping("/batchSale")
     @Operation(summary = "批量上架")
@@ -101,6 +104,15 @@ public class AppSellingController {
     public CommonResult<String> insertOtherItemId() {
 
         ioInvUpdateService.otherTemplateInsert();
+
+        return CommonResult.success("");
+    }
+
+    @PostMapping("/updateIvnFlag")
+    @Operation(summary = "其他平台在售模板")
+    public CommonResult<String> updateIvnFlag() {
+
+        invPreviewExtService.updateIvnFlag();
 
         return CommonResult.success("");
     }
