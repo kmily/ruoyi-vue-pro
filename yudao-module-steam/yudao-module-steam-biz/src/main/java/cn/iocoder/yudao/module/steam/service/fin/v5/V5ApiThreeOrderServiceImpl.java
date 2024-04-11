@@ -102,13 +102,14 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             apiBuyItemRespVo.setErrorCode(OpenApiCode.OK);
             apiBuyItemRespVo.setTradeOfferId(null);// TODO
             return apiBuyItemRespVo;
+
         }
         if (v5ProductBuyRes != null && v5ProductBuyRes.getCode() == 1){
             apiBuyItemRespVo.setIsSuccess(false);
             apiBuyItemRespVo.setTradeLink(createReqVO.getTradeLinks());
             apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1);
             apiBuyItemRespVo.setTradeOfferId(null);// TODO
-            return apiBuyItemRespVo;
+            throw new ServiceException(1,v5ProductBuyRes.getMsg());
         }
         if (v5ProductBuyRes != null && v5ProductBuyRes.getCode() == 1001){
             apiBuyItemRespVo.setIsSuccess(false);
