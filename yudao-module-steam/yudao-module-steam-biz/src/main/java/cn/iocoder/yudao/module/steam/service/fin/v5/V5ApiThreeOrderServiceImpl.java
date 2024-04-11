@@ -13,6 +13,8 @@ import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.service.fin.ApiThreeOrderService;
+import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5OrderDetailRes;
+import cn.iocoder.yudao.module.steam.service.fin.v5.utils.V5Login;
 import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductBuyRes;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5BuyProductVo;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5cancelOrderRespVO;
@@ -27,6 +29,8 @@ import cn.iocoder.yudao.module.steam.service.fin.vo.ApiOrderCancelRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
+import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
+import com.google.gson.Gson;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -164,7 +168,12 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         if (apiOrderExtDO == null){
             throw new ServiceException(-1,"该订单不存在，请检查订单号");
         }
+        Gson gson = new Gson();
+        V5OrderDetailRes v5OrderDetailRes = gson.fromJson(v5OrderInfo, V5OrderDetailRes.class);
+        apiOrderExtDO.setOrderNo(String.valueOf(orderNo));
+        apiOrderExtDO.setOrderStatus(v5OrderDetailRes.getData().getOrderStatus());
         apiOrderExtMapper.updateById(apiOrderExtDO.setOrderInfo(v5OrderInfo));
+
         return v5OrderInfo;//TODO 待调试
     }
 
