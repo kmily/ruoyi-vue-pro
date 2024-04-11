@@ -14,7 +14,7 @@ public class ApiBuyItemRespVo implements Serializable {
     private Boolean isSuccess;
     /**
      * 失败代码
-     * 代码参考 OpenApiCode
+     *  枚举 {@link cn.iocoder.yudao.module.steam.enums.OpenApiCode 对应的类}
      */
     private ErrorCode errorCode;
     /**
