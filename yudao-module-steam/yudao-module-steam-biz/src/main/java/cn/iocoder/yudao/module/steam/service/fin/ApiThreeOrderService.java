@@ -43,7 +43,7 @@ public interface ApiThreeOrderService {
      * @param loginUser 前端用户
      * @param createReqVO 购买信息
      */
-    ApiBuyItemRespVo buyItem(LoginUser loginUser, @Valid ApiQueryCommodityReqVo createReqVO);
+    ApiBuyItemRespVo buyItem(LoginUser loginUser, @Valid ApiQueryCommodityReqVo createReqVO,Long orderId);
     /**
      * 查询订单状态
      * 主要用于更新 steam_api_order_ext，时自动更新相应状态
