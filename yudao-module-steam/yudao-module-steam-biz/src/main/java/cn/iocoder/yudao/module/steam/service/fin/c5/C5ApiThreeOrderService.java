@@ -24,13 +24,14 @@ import java.util.Objects;
 @Service
 public class C5ApiThreeOrderService implements ApiThreeOrderService {
 
+
     @Resource
     private SteamService steamService;
 //    @Resource
 //    private ApiOrderMapper
     @Override
     public PlatCodeEnum getPlatCode() {
-        return ApiThreeOrderService.super.getPlatCode();
+        return PlatCodeEnum.C5;
     }
     @Override
     public ApiCommodityRespVo query(LoginUser loginUser, ApiQueryCommodityReqVo createReqVO) {

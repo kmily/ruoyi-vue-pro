@@ -29,6 +29,11 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
     @Resource
     private ApiOrderExtMapper apiOrderExtMapper;
+
+    @Override
+    public PlatCodeEnum getPlatCode() {
+        return PlatCodeEnum.V5;
+    }
     @Override
     public ApiCommodityRespVo query(LoginUser loginUser, ApiQueryCommodityReqVo createReqVO) {
         checkLoginUser(loginUser);
