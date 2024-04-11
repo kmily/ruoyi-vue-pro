@@ -167,7 +167,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
 
         ApiOrderDO orderDO=new ApiOrderDO()
                 //设置买家
-                .setBuyBindUserId(loginUser.getId()).setBuyUserType(loginUser.getUserType())
+                .setBuyUserId(loginUser.getId()).setBuyUserType(loginUser.getUserType())
                 .setBuyBindUserId(buyBindUserDO.getId()).setBuySteamId(buyBindUserDO.getSteamId()).setBuyTradeLinks(buyBindUserDO.getTradeUrl())
                 //设置卖家信息
                 //服务费账号
@@ -408,7 +408,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         if (Objects.isNull(query)) {
             throw exception(ErrorCodeConstants.UU_GOODS_NOT_FOUND);
         }
-        if(Objects.nonNull(query) && Objects.nonNull(query.getIsSuccess()) && query.getIsSuccess()){
+        if(Objects.nonNull(query) && Objects.nonNull(query.getIsSuccess()) && !query.getIsSuccess()){
             throw new ServiceException(OpenApiCode.ERR_5301);
         }
         //检测交易链接是否是自己
