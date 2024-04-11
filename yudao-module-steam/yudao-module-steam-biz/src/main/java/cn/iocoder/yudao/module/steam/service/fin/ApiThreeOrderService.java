@@ -71,8 +71,15 @@ public interface ApiThreeOrderService {
      * 订单取消
      * @param orderNo  第三方 订单号
      * @param orderId  主订单ID
-     * @return  1,进行中，2完成，3作废
      */
     ApiOrderCancelRespVo orderCancel(LoginUser loginUser, String orderNo, Long orderId);
-
+    /**
+     * 释放库存
+     * 第三方平台不需要
+     * @param orderNo  第三方 订单号
+     * @param orderId  主订单ID
+     */
+   default ApiOrderCancelRespVo releaseIvn(LoginUser loginUser, String orderNo, Long orderId){
+       return new ApiOrderCancelRespVo().setIsSuccess(true).setErrorCode(null);
+   }
 }
