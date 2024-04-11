@@ -399,14 +399,14 @@ public class AppIo661ApiController {
     @Operation(summary = "订单") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
     @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
     @PermitAll
-    public CommonResult<Map<String, Object>> notify(@RequestBody String notifyReq, @PathVariable String platCode) {
+    public CommonResult<Map<String, Object>> notify(@RequestBody Map<String,Object> notifyReq, @PathVariable String platCode) {
         DevAccountUtils.tenantExecute(1L, () -> {
             PlatCodeEnum platCodeEnum = PlatCodeEnum.valueOf(platCode);
             switch(platCodeEnum){
                 case C5:
                     break;
                 case V5:
-                    V5callBackResult v5callBackResult = JacksonUtils.readValue(notifyReq, V5callBackResult.class);
+                    V5callBackResult v5callBackResult = JacksonUtils.readValue(JacksonUtils.writeValueAsString(notifyReq), V5callBackResult.class);
                     apiOrderService.processNotify(JacksonUtils.writeValueAsString(notifyReq),platCodeEnum,v5callBackResult.getNotifyMsgNo());
                 default:
             }
