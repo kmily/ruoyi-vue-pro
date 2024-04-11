@@ -408,7 +408,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         if (Objects.isNull(query)) {
             throw exception(ErrorCodeConstants.UU_GOODS_NOT_FOUND);
         }
-        if(Objects.nonNull(query) && Objects.nonNull(query.getIsSuccess()) && query.getIsSuccess()){
+        if(Objects.nonNull(query) && Objects.nonNull(query.getIsSuccess()) && !query.getIsSuccess()){
             throw new ServiceException(OpenApiCode.ERR_5301);
         }
         //检测交易链接是否是自己
