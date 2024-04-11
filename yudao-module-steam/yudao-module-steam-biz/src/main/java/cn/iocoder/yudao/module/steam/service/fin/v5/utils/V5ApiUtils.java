@@ -29,6 +29,7 @@ public class V5ApiUtils {
 
     private static final OkHttpClient client = new OkHttpClient();
     private static final Gson gson = new Gson();
+    private static final String TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VyVHlwZSI6Im1lcmNoYW50IiwiZXhwIjoxNzEzNjk3NjY5LCJ1c2VyaWQiOiIxMTU3MTAifQ.TRI2s9jLdx3CZLiEf_LgWZrh1SI8pzqNSMsR3lsRHGtK75VJ2a-bCoN8jkhuCEsXs_MDNVDhpg11nQlQeGKwVGdkk7MQ6IsW4fmgGa46BL7PtQNMfoozdiFCkjbVELytpw_KuyI_g7EDVMXWUSxZTw2XG6JiSQV2eV50PZCUj8wrsjN75pQ4U04kDp6BvriL-C0L0Hbq1164nd37F-WvIKWNo35PKVgCjHot9ai8AB5kp-FoWmgwhr_pWChhnNDtyqJ1EtkZBCCgVbenCnmytUwYmnRRIWkQ87FBitj0o-ZsgFjbzH4Xr8GsrUrr4iDefmjbxn-us9ehLEG7hTQvJA";
     /**
      * 获取c5商品价格
      * @param marketHashNameList
@@ -37,9 +38,13 @@ public class V5ApiUtils {
     public  static V5ProductPriceInfoRes.V5ProductPriceInfoResponse getV5ProductLowestPrice(List<String> marketHashNameList) {
         V5queryOnSaleInfoReqVO v5FastPayVo = new V5queryOnSaleInfoReqVO(marketHashNameList,MERCHANT_KEY);
         String requestBodyJson = gson.toJson(v5FastPayVo);
+        Headers headers = new Headers.Builder()
+                .add("Authorization", TOKEN)
+                .build();
         Request request = new Request.Builder()
                 .url(API_POST_V5_PRODUCT_PRICE_URL)
                 .post(RequestBody.create(MediaType.parse(JSON), requestBodyJson))
+                .headers(headers)
                 .build();
         // 发送请求并处理响应
         try (Response response = client.newCall(request).execute()) {
