@@ -1,20 +1,16 @@
 package cn.iocoder.yudao.module.steam.service.fin;
 
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
-import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
-import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
-import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import cn.iocoder.yudao.module.steam.service.fin.vo.ApiSummaryByHashName;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 多平台下单接口
@@ -91,4 +87,11 @@ public interface ApiOrderService {
      */
     void checkTransfer(Long invOrderId);
     void closeUnPayInvOrder(Long invOrderId);
+
+    /**
+     * 批量查询模板在售信息
+     * @param marketHashName
+     * @return
+     */
+    List<ApiSummaryByHashName> summaryByHashName(LoginUser loginUser, List<String> marketHashName);
 }

@@ -182,12 +182,6 @@ public class AppDevApiController {
         return CommonResult.success(select);
     }
 
-    @PostMapping("/v2/V5api/batchSelectLowestPrice")
-    @Operation(summary = "批量查询V5在售商品最低价价格")
-    public ApiResult<V5ProductPriceInfoRes.V5ProductPriceInfoResponse> batchGetOnSaleCommodityInfo(@RequestBody V5queryOnSaleInfoReqVO vo) {
-        V5ProductPriceInfoRes.V5ProductPriceInfoResponse v5ProductLowestPrice = V5ApiUtils
-                .getV5ProductLowestPrice(vo.getTemplateHashNameList());
-        return ApiResult.success(v5ProductLowestPrice);
-    }
+
 
 }
