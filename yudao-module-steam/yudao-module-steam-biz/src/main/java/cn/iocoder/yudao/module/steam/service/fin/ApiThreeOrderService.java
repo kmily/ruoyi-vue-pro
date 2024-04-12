@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 第三方订单系统
@@ -95,5 +96,5 @@ public interface ApiThreeOrderService {
     /**
      * V5模板
      */
-    V5ItemListVO getItemList(V5page v5page);
+    List<V5ItemListVO> getItemList(V5page v5page);
 }
