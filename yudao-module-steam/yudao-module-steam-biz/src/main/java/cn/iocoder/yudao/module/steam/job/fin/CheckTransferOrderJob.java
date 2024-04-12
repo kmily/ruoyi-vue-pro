@@ -23,7 +23,7 @@ import java.util.List;
  * 订单自动检测发货
  */
 @Slf4j
-@Component
+@Component("CheckTransferOrderJob")
 public class CheckTransferOrderJob implements JobHandler {
     @Resource
     private ApiOrderMapper apiOrderMapper;
