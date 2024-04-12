@@ -12,7 +12,7 @@ public class V5Login {
     private static final String ACCOUNT = "15002361201";
     private static final String PASSWORD = "bbbhui342680800";
 
-    public String LoginV5() {
+    public static String LoginV5() {
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url(API_POST_V5_PRODUCT_PRICE_URL);
         builder.method(HttpUtil.Method.JSON);
@@ -22,7 +22,7 @@ public class V5Login {
         builder.postObject(user);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         LoginRespVO json = sent.json(LoginRespVO.class);
-        LoginRespVO.LoginBackVO loginBackVO = JacksonUtils.readValue(JacksonUtils.writeValueAsString(json), LoginRespVO.LoginBackVO.class);
-        return loginBackVO.getTradeToken();
+        LoginRespVO loginBackVO = JacksonUtils.readValue(JacksonUtils.writeValueAsString(json), LoginRespVO.class);
+        return loginBackVO.getData().getTradeToken();
     }
 }

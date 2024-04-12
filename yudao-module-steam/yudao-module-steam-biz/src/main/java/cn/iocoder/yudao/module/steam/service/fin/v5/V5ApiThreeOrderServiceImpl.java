@@ -15,12 +15,15 @@ import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5OrderDetailRes;
 import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductBuyRes;
 import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductPriceInfoRes;
 import cn.iocoder.yudao.module.steam.service.fin.v5.utils.V5ApiUtils;
+import cn.iocoder.yudao.module.steam.service.fin.v5.utils.V5Login;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.*;
 import cn.iocoder.yudao.module.steam.service.fin.vo.*;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +33,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -37,6 +41,8 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
     @Resource
     private ApiOrderExtMapper apiOrderExtMapper;
+    @Resource
+    private RedisTemplate redisTemplate;
 
     private static final String MERCHANT_KEY = "529606f226e6461ca5bac93047976177";
     private static final String Query_Order_Status_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
@@ -315,6 +321,14 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         return respVo;
     }
 
+    @Scheduled(cron = "0 0 0 */3 * *")
+    public void v5Token() {
+        String token = V5Login.LoginV5();
+        if (token != null) {
+            // 将 token 存储到 Redis 中
+            redisTemplate.opsForValue().set("v5_login_token", token);
+        }
+    }
     @Override
     public V5ItemListVO getItemList(){
         return null;
