@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+import org.springframework.data.annotation.Transient;
 
 /**
  * 订单扩展 DO
@@ -50,5 +51,9 @@ public class ApiOrderNotifyDo extends BaseDO {
      * 购买平台代码
      */
     private String platCode;
+    /**
+     * 签名
+     */
+    private transient String sign;
 
 }

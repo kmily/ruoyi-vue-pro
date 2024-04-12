@@ -514,6 +514,14 @@ public class ApiOrderServiceImpl implements ApiOrderService {
                 .eq(ApiOrderExtDO::getOrderNo, orderNo)
         );
     }
+    /**
+     * 获取订单通知
+     * @param notifyId
+     * @return
+     */
+    private ApiOrderNotifyDo getOrderNotify(Long notifyId){
+        return apiOrderNotifyMapper.selectById(notifyId);
+    }
     @Override
     public Io661OrderInfoResp getOrderInfo(QueryOrderReqVo reqVo, LoginUser loginUser) {
         ApiOrderDO apiOrderDO = null;
@@ -681,6 +689,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
             ApiOrderNotifyDo apiOrderNotifyDo=new ApiOrderNotifyDo();
             apiOrderNotifyDo.setPlatCode(PlatCodeEnum.valueOf(orderExt.getPlatCode()).getCode());
             ApiProcessNotifyRemoteReq apiProcessNotifyRemoteReq=new ApiProcessNotifyRemoteReq();
+            apiProcessNotifyRemoteReq.setOrderId(newOrder.getId());
             apiProcessNotifyRemoteReq.setOrderNo(newOrder.getOrderNo());
             apiProcessNotifyRemoteReq.setMerchantNo(newOrder.getMerchantNo());
             apiProcessNotifyRemoteReq.setOrderStatus(newOrder.getOrderStatus());
@@ -700,28 +709,26 @@ public class ApiOrderServiceImpl implements ApiOrderService {
     }
     @Override
     public void pushRemote(Long notifyId) {
-        String callBackInfo = notifyReq.getCallBackInfo();
-        NotifyVo notifyVo = JacksonUtils.readValue(callBackInfo, NotifyVo.class);
+        ApiOrderNotifyDo orderNotify = getOrderNotify(notifyId);
 
-        log.info("回调接收的数据{}",notifyVo);
-        List<ApiOrderDO> apiOrderDOS = apiOrderMapper.selectList(new LambdaQueryWrapper<ApiOrderDO>()
-                .eq(ApiOrderDO::getThreeOrderNo, notifyVo.getOrderNo()));
-        if (!apiOrderDOS.isEmpty()) {
-            ApiOrderDO apiOrderDO = apiOrderDOS.get(0);
+        ApiProcessNotifyRemoteReq apiProcessNotifyRemoteReq = JacksonUtils.readValue(orderNotify.getMsg(), ApiProcessNotifyRemoteReq.class);
+        ApiOrderDO orderById = getOrderById(apiProcessNotifyRemoteReq.getOrderId());
+        log.info("回调接收的数据{}",apiProcessNotifyRemoteReq);
+        if (Objects.nonNull(orderById)) {
             //获取用户的devaccount
             try{
                 DevAccountDO devAccountDO = devAccountMapper.selectOne(new LambdaQueryWrapperX<DevAccountDO>()
-                        .eq(DevAccountDO::getUserId, apiOrderDO.getBuyUserId())
-                        .eq(DevAccountDO::getUserType, apiOrderDO.getBuyUserType())
+                        .eq(DevAccountDO::getUserId, orderById.getBuyUserId())
+                        .eq(DevAccountDO::getUserType, orderById.getBuyUserType())
                 );
                 if(StringUtils.hasText(devAccountDO.getCallbackUrl()) && StringUtils.hasText(devAccountDO.getCallbackPrivateKey()) && StringUtils.hasText(devAccountDO.getCallbackPublicKey())){
                     HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
                     builder.url(devAccountDO.getCallbackUrl());
                     builder.method(HttpUtil.Method.JSON);
                     Map<String, String> params = new HashMap<>();
-                    params.put("messageNo",notifyReq.getMessageNo());
+                    params.put("messageNo",orderNotify.getMessageNo());
                     //注意接收到的callBackInfo是含有双引号转译符"\" 文档上无法体现只需要在验证签名是直接把callBackInfo值当成字符串即可以
-                    params.put("callBackInfo",notifyReq.getCallBackInfo());
+                    params.put("callBackInfo",orderNotify.getMsg());
 
                     // 第一步：检查参数是否已经排序
                     String[] keys = params.keySet().toArray(new String[0]);
@@ -736,12 +743,10 @@ public class ApiOrderServiceImpl implements ApiOrderService {
                     }
                     log.info("stringBuilder:{}",stringBuilder);
                     String s = RSAUtils.signByPrivateKey(stringBuilder.toString().getBytes(), devAccountDO.getCallbackPrivateKey());
-                    notifyReq.setSign(s);
-                    builder.postObject(notifyReq);
+                    orderNotify.setSign(s);
+                    builder.postObject(orderNotify);
                     HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
-                    YouyouNotifyDO youyouNotifyDO = youyouNotifyMapper.selectOne(new LambdaQueryWrapperX<YouyouNotifyDO>()
-                            .eq(YouyouNotifyDO::getMessageNo, notifyReq.getMessageNo()));
-                    youyouNotifyMapper.updateById(new YouyouNotifyDO().setId(youyouNotifyDO.getId()).setPushRemote(true)
+                    apiOrderNotifyMapper.updateById(new ApiOrderNotifyDo().setId(orderNotify.getId()).setPushRemote(true)
                             .setPushRemoteUrl(devAccountDO.getCallbackUrl())
                             .setPushRemoteResult(sent.html()));
                 }
