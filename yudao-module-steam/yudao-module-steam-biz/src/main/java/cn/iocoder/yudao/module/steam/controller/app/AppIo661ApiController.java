@@ -477,14 +477,14 @@ public class AppIo661ApiController {
     @PostMapping("v2/api/getTemplate")
     @Operation(summary = "获取模板")
     @PermitAll
-    public ApiResult<V5ItemListVO> getTemplate(@RequestBody OpenApiReqVo<PageParam> openApiReqVo) {
-        V5ItemListVO ret=new V5ItemListVO();
+    public ApiResult<List<V5ItemListVO.DataDTO>> getTemplate(@RequestBody OpenApiReqVo<PageParam> openApiReqVo) {
+        List<V5ItemListVO.DataDTO> ret=new ArrayList<>();
         try {
             return DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
 
-                return ApiResult.success(apiOrderService.queryTemplate(openApiReqVo.getData()));
+                return ApiResult.success(apiOrderService.queryTemplate(openApiReqVo.getData()).getData());
             });
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(),  e.getMessage(), ret);
