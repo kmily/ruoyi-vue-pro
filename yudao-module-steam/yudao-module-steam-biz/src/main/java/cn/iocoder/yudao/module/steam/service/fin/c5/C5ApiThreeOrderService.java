@@ -87,12 +87,12 @@ public class C5ApiThreeOrderService implements ApiThreeOrderService {
     }
 
     @Override
-    public String queryOrderDetail(LoginUser loginUser, Long orderNo,Long orderId) {
+    public String queryOrderDetail(LoginUser loginUser, String orderNo,Long orderId) {
         if(Objects.isNull(loginUser)){
             throw new ServiceException(OpenApiCode.ID_ERROR);
         }
         //获取订单详情
-        return C5ApiUtils.getC5OrderInfo(orderNo, null);//TODO 待调试
+        return C5ApiUtils.getC5OrderInfo(orderId, null);//TODO 待调试
     }
 
     @Override

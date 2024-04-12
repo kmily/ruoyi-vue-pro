@@ -152,12 +152,12 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     }
 
     @Override
-    public String queryOrderDetail(LoginUser loginUser, Long orderNo,Long orderId) {
+    public String queryOrderDetail(LoginUser loginUser, String orderNo,Long orderId) {
         if(Objects.isNull(loginUser)){
             throw new ServiceException(OpenApiCode.ID_ERROR);
         }
         //获取订单详情
-        String v5OrderInfo = V5ApiUtils.getV5OrderInfo(null, String.valueOf(orderNo));
+        String v5OrderInfo = V5ApiUtils.getV5OrderInfo(null, orderNo);
         ApiOrderExtDO apiOrderExtDO = apiOrderExtMapper.selectOne(ApiOrderExtDO::getOrderId, orderId);
         if (apiOrderExtDO == null){
             throw new ServiceException(-1,"该订单不存在，请检查订单号");
