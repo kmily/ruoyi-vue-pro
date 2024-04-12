@@ -10,7 +10,7 @@ public class V5callBackResult implements Serializable {
 
     private String notifyMsgNo;
 
-    private CallBackInfoVO callBackInfo;
+    private String callBackInfo;
 
     private String sign;
 }

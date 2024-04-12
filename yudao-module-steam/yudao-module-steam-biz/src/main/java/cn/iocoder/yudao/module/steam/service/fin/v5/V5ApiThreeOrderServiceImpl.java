@@ -187,7 +187,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         V5queryOrderStatusReqVO reqVO = new V5queryOrderStatusReqVO();
         reqVO.setMerchantKey(MERCHANT_KEY); // 商户密钥
         reqVO.setOrderNo(orderNo); // V5订单号
-        reqVO.setMerchantOrderNo(String.valueOf(orderId)); // 商户订单号
+//        reqVO.setMerchantOrderNo("d656e0cbbf3801735d7602731486774e"); // 商户订单号
         // 查询
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url(Query_Commodity_Detail);
@@ -199,6 +199,9 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         V5queryCommodityDetailRespVO json = sent.json(V5queryCommodityDetailRespVO.class);
         V5queryCommodityDetailRespVO.OrderDetailInfo data = json.getData();
+        if (data == null){
+            return json.getMsg();
+        }
         V5queryCommodityDetailRespVO.OrderDetailInfo readValue = JacksonUtils.readValue(JacksonUtils.writeValueAsString(data), V5queryCommodityDetailRespVO.OrderDetailInfo.class);
         ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
         apiOrderExtDO.setOrderId(orderId);
@@ -220,7 +223,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         V5queryOrderStatusReqVO reqVO = new V5queryOrderStatusReqVO();
         reqVO.setMerchantKey(MERCHANT_KEY); // 商户密钥
         reqVO.setOrderNo(orderNo); // V5订单号
-        reqVO.setMerchantOrderNo(String.valueOf(orderId)); // 商户订单号
+//        reqVO.setMerchantOrderNo(String.valueOf(orderId)); // 商户订单号
         // 查询
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url(Query_Order_Status_URL);
@@ -233,24 +236,21 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         ApiResult json = sent.json(ApiResult.class);
         Object data = json.getData();
         V5queryOrderStatusRespVO respVO = JacksonUtils.readValue(JacksonUtils.writeValueAsString(data), V5queryOrderStatusRespVO.class);
+        // 更新订单状态
+        ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
+        apiOrderExtDO.setOrderId(orderId);
+        apiOrderExtDO.setOrderSubStatus(String.valueOf(respVO.getStatus()));
+        apiOrderExtDO.setOrderStatus(1);
+        if(respVO.getStatus() == 3){
+            apiOrderExtDO.setOrderStatus(2);
+        }
+        if(respVO.getStatus() == 4){
+            apiOrderExtDO.setOrderStatus(3);
+        }
+        // 更新订单状态
+        apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderNo,orderNo));
         return respVO.getStatus();
-//        // 更新订单状态
-//        ApiOrderDO apiOrderDO = new ApiOrderDO();
-//        apiOrderDO.setId(orderId);
-//        apiOrderDO.setOrderStatus(respVO.getStatus());
-//        apiOrderDO.setOrderSubStatus(respVO.getStatus());
-//        ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
-//        apiOrderExtDO.setOrderId(orderId);
-//        apiOrderExtDO.setOrderSubStatus(respVO.getStatus());
-//        if(respVO.getStatus() == 0){
-//            apiOrderExtDO.setOrderStatus(3);
-//        }
-//        if(respVO.getStatus() == 0){
-//            apiOrderExtDO.setOrderStatus(3);
-//        }
-//        // 更新订单状态
-//        apiOrderMapper.updateById(apiOrderDO);
-//        apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderId,orderId))
+
     }
 
     /**
@@ -264,7 +264,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         V5queryOrderStatusReqVO reqVO = new V5queryOrderStatusReqVO();
         reqVO.setMerchantKey(MERCHANT_KEY); // 商户密钥
         reqVO.setOrderNo(orderNo); // V5订单号
-        reqVO.setMerchantOrderNo(String.valueOf(orderId)); // 商户订单号
+//        reqVO.setMerchantOrderNo(String.valueOf(orderId)); // 商户订单号
         // 查询
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url(Cancel_Order_URL);
@@ -284,10 +284,6 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             respVo.setErrorCode(new ErrorCode(Integer.valueOf(respVO.getStatus()),respVO.getStatusMsg()));
         }
 
-        ApiOrderDO apiOrderDO = new ApiOrderDO();
-        apiOrderDO.setId(orderId);
-        apiOrderDO.setOrderStatus(Integer.valueOf(respVO.getStatus()));
-        apiOrderDO.setOrderSubStatus(Integer.valueOf(respVO.getStatus()));
         ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
         apiOrderExtDO.setOrderId(orderId);
         apiOrderExtDO.setOrderSubStatus(respVO.getStatus());
@@ -295,8 +291,8 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             apiOrderExtDO.setOrderStatus(3);
         }
         // 更新订单状态
-        apiOrderMapper.updateById(apiOrderDO);
-        apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderId,orderId));
+//        apiOrderMapper.updateById(apiOrderDO);
+        apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderNo,orderNo));
         return respVo;
     }
 
@@ -310,15 +306,17 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     @Override
     public ApiProcessNotifyResp processNotify(String jsonData, String msgNo) {
         V5callBackResult v5respVO = JacksonUtils.readValue(JacksonUtils.writeValueAsString(jsonData), V5callBackResult.class);
+        String callBackInfo = v5respVO.getCallBackInfo();
+        CallBackInfoVO callBackInfoVO = JacksonUtils.readValue(callBackInfo, CallBackInfoVO.class);
         ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
-        apiOrderExtDO.setOrderNo(v5respVO.getCallBackInfo().getOrderNo());
+        apiOrderExtDO.setOrderNo(callBackInfoVO.getOrderNo());
         // 更新订单小状态
-        apiOrderExtDO.setOrderSubStatus(String.valueOf(v5respVO.getCallBackInfo().getOrderStatus()));
-        apiOrderExtMapper.update(apiOrderExtDO, new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderNo, v5respVO.getCallBackInfo().getOrderNo()));
-        ApiOrderExtDO apiOrderExtDO1 = apiOrderExtMapper.selectOne(ApiOrderExtDO::getOrderNo, v5respVO.getCallBackInfo().getOrderNo());
+        apiOrderExtDO.setOrderSubStatus(String.valueOf(callBackInfoVO.getOrderStatus()));
+        apiOrderExtMapper.update(apiOrderExtDO, new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderNo, callBackInfoVO.getOrderNo()));
+        ApiOrderExtDO apiOrderExtDO1 = apiOrderExtMapper.selectOne(ApiOrderExtDO::getOrderNo, callBackInfoVO.getOrderNo());
         ApiProcessNotifyResp respVo = new ApiProcessNotifyResp();
         respVo.setOrderId(apiOrderExtDO1.getOrderId());
-        respVo.setOrderNo(v5respVO.getCallBackInfo().getOrderNo());
+        respVo.setOrderNo(callBackInfoVO.getOrderNo());
         return respVo;
     }
 
