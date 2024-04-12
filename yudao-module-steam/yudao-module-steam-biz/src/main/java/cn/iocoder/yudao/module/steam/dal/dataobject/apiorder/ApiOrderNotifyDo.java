@@ -12,7 +12,7 @@ import org.springframework.data.annotation.Transient;
  *
  * @author 管理员
  */
-@TableName("steam_api_order_notify")
+@TableName("steam_api_notify")
 @KeySequence("steam_api_order_notify_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
