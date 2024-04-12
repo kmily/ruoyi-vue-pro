@@ -16,9 +16,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
-@Component
+//@Component
 @Slf4j
-@RabbitListener(queues = "steam_commodity")
+//@RabbitListener(queues = "steam_commodity")
 public class NotifyCommodityConsumer {
     @Resource
     private UUTemplateService uuTemplateService;

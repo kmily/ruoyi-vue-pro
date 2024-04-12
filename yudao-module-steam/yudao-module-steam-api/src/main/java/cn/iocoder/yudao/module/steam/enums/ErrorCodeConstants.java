@@ -50,6 +50,7 @@ public interface ErrorCodeConstants {
     //---库存订单
     ErrorCode INVORDER_INV_NOT_FOUND = new ErrorCode(1_100_011_02, "库存不存在");
     ErrorCode INVORDER_ORDERED_EXCEPT = new ErrorCode(1_100_011_01, "此库存已经存在有效订单");
+    ErrorCode V5_ORDER_CANCEL = new ErrorCode(5_100_011_01, "取消订单正在处理中");
     ErrorCode INVORDER_USER_EXCEPT = new ErrorCode(1_100_011_01, "用户不存在");
     ErrorCode INVORDER_ORDERUSER_EXCEPT = new ErrorCode(1_100_011_01, "不能交易自己上架的饰品");
     ErrorCode INVORDER_BIND_STEAM_EXCEPT = new ErrorCode(1_100_011_01, "绑定steam账号异常");

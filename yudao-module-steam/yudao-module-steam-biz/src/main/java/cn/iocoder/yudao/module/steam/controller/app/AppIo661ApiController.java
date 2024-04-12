@@ -1,8 +1,13 @@
 package cn.iocoder.yudao.module.steam.controller.app;
 
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.infra.controller.admin.config.vo.ConfigSaveReqVO;
@@ -26,20 +31,26 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.api.AppBatchGetOnSaleCommodityInfoReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.api.AppBatchGetOnSaleCommodityInfoRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelResp;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.bindipaddress.BindIpaddressDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
-import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingHashSummary;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
+import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
-import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
+import cn.iocoder.yudao.module.steam.service.fin.ApiOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5ItemListVO;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5callBackResult;
+import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
+import cn.iocoder.yudao.module.steam.service.fin.vo.ApiSummaryByHashName;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.selling.SellingsearchService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
@@ -56,10 +67,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
@@ -69,6 +77,8 @@ import java.math.RoundingMode;
 import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 
 /**
  * 兼容有品的开放平台接口
@@ -107,6 +117,12 @@ public class AppIo661ApiController {
     }
     @Resource
     private SteamService steamService;
+
+    /**
+     * 新版本接口
+     */
+    @Resource
+    private ApiOrderService apiOrderService;
 
     /**
      * api余额接口
@@ -321,6 +337,157 @@ public class AppIo661ApiController {
         } catch (ServiceException e) {
 
             return ApiResult.error(e.getCode(),  e.getMessage(),Io661OrderInfoResp.class);
+        }
+    }
+    //-----------------v2版本接口
+    @Operation(summary = "创建库存订单")
+    @PostMapping("v2/api/createInvOrder")
+    @PermitAll
+    public ApiResult<AppPayOrderSubmitRespVO> createInvOrderV2(@RequestBody OpenApiReqVo<ApiQueryCommodityReqVo> openApiReqVo) {
+        try {
+            return DevAccountUtils.tenantExecute(1L, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+
+
+                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
+                openApiReqVo.getData().setPlatform(PlatFormEnum.API);
+                ApiOrderDO invOrder = apiOrderService.createInvOrder(loginUser, openApiReqVo.getData());
+                AppPayOrderSubmitRespVO reqVO=new AppPayOrderSubmitRespVO();
+                try {
+                    ApiOrderDO orderDO = apiOrderService.payInvOrder(loginUser, invOrder.getId());
+                    reqVO.setOrderNo(invOrder.getOrderNo());
+                    reqVO.setMerchantNo(invOrder.getMerchantNo());
+                    return ApiResult.success(reqVO);
+                } catch (ServiceException e) {
+                    apiOrderService.closeUnPayInvOrder(invOrder.getId());
+                    throw e;
+                }
+            });
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return ApiResult.error(e.getCode(),  e.getMessage(),AppPayOrderSubmitRespVO.class);
+        }
+
+    }
+    /**
+     * 查询订单详情
+     * @param openApiReqVo
+     * @return
+     */
+    @Operation(summary = "查询订单详情")
+    @PostMapping("v2/api/orderStatus")
+    @PermitAll
+    public ApiResult<Io661OrderInfoResp> orderStatusV2(@RequestBody OpenApiReqVo<QueryOrderReqVo> openApiReqVo) {
+        try {
+            return DevAccountUtils.tenantExecute(1L, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
+                return ApiResult.success(apiOrderService.getOrderInfo(openApiReqVo.getData(), loginUser));
+            });
+        } catch (ServiceException e) {
+
+            return ApiResult.error(e.getCode(),  e.getMessage(),Io661OrderInfoResp.class);
+        }
+    }
+    /**
+     * 订单服务器回调
+     *
+     * @param notifyReq UU回调接口
+     * @return
+     */
+    @PostMapping("/notify/{platCode}")
+    @Operation(summary = "订单") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
+    @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
+    @PermitAll
+    public CommonResult<Map<String, Object>> notify(@RequestBody Map<String,Object> notifyReq, @PathVariable String platCode) {
+        DevAccountUtils.tenantExecute(1L, () -> {
+            PlatCodeEnum platCodeEnum = PlatCodeEnum.valueOf(platCode);
+            String jackSon = JacksonUtils.writeValueAsString(notifyReq);
+            switch(platCodeEnum){
+                case C5:
+                    break;
+                case V5:
+
+                    V5callBackResult v5callBackResult = JacksonUtils.readValue(jackSon, V5callBackResult.class);
+                    apiOrderService.processNotify(jackSon,platCodeEnum,v5callBackResult.getNotifyMsgNo());
+                default:
+            }
+            return null;
+        });
+        CommonResult<Map<String, Object>> ret = new CommonResult<>();
+        ret.setCode(200);
+        ret.setMsg("成功");
+        ret.setData(MapUtils.convertMap(Arrays.asList(
+//                new KeyValue<>("messageNo", notifyReq.getMessageNo()),
+                new KeyValue<>("flag", true)
+        )));
+        return ret;
+    }
+    /**
+     * 根据模板hash查询在售商品
+     * @return
+     */
+    @PostMapping("v2/api/batchGetPriceByTemplate")
+    @Operation(summary = "根据模板hash查询在售商品")
+    @PermitAll
+    public ApiResult<List<ApiSummaryByHashName>> batchGetPriceByTemplateV2(@RequestBody OpenApiReqVo<AppBatchGetOnSaleCommodityInfoReqVO> openApiReqVo) {
+        List<ApiSummaryByHashName> ret=new ArrayList<>();
+        try {
+            return DevAccountUtils.tenantExecute(1L, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
+                if(Objects.isNull(openApiReqVo.getData().getRequestList()) || openApiReqVo.getData().getRequestList().size()<=0){
+                    throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
+                }
+                List<AppBatchGetOnSaleCommodityInfoReqVO.RequestListDTO> requestList = openApiReqVo.getData().getRequestList();
+                if(requestList.size()>=20){
+                    throw new ServiceException(OpenApiCode.TO_MANY_ITEM);
+                }
+                List<String> collect = openApiReqVo.getData().getRequestList().stream().map(AppBatchGetOnSaleCommodityInfoReqVO.RequestListDTO::getMarketHashName).collect(Collectors.toList());
+                return ApiResult.success(apiOrderService.summaryByHashName(loginUser,collect));
+            });
+        } catch (ServiceException e) {
+            return ApiResult.error(e.getCode(),  e.getMessage(), ret);
+        }
+    }
+    /**
+     * 买家订单相关接口
+     */
+    @PostMapping("v2/api/orderCancel")
+    @Operation(summary = "买家取消订单")
+    @PermitAll
+    public ApiResult<OrderCancelResp> orderCancel(@RequestBody OpenApiReqVo<OrderCancelVo> openApiReqVo) {
+        try {
+            return DevAccountUtils.tenantExecute(1L, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
+                Integer integer = apiOrderService.orderCancel(loginUser, openApiReqVo.getData(), getClientIP(), "买家调用接口取消");
+                OrderCancelResp ret = new OrderCancelResp();
+                ret.setResult(integer);
+                return ApiResult.success(ret);
+            });
+        } catch (ServiceException e) {
+            return ApiResult.error(e.getCode(), e.getMessage(), OrderCancelResp.class);
+        }
+    }
+    /**
+     * 根据模板hash查询在售商品
+     * @return
+     */
+    @PostMapping("v2/api/getTemplate")
+    @Operation(summary = "获取模板")
+    @PermitAll
+    public ApiResult<List<V5ItemListVO.DataDTO>> getTemplate(@RequestBody OpenApiReqVo<PageParam> openApiReqVo) {
+        List<V5ItemListVO.DataDTO> ret=new ArrayList<>();
+        try {
+            return DevAccountUtils.tenantExecute(1L, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
+
+                return ApiResult.success(apiOrderService.queryTemplate(openApiReqVo.getData()).getData());
+            });
+        } catch (ServiceException e) {
+            return ApiResult.error(e.getCode(),  e.getMessage(), ret);
         }
     }
 }

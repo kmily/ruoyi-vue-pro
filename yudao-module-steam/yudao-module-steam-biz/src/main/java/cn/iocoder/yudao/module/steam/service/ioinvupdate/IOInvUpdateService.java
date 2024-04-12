@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.steam.service.ioinvupdate;
 
 import cn.hutool.json.JSONObject;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -276,6 +277,7 @@ public class IOInvUpdateService {
                 .eq(InvDO::getTransferStatus, invToMergeVO.getTransferStatus())
                 .eq(InvDO::getUserId, invToMergeVO.getUserId())
                 .eq(InvDO::getSteamId, invToMergeVO.getSteamId())
+                .eq(InvDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
                 .eq(InvDO::getBindUserId, invToMergeVO.getBindUserId()));
     }
 
@@ -288,7 +290,8 @@ public class IOInvUpdateService {
                 .eqIfPresent(InvDO::getTransferStatus, invToMergeVO.getTransferStatus())
                 .eq(InvDO::getUserId, invToMergeVO.getUserId())
                 .eq(InvDO::getSteamId, invToMergeVO.getSteamId())
-                .eq(InvDO::getBindUserId, invToMergeVO.getBindUserId()));
+                .eq(InvDO::getBindUserId, invToMergeVO.getBindUserId())
+                .eq(InvDO::getStatus, CommonStatusEnum.ENABLE.getStatus()));
     }
 
 
