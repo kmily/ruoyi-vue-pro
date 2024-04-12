@@ -90,7 +90,6 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             apiCommodityRespVo.setIsSuccess(false);
             return apiCommodityRespVo;
         }
-
     }
     private static void checkLoginUser(Object loginUser) {
         if (Objects.isNull(loginUser)) {
@@ -109,51 +108,47 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         builder.postObject(v5BuyProductVo);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         V5ProductBuyRes json = sent.json(V5ProductBuyRes.class);
-
         ApiBuyItemRespVo apiBuyItemRespVo = new ApiBuyItemRespVo();
-        if (json != null && json.getData() != null) {
-            apiBuyItemRespVo.setOrderNo(json.getData().getOrderNo());
-        }
-        if (json != null && json.getCode() == 0) {//返回成功
-            apiBuyItemRespVo.setIsSuccess(true);
+        if (json != null) {
+            // 设置交易链接
             apiBuyItemRespVo.setTradeLink(createReqVO.getTradeLinks());
-            apiBuyItemRespVo.setErrorCode(OpenApiCode.OK);
-            apiBuyItemRespVo.setTradeOfferId(null);// TODO
-            ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
-            apiOrderExtDO.setPlatCode(createReqVO.getPlatform().getCode());
-            apiOrderExtDO.setOrderNo(apiBuyItemRespVo.getOrderNo());
-            apiOrderExtDO.setTradeOfferId(Long.valueOf(apiBuyItemRespVo.getTradeOfferId()));
-            apiOrderExtDO.setTradeOfferLinks(createReqVO.getTradeLinks());
-            apiOrderExtDO.setOrderId(orderId);
-            apiOrderExtDO.setOrderInfo(sent.html());
-            apiOrderExtMapper.insert(apiOrderExtDO);
-            return apiBuyItemRespVo;
-
+            // 根据返回的状态码进行处理
+            switch (json.getCode()) {
+                case 0: // 返回成功
+                    if (json.getData() != null) {
+                        apiBuyItemRespVo.setOrderNo(json.getData().getOrderNo());
+                    }
+                    apiBuyItemRespVo.setIsSuccess(true);
+                    apiBuyItemRespVo.setErrorCode(OpenApiCode.OK);
+//                    apiBuyItemRespVo.setTradeOfferId(null);
+                    ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
+                    apiOrderExtDO.setPlatCode(createReqVO.getPlatform().getCode());
+                    apiOrderExtDO.setOrderNo(apiBuyItemRespVo.getOrderNo());
+                    apiOrderExtDO.setTradeOfferId(Long.valueOf(apiBuyItemRespVo.getTradeOfferId()));
+                    apiOrderExtDO.setTradeOfferLinks(createReqVO.getTradeLinks());
+                    apiOrderExtDO.setOrderId(orderId);
+                    apiOrderExtDO.setOrderInfo(sent.html());
+                    apiOrderExtMapper.insert(apiOrderExtDO);
+                    break;
+                case 1: // 返回错误码为1
+                    apiBuyItemRespVo.setIsSuccess(false);
+                    apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1);
+                    throw new ServiceException(1, json.getMsg());
+                case 1001: // 返回错误码为1001
+                    apiBuyItemRespVo.setIsSuccess(false);
+                    apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1001);
+                    break;
+                case 1002: // 返回错误码为1002
+                    apiBuyItemRespVo.setIsSuccess(false);
+                    apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1002);
+                    break;
+                default:
+                    // 处理其他未知状态码
+                    break;
+            }
+        } else {
+            throw new ServiceException(-1,"请求返回json为空");
         }
-        if (json != null && json.getCode() == 1){
-            apiBuyItemRespVo.setIsSuccess(false);
-            apiBuyItemRespVo.setTradeLink(createReqVO.getTradeLinks());
-            apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1);
-            apiBuyItemRespVo.setTradeOfferId(null);// TODO
-            throw new ServiceException(1,json.getMsg());
-        }
-        if (json != null && json.getCode() == 1001){
-            apiBuyItemRespVo.setIsSuccess(false);
-            apiBuyItemRespVo.setTradeLink(createReqVO.getTradeLinks());
-            apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1001);
-            apiBuyItemRespVo.setTradeOfferId(null);// TODO
-            return apiBuyItemRespVo;
-        }
-        if (json != null && json.getCode() == 1002){
-            apiBuyItemRespVo.setIsSuccess(false);
-            apiBuyItemRespVo.setTradeLink(createReqVO.getTradeLinks());
-            apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1002);
-            apiBuyItemRespVo.setTradeOfferId(null);// TODO
-            return apiBuyItemRespVo;
-        }
-
-        //
-//        apiOrderExtMapper.selectOne(ApiOrderExtDO::)
         return apiBuyItemRespVo;
     }
 
