@@ -408,8 +408,8 @@ public class AppIo661ApiController {
                     break;
                 case V5:
 
-                    V5callBackResult v5callBackResult = JacksonUtils.readValue(JacksonUtils.writeValueAsString(notifyReq), V5callBackResult.class);
-                    apiOrderService.processNotify(JacksonUtils.writeValueAsString(notifyReq),platCodeEnum,v5callBackResult.getNotifyMsgNo());
+                    V5callBackResult v5callBackResult = JacksonUtils.readValue(jackSon, V5callBackResult.class);
+                    apiOrderService.processNotify(jackSon,platCodeEnum,v5callBackResult.getNotifyMsgNo());
                 default:
             }
             return null;

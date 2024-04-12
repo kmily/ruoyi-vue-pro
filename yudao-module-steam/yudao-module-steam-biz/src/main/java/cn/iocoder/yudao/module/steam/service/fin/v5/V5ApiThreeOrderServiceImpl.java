@@ -23,10 +23,7 @@ import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5queryOrderStatusReqVO;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5queryOrderStatusRespVO;
 import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductPriceInfoRes;
 import cn.iocoder.yudao.module.steam.service.fin.v5.utils.V5ApiUtils;
-import cn.iocoder.yudao.module.steam.service.fin.vo.ApiBuyItemRespVo;
-import cn.iocoder.yudao.module.steam.service.fin.vo.ApiCommodityRespVo;
-import cn.iocoder.yudao.module.steam.service.fin.vo.ApiOrderCancelRespVo;
-import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
+import cn.iocoder.yudao.module.steam.service.fin.vo.*;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
@@ -304,7 +301,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     }
 
     @Override
-    public Long processNotify(String jsonData, String msgNo) {
+    public ApiProcessNotifyResp processNotify(String jsonData, String msgNo) {
 
     }
 

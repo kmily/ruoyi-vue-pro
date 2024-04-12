@@ -8,10 +8,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
-import cn.iocoder.yudao.module.steam.service.fin.vo.ApiBuyItemRespVo;
-import cn.iocoder.yudao.module.steam.service.fin.vo.ApiCommodityRespVo;
-import cn.iocoder.yudao.module.steam.service.fin.vo.ApiOrderCancelRespVo;
-import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
+import cn.iocoder.yudao.module.steam.service.fin.vo.*;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -90,5 +87,5 @@ public interface ApiThreeOrderService {
      * @param msgNo  主订单ID
      * 返回主订单号
      */
-    Long processNotify(String jsonData,String msgNo);
+    ApiProcessNotifyResp processNotify(String jsonData, String msgNo);
 }

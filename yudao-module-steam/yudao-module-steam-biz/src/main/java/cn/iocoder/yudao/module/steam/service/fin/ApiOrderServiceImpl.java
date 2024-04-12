@@ -656,7 +656,8 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         Optional<ApiThreeOrderService> apiThreeByPlatCode = getApiThreeByPlatCode(platCodeEnum);
         if(apiThreeByPlatCode.isPresent()){
             ApiThreeOrderService apiThreeOrderService = apiThreeByPlatCode.get();
-            apiThreeOrderService.processNotify(jsonData,msgNo);
+            Long aLong = apiThreeOrderService.processNotify(jsonData, msgNo);
+
         }
     }
     @Override
