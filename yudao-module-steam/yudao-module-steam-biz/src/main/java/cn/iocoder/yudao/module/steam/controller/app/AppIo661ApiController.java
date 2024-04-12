@@ -30,6 +30,8 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.OpenApiReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.api.AppBatchGetOnSaleCommodityInfoReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.api.AppBatchGetOnSaleCommodityInfoRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelResp;
+import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
@@ -73,6 +75,8 @@ import java.math.RoundingMode;
 import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 
 /**
  * 兼容有品的开放平台接口
@@ -442,6 +446,26 @@ public class AppIo661ApiController {
             });
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(),  e.getMessage(), ret);
+        }
+    }
+    /**
+     * 买家订单相关接口
+     */
+    @PostMapping("v2/api/orderCancel")
+    @Operation(summary = "买家取消订单")
+    @PermitAll
+    public ApiResult<OrderCancelResp> orderCancel(@RequestBody OpenApiReqVo<OrderCancelVo> openApiReqVo) {
+        try {
+            return DevAccountUtils.tenantExecute(1L, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
+                Integer integer = apiOrderService.orderCancel(loginUser, openApiReqVo.getData(), getClientIP(), "买家调用接口取消");
+                OrderCancelResp ret = new OrderCancelResp();
+                ret.setResult(integer);
+                return ApiResult.success(ret);
+            });
+        } catch (ServiceException e) {
+            return ApiResult.error(e.getCode(), e.getMessage(), OrderCancelResp.class);
         }
     }
 }
