@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class V5page {
+    private String merchantKey;
     private Integer pageIndex;
     private Integer pageNum;
 }

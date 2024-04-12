@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5ItemListVO;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5page;
 import cn.iocoder.yudao.module.steam.service.fin.vo.*;
 import cn.iocoder.yudao.module.steam.service.uu.vo.CreateCommodityOrderReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
@@ -94,5 +95,5 @@ public interface ApiThreeOrderService {
     /**
      * V5模板
      */
-    V5ItemListVO getItemList();
+    V5ItemListVO getItemList(V5page v5page);
 }
