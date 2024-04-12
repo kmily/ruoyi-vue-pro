@@ -38,6 +38,7 @@ import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import cn.iocoder.yudao.module.steam.utils.RSAUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -130,6 +131,8 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         this.apiThreeOrderServiceList = apiThreeOrderServiceList;
     }
 
+    @Resource
+    private RabbitTemplate rabbitTemplate;
 
     public ApiOrderServiceImpl() {
     }
@@ -699,6 +702,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
             apiOrderNotifyDo.setPushRemote(false);
             apiOrderNotifyDo.setPlatCode(orderExt.getPlatCode());
             apiOrderNotifyMapper.insert(apiOrderNotifyDo);
+            rabbitTemplate.convertAndSend("steam","steam_inv_order_notify",apiOrderNotifyDo.getId());
         }
     }
     @Override
