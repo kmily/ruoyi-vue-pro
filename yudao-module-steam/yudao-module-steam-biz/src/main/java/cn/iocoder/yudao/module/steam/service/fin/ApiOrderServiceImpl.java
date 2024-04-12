@@ -21,7 +21,6 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderExtDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderNotifyDo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.youyounotify.YouyouNotifyDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderNotifyMapper;
@@ -35,12 +34,9 @@ import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.uu.UUService;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
-import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
-import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyVo;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import cn.iocoder.yudao.module.steam.utils.RSAUtils;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -119,8 +115,6 @@ public class ApiOrderServiceImpl implements ApiOrderService {
     @Resource
     private ApiOrderNotifyMapper apiOrderNotifyMapper;
 
-    @Resource
-    private YouyouNotifyMapper youyouNotifyMapper;
 
     @Resource
     private ConfigService configService;
@@ -516,7 +510,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
     }
     /**
      * 获取订单通知
-     * @param notifyId
+     * @param notifyId 消息ID
      * @return
      */
     private ApiOrderNotifyDo getOrderNotify(Long notifyId){
