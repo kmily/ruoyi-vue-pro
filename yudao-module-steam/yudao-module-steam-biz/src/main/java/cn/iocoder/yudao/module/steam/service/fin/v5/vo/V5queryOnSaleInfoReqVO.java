@@ -19,4 +19,7 @@ public class V5queryOnSaleInfoReqVO implements Serializable {
         this.merchantKey = merchantKey;
         this.templateHashNameList = marketHashNameList;
     }
+
+    public V5queryOnSaleInfoReqVO() {
+    }
 }
