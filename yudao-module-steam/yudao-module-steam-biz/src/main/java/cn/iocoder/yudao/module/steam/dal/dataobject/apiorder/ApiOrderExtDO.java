@@ -57,8 +57,8 @@ public class ApiOrderExtDO extends BaseDO {
      */
     private Integer orderStatus;
     /**
-     * 订单小状态。
+     * 平台订单小状态描述。
      */
-    private Integer orderSubStatus;
+    private String orderSubStatus;
 
 }
