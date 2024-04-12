@@ -26,10 +26,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.devaccount.DevAccountMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyounotify.YouyouNotifyMapper;
-import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
-import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
-import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
-import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
+import cn.iocoder.yudao.module.steam.enums.*;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.fin.vo.*;
 import cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum;
@@ -654,6 +651,9 @@ public class ApiOrderServiceImpl implements ApiOrderService {
 
         Optional<ApiThreeOrderService> apiThreeByPlatCode = getApiThreeByPlatCode(platCodeEnum);
         if(apiThreeByPlatCode.isPresent()){
+
+
+
             ApiThreeOrderService apiThreeOrderService = apiThreeByPlatCode.get();
             ApiProcessNotifyResp apiProcessNotifyResp = apiThreeOrderService.processNotify(jsonData, msgNo);
             ApiOrderDO orderDO = getOrderById(apiProcessNotifyResp.getOrderId());
@@ -663,7 +663,26 @@ public class ApiOrderServiceImpl implements ApiOrderService {
             ApiProcessNotifyRemoteReq apiProcessNotifyRemoteReq=new ApiProcessNotifyRemoteReq();
             apiProcessNotifyRemoteReq.setOrderNo(orderDO.getOrderNo());
             apiProcessNotifyRemoteReq.setMerchantNo(orderDO.getMerchantNo());
-            apiProcessNotifyRemoteReq.setMerchantNo(orderDO.getMerchantNo());
+            if(!PayOrderStatusEnum.isSuccess(orderDO.getPayOrderStatus())){
+                //已支付
+                apiProcessNotifyRemoteReq.setOrderStatus(1);
+            }else{
+                apiProcessNotifyRemoteReq.setOrderStatus(2);
+                if(orderExt.getOrderStatus().equals("2")){
+                    apiProcessNotifyRemoteReq.setOrderStatus(3);
+                }
+            }
+            apiProcessNotifyRemoteReq.setPayOrderStatus(orderDO.getPayOrderStatus());
+
+            apiProcessNotifyRemoteReq.setPayOrderStatusText(PayOrderStatusEnum.findByStatus(orderDO.getPayOrderStatus()).getName());
+            apiProcessNotifyRemoteReq.setCashStatus(orderDO.getCashStatus());
+            apiProcessNotifyRemoteReq.setCashStatusText(InvSellCashStatusEnum.findByStatus(orderDO.getCashStatus()).getName());
+
+
+            apiProcessNotifyRemoteReq.setInvStatus(orderExt.getOrderStatus());
+            apiProcessNotifyRemoteReq.setInvStatusText(IvnStatusEnum.findByCode(orderExt.getOrderStatus()).getName());
+
+
 
             switch (orderExt.getOrderStatus()){
                 case 1:

@@ -5,7 +5,9 @@ import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * 支付订单的状态枚举
@@ -61,4 +63,11 @@ public enum PayOrderStatusEnum implements IntArrayValuable {
         return Objects.equals(status, CLOSED.getStatus());
     }
 
+    public static PayOrderStatusEnum findByStatus(Integer status){
+        Optional<PayOrderStatusEnum> first = Arrays.stream(values()).filter(item -> item.getStatus().equals(status)).findFirst();
+        if(first.isPresent()){
+            return first.get();
+        }
+        return null;
+    }
 }

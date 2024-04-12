@@ -20,7 +20,7 @@ public class ApiProcessNotifyRemoteReq implements Serializable {
     /**
      * 交易阶段1,支付；2,发货，3资金结算
      */
-    private String orderStatus;
+    private Integer orderStatus;
     /**
      * 支付状态
      */
@@ -39,6 +39,7 @@ public class ApiProcessNotifyRemoteReq implements Serializable {
     private String cashStatusText;
     /**
      * 发货状态
+     * IvnStatusEnum
      */
     private Integer invStatus;
     /**
