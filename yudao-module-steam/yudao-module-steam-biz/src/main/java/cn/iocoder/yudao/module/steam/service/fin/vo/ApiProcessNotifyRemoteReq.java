@@ -12,7 +12,7 @@ public class ApiProcessNotifyRemoteReq implements Serializable {
     /**
      * 主订单号
      */
-    private Long merchantNo;
+    private String merchantNo;
     /**
      * 第三方订单号
      */

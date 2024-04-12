@@ -24,7 +24,6 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyounotify.YouyouNotifyDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderNotifyMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.devaccount.DevAccountMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyounotify.YouyouNotifyMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
@@ -184,7 +183,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
      * @param invOrderId 订单号
      */
     public void closeUnPayInvOrder(Long invOrderId) {
-        ApiOrderDO uuOrder = getUUOrderById(invOrderId);
+        ApiOrderDO uuOrder = getOrderById(invOrderId);
         if (PayOrderStatusEnum.isSuccess(uuOrder.getPayOrderStatus())) {
             throw new ServiceException(-1,"订单已支付不支持关闭");
         }
@@ -211,7 +210,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
      */
     @Override
     public void releaseInvOrder(Long invOrderId) {
-        ApiOrderDO uuOrder = getUUOrderById(invOrderId);
+        ApiOrderDO uuOrder = getOrderById(invOrderId);
         if(uuOrder.getCashStatus().equals(InvSellCashStatusEnum.CASHED.getStatus())){
             throw new ServiceException(-1,"订单已经支付给卖家，不支持操作");
         }
@@ -245,7 +244,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
      */
     @Transactional(rollbackFor = ServiceException.class)
     public void damagesCloseInvOrder(Long invOrderId,String reason) {
-        ApiOrderDO uuOrderById = getUUOrderById(invOrderId);
+        ApiOrderDO uuOrderById = getOrderById(invOrderId);
         if(Objects.isNull(uuOrderById)){
             throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
         }
@@ -294,7 +293,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
      */
     @Transactional(rollbackFor = ServiceException.class)
     public void cashInvOrder(Long invOrderId) {
-        ApiOrderDO uuOrderById = getUUOrderById(invOrderId);
+        ApiOrderDO uuOrderById = getOrderById(invOrderId);
         if(Objects.isNull(uuOrderById)){
             throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
         }
@@ -472,7 +471,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         }
     }
 
-    public ApiOrderDO getUUOrderById(Long orderId) {
+    public ApiOrderDO getOrderById(Long orderId) {
         ApiOrderDO orderDO = apiOrderMapper.selectById(orderId);
         if(Objects.isNull(orderDO)){
             throw exception(OpenApiCode.JACKSON_EXCEPTION);
@@ -657,9 +656,15 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         if(apiThreeByPlatCode.isPresent()){
             ApiThreeOrderService apiThreeOrderService = apiThreeByPlatCode.get();
             ApiProcessNotifyResp apiProcessNotifyResp = apiThreeOrderService.processNotify(jsonData, msgNo);
+            ApiOrderDO orderDO = getOrderById(apiProcessNotifyResp.getOrderId());
             ApiOrderExtDO orderExt = getOrderExt(apiProcessNotifyResp.getOrderNo(), apiProcessNotifyResp.getOrderId());
             ApiOrderNotifyDo apiOrderNotifyDo=new ApiOrderNotifyDo();
             apiOrderNotifyDo.setPlatCode(PlatCodeEnum.valueOf(orderExt.getPlatCode()).getCode());
+            ApiProcessNotifyRemoteReq apiProcessNotifyRemoteReq=new ApiProcessNotifyRemoteReq();
+            apiProcessNotifyRemoteReq.setOrderNo(orderDO.getOrderNo());
+            apiProcessNotifyRemoteReq.setMerchantNo(orderDO.getMerchantNo());
+            apiProcessNotifyRemoteReq.setMerchantNo(orderDO.getMerchantNo());
+
             switch (orderExt.getOrderStatus()){
                 case 1:
 
@@ -728,7 +733,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
     @Override
     @Transactional(rollbackFor = ServiceException.class)
     public void checkTransfer(Long invOrderId) {
-        ApiOrderDO uuOrderById = getUUOrderById(invOrderId);
+        ApiOrderDO uuOrderById = getOrderById(invOrderId);
         if(Objects.isNull(uuOrderById)){
             throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
         }
