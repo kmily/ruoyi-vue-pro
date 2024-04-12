@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.steam.service.fin;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
@@ -30,6 +31,8 @@ import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingHashSummary;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyounotify.YouyouNotifyMapper;
 import cn.iocoder.yudao.module.steam.enums.*;
 import cn.iocoder.yudao.module.steam.service.SteamService;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5ItemListVO;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5page;
 import cn.iocoder.yudao.module.steam.service.fin.vo.*;
 import cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
@@ -835,5 +838,19 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         }
         List<ApiSummaryByHashName> collect = ret.entrySet().stream().map(item -> item.getValue()).collect(Collectors.toList());
         return collect;
+    }
+
+    @Override
+    public List<V5ItemListVO> queryTemplate(PageParam param) {
+        Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByPlatCode(PlatCodeEnum.V5);
+        if(apiThreeByOrder.isPresent()){
+            ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
+            V5page v5page=new V5page();
+            v5page.setPageIndex(param.getPageNo());
+            v5page.setPageNum(param.getPageSize());
+            List<V5ItemListVO> itemList = apiThreeOrderService.getItemList(v5page);
+            return itemList;
+        }
+        return Collections.emptyList();
     }
 }

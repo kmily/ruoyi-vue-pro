@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.steam.controller.app;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
@@ -46,6 +47,7 @@ import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.fin.ApiOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5ItemListVO;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5callBackResult;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiSummaryByHashName;
@@ -466,6 +468,26 @@ public class AppIo661ApiController {
             });
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(), e.getMessage(), OrderCancelResp.class);
+        }
+    }
+    /**
+     * 根据模板hash查询在售商品
+     * @return
+     */
+    @PostMapping("v2/api/getTemplate")
+    @Operation(summary = "获取模板")
+    @PermitAll
+    public ApiResult<List<V5ItemListVO>> getTemplate(@RequestBody OpenApiReqVo<PageParam> openApiReqVo) {
+        List<V5ItemListVO> ret=new ArrayList<>();
+        try {
+            return DevAccountUtils.tenantExecute(1L, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
+
+                return ApiResult.success(apiOrderService.queryTemplate(openApiReqVo.getData()));
+            });
+        } catch (ServiceException e) {
+            return ApiResult.error(e.getCode(),  e.getMessage(), ret);
         }
     }
 }

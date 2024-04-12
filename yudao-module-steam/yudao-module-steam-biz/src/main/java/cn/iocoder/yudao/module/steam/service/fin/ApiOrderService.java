@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.steam.service.fin;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5ItemListVO;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiSummaryByHashName;
 
@@ -94,4 +96,10 @@ public interface ApiOrderService {
      * @return
      */
     List<ApiSummaryByHashName> summaryByHashName(LoginUser loginUser, List<String> marketHashName);
+    /**
+     * 批量查询模板在售信息
+     * @param param
+     * @return
+     */
+    List<V5ItemListVO> queryTemplate(PageParam param);
 }
