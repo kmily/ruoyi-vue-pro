@@ -713,6 +713,8 @@ public class ApiOrderServiceImpl implements ApiOrderService {
             apiProcessNotifyRemoteReq.setInvStatusText(IvnStatusEnum.findByCode(orderExt.getOrderStatus()).getName());
             apiOrderNotifyDo.setPushRemote(false);
             apiOrderNotifyDo.setPlatCode(orderExt.getPlatCode());
+            apiOrderNotifyDo.setMsg(JacksonUtils.writeValueAsString(apiProcessNotifyRemoteReq));
+            apiOrderNotifyDo.setMessageNo(msgNo);
             apiOrderNotifyMapper.insert(apiOrderNotifyDo);
             rabbitTemplate.convertAndSend("steam","steam_inv_order_notify",apiOrderNotifyDo.getId());
         }
