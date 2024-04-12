@@ -100,8 +100,9 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ApiBuyItemRespVo buyItem(LoginUser loginUser, ApiQueryCommodityReqVo createReqVO,Long orderId) {
-        V5BuyProductVo v5BuyProductVo = new V5BuyProductVo(createReqVO.getCommodityHashName(),createReqVO.getPurchasePrice(),
+        V5BuyProductVo v5BuyProductVo = new V5BuyProductVo(createReqVO.getCommodityHashName(), (double) (createReqVO.getPurchasePrice() / 100),
                 createReqVO.getTradeLinks(),createReqVO.getMerchantNo(),MERCHANT_KEY,0);
+        v5BuyProductVo.setPurchasePrice(v5BuyProductVo.getPurchasePrice() / 100);
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url(API_POST_BUY_V5_PRODUCT_URL);
         HashMap<String,String> headers = new HashMap<>();
