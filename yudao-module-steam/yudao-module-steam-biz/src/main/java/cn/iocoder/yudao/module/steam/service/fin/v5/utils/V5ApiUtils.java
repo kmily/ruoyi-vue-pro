@@ -25,7 +25,7 @@ public class V5ApiUtils {
     public static final String API_POST_V5_PRODUCT_PRICE_URL = "https://delivery.v5item.com/open/api/queryOnSaleInfo";
 
     private static final String API_POST_V5_ORDER_INFO_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
-    private static final String API_POST_BUY_V5_PRODUCT_URL = "https://delivery.v5item.com/open/api/createOrderByMarketHashName";
+//    private static final String API_POST_BUY_V5_PRODUCT_URL = "https://delivery.v5item.com/open/api/createOrderByMarketHashName";
 
     private static final OkHttpClient client = new OkHttpClient();
     private static final Gson gson = new Gson();
@@ -94,35 +94,35 @@ public class V5ApiUtils {
         }
         return "未获取到订单详情";
     }
-    public static V5ProductBuyRes buyV5Product(V5BuyProductVo buyVo) {
-
-        String requestBodyJson = gson.toJson(buyVo);
-        Headers headers = new Headers.Builder()
-                .add("Authorization", TOKEN)
-                .build();
-        Request request = new Request.Builder()
-                .url(API_POST_BUY_V5_PRODUCT_URL)
-                .post(RequestBody.create(MediaType.parse(JSON), requestBodyJson))
-                .headers(headers)
-                .build();
-        // 发送请求并处理响应
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new IOException("购买指定商品失败: " + response);
-            }
-            // 获取响应数据
-            String responseData = null;
-            if (response.body() != null) {
-                responseData = response.body().string();
-                // 关闭响应体
-                response.body().close();
-                // 使用 Gson 将 JSON 字符串转换为对象
-                return gson.fromJson(responseData, V5ProductBuyRes.class);
-            }
-        } catch (IOException e) {
-            log.error("请求购买指定商品时发生异常", e);
-        }
-        return null;
-    }
+//    public static V5ProductBuyRes buyV5Product(V5BuyProductVo buyVo) {
+//
+//        String requestBodyJson = gson.toJson(buyVo);
+//        Headers headers = new Headers.Builder()
+//                .add("Authorization", TOKEN)
+//                .build();
+//        Request request = new Request.Builder()
+//                .url(API_POST_BUY_V5_PRODUCT_URL)
+//                .post(RequestBody.create(MediaType.parse(JSON), requestBodyJson))
+//                .headers(headers)
+//                .build();
+//        // 发送请求并处理响应
+//        try (Response response = client.newCall(request).execute()) {
+//            if (!response.isSuccessful()) {
+//                throw new IOException("购买指定商品失败: " + response);
+//            }
+//            // 获取响应数据
+//            String responseData = null;
+//            if (response.body() != null) {
+//                responseData = response.body().string();
+//                // 关闭响应体
+//                response.body().close();
+//                // 使用 Gson 将 JSON 字符串转换为对象
+//                return gson.fromJson(responseData, V5ProductBuyRes.class);
+//            }
+//        } catch (IOException e) {
+//            log.error("请求购买指定商品时发生异常", e);
+//        }
+//        return null;
+//    }
 
 }

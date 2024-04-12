@@ -68,11 +68,11 @@ public class C5ApiThreeOrderService implements ApiThreeOrderService {
             throw new ServiceException(OpenApiCode.ERR_5201);
         }
 
-        ApiCommodityRespVo query = query(loginUser, createReqVO);
-        if (query != null && query.getPrice() <= createReqVO.getPurchasePrice() ){ //满足C5下单条件
+//        ApiCommodityRespVo query = query(loginUser, createReqVO);
+//        if (query != null && query.getPrice() <= createReqVO.getPurchasePrice() ){ //满足C5下单条件
         // TODO
 //            C5ApiUtils.buyC5Product()
-        }
+//        }
 
         ApiBuyItemRespVo apiBuyItemRespVo=new ApiBuyItemRespVo();
 //        SellingDO sellingDO = sellingMapper.selectById(reqVo.getSellId());
