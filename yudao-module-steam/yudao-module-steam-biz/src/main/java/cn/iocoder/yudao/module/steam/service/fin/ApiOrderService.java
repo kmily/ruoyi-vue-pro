@@ -101,5 +101,5 @@ public interface ApiOrderService {
      * @param param
      * @return
      */
-    List<V5ItemListVO> queryTemplate(PageParam param);
+    V5ItemListVO queryTemplate(PageParam param);
 }

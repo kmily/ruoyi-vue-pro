@@ -326,7 +326,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         }
     }
     @Override
-    public String getItemList(V5page v5page){
+    public V5ItemListVO getItemList(V5page v5page){
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         V5page reqVO = new V5page();
         reqVO.setMerchantKey(MERCHANT_KEY); // 商户密钥
@@ -339,9 +339,9 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         headers.put("Authorization",Trade_Token);
         builder.headers(headers);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
-        String html = sent.html();
-        log.info("html = {}",html);
-        return html;
+        V5ItemListVO json = sent.json(V5ItemListVO.class);
+
+        return json;
     }
 
 }

@@ -96,5 +96,5 @@ public interface ApiThreeOrderService {
     /**
      * V5模板
      */
-    String getItemList(V5page v5page);
+    V5ItemListVO getItemList(V5page v5page);
 }

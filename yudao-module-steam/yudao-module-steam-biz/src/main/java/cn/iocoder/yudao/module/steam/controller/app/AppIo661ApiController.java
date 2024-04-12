@@ -477,8 +477,8 @@ public class AppIo661ApiController {
     @PostMapping("v2/api/getTemplate")
     @Operation(summary = "获取模板")
     @PermitAll
-    public ApiResult<List<V5ItemListVO>> getTemplate(@RequestBody OpenApiReqVo<PageParam> openApiReqVo) {
-        List<V5ItemListVO> ret=new ArrayList<>();
+    public ApiResult<V5ItemListVO> getTemplate(@RequestBody OpenApiReqVo<PageParam> openApiReqVo) {
+        V5ItemListVO ret=new V5ItemListVO();
         try {
             return DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);

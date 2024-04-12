@@ -841,16 +841,16 @@ public class ApiOrderServiceImpl implements ApiOrderService {
     }
 
     @Override
-    public List<V5ItemListVO> queryTemplate(PageParam param) {
+    public V5ItemListVO queryTemplate(PageParam param) {
         Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByPlatCode(PlatCodeEnum.V5);
         if(apiThreeByOrder.isPresent()){
             ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
             V5page v5page=new V5page();
             v5page.setPageIndex(param.getPageNo());
             v5page.setPageNum(param.getPageSize());
-            List<V5ItemListVO> itemList = apiThreeOrderService.getItemList(v5page);
+            V5ItemListVO itemList = apiThreeOrderService.getItemList(v5page);
             return itemList;
         }
-        return Collections.emptyList();
+        return null;
     }
 }
