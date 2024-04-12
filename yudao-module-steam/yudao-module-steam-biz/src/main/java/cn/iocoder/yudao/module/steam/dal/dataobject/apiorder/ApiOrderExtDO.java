@@ -25,8 +25,9 @@ public class ApiOrderExtDO extends BaseDO {
     private Long id;
     /**
      * 购买平台代码
+     * 枚举 {@link cn.iocoder.yudao.module.steam.enums.PlatCodeEnum 对应的类}
      */
-    private Integer platCode;
+    private String platCode;
     /**
      * 第三方平台订单号
      */
