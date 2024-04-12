@@ -77,7 +77,12 @@ public interface ApiOrderService {
 
 
     void processNotify(String jsonData, PlatCodeEnum platCodeEnum,String msgNo);
-    void pushRemote(NotifyReq notifyReq);
+
+    /**
+     * 推送到栽种
+     * @param notifyId
+     */
+    void pushRemote(Long notifyId);
     /**
      * 关闭订单,
      * 用于未支持的订单进行关闭,并释放库存

@@ -699,7 +699,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         }
     }
     @Override
-    public void pushRemote(NotifyReq notifyReq) {
+    public void pushRemote(Long notifyId) {
         String callBackInfo = notifyReq.getCallBackInfo();
         NotifyVo notifyVo = JacksonUtils.readValue(callBackInfo, NotifyVo.class);
 
