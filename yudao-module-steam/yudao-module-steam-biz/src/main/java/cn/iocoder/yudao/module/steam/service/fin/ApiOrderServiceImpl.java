@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
+import cn.iocoder.yudao.module.steam.controller.app.vo.api.AppBatchGetOnSaleCommodityInfoRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
@@ -25,6 +26,7 @@ import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderNotifyMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.devaccount.DevAccountMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingHashSummary;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyounotify.YouyouNotifyMapper;
 import cn.iocoder.yudao.module.steam.enums.*;
 import cn.iocoder.yudao.module.steam.service.SteamService;
@@ -51,6 +53,7 @@ import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
@@ -160,6 +163,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         ApiOrderDO orderDO=new ApiOrderDO()
                 //设置买家
                 .setBuyUserId(loginUser.getId()).setBuyUserType(loginUser.getUserType())
+                .setBuyMethod(reqVo.getPlatform().getCode())
                 .setBuyBindUserId(buyBindUserDO.getId()).setBuySteamId(buyBindUserDO.getSteamId()).setBuyTradeLinks(buyBindUserDO.getTradeUrl())
                 //设置卖家信息
                 //服务费账号
@@ -201,6 +205,8 @@ public class ApiOrderServiceImpl implements ApiOrderService {
             }
         }
     }
+
+
     /**
      * 释放库存
      * 已经支付的订单退还库存
@@ -792,5 +798,37 @@ public class ApiOrderServiceImpl implements ApiOrderService {
                 }
             }
         }
+    }
+
+    @Override
+    public List<ApiSummaryByHashName> summaryByHashName(LoginUser loginUser,List<String> marketHashName) {
+        Map<String,ApiSummaryByHashName> ret=new HashMap<>();
+        for (String item:marketHashName) {
+            for (PlatCodeEnum value : PlatCodeEnum.values()) {
+                Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByPlatCode(value);
+                if(!apiThreeByOrder.isPresent()){
+                    continue;
+                }
+                ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
+
+                ApiCommodityRespVo tmpQuery = apiThreeOrderService.query(loginUser, new ApiQueryCommodityReqVo().setCommodityHashName(item));
+                if(Objects.nonNull(tmpQuery) && Objects.nonNull(tmpQuery.getIsSuccess()) && tmpQuery.getIsSuccess()){
+                    if(Objects.isNull(ret.get(item))){
+                        ApiSummaryByHashName apiSummaryByHashName=new ApiSummaryByHashName();
+                        apiSummaryByHashName.setMarketHashName(item);
+                        apiSummaryByHashName.setPrice(tmpQuery.getPrice());
+                        ret.put(item,apiSummaryByHashName);
+                    }
+                    ApiSummaryByHashName apiSummaryByHashName = ret.get(item);
+                    if(tmpQuery.getPrice()<apiSummaryByHashName.getPrice()){
+                        ApiSummaryByHashName apiSummaryByHashName1 = ret.get(item);
+                        apiSummaryByHashName1.setPrice(tmpQuery.getPrice());
+                        break;
+                    }
+                }
+            }
+        }
+        List<ApiSummaryByHashName> collect = ret.entrySet().stream().map(item -> item.getValue()).collect(Collectors.toList());
+        return collect;
     }
 }
