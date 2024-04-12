@@ -104,6 +104,9 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                 createReqVO.getTradeLinks(),createReqVO.getMerchantNo(),MERCHANT_KEY,0);
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url(API_POST_BUY_V5_PRODUCT_URL);
+        HashMap<String,String> headers = new HashMap<>();
+        headers.put("Authorization",Trade_Token);
+        builder.headers(headers);
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(v5BuyProductVo);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
