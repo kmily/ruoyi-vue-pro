@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
-@Component
+//@Component
 @Slf4j
-@RabbitListener(queues = "steam_order")
+//@RabbitListener(queues = "steam_order")
 public class NotifyOrderConsumer {
     @Resource
     private UUOrderService uuOrderService;
