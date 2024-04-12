@@ -301,7 +301,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
      */
     @Override
     public ApiProcessNotifyResp processNotify(String jsonData, String msgNo) {
-        V5callBackResult v5respVO = JacksonUtils.readValue(JacksonUtils.writeValueAsString(jsonData), V5callBackResult.class);
+        V5callBackResult v5respVO = JacksonUtils.readValue(jsonData, V5callBackResult.class);
         String callBackInfo = v5respVO.getCallBackInfo();
         CallBackInfoVO callBackInfoVO = JacksonUtils.readValue(callBackInfo, CallBackInfoVO.class);
         ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
