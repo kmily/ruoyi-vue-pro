@@ -21,6 +21,7 @@ import cn.iocoder.yudao.module.steam.service.fin.vo.*;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import com.google.gson.Gson;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@Slf4j
 public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
     @Resource
@@ -163,7 +165,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         apiOrderExtDO.setOrderNo(String.valueOf(orderNo));
         apiOrderExtDO.setOrderSubStatus(String.valueOf(v5OrderDetailRes.getData().getOrderStatus()));
         apiOrderExtDO.setOrderInfo(v5OrderInfo);
-        apiOrderExtMapper.updateById(apiOrderExtDO.setOrderInfo(v5OrderInfo));
+        apiOrderExtMapper.updateById(apiOrderExtDO);
 
         return v5OrderInfo;//TODO 待调试
     }

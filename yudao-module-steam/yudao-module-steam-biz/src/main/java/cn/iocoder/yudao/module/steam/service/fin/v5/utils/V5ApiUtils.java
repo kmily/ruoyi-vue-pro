@@ -25,7 +25,7 @@ public class V5ApiUtils {
     private static final String MERCHANT_KEY = "529606f226e6461ca5bac93047976177";
     public static final String API_POST_V5_PRODUCT_PRICE_URL = "https://delivery.v5item.com/open/api/queryOnSaleInfo";
 
-    private static final String API_POST_V5_ORDER_INFO_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
+    private static final String API_POST_V5_ORDER_INFO_URL = "https://delivery.v5item.com/open/api/queryOrderDetailInfo";
 //    private static final String API_POST_BUY_V5_PRODUCT_URL = "https://delivery.v5item.com/open/api/createOrderByMarketHashName";
 
     private static final OkHttpClient client = new OkHttpClient();
