@@ -97,7 +97,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ApiBuyItemRespVo buyItem(LoginUser loginUser, ApiQueryCommodityReqVo createReqVO,Long orderId) {
-        V5BuyProductVo v5BuyProductVo = new V5BuyProductVo(createReqVO.getCommodityHashName(), (double) (createReqVO.getPurchasePrice() / 100),
+        V5BuyProductVo v5BuyProductVo = new V5BuyProductVo(createReqVO.getCommodityHashName(), new BigDecimal(Double.toString(createReqVO.getPurchasePrice())).divide(new BigDecimal("100")),
                 createReqVO.getTradeLinks(),createReqVO.getMerchantNo(),MERCHANT_KEY,0);
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url(API_POST_BUY_V5_PRODUCT_URL);
@@ -120,11 +120,9 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                     }
                     apiBuyItemRespVo.setIsSuccess(true);
                     apiBuyItemRespVo.setErrorCode(OpenApiCode.OK);
-//                    apiBuyItemRespVo.setTradeOfferId(null);
                     ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
-                    apiOrderExtDO.setPlatCode(createReqVO.getPlatform().getCode());
+                    apiOrderExtDO.setPlatCode(PlatCodeEnum.V5.getName());
                     apiOrderExtDO.setOrderNo(apiBuyItemRespVo.getOrderNo());
-                    apiOrderExtDO.setTradeOfferId(Long.valueOf(apiBuyItemRespVo.getTradeOfferId()));
                     apiOrderExtDO.setTradeOfferLinks(createReqVO.getTradeLinks());
                     apiOrderExtDO.setOrderId(orderId);
                     apiOrderExtDO.setOrderInfo(sent.html());
@@ -302,7 +300,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
     @Override
     public ApiProcessNotifyResp processNotify(String jsonData, String msgNo) {
-
+        return null;
     }
 
 }
