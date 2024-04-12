@@ -537,8 +537,11 @@ public class ApiOrderServiceImpl implements ApiOrderService {
                 );
             }
         }
-        ApiOrderExtDO orderExt = getOrderExt(apiOrderDO.getOrderNo(), apiOrderDO.getId());
         if(Objects.isNull(apiOrderDO)){
+            throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
+        }
+        ApiOrderExtDO orderExt = getOrderExt(apiOrderDO.getThreeOrderNo(), apiOrderDO.getId());
+        if(Objects.isNull(orderExt)){
             throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
         }
         Io661OrderInfoResp.Io661OrderInfoRespBuilder builder = Io661OrderInfoResp.builder();
