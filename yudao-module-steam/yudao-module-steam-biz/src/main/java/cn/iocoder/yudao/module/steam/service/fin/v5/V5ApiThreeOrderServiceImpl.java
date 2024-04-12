@@ -29,11 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -54,7 +50,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             "muMvjQl6dDEYlmIPbWUWG802FogW8hrSMyQQaUamnPqNN9vzA6ag4pgcbQCp-qAiWx1x832M9YsTQbaVh2vQ-keqhBeDk2UodZOPeB0tP3jk" +
             "R68--zqjz73Sij5ctEY-6hYxtX3Yg-Z65tGj5erMNDGjbjGU7a_Caa7rnrtSG-K1Esw";
 
-    public static final String API_POST_V5_PRODUCT_PRICE_URL = "https://delivery.v5item.com/open/api/queryOnSaleInfo";
+    public static final String V5_GetItem_URL = "https://delivery.v5item.com/open/api/getItemList";
 
 
     private static final String API_POST_V5_ORDER_INFO_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
@@ -330,8 +326,22 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         }
     }
     @Override
-    public V5ItemListVO getItemList(){
-        return null;
+    public String getItemList(V5page v5page){
+        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+        V5page reqVO = new V5page();
+        reqVO.setMerchantKey(MERCHANT_KEY); // 商户密钥
+        reqVO.setPageNum(v5page.getPageNum());
+        reqVO.setPageIndex(v5page.getPageIndex());
+        builder.url(V5_GetItem_URL);
+        builder.method(HttpUtil.Method.JSON);
+        builder.postObject(reqVO);
+        HashMap<String,String> headers = new HashMap<>();
+        headers.put("Authorization",Trade_Token);
+        builder.headers(headers);
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
+        String html = sent.html();
+        log.info("html = {}",html);
+        return html;
     }
 
 }
