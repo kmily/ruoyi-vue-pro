@@ -18,11 +18,13 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderExtDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderNotifyDo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyounotify.YouyouNotifyDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderNotifyMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.devaccount.DevAccountMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyounotify.YouyouNotifyMapper;
 import cn.iocoder.yudao.module.steam.enums.ErrorCodeConstants;
@@ -30,10 +32,7 @@ import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
 import cn.iocoder.yudao.module.steam.service.SteamService;
-import cn.iocoder.yudao.module.steam.service.fin.vo.ApiBuyItemRespVo;
-import cn.iocoder.yudao.module.steam.service.fin.vo.ApiCommodityRespVo;
-import cn.iocoder.yudao.module.steam.service.fin.vo.ApiOrderCancelRespVo;
-import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
+import cn.iocoder.yudao.module.steam.service.fin.vo.*;
 import cn.iocoder.yudao.module.steam.service.steam.InvSellCashStatusEnum;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import cn.iocoder.yudao.module.steam.service.uu.UUService;
@@ -653,10 +652,23 @@ public class ApiOrderServiceImpl implements ApiOrderService {
     @Override
     public void processNotify(String jsonData,PlatCodeEnum platCodeEnum,String msgNo) {
         log.info("回调接收的数据{}",jsonData);
+
         Optional<ApiThreeOrderService> apiThreeByPlatCode = getApiThreeByPlatCode(platCodeEnum);
         if(apiThreeByPlatCode.isPresent()){
             ApiThreeOrderService apiThreeOrderService = apiThreeByPlatCode.get();
-            Long aLong = apiThreeOrderService.processNotify(jsonData, msgNo);
+            ApiProcessNotifyResp apiProcessNotifyResp = apiThreeOrderService.processNotify(jsonData, msgNo);
+            ApiOrderExtDO orderExt = getOrderExt(apiProcessNotifyResp.getOrderNo(), apiProcessNotifyResp.getOrderId());
+            ApiOrderNotifyDo apiOrderNotifyDo=new ApiOrderNotifyDo();
+            apiOrderNotifyDo.setPlatCode(PlatCodeEnum.valueOf(orderExt.getPlatCode()).getCode());
+            switch (orderExt.getOrderStatus()){
+                case 1:
+
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+            }
 
         }
     }
