@@ -10,8 +10,9 @@ import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.fin.ApiThreeOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.c5.res.ProductPriceInfoRes;
 import cn.iocoder.yudao.module.steam.service.fin.c5.utils.C5ApiUtils;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5ItemListVO;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5page;
 import cn.iocoder.yudao.module.steam.service.fin.vo.*;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -111,7 +112,17 @@ public class C5ApiThreeOrderService implements ApiThreeOrderService {
     }
 
     @Override
+    public ApiOrderCancelRespVo releaseIvn(LoginUser loginUser, String orderNo, Long orderId) {
+        return ApiThreeOrderService.super.releaseIvn(loginUser, orderNo, orderId);
+    }
+
+    @Override
     public ApiProcessNotifyResp processNotify(String jsonData, String msgNo) {
+        return null;
+    }
+
+    @Override
+    public V5ItemListVO getItemList(V5page v5page) {
         return null;
     }
 
