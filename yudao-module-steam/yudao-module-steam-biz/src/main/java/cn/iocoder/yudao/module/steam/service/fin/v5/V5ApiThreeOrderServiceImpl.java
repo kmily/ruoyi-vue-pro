@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderExtDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderMapper;
+import cn.iocoder.yudao.module.steam.enums.IvnStatusEnum;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.service.fin.ApiThreeOrderService;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.sql.Wrapper;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -171,7 +173,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     /**
      * 查询商品信息
      * @param loginUser 订单用户
-     * @param orderNo  第三方 订单号
+     * @param orderNo  v5 订单号
      * @param orderId  主订单ID
      * @return 买家的订单
      */
@@ -201,7 +203,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         apiOrderExtDO.setOrderId(orderId);
         apiOrderExtDO.setOrderInfo(JacksonUtils.writeValueAsString(data));
         apiOrderExtDO.setCommodityInfo(JacksonUtils.writeValueAsString(readValue.getItemInfo()));
-        apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderId,orderId));
+        apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderNo,orderNo));
         return JacksonUtils.writeValueAsString(data);
     }
 
@@ -234,12 +236,12 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
         apiOrderExtDO.setOrderId(orderId);
         apiOrderExtDO.setOrderSubStatus(String.valueOf(respVO.getStatus()));
-        apiOrderExtDO.setOrderStatus(1);
+        apiOrderExtDO.setOrderStatus(IvnStatusEnum.ACTIONING.getCode());
         if(respVO.getStatus() == 3){
-            apiOrderExtDO.setOrderStatus(2);
+            apiOrderExtDO.setOrderStatus(IvnStatusEnum.DONE.getCode());
         }
         if(respVO.getStatus() == 4){
-            apiOrderExtDO.setOrderStatus(3);
+            apiOrderExtDO.setOrderStatus(IvnStatusEnum.CANCEL.getCode());
         }
         // 更新订单状态
         apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderNo,orderNo));
@@ -285,7 +287,6 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             apiOrderExtDO.setOrderStatus(3);
         }
         // 更新订单状态
-//        apiOrderMapper.updateById(apiOrderDO);
         apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderNo,orderNo));
         return respVo;
     }
