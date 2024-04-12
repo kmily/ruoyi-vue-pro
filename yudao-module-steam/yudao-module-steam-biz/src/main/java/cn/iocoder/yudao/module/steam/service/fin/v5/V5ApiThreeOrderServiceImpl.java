@@ -5,39 +5,34 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
-import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderExtDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderMapper;
-
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.service.fin.ApiThreeOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5OrderDetailRes;
-import cn.iocoder.yudao.module.steam.service.fin.v5.utils.V5Login;
 import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductBuyRes;
-import cn.iocoder.yudao.module.steam.service.fin.v5.vo.*;
 import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductPriceInfoRes;
 import cn.iocoder.yudao.module.steam.service.fin.v5.utils.V5ApiUtils;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.*;
 import cn.iocoder.yudao.module.steam.service.fin.vo.*;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
-import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.google.gson.Gson;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-
-
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
-    @Resource
-    private ApiOrderMapper apiOrderMapper;
     @Resource
     private ApiOrderExtMapper apiOrderExtMapper;
 
