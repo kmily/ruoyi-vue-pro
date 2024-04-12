@@ -626,7 +626,7 @@ public class IOInvUpdateService {
                     otherSellingDO.setMarketName(items.getWeaponInfo().getItemName());
                     otherSellingDO.setMarketHashName(items.getWeaponInfo().getMarketHashName());
                     otherSellingDO.setPlatformIdentity(OtherSellingStatusEnum.V5.getStatus());
-                    otherSellingDO.setPrice((int) (items.getSalePrice() * 1.11 * 100));
+                    otherSellingDO.setPrice((int) (items.getSalePrice() * 1.03 * 100));
                     otherSellingDO.setSelExterior(response2_.getData().getItemInfo().getItemExteriorName());
                     otherSellingDO.setSelQuality(response2_.getData().getItemInfo().getItemQualityName());
                     otherSellingDO.setSelRarity(response2_.getData().getItemInfo().getItemRarityName());
