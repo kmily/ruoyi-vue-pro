@@ -24,6 +24,7 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.youyounotify.YouyouNotifyDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderNotifyMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.devaccount.DevAccountMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.youyounotify.YouyouNotifyMapper;
 import cn.iocoder.yudao.module.steam.enums.*;
@@ -114,6 +115,9 @@ public class ApiOrderServiceImpl implements ApiOrderService {
 
     @Resource
     private ApiOrderExtMapper apiOrderExtMapper;
+
+    @Resource
+    private ApiOrderNotifyMapper apiOrderNotifyMapper;
 
     @Resource
     private YouyouNotifyMapper youyouNotifyMapper;
@@ -651,49 +655,47 @@ public class ApiOrderServiceImpl implements ApiOrderService {
 
         Optional<ApiThreeOrderService> apiThreeByPlatCode = getApiThreeByPlatCode(platCodeEnum);
         if(apiThreeByPlatCode.isPresent()){
-
-
-
             ApiThreeOrderService apiThreeOrderService = apiThreeByPlatCode.get();
             ApiProcessNotifyResp apiProcessNotifyResp = apiThreeOrderService.processNotify(jsonData, msgNo);
             ApiOrderDO orderDO = getOrderById(apiProcessNotifyResp.getOrderId());
+            ApiOrderDO updateOrder = new ApiOrderDO();
+            updateOrder.setId(apiProcessNotifyResp.getOrderId());
             ApiOrderExtDO orderExt = getOrderExt(apiProcessNotifyResp.getOrderNo(), apiProcessNotifyResp.getOrderId());
+
+            if(PayOrderStatusEnum.isSuccess(orderDO.getPayOrderStatus())){
+                updateOrder.setOrderStatus(2);
+                if(orderExt.getOrderStatus().equals("2")){
+                    updateOrder.setOrderStatus(3);
+                }
+            }
+            //回写订单状态
+            apiOrderMapper.updateById(updateOrder);
+
+
+            ApiOrderDO newOrder = getOrderById(apiProcessNotifyResp.getOrderId());
+
+
+
+
+
             ApiOrderNotifyDo apiOrderNotifyDo=new ApiOrderNotifyDo();
             apiOrderNotifyDo.setPlatCode(PlatCodeEnum.valueOf(orderExt.getPlatCode()).getCode());
             ApiProcessNotifyRemoteReq apiProcessNotifyRemoteReq=new ApiProcessNotifyRemoteReq();
-            apiProcessNotifyRemoteReq.setOrderNo(orderDO.getOrderNo());
-            apiProcessNotifyRemoteReq.setMerchantNo(orderDO.getMerchantNo());
-            if(!PayOrderStatusEnum.isSuccess(orderDO.getPayOrderStatus())){
-                //已支付
-                apiProcessNotifyRemoteReq.setOrderStatus(1);
-            }else{
-                apiProcessNotifyRemoteReq.setOrderStatus(2);
-                if(orderExt.getOrderStatus().equals("2")){
-                    apiProcessNotifyRemoteReq.setOrderStatus(3);
-                }
-            }
-            apiProcessNotifyRemoteReq.setPayOrderStatus(orderDO.getPayOrderStatus());
+            apiProcessNotifyRemoteReq.setOrderNo(newOrder.getOrderNo());
+            apiProcessNotifyRemoteReq.setMerchantNo(newOrder.getMerchantNo());
+            apiProcessNotifyRemoteReq.setOrderStatus(newOrder.getOrderStatus());
+            apiProcessNotifyRemoteReq.setPayOrderStatus(newOrder.getPayOrderStatus());
 
-            apiProcessNotifyRemoteReq.setPayOrderStatusText(PayOrderStatusEnum.findByStatus(orderDO.getPayOrderStatus()).getName());
+            apiProcessNotifyRemoteReq.setPayOrderStatusText(PayOrderStatusEnum.findByStatus(newOrder.getPayOrderStatus()).getName());
             apiProcessNotifyRemoteReq.setCashStatus(orderDO.getCashStatus());
-            apiProcessNotifyRemoteReq.setCashStatusText(InvSellCashStatusEnum.findByStatus(orderDO.getCashStatus()).getName());
+            apiProcessNotifyRemoteReq.setCashStatusText(InvSellCashStatusEnum.findByStatus(newOrder.getCashStatus()).getName());
 
 
             apiProcessNotifyRemoteReq.setInvStatus(orderExt.getOrderStatus());
             apiProcessNotifyRemoteReq.setInvStatusText(IvnStatusEnum.findByCode(orderExt.getOrderStatus()).getName());
-
-
-
-            switch (orderExt.getOrderStatus()){
-                case 1:
-
-                    break;
-                case 2:
-                    break;
-                case 3:
-                    break;
-            }
-
+            apiOrderNotifyDo.setPushRemote(false);
+            apiOrderNotifyDo.setPlatCode(orderExt.getPlatCode());
+            apiOrderNotifyMapper.insert(apiOrderNotifyDo);
         }
     }
     @Override
