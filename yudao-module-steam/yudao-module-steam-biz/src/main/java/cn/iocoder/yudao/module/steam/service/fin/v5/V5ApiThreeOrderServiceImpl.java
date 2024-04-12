@@ -203,7 +203,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         V5queryCommodityDetailRespVO.OrderDetailInfo readValue = JacksonUtils.readValue(JacksonUtils.writeValueAsString(data), V5queryCommodityDetailRespVO.OrderDetailInfo.class);
         ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
         apiOrderExtDO.setOrderId(orderId);
-        apiOrderExtDO.setOrderInfo(JacksonUtils.writeValueAsString(data));
+//        apiOrderExtDO.setOrderInfo(JacksonUtils.writeValueAsString(data));
         apiOrderExtDO.setCommodityInfo(JacksonUtils.writeValueAsString(readValue.getItemInfo()));
         apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderNo,orderNo));
         return JacksonUtils.writeValueAsString(data);
