@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 @Service
@@ -51,6 +52,9 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             "R68--zqjz73Sij5ctEY-6hYxtX3Yg-Z65tGj5erMNDGjbjGU7a_Caa7rnrtSG-K1Esw";
 
     public static final String V5_GetItem_URL = "https://delivery.v5item.com/open/api/getItemList";
+    public static final BigDecimal NO1 = new BigDecimal("1.02");
+    public static final BigDecimal NO2 = new BigDecimal("0.998");
+    public static final BigDecimal NO3 = new BigDecimal("100");
 
 
     private static final String API_POST_V5_ORDER_INFO_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
@@ -74,7 +78,10 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         if (data != null && !data.isEmpty()) {
             // 获取第一个 ProductData 对象
             V5ProductPriceInfoRes.V5ProductPriceInfoResponse.V5ProductData productData = data.get(0);
-            apiCommodityRespVo.setPrice(BigDecimal.valueOf(productData.getMinSellPrice()).multiply(BigDecimal.valueOf(100)).intValue());
+            int i = BigDecimal.valueOf(productData.getMinSellPrice()).multiply(NO1)
+                    .multiply(NO2).multiply(NO3).intValue();
+            apiCommodityRespVo.setPrice(i);
+            log.info("经过计算返回v5的最低价为："+ i);
             apiCommodityRespVo.setIsSuccess(true);
             apiCommodityRespVo.setPlatCode(PlatCodeEnum.V5);
             return apiCommodityRespVo;
@@ -92,7 +99,13 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ApiBuyItemRespVo buyItem(LoginUser loginUser, ApiQueryCommodityReqVo createReqVO,Long orderId) {
-        V5BuyProductVo v5BuyProductVo = new V5BuyProductVo(createReqVO.getCommodityHashName(), new BigDecimal(Double.toString(createReqVO.getPurchasePrice())).divide(new BigDecimal("100")),
+        BigDecimal divide = new BigDecimal(Double.toString(createReqVO.getPurchasePrice()))
+                .divide(NO1, 7, RoundingMode.HALF_UP)
+                .divide(NO2, 7, RoundingMode.HALF_UP)
+                .divide(NO3, 7, RoundingMode.HALF_UP)
+                .setScale(2, RoundingMode.HALF_UP);
+        log.info("经过计算购买价格为："+ divide);
+        V5BuyProductVo v5BuyProductVo = new V5BuyProductVo(createReqVO.getCommodityHashName(), divide,
                 createReqVO.getTradeLinks(),createReqVO.getMerchantNo(),MERCHANT_KEY,createReqVO.getFastShipping());
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url(API_POST_BUY_V5_PRODUCT_URL);
