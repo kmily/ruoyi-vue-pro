@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.steam.service.fin.v5.utils;
 
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.steam.service.fin.c5.res.ProductBuyRes;
 import cn.iocoder.yudao.module.steam.service.fin.c5.res.ProductPriceInfoRes;
 import cn.iocoder.yudao.module.steam.service.fin.c5.vo.C5FastPayVo;
@@ -81,7 +82,7 @@ public class V5ApiUtils {
                 .build();
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                throw new IOException("请求订单详情失败: " + response);
+                throw new ServiceException( -1,"请求订单详情失败");
             }
             if (response.body() != null) {
                 String string = response.body().string();
@@ -91,6 +92,7 @@ public class V5ApiUtils {
             }
         } catch (IOException e) {
             log.error("请求订单详情时发生异常", e);
+            throw new ServiceException( -1,"请求订单详情时发生异常");
         }
         return "未获取到订单详情";
     }
