@@ -16,11 +16,7 @@ import cn.iocoder.yudao.module.steam.service.fin.ApiThreeOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5OrderDetailRes;
 import cn.iocoder.yudao.module.steam.service.fin.v5.utils.V5Login;
 import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductBuyRes;
-import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5BuyProductVo;
-import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5cancelOrderRespVO;
-import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5queryCommodityDetailRespVO;
-import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5queryOrderStatusReqVO;
-import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5queryOrderStatusRespVO;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.*;
 import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductPriceInfoRes;
 import cn.iocoder.yudao.module.steam.service.fin.v5.utils.V5ApiUtils;
 import cn.iocoder.yudao.module.steam.service.fin.vo.*;
@@ -123,6 +119,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                     ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
                     apiOrderExtDO.setPlatCode(PlatCodeEnum.V5.getName());
                     apiOrderExtDO.setOrderNo(apiBuyItemRespVo.getOrderNo());
+                    apiOrderExtDO.setTradeOfferId(Long.valueOf(apiBuyItemRespVo.getTradeOfferId()));
                     apiOrderExtDO.setTradeOfferLinks(createReqVO.getTradeLinks());
                     apiOrderExtDO.setOrderId(orderId);
                     apiOrderExtDO.setOrderInfo(sent.html());
@@ -291,7 +288,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         apiOrderDO.setOrderSubStatus(Integer.valueOf(respVO.getStatus()));
         ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
         apiOrderExtDO.setOrderId(orderId);
-        apiOrderExtDO.setOrderSubStatus(Integer.valueOf(respVO.getStatus()));
+        apiOrderExtDO.setOrderSubStatus(respVO.getStatus());
         if(Integer.parseInt(respVO.getStatus()) == 0){
             apiOrderExtDO.setOrderStatus(3);
         }
@@ -301,9 +298,26 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         return respVo;
     }
 
+
+    /**
+     * V5订单服务器回调
+     *
+     * @param jsonData V5回调接口
+     * @return
+     */
     @Override
     public ApiProcessNotifyResp processNotify(String jsonData, String msgNo) {
-        return null;
+        V5callBackResult v5respVO = JacksonUtils.readValue(JacksonUtils.writeValueAsString(jsonData), V5callBackResult.class);
+        ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
+        apiOrderExtDO.setOrderNo(v5respVO.getCallBackInfo().getOrderNo());
+        // 更新订单小状态
+        apiOrderExtDO.setOrderSubStatus(String.valueOf(v5respVO.getCallBackInfo().getOrderStatus()));
+        apiOrderExtMapper.update(apiOrderExtDO, new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderNo, v5respVO.getCallBackInfo().getOrderNo()));
+        ApiOrderExtDO apiOrderExtDO1 = apiOrderExtMapper.selectOne(ApiOrderExtDO::getOrderNo, v5respVO.getCallBackInfo().getOrderNo());
+        ApiProcessNotifyResp respVo = new ApiProcessNotifyResp();
+        respVo.setOrderId(apiOrderExtDO1.getOrderId());
+        respVo.setOrderNo(v5respVO.getCallBackInfo().getOrderNo());
+        return respVo;
     }
 
 }
