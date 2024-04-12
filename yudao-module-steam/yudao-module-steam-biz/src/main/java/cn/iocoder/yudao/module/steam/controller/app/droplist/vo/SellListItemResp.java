@@ -11,4 +11,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class SellListItemResp extends SellingDO implements Serializable {
     private MemberUserRespDTO memberUserRespDTO;
+
+    private Integer sendType;
 }

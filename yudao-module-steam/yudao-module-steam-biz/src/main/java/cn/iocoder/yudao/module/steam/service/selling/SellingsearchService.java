@@ -91,6 +91,7 @@ public class SellingsearchService {
             memberUserRespDTO.setCreateTime(LocalDateTime.now());
             memberUserRespDTO.setLevelId(999l);
             item.setMemberUserRespDTO(memberUserRespDTO);
+            item.setSendType(0);
         }
         return sellingPageReqVOPageResult;
     }
@@ -211,8 +212,8 @@ public class SellingsearchService {
             memberUserRespDTO.setCreateTime(LocalDateTime.now());
             memberUserRespDTO.setLevelId(999l);
             item.setMemberUserRespDTO(memberUserRespDTO);
+            item.setSendType(0);
         }
-
 
         List<SellListItemResp> otherSellingDOPageResultA = new ArrayList<SellListItemResp>();
         for (OtherSellingDO element : otherSellingDOPageResult) {
@@ -236,6 +237,7 @@ public class SellingsearchService {
             memberUserRespDTO1.setCreateTime(LocalDateTime.now());
             memberUserRespDTO1.setLevelId(999l);
             otherSellingListDo1.setMemberUserRespDTO(memberUserRespDTO1);
+            otherSellingListDo1.setSendType(1);
             otherSellingDOPageResultA.add(otherSellingListDo1);
         }
 
