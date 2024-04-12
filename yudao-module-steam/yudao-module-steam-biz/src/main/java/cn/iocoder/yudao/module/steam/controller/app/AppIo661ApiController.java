@@ -8,7 +8,6 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.infra.controller.admin.config.vo.ConfigSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
@@ -38,20 +37,16 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.bindipaddress.BindIpaddressD
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
-import cn.iocoder.yudao.module.steam.dal.mysql.binduser.BindUserMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingHashSummary;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.enums.PlatFormEnum;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
-import cn.iocoder.yudao.module.steam.service.binduser.BindUserService;
 import cn.iocoder.yudao.module.steam.service.fin.ApiOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
-import cn.iocoder.yudao.module.steam.service.fin.v5.vo.CallBackInfoVO;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5callBackResult;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
+import cn.iocoder.yudao.module.steam.service.fin.vo.ApiSummaryByHashName;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewExtService;
 import cn.iocoder.yudao.module.steam.service.selling.SellingsearchService;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
@@ -61,7 +56,6 @@ import cn.iocoder.yudao.module.steam.service.uu.OpenApiService;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReSpVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.service.uu.vo.ApiPayWalletRespVO;
-import cn.iocoder.yudao.module.steam.service.uu.vo.notify.NotifyReq;
 import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import com.google.common.collect.Maps;
@@ -422,5 +416,32 @@ public class AppIo661ApiController {
                 new KeyValue<>("flag", true)
         )));
         return ret;
+    }
+    /**
+     * 根据模板hash查询在售商品
+     * @return
+     */
+    @PostMapping("v2/api/batchGetPriceByTemplate")
+    @Operation(summary = "根据模板hash查询在售商品")
+    @PermitAll
+    public ApiResult<List<ApiSummaryByHashName>> batchGetPriceByTemplateV2(@RequestBody OpenApiReqVo<AppBatchGetOnSaleCommodityInfoReqVO> openApiReqVo) {
+        List<ApiSummaryByHashName> ret=new ArrayList<>();
+        try {
+            return DevAccountUtils.tenantExecute(1L, () -> {
+                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
+                if(Objects.isNull(openApiReqVo.getData().getRequestList()) || openApiReqVo.getData().getRequestList().size()<=0){
+                    throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
+                }
+                List<AppBatchGetOnSaleCommodityInfoReqVO.RequestListDTO> requestList = openApiReqVo.getData().getRequestList();
+                if(requestList.size()>=20){
+                    throw new ServiceException(OpenApiCode.TO_MANY_ITEM);
+                }
+                List<String> collect = openApiReqVo.getData().getRequestList().stream().map(AppBatchGetOnSaleCommodityInfoReqVO.RequestListDTO::getMarketHashName).collect(Collectors.toList());
+                return ApiResult.success(apiOrderService.summaryByHashName(loginUser,collect));
+            });
+        } catch (ServiceException e) {
+            return ApiResult.error(e.getCode(),  e.getMessage(), ret);
+        }
     }
 }
