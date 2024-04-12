@@ -56,11 +56,15 @@ public class AlipayAQFController {
      */
     @GetMapping("/userQuerySign")
     public CommonResult userQuerySign() throws AlipayApiException, JsonProcessingException, ParseException {
-        SteamAlipayAqfSignDO steamAlipayAqfSignDO = steamAlipayAqfSignMapper.selectOne(new QueryWrapper<SteamAlipayAqfSignDO>()
-                .eq("create_user_id", SecurityFrameworkUtils.getLoginUserId())
+        Optional<SteamAlipayAqfSignDO> first = steamAlipayAqfSignMapper.selectList(new LambdaQueryWrapperX<SteamAlipayAqfSignDO>()
+                        .eq(SteamAlipayAqfSignDO::getCreateUserId, SecurityFrameworkUtils.getLoginUserId())
 //                .eq("status", "NORMAL")
-        );
+        ).stream().findFirst();
+        if(!first.isPresent()){
+            return CommonResult.success(Collections.emptyList());
+        }
 
+        SteamAlipayAqfSignDO steamAlipayAqfSignDO = first.get();
 
         PayChannelDO channel = channelService.getChannel(58L);
         // 支付渠道构建
