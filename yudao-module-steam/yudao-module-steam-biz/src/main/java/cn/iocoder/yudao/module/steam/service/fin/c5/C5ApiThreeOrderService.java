@@ -111,7 +111,7 @@ public class C5ApiThreeOrderService implements ApiThreeOrderService {
     }
 
     @Override
-    public void processNotify(String jsonData, String msgNo) {
+    public Long processNotify(String jsonData, String msgNo) {
 
     }
 

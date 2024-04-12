@@ -402,10 +402,12 @@ public class AppIo661ApiController {
     public CommonResult<Map<String, Object>> notify(@RequestBody Map<String,Object> notifyReq, @PathVariable String platCode) {
         DevAccountUtils.tenantExecute(1L, () -> {
             PlatCodeEnum platCodeEnum = PlatCodeEnum.valueOf(platCode);
+            String jackSon = JacksonUtils.writeValueAsString(notifyReq);
             switch(platCodeEnum){
                 case C5:
                     break;
                 case V5:
+
                     V5callBackResult v5callBackResult = JacksonUtils.readValue(JacksonUtils.writeValueAsString(notifyReq), V5callBackResult.class);
                     apiOrderService.processNotify(JacksonUtils.writeValueAsString(notifyReq),platCodeEnum,v5callBackResult.getNotifyMsgNo());
                 default:

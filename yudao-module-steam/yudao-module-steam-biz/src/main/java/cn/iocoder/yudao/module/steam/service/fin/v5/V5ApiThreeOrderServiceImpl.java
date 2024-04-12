@@ -304,7 +304,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     }
 
     @Override
-    public void processNotify(String jsonData, String msgNo) {
+    public Long processNotify(String jsonData, String msgNo) {
 
     }
 
