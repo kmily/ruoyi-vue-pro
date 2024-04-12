@@ -164,7 +164,8 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         Gson gson = new Gson();
         V5OrderDetailRes v5OrderDetailRes = gson.fromJson(v5OrderInfo, V5OrderDetailRes.class);
         apiOrderExtDO.setOrderNo(String.valueOf(orderNo));
-        apiOrderExtDO.setOrderStatus(v5OrderDetailRes.getData().getOrderStatus());
+        apiOrderExtDO.setOrderSubStatus(String.valueOf(v5OrderDetailRes.getData().getOrderStatus()));
+        apiOrderExtDO.setOrderInfo(v5OrderInfo);
         apiOrderExtMapper.updateById(apiOrderExtDO.setOrderInfo(v5OrderInfo));
 
         return v5OrderInfo;//TODO 待调试

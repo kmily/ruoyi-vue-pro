@@ -4,6 +4,8 @@ package cn.iocoder.yudao.module.steam.service.fin.v5.res;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+
 @Data
 public class V5OrderDetailRes implements Serializable {
     private int code;
@@ -19,9 +21,9 @@ public class V5OrderDetailRes implements Serializable {
         private ItemInfo itemInfo;
         private int orderStatus;
         private String orderStatusMsg;
-        private int orderAmount;
-        private int serviceFee;
-        private int serviceFeeRate;
+        private BigDecimal orderAmount;
+        private BigDecimal serviceFee;
+        private BigDecimal serviceFeeRate;
         private String payAt;
         private String devileAt;
         private String createAt;
