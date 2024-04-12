@@ -120,7 +120,6 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                     apiOrderExtDO.setCreator(String.valueOf(loginUser.getId()));
                     apiOrderExtDO.setPlatCode(PlatCodeEnum.V5.getName());
                     apiOrderExtDO.setOrderNo(apiBuyItemRespVo.getOrderNo());
-//                    apiOrderExtDO.setTradeOfferId(Long.valueOf(apiBuyItemRespVo.getTradeOfferId()));
                     apiOrderExtDO.setTradeOfferLinks(createReqVO.getTradeLinks());
                     apiOrderExtDO.setOrderId(orderId);
                     apiOrderExtDO.setOrderInfo(sent.html());
