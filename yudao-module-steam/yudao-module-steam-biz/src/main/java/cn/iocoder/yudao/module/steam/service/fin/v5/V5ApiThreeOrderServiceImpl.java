@@ -244,6 +244,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         headers.put("Authorization",Trade_Token);
         builder.headers(headers);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
+        log.info("getOrderSimpleStatus{}",sent.html());
         ApiResult json = sent.json(ApiResult.class);
         Object data = json.getData();
         V5queryOrderStatusRespVO respVO = JacksonUtils.readValue(JacksonUtils.writeValueAsString(data), V5queryOrderStatusRespVO.class);
@@ -260,8 +261,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         }
         // 更新订单状态
         apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderNo,orderNo));
-        return respVO.getStatus();
-
+        return apiOrderExtDO.getOrderStatus();
     }
 
     /**
@@ -299,7 +299,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         apiOrderExtDO.setOrderId(orderId);
         apiOrderExtDO.setOrderSubStatus(respVO.getStatus());
         if(Integer.parseInt(respVO.getStatus()) == 0){
-            apiOrderExtDO.setOrderStatus(3);
+            apiOrderExtDO.setOrderStatus(IvnStatusEnum.CANCEL.getCode());
         }
         // 更新订单状态
         apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderNo,orderNo));

@@ -34,6 +34,9 @@ public interface OpenApiCode {
     //----open api
     ErrorCode TO_MANY_ITEM = new ErrorCode(8001, "查询数据过多");
 
+    ErrorCode NO_DATA = new ErrorCode(8002, "无相关数据");
+    ErrorCode ERR_M_ORDER_EXISTS = new ErrorCode(8002, "商户订单已经存在");
+
     //V5购买出错
     ErrorCode ERR_1 = new ErrorCode(1, "发生未知错误");
     ErrorCode ERR_1001 = new ErrorCode(1001, "该Steam暂无法交易 ");

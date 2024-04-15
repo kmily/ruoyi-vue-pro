@@ -1,15 +1,12 @@
-package cn.iocoder.yudao.module.pay.controller.app.order.vo;
+package cn.iocoder.yudao.module.steam.service.fin.vo;
 
-import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitRespVO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import lombok.experimental.Accessors;
+import lombok.Data;
 
 @Schema(description = "用户 APP - 支付订单提交 Response VO")
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class AppPayOrderSubmitRespVO extends PayOrderSubmitRespVO {
+public class ApiOrderSubmitRespVO  {
     /**
      * UU订单号
      */
