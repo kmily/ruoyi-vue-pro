@@ -116,6 +116,9 @@ public class InvPreviewPageReqVO extends PageParam {
     @JsonIgnore
     private String type;
 
-    @Schema(description = "页码")
+    @Schema(description = "权重")
     private Integer displayWeight;
+
+    @Schema(description = "首页展示分类")
+    private Integer title;
 }
