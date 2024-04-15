@@ -2,33 +2,33 @@ package cn.iocoder.yudao.module.steam.service.fin.c5.res;
 
 import lombok.Data;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 
 @Data
-public class ProductPriceInfoRes {
+public class ProductPriceInfoRes implements Serializable {
+    private boolean success;
+    private List<ProductData> data;
+    private Integer errorCode;
+    private String errorMsg;
+    private String errorData;
 
-    // 定义返回数据的结构类
+
+
     @Data
-    public static class ProductPriceInfoResponse {
-        private boolean success;
-        private List<ProductData> data;
-        private int errorCode;
-        private String errorMsg;
-        private Object errorData;
+    public static class ProductData {
+        private Integer appId;
+        private String itemId;
+        private String marketHashName;
+        private BigDecimal price;
+        private Integer quantity;
+        private BigDecimal autoDeliverPrice;
+        private Integer autoDeliverQuantity;
+        private BigDecimal manualDeliverPrice;
+        private Integer manualQuantity;
 
-        // 内部类，表示产品数据
-        @Data
-        public static class ProductData {
-            private int appId;
-            private String itemId;
-            private String marketHashName;
-            private double price;
-            private int quantity;
-            private double autoDeliverPrice;
-            private int autoDeliverQuantity;
-            private double manualDeliverPrice;
-            private int manualQuantity;
-        }
+
     }
 }

@@ -76,12 +76,14 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             int i = BigDecimal.valueOf(productData.getMinSellPrice()).multiply(NO1)
                     .multiply(NO2).multiply(NO3).intValue();
             apiCommodityRespVo.setPrice(i);
-            log.info("经过计算返回v5的最低价为："+ i);
+            log.info("经过计算返回v5的最低价为："+ i + "分");
             apiCommodityRespVo.setIsSuccess(true);
             apiCommodityRespVo.setPlatCode(PlatCodeEnum.V5);
+            apiCommodityRespVo.setErrorCode(OpenApiCode.OK);
             return apiCommodityRespVo;
         } else {
             apiCommodityRespVo.setIsSuccess(false);
+            apiCommodityRespVo.setErrorCode(OpenApiCode.ERR_5214);
             return apiCommodityRespVo;
         }
     }

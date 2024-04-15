@@ -4,11 +4,16 @@ import cn.iocoder.yudao.module.steam.service.fin.c5.vo.C5FastPayVo;
 import cn.iocoder.yudao.module.steam.service.fin.c5.vo.C5ProductVo;
 import cn.iocoder.yudao.module.steam.service.fin.c5.res.ProductBuyRes;
 import cn.iocoder.yudao.module.steam.service.fin.c5.res.ProductPriceInfoRes;
+import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductBuyRes;
+import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
+import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
@@ -29,31 +34,15 @@ public class C5ApiUtils {
      * @param marketHashNameList
      * @return
      */
-    public  static ProductPriceInfoRes.ProductPriceInfoResponse getProductPriceInfo(List<String> marketHashNameList) {
-        C5ProductVo c5FastPayVo = new C5ProductVo(CSGO_ID, marketHashNameList);
-        String requestBodyJson = gson.toJson(c5FastPayVo);
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url(API_POST_PRODUCT_PRICE_URL)
-                .post(RequestBody.create(MediaType.parse(JSON), requestBodyJson))
-                .build();
-        // 发送请求并处理响应
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new IOException("请求商品价格信息响应失败: " + response);
-            }
-            if (response.body() != null) {
-                String responseData = response.body().string();
-                // 关闭响应体
-                response.body().close();
-                // 使用 Gson 将 JSON 字符串转换为对象
-                return gson.fromJson(responseData, ProductPriceInfoRes.ProductPriceInfoResponse.class);
-            }
-            return null;
-        } catch (IOException e) {
-            log.error("请求商品价格信息时发生异常", e);
-        }
-        return null;
+    public  static ProductPriceInfoRes getProductPriceInfo(List<String> marketHashNameList) {
+        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+        C5ProductVo c5ProductVo = new C5ProductVo(CSGO_ID, marketHashNameList);
+        builder.url(API_POST_PRODUCT_PRICE_URL);
+        builder.method(HttpUtil.Method.JSON);
+        builder.postObject(c5ProductVo);
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
+        return sent.json(ProductPriceInfoRes.class);
+
     }
 
 
@@ -85,32 +74,16 @@ public class C5ApiUtils {
         }
         return "未获取到订单详情";
     }
-    public static ProductBuyRes buyC5Product(C5FastPayVo payVo) {
+    public static ProductBuyRes buyC5Product(ApiQueryCommodityReqVo createReqVO, BigDecimal maxPrice) {
 
-        String requestBodyJson = gson.toJson(payVo);
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url(API_BUY_C5_PRODUCT_URL)
-                .post(RequestBody.create(MediaType.parse(JSON), requestBodyJson))
-                .build();
-        // 发送请求并处理响应
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new IOException("购买指定商品失败: " + response);
-            }
-            // 获取响应数据
-            String responseData = null;
-            if (response.body() != null) {
-                responseData = response.body().string();
-                // 关闭响应体
-                response.body().close();
-                // 使用 Gson 将 JSON 字符串转换为对象
-                return gson.fromJson(responseData, ProductBuyRes.class);
-            }
-        } catch (IOException e) {
-            log.error("请求购买指定商品时发生异常", e);
-        }
-        return null;
+        C5FastPayVo c5FastPayVo = new C5FastPayVo(CSGO_ID,0,null,null,
+                createReqVO.getCommodityHashName(),maxPrice,null, createReqVO.getTradeLinks());
+        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+        builder.url(API_BUY_C5_PRODUCT_URL);
+        builder.method(HttpUtil.Method.JSON);
+        builder.postObject(c5FastPayVo);
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
+        V5ProductBuyRes json = sent.json(V5ProductBuyRes.class);
+        return sent.json(ProductBuyRes.class);
     }
-
 }
