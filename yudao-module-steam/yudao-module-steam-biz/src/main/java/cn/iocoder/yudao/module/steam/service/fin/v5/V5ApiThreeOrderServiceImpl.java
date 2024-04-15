@@ -224,7 +224,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
 
     /**
-     * 查询订单简状态
+     * 查询订单简单状态
      * @param orderNo  第三方 订单号
      * @param orderId  主订单ID
      * @return  1,进行中，2完成，3作废
@@ -250,9 +250,9 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         V5queryOrderStatusRespVO respVO = JacksonUtils.readValue(JacksonUtils.writeValueAsString(data), V5queryOrderStatusRespVO.class);
         // 更新订单状态
         ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
-        apiOrderExtDO.setOrderId(orderId);
-        apiOrderExtDO.setOrderSubStatus(String.valueOf(respVO.getStatus()));
-        apiOrderExtDO.setOrderStatus(IvnStatusEnum.ACTIONING.getCode());
+        apiOrderExtDO.setOrderId(orderId); // 订单ID
+        apiOrderExtDO.setOrderSubStatus(String.valueOf(respVO.getStatus())); // 订单子状态
+        apiOrderExtDO.setOrderStatus(IvnStatusEnum.ACTIONING.getCode()); // 订单状态
         if(respVO.getStatus() == 3){
             apiOrderExtDO.setOrderStatus(IvnStatusEnum.DONE.getCode());
         }
@@ -297,6 +297,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
         ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
         apiOrderExtDO.setOrderId(orderId);
+//        apiOrderExtDO.setOrderInfo(JacksonUtils.writeValueAsString(respVo));
         apiOrderExtDO.setOrderSubStatus(respVO.getStatus());
         if(Integer.parseInt(respVO.getStatus()) == 0){
             apiOrderExtDO.setOrderStatus(IvnStatusEnum.CANCEL.getCode());
@@ -322,6 +323,8 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         apiOrderExtDO.setOrderNo(callBackInfoVO.getOrderNo());
         // 更新订单小状态
         apiOrderExtDO.setOrderSubStatus(String.valueOf(callBackInfoVO.getOrderStatus()));
+        // 更新原因
+        apiOrderExtDO.setOrderSubStatusErrText(callBackInfoVO.getFailReason());
         apiOrderExtMapper.update(apiOrderExtDO, new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderNo, callBackInfoVO.getOrderNo()));
         ApiOrderExtDO apiOrderExtDO1 = apiOrderExtMapper.selectOne(ApiOrderExtDO::getOrderNo, callBackInfoVO.getOrderNo());
         ApiProcessNotifyResp respVo = new ApiProcessNotifyResp();
