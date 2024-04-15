@@ -15,13 +15,4 @@ public class ApiProcessNotifyResp {
      * 第三方订单号
      */
     private String orderNo;
-    /**
-     * 发货状态描述
-     */
-    private String deliverStatusDesc;
-
-    /**
-     * 失败原因
-     */
-    private String failReason;
 }

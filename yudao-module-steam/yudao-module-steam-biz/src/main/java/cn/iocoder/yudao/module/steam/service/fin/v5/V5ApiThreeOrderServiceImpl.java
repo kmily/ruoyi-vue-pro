@@ -330,7 +330,6 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         ApiProcessNotifyResp respVo = new ApiProcessNotifyResp();
         respVo.setOrderId(apiOrderExtDO1.getOrderId());
         respVo.setOrderNo(apiOrderExtDO1.getOrderNo());
-        respVo.setFailReason(apiOrderExtDO1.getOrderSubStatusErrText());
         return respVo;
     }
 
