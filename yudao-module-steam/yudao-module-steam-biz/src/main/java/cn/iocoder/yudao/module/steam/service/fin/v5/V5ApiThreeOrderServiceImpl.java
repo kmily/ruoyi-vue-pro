@@ -356,9 +356,8 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     }
 
     private String generateAndStoreToken() {
-        // 调用方法生成新的 token，这里假设你有一个名为 LoginV5 的方法来生成 token
+        // 调用方法生成新的 token
         String newToken = V5Login.LoginV5();
-
         // 将新生成的 token 存储到 Redis 中
         redisTemplate.opsForValue().set("v5_login_token", newToken);
 
