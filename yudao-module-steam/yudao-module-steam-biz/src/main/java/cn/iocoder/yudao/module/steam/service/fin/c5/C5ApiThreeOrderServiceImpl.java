@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.steam.service.fin.c5.utils.C5ApiUtils;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5ItemListVO;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5page;
 import cn.iocoder.yudao.module.steam.service.fin.vo.*;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -22,8 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-//@Service
-public class C5ApiThreeOrderService implements ApiThreeOrderService {
+@Service
+public class C5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
 
     @Resource

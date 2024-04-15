@@ -582,7 +582,9 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         builder.sellCashStatus(apiOrderDO.getCashStatus());
         builder.transferDamagesAmount(apiOrderDO.getTransferDamagesAmount());
         builder.transferRefundAmount(apiOrderDO.getTransferRefundAmount());
-
+        if(StringUtils.hasText(orderExt.getOrderSubStatusErrText())){
+            builder.orderSubStatusErrText(orderExt.getOrderSubStatusErrText());
+        }
         return builder.build();
     }
     @Override
