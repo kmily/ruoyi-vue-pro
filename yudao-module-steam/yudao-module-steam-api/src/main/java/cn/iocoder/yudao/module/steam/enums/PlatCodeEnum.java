@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.steam.enums;
 
 public enum PlatCodeEnum {
     UNSUPPORTED("UNSUPPORTED","unsupported"),
+    IO661("IO661","IO661"),
     C5("C5","C5"),
     V5("V5","V5"),
     IG("IG","IG");
