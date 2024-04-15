@@ -89,6 +89,7 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
     @Override
     public ApiBuyItemRespVo buyItem(LoginUser loginUser, ApiQueryCommodityReqVo createReqVO, Long orderId) {
+        ApiBuyItemRespVo.ApiBuyItemRespVoBuilder builder = ApiBuyItemRespVo.builder();
         Optional<SellingDO> first = sellingMapper.selectList(new Page<>(1, 1), new LambdaQueryWrapperX<SellingDO>()
                 .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
                 .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
@@ -106,6 +107,8 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         }
         ApiOrderDO masterOrder = getMasterOrder(orderId);
 
+        builder.orderNo(masterOrder.getOrderNo());
+        builder.tradeLink(masterOrder.getBuyTradeLinks());
         ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
         apiOrderExtDO.setCreator(String.valueOf(loginUser.getId()));
         apiOrderExtDO.setPlatCode(PlatCodeEnum.IO661.getCode());
@@ -118,7 +121,19 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         apiOrderExtDO.setCommodityInfo(sellingDO.getId().toString());
         apiOrderExtDO.setOrderSubStatus(InvTransferStatusEnum.INORDER.getStatus().toString());
         apiOrderExtMapper.insert(apiOrderExtDO);
-        return null;
+        try {
+            tradeAsset(orderId, apiOrderExtDO.getId());
+            ApiOrderExtDO orderExt = getOrderExt(apiOrderExtDO.getId());
+            builder.isSuccess(true);
+            builder.tradeOfferId(orderExt.getTradeOfferId().toString());
+            return builder.build();
+        }catch (Exception e){
+            apiOrderExtDO.setOrderStatus(3);
+            apiOrderExtDO.setOrderSubStatus("发送失败"+e.getMessage());
+            builder.isSuccess(false);
+            builder.errorCode(OpenApiCode.ERR_5301);
+            return builder.build();
+        }
     }
 
     @Override
@@ -184,7 +199,7 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             if (PayOrderStatusEnum.isClosed(sellingDO.getStatus())) {
                 throw new ServiceException(-1,"已关闭无法进行发货。");
             }
-            if (PayOrderStatusEnum.REFUND.getStatus().equals(sellingDO.getStatus())) {
+            if (PayOrderStatusEnum.REFUND.getStatus().equals(masterOrder.getPayOrderStatus())) {
                 throw new ServiceException(-1,"已退款无法进行发货。");
             }
 //            BindUserDO bindUserDO = bindUserMapper.selectById(invOrder.getBuyBindUserId());
