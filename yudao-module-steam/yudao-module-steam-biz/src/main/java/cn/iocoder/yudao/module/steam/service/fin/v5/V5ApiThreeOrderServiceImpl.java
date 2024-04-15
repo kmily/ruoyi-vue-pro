@@ -244,6 +244,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         headers.put("Authorization",Trade_Token);
         builder.headers(headers);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
+        log.info("getOrderSimpleStatus{}",sent.html());
         ApiResult json = sent.json(ApiResult.class);
         Object data = json.getData();
         V5queryOrderStatusRespVO respVO = JacksonUtils.readValue(JacksonUtils.writeValueAsString(data), V5queryOrderStatusRespVO.class);

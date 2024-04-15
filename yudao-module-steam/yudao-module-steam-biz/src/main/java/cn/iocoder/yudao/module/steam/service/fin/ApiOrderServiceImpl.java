@@ -789,20 +789,25 @@ public class ApiOrderServiceImpl implements ApiOrderService {
                 LoginUser loginUser = new LoginUser().setTenantId(1L).setUserType(uuOrderById.getBuyUserType()).setId(uuOrderById.getBuyUserId());
                 // 1,进行中，2完成，3作废
                 Integer orderSimpleStatus = apiThreeOrderService.getOrderSimpleStatus(loginUser,uuOrderById.getThreeOrderNo(), uuOrderById.getId());
+                log.info("订单状态{}",orderSimpleStatus);
                 switch (orderSimpleStatus){
                     case 1://进行中
+                        log.info("进行中{}",orderSimpleStatus);
                         break;
                     case 2://完成
+                        log.info("完成{}",orderSimpleStatus);
                         apiOrderMapper.updateById(new ApiOrderDO().setId(uuOrderById.getId())
                                 .setTransferStatus(InvTransferStatusEnum.TransferFINISH.getStatus()));
                         cashInvOrder(invOrderId);
                         apiOrderMapper.updateById(new ApiOrderDO().setId(invOrderId).setTransferStatus(InvTransferStatusEnum.TransferFINISH.getStatus()));
                         break;
                     case 3://作废
+                        log.info("作废{}",orderSimpleStatus);
                         damagesCloseInvOrder(invOrderId,"订单被第三方取消");
                         apiOrderMapper.updateById(new ApiOrderDO().setId(invOrderId).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus()));
                         break;
                     default:
+                        log.info("其它{}",orderSimpleStatus);
                 }
             }
         }
