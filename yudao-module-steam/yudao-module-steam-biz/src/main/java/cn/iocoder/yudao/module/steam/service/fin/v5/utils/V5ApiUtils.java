@@ -31,17 +31,16 @@ public class V5ApiUtils {
     private static final OkHttpClient client = new OkHttpClient();
     private static final Gson gson = new Gson();
 
-    private static final String TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VyVHlwZSI6Im1lcmNoYW50IiwiZXhwIjoxNzEzNzAzMTA2LCJ1c2VyaWQiOiIxMTU3MTAifQ.fdEFISpapbYXYlbST_M-jTwB4Fc9bFNxA8Ch4XnOnb4NkHaTikkPy3o13q-GfGzTyqli65DbRh_gsRBxB9vKzj2iJv7x39-ZAX7pLY75No9JLtK3E_GXtWIvtAt7EO0x4nkqoe0QFslMRPTf88azod0ODCSr-CjDRBwI_l5muMvjQl6dDEYlmIPbWUWG802FogW8hrSMyQQaUamnPqNN9vzA6ag4pgcbQCp-qAiWx1x832M9YsTQbaVh2vQ-keqhBeDk2UodZOPeB0tP3jkR68--zqjz73Sij5ctEY-6hYxtX3Yg-Z65tGj5erMNDGjbjGU7a_Caa7rnrtSG-K1Esw";
     /**
      * 获取c5商品价格
      * @param marketHashNameList
      * @return
      */
-    public  static V5ProductPriceInfoRes.V5ProductPriceInfoResponse getV5ProductLowestPrice(List<String> marketHashNameList) {
+    public  static V5ProductPriceInfoRes.V5ProductPriceInfoResponse getV5ProductLowestPrice(List<String> marketHashNameList,String v5Token) {
         V5queryOnSaleInfoReqVO v5FastPayVo = new V5queryOnSaleInfoReqVO(marketHashNameList,MERCHANT_KEY);
         String requestBodyJson = gson.toJson(v5FastPayVo);
         Headers headers = new Headers.Builder()
-                .add("Authorization", TOKEN)
+                .add("Authorization", v5Token)
                 .build();
         Request request = new Request.Builder()
                 .url(API_POST_V5_PRODUCT_PRICE_URL)
@@ -68,12 +67,12 @@ public class V5ApiUtils {
     }
 
 
-    public static String getV5OrderInfo(String merchantOrderNo, String orderNo) {
+    public static String getV5OrderInfo(String merchantOrderNo, String orderNo,String v5Token) {
 
         V5OrderInfo v5OrderInfo = new V5OrderInfo(MERCHANT_KEY, merchantOrderNo, orderNo);
         String requestBodyJson = gson.toJson(v5OrderInfo);
         Headers headers = new Headers.Builder()
-                .add("Authorization", TOKEN)
+                .add("Authorization", v5Token)
                 .build();
         Request request = new Request.Builder()
                 .url(API_POST_V5_ORDER_INFO_URL)
