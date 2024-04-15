@@ -115,4 +115,7 @@ public class InvPreviewPageReqVO extends PageParam {
     @Schema(description = "武器类型 (包括武器的大类和小类)")
     @JsonIgnore
     private String type;
+
+    @Schema(description = "页码")
+    private Integer displayWeight;
 }

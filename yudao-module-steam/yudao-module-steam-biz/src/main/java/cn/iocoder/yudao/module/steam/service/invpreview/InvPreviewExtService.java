@@ -148,6 +148,35 @@ public class InvPreviewExtService {
         return new PageResult<>(ret, invPreviewDOPageResult.getTotal());
     }
 
+
+    public PageResult<SellingHotDO> getHeaderHot(InvPreviewPageReqVO pageReqVO) {
+        List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
+                .eq(InvPreviewDO::getExistInv,CommonStatusEnum.DISABLE.getStatus())
+                .isNotNull(InvPreviewDO::getDisplayWeight)
+                .orderByAsc(InvPreviewDO::getDisplayWeight)
+                .last("limit " + pageReqVO.getPageSize().toString()));
+
+
+        List<SellingHotDO> sellingHotDOList = new ArrayList<>();
+        for (InvPreviewDO item : invPreviewDOS) {
+            SellingHotDO sellingHotDO = new SellingHotDO();
+
+            sellingHotDO.setSelExterior(item.getSelExterior());
+            sellingHotDO.setSelQuality(item.getSelQuality());
+            sellingHotDO.setIconUrl(item.getImageUrl());
+            sellingHotDO.setPrice(item.getMinPrice());
+            sellingHotDO.setItemInfo(item.getItemInfo());
+            sellingHotDO.setDisplayWeight(item.getDisplayWeight());
+            sellingHotDO.setMarketName(item.getItemName());
+            sellingHotDO.setMarketHashName(item.getMarketHashName());
+            sellingHotDO.setSellNum(Integer.valueOf(item.getAutoQuantity()));
+            sellingHotDO.setShortName(item.getShortName());
+            sellingHotDOList.add(sellingHotDO);
+        }
+        return new PageResult<>(sellingHotDOList, (long) invPreviewDOS.size());
+    }
+
+
     public PageResult<SellingHotDO> getHot(SellingPageReqVO pageReqVO) {
         // 获取所有数据
         List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()

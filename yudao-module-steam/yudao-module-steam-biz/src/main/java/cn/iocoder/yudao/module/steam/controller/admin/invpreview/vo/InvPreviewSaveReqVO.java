@@ -99,5 +99,7 @@ public class InvPreviewSaveReqVO {
     @NotNull(message = "是否存在库存不能为空")
     private Boolean existInv;
 
+    @Schema(description = "展示权重")
+    private Integer displayWeight;
 
 }

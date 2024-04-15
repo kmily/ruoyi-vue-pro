@@ -48,6 +48,7 @@ public interface InvPreviewMapper extends BaseMapperX<InvPreviewDO> {
                 .eqIfPresent(InvPreviewDO::getSelRarity, reqVO.getSelRarity())
                 .eqIfPresent(InvPreviewDO::getSelType, reqVO.getSelType())
                 .eqIfPresent(InvPreviewDO::getExistInv, reqVO.getExistInv())
+                .eqIfPresent(InvPreviewDO::getDisplayWeight, reqVO.getDisplayWeight())
                 .geIfPresent(InvPreviewDO::getMinPrice,reqVO.getMinPrice())
                 .leIfPresent(InvPreviewDO::getMinPrice,reqVO.getMaxPrice())
                 .orderByDesc(InvPreviewDO::getId));
@@ -82,6 +83,7 @@ public interface InvPreviewMapper extends BaseMapperX<InvPreviewDO> {
                 .eqIfPresent(InvPreviewDO::getSelRarity, reqVO.getSelRarity())
                 .eqIfPresent(InvPreviewDO::getSelType, reqVO.getSelType())
                 .eqIfPresent(InvPreviewDO::getExistInv, reqVO.getExistInv())
+                .eqIfPresent(InvPreviewDO::getDisplayWeight, reqVO.getDisplayWeight())
                 .geIfPresent(InvPreviewDO::getMinPrice,reqVO.getMinPrice())
                 .leIfPresent(InvPreviewDO::getMinPrice,reqVO.getMaxPrice())
                 .orderByDesc(InvPreviewDO::getUpdateTime));
