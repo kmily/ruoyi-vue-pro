@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 
-@Service
+//@Service
 @Slf4j
 public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     @Resource
