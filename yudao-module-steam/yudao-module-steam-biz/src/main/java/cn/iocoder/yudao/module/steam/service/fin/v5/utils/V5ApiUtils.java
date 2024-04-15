@@ -31,14 +31,13 @@ public class V5ApiUtils {
     private static final OkHttpClient client = new OkHttpClient();
     private static final Gson gson = new Gson();
 
-    private static final String V5_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VyVHlwZSI6Im1lcmNoYW50IiwiZXhwIjoxNzE0MDQxODMwLCJ1c2VyaWQiOiIxMTU3MTAifQ.STd9sQ3ECfVEoumNUCw9VpFmU7Y0ErSNJDcNv8I9bAFX3G0HiYXLhQ1ocV97UXvUSMMMmiLQuTGMjW9pfCgjX6S-q0FHcNm29iEaMblRzgvOyIhPlwKpNJWNrbxv-C1znkJSabJ8ba_o1F1cI-igAMItNLe1Ds9JKsJWIZN9P5FVylYHRBfq0AAV4RkgydAWKNFuRAZK3SShCV7hQ3W-2iwUU2gR5yQ9BmaSmFZ5Gi-8Sdms9H8CDoLhhbjdbpCrcqDkjg4loEt6XF2NjuQNFaGhF3vyOjrJiLT2MBasu_dcAQV6D5w0vzYT_si72KTGSD4OoRvovpFOA5J1lRGjXw";
-
+    private static final String V5_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VyVHlwZSI6Im1lcmNoYW50IiwiZXhwIjoxNzE0MDQyOTAxLCJ1c2VyaWQiOiIxMTU3MTAifQ.GRz2fCed-_t6tHZ6a8v8ZAlQWvef68-gN553EkyrXrN8_TyJdCL_98i-wsN-8C3uroLsh_SP5ILH9lxpK7ZIaVnHJrPxjSU2fA1EBnRRl2bCBWNcrsO7XsPpqhLbYOuOi_9CzGgBe7Abby8YYOwoyrZDQiDtjatm3yImcdyjB42RnWXoagUf7U56yatmE-tjWWzzRVYiEuQmtujtkMlLBwrB0KBO1eBasstVm2E4GeV1jNGBdtZxbGZqgPPQ7q3-yQifyAMfESEp02NZpz3H8k-Hda_pL5apj9Emd5XliAegfChDaYC4Gn5b095LRcOVld7zbjBGlSpcaDPqH5WSAA";
     /**
      * 获取c5商品价格
      * @param marketHashNameList
      * @return
      */
-    public  static V5ProductPriceInfoRes.V5ProductPriceInfoResponse getV5ProductLowestPrice(List<String> marketHashNameList,String v5Token) {
+    public  static V5ProductPriceInfoRes.V5ProductPriceInfoResponse getV5ProductLowestPrice(List<String> marketHashNameList) {
         V5queryOnSaleInfoReqVO v5FastPayVo = new V5queryOnSaleInfoReqVO(marketHashNameList,MERCHANT_KEY);
         String requestBodyJson = gson.toJson(v5FastPayVo);
         Headers headers = new Headers.Builder()
@@ -69,7 +68,7 @@ public class V5ApiUtils {
     }
 
 
-    public static String getV5OrderInfo(String merchantOrderNo, String orderNo,String v5Token) {
+    public static String getV5OrderInfo(String merchantOrderNo, String orderNo) {
 
         V5OrderInfo v5OrderInfo = new V5OrderInfo(MERCHANT_KEY, merchantOrderNo, orderNo);
         String requestBodyJson = gson.toJson(v5OrderInfo);
