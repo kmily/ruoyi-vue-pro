@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.steam.service.fin.vo;
 
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
-
+@Builder
+@NoArgsConstructor
 @Data
 public class ApiBuyItemRespVo implements Serializable {
     /**
