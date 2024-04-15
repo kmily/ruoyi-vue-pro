@@ -315,7 +315,11 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         // 更新订单小状态
         apiOrderExtDO.setOrderSubStatus(String.valueOf(callBackInfoVO.getOrderStatus()));
         // 更新原因
+        String keyword = "余额不足";
         apiOrderExtDO.setOrderSubStatusErrText(callBackInfoVO.getFailReason());
+        if(callBackInfoVO.getFailReason().contains(keyword)){
+            apiOrderExtDO.setOrderSubStatusErrText("购买失败！请联系工作人员处理。");
+        }
         apiOrderExtMapper.update(apiOrderExtDO, new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderNo, callBackInfoVO.getOrderNo()));
         ApiOrderExtDO apiOrderExtDO1 = apiOrderExtMapper.selectOne(ApiOrderExtDO::getOrderNo, callBackInfoVO.getOrderNo());
         ApiProcessNotifyResp respVo = new ApiProcessNotifyResp();
