@@ -357,6 +357,8 @@ public class AppIo661ApiController {
                     ApiOrderDO orderDO = apiOrderService.payInvOrder(loginUser, invOrder.getId());
                     reqVO.setOrderNo(invOrder.getOrderNo());
                     reqVO.setMerchantNo(invOrder.getMerchantNo());
+                    reqVO.setDealPriceFen(invOrder.getPayAmount());
+                    reqVO.setDealPrice(new BigDecimal(String.valueOf(invOrder.getPayAmount())).divide(new BigDecimal("100"),2,BigDecimal.ROUND_HALF_DOWN).toString());
                     return ApiResult.success(reqVO);
                 } catch (ServiceException e) {
                     apiOrderService.closeUnPayInvOrder(invOrder.getId());

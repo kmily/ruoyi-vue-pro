@@ -425,6 +425,11 @@ public class ApiOrderServiceImpl implements ApiOrderService {
 //            throw exception(OpenApiCode.ERR_5407);
 //        }
         //校验商品是否存在
+        Long aLong = apiOrderMapper.selectCount(new LambdaQueryWrapperX<ApiOrderDO>()
+                .eq(ApiOrderDO::getMerchantNo, orderDO.getMerchantNo()));
+        if(aLong>0){
+            throw exception(OpenApiCode.ERR_M_ORDER_EXISTS);
+        }
 
         if(PayOrderStatusEnum.isSuccess(orderDO.getPayOrderStatus())){
             throw exception(OpenApiCode.ERR_5299);
