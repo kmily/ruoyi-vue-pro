@@ -45,14 +45,10 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     private static final String Query_Order_Status_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
     private static final String Cancel_Order_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
     private static final String Query_Commodity_Detail = "https://delivery.v5item.com/open/api/queryOrderDetailInfo";
-
     public static final String V5_GetItem_URL = "https://delivery.v5item.com/open/api/getItemList";
     public static final BigDecimal NO1 = new BigDecimal("1.02");
     public static final BigDecimal NO2 = new BigDecimal("0.998");
     public static final BigDecimal NO3 = new BigDecimal("100");
-
-
-    private static final String API_POST_V5_ORDER_INFO_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
     private static final String API_POST_BUY_V5_PRODUCT_URL = "https://delivery.v5item.com/open/api/createOrderByMarketHashName";
 
     @Override
