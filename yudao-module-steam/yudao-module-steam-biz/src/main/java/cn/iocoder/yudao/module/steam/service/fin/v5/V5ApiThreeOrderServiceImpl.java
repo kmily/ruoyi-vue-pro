@@ -299,7 +299,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         apiOrderExtDO.setOrderId(orderId);
         apiOrderExtDO.setOrderSubStatus(respVO.getStatus());
         if(Integer.parseInt(respVO.getStatus()) == 0){
-            apiOrderExtDO.setOrderStatus(3);
+            apiOrderExtDO.setOrderStatus(IvnStatusEnum.CANCEL.getCode());
         }
         // 更新订单状态
         apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderNo,orderNo));
