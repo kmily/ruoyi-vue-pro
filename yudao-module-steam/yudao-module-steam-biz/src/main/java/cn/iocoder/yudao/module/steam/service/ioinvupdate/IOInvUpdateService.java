@@ -355,9 +355,9 @@ public class IOInvUpdateService {
     }
 
 
-    @Async
+
     // 其他平台饰品模板入库
-    public void otherTemplateInsert() {
+    public void otherSellingInsertC5() {
         otherSellingMapper.delete(new LambdaQueryWrapperX<OtherSellingDO>().eq(OtherSellingDO::getPlatformIdentity,OtherSellingStatusEnum.C5.getStatus()));
         IOInvUpdateService bean = applicationContext.getBean(IOInvUpdateService.class);
         int page = 1;
@@ -522,8 +522,8 @@ public class IOInvUpdateService {
     }
 
 
-    @Async
-    public void otherTemplateInsertV5() {
+
+    public void otherSellingInsertV5() {
         otherSellingMapper.delete(new LambdaQueryWrapperX<OtherSellingDO>().eq(OtherSellingDO::getPlatformIdentity,OtherSellingStatusEnum.V5.getStatus()));
         IOInvUpdateService bean = applicationContext.getBean(IOInvUpdateService.class);
         int page = 1;
