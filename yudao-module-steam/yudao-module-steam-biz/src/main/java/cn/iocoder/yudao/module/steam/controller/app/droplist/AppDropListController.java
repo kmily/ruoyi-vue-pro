@@ -188,16 +188,17 @@ public class AppDropListController {
         reqVO1.setType(reqVO.getType());
         return success(invPreviewExtService.getInvPreviewPage(reqVO1));
     }
-    @GetMapping("items/730/getHeaderHot")
+
+/*    @GetMapping("items/730/getHeaderHot")
     @Operation(summary = "热门在售卖")
     public CommonResult<PageResult<SellingHotDO>> getHot(@Valid SellingPageReqVO sellingPageReqVO) {
         return success(invPreviewExtService.getHot(sellingPageReqVO));
-    }
+    }*/
 
     @GetMapping("items/730/getHot")
     @Operation(summary = "热门在售卖")
-    public CommonResult<PageResult<SellingHotDO>> getHeaderHot(@Valid InvPreviewPageReqVO invPreviewPageReqVO) {
-        return success(invPreviewExtService.getHeaderHot(invPreviewPageReqVO));
+    public CommonResult<PageResult<SellingHotDO>> getHot(@Valid InvPreviewPageReqVO invPreviewPageReqVO) {
+        return success(invPreviewExtService.getHot(invPreviewPageReqVO));
     }
 
     @GetMapping("items/730/header")
