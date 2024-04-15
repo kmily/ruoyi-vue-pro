@@ -329,7 +329,8 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         ApiOrderExtDO apiOrderExtDO1 = apiOrderExtMapper.selectOne(ApiOrderExtDO::getOrderNo, callBackInfoVO.getOrderNo());
         ApiProcessNotifyResp respVo = new ApiProcessNotifyResp();
         respVo.setOrderId(apiOrderExtDO1.getOrderId());
-        respVo.setOrderNo(callBackInfoVO.getOrderNo());
+        respVo.setOrderNo(apiOrderExtDO1.getOrderNo());
+        respVo.setFailReason(apiOrderExtDO1.getOrderSubStatusErrText());
         return respVo;
     }
 
