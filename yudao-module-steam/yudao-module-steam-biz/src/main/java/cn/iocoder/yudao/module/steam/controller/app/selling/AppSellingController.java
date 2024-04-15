@@ -100,11 +100,11 @@ public class AppSellingController {
         return CommonResult.success(otherSellingDO);
     }
     @PostMapping("/otherTemplateInsert")
-    @Operation(summary = "其他平台在售模板")
+    @Operation(summary = "手动拉取其他平台在售模板")
     public CommonResult<String> insertOtherItemId() {
 
-        ioInvUpdateService.otherTemplateInsert();
-        ioInvUpdateService.otherTemplateInsertV5();
+        ioInvUpdateService.otherSellingInsertC5();
+        ioInvUpdateService.otherSellingInsertV5();
 
         return CommonResult.success("");
     }
