@@ -45,11 +45,6 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     private static final String Query_Order_Status_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
     private static final String Cancel_Order_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
     private static final String Query_Commodity_Detail = "https://delivery.v5item.com/open/api/queryOrderDetailInfo";
-    private static final String Trade_Token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VyVHlwZSI6Im1lcmNoYW50IiwiZ" +
-            "XhwIjoxNzEzNzAzMTA2LCJ1c2VyaWQiOiIxMTU3MTAifQ.fdEFISpapbYXYlbST_M-jTwB4Fc9bFNxA8Ch4XnOnb4NkHaTikkPy3o13q-G" +
-            "fGzTyqli65DbRh_gsRBxB9vKzj2iJv7x39-ZAX7pLY75No9JLtK3E_GXtWIvtAt7EO0x4nkqoe0QFslMRPTf88azod0ODCSr-CjDRBwI_l5" +
-            "muMvjQl6dDEYlmIPbWUWG802FogW8hrSMyQQaUamnPqNN9vzA6ag4pgcbQCp-qAiWx1x832M9YsTQbaVh2vQ-keqhBeDk2UodZOPeB0tP3jk" +
-            "R68--zqjz73Sij5ctEY-6hYxtX3Yg-Z65tGj5erMNDGjbjGU7a_Caa7rnrtSG-K1Esw";
 
     public static final String V5_GetItem_URL = "https://delivery.v5item.com/open/api/getItemList";
     public static final BigDecimal NO1 = new BigDecimal("1.02");
@@ -69,7 +64,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         checkLoginUser(loginUser);
         //获取v5平台商品最低价
         V5ProductPriceInfoRes.V5ProductPriceInfoResponse productPriceInfo =
-                V5ApiUtils.getV5ProductLowestPrice(Collections.singletonList(createReqVO.getCommodityHashName()));
+                V5ApiUtils.getV5ProductLowestPrice(Collections.singletonList(createReqVO.getCommodityHashName()),getTokenFromRedisOrSetNew());
         ApiCommodityRespVo apiCommodityRespVo = new ApiCommodityRespVo();
         List<V5ProductPriceInfoRes.V5ProductPriceInfoResponse.V5ProductData> data = null;
         if (productPriceInfo != null) {
@@ -110,7 +105,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url(API_POST_BUY_V5_PRODUCT_URL);
         HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",Trade_Token);
+        headers.put("Authorization",getTokenFromRedisOrSetNew());
         builder.headers(headers);
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(v5BuyProductVo);
@@ -168,7 +163,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             throw new ServiceException(OpenApiCode.ID_ERROR);
         }
         //获取订单详情
-        String v5OrderInfo = V5ApiUtils.getV5OrderInfo(null, orderNo);
+        String v5OrderInfo = V5ApiUtils.getV5OrderInfo(null, orderNo,getTokenFromRedisOrSetNew());
         ApiOrderExtDO apiOrderExtDO = apiOrderExtMapper.selectOne(ApiOrderExtDO::getOrderId, orderId);
         if (apiOrderExtDO == null){
             throw new ServiceException(-1,"该订单不存在，请检查订单号");
@@ -203,7 +198,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url(Query_Commodity_Detail);
         HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",Trade_Token);
+        headers.put("Authorization",getTokenFromRedisOrSetNew());
         builder.headers(headers);
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(reqVO);
@@ -241,7 +236,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(reqVO);
         HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",Trade_Token);
+        headers.put("Authorization",getTokenFromRedisOrSetNew());
         builder.headers(headers);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         log.info("getOrderSimpleStatus{}",sent.html());
@@ -282,7 +277,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(reqVO);
         HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",Trade_Token);
+        headers.put("Authorization",getTokenFromRedisOrSetNew());
         builder.headers(headers);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         ApiResult json = sent.json(ApiResult.class);
@@ -334,14 +329,6 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         return respVo;
     }
 
-    @Scheduled(cron = "0 0 0 */3 * *")
-    public void v5Token() {
-        String token = V5Login.LoginV5();
-        if (token != null) {
-            // 将 token 存储到 Redis 中
-            redisTemplate.opsForValue().set("v5_login_token", token);
-        }
-    }
     @Override
     public V5ItemListVO getItemList(V5page v5page){
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
@@ -353,12 +340,32 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(reqVO);
         HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",Trade_Token);
+        headers.put("Authorization",getTokenFromRedisOrSetNew());
         builder.headers(headers);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         V5ItemListVO json = sent.json(V5ItemListVO.class);
 
         return json;
+    }
+
+
+    public String getTokenFromRedisOrSetNew() {
+        // 从 Redis 中获取 token
+        String token = (String) redisTemplate.opsForValue().get("v5_login_token");
+        // 如果 token 为空，则调用方法重新生成并存储 token
+        if (token == null) {
+            token = generateAndStoreToken();
+        }
+        return token;
+    }
+
+    private String generateAndStoreToken() {
+        // 调用方法生成新的 token
+        String newToken = V5Login.LoginV5();
+        // 将新生成的 token 存储到 Redis 中
+        redisTemplate.opsForValue().set("v5_login_token", newToken);
+
+        return newToken;
     }
 
 }

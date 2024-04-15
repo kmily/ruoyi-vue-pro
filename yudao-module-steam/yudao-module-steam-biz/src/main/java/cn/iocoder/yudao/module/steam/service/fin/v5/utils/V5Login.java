@@ -8,7 +8,6 @@ import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 public class V5Login {
 
     public static final String API_POST_V5_PRODUCT_PRICE_URL = "https://delivery.v5item.com/open/api/queryMerchantInfo";
-    private static final String MERCHANT_KEY = "529606f226e6461ca5bac93047976177";
     private static final String ACCOUNT = "15002361201";
     private static final String PASSWORD = "bbbhui342680800";
 
@@ -25,4 +24,9 @@ public class V5Login {
         LoginRespVO loginBackVO = JacksonUtils.readValue(JacksonUtils.writeValueAsString(json), LoginRespVO.class);
         return loginBackVO.getData().getTradeToken();
     }
+
+
+
+
+
 }
