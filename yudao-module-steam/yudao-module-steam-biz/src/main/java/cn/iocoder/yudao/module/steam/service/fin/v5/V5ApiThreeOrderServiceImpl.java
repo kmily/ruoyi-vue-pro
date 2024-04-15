@@ -50,6 +50,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     public static final BigDecimal NO2 = new BigDecimal("0.998");
     public static final BigDecimal NO3 = new BigDecimal("100");
     private static final String API_POST_BUY_V5_PRODUCT_URL = "https://delivery.v5item.com/open/api/createOrderByMarketHashName";
+    private static final String V5_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VyVHlwZSI6Im1lcmNoYW50IiwiZXhwIjoxNzE0MDQxODMwLCJ1c2VyaWQiOiIxMTU3MTAifQ.STd9sQ3ECfVEoumNUCw9VpFmU7Y0ErSNJDcNv8I9bAFX3G0HiYXLhQ1ocV97UXvUSMMMmiLQuTGMjW9pfCgjX6S-q0FHcNm29iEaMblRzgvOyIhPlwKpNJWNrbxv-C1znkJSabJ8ba_o1F1cI-igAMItNLe1Ds9JKsJWIZN9P5FVylYHRBfq0AAV4RkgydAWKNFuRAZK3SShCV7hQ3W-2iwUU2gR5yQ9BmaSmFZ5Gi-8Sdms9H8CDoLhhbjdbpCrcqDkjg4loEt6XF2NjuQNFaGhF3vyOjrJiLT2MBasu_dcAQV6D5w0vzYT_si72KTGSD4OoRvovpFOA5J1lRGjXw";
 
     @Override
     public PlatCodeEnum getPlatCode() {
@@ -101,7 +102,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url(API_POST_BUY_V5_PRODUCT_URL);
         HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",getTokenFromRedisOrSetNew());
+        headers.put("Authorization",V5_TOKEN);
         builder.headers(headers);
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(v5BuyProductVo);
@@ -194,7 +195,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url(Query_Commodity_Detail);
         HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",getTokenFromRedisOrSetNew());
+        headers.put("Authorization",V5_TOKEN);
         builder.headers(headers);
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(reqVO);
@@ -232,7 +233,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(reqVO);
         HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",getTokenFromRedisOrSetNew());
+        headers.put("Authorization",V5_TOKEN);
         builder.headers(headers);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         log.info("getOrderSimpleStatus{}",sent.html());
@@ -273,7 +274,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(reqVO);
         HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",getTokenFromRedisOrSetNew());
+        headers.put("Authorization",V5_TOKEN);
         builder.headers(headers);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         ApiResult json = sent.json(ApiResult.class);
@@ -335,7 +336,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(reqVO);
         HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",getTokenFromRedisOrSetNew());
+        headers.put("Authorization",V5_TOKEN);
         builder.headers(headers);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         V5ItemListVO json = sent.json(V5ItemListVO.class);

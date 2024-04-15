@@ -31,6 +31,8 @@ public class V5ApiUtils {
     private static final OkHttpClient client = new OkHttpClient();
     private static final Gson gson = new Gson();
 
+    private static final String V5_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VyVHlwZSI6Im1lcmNoYW50IiwiZXhwIjoxNzE0MDQxODMwLCJ1c2VyaWQiOiIxMTU3MTAifQ.STd9sQ3ECfVEoumNUCw9VpFmU7Y0ErSNJDcNv8I9bAFX3G0HiYXLhQ1ocV97UXvUSMMMmiLQuTGMjW9pfCgjX6S-q0FHcNm29iEaMblRzgvOyIhPlwKpNJWNrbxv-C1znkJSabJ8ba_o1F1cI-igAMItNLe1Ds9JKsJWIZN9P5FVylYHRBfq0AAV4RkgydAWKNFuRAZK3SShCV7hQ3W-2iwUU2gR5yQ9BmaSmFZ5Gi-8Sdms9H8CDoLhhbjdbpCrcqDkjg4loEt6XF2NjuQNFaGhF3vyOjrJiLT2MBasu_dcAQV6D5w0vzYT_si72KTGSD4OoRvovpFOA5J1lRGjXw";
+
     /**
      * 获取c5商品价格
      * @param marketHashNameList
@@ -40,7 +42,7 @@ public class V5ApiUtils {
         V5queryOnSaleInfoReqVO v5FastPayVo = new V5queryOnSaleInfoReqVO(marketHashNameList,MERCHANT_KEY);
         String requestBodyJson = gson.toJson(v5FastPayVo);
         Headers headers = new Headers.Builder()
-                .add("Authorization", v5Token)
+                .add("Authorization", V5_TOKEN)
                 .build();
         Request request = new Request.Builder()
                 .url(API_POST_V5_PRODUCT_PRICE_URL)
@@ -72,7 +74,7 @@ public class V5ApiUtils {
         V5OrderInfo v5OrderInfo = new V5OrderInfo(MERCHANT_KEY, merchantOrderNo, orderNo);
         String requestBodyJson = gson.toJson(v5OrderInfo);
         Headers headers = new Headers.Builder()
-                .add("Authorization", v5Token)
+                .add("Authorization", V5_TOKEN)
                 .build();
         Request request = new Request.Builder()
                 .url(API_POST_V5_ORDER_INFO_URL)
