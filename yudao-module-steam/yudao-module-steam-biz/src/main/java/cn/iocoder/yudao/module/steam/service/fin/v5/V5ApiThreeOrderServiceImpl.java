@@ -261,8 +261,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         }
         // 更新订单状态
         apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderNo,orderNo));
-        return respVO.getStatus();
-
+        return apiOrderExtDO.getOrderStatus();
     }
 
     /**
