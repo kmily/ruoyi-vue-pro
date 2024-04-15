@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 
 @Slf4j
-@Component
-public class OtherSellingPullJob implements JobHandler {
+@Component("otherSellingInsertC5Job")
+public class OtherSellingInsertC5Job implements JobHandler {
 
     @Resource
     private IOInvUpdateService ioInvUpdateService;
@@ -24,8 +24,7 @@ public class OtherSellingPullJob implements JobHandler {
     @Override
     public String execute(String param) {
 
-        TenantUtils.execute(1L, () ->ioInvUpdateService.otherTemplateInsert());
-        TenantUtils.execute(1L, () ->ioInvUpdateService.otherTemplateInsertV5());
+        TenantUtils.execute(1L, () ->ioInvUpdateService.otherSellingInsertC5());
 
         return "已完成";
     }
