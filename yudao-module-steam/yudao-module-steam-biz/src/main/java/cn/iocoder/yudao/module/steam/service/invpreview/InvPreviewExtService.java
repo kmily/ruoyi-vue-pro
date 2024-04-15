@@ -153,7 +153,7 @@ public class InvPreviewExtService {
         List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
                 .eq(InvPreviewDO::getExistInv,CommonStatusEnum.DISABLE.getStatus())
                 .isNotNull(InvPreviewDO::getDisplayWeight)
-                .orderByAsc(InvPreviewDO::getDisplayWeight)
+                .orderByDesc(InvPreviewDO::getDisplayWeight)
                 .last("limit " + pageReqVO.getPageSize().toString()));
 
 
@@ -596,7 +596,6 @@ public class InvPreviewExtService {
                     .setAutoQuantity(total.toString())
                     .setMarketHashName(marketHashName)
                     .setImageUrl(invDescDO.getIconUrl())
-                    .setDisplayWeight(InvTransferStatusEnum.INORDER.getStatus())
                     .setItemName(invDescDO.getMarketName())
                     .setItemId(System.currentTimeMillis())
                     .setAutoPrice(String.valueOf(sellingDOOptional.isPresent() ? sellingDOOptional.get().getPrice() : -1))
