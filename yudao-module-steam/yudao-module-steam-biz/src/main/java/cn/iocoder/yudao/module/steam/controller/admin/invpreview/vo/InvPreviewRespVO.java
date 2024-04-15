@@ -130,4 +130,7 @@ public class InvPreviewRespVO {
     @Schema(description = "页码")
     private int pageNum;
 
+    @Schema(description = "展示权重")
+    private Integer displayWeight;
+
 }

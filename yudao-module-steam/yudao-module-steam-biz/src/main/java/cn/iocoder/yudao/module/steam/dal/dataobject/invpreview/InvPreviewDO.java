@@ -153,5 +153,10 @@ public class InvPreviewDO extends BaseDO {
      */
     private Integer minPrice;
 
+    /**
+     * 在售展示权重
+     */
+    private Integer displayWeight;
+
 
 }

@@ -54,8 +54,10 @@ public class InvOrderExtService {
                     .orderByDesc(InvOrderDO::getCreateTime);
         }else{
             List<Integer> statusesToMatch = Arrays.asList(
-                    InvTransferStatusEnum.TransferFINISH.getStatus(),
                     InvTransferStatusEnum.INORDER.getStatus(),
+                    InvTransferStatusEnum.TransferING.getStatus(),
+                    InvTransferStatusEnum.TransferFINISH.getStatus(),
+                    InvTransferStatusEnum.OFF_SALE.getStatus(),
                     InvTransferStatusEnum.TransferERROR.getStatus(),
                     InvTransferStatusEnum.CLOSE.getStatus());
             invOrderDO = new LambdaQueryWrapper<InvOrderDO>()
