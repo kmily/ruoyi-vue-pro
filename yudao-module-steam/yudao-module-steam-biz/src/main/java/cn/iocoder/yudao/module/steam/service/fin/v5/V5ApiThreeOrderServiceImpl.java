@@ -50,8 +50,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     public static final BigDecimal NO2 = new BigDecimal("0.998");
     public static final BigDecimal NO3 = new BigDecimal("100");
     private static final String API_POST_BUY_V5_PRODUCT_URL = "https://delivery.v5item.com/open/api/createOrderByMarketHashName";
-    private static final String V5_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VyVHlwZSI6Im1lcmNoYW50IiwiZXhwIjoxNzE0MDQxODMwLCJ1c2VyaWQiOiIxMTU3MTAifQ.STd9sQ3ECfVEoumNUCw9VpFmU7Y0ErSNJDcNv8I9bAFX3G0HiYXLhQ1ocV97UXvUSMMMmiLQuTGMjW9pfCgjX6S-q0FHcNm29iEaMblRzgvOyIhPlwKpNJWNrbxv-C1znkJSabJ8ba_o1F1cI-igAMItNLe1Ds9JKsJWIZN9P5FVylYHRBfq0AAV4RkgydAWKNFuRAZK3SShCV7hQ3W-2iwUU2gR5yQ9BmaSmFZ5Gi-8Sdms9H8CDoLhhbjdbpCrcqDkjg4loEt6XF2NjuQNFaGhF3vyOjrJiLT2MBasu_dcAQV6D5w0vzYT_si72KTGSD4OoRvovpFOA5J1lRGjXw";
-
+    private static final String V5_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VyVHlwZSI6Im1lcmNoYW50IiwiZXhwIjoxNzE0MDQyOTAxLCJ1c2VyaWQiOiIxMTU3MTAifQ.GRz2fCed-_t6tHZ6a8v8ZAlQWvef68-gN553EkyrXrN8_TyJdCL_98i-wsN-8C3uroLsh_SP5ILH9lxpK7ZIaVnHJrPxjSU2fA1EBnRRl2bCBWNcrsO7XsPpqhLbYOuOi_9CzGgBe7Abby8YYOwoyrZDQiDtjatm3yImcdyjB42RnWXoagUf7U56yatmE-tjWWzzRVYiEuQmtujtkMlLBwrB0KBO1eBasstVm2E4GeV1jNGBdtZxbGZqgPPQ7q3-yQifyAMfESEp02NZpz3H8k-Hda_pL5apj9Emd5XliAegfChDaYC4Gn5b095LRcOVld7zbjBGlSpcaDPqH5WSAA";
     @Override
     public PlatCodeEnum getPlatCode() {
         return PlatCodeEnum.V5;
@@ -61,7 +60,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         checkLoginUser(loginUser);
         //获取v5平台商品最低价
         V5ProductPriceInfoRes.V5ProductPriceInfoResponse productPriceInfo =
-                V5ApiUtils.getV5ProductLowestPrice(Collections.singletonList(createReqVO.getCommodityHashName()),getTokenFromRedisOrSetNew());
+                V5ApiUtils.getV5ProductLowestPrice(Collections.singletonList(createReqVO.getCommodityHashName()));
         ApiCommodityRespVo apiCommodityRespVo = new ApiCommodityRespVo();
         List<V5ProductPriceInfoRes.V5ProductPriceInfoResponse.V5ProductData> data = null;
         if (productPriceInfo != null) {
@@ -160,7 +159,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             throw new ServiceException(OpenApiCode.ID_ERROR);
         }
         //获取订单详情
-        String v5OrderInfo = V5ApiUtils.getV5OrderInfo(null, orderNo,getTokenFromRedisOrSetNew());
+        String v5OrderInfo = V5ApiUtils.getV5OrderInfo(null, orderNo);
         ApiOrderExtDO apiOrderExtDO = apiOrderExtMapper.selectOne(ApiOrderExtDO::getOrderId, orderId);
         if (apiOrderExtDO == null){
             throw new ServiceException(-1,"该订单不存在，请检查订单号");
@@ -345,23 +344,23 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     }
 
 
-    public String getTokenFromRedisOrSetNew() {
-        // 从 Redis 中获取 token
-        String token = (String) redisTemplate.opsForValue().get("v5_login_token");
-        // 如果 token 为空，则调用方法重新生成并存储 token
-        if (token == null) {
-            token = generateAndStoreToken();
-        }
-        return token;
-    }
+//    public String getTokenFromRedisOrSetNew() {
+//        // 从 Redis 中获取 token
+//        String token = (String) redisTemplate.opsForValue().get("v5_login_token");
+//        // 如果 token 为空，则调用方法重新生成并存储 token
+//        if (token == null) {
+//            token = generateAndStoreToken();
+//        }
+//        return token;
+//    }
 
-    private String generateAndStoreToken() {
-        // 调用方法生成新的 token
-        String newToken = V5Login.LoginV5();
-        // 将新生成的 token 存储到 Redis 中
-        redisTemplate.opsForValue().set("v5_login_token", newToken);
-
-        return newToken;
-    }
+//    private String generateAndStoreToken() {
+//        // 调用方法生成新的 token
+//        String newToken = V5Login.LoginV5();
+//        // 将新生成的 token 存储到 Redis 中
+//        redisTemplate.opsForValue().set("v5_login_token", newToken);
+//
+//        return newToken;
+//    }
 
 }
