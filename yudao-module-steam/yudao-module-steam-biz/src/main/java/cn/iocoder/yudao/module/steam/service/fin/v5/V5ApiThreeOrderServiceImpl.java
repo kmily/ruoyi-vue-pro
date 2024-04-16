@@ -138,29 +138,29 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                     apiOrderExtDO.setOrderStatus(1);
                     apiOrderExtDO.setOrderSubStatus(json.getMsg());
 //                    apiOrderExtDO.setCommodityInfo(createReqVO.getCommodityHashName());
-                        apiOrderExtMapper.insert(apiOrderExtDO);
-                        queryCommodityDetail(loginUser,json.getData().getOrderNo(),orderId);
-                        break;
-                    case 1: // 返回错误码为1
-                        apiBuyItemRespVo.setIsSuccess(false);
-                        apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1);
-                        throw new ServiceException(1, json.getMsg());
-                    case 1001: // 返回错误码为1001
-                        apiBuyItemRespVo.setIsSuccess(false);
-                        apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1001);
-                        break;
-                    case 1002: // 返回错误码为1002
-                        apiBuyItemRespVo.setIsSuccess(false);
-                        apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1002);
-                        break;
-                    default:
-                        // 处理其他未知状态码
-                        throw new ServiceException(-1,"请求接口返回的错误码未知");
-                }
-            } else {
-                throw new ServiceException(-1,"请求返回json为空");
+                    apiOrderExtMapper.insert(apiOrderExtDO);
+                    queryCommodityDetail(loginUser,json.getData().getOrderNo(),orderId);
+                    break;
+                case 1: // 返回错误码为1
+                    apiBuyItemRespVo.setIsSuccess(false);
+                    apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1);
+                    throw new ServiceException(1, json.getMsg());
+                case 1001: // 返回错误码为1001
+                    apiBuyItemRespVo.setIsSuccess(false);
+                    apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1001);
+                    break;
+                case 1002: // 返回错误码为1002
+                    apiBuyItemRespVo.setIsSuccess(false);
+                    apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1002);
+                    break;
+                default:
+                    // 处理其他未知状态码
+                    break;
             }
-            return apiBuyItemRespVo;
+        } else {
+            throw new ServiceException(-1,"请求返回json为空");
+        }
+        return apiBuyItemRespVo;
 
     }
 
