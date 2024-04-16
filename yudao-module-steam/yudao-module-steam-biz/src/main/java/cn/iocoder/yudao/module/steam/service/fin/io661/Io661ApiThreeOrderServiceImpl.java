@@ -117,13 +117,19 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         apiOrderExtDO.setOrderId(orderId);
         apiOrderExtDO.setOrderInfo(null);
         apiOrderExtDO.setOrderStatus(1);
-        apiOrderExtDO.setOrderSubStatus("");
         apiOrderExtDO.setCommodityInfo(sellingDO.getId().toString());
         apiOrderExtDO.setOrderSubStatus(InvTransferStatusEnum.INORDER.getStatus().toString());
         apiOrderExtMapper.insert(apiOrderExtDO);
         try {
             tradeAsset(orderId, apiOrderExtDO.getId());
             ApiOrderExtDO orderExt = getOrderExt(apiOrderExtDO.getId());
+            //回写主表
+            apiOrderMapper.updateById(new ApiOrderDO().setId(masterOrder.getId())
+                    .setSellUserId(sellingDO.getUserId())
+                    .setSellUserType(sellingDO.getUserType())
+                    .setSellBindUserId(sellingDO.getBindUserId())
+                    .setSellSteamId(sellingDO.getSteamId())
+            );
             builder.isSuccess(true);
             builder.tradeOfferId(orderExt.getTradeOfferId().toString());
             return builder.build();
