@@ -31,6 +31,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -59,6 +60,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     public ApiCommodityRespVo query(LoginUser loginUser, ApiQueryCommodityReqVo createReqVO) {
         checkLoginUser(loginUser);
         //获取v5平台商品最低价
+//        String token = getTokenFromRedisOrSetNew();
         V5ProductPriceInfoRes.V5ProductPriceInfoResponse productPriceInfo =
                 V5ApiUtils.getV5ProductLowestPrice(Collections.singletonList(createReqVO.getCommodityHashName()));
         ApiCommodityRespVo apiCommodityRespVo = new ApiCommodityRespVo();
@@ -109,8 +111,11 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         builder.headers(headers);
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(v5BuyProductVo);
+        log.info("准备发起http请求：" + builder);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
+        log.info("发起http请求返回：" + sent.html());
         V5ProductBuyRes json = sent.json(V5ProductBuyRes.class);
+
         ApiBuyItemRespVo apiBuyItemRespVo = new ApiBuyItemRespVo();
         if (json != null) {
             // 设置交易链接
@@ -133,29 +138,33 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                     apiOrderExtDO.setOrderStatus(1);
                     apiOrderExtDO.setOrderSubStatus(json.getMsg());
 //                    apiOrderExtDO.setCommodityInfo(createReqVO.getCommodityHashName());
-                    apiOrderExtMapper.insert(apiOrderExtDO);
-                    queryCommodityDetail(loginUser,json.getData().getOrderNo(),orderId);
-                    break;
-                case 1: // 返回错误码为1
-                    apiBuyItemRespVo.setIsSuccess(false);
-                    apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1);
-                    throw new ServiceException(1, json.getMsg());
-                case 1001: // 返回错误码为1001
-                    apiBuyItemRespVo.setIsSuccess(false);
-                    apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1001);
-                    break;
-                case 1002: // 返回错误码为1002
-                    apiBuyItemRespVo.setIsSuccess(false);
-                    apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1002);
-                    break;
-                default:
-                    // 处理其他未知状态码
-                    break;
+                        apiOrderExtMapper.insert(apiOrderExtDO);
+                        queryCommodityDetail(loginUser,json.getData().getOrderNo(),orderId);
+                        break;
+                    case 1: // 返回错误码为1
+                        apiBuyItemRespVo.setIsSuccess(false);
+                        apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1);
+                        throw new ServiceException(1, json.getMsg());
+                    case 1001: // 返回错误码为1001
+                        apiBuyItemRespVo.setIsSuccess(false);
+                        apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1001);
+                        break;
+                    case 1002: // 返回错误码为1002
+                        apiBuyItemRespVo.setIsSuccess(false);
+                        apiBuyItemRespVo.setErrorCode(OpenApiCode.ERR_1002);
+                        break;
+                    default:
+                        // 处理其他未知状态码
+                        throw new ServiceException(-1,"请求接口返回的错误码未知");
+                }
+            } else {
+                throw new ServiceException(-1,"请求返回json为空");
             }
-        } else {
-            throw new ServiceException(-1,"请求返回json为空");
+            return apiBuyItemRespVo;
+        }catch (Exception e){
+            throw new ServiceException(OpenApiCode.ERR_WIFI);
         }
-        return apiBuyItemRespVo;
+
     }
 
     @Override
@@ -164,6 +173,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             throw new ServiceException(OpenApiCode.ID_ERROR);
         }
         //获取订单详情
+//        String token = getTokenFromRedisOrSetNew();
         String v5OrderInfo = V5ApiUtils.getV5OrderInfo(null, orderNo);
         ApiOrderExtDO apiOrderExtDO = apiOrderExtMapper.selectOne(ApiOrderExtDO::getOrderId, orderId);
         if (apiOrderExtDO == null){
@@ -343,29 +353,34 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         headers.put("Authorization",V5_TOKEN);
         builder.headers(headers);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
-        V5ItemListVO json = sent.json(V5ItemListVO.class);
-
-        return json;
+        return sent.json(V5ItemListVO.class);
     }
 
 
-//    public String getTokenFromRedisOrSetNew() {
-//        // 从 Redis 中获取 token
-//        String token = (String) redisTemplate.opsForValue().get("v5_login_token");
-//        // 如果 token 为空，则调用方法重新生成并存储 token
-//        if (token == null) {
-//            token = generateAndStoreToken();
-//        }
-//        return token;
-//    }
+    public String getTokenFromRedisOrSetNew() {
+        // 从 Redis 中获取 token
+        String token = (String) redisTemplate.opsForValue().get("v5_login_token");
+        // 如果 token 为空或已过期，则重新生成并存储 token
+        if (token == null || isTokenExpired()) {
+            token = generateAndStoreToken();
+        }
+        return token;
+    }
 
-//    private String generateAndStoreToken() {
-//        // 调用方法生成新的 token
-//        String newToken = V5Login.LoginV5();
-//        // 将新生成的 token 存储到 Redis 中
-//        redisTemplate.opsForValue().set("v5_login_token", newToken);
-//
-//        return newToken;
-//    }
+    private boolean isTokenExpired() {
+        // 检查 token 是否已过期
+        Long expireTime = redisTemplate.getExpire("v5_login_token");
+        return expireTime != null && expireTime <= 0;
+    }
+
+    private String generateAndStoreToken() {
+        V5Login v5Login = new V5Login();
+        String newToken = v5Login.LoginV5();
+        // 将新生成的 token 存储到 Redis 中，并设置过期时间为两天
+        redisTemplate.opsForValue().set("v5_login_token", newToken);
+        redisTemplate.expire("v5_login_token", 2, TimeUnit.DAYS);
+
+        return newToken;
+    }
 
 }
