@@ -138,6 +138,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                     apiOrderExtDO.setOrderSubStatus(json.getMsg());
 //                    apiOrderExtDO.setCommodityInfo(createReqVO.getCommodityHashName());
                     apiOrderExtMapper.insert(apiOrderExtDO);
+                    log.info("插入的apiOrderExtDO为：" + apiOrderExtDO);
                     queryCommodityDetail(loginUser,json.getData().getOrderNo(),orderId);
                     break;
                 case 1: // 返回错误码为1
