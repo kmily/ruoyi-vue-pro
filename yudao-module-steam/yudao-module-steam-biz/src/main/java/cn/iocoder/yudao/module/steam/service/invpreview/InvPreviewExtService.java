@@ -245,7 +245,7 @@ public class InvPreviewExtService {
                         .eq(InvPreviewDO::getExistInv, CommonStatusEnum.DISABLE.getStatus())
                         .betweenIfPresent(InvPreviewDO::getMinPrice, 0, 1000)
                         .ge(InvPreviewDO::getQuantity,1)
-                        .orderByDesc(InvPreviewDO::getAutoQuantity)
+                        .orderByDesc(InvPreviewDO::getQuantity)
                         .last("limit " + pageReqVO.getPageSize().toString()));
 
                 List<SellingHotDO> sellingEconomicalDOList = new ArrayList<>();
