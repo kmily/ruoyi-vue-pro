@@ -114,7 +114,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         log.info("发起http请求返回：" + sent.html());
         V5ProductBuyRes json = sent.json(V5ProductBuyRes.class);
-
+        log.info("返回的json对象V5ProductBuyRes为：" + json);
         ApiBuyItemRespVo apiBuyItemRespVo = new ApiBuyItemRespVo();
         if (json != null) {
             // 设置交易链接
