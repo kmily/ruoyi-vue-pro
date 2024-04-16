@@ -10,7 +10,6 @@ import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderExtDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.bindipaddress.BindIpaddressDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderMapper;
@@ -26,20 +25,25 @@ import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5ItemListVO;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5page;
 import cn.iocoder.yudao.module.steam.service.fin.vo.*;
 import cn.iocoder.yudao.module.steam.service.steam.*;
-import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
+import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
-//@Service
+@Service
 @Slf4j
 public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     @Resource
@@ -54,6 +58,9 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     private BindUserService bindUserService;
 
     private SteamService steamService;
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
     @Autowired
     public void setSteamService(SteamService steamService) {
@@ -71,7 +78,8 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         List<SellingDO> sellingDOS = sellingMapper.selectList(new Page<>(1, 1), new LambdaQueryWrapperX<SellingDO>()
                 .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
                 .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
-                .le(SellingDO::getPrice, createReqVO.getPurchasePrice())
+                .eq(SellingDO::getMarketHashName, createReqVO.getCommodityHashName())
+                .leIfPresent(SellingDO::getPrice, createReqVO.getPurchasePrice())
                 .orderByAsc(SellingDO::getPrice)
         );
         if(sellingDOS.size()>0){
@@ -96,7 +104,7 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                 .le(SellingDO::getPrice, createReqVO.getPurchasePrice())
                 .orderByAsc(SellingDO::getPrice)
         ).stream().findFirst();
-        if(first.isPresent()){
+        if(!first.isPresent()){
             return ApiBuyItemRespVo.builder().isSuccess(false).errorCode(OpenApiCode.ERR_5301).build();
         }
 
@@ -117,13 +125,19 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         apiOrderExtDO.setOrderId(orderId);
         apiOrderExtDO.setOrderInfo(null);
         apiOrderExtDO.setOrderStatus(1);
-        apiOrderExtDO.setOrderSubStatus("");
         apiOrderExtDO.setCommodityInfo(sellingDO.getId().toString());
         apiOrderExtDO.setOrderSubStatus(InvTransferStatusEnum.INORDER.getStatus().toString());
         apiOrderExtMapper.insert(apiOrderExtDO);
         try {
             tradeAsset(orderId, apiOrderExtDO.getId());
             ApiOrderExtDO orderExt = getOrderExt(apiOrderExtDO.getId());
+            //回写主表
+            apiOrderMapper.updateById(new ApiOrderDO().setId(masterOrder.getId())
+                    .setSellUserId(sellingDO.getUserId())
+                    .setSellUserType(sellingDO.getUserType())
+                    .setSellBindUserId(sellingDO.getBindUserId())
+                    .setSellSteamId(sellingDO.getSteamId())
+            );
             builder.isSuccess(true);
             builder.tradeOfferId(orderExt.getTradeOfferId().toString());
             return builder.build();
@@ -148,16 +162,48 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
     @Override
     public Integer getOrderSimpleStatus(LoginUser loginUser, String orderNo, Long orderId) {
-        return null;
+        ApiOrderDO masterOrder = getMasterOrder(orderId);
+        ApiOrderExtDO orderExt = getOrderExt(orderNo, orderId);
+        BindUserDO bindUser = bindUserService.getBindUser(masterOrder.getSellBindUserId());
+        Integer tradeOffInfoV2 = getTradeOffInfoV2(bindUser, String.valueOf(orderExt.getTradeOfferId()));
+        log.info("tradeOffInfoV2 {}",tradeOffInfoV2);
+        //1,进行中，2完成，3作废
+        if(tradeOffInfoV2 ==3){
+            //打款
+            return 2;
+//            cashInvOrder(invOrderId);
+        }else if(tradeOffInfoV2 ==7){
+            //买家取消
+            return 3;
+//            damagesCloseInvOrder(invOrderId);
+        }else if(tradeOffInfoV2 ==6){
+            //卖家取消
+            return 3;
+//            damagesCloseInvOrder(invOrderId);
+        }else{
+            LocalDateTime plus = orderExt.getCreateTime().plus(Duration.ofHours(12));
+            if(LocalDateTime.now().compareTo(plus) > 0){
+                //时间是否超出12小时，超出则退款
+                return 3;
+//                damagesCloseInvOrder(invOrderId);
+            }
+        }
+        return 1;
     }
 
     @Override
     public ApiOrderCancelRespVo orderCancel(LoginUser loginUser, String orderNo, Long orderId) {
-        return null;
+        throw new ServiceException(-1,"此订单不取消的操作");
     }
 
     @Override
     public ApiOrderCancelRespVo releaseIvn(LoginUser loginUser, String orderNo, Long orderId) {
+        ApiOrderExtDO orderExt = getOrderExt(orderNo, orderId);
+        SellingDO sellingDO = sellingMapper.selectById(Long.valueOf(orderExt.getCommodityInfo()));
+        if(Objects.nonNull(sellingDO)){
+            sellingMapper.updateById(new SellingDO().setId(sellingDO.getId()).setTransferStatus(InvTransferStatusEnum.SELL.getStatus()));
+            apiOrderExtMapper.updateById(new ApiOrderExtDO().setId(orderExt.getId()).setOrderSubStatus(InvTransferStatusEnum.CLOSE.getStatus().toString()).setOrderStatus(3));
+        }
         return ApiThreeOrderService.super.releaseIvn(loginUser, orderNo, orderId);
     }
 
@@ -185,6 +231,18 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                 .eq(ApiOrderExtDO::getCommodityInfo, sellId.toString())
                 .ne(ApiOrderExtDO::getOrderSubStatus, InvTransferStatusEnum.CLOSE.getStatus())
                 .ne(ApiOrderExtDO::getPlatCode, PlatCodeEnum.IO661.getCode())
+        );
+    }
+    /**
+     * 获取子订单
+     * @param orderNo
+     * @param orderId
+     * @return
+     */
+    private ApiOrderExtDO getOrderExt(String orderNo,Long orderId){
+        return apiOrderExtMapper.selectOne(new LambdaQueryWrapperX<ApiOrderExtDO>()
+                .eq(ApiOrderExtDO::getOrderId, orderId)
+                .eq(ApiOrderExtDO::getOrderNo, orderNo)
         );
     }
     public void tradeAsset(Long id,Long orderExtId) {
@@ -273,5 +331,70 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 //            setPayInvOrderServiceFee(invOrder);
 //        }
 
+    }
+
+    /**
+     * 返回订单状态
+     *
+     * @param bindUserDO
+     * @param tradeOfferId
+     * @return  3交易成功，7，6 交易失败
+     */
+    private Integer getTradeOffInfoV2(BindUserDO bindUserDO,String tradeOfferId) {
+        try{
+            Optional<BindIpaddressDO> bindUserIp = steamService.getBindUserIp(bindUserDO);
+            SteamWeb steamWeb=new SteamWeb(configService,bindUserIp);
+            if(steamWeb.checkLogin(bindUserDO)){
+                if(steamWeb.getWebApiKey().isPresent()){
+                    bindUserDO.setApiKey(steamWeb.getWebApiKey().get());
+                }
+                bindUserService.changeBindUserCookie(new BindUserDO().setId(bindUserDO.getId()).setLoginCookie(steamWeb.getCookieString()).setApiKey(bindUserDO.getApiKey()));
+            }
+            String s1 = stringRedisTemplate.opsForValue().get("steam_order" + bindUserDO.getSteamId());
+            if(Objects.isNull(s1)){
+                HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
+                Map<String, String> header = new HashMap<>();
+                header.put("Accept-Language", "zh-CN,zh;q=0.9");
+                builder.headers(header);
+                builder.url("https://steamcommunity.com/profiles/:steamId/tradeoffers/sent/");
+                Map<String, String> pathVar = new HashMap<>();
+                pathVar.put("steamId", bindUserDO.getSteamId());
+                builder.pathVar(pathVar);
+                builder.cookieString(bindUserDO.getLoginCookie());
+
+                HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),bindUserIp);
+
+                log.error("steam返回{}",proxyResponseVo);
+                if(Objects.nonNull(proxyResponseVo.getStatus()) && proxyResponseVo.getStatus()==200){
+                    s1=proxyResponseVo.getHtml();
+                    stringRedisTemplate.opsForValue().set("steam_order" + bindUserDO.getSteamId(),s1,5, TimeUnit.MINUTES);
+                }
+            }
+            log.error("steam返回{}",s1);
+            if(Objects.nonNull(s1)){
+                Document parse = Jsoup.parse(s1);
+                Element tradeofferInfo = parse.body().getElementById("tradeofferid_"+tradeOfferId);
+                if(Objects.nonNull(tradeofferInfo)){
+                    String s = tradeofferInfo.toString();
+                    if(s.contains("取消交易报价")){//还未确认
+                        return 2;
+                    }
+                    if(s.contains("接受了交易")){//接受了交易
+                        return 3;
+                    }
+                    if(s.contains("交易于") && s.contains("拒绝")){//还未确认
+                        return 6;
+                    }
+                }
+
+
+                return 2;
+            }else{
+                throw new ServiceException(-1,"Steam openid 接口验证异常");
+            }
+        }catch (Exception e){
+            log.error("解析出错原因{}",e.getMessage());
+            throw new ServiceException(-1,"Steam openid1 接口验证异常");
+        }
     }
 }

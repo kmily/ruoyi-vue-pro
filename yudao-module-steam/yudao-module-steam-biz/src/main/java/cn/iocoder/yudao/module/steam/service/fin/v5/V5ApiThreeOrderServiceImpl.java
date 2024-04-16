@@ -253,6 +253,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         // 更新订单状态
         ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
         apiOrderExtDO.setOrderId(orderId); // 订单ID
+        apiOrderExtDO.setOrderSubStatusErrText(respVO.getStatusMsg()); // 订单子状态错误信息
         apiOrderExtDO.setOrderSubStatus(String.valueOf(respVO.getStatus())); // 订单子状态
         apiOrderExtDO.setOrderStatus(IvnStatusEnum.ACTIONING.getCode()); // 订单状态
         if(respVO.getStatus() == 3){
