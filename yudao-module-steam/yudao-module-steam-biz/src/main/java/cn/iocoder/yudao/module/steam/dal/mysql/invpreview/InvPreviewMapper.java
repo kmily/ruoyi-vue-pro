@@ -21,7 +21,6 @@ public interface InvPreviewMapper extends BaseMapperX<InvPreviewDO> {
     default PageResult<InvPreviewDO> selectPage(InvPreviewPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<InvPreviewDO>()
                 .eqIfPresent(InvPreviewDO::getPrice, reqVO.getPrice())
-                .eqIfPresent(InvPreviewDO::getQuantity, reqVO.getQuantity())
                 .eqIfPresent(InvPreviewDO::getDeals, reqVO.getDeals())
                 .eqIfPresent(InvPreviewDO::getItemId, reqVO.getItemId())
                 .eqIfPresent(InvPreviewDO::getAppId, reqVO.getAppId())
@@ -39,7 +38,10 @@ public interface InvPreviewMapper extends BaseMapperX<InvPreviewDO> {
                 .eqIfPresent(InvPreviewDO::getTagList, reqVO.getTagList())
                 .eqIfPresent(InvPreviewDO::getSubsidyTag, reqVO.getSubsidyTag())
                 .eqIfPresent(InvPreviewDO::getAutoPrice, reqVO.getAutoPrice())
+                .eqIfPresent(InvPreviewDO::getQuantity, reqVO.getQuantity())
                 .eqIfPresent(InvPreviewDO::getAutoQuantity, reqVO.getAutoQuantity())
+                .eqIfPresent(InvPreviewDO::getOurSellQuantity,reqVO.getOurSellQuantity())
+                .eqIfPresent(InvPreviewDO::getOtherSellQuantity,reqVO.getOtherSellQuantity())
                 .eqIfPresent(InvPreviewDO::getReferencePrice, reqVO.getReferencePrice())
                 .eqIfPresent(InvPreviewDO::getSelQuality, reqVO.getSelQuality())
                 .eqIfPresent(InvPreviewDO::getSelItemset, reqVO.getSelItemset())

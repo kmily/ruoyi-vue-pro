@@ -115,6 +115,14 @@ public class InvPreviewDO extends BaseDO {
      */
     private String autoQuantity;
     /**
+     * 其他平台在售数量
+     */
+    private Integer OtherSellQuantity;
+    /**
+     * 本平台在售数量
+     */
+    private Integer OurSellQuantity;
+    /**
      * 参考价
      */
     private String referencePrice;
