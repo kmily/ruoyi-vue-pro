@@ -165,7 +165,7 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     public Integer getOrderSimpleStatus(LoginUser loginUser, String orderNo, Long orderId) {
         ApiOrderDO masterOrder = getMasterOrder(orderId);
         ApiOrderExtDO orderExt = getOrderExt(orderNo, orderId);
-        BindUserDO bindUser = bindUserService.getBindUser(masterOrder.getBuyBindUserId());
+        BindUserDO bindUser = bindUserService.getBindUser(masterOrder.getSellBindUserId());
         Integer tradeOffInfoV2 = getTradeOffInfoV2(bindUser, String.valueOf(orderExt.getTradeOfferId()));
         log.info("tradeOffInfoV2 {}",tradeOffInfoV2);
         //1,进行中，2完成，3作废
