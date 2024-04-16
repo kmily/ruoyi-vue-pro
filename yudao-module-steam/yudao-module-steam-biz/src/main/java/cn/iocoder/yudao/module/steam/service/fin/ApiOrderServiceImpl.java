@@ -692,7 +692,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
 
             if(PayOrderStatusEnum.isSuccess(orderDO.getPayOrderStatus())){
                 updateOrder.setOrderStatus(2);
-                if(orderExt.getOrderStatus().equals("2")){
+                if(orderExt.getOrderStatus().equals(2)){
                     updateOrder.setOrderStatus(3);
                 }
             }
