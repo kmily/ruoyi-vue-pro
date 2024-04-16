@@ -59,6 +59,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     public ApiCommodityRespVo query(LoginUser loginUser, ApiQueryCommodityReqVo createReqVO) {
         checkLoginUser(loginUser);
         //获取v5平台商品最低价
+//        String token = getTokenFromRedisOrSetNew();
         V5ProductPriceInfoRes.V5ProductPriceInfoResponse productPriceInfo =
                 V5ApiUtils.getV5ProductLowestPrice(Collections.singletonList(createReqVO.getCommodityHashName()));
         ApiCommodityRespVo apiCommodityRespVo = new ApiCommodityRespVo();
@@ -98,15 +99,22 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         log.info("经过计算购买价格为："+ divide);
         V5BuyProductVo v5BuyProductVo = new V5BuyProductVo(createReqVO.getCommodityHashName(), divide,
                 createReqVO.getTradeLinks(),createReqVO.getMerchantNo(),MERCHANT_KEY,createReqVO.getFastShipping());
+        log.info("V5BuyProduct的有参构造方法执行了" + v5BuyProductVo);
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+        log.info("builder对象创建成功" + builder);
         builder.url(API_POST_BUY_V5_PRODUCT_URL);
+        log.info("购买url拼接成功：" + API_POST_BUY_V5_PRODUCT_URL);
         HashMap<String,String> headers = new HashMap<>();
+        log.info("hashMap对象创建成功" + builder);
         headers.put("Authorization",V5_TOKEN);
         builder.headers(headers);
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(v5BuyProductVo);
+        log.info("准备发起http请求：" + builder);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
+        log.info("发起http请求返回：" + sent.html());
         V5ProductBuyRes json = sent.json(V5ProductBuyRes.class);
+
         ApiBuyItemRespVo apiBuyItemRespVo = new ApiBuyItemRespVo();
         if (json != null) {
             // 设置交易链接
@@ -128,8 +136,9 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                     apiOrderExtDO.setOrderInfo(sent.html());
                     apiOrderExtDO.setOrderStatus(1);
                     apiOrderExtDO.setOrderSubStatus(json.getMsg());
-                    apiOrderExtDO.setCommodityInfo(createReqVO.getCommodityHashName());
+//                    apiOrderExtDO.setCommodityInfo(createReqVO.getCommodityHashName());
                     apiOrderExtMapper.insert(apiOrderExtDO);
+                    queryCommodityDetail(loginUser,json.getData().getOrderNo(),orderId);
                     break;
                 case 1: // 返回错误码为1
                     apiBuyItemRespVo.setIsSuccess(false);
@@ -151,6 +160,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             throw new ServiceException(-1,"请求返回json为空");
         }
         return apiBuyItemRespVo;
+
     }
 
     @Override
@@ -159,6 +169,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             throw new ServiceException(OpenApiCode.ID_ERROR);
         }
         //获取订单详情
+//        String token = getTokenFromRedisOrSetNew();
         String v5OrderInfo = V5ApiUtils.getV5OrderInfo(null, orderNo);
         ApiOrderExtDO apiOrderExtDO = apiOrderExtMapper.selectOne(ApiOrderExtDO::getOrderId, orderId);
         if (apiOrderExtDO == null){

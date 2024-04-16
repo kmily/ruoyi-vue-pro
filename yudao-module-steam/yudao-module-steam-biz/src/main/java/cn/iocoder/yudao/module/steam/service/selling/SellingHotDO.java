@@ -12,7 +12,7 @@ public class SellingHotDO {
     /**
      * 在售数量
      */
-    private Integer sellNum;
+    private Integer quantity;
     /**
      * 出售价格单价分
      */
