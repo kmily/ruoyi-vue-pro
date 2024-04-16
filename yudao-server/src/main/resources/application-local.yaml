@@ -135,16 +135,6 @@ lock4j:
   acquire-timeout: 3000 # 获取分布式锁超时时间，默认为 3000 毫秒
   expire: 30000 # 分布式锁的超时时间，默认为 30 毫秒
 
-# Resilience4j 配置项
-resilience4j:
-  ratelimiter:
-    instances:
-      backendA:
-        limit-for-period: 1 # 每个周期内，允许的请求数。默认为 50
-        limit-refresh-period: 60s # 每个周期的时长，单位：微秒。默认为 500
-        timeout-duration: 1s # 被限流时，阻塞等待的时长，单位：微秒。默认为 5s
-        register-health-indicator: true # 是否注册到健康监测
-
 --- #################### 监控相关配置 ####################
 
 # Actuator 监控端点的配置项
@@ -187,26 +177,33 @@ logging:
     cn.iocoder.yudao.module.trade.dal.mysql: debug
     cn.iocoder.yudao.module.promotion.dal.mysql: debug
     cn.iocoder.yudao.module.statistics.dal.mysql: debug
+    cn.iocoder.yudao.module.crm.dal.mysql: debug
+    cn.iocoder.yudao.module.erp.dal.mysql: debug
+    org.springframework.context.support.PostProcessorRegistrationDelegate: ERROR # TODO 芋艿：先禁用，Spring Boot 3.X 存在部分错误的 WARN 提示
 
 debug: false
 
 --- #################### 微信公众号、小程序相关配置 ####################
 wx:
   mp: # 公众号配置（必填），参见 https://github.com/Wechat-Group/WxJava/blob/develop/spring-boot-starters/wx-java-mp-spring-boot-starter/README.md 文档
-    #    app-id: wx041349c6f39b268b
-    #    secret: 5abee519483bc9f8cb37ce280e814bd0
-    app-id: wx5b23ba7a5589ecbb # 测试号
+#    app-id: wx041349c6f39b268b # 测试号（牛希尧提供的）
+#    secret: 5abee519483bc9f8cb37ce280e814bd0
+    app-id: wx5b23ba7a5589ecbb # 测试号（自己的）
     secret: 2a7b3b20c537e52e74afd395eb85f61f
+#    app-id: wxa69ab825b163be19 # 测试号（Kongdy 提供的）
+#    secret: bd4f9fab889591b62aeac0d7b8d8b4a0
     # 存储配置，解决 AccessToken 的跨节点的共享
     config-storage:
       type: RedisTemplate # 采用 RedisTemplate 操作 Redis，会自动从 Spring 中获取
       key-prefix: wx # Redis Key 的前缀
       http-client-type: HttpClient # 采用 HttpClient 请求微信公众号平台
   miniapp: # 小程序配置（必填），参见 https://github.com/Wechat-Group/WxJava/blob/develop/spring-boot-starters/wx-java-miniapp-spring-boot-starter/README.md 文档
-    #    appid: wx62056c0d5e8db250
+    #    appid: wx62056c0d5e8db250 # 测试号（牛希尧提供的）
     #    secret: 333ae72f41552af1e998fe1f54e1584a
     appid: wx63c280fe3248a3e7 # wenhualian的接口测试号
     secret: 6f270509224a7ae1296bbf1c8cb97aed
+#    appid: wxc4598c446f8a9cb3 # 测试号（Kongdy 提供的）
+#    secret: 4a1a04e07f6a4a0751b39c3064a92c8b
     config-storage:
       type: RedisTemplate # 采用 RedisTemplate 操作 Redis，会自动从 Spring 中获取
       key-prefix: wa # Redis Key 的前缀
@@ -256,24 +253,8 @@ justauth:
       client-id: ${wx.mp.app-id}
       client-secret: ${wx.mp.secret}
       ignore-check-redirect-uri: true
-      ignore-check-state: true # 微信公众号，未调用后端的 getSocialAuthorizeUrl 方法，所以无法进行 state 校验 TODO 芋艿：后续考虑支持
-
   cache:
     type: REDIS
     prefix: 'social_auth_state:' # 缓存前缀，目前只对 Redis 缓存生效，默认 JUSTAUTH::STATE::
     timeout: 24h # 超时时长，目前只对 Redis 缓存生效，默认 3 分钟
-
-# TODO 赤焰：这个配置的目的是？
-#ureport配置
-#ureport:
-#  disableHttpSessionReportCache: true #是否禁用
-#  disableFileProvider: true #是否禁用
-#  debug: true
-#  fileStoreDir: D://ureport//files
-#  provider:
-#    database:
-#       disabled: true
-#    file:
-#       disabled: true
-
 

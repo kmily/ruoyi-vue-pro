@@ -92,6 +92,8 @@
 
 如果你想把【完整版】的功能，迁移到【精简版】，可以参考 [《迁移功能到精简版》](https://doc.iocoder.cn/migrate-module/) 文档。
 
+如果你想把【完整版】的功能，迁移到【精简版】，可以参考 [《迁移功能到精简版》](https://doc.iocoder.cn/migrate-module/) 文档。
+
 ## 😎 开源协议
 
 **为什么推荐使用本项目？**
@@ -126,6 +128,8 @@
 * 数据报表
 * 商城系统
 * 微信公众号
+* ERP 系统
+* CRM 系统
 
 > 友情提示：本项目基于 RuoYi-Vue 修改，**重构优化**后端的代码，**美化**前端的界面。
 >
@@ -158,6 +162,8 @@
 | 🚀  | 应用管理  | 管理 SSO 单点登录的应用，支持多种 OAuth2 授权方式 |
 | 🚀  | 地区管理  | 展示省份、城市、区镇等城市信息，支持 IP 对应城市      |
 
+![功能图](/.image/common/system-feature.png)
+
 ### 工作流程
 
 |     | 功能    | 描述                                     |
@@ -169,6 +175,8 @@
 | 🚀  | 待办任务  | 查看自己【未】审批的工作任务，支持通过、不通过、转发、委派、退回等操作    |
 | 🚀  | 已办任务  | 查看自己【已】审批的工作任务，未来会支持回退操作               |
 | 🚀  | OA 请假 | 作为业务自定义接入工作流的使用示例，只需创建请求对应的工作流程，即可进行审批 |
+
+![功能图](/.image/common/bpm-feature.png)
 
 ### 支付系统
 
@@ -199,11 +207,11 @@
 | 🚀  | Java 监控   | 基于 Spring Boot Admin 实现 Java 应用的监控           |
 | 🚀  | 链路追踪      | 接入 SkyWalking 组件，实现链路追踪                      |
 | 🚀  | 日志中心      | 接入 SkyWalking 组件，实现日志中心                      |
-| 🚀  | 分布式锁      | 基于 Redis 实现分布式锁，满足并发场景                       |
-| 🚀  | 幂等组件      | 基于 Redis 实现幂等组件，解决重复请求问题                     |
-| 🚀  | 服务保障      | 基于 Resilience4j 实现服务的稳定性，包括限流、熔断等功能          |
+| 🚀  | 服务保障      | 基于 Redis 实现分布式锁、幂等、限流功能，满足高并发场景              |
 | 🚀  | 日志服务      | 轻量级日志中心，查看远程服务器的日志                           |
 | 🚀  | 单元测试      | 基于 JUnit + Mockito 实现单元测试，保证功能的正确性、代码的质量等    |
+
+![功能图](/.image/common/infra-feature.png)
 
 ### 数据报表
 
@@ -233,8 +241,6 @@
 
 ![功能图](/.image/common/mall-preview.png)
 
-_前端基于 crmeb uniapp 经过授权重构，优化代码实现，接入芋道快速开发平台_
-
 演示地址：<https://doc.iocoder.cn/mall-preview/>
 
 ### 会员中心
@@ -247,29 +253,43 @@ _前端基于 crmeb uniapp 经过授权重构，优化代码实现，接入芋�
 | 🚀  | 会员分组 | 对会员进行分组，用于用户画像、内容推送等运营手段         |
 | 🚀  | 积分签到 | 回馈给签到、消费等行为的积分，会员可订单抵现、积分兑换等途径消耗 |
 
+### ERP 系统
+
+![功能图](/.image/common/erp-feature.png)
+
+演示地址：<https://doc.iocoder.cn/erp-preview/>
+
+### CRM 系统
+
+![功能图](/.image/common/crm-feature.png)
+
+演示地址：<https://doc.iocoder.cn/crm-preview/>
+
 ## 🐨 技术栈
 
 ### 模块
 
-| 项目                                                                       | 说明                 |
-|--------------------------------------------------------------------------|--------------------|
-| `yudao-dependencies`                                                     | Maven 依赖版本管理       |
-| `yudao-framework`                                                        | Java 框架拓展          |
-| `yudao-server`                                                           | 管理后台 + 用户 APP 的服务端 |
-| `yudao-module-system`                                                    | 系统功能的 Module 模块    |
-| `yudao-module-member`                                                    | 会员中心的 Module 模块    |
-| `yudao-module-infra`                                                     | 基础设施的 Module 模块    |
-| `yudao-module-bpm`                                                       | 工作流程的 Module 模块    |
-| `yudao-module-pay`                                                       | 支付系统的 Module 模块    |
-| `yudao-module-mall`                                                      | 商城系统的 Module 模块    |
-| `yudao-module-mp`                                                        | 微信公众号的 Module 模块   |
-| `yudao-module-report`                                                    | 大屏报表 Module 模块     |
+| 项目                    | 说明                 |
+|-----------------------|--------------------|
+| `yudao-dependencies`  | Maven 依赖版本管理       |
+| `yudao-framework`     | Java 框架拓展          |
+| `yudao-server`        | 管理后台 + 用户 APP 的服务端 |
+| `yudao-module-system` | 系统功能的 Module 模块    |
+| `yudao-module-member` | 会员中心的 Module 模块    |
+| `yudao-module-infra`  | 基础设施的 Module 模块    |
+| `yudao-module-bpm`    | 工作流程的 Module 模块    |
+| `yudao-module-pay`    | 支付系统的 Module 模块    |
+| `yudao-module-mall`   | 商城系统的 Module 模块    |
+| `yudao-module-erp`    | ERP 系统的 Module 模块  |
+| `yudao-module-crm`    | CRM 系统的 Module 模块  |
+| `yudao-module-mp`     | 微信公众号的 Module 模块   |
+| `yudao-module-report` | 大屏报表 Module 模块     |
 
 ### 框架
 
 | 框架                                                                                          | 说明               | 版本             | 学习指南                                                           |
 |---------------------------------------------------------------------------------------------|------------------|----------------|----------------------------------------------------------------|
-| [Spring Boot](https://spring.io/projects/spring-boot)                                       | 应用开发框架           | 2.7.17         | [文档](https://github.com/YunaiV/SpringBoot-Labs)                |
+| [Spring Boot](https://spring.io/projects/spring-boot)                                       | 应用开发框架           | 2.7.18         | [文档](https://github.com/YunaiV/SpringBoot-Labs)                |
 | [MySQL](https://www.mysql.com/cn/)                                                          | 数据库服务器           | 5.7 / 8.0+     |                                                                |
 | [Druid](https://github.com/alibaba/druid)                                                   | JDBC 连接池、监控组件    | 1.2.19         | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
 | [MyBatis Plus](https://mp.baomidou.com/)                                                    | MyBatis 增强工具包    | 3.5.3.2        | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao)         |
@@ -282,7 +302,6 @@ _前端基于 crmeb uniapp 经过授权重构，优化代码实现，接入芋�
 | [Flowable](https://github.com/flowable/flowable-engine)                                     | 工作流引擎            | 6.8.0          | [文档](https://doc.iocoder.cn/bpm/)                              |
 | [Quartz](https://github.com/quartz-scheduler)                                               | 任务调度组件           | 2.3.2          | [文档](http://www.iocoder.cn/Spring-Boot/Job/?yudao)             |
 | [Springdoc](https://springdoc.org/)                                                         | Swagger 文档       | 1.6.15         | [文档](http://www.iocoder.cn/Spring-Boot/Swagger/?yudao)         |
-| [Resilience4j](https://github.com/resilience4j/resilience4j)                                | 服务保障组件           | 1.7.1          | [文档](http://www.iocoder.cn/Spring-Boot/Resilience4j/?yudao)    |
 | [SkyWalking](https://skywalking.apache.org/)                                                | 分布式应用追踪系统        | 8.12.0         | [文档](http://www.iocoder.cn/Spring-Boot/SkyWalking/?yudao)      |
 | [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin)                       | Spring Boot 监控平台 | 2.7.10         | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao)           |
 | [Jackson](https://github.com/FasterXML/jackson)                                             | JSON 工具库         | 2.13.3         |                                                                |
