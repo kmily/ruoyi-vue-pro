@@ -164,6 +164,7 @@ public class InvPreviewExtService {
                 List<InvPreviewDO> invPreviewHandle = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
                         .eq(InvPreviewDO::getExistInv, CommonStatusEnum.DISABLE.getStatus())
                         .isNotNull(InvPreviewDO::getDisplayWeight)
+                        .ge(InvPreviewDO::getQuantity,1)
                         .orderByDesc(InvPreviewDO::getDisplayWeight)
                         .last("limit " + pageReqVO.getPageSize().toString()));
 
@@ -179,7 +180,7 @@ public class InvPreviewExtService {
                     sellingHotDO.setDisplayWeight(item.getDisplayWeight());
                     sellingHotDO.setMarketName(item.getItemName());
                     sellingHotDO.setMarketHashName(item.getMarketHashName());
-                    sellingHotDO.setQuantity(Integer.valueOf(item.getQuantity() != null ? item.getQuantity() : "0"));
+                    sellingHotDO.setQuantity(item.getQuantity() != null ? item.getQuantity() : 0);
                     sellingHotDO.setShortName(item.getShortName());
                     sellingHandleDOList.add(sellingHotDO);
                 }
@@ -190,6 +191,7 @@ public class InvPreviewExtService {
                 List<InvPreviewDO> invPreviewHot = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
                         .eq(InvPreviewDO::getExistInv, CommonStatusEnum.DISABLE.getStatus())
                         .betweenIfPresent(InvPreviewDO::getMinPrice, 10000, 100000)
+                        .ge(InvPreviewDO::getQuantity,1)
                         .orderByDesc(InvPreviewDO::getOurSellQuantity)
                         .last("limit " + pageReqVO.getPageSize().toString()));
 
@@ -205,7 +207,7 @@ public class InvPreviewExtService {
                     sellingHotDO.setDisplayWeight(item.getDisplayWeight());
                     sellingHotDO.setMarketName(item.getItemName());
                     sellingHotDO.setMarketHashName(item.getMarketHashName());
-                    sellingHotDO.setQuantity(Integer.valueOf(item.getQuantity() != null ? item.getQuantity() : "0"));
+                    sellingHotDO.setQuantity(item.getQuantity() != null ? item.getQuantity() : 0);
                     sellingHotDO.setShortName(item.getShortName());
                     sellingHotDOList.add(sellingHotDO);
                 }
@@ -215,6 +217,7 @@ public class InvPreviewExtService {
             case 2:
                 List<InvPreviewDO> invPreviewMaxPrice = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
                         .eq(InvPreviewDO::getExistInv, CommonStatusEnum.DISABLE.getStatus())
+                        .ge(InvPreviewDO::getQuantity,1)
                         .orderByDesc(InvPreviewDO::getMinPrice)
                         .last("limit " + pageReqVO.getPageSize().toString()));
 
@@ -230,7 +233,7 @@ public class InvPreviewExtService {
                     sellingHotDO.setDisplayWeight(item.getDisplayWeight());
                     sellingHotDO.setMarketName(item.getItemName());
                     sellingHotDO.setMarketHashName(item.getMarketHashName());
-                    sellingHotDO.setQuantity(Integer.valueOf(item.getQuantity() != null ? item.getQuantity() : "0"));
+                    sellingHotDO.setQuantity(item.getQuantity() != null ? item.getQuantity() : 0);
                     sellingHotDO.setShortName(item.getShortName());
                     sellingMaxDOList.add(sellingHotDO);
                 }
@@ -241,6 +244,7 @@ public class InvPreviewExtService {
                 List<InvPreviewDO> invPreviewEconomical = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
                         .eq(InvPreviewDO::getExistInv, CommonStatusEnum.DISABLE.getStatus())
                         .betweenIfPresent(InvPreviewDO::getMinPrice, 0, 1000)
+                        .ge(InvPreviewDO::getQuantity,1)
                         .orderByDesc(InvPreviewDO::getAutoQuantity)
                         .last("limit " + pageReqVO.getPageSize().toString()));
 
@@ -256,7 +260,7 @@ public class InvPreviewExtService {
                     sellingHotDO.setDisplayWeight(item.getDisplayWeight());
                     sellingHotDO.setMarketName(item.getItemName());
                     sellingHotDO.setMarketHashName(item.getMarketHashName());
-                    sellingHotDO.setQuantity(Integer.valueOf(item.getQuantity() != null ? item.getQuantity() : "0"));
+                    sellingHotDO.setQuantity(item.getQuantity() != null ? item.getQuantity() : 0);
                     sellingHotDO.setShortName(item.getShortName());
                     sellingEconomicalDOList.add(sellingHotDO);
                 }
@@ -281,7 +285,7 @@ public class InvPreviewExtService {
                     sellingHotDO.setDisplayWeight(item.getDisplayWeight());
                     sellingHotDO.setMarketName(item.getItemName());
                     sellingHotDO.setMarketHashName(item.getMarketHashName());
-                    sellingHotDO.setQuantity(Integer.valueOf(item.getQuantity() != null ? item.getQuantity() : "0"));
+                    sellingHotDO.setQuantity(item.getQuantity() != null ? item.getQuantity() : 0);
                     sellingHotDO.setShortName(item.getShortName());
                     sellingRecentDOList.add(sellingHotDO);
                 }
@@ -306,7 +310,7 @@ public class InvPreviewExtService {
                     sellingHotDO.setDisplayWeight(item.getDisplayWeight());
                     sellingHotDO.setMarketName(item.getItemName());
                     sellingHotDO.setMarketHashName(item.getMarketHashName());
-                    sellingHotDO.setQuantity(Integer.valueOf(item.getQuantity() != null ? item.getQuantity() : "0"));
+                    sellingHotDO.setQuantity(item.getQuantity() != null ? item.getQuantity() : 0);
                     sellingHotDO.setShortName(item.getShortName());
                     sellingDefaultDOList.add(sellingHotDO);
                 }
@@ -432,7 +436,7 @@ public class InvPreviewExtService {
         if (Objects.nonNull(invPreviewDOS) && invPreviewDOS.size() > 0) {
             invPreviewDOS.forEach(item -> {
                 C5ItemInfo itemInfo = item.getItemInfo();
-                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(sellingDOPageResult.getTotal() > 0).setQuantity(sellingDOPageResult.getTotal().toString())
+                invPreviewMapper.updateById(new InvPreviewDO().setId(item.getId()).setExistInv(sellingDOPageResult.getTotal() > 0).setQuantity(Math.toIntExact(sellingDOPageResult.getTotal()))
                         .setMinPrice(sellingDOOptional.isPresent() ? sellingDOOptional.get().getPrice() : -1)
                         .setSelExterior(itemInfo.getExteriorName())
                         .setSelQuality(itemInfo.getQualityName())
@@ -731,7 +735,7 @@ public class InvPreviewExtService {
 
 
             invPreviewDO.setMinPrice(sellingDOOptional.isPresent() ? sellingDOOptional.get().getPrice() : -1).setExistInv(total > 0)
-                    .setQuantity(total.toString())
+                    .setQuantity(Integer.valueOf(total.toString()))
                     .setMarketHashName(marketHashName)
                     .setImageUrl(invDescDO.getIconUrl())
                     .setItemName(invDescDO.getMarketName())
@@ -778,7 +782,7 @@ public class InvPreviewExtService {
 
 
             int sellNum = sellingDOPageResult.size() + otherSellingDOPageResult.size();
-            item.setQuantity(String.valueOf(sellNum));
+            item.setQuantity(sellNum);
             item.setOurSellQuantity(sellingDOPageResult.size());
             item.setOtherSellQuantity(otherSellingDOPageResult.size());
 

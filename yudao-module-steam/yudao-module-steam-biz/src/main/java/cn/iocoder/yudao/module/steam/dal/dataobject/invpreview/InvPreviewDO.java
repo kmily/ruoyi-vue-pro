@@ -39,7 +39,7 @@ public class InvPreviewDO extends BaseDO {
     /**
      * quantity
      */
-    private String quantity;
+    private Integer quantity;
     /**
      * deals
      */
