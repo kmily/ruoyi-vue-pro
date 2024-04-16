@@ -41,4 +41,9 @@ public interface OpenApiCode {
     ErrorCode ERR_1 = new ErrorCode(1, "发生未知错误");
     ErrorCode ERR_1001 = new ErrorCode(1001, "该Steam暂无法交易 ");
     ErrorCode ERR_1002 = new ErrorCode(1002, "商品状态发生变化，暂无法购买，请选购其他商品");
+
+    //v5登录
+    ErrorCode ERR_V5_LOGIN = new ErrorCode(1003, "请求v5登录接口出错 ");
+    ErrorCode ERR_WIFI = new ErrorCode(1004, "网络连接不良，请重试 ");
+
 }
