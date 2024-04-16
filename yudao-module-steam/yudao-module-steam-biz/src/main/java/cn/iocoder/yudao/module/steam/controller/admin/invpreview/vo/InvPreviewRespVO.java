@@ -95,6 +95,14 @@ public class InvPreviewRespVO {
     @ExcelProperty("自动发货数量")
     private String autoQuantity;
 
+    @Schema(description = "其他平台在售数量")
+    @ExcelProperty("其他平台在售数量")
+    private Integer OtherSellQuantity;
+
+    @Schema(description = "本平台在售数量")
+    @ExcelProperty("其他平台在售数量")
+    private Integer OurSellQuantity;
+
     @Schema(description = "参考价", example = "31534")
     @ExcelProperty("参考价")
     private String referencePrice;

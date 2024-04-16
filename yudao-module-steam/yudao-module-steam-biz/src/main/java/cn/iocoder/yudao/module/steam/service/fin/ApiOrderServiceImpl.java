@@ -14,7 +14,6 @@ import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
-import cn.iocoder.yudao.module.steam.controller.app.vo.api.AppBatchGetOnSaleCommodityInfoRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.Io661OrderInfoResp;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderCancelVo;
 import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
@@ -27,8 +26,6 @@ import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderNotifyMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.devaccount.DevAccountMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingHashSummary;
-import cn.iocoder.yudao.module.steam.dal.mysql.youyounotify.YouyouNotifyMapper;
 import cn.iocoder.yudao.module.steam.enums.*;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5ItemListVO;
@@ -72,9 +69,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 public class ApiOrderServiceImpl implements ApiOrderService {
 
     /**
-     * 接入的实力应用编号
-     *
-     * 从 [支付管理 -> 应用信息] 里添加
+     * IO661平台收款帐号
      */
     private static final Long UU_CASH_ACCOUNT_ID = 250L;//UU收款账号ID
     /**
@@ -315,7 +310,12 @@ public class ApiOrderServiceImpl implements ApiOrderService {
 
             apiOrderMapper.updateById(new ApiOrderDO().setId(invOrderId).setServiceFeeRet(JacksonUtils.writeValueAsString(payWalletTransactionDO)));
             //获取卖家家钱包并进行打款
-            PayWalletDO orCreateWallet2 = payWalletService.getOrCreateWallet(uuOrderById.getSellUserId(), uuOrderById.getSellUserType());
+            PayWalletDO orCreateWallet2;
+            if(Objects.nonNull(uuOrderById.getSellUserId()) && Objects.nonNull(uuOrderById.getSellUserType())){
+                orCreateWallet2 = payWalletService.getOrCreateWallet(uuOrderById.getSellUserId(), uuOrderById.getSellUserType());
+            }else{
+                orCreateWallet2 = payWalletService.getOrCreateWallet(UU_CASH_ACCOUNT_ID, UserTypeEnum.MEMBER.getValue());
+            }
             PayWalletTransactionDO payWalletTransactionDO1 = payWalletService.addWalletBalance(orCreateWallet2.getId(), String.valueOf(uuOrderById.getId()),
                     PayWalletBizTypeEnum.STEAM_CASH, uuOrderById.getCommodityAmount());
             apiOrderMapper.updateById(new ApiOrderDO().setId(invOrderId).setCashRet(JacksonUtils.writeValueAsString(payWalletTransactionDO1)).setCashStatus(InvSellCashStatusEnum.CASHED.getStatus()));
@@ -352,18 +352,22 @@ public class ApiOrderServiceImpl implements ApiOrderService {
             throw exception(OpenApiCode.ERR_5213);
         }
         //购买
-        ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
-        ApiBuyItemRespVo apiBuyItemRespVo = apiThreeOrderService.buyItem(loginUser, uuOrder1.getBuyInfo(),uuOrder1.getId());
-        if(!apiBuyItemRespVo.getIsSuccess()){
-            throw new ServiceException(apiBuyItemRespVo.getErrorCode());
+        try{
+            ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
+            ApiBuyItemRespVo apiBuyItemRespVo = apiThreeOrderService.buyItem(loginUser, uuOrder1.getBuyInfo(),uuOrder1.getId());
+            if(!apiBuyItemRespVo.getIsSuccess()){
+                throw new ServiceException(apiBuyItemRespVo.getErrorCode());
+            }
+            apiOrderMapper.updateById(new ApiOrderDO().setId(uuOrder1.getId())
+                    .setThreeOrderNo(apiBuyItemRespVo.getOrderNo())
+                    .setPayOrderStatus(PayOrderStatusEnum.SUCCESS.getStatus())
+                    .setTransferStatus(InvTransferStatusEnum.TransferING.getStatus())
+            );
+            return getOrder(loginUser, queryOrderReqVo);
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new ServiceException(OpenApiCode.ERR_BUY_ERROR);
         }
-
-        apiOrderMapper.updateById(new ApiOrderDO().setId(uuOrder1.getId())
-                .setThreeOrderNo(apiBuyItemRespVo.getOrderNo())
-                .setPayOrderStatus(PayOrderStatusEnum.SUCCESS.getStatus())
-                .setTransferStatus(InvTransferStatusEnum.TransferING.getStatus())
-        );
-        return getOrder(loginUser, queryOrderReqVo);
     }
 
     private void validateInvOrderCanCreate(LoginUser loginUser,ApiOrderDO orderDO) {
@@ -691,7 +695,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
 
             if(PayOrderStatusEnum.isSuccess(orderDO.getPayOrderStatus())){
                 updateOrder.setOrderStatus(2);
-                if(orderExt.getOrderStatus().equals("2")){
+                if(orderExt.getOrderStatus().equals(2)){
                     updateOrder.setOrderStatus(3);
                 }
             }
@@ -702,7 +706,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
     }
     private void insertNotify(Long orderId,String msgNo){
         ApiOrderDO newOrder = getOrderById(orderId);
-        ApiOrderExtDO orderExt = getOrderExt(newOrder.getOrderNo(), newOrder.getId());
+        ApiOrderExtDO orderExt = getOrderExt(newOrder.getThreeOrderNo(), newOrder.getId());
 
 
 

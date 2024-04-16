@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-@Service
+//@Service
 public class C5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
 

@@ -26,8 +26,10 @@ public class DevAccountUtils {
             // 执行逻辑
             return callable.call();
         }catch (ServiceException e){
+            e.printStackTrace();
             throw e;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ServiceException(-1,e.getMessage());
         } finally {
             TenantContextHolder.setTenantId(oldTenantId);
