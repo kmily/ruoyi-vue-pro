@@ -80,7 +80,8 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         List<SellingDO> sellingDOS = sellingMapper.selectList(new Page<>(1, 1), new LambdaQueryWrapperX<SellingDO>()
                 .eq(SellingDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
                 .eq(SellingDO::getTransferStatus, InvTransferStatusEnum.SELL.getStatus())
-                .le(SellingDO::getPrice, createReqVO.getPurchasePrice())
+                .eq(SellingDO::getMarketHashName, createReqVO.getCommodityHashName())
+                .leIfPresent(SellingDO::getPrice, createReqVO.getPurchasePrice())
                 .orderByAsc(SellingDO::getPrice)
         );
         if(sellingDOS.size()>0){
