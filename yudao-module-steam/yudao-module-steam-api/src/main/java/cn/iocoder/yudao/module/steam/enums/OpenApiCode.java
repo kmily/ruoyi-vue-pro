@@ -41,4 +41,7 @@ public interface OpenApiCode {
     ErrorCode ERR_1 = new ErrorCode(1, "发生未知错误");
     ErrorCode ERR_1001 = new ErrorCode(1001, "该Steam暂无法交易 ");
     ErrorCode ERR_1002 = new ErrorCode(1002, "商品状态发生变化，暂无法购买，请选购其他商品");
+
+
+    ErrorCode ERR_BUY_ERROR = new ErrorCode(8003, "购买出错");
 }
