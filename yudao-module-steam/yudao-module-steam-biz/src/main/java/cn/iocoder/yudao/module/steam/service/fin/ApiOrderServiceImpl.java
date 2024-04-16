@@ -399,7 +399,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
             throw exception(OpenApiCode.ERR_5408);
         }
         ApiCommodityRespVo query=null;
-        for (PlatCodeEnum value : PlatCodeEnum.values()) {
+        for (PlatCodeEnum value : getAllPlatCode(orderDO.getBuyInfo().getFastShipping())) {
             Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByPlatCode(value);
             if(!apiThreeByOrder.isPresent()){
                 continue;
@@ -871,5 +871,20 @@ public class ApiOrderServiceImpl implements ApiOrderService {
             return itemList;
         }
         return null;
+    }
+
+    /**
+     * 是否极速发货
+     * @param fastShipping 0：优先购买极速发货；1：只购买极速发货
+     * @return
+     */
+    private List<PlatCodeEnum> getAllPlatCode(Integer fastShipping){
+        PlatCodeEnum[] values = PlatCodeEnum.values();
+        if(Objects.nonNull(fastShipping)  && fastShipping==1){
+            return Arrays.stream(values).filter(i -> i.equals(PlatCodeEnum.IO661)).collect(Collectors.toList());
+        }else{
+            return Arrays.stream(values).collect(Collectors.toList());
+        }
+
     }
 }
