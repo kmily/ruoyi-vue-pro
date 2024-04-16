@@ -76,6 +76,12 @@ public class InvPreviewPageReqVO extends PageParam {
     @Schema(description = "自动发货数量")
     private String autoQuantity;
 
+    @Schema(description = "其他平台在售数量")
+    private Integer OtherSellQuantity;
+
+    @Schema(description = "本平台在售数量")
+    private Integer OurSellQuantity;
+
     @Schema(description = "参考价", example = "31534")
     private String referencePrice;
 
@@ -116,6 +122,9 @@ public class InvPreviewPageReqVO extends PageParam {
     @JsonIgnore
     private String type;
 
-    @Schema(description = "页码")
+    @Schema(description = "权重")
     private Integer displayWeight;
+
+    @Schema(description = "首页展示分类")
+    private Integer title;
 }

@@ -39,7 +39,7 @@ public class InvPreviewDO extends BaseDO {
     /**
      * quantity
      */
-    private String quantity;
+    private Integer quantity;
     /**
      * deals
      */
@@ -114,6 +114,14 @@ public class InvPreviewDO extends BaseDO {
      * 自动发货数量
      */
     private String autoQuantity;
+    /**
+     * 其他平台在售数量
+     */
+    private Integer OtherSellQuantity;
+    /**
+     * 本平台在售数量
+     */
+    private Integer OurSellQuantity;
     /**
      * 参考价
      */
