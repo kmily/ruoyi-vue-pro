@@ -194,11 +194,12 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
     @Override
     public ApiOrderCancelRespVo orderCancel(LoginUser loginUser, String orderNo, Long orderId) {
-        return null;
+        throw new ServiceException(-1,"此订单不取消的操作");
     }
 
     @Override
     public ApiOrderCancelRespVo releaseIvn(LoginUser loginUser, String orderNo, Long orderId) {
+
         return ApiThreeOrderService.super.releaseIvn(loginUser, orderNo, orderId);
     }
 
