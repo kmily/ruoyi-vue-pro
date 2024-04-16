@@ -179,7 +179,7 @@ public class InvPreviewExtService {
                     sellingHotDO.setDisplayWeight(item.getDisplayWeight());
                     sellingHotDO.setMarketName(item.getItemName());
                     sellingHotDO.setMarketHashName(item.getMarketHashName());
-                    sellingHotDO.setQuantity(Integer.valueOf(item.getAutoQuantity()));
+                    sellingHotDO.setQuantity(Integer.valueOf(item.getQuantity() != null ? item.getQuantity() : "0"));
                     sellingHotDO.setShortName(item.getShortName());
                     sellingHandleDOList.add(sellingHotDO);
                 }
@@ -230,7 +230,7 @@ public class InvPreviewExtService {
                     sellingHotDO.setDisplayWeight(item.getDisplayWeight());
                     sellingHotDO.setMarketName(item.getItemName());
                     sellingHotDO.setMarketHashName(item.getMarketHashName());
-                    sellingHotDO.setQuantity(Integer.valueOf(item.getAutoQuantity()));
+                    sellingHotDO.setQuantity(Integer.valueOf(item.getQuantity() != null ? item.getQuantity() : "0"));
                     sellingHotDO.setShortName(item.getShortName());
                     sellingMaxDOList.add(sellingHotDO);
                 }
@@ -256,7 +256,7 @@ public class InvPreviewExtService {
                     sellingHotDO.setDisplayWeight(item.getDisplayWeight());
                     sellingHotDO.setMarketName(item.getItemName());
                     sellingHotDO.setMarketHashName(item.getMarketHashName());
-                    sellingHotDO.setQuantity(Integer.valueOf(item.getAutoQuantity()));
+                    sellingHotDO.setQuantity(Integer.valueOf(item.getQuantity() != null ? item.getQuantity() : "0"));
                     sellingHotDO.setShortName(item.getShortName());
                     sellingEconomicalDOList.add(sellingHotDO);
                 }
@@ -281,7 +281,7 @@ public class InvPreviewExtService {
                     sellingHotDO.setDisplayWeight(item.getDisplayWeight());
                     sellingHotDO.setMarketName(item.getItemName());
                     sellingHotDO.setMarketHashName(item.getMarketHashName());
-                    sellingHotDO.setQuantity(Integer.valueOf(item.getAutoQuantity()));
+                    sellingHotDO.setQuantity(Integer.valueOf(item.getQuantity() != null ? item.getQuantity() : "0"));
                     sellingHotDO.setShortName(item.getShortName());
                     sellingRecentDOList.add(sellingHotDO);
                 }
@@ -306,7 +306,7 @@ public class InvPreviewExtService {
                     sellingHotDO.setDisplayWeight(item.getDisplayWeight());
                     sellingHotDO.setMarketName(item.getItemName());
                     sellingHotDO.setMarketHashName(item.getMarketHashName());
-                    sellingHotDO.setQuantity(Integer.valueOf(item.getAutoQuantity()));
+                    sellingHotDO.setQuantity(Integer.valueOf(item.getQuantity() != null ? item.getQuantity() : "0"));
                     sellingHotDO.setShortName(item.getShortName());
                     sellingDefaultDOList.add(sellingHotDO);
                 }
