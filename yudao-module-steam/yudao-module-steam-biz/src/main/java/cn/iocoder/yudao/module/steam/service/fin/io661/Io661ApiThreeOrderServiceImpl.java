@@ -39,7 +39,7 @@ import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
-//@Service
+@Service
 @Slf4j
 public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     @Resource
@@ -96,7 +96,7 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                 .le(SellingDO::getPrice, createReqVO.getPurchasePrice())
                 .orderByAsc(SellingDO::getPrice)
         ).stream().findFirst();
-        if(first.isPresent()){
+        if(!first.isPresent()){
             return ApiBuyItemRespVo.builder().isSuccess(false).errorCode(OpenApiCode.ERR_5301).build();
         }
 
