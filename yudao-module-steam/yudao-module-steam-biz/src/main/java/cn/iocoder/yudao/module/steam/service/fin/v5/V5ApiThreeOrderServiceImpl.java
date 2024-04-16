@@ -161,9 +161,6 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                 throw new ServiceException(-1,"请求返回json为空");
             }
             return apiBuyItemRespVo;
-        }catch (Exception e){
-            throw new ServiceException(OpenApiCode.ERR_WIFI);
-        }
 
     }
 
