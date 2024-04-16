@@ -69,9 +69,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 public class ApiOrderServiceImpl implements ApiOrderService {
 
     /**
-     * 接入的实力应用编号
-     *
-     * 从 [支付管理 -> 应用信息] 里添加
+     * IO661平台收款帐号
      */
     private static final Long UU_CASH_ACCOUNT_ID = 250L;//UU收款账号ID
     /**
@@ -312,7 +310,12 @@ public class ApiOrderServiceImpl implements ApiOrderService {
 
             apiOrderMapper.updateById(new ApiOrderDO().setId(invOrderId).setServiceFeeRet(JacksonUtils.writeValueAsString(payWalletTransactionDO)));
             //获取卖家家钱包并进行打款
-            PayWalletDO orCreateWallet2 = payWalletService.getOrCreateWallet(uuOrderById.getSellUserId(), uuOrderById.getSellUserType());
+            PayWalletDO orCreateWallet2;
+            if(Objects.nonNull(uuOrderById.getSellUserId()) && Objects.nonNull(uuOrderById.getSellUserType())){
+                orCreateWallet2 = payWalletService.getOrCreateWallet(uuOrderById.getSellUserId(), uuOrderById.getSellUserType());
+            }else{
+                orCreateWallet2 = payWalletService.getOrCreateWallet(UU_CASH_ACCOUNT_ID, UserTypeEnum.MEMBER.getValue());
+            }
             PayWalletTransactionDO payWalletTransactionDO1 = payWalletService.addWalletBalance(orCreateWallet2.getId(), String.valueOf(uuOrderById.getId()),
                     PayWalletBizTypeEnum.STEAM_CASH, uuOrderById.getCommodityAmount());
             apiOrderMapper.updateById(new ApiOrderDO().setId(invOrderId).setCashRet(JacksonUtils.writeValueAsString(payWalletTransactionDO1)).setCashStatus(InvSellCashStatusEnum.CASHED.getStatus()));
@@ -703,7 +706,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
     }
     private void insertNotify(Long orderId,String msgNo){
         ApiOrderDO newOrder = getOrderById(orderId);
-        ApiOrderExtDO orderExt = getOrderExt(newOrder.getOrderNo(), newOrder.getId());
+        ApiOrderExtDO orderExt = getOrderExt(newOrder.getThreeOrderNo(), newOrder.getId());
 
 
 
