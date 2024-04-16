@@ -200,7 +200,12 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
     @Override
     public ApiOrderCancelRespVo releaseIvn(LoginUser loginUser, String orderNo, Long orderId) {
-
+        ApiOrderExtDO orderExt = getOrderExt(orderNo, orderId);
+        SellingDO sellingDO = sellingMapper.selectById(Long.valueOf(orderExt.getCommodityInfo()));
+        if(Objects.nonNull(sellingDO)){
+            sellingMapper.updateById(new SellingDO().setId(sellingDO.getId()).setTransferStatus(InvTransferStatusEnum.SELL.getStatus()));
+            apiOrderExtMapper.updateById(new ApiOrderExtDO().setId(orderExt.getId()).setOrderSubStatus(InvTransferStatusEnum.CLOSE.getStatus().toString()).setOrderStatus(3));
+        }
         return ApiThreeOrderService.super.releaseIvn(loginUser, orderNo, orderId);
     }
 
