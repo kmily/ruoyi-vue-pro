@@ -98,9 +98,13 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         log.info("经过计算购买价格为："+ divide);
         V5BuyProductVo v5BuyProductVo = new V5BuyProductVo(createReqVO.getCommodityHashName(), divide,
                 createReqVO.getTradeLinks(),createReqVO.getMerchantNo(),MERCHANT_KEY,createReqVO.getFastShipping());
+        log.info("V5BuyProduct的有参构造方法执行了" + v5BuyProductVo);
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+        log.info("builder对象创建成功" + builder);
         builder.url(API_POST_BUY_V5_PRODUCT_URL);
+        log.info("购买url拼接成功：" + API_POST_BUY_V5_PRODUCT_URL);
         HashMap<String,String> headers = new HashMap<>();
+        log.info("hashMap对象创建成功" + builder);
         headers.put("Authorization",V5_TOKEN);
         builder.headers(headers);
         builder.method(HttpUtil.Method.JSON);
