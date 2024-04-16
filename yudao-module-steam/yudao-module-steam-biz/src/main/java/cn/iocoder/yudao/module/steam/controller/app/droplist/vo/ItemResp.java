@@ -21,6 +21,7 @@ public class ItemResp implements Serializable {
     private Integer salePrice;
     private List<C5ItemTag> tagList;
     private String autoQuantity;
+    private String quantity;
     /**
      * 参考价
      */
