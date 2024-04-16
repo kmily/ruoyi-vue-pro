@@ -3,6 +3,9 @@ package cn.iocoder.yudao.module.steam.service.steam;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 @Getter
 @AllArgsConstructor
 public enum InvSellCashStatusEnum {
@@ -18,4 +21,13 @@ public enum InvSellCashStatusEnum {
      * 状态名
      */
     private final String name;
+
+
+    public static InvSellCashStatusEnum findByStatus(Integer status){
+        Optional<InvSellCashStatusEnum> first = Arrays.stream(values()).filter(item -> item.getStatus().equals(status)).findFirst();
+        if(first.isPresent()){
+            return first.get();
+        }
+        return null;
+    }
 }

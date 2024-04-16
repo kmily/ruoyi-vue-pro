@@ -473,6 +473,7 @@ public class SellingExtService {
                 memberUserRespDTO1.setCreateTime(LocalDateTime.now());
                 memberUserRespDTO1.setLevelId(999l);
                 otherSellingListDo1.setMemberUserRespDTO(memberUserRespDTO1);
+                otherSellingListDo1.setSendType(1);
                 otherSellingPageReqVOS.add(otherSellingListDo1);
         }
         return new PageResult(otherSellingPageReqVOS, (long) otherSellingDO.size());

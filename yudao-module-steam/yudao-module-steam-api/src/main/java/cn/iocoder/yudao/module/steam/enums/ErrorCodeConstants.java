@@ -50,6 +50,7 @@ public interface ErrorCodeConstants {
     //---库存订单
     ErrorCode INVORDER_INV_NOT_FOUND = new ErrorCode(1_100_011_02, "库存不存在");
     ErrorCode INVORDER_ORDERED_EXCEPT = new ErrorCode(1_100_011_01, "此库存已经存在有效订单");
+    ErrorCode V5_ORDER_CANCEL = new ErrorCode(5_100_011_01, "取消订单正在处理中");
     ErrorCode INVORDER_USER_EXCEPT = new ErrorCode(1_100_011_01, "用户不存在");
     ErrorCode INVORDER_ORDERUSER_EXCEPT = new ErrorCode(1_100_011_01, "不能交易自己上架的饰品");
     ErrorCode INVORDER_BIND_STEAM_EXCEPT = new ErrorCode(1_100_011_01, "绑定steam账号异常");
@@ -78,7 +79,7 @@ public interface ErrorCodeConstants {
     ErrorCode UU_GOODS_ORDER_UPDATE_PAID_STATUS_NOT_UNPAID = new ErrorCode(1_100_011_04, "订单不是【未支付】状态");
     ErrorCode UU_GOODS_ORDER_MIN_TIME = new ErrorCode(3, "创单成功后30min后卖家未发送交易报价才能取消");
     ErrorCode UU_GOODS_ORDER_CAN_NOT_CANCEL = new ErrorCode(3, "此状态下不支持取消");
-    ErrorCode UU_GOODS_ORDER_TRANSFER_CASHED = new ErrorCode(1_100_011_05, "卖家已收款，不支付退款");
+    ErrorCode UU_GOODS_ORDER_TRANSFER_CASHED = new ErrorCode(1_100_011_05, "已收款或已退款，不支持退款操作");
     // 饰品在售预览
     ErrorCode INV_PREVIEW_NOT_EXISTS = new ErrorCode(1_100_010_01, "饰品在售预览不存在");
 

@@ -44,4 +44,6 @@ public class OtherSellingListDo extends PageParam {
     private Integer platformIdentity;
 
     private MemberUserRespDTO memberUserRespDTO;
+
+    private Integer sendType;
 }

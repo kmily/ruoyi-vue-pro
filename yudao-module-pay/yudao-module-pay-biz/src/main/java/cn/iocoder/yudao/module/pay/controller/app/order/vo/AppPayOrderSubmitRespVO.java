@@ -23,5 +23,14 @@ public class AppPayOrderSubmitRespVO extends PayOrderSubmitRespVO {
      */
     @JsonProperty("merchantNo")
     private String merchantNo;
-
+    /**
+     * 最终成交价格（单位：元）
+     */
+    @JsonProperty("dealPrice")
+    private String dealPrice;
+    /**
+     * 最终成交价格（单位：分）
+     */
+    @JsonProperty("dealPriceFen")
+    private Integer dealPriceFen;
 }

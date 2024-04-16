@@ -82,4 +82,8 @@ public class Io661OrderInfoResp {
      * 商品名称
      */
     private String marketName;
+    /**
+     * 出错说明
+     */
+    private String orderSubStatusErrText;
 }

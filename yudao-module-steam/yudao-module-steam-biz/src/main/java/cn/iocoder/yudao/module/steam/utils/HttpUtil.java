@@ -350,7 +350,7 @@ public class HttpUtil {
                 log.error("请求出错，服务器返回{}", Objects.requireNonNull(execute.body()).string());
                 throw new ServiceException(-1,"Http请求出错" + execute.message());
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new ServiceException(-1,"Http请求出错" + e.getMessage());
         }

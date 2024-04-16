@@ -7,6 +7,9 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
+/**
+ * 购买方式
+ */
 @AllArgsConstructor
 @Getter
 public enum PlatFormEnum  implements IntArrayValuable {

@@ -8,10 +8,14 @@ import cn.iocoder.yudao.module.steam.controller.admin.selquality.vo.SelQualityPa
 import cn.iocoder.yudao.module.steam.controller.admin.selrarity.vo.SelRarityPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.seltype.vo.SelTypePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppDropListRespVO;
+import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.seltype.SelTypeDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.seltype.SelWeaponDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.seltype.SelWeaponMapper;
+import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductPriceInfoRes;
+import cn.iocoder.yudao.module.steam.service.fin.v5.utils.V5ApiUtils;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5queryOnSaleInfoReqVO;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewService;
 import cn.iocoder.yudao.module.steam.service.selexterior.SelExteriorService;
 import cn.iocoder.yudao.module.steam.service.selitemset.SelItemsetService;
@@ -21,9 +25,7 @@ import cn.iocoder.yudao.module.steam.service.seltype.SelTypeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
@@ -179,5 +181,7 @@ public class AppDevApiController {
         List<InvPreviewDO> select = invPreviewService.getInvPreviewPage(page).getList();
         return CommonResult.success(select);
     }
+
+
 
 }
