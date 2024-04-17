@@ -1,36 +1,43 @@
 package cn.iocoder.yudao.module.steam.service.fin.c5;
 
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderExtDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.fin.ApiThreeOrderService;
+import cn.iocoder.yudao.module.steam.service.fin.c5.res.ProductBuyRes;
 import cn.iocoder.yudao.module.steam.service.fin.c5.res.ProductPriceInfoRes;
 import cn.iocoder.yudao.module.steam.service.fin.c5.utils.C5ApiUtils;
+import cn.iocoder.yudao.module.steam.service.fin.c5.vo.C5FastPayVo;
+import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductBuyRes;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5BuyProductVo;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5ItemListVO;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5page;
 import cn.iocoder.yudao.module.steam.service.fin.vo.*;
+import cn.iocoder.yudao.module.steam.utils.HttpUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.math.RoundingMode;
+import java.util.*;
 
-//@Service
+@Service
+@Slf4j
 public class C5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
-
-    @Resource
-    private SteamService steamService;
-//    @Resource
-//    private ApiOrderMapper
+    public static final BigDecimal NO1 = new BigDecimal("1.05");
+    public static final BigDecimal NO2 = new BigDecimal("0.998");
+    public static final BigDecimal NO3 = new BigDecimal("100");
+    public static final BigDecimal NO4 = new BigDecimal("6.75"); //与c5的汇率定为这么多
     @Override
     public PlatCodeEnum getPlatCode() {
         return PlatCodeEnum.C5;
@@ -51,8 +58,10 @@ public class C5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             ProductPriceInfoRes.ProductPriceInfoResponse.ProductData productData = data.get(0);
             apiCommodityRespVo.setPrice(BigDecimal.valueOf(productData.getPrice()).multiply(BigDecimal.valueOf(675)).intValue());
             apiCommodityRespVo.setIsSuccess(true);
+            apiCommodityRespVo.setErrorCode(OpenApiCode.OK);
         } else {
             apiCommodityRespVo.setIsSuccess(false);
+            apiCommodityRespVo.setErrorCode(OpenApiCode.ERR_C5_QUERY_ERROR);
         }
         apiCommodityRespVo.setPlatCode(PlatCodeEnum.C5);
         return apiCommodityRespVo;
@@ -61,31 +70,36 @@ public class C5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ApiBuyItemRespVo buyItem(LoginUser loginUser, ApiQueryCommodityReqVo createReqVO,Long orderId) {
-        //买家身份检测
-        BindUserDO buyBindUserDO=null;
-        if(StringUtils.hasText(createReqVO.getTradeLinks())){
-            buyBindUserDO = steamService.getTempBindUserByLogin(loginUser, createReqVO.getTradeLinks(),true);
+        BigDecimal divide = new BigDecimal(createReqVO.getPurchasePrice())
+                .divide(NO1, 7, RoundingMode.HALF_UP)
+                .divide(NO2, 7, RoundingMode.HALF_UP)
+                .divide(NO3, 7, RoundingMode.HALF_UP)
+                .divide(NO4, 7, RoundingMode.HALF_UP)
+                .setScale(2, RoundingMode.HALF_UP);
+        log.info("C5经过计算购买价格为："+ divide + "元");
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+        String merchantOrderNo = "C" + uuid.substring(1, 21); // 使用UUID的一部分截取20位作为唯一ID
+        C5FastPayVo c5FastPayVo = new C5FastPayVo(C5ApiUtils.CSGO_ID,1,null,
+                1, createReqVO.getCommodityHashName(),divide, merchantOrderNo, createReqVO.getTradeLinks());
+        log.info("购买"+createReqVO.getCommodityHashName()+ "商品的入参为"+ c5FastPayVo);
+        ProductBuyRes json = C5ApiUtils.buyC5Product(c5FastPayVo);
+        ApiBuyItemRespVo apiBuyItemRespVo = new ApiBuyItemRespVo();
+        if (json != null) {
+            // 设置交易链接
+            apiBuyItemRespVo.setTradeLink(createReqVO.getTradeLinks());
+            if (json.getErrorCode() != 200){
+                apiBuyItemRespVo.setIsSuccess(false);
+                apiBuyItemRespVo.setErrorCode(new ErrorCode(json.getErrorCode(), json.getErrorMsg()));
+                return apiBuyItemRespVo;
+            }
+            apiBuyItemRespVo.setOrderNo(String.valueOf(json.getData().getOrderId()));//这里返回的是C5接口的orderId
+            apiBuyItemRespVo.setErrorCode(OpenApiCode.OK);
+            apiBuyItemRespVo.setIsSuccess(true);
+            return apiBuyItemRespVo;
+
+        } else {
+            throw new ServiceException(-1,"请求返回C5的json为空");
         }
-        if(Objects.isNull(buyBindUserDO)){
-            throw new ServiceException(OpenApiCode.ERR_5201);
-        }
-
-//        ApiCommodityRespVo query = query(loginUser, createReqVO);
-//        if (query != null && query.getPrice() <= createReqVO.getPurchasePrice() ){ //满足C5下单条件
-        // TODO
-//            C5ApiUtils.buyC5Product()
-//        }
-
-        ApiBuyItemRespVo apiBuyItemRespVo=new ApiBuyItemRespVo();
-//        SellingDO sellingDO = sellingMapper.selectById(reqVo.getSellId());
-//        if(Objects.isNull(sellingDO)){
-//            throw new ServiceException(OpenApiCode.ERR_5214);
-//        }
-
-        //创建订单
-        ApiOrderDO apiOrderDO = new ApiOrderDO();
-
-        return null;
     }
 
     @Override

@@ -4,11 +4,17 @@ import cn.iocoder.yudao.module.steam.service.fin.c5.vo.C5FastPayVo;
 import cn.iocoder.yudao.module.steam.service.fin.c5.vo.C5ProductVo;
 import cn.iocoder.yudao.module.steam.service.fin.c5.res.ProductBuyRes;
 import cn.iocoder.yudao.module.steam.service.fin.c5.res.ProductPriceInfoRes;
+import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductBuyRes;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5BuyProductVo;
+import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
@@ -86,31 +92,17 @@ public class C5ApiUtils {
         return "未获取到订单详情";
     }
     public static ProductBuyRes buyC5Product(C5FastPayVo payVo) {
-
-        String requestBodyJson = gson.toJson(payVo);
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url(API_BUY_C5_PRODUCT_URL)
-                .post(RequestBody.create(MediaType.parse(JSON), requestBodyJson))
-                .build();
-        // 发送请求并处理响应
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new IOException("购买指定商品失败: " + response);
-            }
-            // 获取响应数据
-            String responseData = null;
-            if (response.body() != null) {
-                responseData = response.body().string();
-                // 关闭响应体
-                response.body().close();
-                // 使用 Gson 将 JSON 字符串转换为对象
-                return gson.fromJson(responseData, ProductBuyRes.class);
-            }
-        } catch (IOException e) {
-            log.error("请求购买指定商品时发生异常", e);
-        }
-        return null;
+        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+        log.info("builder对象创建成功" + builder);
+        builder.url(API_BUY_C5_PRODUCT_URL);
+        builder.method(HttpUtil.Method.JSON);
+        builder.postObject(payVo);
+        log.info("准备发起http请求：" + builder);
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
+        log.info("发起http请求返回：" + sent.html());
+        ProductBuyRes json = sent.json(ProductBuyRes.class);
+        log.info("json：" + json);
+        return  json;
     }
 
 }

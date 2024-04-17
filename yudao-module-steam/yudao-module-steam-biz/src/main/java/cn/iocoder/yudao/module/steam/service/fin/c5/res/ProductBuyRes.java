@@ -4,18 +4,21 @@ package cn.iocoder.yudao.module.steam.service.fin.c5.res;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-@Data
-public class ProductBuyRes {
+import java.io.Serializable;
+import java.math.BigDecimal;
 
-    private Data data;
+@Data
+public class ProductBuyRes implements Serializable {
+
+    private Inform data;
     private int errorCode;
     private Object errorData;
     private String errorMsg;
     private boolean success;
-    @lombok.Data
-    public static class Data {
+    @Data
+    public static class Inform {
         @JsonProperty("buyPrice")
-        private double buyPrice;
+        private BigDecimal buyPrice;
 
         @JsonProperty("delivery")
         private double delivery;
