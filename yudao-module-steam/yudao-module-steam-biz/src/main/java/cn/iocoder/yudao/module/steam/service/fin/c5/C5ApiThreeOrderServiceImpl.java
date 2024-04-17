@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderExtDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.binduser.BindUserDO;
+import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.service.SteamService;
@@ -34,6 +35,8 @@ import java.util.*;
 @Slf4j
 public class C5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
+    @Resource
+    private ApiOrderExtMapper apiOrderExtMapper;
     public static final BigDecimal NO1 = new BigDecimal("1.05");
     public static final BigDecimal NO2 = new BigDecimal("0.998");
     public static final BigDecimal NO3 = new BigDecimal("100");
@@ -84,6 +87,7 @@ public class C5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         log.info("购买"+createReqVO.getCommodityHashName()+ "商品的入参为"+ c5FastPayVo);
         ProductBuyRes json = C5ApiUtils.buyC5Product(c5FastPayVo);
         ApiBuyItemRespVo apiBuyItemRespVo = new ApiBuyItemRespVo();
+
         if (json != null) {
             // 设置交易链接
             apiBuyItemRespVo.setTradeLink(createReqVO.getTradeLinks());
@@ -92,9 +96,21 @@ public class C5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                 apiBuyItemRespVo.setErrorCode(new ErrorCode(json.getErrorCode(), json.getErrorMsg()));
                 return apiBuyItemRespVo;
             }
+            ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
+            apiOrderExtDO.setCreator(String.valueOf(loginUser.getId()));
+            apiOrderExtDO.setPlatCode(PlatCodeEnum.C5.getName());
+            apiOrderExtDO.setOrderNo(String.valueOf(json.getData().getOrderId()));
+            apiOrderExtDO.setTradeOfferLinks(createReqVO.getTradeLinks());
+            apiOrderExtDO.setOrderId(orderId);//apiOrder表的主键id
+            apiOrderExtDO.setOrderInfo(String.valueOf(json));
+            apiOrderExtDO.setOrderStatus(1);
+            apiOrderExtDO.setOrderSubStatus(json.getErrorMsg());
+            apiOrderExtDO.setMerchantNo(merchantOrderNo);
+            apiOrderExtMapper.insert(apiOrderExtDO);
             apiBuyItemRespVo.setOrderNo(String.valueOf(json.getData().getOrderId()));//这里返回的是C5接口的orderId
             apiBuyItemRespVo.setErrorCode(OpenApiCode.OK);
             apiBuyItemRespVo.setIsSuccess(true);
+
             return apiBuyItemRespVo;
 
         } else {

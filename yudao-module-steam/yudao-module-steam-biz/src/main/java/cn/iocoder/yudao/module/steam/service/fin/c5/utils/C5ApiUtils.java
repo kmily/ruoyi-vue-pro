@@ -93,16 +93,13 @@ public class C5ApiUtils {
     }
     public static ProductBuyRes buyC5Product(C5FastPayVo payVo) {
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-        log.info("builder对象创建成功" + builder);
         builder.url(API_BUY_C5_PRODUCT_URL);
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(payVo);
-        log.info("准备发起http请求：" + builder);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
-        log.info("发起http请求返回：" + sent.html());
         ProductBuyRes json = sent.json(ProductBuyRes.class);
         log.info("json：" + json);
-        return  json;
+        return json;
     }
 
 }
