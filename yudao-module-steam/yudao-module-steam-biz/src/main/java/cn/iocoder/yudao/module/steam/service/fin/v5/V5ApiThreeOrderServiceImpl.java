@@ -360,7 +360,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
     public String getTokenFromRedisOrSetNew() {
         // 从 Redis 中获取 token
-        String token = (String) redisTemplate.opsForValue().get("v5_login_token");
+        String token = (String) redisTemplate.opsForValue().get("v5_token");
         // 如果 token 为空或已过期，则重新生成并存储 token
         if (token == null || isTokenExpired()) {
             token = generateAndStoreToken();
@@ -370,7 +370,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
     private boolean isTokenExpired() {
         // 检查 token 是否已过期
-        Long expireTime = redisTemplate.getExpire("v5_login_token");
+        Long expireTime = redisTemplate.getExpire("v5_token");
         return expireTime != null && expireTime <= 0;
     }
 
@@ -378,8 +378,8 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         V5Login v5Login = new V5Login();
         String newToken = v5Login.loginV5();
         // 将新生成的 token 存储到 Redis 中，并设置过期时间为两天
-        redisTemplate.opsForValue().set("v5_login_token", newToken);
-        redisTemplate.expire("v5_login_token", 2, TimeUnit.DAYS);
+        redisTemplate.opsForValue().set("v5_token", newToken);
+        redisTemplate.expire("v5_token", 2, TimeUnit.DAYS);
 
         return newToken;
     }
