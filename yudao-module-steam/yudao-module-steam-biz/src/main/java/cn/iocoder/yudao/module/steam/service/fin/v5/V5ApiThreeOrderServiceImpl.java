@@ -31,6 +31,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -357,23 +358,30 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     }
 
 
-//    public String getTokenFromRedisOrSetNew() {
-//        // 从 Redis 中获取 token
-//        String token = (String) redisTemplate.opsForValue().get("v5_login_token");
-//        // 如果 token 为空，则调用方法重新生成并存储 token
-//        if (token == null) {
-//            token = generateAndStoreToken();
-//        }
-//        return token;
-//    }
+    public String getTokenFromRedisOrSetNew() {
+        // 从 Redis 中获取 token
+        String token = (String) redisTemplate.opsForValue().get("v5_login_token");
+        // 如果 token 为空或已过期，则重新生成并存储 token
+        if (token == null || isTokenExpired()) {
+            token = generateAndStoreToken();
+        }
+        return token;
+    }
 
-//    private String generateAndStoreToken() {
-//        // 调用方法生成新的 token
-//        String newToken = V5Login.LoginV5();
-//        // 将新生成的 token 存储到 Redis 中
-//        redisTemplate.opsForValue().set("v5_login_token", newToken);
-//
-//        return newToken;
-//    }
+    private boolean isTokenExpired() {
+        // 检查 token 是否已过期
+        Long expireTime = redisTemplate.getExpire("v5_login_token");
+        return expireTime != null && expireTime <= 0;
+    }
+
+    private String generateAndStoreToken() {
+        V5Login v5Login = new V5Login();
+        String newToken = v5Login.loginV5();
+        // 将新生成的 token 存储到 Redis 中，并设置过期时间为两天
+        redisTemplate.opsForValue().set("v5_login_token", newToken);
+        redisTemplate.expire("v5_login_token", 2, TimeUnit.DAYS);
+
+        return newToken;
+    }
 
 }

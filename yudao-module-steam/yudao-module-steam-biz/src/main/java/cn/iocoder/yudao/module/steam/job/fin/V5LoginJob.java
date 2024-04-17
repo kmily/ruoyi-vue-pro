@@ -22,7 +22,8 @@ public class V5LoginJob implements JobHandler {
         Integer execute = TenantUtils.execute(1L, () -> {
 
 
-            String token = V5Login.LoginV5();
+            V5Login v5Login = new V5Login();
+            String token = v5Login.loginV5();
             log.info("V5Token{}",token);
             Integer integer=0;
             if (token != null) {
