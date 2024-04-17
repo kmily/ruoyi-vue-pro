@@ -28,7 +28,7 @@ public class C5ApiUtils {
     private static final String API_GET_C5_ORDER_INFO_URL = "https://app.zbt.com/open/order/v2/buy/detail?language=zh-CN&app-key="+APP_KEY;
     private static final String API_BUY_C5_PRODUCT_URL = "https://app.zbt.com/open/trade/v2/quick-buy?language=zh-CN&app-key="+APP_KEY;
 
-    private static final OkHttpClient client = new OkHttpClient();
+
     private static final Gson gson = new Gson();
     /**
      * 获取c5商品价格
@@ -37,59 +37,25 @@ public class C5ApiUtils {
      */
     public  static ProductPriceInfoRes.ProductPriceInfoResponse getProductPriceInfo(List<String> marketHashNameList) {
         C5ProductVo c5FastPayVo = new C5ProductVo(CSGO_ID, marketHashNameList);
-        String requestBodyJson = gson.toJson(c5FastPayVo);
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url(API_POST_PRODUCT_PRICE_URL)
-                .post(RequestBody.create(MediaType.parse(JSON), requestBodyJson))
-                .build();
-        // 发送请求并处理响应
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new IOException("请求商品价格信息响应失败: " + response);
-            }
-            if (response.body() != null) {
-                String responseData = response.body().string();
-                // 关闭响应体
-                response.body().close();
-                // 使用 Gson 将 JSON 字符串转换为对象
-                return gson.fromJson(responseData, ProductPriceInfoRes.ProductPriceInfoResponse.class);
-            }
-            return null;
-        } catch (IOException e) {
-            log.error("请求商品价格信息时发生异常", e);
-        }
-        return null;
+        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+        builder.url(API_POST_PRODUCT_PRICE_URL);
+        builder.method(HttpUtil.Method.JSON);
+        builder.postObject(c5FastPayVo);
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
+        ProductPriceInfoRes.ProductPriceInfoResponse json = sent.json(ProductPriceInfoRes.ProductPriceInfoResponse.class);
+        log.info("C5查询最低价格返回的json：" + json);
+        return json;
     }
 
 
     public static String getC5OrderInfo(Long orderId, String outTradeNo) {
-        StringBuilder urlBuilder = new StringBuilder(API_GET_C5_ORDER_INFO_URL);
-        // 添加可选参数
-        if (orderId != null) {
-            urlBuilder.append("&orderId=").append(orderId);
-        }
-        if (outTradeNo != null && !outTradeNo.isEmpty()) {
-            urlBuilder.append("&outTradeNo=").append(outTradeNo);
-        }
-        Request request = new Request.Builder()
-                .url(String.valueOf(urlBuilder))
-                .get()
-                .build();
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new IOException("请求订单详情失败: " + response);
-            }
-            if (response.body() != null) {
-                String string = response.body().string();
-                // 关闭响应体
-                response.body().close();
-                return string;
-            }
-        } catch (IOException e) {
-            log.error("请求订单详情时发生异常", e);
-        }
-        return "未获取到订单详情";
+        // 构建带有参数的URL
+        String urlWithParams = API_GET_C5_ORDER_INFO_URL + "&orderId=" + orderId + "&outTradeNo=" + outTradeNo;
+        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+        builder.url(urlWithParams);
+        builder.method(HttpUtil.Method.GET);
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
+        return sent.html();
     }
     public static ProductBuyRes buyC5Product(C5FastPayVo payVo) {
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();

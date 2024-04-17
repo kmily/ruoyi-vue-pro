@@ -21,13 +21,13 @@ public class ProductBuyRes implements Serializable {
         private BigDecimal buyPrice;
 
         @JsonProperty("delivery")
-        private double delivery;
+        private Integer delivery;
 
         @JsonProperty("offerId")
         private String offerId;
 
         @JsonProperty("orderId")
-        private int orderId;
+        private String orderId;
 
     }
 }
