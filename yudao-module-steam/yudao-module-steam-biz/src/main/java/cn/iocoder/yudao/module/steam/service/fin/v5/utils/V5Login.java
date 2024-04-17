@@ -33,9 +33,9 @@ public class V5Login {
             LoginRespVO loginBackVO = JacksonUtils.readValue(JacksonUtils.writeValueAsString(json), LoginRespVO.class);
             return loginBackVO.getData().getTradeToken();
 
-        }catch (ServiceException e){
+        } catch (ServiceException e) {
             throw new ServiceException(OpenApiCode.ERR_V5_LOGIN);
         }
 
-
+        }
     }
