@@ -827,6 +827,25 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         }
     }
 
+    /**
+     * 获取标签下所有的价格
+     * @param loginUser
+     * @param marketHashName
+     * @return
+     */
+    private ApiCommodityRespVo[] getAllPrice(LoginUser loginUser,String marketHashName){
+        List<ApiCommodityRespVo> ret=new ArrayList<>();
+        for (PlatCodeEnum value : PlatCodeEnum.values()) {
+            Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByPlatCode(value);
+            if(!apiThreeByOrder.isPresent()){
+                continue;
+            }
+            ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
+            ApiCommodityRespVo tmpQuery = apiThreeOrderService.query(loginUser, new ApiQueryCommodityReqVo().setCommodityHashName(marketHashName));
+            ret.add(tmpQuery);
+        }
+        return ret.toArray(new ApiCommodityRespVo[0]);
+    }
     @Override
     public List<ApiSummaryByHashName> summaryByHashName(LoginUser loginUser,List<String> marketHashName) {
         Map<String,ApiSummaryByHashName> ret=new HashMap<>();
