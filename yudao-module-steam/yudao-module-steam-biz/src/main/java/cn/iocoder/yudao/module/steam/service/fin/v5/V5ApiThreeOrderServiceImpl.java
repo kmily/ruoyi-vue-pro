@@ -97,24 +97,22 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                 .divide(NO3, 7, RoundingMode.HALF_UP)
                 .setScale(2, RoundingMode.HALF_UP);
         log.info("经过计算购买价格为："+ divide);
+        UUID uuid = UUID.randomUUID();
+        String uuidString = uuid.toString().replace("-", "");
+        String merchantOrderNo = "I" + uuidString.substring(1, 21); // 使用UUID的一部分截取20位作为唯一ID
         V5BuyProductVo v5BuyProductVo = new V5BuyProductVo(createReqVO.getCommodityHashName(), divide,
-                createReqVO.getTradeLinks(),createReqVO.getMerchantNo(),MERCHANT_KEY,createReqVO.getFastShipping());
+                createReqVO.getTradeLinks(),merchantOrderNo,MERCHANT_KEY,0);
         log.info("V5BuyProduct的有参构造方法执行了" + v5BuyProductVo);
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-        log.info("builder对象创建成功" + builder);
         builder.url(API_POST_BUY_V5_PRODUCT_URL);
-        log.info("购买url拼接成功：" + API_POST_BUY_V5_PRODUCT_URL);
         HashMap<String,String> headers = new HashMap<>();
-        log.info("hashMap对象创建成功" + builder);
         headers.put("Authorization",V5_TOKEN);
         builder.headers(headers);
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(v5BuyProductVo);
-        log.info("准备发起http请求：" + builder);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
-        log.info("发起http请求返回：" + sent.html());
         V5ProductBuyRes json = sent.json(V5ProductBuyRes.class);
-
+        log.info("返回的对象json为：" + json );
         ApiBuyItemRespVo apiBuyItemRespVo = new ApiBuyItemRespVo();
         if (json != null) {
             // 设置交易链接
@@ -136,7 +134,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                     apiOrderExtDO.setOrderInfo(sent.html());
                     apiOrderExtDO.setOrderStatus(1);
                     apiOrderExtDO.setOrderSubStatus(json.getMsg());
-//                    apiOrderExtDO.setCommodityInfo(createReqVO.getCommodityHashName());
+                    apiOrderExtDO.setMerchantNo(merchantOrderNo);
                     apiOrderExtMapper.insert(apiOrderExtDO);
                     queryCommodityDetail(loginUser,json.getData().getOrderNo(),orderId);
                     break;

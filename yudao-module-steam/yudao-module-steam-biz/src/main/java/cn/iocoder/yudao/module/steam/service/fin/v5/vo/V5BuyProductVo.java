@@ -12,9 +12,9 @@ public class V5BuyProductVo implements Serializable {
     private String tradeUrl;
     private String merchantOrderNo;
     private String merchantKey;
-    private int buyType;
+    private Integer buyType;
 
-    public V5BuyProductVo(String marketHashName, BigDecimal purchasePrice, String tradeUrl, String merchantOrderNo, String merchantKey, int buyType) {
+    public V5BuyProductVo(String marketHashName, BigDecimal purchasePrice, String tradeUrl, String merchantOrderNo, String merchantKey, Integer buyType) {
         this.marketHashName = marketHashName;
         this.purchasePrice = purchasePrice;
         this.tradeUrl = tradeUrl;
