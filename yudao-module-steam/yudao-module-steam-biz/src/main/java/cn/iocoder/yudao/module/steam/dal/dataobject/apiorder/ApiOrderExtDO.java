@@ -33,6 +33,11 @@ public class ApiOrderExtDO extends BaseDO {
      */
     private String orderNo;
     /**
+     * 第三方平台订单号
+     * 各个平台自主生成
+     */
+    private String merchantNo;
+    /**
      * 报价ID,一般保存steam的
      */
     private Long tradeOfferId;
