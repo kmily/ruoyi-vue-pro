@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
+import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.SellOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
@@ -21,6 +22,7 @@ import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.InvOrderExtService
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PaySteamOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.PayWithdrawalOrderCreateReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.wallet.vo.SellingDoList;
+import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
@@ -72,8 +74,10 @@ public class AppWalletController {
 
 //    @Resource
 //    private V5ApiThreeOrderServiceImpl v5ApiThreeOrderService;
+
     /**
      * 创建提现订单
+     *
      * @param createReqVO
      * @return
      */
@@ -87,6 +91,7 @@ public class AppWalletController {
         //自动支付
         return CommonResult.success(withdrawalOrder);
     }
+
     @PostMapping("/withdrawal/update-paid")
     @Operation(summary = "更新提现订单已支付") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
     @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
@@ -96,6 +101,7 @@ public class AppWalletController {
                 notifyReqDTO.getPayOrderId());
         return success(true);
     }
+
     @PostMapping("/create/invOrder")
     @Operation(summary = "创建库存订单")
     @PreAuthenticated
@@ -106,6 +112,7 @@ public class AppWalletController {
         CreateOrderResult invOrder = paySteamOrderService.createInvOrder(loginUser, reqVo);
         return CommonResult.success(invOrder);
     }
+
     @PostMapping("/getInvOrderWithPage")
     @Operation(summary = "库存订单列表")
     @PreAuthenticated
@@ -114,18 +121,30 @@ public class AppWalletController {
         PageResult<Io661OrderInfoResp> invOrderWithPage = paySteamOrderService.getInvOrderWithPage(reqVo, loginUser);
         return CommonResult.success(invOrderWithPage);
     }
+
     @GetMapping("/getSellOrderWithPage")
     @Operation(summary = "出售列表")
     public CommonResult<PageResult<SellingDoList>> getSellOrderWithPage(@Valid InvOrderPageReqVO reqVo) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         Page<InvOrderDO> page = new Page<>(reqVo.getPageNo(), reqVo.getPageSize());
-        PageResult<SellingDoList> invOrderWithPage = invOrderExtService.getSellOrderWithPage(reqVo, page,loginUser);
+        PageResult<SellingDoList> invOrderWithPage = invOrderExtService.getSellOrderWithPage(reqVo, page, loginUser);
         return CommonResult.success(invOrderWithPage);
+    }
+
+    @GetMapping("/getSellOrder")
+    @Operation(summary = "出售列表")
+    @PreAuthenticated
+    public CommonResult<PageResult<SellingDoList>> getSellOrder(@Valid SellOrderPageReqVO reqVo) {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        Page<ApiOrderDO> page = new Page<>(reqVo.getPageNo(), reqVo.getPageSize());
+        PageResult<SellingDoList> apiOrder = invOrderExtService.getSellOrder(reqVo, page, loginUser);
+        return CommonResult.success(apiOrder);
     }
 
 
     /**
      * 查询订单详情
+     *
      * @param reqVO marketHashName marketName
      * @Descriptons 订单的 markethashname   marketname itemInfo 卖家信息 售出价格
      */
@@ -140,6 +159,7 @@ public class AppWalletController {
 
     /**
      * 查询订单详情
+     *
      * @param reqVO marketHashName marketName
      * @Descriptons 订单的 markethashname   marketname itemInfo 卖家信息 售出价格
      */
@@ -172,13 +192,14 @@ public class AppWalletController {
                 notifyReqDTO.getPayRefundId());
         return success(true);
     }
+
     @PostMapping("/invOrder/refundOrder")
     @Operation(summary = "订单") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
     @OperateLog(enable = false) // 禁用操作日志，因为没有操作人
     @PreAuthenticated
     public CommonResult<Boolean> refundInvOrder(@RequestParam("id") Long id) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        paySteamOrderService.refundInvOrder(loginUser,id, ServletUtils.getClientIP());
+        paySteamOrderService.refundInvOrder(loginUser, id, ServletUtils.getClientIP());
         return success(true);
     }
 
