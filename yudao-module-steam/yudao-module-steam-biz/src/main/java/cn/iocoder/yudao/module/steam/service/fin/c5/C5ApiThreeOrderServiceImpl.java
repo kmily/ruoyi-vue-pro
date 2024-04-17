@@ -87,7 +87,7 @@ public class C5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         if (json != null) {
             // 设置交易链接
             apiBuyItemRespVo.setTradeLink(createReqVO.getTradeLinks());
-            if (json.getErrorCode() != 200){
+            if (json.getErrorCode() != 0){
                 apiBuyItemRespVo.setIsSuccess(false);
                 apiBuyItemRespVo.setErrorCode(new ErrorCode(json.getErrorCode(), json.getErrorMsg()));
                 return apiBuyItemRespVo;
