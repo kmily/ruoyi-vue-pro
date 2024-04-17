@@ -166,7 +166,7 @@ public class InvOrderExtService {
             sellingDoListTemp.setTransferStatus(apiOrderDO1.getTransferStatus());
 
             List<ApiOrderExtDO> apiOrderExtDOS = apiOrderExtMapper.selectList(new LambdaQueryWrapperX<ApiOrderExtDO>()
-                    .eq(ApiOrderExtDO::getOrderId, apiOrderDO1.getId()));
+                    .eqIfPresent(ApiOrderExtDO::getOrderId, apiOrderDO1.getId()));
 
             if(apiOrderExtDOS.isEmpty()){
                 apiOrderExtDOS.add(new ApiOrderExtDO());
@@ -174,13 +174,13 @@ public class InvOrderExtService {
 
             // 查找selling表返回相应字段
             List<SellingDO> apiOrderExtDOList = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
-                    .eq(SellingDO::getId,apiOrderExtDOS.get(0).getCommodityInfo()));
+                    .eqIfPresent(SellingDO::getId,apiOrderExtDOS.get(0).getCommodityInfo()));
             if(apiOrderExtDOList.isEmpty()){
                 apiOrderExtDOList.add(new SellingDO());
             }
 
             List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
-                    .eq(InvPreviewDO::getMarketHashName, apiOrderExtDOList.get(0).getMarketHashName()));
+                    .eqIfPresent(InvPreviewDO::getMarketHashName, apiOrderExtDOList.get(0).getMarketHashName()));
             if(invPreviewDOS.isEmpty()){
                 invPreviewDOS.add(new InvPreviewDO());
             }
