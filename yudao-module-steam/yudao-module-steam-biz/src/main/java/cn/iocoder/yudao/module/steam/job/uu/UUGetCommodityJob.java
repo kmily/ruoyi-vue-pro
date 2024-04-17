@@ -27,7 +27,8 @@ import java.util.List;
 
 
 @Slf4j
-@Component
+//@Component
+@Deprecated
 public class UUGetCommodityJob implements JobHandler {
 
     @Resource
