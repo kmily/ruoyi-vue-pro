@@ -361,7 +361,6 @@ public class IOInvUpdateService {
 
     // 其他平台饰品模板入库
     public void otherSellingInsertC5() {
-        otherSellingMapper.delete(new LambdaQueryWrapperX<OtherSellingDO>().eq(OtherSellingDO::getPlatformIdentity,OtherSellingStatusEnum.C5.getStatus()));
         IOInvUpdateService bean = applicationContext.getBean(IOInvUpdateService.class);
         int page = 1;
         String[] types = {
@@ -429,7 +428,7 @@ public class IOInvUpdateService {
                 int userGoodsNumNow = 0;
                 Float lastPrice = 0f;
                 Map<String, String> UserInfo = randomUserInfo();
-
+                otherSellingMapper.delete(new LambdaQueryWrapperX<OtherSellingDO>().eq(OtherSellingDO::getMarketHashName, goodsInfo.getMarketHashName()));
                 for (AppOtherInvDetailListVO.Data__.CommodityInfo items : response_.getData().getList()) {
                     if (userGoodsNumNow++ >= userGoodsNum || !Objects.equals(lastPrice, items.getPrice())) {
                         if (items == null) {
@@ -527,7 +526,6 @@ public class IOInvUpdateService {
 
 
     public void otherSellingInsertV5() {
-        otherSellingMapper.delete(new LambdaQueryWrapperX<OtherSellingDO>().eq(OtherSellingDO::getPlatformIdentity,OtherSellingStatusEnum.V5.getStatus()));
         IOInvUpdateService bean = applicationContext.getBean(IOInvUpdateService.class);
         int page = 1;
             while (true) {
@@ -613,7 +611,7 @@ public class IOInvUpdateService {
                 int userGoodsNumNow = 0;
                 Float lastPrice = 0f;
                 Map<String, String> UserInfo = randomUserInfo();
-
+                otherSellingMapper.delete(new LambdaQueryWrapperX<OtherSellingDO>().eq(OtherSellingDO::getMarketHashName, goodsInfo.getMarketHashName()));
                 for (OtherSellingV5DetailListVDo.Data_ items : response_.getData()) {
                     if (userGoodsNumNow++ >= userGoodsNum || !Objects.equals(lastPrice, items.getSalePrice())) {
                         if (items == null) {
