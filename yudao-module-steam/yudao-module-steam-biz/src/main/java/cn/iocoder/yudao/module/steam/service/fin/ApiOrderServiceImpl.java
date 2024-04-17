@@ -865,37 +865,15 @@ public class ApiOrderServiceImpl implements ApiOrderService {
     public List<ApiSummaryByHashName> summaryByHashName(LoginUser loginUser,List<String> marketHashName) {
         Map<String,ApiSummaryByHashName> ret=new HashMap<>();
         for (String item:marketHashName) {
-            for (PlatCodeEnum value : PlatCodeEnum.values()) {
-                Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByPlatCode(value);
-                if(!apiThreeByOrder.isPresent()){
-                    continue;
-                }
-//                ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
-                ApiCommodityRespVo[] allPrice = getAllPrice(loginUser, item);
-                Optional<ApiCommodityRespVo> min = Arrays.stream(allPrice).min((v1, v2) -> Integer.compare(v1.getPrice(), v2.getPrice()));
-                if(min.isPresent()){
+            ApiCommodityRespVo[] allPrice = getAllPrice(loginUser, item);
+            Optional<ApiCommodityRespVo> min = Arrays.stream(allPrice).min((v1, v2) -> Integer.compare(v1.getPrice(), v2.getPrice()));
+            if(min.isPresent()){
 
-                    ApiSummaryByHashName apiSummaryByHashName=new ApiSummaryByHashName();
-                    apiSummaryByHashName.setMarketHashName(item);
+                ApiSummaryByHashName apiSummaryByHashName=new ApiSummaryByHashName();
+                apiSummaryByHashName.setMarketHashName(item);
 
-                    apiSummaryByHashName.setPrice(min.get().getPrice());
-                    ret.put(item,apiSummaryByHashName);
-                }
-//                ApiCommodityRespVo tmpQuery = apiThreeOrderService.query(loginUser, new ApiQueryCommodityReqVo().setCommodityHashName(item));
-//                if(Objects.nonNull(tmpQuery) && Objects.nonNull(tmpQuery.getIsSuccess()) && tmpQuery.getIsSuccess()){
-//                    if(Objects.isNull(ret.get(item))){
-//                        ApiSummaryByHashName apiSummaryByHashName=new ApiSummaryByHashName();
-//                        apiSummaryByHashName.setMarketHashName(item);
-//                        apiSummaryByHashName.setPrice(tmpQuery.getPrice());
-//                        ret.put(item,apiSummaryByHashName);
-//                    }
-//                    ApiSummaryByHashName apiSummaryByHashName = ret.get(item);
-//                    if(tmpQuery.getPrice()<apiSummaryByHashName.getPrice()){
-//                        ApiSummaryByHashName apiSummaryByHashName1 = ret.get(item);
-//                        apiSummaryByHashName1.setPrice(tmpQuery.getPrice());
-//                        break;
-//                    }
-//                }
+                apiSummaryByHashName.setPrice(min.get().getPrice());
+                ret.put(item,apiSummaryByHashName);
             }
         }
         List<ApiSummaryByHashName> collect = ret.entrySet().stream().map(item -> item.getValue()).collect(Collectors.toList());
