@@ -39,6 +39,7 @@ import cn.iocoder.yudao.module.steam.service.fin.vo.ApiCommodityRespVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
 import cn.iocoder.yudao.module.steam.service.steam.CreateOrderResult;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
@@ -132,12 +133,22 @@ public class AppWalletController {
     }
 
     @GetMapping("/getSellOrder")
-    @Operation(summary = "出售列表")
+    @Operation(summary = "出售记录")
     @PreAuthenticated
     public CommonResult<PageResult<SellingDoList>> getSellOrder(@Valid SellOrderPageReqVO reqVo) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         Page<ApiOrderDO> page = new Page<>(reqVo.getPageNo(), reqVo.getPageSize());
         PageResult<SellingDoList> apiOrder = invOrderExtService.getSellOrder(reqVo, page, loginUser);
+        return CommonResult.success(apiOrder);
+    }
+
+    @GetMapping("/getPurchaseOrder")
+    @Operation(summary = "购买记录")
+    @PreAuthenticated
+    public CommonResult<PageResult<SellingDoList>> getPurchaseOrder(@Valid SellOrderPageReqVO reqVo) throws JsonProcessingException {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        Page<ApiOrderDO> page = new Page<>(reqVo.getPageNo(), reqVo.getPageSize());
+        PageResult<SellingDoList> apiOrder = invOrderExtService.getPurchaseOrder(reqVo, page, loginUser);
         return CommonResult.success(apiOrder);
     }
 

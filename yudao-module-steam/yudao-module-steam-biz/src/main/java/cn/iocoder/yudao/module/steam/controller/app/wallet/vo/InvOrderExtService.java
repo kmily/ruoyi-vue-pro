@@ -1,13 +1,11 @@
 package cn.iocoder.yudao.module.steam.controller.app.wallet.vo;
 
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.InvOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.invorder.vo.SellOrderPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.SellingPageReqVO;
-import cn.iocoder.yudao.module.steam.controller.app.vo.order.QueryOrderReqVo;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderExtDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invorder.InvOrderDO;
@@ -18,10 +16,13 @@ import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invorder.InvOrderMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.invpreview.InvPreviewMapper;
 import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
+import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
 import cn.iocoder.yudao.module.steam.service.steam.InvTransferStatusEnum;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -47,6 +48,7 @@ public class InvOrderExtService {
     private ApiOrderMapper apiOrderMapper;
     @Resource
     private ApiOrderExtMapper apiOrderExtMapper;
+
 
 
 
@@ -119,6 +121,7 @@ public class InvOrderExtService {
     }
 
 
+    // 出售记录
     public PageResult<SellingDoList> getSellOrder(SellOrderPageReqVO reqVo, Page<ApiOrderDO> page, LoginUser loginUser) {
         // 下单状态
         List<SellingDoList> sellingDoLists = new ArrayList<>();
@@ -172,13 +175,13 @@ public class InvOrderExtService {
             // 查找selling表返回相应字段
             List<SellingDO> apiOrderExtDOList = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>()
                     .eq(SellingDO::getId,apiOrderExtDOS.get(0).getCommodityInfo()));
-            if(apiOrderExtDOS.isEmpty()){
+            if(apiOrderExtDOList.isEmpty()){
                 apiOrderExtDOList.add(new SellingDO());
             }
 
             List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
                     .eq(InvPreviewDO::getMarketHashName, apiOrderExtDOList.get(0).getMarketHashName()));
-            if(apiOrderExtDOS.isEmpty()){
+            if(invPreviewDOS.isEmpty()){
                 invPreviewDOS.add(new InvPreviewDO());
             }
 
@@ -201,6 +204,82 @@ public class InvOrderExtService {
         return new PageResult<>(sellingDoLists, apiOrderDOIPage.getTotal());
     }
 
+
+    // 购买记录
+    public PageResult<SellingDoList> getPurchaseOrder(SellOrderPageReqVO reqVo, Page<ApiOrderDO> page, LoginUser loginUser) throws JsonProcessingException {
+        // 下单状态
+        List<SellingDoList> sellingDoLists = new ArrayList<>();
+        LambdaQueryWrapper<ApiOrderDO> apiOrderDO;
+        // 匹配订单状态
+        if(reqVo.getTransferStatus() != null){
+            apiOrderDO = new LambdaQueryWrapper<ApiOrderDO>()
+                    .eq(ApiOrderDO::getBuyUserId, loginUser.getId())
+                    .eq(ApiOrderDO::getBuyUserType, loginUser.getUserType())
+                    .eq(ApiOrderDO::getTransferStatus, reqVo.getTransferStatus())
+                    .orderByDesc(ApiOrderDO::getUpdateTime);
+        }else{
+            List<Integer> statusesToMatch = Arrays.asList(
+                    InvTransferStatusEnum.INORDER.getStatus(),
+                    InvTransferStatusEnum.TransferING.getStatus(),
+                    InvTransferStatusEnum.TransferFINISH.getStatus(),
+                    InvTransferStatusEnum.OFF_SALE.getStatus(),
+                    InvTransferStatusEnum.TransferERROR.getStatus(),
+                    InvTransferStatusEnum.CLOSE.getStatus());
+            apiOrderDO = new LambdaQueryWrapper<ApiOrderDO>()
+                    .eq(ApiOrderDO::getBuyUserId, loginUser.getId())
+                    .eq(ApiOrderDO::getBuyUserType, loginUser.getUserType())
+                    .in(ApiOrderDO::getTransferStatus, statusesToMatch)
+                    .orderByDesc(ApiOrderDO::getUpdateTime);
+        }
+
+        // 执行分页查询
+        IPage<ApiOrderDO> apiOrderDOIPage = apiOrderMapper.selectPage(page, apiOrderDO);
+
+        // 判断
+        if (apiOrderDO.isEmptyOfWhere()) {
+            return new PageResult<>(sellingDoLists, 0L);
+        }
+        // 遍历订单，返回订单号等关键数据
+        for (ApiOrderDO apiOrderDO1 : apiOrderDOIPage.getRecords()) {
+            SellingDoList sellingDoListTemp = new SellingDoList();
+            sellingDoListTemp.setOrderNo(apiOrderDO1.getOrderNo());
+            sellingDoListTemp.setPayTime(apiOrderDO1.getUpdateTime());
+            sellingDoListTemp.setCommodityAmount(apiOrderDO1.getPayAmount());
+            sellingDoListTemp.setMerchantNo(apiOrderDO1.getMerchantNo());
+            sellingDoListTemp.setCreateTime(apiOrderDO1.getCreateTime());
+            sellingDoListTemp.setTransferStatus(apiOrderDO1.getTransferStatus());
+
+            ApiQueryCommodityReqVo apiQueryCommodityReqVo = apiOrderDO1.getBuyInfo();
+
+            if(apiQueryCommodityReqVo != null){
+               new ApiQueryCommodityReqVo();
+            }
+
+            List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
+                    .eqIfPresent(InvPreviewDO::getMarketHashName, apiQueryCommodityReqVo.getCommodityHashName()));
+
+            if(invPreviewDOS.isEmpty()){
+                invPreviewDOS.add(new InvPreviewDO());
+            }
+
+            sellingDoListTemp.setSelExterior(invPreviewDOS.get(0).getSelExterior());
+            sellingDoListTemp.setIconUrl(invPreviewDOS.get(0).getImageUrl());
+            sellingDoListTemp.setMarketName(invPreviewDOS.get(0).getItemName());
+            sellingDoListTemp.setMarketHashName(invPreviewDOS.get(0).getMarketHashName());
+
+            InvPreviewDO matchingInvPreviewDO = invPreviewDOS.stream()
+                    .filter(invPreview -> invPreview.getMarketHashName().equals(invPreviewDOS.get(0).getMarketHashName()))
+                    .findFirst()
+                    .orElse(null);
+            if (matchingInvPreviewDO != null) {
+                sellingDoListTemp.setSelExteriorColor(matchingInvPreviewDO.getItemInfo().getExteriorColor());
+            } else {
+                sellingDoListTemp.setSelExteriorColor((invPreviewDOS.get(0).getItemInfo()).getExteriorColor());
+            }
+            sellingDoLists.add(sellingDoListTemp);
+        }
+        return new PageResult<>(sellingDoLists, apiOrderDOIPage.getTotal());
+    }
 
     /**
      * @param reqVO
