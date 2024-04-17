@@ -404,8 +404,14 @@ public class ApiOrderServiceImpl implements ApiOrderService {
             throw exception(OpenApiCode.ERR_5408);
         }
         ApiCommodityRespVo[] allPrice = getAllPrice(loginUser, orderDO.getBuyInfo().getCommodityHashName());
-        Optional<ApiCommodityRespVo> min = Arrays.stream(allPrice).min((v1, v2) -> Integer.compare(v1.getPrice(), v2.getPrice()));
-        ApiCommodityRespVo apiCommodityRespVo = min.orElseThrow(()->exception(ErrorCodeConstants.UU_GOODS_NOT_FOUND));
+        ApiCommodityRespVo apiCommodityRespVo;
+        Optional<ApiCommodityRespVo> min;
+        if(orderDO.getBuyInfo().getFastShipping()==1){
+            min = Arrays.stream(allPrice).filter(i -> i.getPlatCode().equals(PlatCodeEnum.IO661)).findFirst();
+        }else{
+            min = Arrays.stream(allPrice).min((v1, v2) -> Integer.compare(v1.getPrice(), v2.getPrice()));
+        }
+        apiCommodityRespVo = min.orElseThrow(()->exception(ErrorCodeConstants.UU_GOODS_NOT_FOUND));
 
 //        ApiCommodityRespVo query=null;
 //        for (PlatCodeEnum value : getAllPlatCode(orderDO.getBuyInfo().getFastShipping())) {
