@@ -288,34 +288,34 @@ public class AppIo661ApiController {
     public ApiResult<AppPayOrderSubmitRespVO> createInvOrder(@RequestBody OpenApiReqVo<PaySteamOrderCreateReqVO> openApiReqVo) {
         try {
             return DevAccountUtils.tenantExecute(1L, () -> {
-                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
-
-
-                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
-                openApiReqVo.getData().setPlatform(PlatFormEnum.API);
-                CreateOrderResult invOrder = paySteamOrderService.createInvOrder(loginUser, openApiReqVo.getData());
-
-                //付款
-                AppPayOrderSubmitReqVO reqVO=new AppPayOrderSubmitReqVO();
-                reqVO.setChannelCode(PayChannelEnum.WALLET.getCode());
-                reqVO.setId(invOrder.getPayOrderId());
-                if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
-                    Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
-                            Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
-                    channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(devAccount.getUserId()));
-                    channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(devAccount.getUserType()));
-                    reqVO.setChannelExtras(channelExtras);
-                }
-                // 2. 提交支付
-                PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, ServletUtils.getClientIP());
-                AppPayOrderSubmitRespVO appPayOrderSubmitRespVO = PayOrderConvert.INSTANCE.convert3(respVO);
-                InvOrderDO invOrder1 = paySteamOrderService.getInvOrder(invOrder.getBizOrderId());
-                appPayOrderSubmitRespVO.setOrderNo(invOrder1.getOrderNo());
-                appPayOrderSubmitRespVO.setMerchantNo(invOrder1.getMerchantNo());
-                return ApiResult.success(appPayOrderSubmitRespVO);
+                throw new ServiceException(OpenApiCode.ERR_OFFLINE);
+//                DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
+//
+//
+//                LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
+//                openApiReqVo.getData().setPlatform(PlatFormEnum.API);
+//                CreateOrderResult invOrder = paySteamOrderService.createInvOrder(loginUser, openApiReqVo.getData());
+//
+//                //付款
+//                AppPayOrderSubmitReqVO reqVO=new AppPayOrderSubmitReqVO();
+//                reqVO.setChannelCode(PayChannelEnum.WALLET.getCode());
+//                reqVO.setId(invOrder.getPayOrderId());
+//                if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
+//                    Map<String, String> channelExtras = reqVO.getChannelExtras() == null ?
+//                            Maps.newHashMapWithExpectedSize(2) : reqVO.getChannelExtras();
+//                    channelExtras.put(WalletPayClient.USER_ID_KEY, String.valueOf(devAccount.getUserId()));
+//                    channelExtras.put(WalletPayClient.USER_TYPE_KEY, String.valueOf(devAccount.getUserType()));
+//                    reqVO.setChannelExtras(channelExtras);
+//                }
+//                // 2. 提交支付
+//                PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, ServletUtils.getClientIP());
+//                AppPayOrderSubmitRespVO appPayOrderSubmitRespVO = PayOrderConvert.INSTANCE.convert3(respVO);
+//                InvOrderDO invOrder1 = paySteamOrderService.getInvOrder(invOrder.getBizOrderId());
+//                appPayOrderSubmitRespVO.setOrderNo(invOrder1.getOrderNo());
+//                appPayOrderSubmitRespVO.setMerchantNo(invOrder1.getMerchantNo());
+//                return ApiResult.success(appPayOrderSubmitRespVO);
             });
         } catch (ServiceException e) {
-            e.printStackTrace();
             return ApiResult.error(e.getCode(),  e.getMessage(),AppPayOrderSubmitRespVO.class);
         }
 
