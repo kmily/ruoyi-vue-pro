@@ -63,7 +63,7 @@ public class C5ApiUtils {
         builder.postObject(payVo);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         ProductBuyRes json = sent.json(ProductBuyRes.class);
-        log.info("json：" + json);
+        log.info("购买C5商品返回的json：" + json);
         return json;
     }
 
@@ -74,7 +74,7 @@ public class C5ApiUtils {
         builder.postObject(cancelC5OrderVo);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         OrderCancelRes json = sent.json(OrderCancelRes.class);
-        log.info("取消订单返回json：" + json);
+        log.info("取消C5订单订单返回json：" + json);
         return json;
     }
 
