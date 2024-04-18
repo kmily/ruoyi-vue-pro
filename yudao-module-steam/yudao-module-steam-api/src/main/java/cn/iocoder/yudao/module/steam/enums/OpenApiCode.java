@@ -33,6 +33,7 @@ public interface OpenApiCode {
     ErrorCode ERR_5408 = new ErrorCode(5408, "代购对象的交易链接格式错误");
     //----open api
     ErrorCode TO_MANY_ITEM = new ErrorCode(8001, "查询数据过多");
+    ErrorCode ERR_OFFLINE = new ErrorCode(8002, "接口已下线");
 
     ErrorCode NO_DATA = new ErrorCode(8002, "无相关数据");
     ErrorCode ERR_M_ORDER_EXISTS = new ErrorCode(8002, "商户订单已经存在");

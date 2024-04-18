@@ -39,9 +39,11 @@ import cn.iocoder.yudao.module.steam.service.uu.vo.ApiCheckTradeUrlReqVo;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import cn.iocoder.yudao.module.steam.utils.RSAUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -53,6 +55,7 @@ import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -134,6 +137,8 @@ public class ApiOrderServiceImpl implements ApiOrderService {
 
     @Resource
     private RabbitTemplate rabbitTemplate;
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
     public ApiOrderServiceImpl() {
     }
@@ -398,25 +403,35 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         }catch (ServiceException e){
             throw exception(OpenApiCode.ERR_5408);
         }
-        ApiCommodityRespVo query=null;
-        for (PlatCodeEnum value : getAllPlatCode(orderDO.getBuyInfo().getFastShipping())) {
-            Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByPlatCode(value);
-            if(!apiThreeByOrder.isPresent()){
-                continue;
-            }
-            ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
-            ApiCommodityRespVo tmpQuery = apiThreeOrderService.query(loginUser, orderDO.getBuyInfo());
-            if(Objects.nonNull(tmpQuery) && Objects.nonNull(tmpQuery.getIsSuccess()) && tmpQuery.getIsSuccess()){
-                if(tmpQuery.getPrice()<=orderDO.getBuyInfo().getPurchasePrice()){
-                    query=tmpQuery;
-                    break;
-                }
-            }
+        ApiCommodityRespVo[] allPrice = getAllPrice(loginUser, orderDO.getBuyInfo().getCommodityHashName());
+        ApiCommodityRespVo apiCommodityRespVo;
+        Optional<ApiCommodityRespVo> min;
+        if(orderDO.getBuyInfo().getFastShipping()==1){
+            min = Arrays.stream(allPrice).filter(i -> i.getPlatCode().equals(PlatCodeEnum.IO661)).findFirst();
+        }else{
+            min = Arrays.stream(allPrice).min((v1, v2) -> Integer.compare(v1.getPrice(), v2.getPrice()));
         }
-        if (Objects.isNull(query)) {
+        apiCommodityRespVo = min.orElseThrow(()->exception(ErrorCodeConstants.UU_GOODS_NOT_FOUND));
+
+//        ApiCommodityRespVo query=null;
+//        for (PlatCodeEnum value : getAllPlatCode(orderDO.getBuyInfo().getFastShipping())) {
+//            Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByPlatCode(value);
+//            if(!apiThreeByOrder.isPresent()){
+//                continue;
+//            }
+//            ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
+//            ApiCommodityRespVo tmpQuery = apiThreeOrderService.query(loginUser, orderDO.getBuyInfo());
+//            if(Objects.nonNull(tmpQuery) && Objects.nonNull(tmpQuery.getIsSuccess()) && tmpQuery.getIsSuccess()){
+//                if(tmpQuery.getPrice()<=orderDO.getBuyInfo().getPurchasePrice()){
+//                    query=tmpQuery;
+//                    break;
+//                }
+//            }
+//        }
+        if (Objects.isNull(apiCommodityRespVo)) {
             throw exception(ErrorCodeConstants.UU_GOODS_NOT_FOUND);
         }
-        if(Objects.nonNull(query) && Objects.nonNull(query.getIsSuccess()) && !query.getIsSuccess()){
+        if(Objects.nonNull(apiCommodityRespVo) && Objects.nonNull(apiCommodityRespVo.getIsSuccess()) && !apiCommodityRespVo.getIsSuccess()){
             throw new ServiceException(OpenApiCode.ERR_5301);
         }
         //检测交易链接是否是自己
@@ -438,8 +453,8 @@ public class ApiOrderServiceImpl implements ApiOrderService {
         if(PayOrderStatusEnum.isSuccess(orderDO.getPayOrderStatus())){
             throw exception(OpenApiCode.ERR_5299);
         }
-        orderDO.setPlatCode(query.getPlatCode().getCode());
-        orderDO.setCommodityAmount(query.getPrice());
+        orderDO.setPlatCode(apiCommodityRespVo.getPlatCode().getCode());
+        orderDO.setCommodityAmount(apiCommodityRespVo.getPrice());
         ConfigDO serviceFeeLimit = configService.getConfigByKey("steam.inv.serviceFeeLimit");
         ConfigDO serviceFeeRateConfigByKey = configService.getConfigByKey("steam.inv.serviceFeeRate");
         if(PlatFormEnum.WEB.getCode().equals(orderDO.getBuyMethod()) || Objects.isNull(serviceFeeRateConfigByKey)){
@@ -834,6 +849,10 @@ public class ApiOrderServiceImpl implements ApiOrderService {
      * @return
      */
     private ApiCommodityRespVo[] getAllPrice(LoginUser loginUser,String marketHashName){
+        String s = stringRedisTemplate.opsForValue().get("PR_" + marketHashName);
+        if(StringUtils.hasText(s)){
+            return JacksonUtils.readValue(s, new TypeReference<ApiCommodityRespVo[]>(){} );
+        }
         List<ApiCommodityRespVo> ret=new ArrayList<>();
         for (PlatCodeEnum value : PlatCodeEnum.values()) {
             Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByPlatCode(value);
@@ -844,34 +863,23 @@ public class ApiOrderServiceImpl implements ApiOrderService {
             ApiCommodityRespVo tmpQuery = apiThreeOrderService.query(loginUser, new ApiQueryCommodityReqVo().setCommodityHashName(marketHashName));
             ret.add(tmpQuery);
         }
+        ApiCommodityRespVo[] apiCommodityRespVos = ret.toArray(new ApiCommodityRespVo[0]);
+        stringRedisTemplate.opsForValue().set("PR_" + marketHashName,JacksonUtils.writeValueAsString(apiCommodityRespVos),20, TimeUnit.SECONDS);
         return ret.toArray(new ApiCommodityRespVo[0]);
     }
     @Override
     public List<ApiSummaryByHashName> summaryByHashName(LoginUser loginUser,List<String> marketHashName) {
         Map<String,ApiSummaryByHashName> ret=new HashMap<>();
         for (String item:marketHashName) {
-            for (PlatCodeEnum value : PlatCodeEnum.values()) {
-                Optional<ApiThreeOrderService> apiThreeByOrder = getApiThreeByPlatCode(value);
-                if(!apiThreeByOrder.isPresent()){
-                    continue;
-                }
-                ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
+            ApiCommodityRespVo[] allPrice = getAllPrice(loginUser, item);
+            Optional<ApiCommodityRespVo> min = Arrays.stream(allPrice).min((v1, v2) -> Integer.compare(v1.getPrice(), v2.getPrice()));
+            if(min.isPresent()){
 
-                ApiCommodityRespVo tmpQuery = apiThreeOrderService.query(loginUser, new ApiQueryCommodityReqVo().setCommodityHashName(item));
-                if(Objects.nonNull(tmpQuery) && Objects.nonNull(tmpQuery.getIsSuccess()) && tmpQuery.getIsSuccess()){
-                    if(Objects.isNull(ret.get(item))){
-                        ApiSummaryByHashName apiSummaryByHashName=new ApiSummaryByHashName();
-                        apiSummaryByHashName.setMarketHashName(item);
-                        apiSummaryByHashName.setPrice(tmpQuery.getPrice());
-                        ret.put(item,apiSummaryByHashName);
-                    }
-                    ApiSummaryByHashName apiSummaryByHashName = ret.get(item);
-                    if(tmpQuery.getPrice()<apiSummaryByHashName.getPrice()){
-                        ApiSummaryByHashName apiSummaryByHashName1 = ret.get(item);
-                        apiSummaryByHashName1.setPrice(tmpQuery.getPrice());
-                        break;
-                    }
-                }
+                ApiSummaryByHashName apiSummaryByHashName=new ApiSummaryByHashName();
+                apiSummaryByHashName.setMarketHashName(item);
+
+                apiSummaryByHashName.setPrice(min.get().getPrice());
+                ret.put(item,apiSummaryByHashName);
             }
         }
         List<ApiSummaryByHashName> collect = ret.entrySet().stream().map(item -> item.getValue()).collect(Collectors.toList());
