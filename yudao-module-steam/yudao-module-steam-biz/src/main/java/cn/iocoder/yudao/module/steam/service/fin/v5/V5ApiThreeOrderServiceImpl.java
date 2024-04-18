@@ -43,7 +43,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
     private static final String MERCHANT_KEY = "529606f226e6461ca5bac93047976177";
     private static final String Query_Order_Status_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
-    private static final String Cancel_Order_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
+    private static final String Cancel_Order_URL = "https://delivery.v5item.com/open/api/cancelOrder";
     private static final String Query_Commodity_Detail = "https://delivery.v5item.com/open/api/queryOrderDetailInfo";
     public static final String V5_GetItem_URL = "https://delivery.v5item.com/open/api/getItemList";
     public static final BigDecimal NO1 = new BigDecimal("1.02");
