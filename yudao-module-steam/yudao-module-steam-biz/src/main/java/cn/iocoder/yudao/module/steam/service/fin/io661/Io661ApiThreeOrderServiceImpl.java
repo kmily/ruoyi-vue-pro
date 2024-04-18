@@ -165,6 +165,13 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     public Integer getOrderSimpleStatus(LoginUser loginUser, String orderNo, Long orderId) {
         ApiOrderDO masterOrder = getMasterOrder(orderId);
         ApiOrderExtDO orderExt = getOrderExt(orderNo, orderId);
+        if(orderExt.getOrderStatus()==2){
+            return 2;
+        }
+
+        if(orderExt.getOrderStatus()==3){
+            return 3;
+        }
         BindUserDO bindUser = bindUserService.getBindUser(masterOrder.getSellBindUserId());
 
         SteamWeb steamWeb=new SteamWeb(configService,steamService.getBindUserIp(bindUser));
