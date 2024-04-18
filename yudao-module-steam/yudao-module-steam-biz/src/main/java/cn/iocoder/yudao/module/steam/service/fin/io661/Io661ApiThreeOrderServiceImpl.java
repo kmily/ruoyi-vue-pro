@@ -35,6 +35,7 @@ import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -194,11 +195,39 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             e.printStackTrace();
             log.warn("交易单据未进行手机自动确认交易单据未进行手机自动确认{}",orderExt.getTradeOfferId());
         }
+        //获取access_token
+//        https://steamcommunity.com/profiles/76561199303124510/tradeoffers/
+//            builder.form(post);
+        HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
+        Map<String, String> header = new HashMap<>();
+        header.put("Accept-Language", "zh-CN,zh;q=0.9");
+        builder.headers(header);
+        builder.cookieString(steamWeb.getCookieString());
+        builder.url("https://steamcommunity.com/profiles/:steamId/tradeoffers/");
+//        builder.query(post);
+        Map<String, String> pathvar = new HashMap<>();
+        pathvar.put("steamId", bindUser.getSteamId());
+        builder.pathVar(pathvar);
+        Optional<BindIpaddressDO> bindUserIp = steamService.getBindUserIp(bindUser);
+        HttpUtil.ProxyResponseVo proxyResponseVo = HttpUtil.sentToSteamByProxy(builder.build(),bindUserIp);
+        log.info("{}",proxyResponseVo);
+        String accessToken=null;
+        if(Objects.nonNull(proxyResponseVo.getStatus()) && proxyResponseVo.getStatus()==200){
+            Element application_config = Jsoup.parse(proxyResponseVo.getHtml()).body().getElementById("application_config");
+            if(Objects.nonNull(application_config)){
+                accessToken = application_config.attributes().get("data-loyalty_webapi_token");
+            }
+        }else{
+            return 1;
+        }
+        if(!StringUtils.hasText(accessToken)){
+            log.info("获取accesstoken失败");
+        }
+        accessToken=accessToken.replaceAll("^\"","").replaceAll("\"$","");
 
 
 
-
-        TradeOfferInfo tradeOffInfo = getTradeOffInfo(bindUser, String.valueOf(orderExt.getTradeOfferId()));
+        TradeOfferInfo tradeOffInfo = getTradeOffInfo(bindUser, String.valueOf(orderExt.getTradeOfferId()),accessToken);
         Integer tradeOfferState = tradeOffInfo.getResponse().getOffer().getTradeOfferState();
 //        Integer tradeOffInfoV2 = getTradeOffInfo(bindUser, String.valueOf(orderExt.getTradeOfferId()));
         log.info("tradeOffInfoV2 {}",tradeOfferState);
@@ -434,7 +463,7 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             throw new ServiceException(-1,"Steam openid1 接口验证异常");
         }
     }
-    private TradeOfferInfo getTradeOffInfo(BindUserDO bindUserDO,String tradeOfferId) {
+    private TradeOfferInfo getTradeOffInfo(BindUserDO bindUserDO,String tradeOfferId,String accessToken) {
         try{
             Optional<BindIpaddressDO> bindUserIp = steamService.getBindUserIp(bindUserDO);
             SteamWeb steamWeb=new SteamWeb(configService,bindUserIp);
@@ -448,6 +477,7 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             Map<String,String> post=new HashMap<>();
             post.put("key",bindUserDO.getApiKey());
             post.put("tradeofferid",tradeOfferId);
+            post.put("access_token",accessToken);
 //            builder.form(post);
             HttpUtil.ProxyRequestVo.ProxyRequestVoBuilder builder = HttpUtil.ProxyRequestVo.builder();
             Map<String, String> header = new HashMap<>();
