@@ -165,7 +165,32 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     public Integer getOrderSimpleStatus(LoginUser loginUser, String orderNo, Long orderId) {
         ApiOrderDO masterOrder = getMasterOrder(orderId);
         ApiOrderExtDO orderExt = getOrderExt(orderNo, orderId);
+        if(orderExt.getOrderStatus()==2){
+            return 2;
+        }
+
+        if(orderExt.getOrderStatus()==3){
+            return 3;
+        }
         BindUserDO bindUser = bindUserService.getBindUser(masterOrder.getSellBindUserId());
+
+        SteamWeb steamWeb=new SteamWeb(configService,steamService.getBindUserIp(bindUser));
+        if(steamWeb.checkLogin(bindUser)){
+            if(steamWeb.getWebApiKey().isPresent()){
+                bindUser.setApiKey(steamWeb.getWebApiKey().get());
+            }
+            bindUserService.changeBindUserCookie(new BindUserDO().setId(bindUser.getId()).setLoginCookie(steamWeb.getCookieString()).setApiKey(bindUser.getApiKey()));
+        }
+        Optional<MobileConfList.ConfDTO> confDTO = steamWeb.confirmOfferList(orderExt.getTradeOfferId().toString());
+        if (confDTO.isPresent()) {
+//                confirmOffer(confDTO.get(), ConfirmAction.CANCEL);
+            steamWeb.confirmOffer(confDTO.get(), ConfirmAction.ALLOW);
+        }else {
+            log.warn("交易单据未进行手机自动确认交易单据未进行手机自动确认{}",orderExt.getTradeOfferId());
+        }
+
+
+
         Integer tradeOffInfoV2 = getTradeOffInfoV2(bindUser, String.valueOf(orderExt.getTradeOfferId()));
         log.info("tradeOffInfoV2 {}",tradeOffInfoV2);
         //1,进行中，2完成，3作废
@@ -182,19 +207,21 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             return 3;
 //            damagesCloseInvOrder(invOrderId);
         }else{
-            LocalDateTime plus = orderExt.getCreateTime().plus(Duration.ofHours(12));
-            if(LocalDateTime.now().compareTo(plus) > 0){
-                //时间是否超出12小时，超出则退款
-                return 3;
-//                damagesCloseInvOrder(invOrderId);
-            }
+            return 1;
+            //todo 12小时恢复
+//            LocalDateTime plus = orderExt.getCreateTime().plus(Duration.ofHours(12));
+//            if(LocalDateTime.now().compareTo(plus) > 0){
+//                //时间是否超出12小时，超出则退款
+//                return 3;
+////                damagesCloseInvOrder(invOrderId);
+//            }
         }
-        return 1;
+//        return 1;
     }
 
     @Override
     public ApiOrderCancelRespVo orderCancel(LoginUser loginUser, String orderNo, Long orderId) {
-        throw new ServiceException(-1,"此订单不取消的操作");
+        throw new ServiceException(-1,"此订单不支持取消的操作");
     }
 
     @Override
@@ -306,13 +333,12 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                     orderExt.setOrderSubStatus(InvTransferStatusEnum.TransferING.getStatus().toString());
                     sellingDO.setTransferStatus(InvTransferStatusEnum.TransferFINISH.getStatus());
                 }else {
-                    log.warn("交易单据未进行手机自动确认{}",trade.getTradeofferid());
+                    log.warn("交易单据未进行手机自动确认交易单据未进行手机自动确认{}",trade.getTradeofferid());
                 }
             }catch (Exception e){
                 log.info("交易单据未进行手机自动确认{}",e.getMessage());
                 transferMsg.setErrMsg("交易单据未进行手机自动确认"+e.getMessage());
-                orderExt.setOrderSubStatus(InvTransferStatusEnum.TransferERROR.getStatus().toString());
-                orderExt.setOrderSubStatus(InvTransferStatusEnum.TransferERROR.getStatus().toString());
+                orderExt.setOrderSubStatus(InvTransferStatusEnum.TransferING.getStatus().toString());
                 sellingDO.setTransferStatus(InvTransferStatusEnum.TransferERROR.getStatus());
             }
 //            invOrder.setTransferText(transferMsg);
