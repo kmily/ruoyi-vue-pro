@@ -173,6 +173,7 @@ public class C5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             if (orderCancelRes.isSuccess()){
                 apiOrderCancelRespVo.setIsSuccess(true);
                 apiOrderCancelRespVo.setErrorCode(OpenApiCode.OK);
+                return apiOrderCancelRespVo;
             }
             apiOrderCancelRespVo.setIsSuccess(false);
             apiOrderCancelRespVo.setErrorCode(new ErrorCode(orderCancelRes.getErrorCode(),orderCancelRes.getErrorMsg()));
