@@ -2,9 +2,11 @@ package cn.iocoder.yudao.module.steam.service.fin.c5;
 
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderExtDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
+import cn.iocoder.yudao.module.steam.enums.IvnStatusEnum;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.service.fin.ApiThreeOrderService;
@@ -173,6 +175,12 @@ public class C5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             if (orderCancelRes.isSuccess()){
                 apiOrderCancelRespVo.setIsSuccess(true);
                 apiOrderCancelRespVo.setErrorCode(OpenApiCode.OK);
+                ApiOrderExtDO apiOrderExtDO = apiOrderExtMapper.selectOne(ApiOrderExtDO::getOrderId, orderId);
+                if (apiOrderExtDO == null){
+                    throw new ServiceException(-1,"该拓展表的主订单id不存在，请检查orderId");
+                }
+                apiOrderExtDO.setOrderStatus(IvnStatusEnum.CANCEL.getCode());//订单退款作废
+                apiOrderExtDO.setOrderSubStatus(String.valueOf(11));//C5状态已取消11
                 return apiOrderCancelRespVo;
             }
             apiOrderCancelRespVo.setIsSuccess(false);
