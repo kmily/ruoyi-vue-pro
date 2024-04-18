@@ -8,7 +8,6 @@ import cn.iocoder.yudao.module.steam.service.fin.c5.vo.C5FastPayVo;
 import cn.iocoder.yudao.module.steam.service.fin.c5.vo.C5ProductVo;
 import cn.iocoder.yudao.module.steam.service.fin.c5.vo.CancelC5OrderVo;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
-import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -25,12 +24,9 @@ public class C5ApiUtils {
     private static final String API_BUY_C5_PRODUCT_URL = "https://app.zbt.com/open/trade/v2/quick-buy?language=zh-CN&app-key="+APP_KEY;
     private static final String API_CANCEL_C5_ORDER_URL = "https://app.zbt.com/open/order/buyer-cancel?language=zh-CN&app-key="+APP_KEY;
 
-
-    private static final Gson gson = new Gson();
     /**
      * 获取c5商品价格
-     * @param marketHashNameList
-     * @return
+
      */
     public  static ProductPriceInfoRes.ProductPriceInfoResponse getProductPriceInfo(List<String> marketHashNameList) {
         C5ProductVo c5FastPayVo = new C5ProductVo(CSGO_ID, marketHashNameList);
@@ -59,8 +55,6 @@ public class C5ApiUtils {
 
     /**
      * 购买C5的商品
-     * @param payVo
-     * @return
      */
     public static ProductBuyRes buyC5Product(C5FastPayVo payVo) {
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
