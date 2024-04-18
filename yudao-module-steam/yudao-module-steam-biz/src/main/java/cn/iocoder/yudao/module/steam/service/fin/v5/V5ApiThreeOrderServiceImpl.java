@@ -114,7 +114,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         log.info("发起http请求返回：" + sent.html());
         V5ProductBuyRes json = sent.json(V5ProductBuyRes.class);
-
+        log.info("返回的json对象V5ProductBuyRes为：" + json);
         ApiBuyItemRespVo apiBuyItemRespVo = new ApiBuyItemRespVo();
         if (json != null) {
             // 设置交易链接
@@ -138,6 +138,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                     apiOrderExtDO.setOrderSubStatus(json.getMsg());
 //                    apiOrderExtDO.setCommodityInfo(createReqVO.getCommodityHashName());
                     apiOrderExtMapper.insert(apiOrderExtDO);
+                    log.info("插入的apiOrderExtDO为：" + apiOrderExtDO);
                     queryCommodityDetail(loginUser,json.getData().getOrderNo(),orderId);
                     break;
                 case 1: // 返回错误码为1

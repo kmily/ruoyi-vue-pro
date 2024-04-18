@@ -49,4 +49,7 @@ public interface OpenApiCode {
 
 
     ErrorCode ERR_BUY_ERROR = new ErrorCode(8003, "购买出错");
+
+    //C5
+    ErrorCode ERR_C5_QUERY_ERROR = new ErrorCode(1005, "要查询的饰品不存在");
 }
