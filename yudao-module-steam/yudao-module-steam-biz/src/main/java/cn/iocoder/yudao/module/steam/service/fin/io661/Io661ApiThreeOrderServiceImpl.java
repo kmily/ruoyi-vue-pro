@@ -194,7 +194,7 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
     @Override
     public ApiOrderCancelRespVo orderCancel(LoginUser loginUser, String orderNo, Long orderId) {
-        throw new ServiceException(-1,"此订单不取消的操作");
+        throw new ServiceException(-1,"此订单不支持取消的操作");
     }
 
     @Override

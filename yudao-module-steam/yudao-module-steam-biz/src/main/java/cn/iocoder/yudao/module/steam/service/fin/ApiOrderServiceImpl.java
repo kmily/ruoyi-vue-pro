@@ -830,10 +830,10 @@ public class ApiOrderServiceImpl implements ApiOrderService {
                         insertNotify(invOrderId,"IO661"+System.currentTimeMillis());
                         break;
                     case 3://作废
-                        log.info("作废{}",orderSimpleStatus);
-                        damagesCloseInvOrder(invOrderId,"订单被第三方取消");
-                        apiOrderMapper.updateById(new ApiOrderDO().setId(invOrderId).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus()));
-                        insertNotify(invOrderId,"IO661"+System.currentTimeMillis());
+//                        log.info("作废{}",orderSimpleStatus);
+//                        damagesCloseInvOrder(invOrderId,"订单被第三方取消");
+//                        apiOrderMapper.updateById(new ApiOrderDO().setId(invOrderId).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus()));
+//                        insertNotify(invOrderId,"IO661"+System.currentTimeMillis());
                         break;
                     default:
                         log.info("其它{}",orderSimpleStatus);
