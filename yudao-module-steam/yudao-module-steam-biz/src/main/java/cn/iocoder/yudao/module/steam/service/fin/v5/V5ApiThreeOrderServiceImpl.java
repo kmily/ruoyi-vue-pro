@@ -6,7 +6,9 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderExtDO;
+import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
+import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.enums.IvnStatusEnum;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
@@ -21,7 +23,10 @@ import cn.iocoder.yudao.module.steam.service.fin.vo.*;
 import cn.iocoder.yudao.module.steam.utils.HttpUtil;
 import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import com.google.gson.Gson;
+import com.mysql.cj.x.protobuf.MysqlxDatatypes;
+import jdk.xml.internal.Utils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -40,12 +45,15 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     private ApiOrderExtMapper apiOrderExtMapper;
     @Resource
     private RedisTemplate redisTemplate;
+    @Resource
+    private SellingMapper sellingMapper;
 
     private static final String MERCHANT_KEY = "529606f226e6461ca5bac93047976177";
     private static final String Query_Order_Status_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
     private static final String Cancel_Order_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
     private static final String Query_Commodity_Detail = "https://delivery.v5item.com/open/api/queryOrderDetailInfo";
     public static final String V5_GetItem_URL = "https://delivery.v5item.com/open/api/getItemList";
+    private static final String V5_Query_On_Sale_Info = "https://delivery.v5item.com/open/api/queryOnSaleInfo";
     public static final BigDecimal NO1 = new BigDecimal("1.02");
     public static final BigDecimal NO2 = new BigDecimal("0.998");
     public static final BigDecimal NO3 = new BigDecimal("100");
@@ -358,6 +366,56 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         V5ItemListVO json = sent.json(V5ItemListVO.class);
         return json;
     }
+
+    /**
+     * 根据marketHashName查询在售饰品信息(支持批量查询)
+     */
+    public ArrayList<IO661QueryOnSaleInfo> queryOnSaleInfo(V5queryOnSaleInfoReqVO reqVO){
+        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+        reqVO.setMerchantKey(MERCHANT_KEY); // 商户密钥
+        builder.url(V5_Query_On_Sale_Info);
+        builder.method(HttpUtil.Method.JSON);
+        builder.postObject(reqVO);
+        HashMap<String,String> headers = new HashMap<>();
+        headers.put("Authorization",V5_TOKEN);
+        builder.headers(headers);
+        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
+        V5QueryOnSaleInfoDO json = sent.json(V5QueryOnSaleInfoDO.class);
+        log.info("查询在售饰品信息结果:{}",json.getData());
+        double Min = 0.6;
+        double Max = 0.8;
+        double doubleRandom = (Math.random()*(Max-Min))+Min;
+        List<V5QueryOnSaleInfoDO.V5ProductData> data = json.getData();
+        ArrayList<IO661QueryOnSaleInfo> list = new ArrayList<>();
+        for (V5QueryOnSaleInfoDO.V5ProductData v5ProductData : data){
+
+            // v5价格展示到io661计算
+            int v5Price = BigDecimal.valueOf(v5ProductData.getMinSellPrice()).multiply(NO1)
+                    .multiply(NO2).multiply(NO3).intValue();
+
+            IO661QueryOnSaleInfo io661QueryOnSaleInfoDO = new IO661QueryOnSaleInfo();
+            io661QueryOnSaleInfoDO.setMarketHashName(v5ProductData.getMarketHashName());
+            // IO661在售数量查询
+            List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>().eq(SellingDO::getMarketHashName, v5ProductData.getMarketHashName()));
+            int size = sellingDOS.size();
+            io661QueryOnSaleInfoDO.setMinSellPrice(v5Price);
+            if(size>0){
+                for (SellingDO sellingDO : sellingDOS) {
+                    if(sellingDO.getPrice()< io661QueryOnSaleInfoDO.getMinSellPrice()){
+                        io661QueryOnSaleInfoDO.setMinSellPrice(sellingDO.getPrice());
+                    }
+                }
+            }
+            // 在售数量
+            io661QueryOnSaleInfoDO.setOnSaleStock((int) (((v5ProductData.getOnSaleStock())*doubleRandom)+size));
+            list.add(io661QueryOnSaleInfoDO);
+        }
+        log.info("list:{}",list);
+        return list;
+    }
+
+
+
 
 
 //    public String getTokenFromRedisOrSetNew() {

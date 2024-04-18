@@ -32,7 +32,7 @@ public interface OpenApiCode {
     ErrorCode ERR_5407 = new ErrorCode(5407, "不可输入本人交易链接");
     ErrorCode ERR_5408 = new ErrorCode(5408, "代购对象的交易链接格式错误");
     //----open api
-    ErrorCode TO_MANY_ITEM = new ErrorCode(8001, "查询数据过多");
+    ErrorCode TO_MANY_ITEM = new ErrorCode(8001, "查询数据过多,单次批量查询支持20条");
     ErrorCode ERR_OFFLINE = new ErrorCode(8002, "接口已下线");
 
     ErrorCode NO_DATA = new ErrorCode(8002, "无相关数据");

@@ -47,8 +47,11 @@ import cn.iocoder.yudao.module.steam.service.SteamService;
 import cn.iocoder.yudao.module.steam.service.SteamWeb;
 import cn.iocoder.yudao.module.steam.service.fin.ApiOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.PaySteamOrderService;
+import cn.iocoder.yudao.module.steam.service.fin.v5.V5ApiThreeOrderServiceImpl;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.IO661QueryOnSaleInfo;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5ItemListVO;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5callBackResult;
+import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5queryOnSaleInfoReqVO;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiOrderSubmitRespVO;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
 import cn.iocoder.yudao.module.steam.service.fin.vo.ApiSummaryByHashName;
@@ -103,7 +106,8 @@ public class AppIo661ApiController {
         this.configService = configService;
     }
 
-
+    @Resource
+    private V5ApiThreeOrderServiceImpl v5ApiThreeOrderService;
     @Resource
     private PaySteamOrderService paySteamOrderService;
     @Resource
@@ -430,24 +434,23 @@ public class AppIo661ApiController {
      * 根据模板hash查询在售商品
      * @return
      */
-    @PostMapping("v2/api/batchGetPriceByTemplate")
-    @Operation(summary = "根据模板hash查询在售商品")
+    @PostMapping("v2/api/batchGetTemplate")
+    @Operation(summary = "根据marketHashName查询在售饰品信息(支持批量查询)")
     @PermitAll
-    public ApiResult<List<ApiSummaryByHashName>> batchGetPriceByTemplateV2(@RequestBody OpenApiReqVo<AppBatchGetOnSaleCommodityInfoReqVO> openApiReqVo) {
-        List<ApiSummaryByHashName> ret=new ArrayList<>();
+    public ApiResult<ArrayList<IO661QueryOnSaleInfo>> batchGetPriceByTemplateV2(@RequestBody OpenApiReqVo<V5queryOnSaleInfoReqVO> openApiReqVo) {
+        ArrayList<IO661QueryOnSaleInfo> ret=new ArrayList<>();
         try {
             return DevAccountUtils.tenantExecute(1L, () -> {
                 DevAccountDO devAccount = openApiService.apiCheck(openApiReqVo);
                 LoginUser loginUser = new LoginUser().setUserType(devAccount.getUserType()).setId(devAccount.getUserId()).setTenantId(1L);
-                if(Objects.isNull(openApiReqVo.getData().getRequestList()) || openApiReqVo.getData().getRequestList().size()<=0){
+                if(Objects.isNull(openApiReqVo.getData())){
                     throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
                 }
-                List<AppBatchGetOnSaleCommodityInfoReqVO.RequestListDTO> requestList = openApiReqVo.getData().getRequestList();
-                if(requestList.size()>=20){
+                if(openApiReqVo.getData().getTemplateHashNameList().size() >=21){
                     throw new ServiceException(OpenApiCode.TO_MANY_ITEM);
                 }
-                List<String> collect = openApiReqVo.getData().getRequestList().stream().map(AppBatchGetOnSaleCommodityInfoReqVO.RequestListDTO::getMarketHashName).collect(Collectors.toList());
-                return ApiResult.success(apiOrderService.summaryByHashName(loginUser,collect));
+                ArrayList<IO661QueryOnSaleInfo> io661QueryOnSaleInfos = v5ApiThreeOrderService.queryOnSaleInfo(openApiReqVo.getData());
+                return ApiResult.success(io661QueryOnSaleInfos);
             });
         } catch (ServiceException e) {
             return ApiResult.error(e.getCode(),  e.getMessage(), ret);
