@@ -207,14 +207,16 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             return 3;
 //            damagesCloseInvOrder(invOrderId);
         }else{
-            LocalDateTime plus = orderExt.getCreateTime().plus(Duration.ofHours(12));
-            if(LocalDateTime.now().compareTo(plus) > 0){
-                //时间是否超出12小时，超出则退款
-                return 3;
-//                damagesCloseInvOrder(invOrderId);
-            }
+            return 1;
+            //todo 12小时恢复
+//            LocalDateTime plus = orderExt.getCreateTime().plus(Duration.ofHours(12));
+//            if(LocalDateTime.now().compareTo(plus) > 0){
+//                //时间是否超出12小时，超出则退款
+//                return 3;
+////                damagesCloseInvOrder(invOrderId);
+//            }
         }
-        return 1;
+//        return 1;
     }
 
     @Override

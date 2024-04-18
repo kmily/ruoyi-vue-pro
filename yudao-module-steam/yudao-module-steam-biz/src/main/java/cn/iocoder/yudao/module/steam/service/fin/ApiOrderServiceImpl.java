@@ -802,6 +802,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
     @Transactional(rollbackFor = ServiceException.class)
     public void checkTransfer(Long invOrderId) {
         ApiOrderDO uuOrderById = getOrderById(invOrderId);
+        log.info("订单信息{},",uuOrderById);
         if(Objects.isNull(uuOrderById)){
             throw new ServiceException(OpenApiCode.JACKSON_EXCEPTION);
         }
@@ -816,7 +817,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
                 LoginUser loginUser = new LoginUser().setTenantId(1L).setUserType(uuOrderById.getBuyUserType()).setId(uuOrderById.getBuyUserId());
                 // 1,进行中，2完成，3作废
                 Integer orderSimpleStatus = apiThreeOrderService.getOrderSimpleStatus(loginUser,uuOrderById.getThreeOrderNo(), uuOrderById.getId());
-                log.info("订单状态{}",orderSimpleStatus);
+                log.info("订单状态{},订单ID{}",orderSimpleStatus,invOrderId);
                 switch (orderSimpleStatus){
                     case 1://进行中
                         log.info("进行中{}",orderSimpleStatus);
@@ -830,10 +831,10 @@ public class ApiOrderServiceImpl implements ApiOrderService {
                         insertNotify(invOrderId,"IO661"+System.currentTimeMillis());
                         break;
                     case 3://作废
-//                        log.info("作废{}",orderSimpleStatus);
-//                        damagesCloseInvOrder(invOrderId,"订单被第三方取消");
-//                        apiOrderMapper.updateById(new ApiOrderDO().setId(invOrderId).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus()));
-//                        insertNotify(invOrderId,"IO661"+System.currentTimeMillis());
+                        log.info("作废{}",orderSimpleStatus);
+                        damagesCloseInvOrder(invOrderId,"订单被第三方取消");
+                        apiOrderMapper.updateById(new ApiOrderDO().setId(invOrderId).setTransferStatus(InvTransferStatusEnum.CLOSE.getStatus()));
+                        insertNotify(invOrderId,"IO661"+System.currentTimeMillis());
                         break;
                     default:
                         log.info("其它{}",orderSimpleStatus);
