@@ -151,13 +151,30 @@ public class C5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     public Integer getOrderSimpleStatus(LoginUser loginUser, String orderNo, Long orderId) {
         checkLoginUser(loginUser);
         C5OrderInfo c5OrderInfo = C5ApiUtils.getC5OrderInfo(Long.valueOf(orderNo), null);
+
         if (c5OrderInfo != null && c5OrderInfo.isSuccess() && c5OrderInfo.getData() != null ){
+            ApiOrderExtDO apiOrder = apiOrderExtMapper.selectOne(ApiOrderExtDO::getOrderId, orderId);
+            if (apiOrder == null){
+                throw new ServiceException(-1,"该订单不存在，请检查订单号");
+            }
+            ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
+            apiOrderExtDO.setOrderSubStatusErrText(c5OrderInfo.getErrorMsg()); // 订单子状态错误信息
+            apiOrderExtDO.setOrderSubStatus(String.valueOf(c5OrderInfo.getData().getStatus())); // 订单子状态
+            apiOrderExtDO.setOrderStatus(IvnStatusEnum.ACTIONING.getCode()); // 订单状态
+
             if (c5OrderInfo.getData().getStatus() == 10){
+                apiOrderExtDO.setOrderStatus(IvnStatusEnum.DONE.getCode());
+                // 更新订单状态
+                apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderNo,orderNo));
                 return 2;
             }
             if (c5OrderInfo.getData().getStatus() == 11){
+                apiOrderExtDO.setOrderStatus(IvnStatusEnum.CANCEL.getCode());
+                apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderNo,orderNo));
                 return 3;
             }
+            apiOrderExtDO.setOrderStatus(IvnStatusEnum.ACTIONING.getCode());
+            apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderNo,orderNo));
             return 1;
         }
         throw new ServiceException(-1,"查询订单出错或者不存在这笔订单，请检查订单号");
