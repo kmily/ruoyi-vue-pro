@@ -141,6 +141,15 @@ public class AppWalletController {
         PageResult<SellingDoList> apiOrder = invOrderExtService.getSellOrder(reqVo, page, loginUser);
         return CommonResult.success(apiOrder);
     }
+    @GetMapping("/getSellOrderDetail")
+    @Operation(summary = "出售详情")
+    @PreAuthenticated
+    public CommonResult<PageResult<SellingDoList>> getSellOrderDetail(@Valid SellOrderPageReqVO reqVo) {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        Page<ApiOrderDO> page = new Page<>(reqVo.getPageNo(), reqVo.getPageSize());
+        PageResult<SellingDoList> apiOrder = invOrderExtService.getSellOrderDetail(reqVo, page, loginUser);
+        return CommonResult.success(apiOrder);
+    }
 
     @GetMapping("/getPurchaseOrder")
     @Operation(summary = "购买记录")
@@ -149,6 +158,15 @@ public class AppWalletController {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         Page<ApiOrderDO> page = new Page<>(reqVo.getPageNo(), reqVo.getPageSize());
         PageResult<SellingDoList> apiOrder = invOrderExtService.getPurchaseOrder(reqVo, page, loginUser);
+        return CommonResult.success(apiOrder);
+    }
+    @GetMapping("/getPurchaseOrderDetail")
+    @Operation(summary = "购买详情")
+    @PreAuthenticated
+    public CommonResult<PageResult<SellingDoList>> getPurchaseOrderDetail(@Valid SellOrderPageReqVO reqVo) throws JsonProcessingException {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        Page<ApiOrderDO> page = new Page<>(reqVo.getPageNo(), reqVo.getPageSize());
+        PageResult<SellingDoList> apiOrder = invOrderExtService.getPurchaseOrderDetail(reqVo, page, loginUser);
         return CommonResult.success(apiOrder);
     }
 
