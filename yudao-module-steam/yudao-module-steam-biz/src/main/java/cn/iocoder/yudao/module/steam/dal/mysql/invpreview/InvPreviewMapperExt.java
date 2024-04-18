@@ -54,7 +54,8 @@ public interface InvPreviewMapperExt extends BaseMapperX<InvPreviewDO> {
                 .eq(ObjectUtil.isNotNull(reqVO.getExistInv()),InvPreviewDO::getExistInv, reqVO.getExistInv())
                 .ge(ObjectUtil.isNotNull(reqVO.getMinPrice()),InvPreviewDO::getMinPrice,reqVO.getMinPrice())
                 .le(ObjectUtil.isNotNull(reqVO.getMaxPrice()),InvPreviewDO::getMinPrice,reqVO.getMaxPrice())
-                .orderByDesc(InvPreviewDO::getOurSellQuantity);
+                .orderByDesc(InvPreviewDO::getOurSellQuantity)
+                .orderByDesc(InvPreviewDO::getId);
         if (reqVO.getType() != null){
             queryWrapper.lambda().and(wrapper -> {
                 if (ObjectUtil.isNotNull(reqVO.getType())) {
