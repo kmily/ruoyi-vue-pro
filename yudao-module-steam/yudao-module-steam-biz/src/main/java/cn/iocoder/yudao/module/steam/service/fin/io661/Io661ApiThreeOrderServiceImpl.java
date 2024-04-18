@@ -329,7 +329,7 @@ public class Io661ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             }catch (Exception e){
                 log.info("交易单据未进行手机自动确认{}",e.getMessage());
                 transferMsg.setErrMsg("交易单据未进行手机自动确认"+e.getMessage());
-                orderExt.setOrderSubStatus(InvTransferStatusEnum.TransferERROR.getStatus().toString());
+                orderExt.setOrderSubStatus(InvTransferStatusEnum.TransferING.getStatus().toString());
                 sellingDO.setTransferStatus(InvTransferStatusEnum.TransferERROR.getStatus());
             }
 //            invOrder.setTransferText(transferMsg);
