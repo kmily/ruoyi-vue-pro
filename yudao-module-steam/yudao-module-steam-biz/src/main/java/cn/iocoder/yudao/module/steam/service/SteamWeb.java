@@ -96,6 +96,9 @@ public class SteamWeb {
      */
     public boolean checkLogin(BindUserDO bindUserDO){
         this.cookieString=bindUserDO.getLoginCookie();
+        if(Objects.nonNull(bindUserDO.getSteamId()) && !bindUserDO.getSteamId().startsWith("temp")){
+            this.sessionId=Optional.ofNullable(bindUserDO.getSteamId());
+        }
         try{
             steamMaFile = bindUserDO.getMaFile();
             initApiKey();
@@ -180,10 +183,14 @@ public class SteamWeb {
         if (matcher.find()) {
             webApiKey = Optional.of(matcher.group(1));
         }
-        Pattern pattern2 = Pattern.compile("https://steamcommunity.com/profiles/(\\d+)/");
-        Matcher matcher2 = pattern2.matcher(proxyResponseVo.getHtml());
-        if (matcher2.find()) {
-            steamId = Optional.of(matcher2.group(1));
+        if(steamId.isPresent()){
+
+        }else{
+            Pattern pattern2 = Pattern.compile("https://steamcommunity.com/profiles/(\\d+)/");
+            Matcher matcher2 = pattern2.matcher(proxyResponseVo.getHtml());
+            if (matcher2.find()) {
+                steamId = Optional.of(matcher2.group(1));
+            }
         }
         //set browserid
         Map<String, String> cookies = proxyResponseVo.getCookies();
