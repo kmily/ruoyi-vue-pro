@@ -172,13 +172,13 @@ public class C5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
             ApiOrderCancelRespVo apiOrderCancelRespVo = new ApiOrderCancelRespVo();
             if (orderCancelRes.isSuccess()){
                 apiOrderCancelRespVo.setIsSuccess(true);
-                //TODO C5退款成功,进行操作
+                apiOrderCancelRespVo.setErrorCode(OpenApiCode.OK);
             }
             apiOrderCancelRespVo.setIsSuccess(false);
             apiOrderCancelRespVo.setErrorCode(new ErrorCode(orderCancelRes.getErrorCode(),orderCancelRes.getErrorMsg()));
             return apiOrderCancelRespVo;
         }
-        return null;
+        throw new ServiceException(-1,"订单退款异常，请联系管理员");
     }
 
     @Override
