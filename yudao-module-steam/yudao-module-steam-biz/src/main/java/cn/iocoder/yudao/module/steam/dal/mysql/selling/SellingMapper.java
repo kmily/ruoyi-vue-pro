@@ -5,11 +5,10 @@ import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.module.steam.dal.dataobject.invdesc.InvDescDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.steam.controller.admin.selling.vo.*;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * 在售饰品 Mapper
@@ -50,5 +49,8 @@ public interface SellingMapper extends BaseMapperX<SellingDO> {
                 .likeIfPresent(SellingDO::getShortName, reqVO.getShortName())
                 .orderByDesc(SellingDO::getId));
     }
+
+    @Select("SELECT * FROM steam_selling WHERE id = #{id}")
+    SellingDO selectById(Long id);
 
 }
