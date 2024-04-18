@@ -197,7 +197,8 @@ public class C5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                     throw new ServiceException(-1,"该拓展表的主订单id不存在，请检查orderId");
                 }
                 apiOrderExtDO.setOrderStatus(IvnStatusEnum.CANCEL.getCode());//订单退款作废
-                apiOrderExtDO.setOrderSubStatus(String.valueOf(11));//C5状态已取消11
+                apiOrderExtDO.setOrderSubStatus(String.valueOf(11));//C5状态已取消11   小状态
+                apiOrderExtMapper.updateById(apiOrderExtDO);
                 return apiOrderCancelRespVo;
             }
             apiOrderCancelRespVo.setIsSuccess(false);
