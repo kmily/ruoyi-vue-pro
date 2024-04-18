@@ -434,7 +434,7 @@ public class AppIo661ApiController {
      * 根据模板hash查询在售商品
      * @return
      */
-    @PostMapping("v2/api/batchGetTemplate")
+    @PostMapping("v2/api/batchGetPriceByTemplate")
     @Operation(summary = "根据marketHashName查询在售饰品信息(支持批量查询)")
     @PermitAll
     public ApiResult<ArrayList<IO661QueryOnSaleInfo>> batchGetPriceByTemplateV2(@RequestBody OpenApiReqVo<V5queryOnSaleInfoReqVO> openApiReqVo) {
