@@ -97,7 +97,7 @@ public class SteamWeb {
     public boolean checkLogin(BindUserDO bindUserDO){
         this.cookieString=bindUserDO.getLoginCookie();
         if(Objects.nonNull(bindUserDO.getSteamId()) && !bindUserDO.getSteamId().startsWith("temp")){
-            this.sessionId=Optional.ofNullable(bindUserDO.getSteamId());
+            this.steamId=Optional.ofNullable(bindUserDO.getSteamId());
         }
         try{
             steamMaFile = bindUserDO.getMaFile();
