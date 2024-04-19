@@ -22,15 +22,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class SellingDoList extends PageParam implements Serializable {
 
-    /**
-     * 订单编号
-     */
-    @TableId
-//    private Long id;
-    /**
-     * 订单支付时间
-     */
-    private LocalDateTime payTime;
+
     /**
      * 订单创建时间
      */

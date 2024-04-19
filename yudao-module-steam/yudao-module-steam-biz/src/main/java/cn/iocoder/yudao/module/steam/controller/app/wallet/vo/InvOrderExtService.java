@@ -32,6 +32,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -51,89 +52,16 @@ public class InvOrderExtService {
 
 
 
-
-    public PageResult<SellingDoList> getSellOrderWithPage(InvOrderPageReqVO reqVo, Page<InvOrderDO> page, LoginUser loginUser) {
-        // 下单状态
-        List<SellingDoList> sellingDoLists = new ArrayList<>();
-        LambdaQueryWrapper<InvOrderDO> invOrderDO;
-        // 匹配订单状态
-        if(reqVo.getTransferStatus() != null){
-            invOrderDO = new LambdaQueryWrapper<InvOrderDO>()
-                    .eq(InvOrderDO::getSellUserId, loginUser.getId())
-                    .eq(InvOrderDO::getSellUserType, loginUser.getUserType())
-                    .eq(InvOrderDO::getTransferStatus, reqVo.getTransferStatus())
-                    .orderByDesc(InvOrderDO::getCreateTime);
-        }else{
-            List<Integer> statusesToMatch = Arrays.asList(
-                    InvTransferStatusEnum.INORDER.getStatus(),
-                    InvTransferStatusEnum.TransferING.getStatus(),
-                    InvTransferStatusEnum.TransferFINISH.getStatus(),
-                    InvTransferStatusEnum.OFF_SALE.getStatus(),
-                    InvTransferStatusEnum.TransferERROR.getStatus(),
-                    InvTransferStatusEnum.CLOSE.getStatus());
-            invOrderDO = new LambdaQueryWrapper<InvOrderDO>()
-                    .eq(InvOrderDO::getSellUserId, loginUser.getId())
-                    .eq(InvOrderDO::getSellUserType, loginUser.getUserType())
-                    .in(InvOrderDO::getTransferStatus, statusesToMatch)
-                    .orderByDesc(InvOrderDO::getCreateTime);
-        }
-
-        // 执行分页查询
-        IPage<InvOrderDO> invOrderPage = invOrderMapper.selectPage(page, invOrderDO);
-
-        // 判断
-        if (invOrderDO.isEmptyOfWhere()) {
-            return new PageResult<>(sellingDoLists, 0L);
-        }
-        // 遍历订单，返回订单号等关键数据
-        for (InvOrderDO invOrderDOTemp : invOrderPage.getRecords()) {
-            SellingDoList sellingDoListTemp = new SellingDoList();
-            sellingDoListTemp.setOrderNo(invOrderDOTemp.getOrderNo());
-            sellingDoListTemp.setPayTime(invOrderDOTemp.getPayTime());
-            sellingDoListTemp.setCommodityAmount(invOrderDOTemp.getCommodityAmount());
-            sellingDoListTemp.setMerchantNo(invOrderDOTemp.getMerchantNo());
-            sellingDoListTemp.setMarketName(invOrderDOTemp.getMarketName());
-            sellingDoListTemp.setCreateTime(invOrderDOTemp.getCreateTime());
-            sellingDoListTemp.setTransferStatus(invOrderDOTemp.getTransferStatus());
-
-            List<InvPreviewDO> invPreviewDOS = invPreviewMapper.selectList(new LambdaQueryWrapperX<InvPreviewDO>()
-                    .eq(InvPreviewDO::getItemName, invOrderDOTemp.getMarketName()));
-            if(invPreviewDOS.isEmpty()){
-                invPreviewDOS.add(new InvPreviewDO());
-            }
-            sellingDoListTemp.setSelExterior(invPreviewDOS.get(0).getSelExterior());
-            sellingDoListTemp.setIconUrl(invPreviewDOS.get(0).getImageUrl());
-            sellingDoListTemp.setMarketName(invPreviewDOS.get(0).getItemName());
-            sellingDoListTemp.setMarketHashName(invPreviewDOS.get(0).getMarketHashName());
-
-            InvPreviewDO matchingInvPreviewDO = invPreviewDOS.stream()
-                    .filter(invPreview -> invPreview.getMarketHashName().equals(invPreviewDOS.get(0).getMarketHashName()))
-                    .findFirst()
-                    .orElse(null);
-            if (matchingInvPreviewDO != null) {
-                sellingDoListTemp.setSelExteriorColor(matchingInvPreviewDO.getItemInfo().getExteriorColor());
-            } else {
-                sellingDoListTemp.setSelExteriorColor((invPreviewDOS.get(0).getItemInfo()).getExteriorColor());
-            }
-            sellingDoLists.add(sellingDoListTemp);
-        }
-        return new PageResult<>(sellingDoLists, invOrderPage.getTotal());
-    }
-
-
     // 出售记录
-    public PageResult<SellingDoList> getSellOrder(SellOrderPageReqVO reqVo, Page<ApiOrderDO> page, LoginUser loginUser) {
-        // 下单状态
-        List<SellingDoList> sellingDoLists = new ArrayList<>();
-        LambdaQueryWrapper<ApiOrderDO> apiOrderDO;
-        // 匹配订单状态
-        if(reqVo.getTransferStatus() != null){
-            apiOrderDO = new LambdaQueryWrapper<ApiOrderDO>()
-                    .eq(ApiOrderDO::getSellUserId, loginUser.getId())
-                    .eq(ApiOrderDO::getSellUserType, loginUser.getUserType())
-                    .eq(ApiOrderDO::getTransferStatus, reqVo.getTransferStatus())
-                    .orderByDesc(ApiOrderDO::getUpdateTime);
-        }else{
+    public PageResult<SellingDoList> getSellOrder(SellOrderPageReqVO sellReqVo, Page page, LoginUser loginUser) {
+
+        LambdaQueryWrapper<ApiOrderDO> apiOrderDO = new LambdaQueryWrapper<ApiOrderDO>()
+                .eq(ApiOrderDO::getSellUserId, loginUser.getId())
+                .eq(ApiOrderDO::getSellUserType, loginUser.getUserType());
+
+        if (sellReqVo.getTransferStatus() != null) {
+            apiOrderDO.eq(ApiOrderDO::getTransferStatus, sellReqVo.getTransferStatus());
+        } else {
             List<Integer> statusesToMatch = Arrays.asList(
                     InvTransferStatusEnum.INORDER.getStatus(),
                     InvTransferStatusEnum.TransferING.getStatus(),
@@ -141,25 +69,36 @@ public class InvOrderExtService {
                     InvTransferStatusEnum.OFF_SALE.getStatus(),
                     InvTransferStatusEnum.TransferERROR.getStatus(),
                     InvTransferStatusEnum.CLOSE.getStatus());
-            apiOrderDO = new LambdaQueryWrapper<ApiOrderDO>()
-                    .eq(ApiOrderDO::getSellUserId, loginUser.getId())
-                    .eq(ApiOrderDO::getSellUserType, loginUser.getUserType())
-                    .in(ApiOrderDO::getTransferStatus, statusesToMatch)
-                    .orderByDesc(ApiOrderDO::getUpdateTime);
+            apiOrderDO.in(ApiOrderDO::getTransferStatus, statusesToMatch);
         }
 
-        // 执行分页查询
-        IPage<ApiOrderDO> apiOrderDOIPage = apiOrderMapper.selectPage(page, apiOrderDO);
+        apiOrderDO.orderByDesc(ApiOrderDO::getCreateTime);
+        List<ApiOrderDO> apiOrderDOList = apiOrderMapper.selectList(apiOrderDO);
 
-        // 判断
-        if (apiOrderDO.isEmptyOfWhere()) {
-            return new PageResult<>(sellingDoLists, 0L);
+        LambdaQueryWrapper<InvOrderDO> invOrderDO = new LambdaQueryWrapper<InvOrderDO>()
+                .eq(InvOrderDO::getSellUserId, loginUser.getId())
+                .eq(InvOrderDO::getUserType, loginUser.getUserType());
+
+        if (sellReqVo.getTransferStatus() != null) {
+            invOrderDO.eq(InvOrderDO::getTransferStatus, sellReqVo.getTransferStatus());
+        } else {
+            List<Integer> statusesToMatch = Arrays.asList(
+                    InvTransferStatusEnum.INORDER.getStatus(),
+                    InvTransferStatusEnum.TransferING.getStatus(),
+                    InvTransferStatusEnum.TransferFINISH.getStatus(),
+                    InvTransferStatusEnum.OFF_SALE.getStatus(),
+                    InvTransferStatusEnum.TransferERROR.getStatus(),
+                    InvTransferStatusEnum.CLOSE.getStatus());
+            invOrderDO.in(InvOrderDO::getTransferStatus, statusesToMatch);
         }
-        // 遍历订单，返回订单号等关键数据
-        for (ApiOrderDO apiOrderDO1 : apiOrderDOIPage.getRecords()) {
+
+        invOrderDO.orderByDesc(InvOrderDO::getCreateTime);
+        List<InvOrderDO> invOrderDOList = invOrderMapper.selectList(invOrderDO);
+
+        List<SellingDoList> combinedList = new ArrayList<>();
+        for (ApiOrderDO apiOrderDO1 : apiOrderDOList) {
             SellingDoList sellingDoListTemp = new SellingDoList();
             sellingDoListTemp.setOrderNo(apiOrderDO1.getOrderNo());
-            sellingDoListTemp.setPayTime(apiOrderDO1.getUpdateTime());
             sellingDoListTemp.setCommodityAmount(apiOrderDO1.getCommodityAmount());
             sellingDoListTemp.setMerchantNo(apiOrderDO1.getMerchantNo());
             sellingDoListTemp.setCreateTime(apiOrderDO1.getCreateTime());
@@ -168,19 +107,18 @@ public class InvOrderExtService {
             ApiOrderExtDO apiOrderExtDOS = apiOrderExtMapper.selectOne(new LambdaQueryWrapperX<ApiOrderExtDO>()
                     .eqIfPresent(ApiOrderExtDO::getOrderId, apiOrderDO1.getId()));
 
-            if(apiOrderExtDOS == null){
+            if (apiOrderExtDOS == null) {
                 apiOrderExtDOS = new ApiOrderExtDO();
             }
 
-            // 查找selling表返回相应字段
-            SellingDO apiOrderExtDOList = sellingMapper.selectById(Long.valueOf(apiOrderExtDOS.getCommodityInfo()));
-            if(apiOrderExtDOList == null){
-                apiOrderExtDOList = new SellingDO();
+            SellingDO sellingDO = sellingMapper.selectById(Long.valueOf(apiOrderExtDOS.getCommodityInfo()));
+            if (sellingDO == null) {
+                sellingDO = new SellingDO();
             }
 
             InvPreviewDO invPreviewDOS = invPreviewMapper.selectOne(new LambdaQueryWrapperX<InvPreviewDO>()
-                    .eqIfPresent(InvPreviewDO::getMarketHashName, apiOrderExtDOList.getMarketHashName()));
-            if(invPreviewDOS== null){
+                    .eqIfPresent(InvPreviewDO::getMarketHashName, sellingDO.getMarketHashName()));
+            if (invPreviewDOS == null) {
                 invPreviewDOS = new InvPreviewDO();
             }
 
@@ -191,14 +129,155 @@ public class InvOrderExtService {
 
             InvPreviewDO matchingInvPreviewDO = invPreviewDOS;
 
-            if (matchingInvPreviewDO != null) {
-                sellingDoListTemp.setSelExteriorColor(matchingInvPreviewDO.getItemInfo().getExteriorColor());
-            } else {
-                sellingDoListTemp.setSelExteriorColor((invPreviewDOS.getItemInfo()).getExteriorColor());
-            }
-            sellingDoLists.add(sellingDoListTemp);
+            sellingDoListTemp.setSelExteriorColor(matchingInvPreviewDO.getItemInfo().getExteriorColor());
+
+            combinedList.add(sellingDoListTemp);
         }
-        return new PageResult<>(sellingDoLists, apiOrderDOIPage.getTotal());
+
+        for (InvOrderDO invOrderDO1 : invOrderDOList) {
+            SellingDoList sellingDoListTemp = new SellingDoList();
+            sellingDoListTemp.setOrderNo(invOrderDO1.getOrderNo());
+            sellingDoListTemp.setCommodityAmount(invOrderDO1.getCommodityAmount());
+            sellingDoListTemp.setMerchantNo(invOrderDO1.getMerchantNo());
+            sellingDoListTemp.setCreateTime(invOrderDO1.getCreateTime());
+            sellingDoListTemp.setTransferStatus(invOrderDO1.getTransferStatus());
+
+            InvPreviewDO invPreviewDOS = invPreviewMapper.selectOne(new LambdaQueryWrapperX<InvPreviewDO>()
+                    .eqIfPresent(InvPreviewDO::getItemName, invOrderDO1.getMarketName()));
+            if (invPreviewDOS == null) {
+                invPreviewDOS = new InvPreviewDO();
+            }
+
+            sellingDoListTemp.setSelExterior(invPreviewDOS.getSelExterior());
+            sellingDoListTemp.setIconUrl(invPreviewDOS.getImageUrl());
+            sellingDoListTemp.setMarketName(invPreviewDOS.getItemName());
+            sellingDoListTemp.setMarketHashName(invPreviewDOS.getMarketHashName());
+
+            InvPreviewDO matchingInvPreviewDO = invPreviewDOS;
+
+            sellingDoListTemp.setSelExteriorColor(matchingInvPreviewDO.getItemInfo().getExteriorColor());
+
+            combinedList.add(sellingDoListTemp);
+        }
+
+        combinedList.sort(Comparator.comparing(SellingDoList::getCreateTime).reversed());
+
+        long pageSize = page.getSize();
+        long pageNo = page.getCurrent();
+        long startIndex = (pageNo - 1) * pageSize;
+        long endIndex = Math.min(startIndex + pageSize, combinedList.size());
+        List<SellingDoList> paginatedList = combinedList.subList((int) startIndex, (int) endIndex);
+
+        return new PageResult<>(paginatedList, (long) combinedList.size());
+    }
+
+    // 购买记录
+    public PageResult<SellingDoList> getPurchaseOrder(SellOrderPageReqVO sellReqVo, Page page, LoginUser loginUser) {
+        LambdaQueryWrapper<ApiOrderDO> apiOrderDO = new LambdaQueryWrapper<ApiOrderDO>()
+                .eq(ApiOrderDO::getBuyUserId, loginUser.getId())
+                .eq(ApiOrderDO::getBuyUserType, loginUser.getUserType());
+
+        if (sellReqVo.getTransferStatus() != null) {
+            apiOrderDO.eq(ApiOrderDO::getTransferStatus, sellReqVo.getTransferStatus());
+        } else {
+            List<Integer> statusesToMatch = Arrays.asList(
+                    InvTransferStatusEnum.INORDER.getStatus(),
+                    InvTransferStatusEnum.TransferING.getStatus(),
+                    InvTransferStatusEnum.TransferFINISH.getStatus(),
+                    InvTransferStatusEnum.OFF_SALE.getStatus(),
+                    InvTransferStatusEnum.TransferERROR.getStatus(),
+                    InvTransferStatusEnum.CLOSE.getStatus());
+            apiOrderDO.in(ApiOrderDO::getTransferStatus, statusesToMatch);
+        }
+
+        apiOrderDO.orderByDesc(ApiOrderDO::getCreateTime);
+        List<ApiOrderDO> apiOrderDOList = apiOrderMapper.selectList(apiOrderDO);
+
+        LambdaQueryWrapper<InvOrderDO> invOrderDO = new LambdaQueryWrapper<InvOrderDO>()
+                .eq(InvOrderDO::getUserId, loginUser.getId())
+                .eq(InvOrderDO::getUserType, loginUser.getUserType());
+
+        if (sellReqVo.getTransferStatus() != null) {
+            invOrderDO.eq(InvOrderDO::getTransferStatus, sellReqVo.getTransferStatus());
+        } else {
+            List<Integer> statusesToMatch = Arrays.asList(
+                    InvTransferStatusEnum.INORDER.getStatus(),
+                    InvTransferStatusEnum.TransferING.getStatus(),
+                    InvTransferStatusEnum.TransferFINISH.getStatus(),
+                    InvTransferStatusEnum.OFF_SALE.getStatus(),
+                    InvTransferStatusEnum.TransferERROR.getStatus(),
+                    InvTransferStatusEnum.CLOSE.getStatus());
+            invOrderDO.in(InvOrderDO::getTransferStatus, statusesToMatch);
+        }
+
+        invOrderDO.orderByDesc(InvOrderDO::getCreateTime);
+        List<InvOrderDO> invOrderDOList = invOrderMapper.selectList(invOrderDO);
+
+        List<SellingDoList> combinedList = new ArrayList<>();
+        for (ApiOrderDO apiOrderDO1 : apiOrderDOList) {
+            SellingDoList sellingDoListTemp = new SellingDoList();
+            sellingDoListTemp.setOrderNo(apiOrderDO1.getOrderNo());
+            sellingDoListTemp.setCommodityAmount(apiOrderDO1.getPayAmount());
+            sellingDoListTemp.setMerchantNo(apiOrderDO1.getMerchantNo());
+            sellingDoListTemp.setCreateTime(apiOrderDO1.getCreateTime());
+            sellingDoListTemp.setTransferStatus(apiOrderDO1.getTransferStatus());
+
+            ApiQueryCommodityReqVo apiQueryCommodityReqVo = apiOrderDO1.getBuyInfo();
+
+            if (apiQueryCommodityReqVo != null) {
+                InvPreviewDO invPreviewDOS = invPreviewMapper.selectOne(new LambdaQueryWrapperX<InvPreviewDO>()
+                        .eqIfPresent(InvPreviewDO::getMarketHashName, apiQueryCommodityReqVo.getCommodityHashName()));
+
+                if (invPreviewDOS == null) {
+                    invPreviewDOS = new InvPreviewDO();
+                }
+
+                sellingDoListTemp.setSelExterior(invPreviewDOS.getSelExterior());
+                sellingDoListTemp.setIconUrl(invPreviewDOS.getImageUrl());
+                sellingDoListTemp.setMarketName(invPreviewDOS.getItemName());
+                sellingDoListTemp.setMarketHashName(invPreviewDOS.getMarketHashName());
+
+                InvPreviewDO matchingInvPreviewDO = invPreviewDOS;
+                sellingDoListTemp.setSelExteriorColor(matchingInvPreviewDO.getItemInfo().getExteriorColor());
+            }
+
+            combinedList.add(sellingDoListTemp);
+        }
+
+        for (InvOrderDO invOrderDO1 : invOrderDOList) {
+            SellingDoList sellingDoListTemp = new SellingDoList();
+            sellingDoListTemp.setOrderNo(invOrderDO1.getOrderNo());
+            sellingDoListTemp.setCommodityAmount(invOrderDO1.getCommodityAmount());
+            sellingDoListTemp.setMerchantNo(invOrderDO1.getMerchantNo());
+            sellingDoListTemp.setCreateTime(invOrderDO1.getCreateTime());
+            sellingDoListTemp.setTransferStatus(invOrderDO1.getTransferStatus());
+
+            InvPreviewDO invPreviewDOS = invPreviewMapper.selectOne(new LambdaQueryWrapperX<InvPreviewDO>()
+                    .eqIfPresent(InvPreviewDO::getItemName, invOrderDO1.getMarketName()));
+            if (invPreviewDOS == null) {
+                invPreviewDOS = new InvPreviewDO();
+            }
+
+            sellingDoListTemp.setSelExterior(invPreviewDOS.getSelExterior());
+            sellingDoListTemp.setIconUrl(invPreviewDOS.getImageUrl());
+            sellingDoListTemp.setMarketName(invPreviewDOS.getItemName());
+            sellingDoListTemp.setMarketHashName(invPreviewDOS.getMarketHashName());
+
+            InvPreviewDO matchingInvPreviewDO = invPreviewDOS;
+            sellingDoListTemp.setSelExteriorColor(matchingInvPreviewDO.getItemInfo().getExteriorColor());
+
+            combinedList.add(sellingDoListTemp);
+        }
+
+        combinedList.sort(Comparator.comparing(SellingDoList::getCreateTime).reversed());
+
+        long pageSize = page.getSize();
+        long pageNo = page.getCurrent();
+        long startIndex = (pageNo - 1) * pageSize;
+        long endIndex = Math.min(startIndex + pageSize, combinedList.size());
+        List<SellingDoList> paginatedList = combinedList.subList((int) startIndex, (int) endIndex);
+
+        return new PageResult<>(paginatedList, (long) combinedList.size());
     }
 
     // 出售详情
@@ -212,7 +291,7 @@ public class InvOrderExtService {
                     .eq(ApiOrderDO::getSellUserId, loginUser.getId())
                     .eq(ApiOrderDO::getSellUserType, loginUser.getUserType())
                     .eq(ApiOrderDO::getTransferStatus, reqVo.getTransferStatus())
-                    .orderByDesc(ApiOrderDO::getUpdateTime);
+                    .orderByDesc(ApiOrderDO::getCreateTime);
         }else{
             List<Integer> statusesToMatch = Arrays.asList(
                     InvTransferStatusEnum.INORDER.getStatus(),
@@ -225,7 +304,7 @@ public class InvOrderExtService {
                     .eq(ApiOrderDO::getSellUserId, loginUser.getId())
                     .eq(ApiOrderDO::getSellUserType, loginUser.getUserType())
                     .in(ApiOrderDO::getTransferStatus, statusesToMatch)
-                    .orderByDesc(ApiOrderDO::getUpdateTime);
+                    .orderByDesc(ApiOrderDO::getCreateTime);
         }
 
         // 执行分页查询
@@ -239,7 +318,6 @@ public class InvOrderExtService {
         for (ApiOrderDO apiOrderDO1 : apiOrderDOIPage.getRecords()) {
             SellingDoList sellingDoListTemp = new SellingDoList();
             sellingDoListTemp.setOrderNo(apiOrderDO1.getOrderNo());
-            sellingDoListTemp.setPayTime(apiOrderDO1.getUpdateTime());
             sellingDoListTemp.setCommodityAmount(apiOrderDO1.getCommodityAmount());
             sellingDoListTemp.setMerchantNo(apiOrderDO1.getMerchantNo());
             sellingDoListTemp.setCreateTime(apiOrderDO1.getCreateTime());
@@ -282,79 +360,6 @@ public class InvOrderExtService {
     }
 
 
-    // 购买记录
-    public PageResult<SellingDoList> getPurchaseOrder(SellOrderPageReqVO reqVo, Page<ApiOrderDO> page, LoginUser loginUser) throws JsonProcessingException {
-        // 下单状态
-        List<SellingDoList> sellingDoLists = new ArrayList<>();
-        LambdaQueryWrapper<ApiOrderDO> apiOrderDO;
-        // 匹配订单状态
-        if(reqVo.getTransferStatus() != null){
-            apiOrderDO = new LambdaQueryWrapper<ApiOrderDO>()
-                    .eq(ApiOrderDO::getBuyUserId, loginUser.getId())
-                    .eq(ApiOrderDO::getBuyUserType, loginUser.getUserType())
-                    .eq(ApiOrderDO::getTransferStatus, reqVo.getTransferStatus())
-                    .orderByDesc(ApiOrderDO::getUpdateTime);
-        }else{
-            List<Integer> statusesToMatch = Arrays.asList(
-                    InvTransferStatusEnum.INORDER.getStatus(),
-                    InvTransferStatusEnum.TransferING.getStatus(),
-                    InvTransferStatusEnum.TransferFINISH.getStatus(),
-                    InvTransferStatusEnum.OFF_SALE.getStatus(),
-                    InvTransferStatusEnum.TransferERROR.getStatus(),
-                    InvTransferStatusEnum.CLOSE.getStatus());
-            apiOrderDO = new LambdaQueryWrapper<ApiOrderDO>()
-                    .eq(ApiOrderDO::getBuyUserId, loginUser.getId())
-                    .eq(ApiOrderDO::getBuyUserType, loginUser.getUserType())
-                    .in(ApiOrderDO::getTransferStatus, statusesToMatch)
-                    .orderByDesc(ApiOrderDO::getUpdateTime);
-        }
-
-        // 执行分页查询
-        IPage<ApiOrderDO> apiOrderDOIPage = apiOrderMapper.selectPage(page, apiOrderDO);
-
-        // 判断
-        if (apiOrderDO.isEmptyOfWhere()) {
-            return new PageResult<>(sellingDoLists, 0L);
-        }
-        // 遍历订单，返回订单号等关键数据
-        for (ApiOrderDO apiOrderDO1 : apiOrderDOIPage.getRecords()) {
-            SellingDoList sellingDoListTemp = new SellingDoList();
-            sellingDoListTemp.setOrderNo(apiOrderDO1.getOrderNo());
-            sellingDoListTemp.setPayTime(apiOrderDO1.getUpdateTime());
-            sellingDoListTemp.setCommodityAmount(apiOrderDO1.getPayAmount());
-            sellingDoListTemp.setMerchantNo(apiOrderDO1.getMerchantNo());
-            sellingDoListTemp.setCreateTime(apiOrderDO1.getCreateTime());
-            sellingDoListTemp.setTransferStatus(apiOrderDO1.getTransferStatus());
-
-            ApiQueryCommodityReqVo apiQueryCommodityReqVo = apiOrderDO1.getBuyInfo();
-
-            if(apiQueryCommodityReqVo != null){
-               new ApiQueryCommodityReqVo();
-            }
-
-            InvPreviewDO invPreviewDOS = invPreviewMapper.selectOne(new LambdaQueryWrapperX<InvPreviewDO>()
-                    .eqIfPresent(InvPreviewDO::getMarketHashName, apiQueryCommodityReqVo.getCommodityHashName()));
-
-            if(invPreviewDOS == null){
-                invPreviewDOS = new InvPreviewDO();
-            }
-
-            sellingDoListTemp.setSelExterior(invPreviewDOS.getSelExterior());
-            sellingDoListTemp.setIconUrl(invPreviewDOS.getImageUrl());
-            sellingDoListTemp.setMarketName(invPreviewDOS.getItemName());
-            sellingDoListTemp.setMarketHashName(invPreviewDOS.getMarketHashName());
-
-            InvPreviewDO matchingInvPreviewDO = invPreviewDOS;
-            if (matchingInvPreviewDO != null) {
-                sellingDoListTemp.setSelExteriorColor(matchingInvPreviewDO.getItemInfo().getExteriorColor());
-            } else {
-                sellingDoListTemp.setSelExteriorColor((invPreviewDOS.getItemInfo()).getExteriorColor());
-            }
-            sellingDoLists.add(sellingDoListTemp);
-        }
-        return new PageResult<>(sellingDoLists, apiOrderDOIPage.getTotal());
-    }
-
     // 出售详情
     public PageResult<SellingDoList> getPurchaseOrderDetail(SellOrderPageReqVO reqVo, Page<ApiOrderDO> page, LoginUser loginUser) throws JsonProcessingException {
         // 下单状态
@@ -366,7 +371,7 @@ public class InvOrderExtService {
                     .eq(ApiOrderDO::getBuyUserId, loginUser.getId())
                     .eq(ApiOrderDO::getBuyUserType, loginUser.getUserType())
                     .eq(ApiOrderDO::getTransferStatus, reqVo.getTransferStatus())
-                    .orderByDesc(ApiOrderDO::getUpdateTime);
+                    .orderByDesc(ApiOrderDO::getCreateTime);
         }else{
             List<Integer> statusesToMatch = Arrays.asList(
                     InvTransferStatusEnum.INORDER.getStatus(),
@@ -379,7 +384,7 @@ public class InvOrderExtService {
                     .eq(ApiOrderDO::getBuyUserId, loginUser.getId())
                     .eq(ApiOrderDO::getBuyUserType, loginUser.getUserType())
                     .in(ApiOrderDO::getTransferStatus, statusesToMatch)
-                    .orderByDesc(ApiOrderDO::getUpdateTime);
+                    .orderByDesc(ApiOrderDO::getCreateTime);
         }
 
         // 执行分页查询
@@ -393,7 +398,6 @@ public class InvOrderExtService {
         for (ApiOrderDO apiOrderDO1 : apiOrderDOIPage.getRecords()) {
             SellingDoList sellingDoListTemp = new SellingDoList();
             sellingDoListTemp.setOrderNo(apiOrderDO1.getOrderNo());
-            sellingDoListTemp.setPayTime(apiOrderDO1.getUpdateTime());
             sellingDoListTemp.setCommodityAmount(apiOrderDO1.getPayAmount());
             sellingDoListTemp.setMerchantNo(apiOrderDO1.getMerchantNo());
             sellingDoListTemp.setCreateTime(apiOrderDO1.getCreateTime());

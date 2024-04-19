@@ -63,6 +63,10 @@ public class OrderDetailDOList {
     private Integer transferStatus;
 
     /**
+     * 付款状态
+     */
+    private Integer payStatus;
+    /**
      * 商品图片
      */
     private String iconUrl;
