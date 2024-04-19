@@ -39,4 +39,6 @@ public class OfflineRechangeRespVO {
     @Schema(description = "手机")
     @ExcelProperty("手机")
     private String mobile;
+    @ExcelProperty("手机")
+    private Integer rechangeType;
 }
