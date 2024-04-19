@@ -2,22 +2,25 @@ package cn.iocoder.yudao.module.steam.service.fin.c5;
 
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderExtDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
+import cn.iocoder.yudao.module.steam.enums.IvnStatusEnum;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
 import cn.iocoder.yudao.module.steam.service.fin.ApiThreeOrderService;
 import cn.iocoder.yudao.module.steam.service.fin.c5.res.C5OrderInfo;
+import cn.iocoder.yudao.module.steam.service.fin.c5.res.OrderCancelRes;
 import cn.iocoder.yudao.module.steam.service.fin.c5.res.ProductBuyRes;
 import cn.iocoder.yudao.module.steam.service.fin.c5.res.ProductPriceInfoRes;
 import cn.iocoder.yudao.module.steam.service.fin.c5.utils.C5ApiUtils;
 import cn.iocoder.yudao.module.steam.service.fin.c5.vo.C5FastPayVo;
-import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5OrderDetailRes;
+import cn.iocoder.yudao.module.steam.service.fin.c5.vo.CancelC5OrderVo;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5ItemListVO;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5page;
 import cn.iocoder.yudao.module.steam.service.fin.vo.*;
-import com.google.gson.Gson;
+import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +49,7 @@ public class C5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     }
     @Override
     public ApiCommodityRespVo query(LoginUser loginUser, ApiQueryCommodityReqVo createReqVO) {
-//        checkLoginUser(loginUser);
+        checkLoginUser(loginUser);
         //获取c5平台商品最低价
         ProductPriceInfoRes.ProductPriceInfoResponse productPriceInfo =
                 C5ApiUtils.getProductPriceInfo(Collections.singletonList(createReqVO.getCommodityHashName()));
@@ -122,35 +125,85 @@ public class C5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     public String queryOrderDetail(LoginUser loginUser, String orderNo,Long orderId) {
         checkLoginUser(loginUser);
         //获取订单详情
-        String c5OrderInfo = C5ApiUtils.getC5OrderInfo(Long.valueOf(orderNo), null);
+        C5OrderInfo c5OrderInfo = C5ApiUtils.getC5OrderInfo(Long.valueOf(orderNo), null);
         ApiOrderExtDO apiOrderExtDO = apiOrderExtMapper.selectOne(ApiOrderExtDO::getOrderNo, orderNo);
         if (apiOrderExtDO == null){
             throw new ServiceException(-1,"该订单不存在，请检查订单号");
         }
-        Gson gson = new Gson();
-        C5OrderInfo c5Order = gson.fromJson(c5OrderInfo, C5OrderInfo.class);
         apiOrderExtDO.setOrderNo(orderNo);
-        apiOrderExtDO.setOrderSubStatus(String.valueOf(c5Order.getData().getStatus()));
-        apiOrderExtDO.setOrderInfo(c5OrderInfo);
-        apiOrderExtDO.setTradeOfferId(c5Order.getData().getOfferInfoDTO().getTradeOfferId());
+        apiOrderExtDO.setOrderSubStatus(String.valueOf(c5OrderInfo.getData().getStatus()));
+        apiOrderExtDO.setOrderInfo(JacksonUtils.writeValueAsString(c5OrderInfo));
+        apiOrderExtDO.setTradeOfferId(c5OrderInfo.getData().getOfferInfoDTO().getTradeOfferId());
+        apiOrderExtDO.setCommodityInfo(JacksonUtils.writeValueAsString(c5OrderInfo.getData().getOpenItemInfo()));
         apiOrderExtMapper.updateById(apiOrderExtDO);
-
-        return c5OrderInfo;
+        return JacksonUtils.writeValueAsString(c5OrderInfo);
     }
 
     @Override
     public String queryCommodityDetail(LoginUser loginUser, String orderNo, Long orderId) {
+
         return null;
     }
 
     @Override
     public Integer getOrderSimpleStatus(LoginUser loginUser, String orderNo, Long orderId) {
-        return null;
+        checkLoginUser(loginUser);
+        C5OrderInfo c5OrderInfo = C5ApiUtils.getC5OrderInfo(Long.valueOf(orderNo), null);
+
+        if (c5OrderInfo != null && c5OrderInfo.isSuccess() && c5OrderInfo.getData() != null ){
+            ApiOrderExtDO apiOrder = apiOrderExtMapper.selectOne(ApiOrderExtDO::getOrderId, orderId);
+            if (apiOrder == null){
+                throw new ServiceException(-1,"该订单不存在，请检查订单号");
+            }
+            ApiOrderExtDO apiOrderExtDO = new ApiOrderExtDO();
+            apiOrderExtDO.setOrderSubStatusErrText(c5OrderInfo.getErrorMsg()); // 订单子状态错误信息
+            apiOrderExtDO.setOrderSubStatus(String.valueOf(c5OrderInfo.getData().getStatus())); // 订单子状态
+            apiOrderExtDO.setOrderStatus(IvnStatusEnum.ACTIONING.getCode()); // 订单状态
+
+            if (c5OrderInfo.getData().getStatus() == 10){
+                apiOrderExtDO.setOrderStatus(IvnStatusEnum.DONE.getCode());
+                // 更新订单状态
+                apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderNo,orderNo));
+                return 2;
+            }
+            if (c5OrderInfo.getData().getStatus() == 11){
+                apiOrderExtDO.setOrderStatus(IvnStatusEnum.CANCEL.getCode());
+                apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderNo,orderNo));
+                return 3;
+            }
+            apiOrderExtDO.setOrderStatus(IvnStatusEnum.ACTIONING.getCode());
+            apiOrderExtMapper.update(apiOrderExtDO,new LambdaQueryWrapperX<ApiOrderExtDO>().eq(ApiOrderExtDO::getOrderNo,orderNo));
+            return 1;
+        }
+        throw new ServiceException(-1,"查询订单出错或者不存在这笔订单，请检查订单号");
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ApiOrderCancelRespVo orderCancel(LoginUser loginUser, String orderNo, Long orderId) {
-        return null;
+        checkLoginUser(loginUser);
+        CancelC5OrderVo cancelC5OrderVo = new CancelC5OrderVo();
+        cancelC5OrderVo.setOrderId(orderNo);
+        OrderCancelRes orderCancelRes = C5ApiUtils.cancelC5Order(cancelC5OrderVo);
+        if (orderCancelRes != null){
+            ApiOrderCancelRespVo apiOrderCancelRespVo = new ApiOrderCancelRespVo();
+            if (orderCancelRes.isSuccess()){
+                apiOrderCancelRespVo.setIsSuccess(true);
+                apiOrderCancelRespVo.setErrorCode(OpenApiCode.OK);
+                ApiOrderExtDO apiOrderExtDO = apiOrderExtMapper.selectOne(ApiOrderExtDO::getOrderId, orderId);
+                if (apiOrderExtDO == null){
+                    throw new ServiceException(-1,"该拓展表的主订单id不存在，请检查orderId");
+                }
+                apiOrderExtDO.setOrderStatus(IvnStatusEnum.CANCEL.getCode());//订单退款作废
+                apiOrderExtDO.setOrderSubStatus(String.valueOf(11));//C5状态已取消11   小状态
+                apiOrderExtMapper.updateById(apiOrderExtDO);
+                return apiOrderCancelRespVo;
+            }
+            apiOrderCancelRespVo.setIsSuccess(false);
+            apiOrderCancelRespVo.setErrorCode(new ErrorCode(orderCancelRes.getErrorCode(),orderCancelRes.getErrorMsg()));
+            return apiOrderCancelRespVo;
+        }
+        throw new ServiceException(-1,"订单退款异常，请联系管理员");
     }
 
     @Override

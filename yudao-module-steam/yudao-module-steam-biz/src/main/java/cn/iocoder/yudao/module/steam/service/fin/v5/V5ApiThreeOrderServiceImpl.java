@@ -36,6 +36,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -50,7 +51,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
     private static final String MERCHANT_KEY = "529606f226e6461ca5bac93047976177";
     private static final String Query_Order_Status_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
-    private static final String Cancel_Order_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
+    private static final String Cancel_Order_URL = "https://delivery.v5item.com/open/api/cancelOrder";
     private static final String Query_Commodity_Detail = "https://delivery.v5item.com/open/api/queryOrderDetailInfo";
     public static final String V5_GetItem_URL = "https://delivery.v5item.com/open/api/getItemList";
     private static final String V5_Query_On_Sale_Info = "https://delivery.v5item.com/open/api/queryOnSaleInfo";
@@ -105,22 +106,20 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                 .divide(NO3, 7, RoundingMode.HALF_UP)
                 .setScale(2, RoundingMode.HALF_UP);
         log.info("经过计算购买价格为："+ divide);
+        UUID uuid = UUID.randomUUID();
+        String uuidString = uuid.toString().replace("-", "");
+        String merchantOrderNo = "I" + uuidString.substring(1, 21); // 使用UUID的一部分截取20位作为唯一ID
         V5BuyProductVo v5BuyProductVo = new V5BuyProductVo(createReqVO.getCommodityHashName(), divide,
-                createReqVO.getTradeLinks(),createReqVO.getMerchantNo(),MERCHANT_KEY,createReqVO.getFastShipping());
+                createReqVO.getTradeLinks(),merchantOrderNo,MERCHANT_KEY,0);
         log.info("V5BuyProduct的有参构造方法执行了" + v5BuyProductVo);
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-        log.info("builder对象创建成功" + builder);
         builder.url(API_POST_BUY_V5_PRODUCT_URL);
-        log.info("购买url拼接成功：" + API_POST_BUY_V5_PRODUCT_URL);
         HashMap<String,String> headers = new HashMap<>();
-        log.info("hashMap对象创建成功" + builder);
         headers.put("Authorization",V5_TOKEN);
         builder.headers(headers);
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(v5BuyProductVo);
-        log.info("准备发起http请求：" + builder);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
-        log.info("发起http请求返回：" + sent.html());
         V5ProductBuyRes json = sent.json(V5ProductBuyRes.class);
         log.info("返回的json对象V5ProductBuyRes为：" + json);
         ApiBuyItemRespVo apiBuyItemRespVo = new ApiBuyItemRespVo();
@@ -144,7 +143,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                     apiOrderExtDO.setOrderInfo(sent.html());
                     apiOrderExtDO.setOrderStatus(1);
                     apiOrderExtDO.setOrderSubStatus(json.getMsg());
-//                    apiOrderExtDO.setCommodityInfo(createReqVO.getCommodityHashName());
+                    apiOrderExtDO.setMerchantNo(merchantOrderNo);
                     apiOrderExtMapper.insert(apiOrderExtDO);
                     log.info("插入的apiOrderExtDO为：" + apiOrderExtDO);
                     queryCommodityDetail(loginUser,json.getData().getOrderNo(),orderId);
@@ -422,23 +421,30 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
 
 
 
-//    public String getTokenFromRedisOrSetNew() {
-//        // 从 Redis 中获取 token
-//        String token = (String) redisTemplate.opsForValue().get("v5_login_token");
-//        // 如果 token 为空，则调用方法重新生成并存储 token
-//        if (token == null) {
-//            token = generateAndStoreToken();
-//        }
-//        return token;
-//    }
+    public String getTokenFromRedisOrSetNew() {
+        // 从 Redis 中获取 token
+        String token = (String) redisTemplate.opsForValue().get("v5_token");
+        // 如果 token 为空或已过期，则重新生成并存储 token
+        if (token == null || isTokenExpired()) {
+            token = generateAndStoreToken();
+        }
+        return token;
+    }
 
-//    private String generateAndStoreToken() {
-//        // 调用方法生成新的 token
-//        String newToken = V5Login.LoginV5();
-//        // 将新生成的 token 存储到 Redis 中
-//        redisTemplate.opsForValue().set("v5_login_token", newToken);
-//
-//        return newToken;
-//    }
+    private boolean isTokenExpired() {
+        // 检查 token 是否已过期
+        Long expireTime = redisTemplate.getExpire("v5_token");
+        return expireTime != null && expireTime <= 0;
+    }
+
+    private String generateAndStoreToken() {
+        V5Login v5Login = new V5Login();
+        String newToken = v5Login.loginV5();
+        // 将新生成的 token 存储到 Redis 中，并设置过期时间为两天
+        redisTemplate.opsForValue().set("v5_token", newToken);
+        redisTemplate.expire("v5_token", 2, TimeUnit.DAYS);
+
+        return newToken;
+    }
 
 }
