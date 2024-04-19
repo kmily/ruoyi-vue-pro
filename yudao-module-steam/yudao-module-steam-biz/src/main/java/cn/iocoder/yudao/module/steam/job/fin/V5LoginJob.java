@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 
 @Slf4j
-@Component("V5LoginJob")
+//@Component("V5LoginJob")
 public class V5LoginJob implements JobHandler {
 
     @Resource

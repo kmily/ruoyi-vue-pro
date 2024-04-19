@@ -19,7 +19,7 @@ import java.util.List;
  */
 @Slf4j
 @Deprecated
-//@Component("UUCheckOrderJob")
+//@Component("OrderSummaryJob")
 public class UUCheckOrderJob implements JobHandler {
     @Resource
     private YouyouOrderMapper youyouOrderMapper;
