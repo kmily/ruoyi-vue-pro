@@ -123,14 +123,6 @@ public class AppWalletController {
         return CommonResult.success(invOrderWithPage);
     }
 
-    @GetMapping("/getSellOrderWithPage")
-    @Operation(summary = "出售列表")
-    public CommonResult<PageResult<SellingDoList>> getSellOrderWithPage(@Valid InvOrderPageReqVO reqVo) {
-        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        Page<InvOrderDO> page = new Page<>(reqVo.getPageNo(), reqVo.getPageSize());
-        PageResult<SellingDoList> invOrderWithPage = invOrderExtService.getSellOrderWithPage(reqVo, page, loginUser);
-        return CommonResult.success(invOrderWithPage);
-    }
 
     @GetMapping("/getSellOrder")
     @Operation(summary = "出售记录")
@@ -138,9 +130,20 @@ public class AppWalletController {
     public CommonResult<PageResult<SellingDoList>> getSellOrder(@Valid SellOrderPageReqVO reqVo) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         Page<ApiOrderDO> page = new Page<>(reqVo.getPageNo(), reqVo.getPageSize());
-        PageResult<SellingDoList> apiOrder = invOrderExtService.getSellOrder(reqVo, page, loginUser);
-        return CommonResult.success(apiOrder);
+        PageResult<SellingDoList> sellingDoListResult = invOrderExtService.getSellOrder(reqVo, page, loginUser);
+        return CommonResult.success(sellingDoListResult);
     }
+
+    @GetMapping("/getPurchaseOrder")
+    @Operation(summary = "购买记录")
+    @PreAuthenticated
+    public CommonResult<PageResult<SellingDoList>> getPurchaseOrder(@Valid SellOrderPageReqVO reqVo) {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        Page<ApiOrderDO> page = new Page<>(reqVo.getPageNo(), reqVo.getPageSize());
+        PageResult<SellingDoList> sellingDoListResult = invOrderExtService.getPurchaseOrder(reqVo, page, loginUser);
+        return CommonResult.success(sellingDoListResult);
+    }
+
     @GetMapping("/getSellOrderDetail")
     @Operation(summary = "出售详情")
     @PreAuthenticated
@@ -151,15 +154,6 @@ public class AppWalletController {
         return CommonResult.success(apiOrder);
     }
 
-    @GetMapping("/getPurchaseOrder")
-    @Operation(summary = "购买记录")
-    @PreAuthenticated
-    public CommonResult<PageResult<SellingDoList>> getPurchaseOrder(@Valid SellOrderPageReqVO reqVo) throws JsonProcessingException {
-        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        Page<ApiOrderDO> page = new Page<>(reqVo.getPageNo(), reqVo.getPageSize());
-        PageResult<SellingDoList> apiOrder = invOrderExtService.getPurchaseOrder(reqVo, page, loginUser);
-        return CommonResult.success(apiOrder);
-    }
     @GetMapping("/getPurchaseOrderDetail")
     @Operation(summary = "购买详情")
     @PreAuthenticated

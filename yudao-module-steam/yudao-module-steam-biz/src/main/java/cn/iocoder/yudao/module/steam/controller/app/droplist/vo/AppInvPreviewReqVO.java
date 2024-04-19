@@ -16,7 +16,6 @@ public class AppInvPreviewReqVO extends PageParam {
 
     private String selItemset;
 
-    @NotNull(message = "搜索词不能为空不能为空")
     private String itemName;
 
     @Schema(description = "最低价格", example = "1")
