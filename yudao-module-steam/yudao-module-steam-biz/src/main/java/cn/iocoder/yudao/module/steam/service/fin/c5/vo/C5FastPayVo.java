@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.steam.service.fin.c5.vo;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 @Data
 public class C5FastPayVo implements Serializable {
@@ -24,7 +25,7 @@ public class C5FastPayVo implements Serializable {
      * 如果这些在售中有自动发货，那就回选最便宜的自动发货，
      * 如果没有自动发货的，就会去选一个最便宜的东西
      */
-    private Double lowPrice;
+    private Integer lowPrice;
     /**
      * steam饰品唯一名称，需要和appId一起传,示例值(AWP | Asiimov (Field-Tested))
      */
@@ -32,7 +33,7 @@ public class C5FastPayVo implements Serializable {
     /**
      * 购买a可以接受的最高价格(T币),示例值(3.12)
      */
-    private Double maxPrice;
+    private BigDecimal maxPrice;
     /**
      * 商户订单号,示例值(12345)
      */
@@ -41,8 +42,8 @@ public class C5FastPayVo implements Serializable {
      * 收货的steam交易链接,示例值(https://steamcommunity.com/tradeoffer/new/?partner=191976672&token=8LZ3R_AF)
      */
     private String tradeUrl;
-    public C5FastPayVo(Integer appId, Integer delivery, Long itemId, Double lowPrice, String marketHashName,
-                       Double maxPrice, String outTradeNo, String tradeUrl) {
+    public C5FastPayVo(Integer appId, Integer delivery, Long itemId, Integer lowPrice, String marketHashName,
+                       BigDecimal maxPrice, String outTradeNo, String tradeUrl) {
         this.appId = appId;
         this.delivery = delivery;
         this.itemId = itemId;
