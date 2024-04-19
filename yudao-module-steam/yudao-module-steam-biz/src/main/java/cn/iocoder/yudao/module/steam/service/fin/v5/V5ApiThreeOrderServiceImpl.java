@@ -364,6 +364,10 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         builder.headers(headers);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         V5ItemListVO json = sent.json(V5ItemListVO.class);
+        for (V5ItemListVO.DataDTO datum : json.getData()) {
+            List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>().eq(SellingDO::getMarketHashName, datum.getMarketHashName()));
+            datum.setOnSaleStock(datum.getOnSaleStock() + sellingDOS.size());
+        }
         return json;
     }
 
