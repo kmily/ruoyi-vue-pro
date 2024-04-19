@@ -862,9 +862,7 @@ public class ApiOrderServiceImpl implements ApiOrderService {
             }
             ApiThreeOrderService apiThreeOrderService = apiThreeByOrder.get();
             ApiCommodityRespVo tmpQuery = apiThreeOrderService.query(loginUser, new ApiQueryCommodityReqVo().setCommodityHashName(marketHashName));
-            if(tmpQuery.getIsSuccess()){
-                ret.add(tmpQuery);
-            }
+            ret.add(tmpQuery);
         }
         ApiCommodityRespVo[] apiCommodityRespVos = ret.toArray(new ApiCommodityRespVo[0]);
         stringRedisTemplate.opsForValue().set("PR_" + marketHashName,JacksonUtils.writeValueAsString(apiCommodityRespVos),20, TimeUnit.SECONDS);

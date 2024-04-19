@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.steam.controller.app;
 
-import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.steam.controller.admin.invpreview.vo.InvPreviewPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selexterior.vo.SelExteriorPageReqVO;
 import cn.iocoder.yudao.module.steam.controller.admin.selitemset.vo.SelItemsetListReqVO;
@@ -11,26 +9,19 @@ import cn.iocoder.yudao.module.steam.controller.admin.selrarity.vo.SelRarityPage
 import cn.iocoder.yudao.module.steam.controller.admin.seltype.vo.SelTypePageReqVO;
 import cn.iocoder.yudao.module.steam.controller.app.droplist.vo.AppDropListRespVO;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
-import cn.iocoder.yudao.module.steam.controller.app.vo.order.OrderInfoResp;
-import cn.iocoder.yudao.module.steam.dal.dataobject.devaccount.DevAccountDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.invpreview.InvPreviewDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.seltype.SelTypeDO;
 import cn.iocoder.yudao.module.steam.dal.dataobject.seltype.SelWeaponDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.youyouorder.YouyouOrderDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.seltype.SelWeaponMapper;
-import cn.iocoder.yudao.module.steam.service.fin.c5.C5ApiThreeOrderServiceImpl;
 import cn.iocoder.yudao.module.steam.service.fin.v5.res.V5ProductPriceInfoRes;
 import cn.iocoder.yudao.module.steam.service.fin.v5.utils.V5ApiUtils;
 import cn.iocoder.yudao.module.steam.service.fin.v5.vo.V5queryOnSaleInfoReqVO;
-import cn.iocoder.yudao.module.steam.service.fin.vo.ApiCommodityRespVo;
-import cn.iocoder.yudao.module.steam.service.fin.vo.ApiQueryCommodityReqVo;
 import cn.iocoder.yudao.module.steam.service.invpreview.InvPreviewService;
 import cn.iocoder.yudao.module.steam.service.selexterior.SelExteriorService;
 import cn.iocoder.yudao.module.steam.service.selitemset.SelItemsetService;
 import cn.iocoder.yudao.module.steam.service.selquality.SelQualityService;
 import cn.iocoder.yudao.module.steam.service.selrarity.SelRarityService;
 import cn.iocoder.yudao.module.steam.service.seltype.SelTypeService;
-import cn.iocoder.yudao.module.steam.utils.DevAccountUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
@@ -64,8 +55,7 @@ public class AppDevApiController {
 
     @Resource
     private InvPreviewService invPreviewService;
-    @Resource
-    private C5ApiThreeOrderServiceImpl c5ApiThreeOrderService;
+
 
     /**
      * 类别选择
@@ -193,14 +183,5 @@ public class AppDevApiController {
     }
 
 
-    @PostMapping("v2/C5api/batchSelectLowestPrice")
-    @Operation(summary = "获取模板")
-    @PermitAll
-    public ApiCommodityRespVo get(@RequestBody ApiQueryCommodityReqVo createReqVO) {
 
-        return c5ApiThreeOrderService.query(null, createReqVO);
-
-
-
-    }
 }

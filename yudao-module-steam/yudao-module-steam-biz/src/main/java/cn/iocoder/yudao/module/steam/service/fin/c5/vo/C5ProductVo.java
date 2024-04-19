@@ -1,10 +1,8 @@
 package cn.iocoder.yudao.module.steam.service.fin.c5.vo;
 
-import lombok.Data;
-
 import java.io.Serializable;
 import java.util.List;
-@Data
+
 public class C5ProductVo implements Serializable {
     /**
      * 游戏id，配合marketHashName,示例值(730)

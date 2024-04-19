@@ -6,9 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.steam.controller.app.vo.ApiResult;
 import cn.iocoder.yudao.module.steam.dal.dataobject.apiorder.ApiOrderExtDO;
-import cn.iocoder.yudao.module.steam.dal.dataobject.selling.SellingDO;
 import cn.iocoder.yudao.module.steam.dal.mysql.apiorder.ApiOrderExtMapper;
-import cn.iocoder.yudao.module.steam.dal.mysql.selling.SellingMapper;
 import cn.iocoder.yudao.module.steam.enums.IvnStatusEnum;
 import cn.iocoder.yudao.module.steam.enums.OpenApiCode;
 import cn.iocoder.yudao.module.steam.enums.PlatCodeEnum;
@@ -32,7 +30,6 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -42,15 +39,12 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
     private ApiOrderExtMapper apiOrderExtMapper;
     @Resource
     private RedisTemplate redisTemplate;
-    @Resource
-    private SellingMapper sellingMapper;
 
     private static final String MERCHANT_KEY = "529606f226e6461ca5bac93047976177";
     private static final String Query_Order_Status_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
-    private static final String Cancel_Order_URL = "https://delivery.v5item.com/open/api/cancelOrder";
+    private static final String Cancel_Order_URL = "https://delivery.v5item.com/open/api/queryOrderStatus";
     private static final String Query_Commodity_Detail = "https://delivery.v5item.com/open/api/queryOrderDetailInfo";
     public static final String V5_GetItem_URL = "https://delivery.v5item.com/open/api/getItemList";
-    private static final String V5_Query_On_Sale_Info = "https://delivery.v5item.com/open/api/queryOnSaleInfo";
     public static final BigDecimal NO1 = new BigDecimal("1.02");
     public static final BigDecimal NO2 = new BigDecimal("0.998");
     public static final BigDecimal NO3 = new BigDecimal("100");
@@ -66,7 +60,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         //获取v5平台商品最低价
 //        String token = getTokenFromRedisOrSetNew();
         V5ProductPriceInfoRes.V5ProductPriceInfoResponse productPriceInfo =
-                V5ApiUtils.getV5ProductLowestPrice(Collections.singletonList(createReqVO.getCommodityHashName()),getTokenFromRedisOrSetNew());
+                V5ApiUtils.getV5ProductLowestPrice(Collections.singletonList(createReqVO.getCommodityHashName()));
         ApiCommodityRespVo apiCommodityRespVo = new ApiCommodityRespVo();
         List<V5ProductPriceInfoRes.V5ProductPriceInfoResponse.V5ProductData> data = null;
         if (productPriceInfo != null) {
@@ -102,22 +96,24 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                 .divide(NO3, 7, RoundingMode.HALF_UP)
                 .setScale(2, RoundingMode.HALF_UP);
         log.info("经过计算购买价格为："+ divide);
-        UUID uuid = UUID.randomUUID();
-        String uuidString = uuid.toString().replace("-", "");
-        String merchantOrderNo = "I" + uuidString.substring(1, 21); // 使用UUID的一部分截取20位作为唯一ID
         V5BuyProductVo v5BuyProductVo = new V5BuyProductVo(createReqVO.getCommodityHashName(), divide,
-                createReqVO.getTradeLinks(),merchantOrderNo,MERCHANT_KEY,0);
+                createReqVO.getTradeLinks(),createReqVO.getMerchantNo(),MERCHANT_KEY,createReqVO.getFastShipping());
         log.info("V5BuyProduct的有参构造方法执行了" + v5BuyProductVo);
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
+        log.info("builder对象创建成功" + builder);
         builder.url(API_POST_BUY_V5_PRODUCT_URL);
+        log.info("购买url拼接成功：" + API_POST_BUY_V5_PRODUCT_URL);
         HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",getTokenFromRedisOrSetNew());
+        log.info("hashMap对象创建成功" + builder);
+        headers.put("Authorization",V5_TOKEN);
         builder.headers(headers);
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(v5BuyProductVo);
+        log.info("准备发起http请求：" + builder);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
+        log.info("发起http请求返回：" + sent.html());
         V5ProductBuyRes json = sent.json(V5ProductBuyRes.class);
-        log.info("返回的json对象V5ProductBuyRes为：" + json);
+
         ApiBuyItemRespVo apiBuyItemRespVo = new ApiBuyItemRespVo();
         if (json != null) {
             // 设置交易链接
@@ -139,9 +135,8 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
                     apiOrderExtDO.setOrderInfo(sent.html());
                     apiOrderExtDO.setOrderStatus(1);
                     apiOrderExtDO.setOrderSubStatus(json.getMsg());
-                    apiOrderExtDO.setMerchantNo(merchantOrderNo);
+//                    apiOrderExtDO.setCommodityInfo(createReqVO.getCommodityHashName());
                     apiOrderExtMapper.insert(apiOrderExtDO);
-                    log.info("插入的apiOrderExtDO为：" + apiOrderExtDO);
                     queryCommodityDetail(loginUser,json.getData().getOrderNo(),orderId);
                     break;
                 case 1: // 返回错误码为1
@@ -174,7 +169,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         }
         //获取订单详情
 //        String token = getTokenFromRedisOrSetNew();
-        String v5OrderInfo = V5ApiUtils.getV5OrderInfo(null, orderNo,getTokenFromRedisOrSetNew());
+        String v5OrderInfo = V5ApiUtils.getV5OrderInfo(null, orderNo);
         ApiOrderExtDO apiOrderExtDO = apiOrderExtMapper.selectOne(ApiOrderExtDO::getOrderId, orderId);
         if (apiOrderExtDO == null){
             throw new ServiceException(-1,"该订单不存在，请检查订单号");
@@ -209,7 +204,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url(Query_Commodity_Detail);
         HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",getTokenFromRedisOrSetNew());
+        headers.put("Authorization",V5_TOKEN);
         builder.headers(headers);
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(reqVO);
@@ -247,7 +242,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(reqVO);
         HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",getTokenFromRedisOrSetNew());
+        headers.put("Authorization",V5_TOKEN);
         builder.headers(headers);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         log.info("getOrderSimpleStatus{}",sent.html());
@@ -289,7 +284,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(reqVO);
         HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",getTokenFromRedisOrSetNew());
+        headers.put("Authorization",V5_TOKEN);
         builder.headers(headers);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         ApiResult json = sent.json(ApiResult.class);
@@ -355,92 +350,31 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(reqVO);
         HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",getTokenFromRedisOrSetNew());
+        headers.put("Authorization",V5_TOKEN);
         builder.headers(headers);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         V5ItemListVO json = sent.json(V5ItemListVO.class);
-        for (V5ItemListVO.DataDTO datum : json.getData()) {
-            List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>().eq(SellingDO::getMarketHashName, datum.getMarketHashName()));
-            datum.setOnSaleStock(datum.getOnSaleStock() + sellingDOS.size());
-        }
         return json;
     }
 
-    /**
-     * 根据marketHashName查询在售饰品信息(支持批量查询)
-     */
-    public ArrayList<IO661QueryOnSaleInfo> queryOnSaleInfo(V5queryOnSaleInfoReqVO reqVO){
-        HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
-        reqVO.setMerchantKey(MERCHANT_KEY); // 商户密钥
-        builder.url(V5_Query_On_Sale_Info);
-        builder.method(HttpUtil.Method.JSON);
-        builder.postObject(reqVO);
-        HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",getTokenFromRedisOrSetNew());
-        builder.headers(headers);
-        HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
-        V5QueryOnSaleInfoDO json = sent.json(V5QueryOnSaleInfoDO.class);
-        log.info("查询在售饰品信息结果:{}",json.getData());
-        double Min = 0.6;
-        double Max = 0.8;
-        double doubleRandom = (Math.random()*(Max-Min))+Min;
-        List<V5QueryOnSaleInfoDO.V5ProductData> data = json.getData();
-        ArrayList<IO661QueryOnSaleInfo> list = new ArrayList<>();
-        for (V5QueryOnSaleInfoDO.V5ProductData v5ProductData : data){
 
-            // v5价格展示到io661计算
-            int v5Price = BigDecimal.valueOf(v5ProductData.getMinSellPrice()).multiply(NO1)
-                    .multiply(NO2).multiply(NO3).intValue();
+//    public String getTokenFromRedisOrSetNew() {
+//        // 从 Redis 中获取 token
+//        String token = (String) redisTemplate.opsForValue().get("v5_login_token");
+//        // 如果 token 为空，则调用方法重新生成并存储 token
+//        if (token == null) {
+//            token = generateAndStoreToken();
+//        }
+//        return token;
+//    }
 
-            IO661QueryOnSaleInfo io661QueryOnSaleInfoDO = new IO661QueryOnSaleInfo();
-            io661QueryOnSaleInfoDO.setMarketHashName(v5ProductData.getMarketHashName());
-            // IO661在售数量查询
-            List<SellingDO> sellingDOS = sellingMapper.selectList(new LambdaQueryWrapperX<SellingDO>().eq(SellingDO::getMarketHashName, v5ProductData.getMarketHashName()));
-            int size = sellingDOS.size();
-            io661QueryOnSaleInfoDO.setMinSellPrice(v5Price);
-            if(size>0){
-                for (SellingDO sellingDO : sellingDOS) {
-                    if(sellingDO.getPrice()< io661QueryOnSaleInfoDO.getMinSellPrice()){
-                        io661QueryOnSaleInfoDO.setMinSellPrice(sellingDO.getPrice());
-                    }
-                }
-            }
-            // 在售数量
-            io661QueryOnSaleInfoDO.setOnSaleStock((int) (((v5ProductData.getOnSaleStock())*doubleRandom)+size));
-            list.add(io661QueryOnSaleInfoDO);
-        }
-        log.info("list:{}",list);
-        return list;
-    }
-
-
-
-
-
-    public String getTokenFromRedisOrSetNew() {
-        // 从 Redis 中获取 token
-        String token = (String) redisTemplate.opsForValue().get("v5_token");
-        // 如果 token 为空或已过期，则重新生成并存储 token
-        if (token == null || isTokenExpired()) {
-            token = generateAndStoreToken();
-        }
-        return token;
-    }
-
-    private boolean isTokenExpired() {
-        // 检查 token 是否已过期
-        Long expireTime = redisTemplate.getExpire("v5_token");
-        return expireTime != null && expireTime <= 0;
-    }
-
-    private String generateAndStoreToken() {
-        V5Login v5Login = new V5Login();
-        String newToken = v5Login.loginV5();
-        // 将新生成的 token 存储到 Redis 中，并设置过期时间为两天
-        redisTemplate.opsForValue().set("v5_token", newToken);
-        redisTemplate.expire("v5_token", 2, TimeUnit.DAYS);
-
-        return newToken;
-    }
+//    private String generateAndStoreToken() {
+//        // 调用方法生成新的 token
+//        String newToken = V5Login.LoginV5();
+//        // 将新生成的 token 存储到 Redis 中
+//        redisTemplate.opsForValue().set("v5_login_token", newToken);
+//
+//        return newToken;
+//    }
 
 }
