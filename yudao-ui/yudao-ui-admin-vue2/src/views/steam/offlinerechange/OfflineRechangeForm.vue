@@ -3,22 +3,29 @@
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="45%" v-dialogDrag append-to-body>
       <el-form ref="formRef" :model="formData" :rules="formRules" v-loading="formLoading" label-width="100px">
-                    <el-form-item label="用户ID" prop="userId">
+                    <el-form-item label="用户ID" prop="userId" hidden>
                       <el-input v-model="formData.userId" placeholder="请输入用户ID" />
                     </el-form-item>
                     <el-form-item label="手机号" prop="userId">
                       <el-input v-model="formData.mobile" placeholder="请输入手机号" />
                     </el-form-item>
 
-                    <el-form-item label="用户类型" prop="userType">
+                    <el-form-item label="用户类型" prop="userType" hidden>
                       <el-radio-group v-model="formData.userType">
                             <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.USER_TYPE)"
                                       :key="dict.value" :label="parseInt(dict.value)"
 >{{dict.label}}</el-radio>
                       </el-radio-group>
                     </el-form-item>
+                    <el-form-item label="充值类型" prop="rechangeType">
+                      <el-radio-group v-model="formData.rechangeType">
+                            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.IO661_RECHANGE_TYPE)"
+                                      :key="dict.value" :label="parseInt(dict.value)"
+>{{dict.label}}</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
                     <el-form-item label="充值金额" prop="amount">
-                      <el-input v-model="formData.amount" placeholder="请输入充值金额" />
+                      <el-input v-model="formData.amount" placeholder="请输入充值金额,单位分" type="number" />
                     </el-form-item>
                     <el-form-item label="备注">
                       <Editor v-model="formData.comment" :min-height="192"/>
@@ -53,6 +60,7 @@
                             userId: undefined,
                             mobile: undefined,
                             userType: undefined,
+                            rechangeType: undefined,
                             amount: undefined,
                             comment: undefined,
                             id: undefined,
@@ -110,6 +118,7 @@
                             userId: undefined,
                             mobile: undefined,
                             userType: undefined,
+                            rechangeType: undefined,
                             amount: undefined,
                             comment: undefined,
                             id: undefined,

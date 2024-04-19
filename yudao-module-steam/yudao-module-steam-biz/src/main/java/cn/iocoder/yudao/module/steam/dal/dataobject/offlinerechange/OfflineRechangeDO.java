@@ -47,4 +47,8 @@ public class OfflineRechangeDO extends BaseDO {
      * 备注
      */
     private String mobile;
+
+    private String walletInfo;
+
+    private Integer rechangeType;
 }

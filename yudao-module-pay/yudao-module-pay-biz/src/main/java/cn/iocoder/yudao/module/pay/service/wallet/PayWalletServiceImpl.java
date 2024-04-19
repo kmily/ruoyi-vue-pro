@@ -180,6 +180,8 @@ public class PayWalletServiceImpl implements  PayWalletService {
             case INV_DAMAGES:
             case STEAM_CASH_REFUND:
             case INV_SERVICE_FEE_REFUND:
+            case OFFLINE_RECHARGE:
+            case CASH_REPARATION:
             case STEAM_REFUND: {
                 walletMapper.updateWhenRecharge(payWallet.getId(), price);
                 break;

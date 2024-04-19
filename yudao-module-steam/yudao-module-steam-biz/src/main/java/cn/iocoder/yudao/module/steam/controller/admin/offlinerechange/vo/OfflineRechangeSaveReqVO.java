@@ -24,4 +24,7 @@ public class OfflineRechangeSaveReqVO {
     @Schema(description = "Primary Key", requiredMode = Schema.RequiredMode.REQUIRED, example = "3219")
     private Long id;
 
+    private String mobile;
+
+    private Integer rechangeType;
 }

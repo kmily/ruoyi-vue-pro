@@ -1,5 +1,14 @@
 package cn.iocoder.yudao.module.steam.service.offlinerechange;
 
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
+import cn.iocoder.yudao.module.member.service.user.MemberUserService;
+import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
+import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
+import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
+import cn.iocoder.yudao.module.steam.utils.JacksonUtils;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -28,12 +37,33 @@ public class OfflineRechangeServiceImpl implements OfflineRechangeService {
 
     @Resource
     private OfflineRechangeMapper offlineRechangeMapper;
+    @Resource
+    private PayWalletService payWalletService;
+    @Resource
+    private MemberUserService memberUserService;
 
     @Override
+    @Transactional(rollbackFor = {ServiceException.class})
     public Long createOfflineRechange(OfflineRechangeSaveReqVO createReqVO) {
         // 插入
         OfflineRechangeDO offlineRechange = BeanUtils.toBean(createReqVO, OfflineRechangeDO.class);
+        offlineRechange.setUserType(UserTypeEnum.MEMBER.getValue());
+        MemberUserDO userByMobile = memberUserService.getUserByMobile(offlineRechange.getMobile());
+        if(!Objects.nonNull(userByMobile)){
+            throw new ServiceException(-1,"用户不存在");
+        }
+        offlineRechange.setUserId(userByMobile.getId());
+        offlineRechange.setUserType(UserTypeEnum.MEMBER.getValue());
         offlineRechangeMapper.insert(offlineRechange);
+
+        Optional<PayWalletBizTypeEnum> first = Arrays.stream(PayWalletBizTypeEnum.values()).filter(i -> i.getType().equals(offlineRechange.getRechangeType())).findFirst();
+        PayWalletBizTypeEnum rechangeEnum = first.orElseThrow(()->{return new ServiceException(-1, "充值类型不存在");});
+
+        PayWalletDO orCreateWallet = payWalletService.getOrCreateWallet(userByMobile.getId(), UserTypeEnum.MEMBER.getValue());
+        PayWalletTransactionDO payWalletTransactionDO1 = payWalletService.addWalletBalance(orCreateWallet.getId(), String.valueOf(offlineRechange.getId()),
+                rechangeEnum, offlineRechange.getAmount());
+        offlineRechange.setWalletInfo(JacksonUtils.writeValueAsString(payWalletTransactionDO1));
+        offlineRechangeMapper.updateById(offlineRechange);
         // 返回
         return offlineRechange.getId();
     }
@@ -41,18 +71,20 @@ public class OfflineRechangeServiceImpl implements OfflineRechangeService {
     @Override
     public void updateOfflineRechange(OfflineRechangeSaveReqVO updateReqVO) {
         // 校验存在
-        validateOfflineRechangeExists(updateReqVO.getId());
-        // 更新
-        OfflineRechangeDO updateObj = BeanUtils.toBean(updateReqVO, OfflineRechangeDO.class);
-        offlineRechangeMapper.updateById(updateObj);
+        throw new ServiceException(-1,"不支持的操作");
+//        validateOfflineRechangeExists(updateReqVO.getId());
+//        // 更新
+//        OfflineRechangeDO updateObj = BeanUtils.toBean(updateReqVO, OfflineRechangeDO.class);
+//        offlineRechangeMapper.updateById(updateObj);
     }
 
     @Override
     public void deleteOfflineRechange(Long id) {
-        // 校验存在
-        validateOfflineRechangeExists(id);
-        // 删除
-        offlineRechangeMapper.deleteById(id);
+        throw new ServiceException(-1,"不支持的操作");
+//        // 校验存在
+//        validateOfflineRechangeExists(id);
+//        // 删除
+//        offlineRechangeMapper.deleteById(id);
     }
 
     private void validateOfflineRechangeExists(Long id) {

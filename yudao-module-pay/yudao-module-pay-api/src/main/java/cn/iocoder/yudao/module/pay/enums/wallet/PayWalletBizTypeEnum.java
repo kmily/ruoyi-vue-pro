@@ -29,8 +29,8 @@ public enum PayWalletBizTypeEnum implements IntArrayValuable {
     SUB_STEAM_CASH(106,"购买饰品交易-收款到平台"),
     STEAM_CASH_REFUND(108,"购买饰品交易-退款"),
     INV_SERVICE_FEE_REFUND(107,"购买服务手续费-退款"),
-    CASH_REPARATION(108,"交易-补偿"),
-    OFFLINE_RECHARGE(108,"线下充值-补偿");
+    CASH_REPARATION(110,"交易-补偿"),
+    OFFLINE_RECHARGE(109,"线下充值-人工");
 
 
     // TODO 后续增加
