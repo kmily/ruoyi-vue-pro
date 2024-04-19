@@ -115,5 +115,7 @@ public interface ErrorCodeConstants {
 // ========== 其他平台模板 TODO 补充编号 ==========
     ErrorCode OTHER_TEMPLATE_NOT_EXISTS = new ErrorCode(1_900_010_01, "其他平台模板不存在");
 
+    // ========== 线下人工充值 TODO 补充编号 ==========
+    ErrorCode OFFLINE_RECHANGE_NOT_EXISTS = new ErrorCode(1_900_011_01, "线下人工充值不存在");
 
 }

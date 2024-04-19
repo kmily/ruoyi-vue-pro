@@ -43,7 +43,6 @@ public class CheckTransferOrderJob implements JobHandler {
                     .eqIfPresent(ApiOrderDO::getTransferStatus, InvTransferStatusEnum.TransferING.getStatus())
                     .eq(ApiOrderDO::getCashStatus, InvSellCashStatusEnum.INIT.getStatus())
             );
-            log.info("apiOrderDOS{}",apiOrderDOS);
             Integer integer=0;
             for (ApiOrderDO item:apiOrderDOS) {
                 apiOrderService.checkTransfer(item.getId());
