@@ -37,11 +37,11 @@ public class V5ApiUtils {
      * @param marketHashNameList
      * @return
      */
-    public  static V5ProductPriceInfoRes.V5ProductPriceInfoResponse getV5ProductLowestPrice(List<String> marketHashNameList) {
+    public  static V5ProductPriceInfoRes.V5ProductPriceInfoResponse getV5ProductLowestPrice(List<String> marketHashNameList,String v5_TOKEN) {
         V5queryOnSaleInfoReqVO v5FastPayVo = new V5queryOnSaleInfoReqVO(marketHashNameList,MERCHANT_KEY);
         String requestBodyJson = gson.toJson(v5FastPayVo);
         Headers headers = new Headers.Builder()
-                .add("Authorization", V5_TOKEN)
+                .add("Authorization", v5_TOKEN)
                 .build();
         Request request = new Request.Builder()
                 .url(API_POST_V5_PRODUCT_PRICE_URL)
@@ -68,12 +68,12 @@ public class V5ApiUtils {
     }
 
 
-    public static String getV5OrderInfo(String merchantOrderNo, String orderNo) {
+    public static String getV5OrderInfo(String merchantOrderNo, String orderNo,String v5_TOKEN) {
 
         V5OrderInfo v5OrderInfo = new V5OrderInfo(MERCHANT_KEY, merchantOrderNo, orderNo);
         String requestBodyJson = gson.toJson(v5OrderInfo);
         Headers headers = new Headers.Builder()
-                .add("Authorization", V5_TOKEN)
+                .add("Authorization", v5_TOKEN)
                 .build();
         Request request = new Request.Builder()
                 .url(API_POST_V5_ORDER_INFO_URL)

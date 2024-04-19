@@ -70,7 +70,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         //获取v5平台商品最低价
 //        String token = getTokenFromRedisOrSetNew();
         V5ProductPriceInfoRes.V5ProductPriceInfoResponse productPriceInfo =
-                V5ApiUtils.getV5ProductLowestPrice(Collections.singletonList(createReqVO.getCommodityHashName()));
+                V5ApiUtils.getV5ProductLowestPrice(Collections.singletonList(createReqVO.getCommodityHashName()),getTokenFromRedisOrSetNew());
         ApiCommodityRespVo apiCommodityRespVo = new ApiCommodityRespVo();
         List<V5ProductPriceInfoRes.V5ProductPriceInfoResponse.V5ProductData> data = null;
         if (productPriceInfo != null) {
@@ -115,7 +115,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url(API_POST_BUY_V5_PRODUCT_URL);
         HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",V5_TOKEN);
+        headers.put("Authorization",getTokenFromRedisOrSetNew());
         builder.headers(headers);
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(v5BuyProductVo);
@@ -178,7 +178,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         }
         //获取订单详情
 //        String token = getTokenFromRedisOrSetNew();
-        String v5OrderInfo = V5ApiUtils.getV5OrderInfo(null, orderNo);
+        String v5OrderInfo = V5ApiUtils.getV5OrderInfo(null, orderNo,getTokenFromRedisOrSetNew());
         ApiOrderExtDO apiOrderExtDO = apiOrderExtMapper.selectOne(ApiOrderExtDO::getOrderId, orderId);
         if (apiOrderExtDO == null){
             throw new ServiceException(-1,"该订单不存在，请检查订单号");
@@ -213,7 +213,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         HttpUtil.HttpRequest.HttpRequestBuilder builder = HttpUtil.HttpRequest.builder();
         builder.url(Query_Commodity_Detail);
         HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",V5_TOKEN);
+        headers.put("Authorization",getTokenFromRedisOrSetNew());
         builder.headers(headers);
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(reqVO);
@@ -251,7 +251,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(reqVO);
         HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",V5_TOKEN);
+        headers.put("Authorization",getTokenFromRedisOrSetNew());
         builder.headers(headers);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         log.info("getOrderSimpleStatus{}",sent.html());
@@ -293,7 +293,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(reqVO);
         HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",V5_TOKEN);
+        headers.put("Authorization",getTokenFromRedisOrSetNew());
         builder.headers(headers);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         ApiResult json = sent.json(ApiResult.class);
@@ -359,7 +359,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(reqVO);
         HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",V5_TOKEN);
+        headers.put("Authorization",getTokenFromRedisOrSetNew());
         builder.headers(headers);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         V5ItemListVO json = sent.json(V5ItemListVO.class);
@@ -380,7 +380,7 @@ public class V5ApiThreeOrderServiceImpl implements ApiThreeOrderService {
         builder.method(HttpUtil.Method.JSON);
         builder.postObject(reqVO);
         HashMap<String,String> headers = new HashMap<>();
-        headers.put("Authorization",V5_TOKEN);
+        headers.put("Authorization",getTokenFromRedisOrSetNew());
         builder.headers(headers);
         HttpUtil.HttpResponse sent = HttpUtil.sent(builder.build());
         V5QueryOnSaleInfoDO json = sent.json(V5QueryOnSaleInfoDO.class);
