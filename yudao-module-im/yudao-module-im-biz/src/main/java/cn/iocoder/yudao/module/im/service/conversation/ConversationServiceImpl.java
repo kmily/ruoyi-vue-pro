@@ -5,13 +5,13 @@ import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversatio
 import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationDO;
 import cn.iocoder.yudao.module.im.dal.mysql.conversation.ConversationMapper;
 import cn.iocoder.yudao.module.im.enums.conversation.ImConversationTypeEnum;
-import cn.iocoder.yudao.module.im.service.inbox.InboxService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
+// TODO @hao：前缀 IM
 /**
  * IM 会话 Service 实现类
  *
@@ -23,8 +23,6 @@ public class ConversationServiceImpl implements ConversationService {
 
     @Resource
     private ConversationMapper conversationMapper;
-    @Resource
-    private InboxService inboxService;
 
     @Override
     public List<ImConversationDO> getConversationList() {

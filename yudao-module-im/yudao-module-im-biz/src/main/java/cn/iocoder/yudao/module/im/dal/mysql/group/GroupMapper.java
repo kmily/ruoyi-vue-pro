@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.*;
 
+// TODO @hao：这个也要有 Im 前缀
 /**
  * 群 Mapper
  *

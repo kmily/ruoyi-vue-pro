@@ -24,6 +24,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.MESSAGE_RECEIVER_NOT_EXISTS;
 
+// TODO @hao：前缀 IM
 /**
  * 消息 Service 实现类
  *

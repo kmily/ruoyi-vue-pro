@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
+// TODO @hao：IM 前缀
 /**
  * IM 收件箱 Mapper
  *

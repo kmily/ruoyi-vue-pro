@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.im.controller.admin.group.vo.*;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
+// TODO @hao：前缀 IM
 /**
  * 群 Service 接口
  *

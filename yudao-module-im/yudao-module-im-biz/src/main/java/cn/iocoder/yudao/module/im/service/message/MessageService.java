@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
 
 import java.util.List;
 
+// TODO @hao：前缀 IM
 /**
  * 消息 Service 接口
  *
