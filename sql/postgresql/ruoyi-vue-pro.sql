@@ -5064,6 +5064,7 @@ CREATE TABLE "system_oauth2_access_token"
     "user_id"       int8                                        NOT NULL,
     "access_token"  varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
     "refresh_token" varchar(32) COLLATE "pg_catalog"."default"  NOT NULL,
+    "user_info"     varchar(512) COLLATE "pg_catalog"."default"  NOT NULL,
     "user_type"     int2                                        NOT NULL,
     "client_id"     varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
     "expires_time"  timestamp(6)                                NOT NULL,
