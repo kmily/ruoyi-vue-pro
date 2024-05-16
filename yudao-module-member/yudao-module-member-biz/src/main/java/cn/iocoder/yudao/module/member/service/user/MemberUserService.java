@@ -187,4 +187,12 @@ public interface MemberUserService {
      */
     boolean updateUserPoint(Long userId, Integer point);
 
+    /**
+     * 管理后台创建会员
+     * @param mobile
+     * @param pwd
+     * @return
+     */
+    MemberUserDO createUserByAdmin(String mobile, String pwd,String registerIp, Integer terminal);
+
 }

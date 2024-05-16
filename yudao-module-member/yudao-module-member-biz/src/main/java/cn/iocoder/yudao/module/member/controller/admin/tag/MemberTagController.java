@@ -25,7 +25,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "管理后台 - 会员标签")
 @RestController
-@RequestMapping("/member/tag")
+@RequestMapping("/admin-api/member/tag")
 @Validated
 public class MemberTagController {
 

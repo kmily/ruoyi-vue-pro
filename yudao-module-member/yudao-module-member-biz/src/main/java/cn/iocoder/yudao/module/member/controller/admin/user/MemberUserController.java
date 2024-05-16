@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.member.controller.admin.user;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.*;
+import cn.iocoder.yudao.module.member.controller.app.auth.vo.AppAuthLoginReqVO;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.group.MemberGroupDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
@@ -23,6 +26,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
@@ -116,6 +120,14 @@ public class MemberUserController {
         List<MemberGroupDO> groups = memberGroupService.getGroupList(
                 convertSet(pageResult.getList(), MemberUserDO::getGroupId));
         return success(MemberUserConvert.INSTANCE.convertPage(pageResult, tags, levels, groups));
+    }
+
+    @PostMapping("/create")
+    @Operation(summary = "使用手机 + 密码登录")
+    public CommonResult<MemberUserBaseVO> create(@RequestBody @Valid AppAuthLoginReqVO reqVO, HttpServletRequest request) {
+        String ip = ServletUtils.getClientIP(request);
+        MemberUserDO userDO = memberUserService.createUserByAdmin(reqVO.getMobile(), reqVO.getPassword(), "", TerminalEnum.ADMIN_WEB.getTerminal());
+        return success(MemberUserConvert.INSTANCE.convert04(userDO));
     }
 
 }

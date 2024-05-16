@@ -23,6 +23,7 @@ import cn.iocoder.yudao.module.system.api.social.dto.SocialWxPhoneNumberInfoResp
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,19 +84,31 @@ public class MemberUserServiceImpl implements MemberUserService {
             return user;
         }
         // 用户不存在，则进行创建
-        return createUser(mobile, null, null, registerIp, terminal);
+        return createUser(mobile, null, null, registerIp, terminal,null);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public MemberUserDO createUserByAdmin(String mobile, String pwd,String registerIp, Integer terminal) {
+        // 用户已经存在
+        MemberUserDO user = memberUserMapper.selectByMobile(mobile);
+        if (user != null) {
+            return user;
+        }
+        // 用户不存在，则进行创建
+        return createUser(mobile, null, null, registerIp, terminal,pwd);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public MemberUserDO createUser(String nickname, String avtar, String registerIp, Integer terminal) {
-        return createUser(null, nickname, avtar, registerIp, terminal);
+        return createUser(null, nickname, avtar, registerIp, terminal,null);
     }
 
     private MemberUserDO createUser(String mobile, String nickname, String avtar,
-                                    String registerIp, Integer terminal) {
+                                    String registerIp, Integer terminal,String pwd) {
         // 生成密码
-        String password = IdUtil.fastSimpleUUID();
+        String password = StringUtils.isNotBlank(pwd)?pwd: IdUtil.fastSimpleUUID();
         // 插入用户
         MemberUserDO user = new MemberUserDO();
         user.setMobile(mobile);
@@ -110,14 +123,14 @@ public class MemberUserServiceImpl implements MemberUserService {
         memberUserMapper.insert(user);
 
         // 发送 MQ 消息：用户创建
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-
-            @Override
-            public void afterCommit() {
-                memberUserProducer.sendUserCreateMessage(user.getId());
-            }
-
-        });
+//        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+//
+//            @Override
+//            public void afterCommit() {
+//                memberUserProducer.sendUserCreateMessage(user.getId());
+//            }
+//
+//        });
         return user;
     }
 

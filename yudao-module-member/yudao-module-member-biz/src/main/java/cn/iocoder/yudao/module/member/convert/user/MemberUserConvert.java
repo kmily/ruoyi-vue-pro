@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.member.convert.user;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserBaseVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserRespVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserInfoRespVO;
@@ -59,5 +60,7 @@ public interface MemberUserConvert {
         });
         return result;
     }
+
+    MemberUserBaseVO convert04(MemberUserDO bean);
 
 }
