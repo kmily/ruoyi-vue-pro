@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.module.system.dal.mysql.definition;
+package cn.iocoder.yudao.module.therapy.dal.mysql.definition;
 
-import cn.iocoder.yudao.module.system.dal.dataobject.definition.TreatmentFlowDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDO;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import org.apache.ibatis.annotations.Mapper;
 

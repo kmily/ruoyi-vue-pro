@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.module.system.controller;
+package cn.iocoder.yudao.module.therapy.controller.app;
 
-import cn.iocoder.yudao.module.system.service.TreatmentService;
+import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import io.swagger.v3.oas.annotations.Operation;

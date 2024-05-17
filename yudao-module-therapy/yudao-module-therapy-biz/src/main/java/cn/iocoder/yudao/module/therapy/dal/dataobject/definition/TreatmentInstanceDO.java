@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.dal.dataobject.definition;
+package cn.iocoder.yudao.module.therapy.dal.dataobject.definition;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;

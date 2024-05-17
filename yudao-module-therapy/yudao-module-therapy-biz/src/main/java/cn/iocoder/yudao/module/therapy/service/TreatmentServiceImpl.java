@@ -1,9 +1,9 @@
-package cn.iocoder.yudao.module.system.service;
+package cn.iocoder.yudao.module.therapy.service;
 
-import cn.iocoder.yudao.module.system.dal.dataobject.definition.TreatmentFlowDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.definition.TreatmentInstanceDO;
-import cn.iocoder.yudao.module.system.dal.mysql.definition.TreatmentFlowMapper;
-import cn.iocoder.yudao.module.system.dal.mysql.definition.TreatmentInstanceMapper;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentInstanceDO;
+import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentFlowMapper;
+import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentInstanceMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
