@@ -54,3 +54,4 @@ application-my.yaml
 
 # Customize
 application-local.yaml
+nohup.out
