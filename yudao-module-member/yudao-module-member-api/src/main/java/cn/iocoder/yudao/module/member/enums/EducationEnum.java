@@ -1,31 +1,30 @@
 package cn.iocoder.yudao.module.member.enums;
 
 import cn.hutool.core.util.EnumUtil;
+import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * 会员经验 - 业务类型
+ * 会员学历程度
  *
  * @author owen
  */
 @Getter
 @AllArgsConstructor
-public enum EducationEnum {
+public enum EducationEnum implements IntArrayValuable {
 
-    /**
-     * 管理员调整、邀请新用户、下单、退单、签到、抽奖
-     */
-    ADMIN(0, "管理员调整", "管理员调整获得 {} 经验", true),
-    INVITE_REGISTER(1, "邀新奖励", "邀请好友获得 {} 经验", true),
-    SIGN_IN(4, "签到奖励", "签到获得 {} 经验", true),
-    LOTTERY(5, "抽奖奖励", "抽奖获得 {} 经验", true),
-    ORDER_GIVE(11, "下单奖励", "下单获得 {} 经验", true),
-    ORDER_GIVE_CANCEL(12, "下单奖励（整单取消）", "取消订单获得 {} 经验", false), // ORDER_GIVE 的取消
-    ORDER_GIVE_CANCEL_ITEM(13, "下单奖励（单个退款）", "退款订单获得 {} 经验", false), // ORDER_GIVE 的取消
-    ;
+    PRIMARY_SCHOOL_DIPLOMA(0, "小学"),
+    MIDDLE_SCHOOL_DIPLOMA(1, "初中"),
+    HIGH_SCHOOL_DIPLOMA(2, "高中"),
+    COLLEGE_DIPLOMA(3, "大专"),
+    BACHELOR_DEGREE(4, "本科"),
+    MASTER_DEGREE(5, "硕士"),
+    DOCTORAL_DEGREE(6, "博士"),
+    NOTHING(7,"未受教育");
 
     /**
      * 业务类型
@@ -35,17 +34,15 @@ public enum EducationEnum {
      * 标题
      */
     private final String title;
-    /**
-     * 描述
-     */
-    private final String description;
-    /**
-     * 是否为扣减积分
-     */
-    private final boolean add;
+
 
     public static EducationEnum getByType(Integer type) {
         return EnumUtil.getBy(EducationEnum.class,
                 e -> Objects.equals(type, e.getType()));
+    }
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(EducationEnum::getType).toArray();
+    @Override
+    public int[] array() {
+        return ARRAYS;
     }
 }

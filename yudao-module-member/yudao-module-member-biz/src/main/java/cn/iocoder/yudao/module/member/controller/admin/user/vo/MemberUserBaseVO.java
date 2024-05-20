@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.module.member.controller.admin.user.vo;
 
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.member.enums.EducationEnum;
+import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
@@ -61,5 +64,9 @@ public class MemberUserBaseVO {
 
     @Schema(description = "用户分组编号", example = "1")
     private Long groupId;
+
+    @Schema(description = "受教育程度", example = "2")
+    @InEnum(EducationEnum.class)
+    private Integer eduType;
 
 }

@@ -123,7 +123,7 @@ public class MemberUserController {
     }
 
     @PostMapping("/create")
-    @Operation(summary = "使用手机 + 密码登录")
+    @Operation(summary = "使用手机号和密码创建患者")
     public CommonResult<MemberUserBaseVO> create(@RequestBody @Valid AppAuthLoginReqVO reqVO, HttpServletRequest request) {
         String ip = ServletUtils.getClientIP(request);
         MemberUserDO userDO = memberUserService.createUserByAdmin(reqVO.getMobile(), reqVO.getPassword(), "", TerminalEnum.ADMIN_WEB.getTerminal());

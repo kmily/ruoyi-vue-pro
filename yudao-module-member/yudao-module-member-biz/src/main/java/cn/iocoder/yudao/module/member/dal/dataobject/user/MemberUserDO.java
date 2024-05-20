@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.member.dal.dataobject.user;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
+import cn.iocoder.yudao.module.member.enums.EducationEnum;
 import cn.iocoder.yudao.framework.ip.core.Area;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
@@ -141,5 +142,11 @@ public class MemberUserDO extends TenantBaseDO {
      * 关联 {@link MemberGroupDO#getId()} 字段
      */
     private Long groupId;
+
+    /**
+     * 受教育程度
+     * 枚举 {@link EducationEnum}
+     */
+    private Integer eduType;
 
 }
