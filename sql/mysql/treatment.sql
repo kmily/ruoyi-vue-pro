@@ -4,6 +4,7 @@ CREATE TABLE `hlgyy_treatment_flow`  (
       `name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '治疗流程名称',
       `code` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '治疗流程编码',
       `status` tinyint NOT NULL DEFAULT 0 COMMENT '流程状态（0未发布 1已发布）',
+      `tenant_id` bigint NOT NULL COMMENT '租户id',
       `remark` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '备注',
       `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '创建者',
       `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -13,14 +14,16 @@ CREATE TABLE `hlgyy_treatment_flow`  (
       PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '治疗流程模板';
 
-insert into hlgyy_treatment_flow(name, code, status, creator, create_time, updater, update_time, deleted)
-values('治疗流程1', 'treatment_flow_1', 1, 'admin', now(), 'admin', now(), 0);
+insert into hlgyy_treatment_flow(name, tenant_id, code, status, creator, create_time, updater, update_time, deleted)
+values('治疗流程1', 1 ,'treatment_flow_1', 1, 'admin', now(), 'admin', now(), 0);
 
 DROP TABLE IF EXISTS `hlgyy_treatment_instance`;
 CREATE TABLE `hlgyy_treatment_instance`  (
          `id` bigint NOT NULL AUTO_INCREMENT COMMENT '治疗流程实例id',
          `user_id` bigint not null COMMENT '用户id',
          `flow_id` bigint NOT NULL COMMENT '治疗流程id',
+         `tenant_id` bigint NOT NULL COMMENT '租户id',
+         `status` tinyint NOT NULL DEFAULT 0 COMMENT '流程状态（0未开始 1进行中 2已完成 3已取消）',
          `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '创建者',
          `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
          `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
@@ -36,6 +39,7 @@ CREATE TABLE `hlgyy_treatment_flow_dayitem`  (
      `name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '名称',
      `status` tinyint NOT NULL DEFAULT 0 COMMENT '流程状态（0开始 1进行中 2已完成 3未完成）',
      `remark` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '备注',
+     `tenant_id` bigint NOT NULL COMMENT '租户id',
      `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '创建者',
      `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
      `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
