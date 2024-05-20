@@ -1,4 +1,4 @@
-package cn.iocoder.boot.enums;
+package cn.iocoder.boot.module.therapy.enums;
 
 public interface DayTreatStatus {
     String INIT_STATUS = "未开始";

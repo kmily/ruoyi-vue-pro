@@ -1,4 +1,4 @@
-package cn.iocoder.boot.api.day.dto;
+package cn.iocoder.boot.module.therapy.api.day.dto;
 
 public class DayTreatmentStatusRespDTO {
     private String status;
