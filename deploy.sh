@@ -3,7 +3,7 @@
 # Step 1: 拉取最新代码
 echo "Step 1: 正在拉取最新代码..."
 cd /home/www/hospital_mdd
-git checkout dev
+git checkout test
 git pull
 if [ $? -ne 0 ]; then
   echo "拉取最新代码失败，请检查网络连接或者项目地址是否正确。"
