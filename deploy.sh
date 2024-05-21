@@ -34,7 +34,7 @@ if [ ! -d "$deploy_dir" ]; then
 fi
 
 echo "正在复制项目到部署目录..."
-cp -P -r /home/www/hospital_mdd/yudao-server/target/yudao-server.jar "$deploy_dir"
+cp -P -r -a /home/www/hospital_mdd/yudao-server/target/. "$deploy_dir"
 if [ $? -ne 0 ]; then
   echo "复制项目文件失败，请检查文件路径和权限。"
   exit 1
@@ -62,7 +62,8 @@ fi
 # Step 4: 启动项目
 echo "Step 4: 正在启动项目..."
 cd "$deploy_dir"
-nohup java -jar yudao-server.jar > server.log 2>&1 &
+nohup java -jar yudao-server.jar --spring.profiles.active=dev > server.log 2>&1 &
+
 echo "项目启动中..."
 
 echo "部署完成。"
