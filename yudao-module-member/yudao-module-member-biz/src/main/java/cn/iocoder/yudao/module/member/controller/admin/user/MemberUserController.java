@@ -106,20 +106,21 @@ public class MemberUserController {
             return success(PageResult.empty());
         }
 
-        // 处理用户标签返显
-        Set<Long> tagIds = pageResult.getList().stream()
-                .map(MemberUserDO::getTagIds)
-                .filter(Objects::nonNull)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toSet());
-        List<MemberTagDO> tags = memberTagService.getTagList(tagIds);
-        // 处理用户级别返显
-        List<MemberLevelDO> levels = memberLevelService.getLevelList(
-                convertSet(pageResult.getList(), MemberUserDO::getLevelId));
-        // 处理用户分组返显
-        List<MemberGroupDO> groups = memberGroupService.getGroupList(
-                convertSet(pageResult.getList(), MemberUserDO::getGroupId));
-        return success(MemberUserConvert.INSTANCE.convertPage(pageResult, tags, levels, groups));
+//        // 处理用户标签返显
+//        Set<Long> tagIds = pageResult.getList().stream()
+//                .map(MemberUserDO::getTagIds)
+//                .filter(Objects::nonNull)
+//                .flatMap(Collection::stream)
+//                .collect(Collectors.toSet());
+//        List<MemberTagDO> tags = memberTagService.getTagList(tagIds);
+//        // 处理用户级别返显
+//        List<MemberLevelDO> levels = memberLevelService.getLevelList(
+//                convertSet(pageResult.getList(), MemberUserDO::getLevelId));
+//        // 处理用户分组返显
+//        List<MemberGroupDO> groups = memberGroupService.getGroupList(
+//                convertSet(pageResult.getList(), MemberUserDO::getGroupId));
+//        return success(MemberUserConvert.INSTANCE.convertPage(pageResult, tags, levels, groups));
+        return success(MemberUserConvert.INSTANCE.convertPage(pageResult));
     }
 
     @PostMapping("/create")

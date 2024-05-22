@@ -32,10 +32,15 @@ public class TreatmentSurveyDO extends TenantBaseDO {
     private String title;
 
     /**
+     * 标签,逗号分割
+     */
+    private String tags;
+
+    /**
      * 类型
      * 枚举 {@link SurveyType}
      */
-    private String surveyType;
+    private Integer surveyType;
 
     /**
      * 是否禁用

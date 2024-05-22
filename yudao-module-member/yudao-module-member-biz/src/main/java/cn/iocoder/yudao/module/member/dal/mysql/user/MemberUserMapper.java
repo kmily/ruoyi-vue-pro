@@ -44,6 +44,7 @@ public interface MemberUserMapper extends BaseMapperX<MemberUserDO> {
                 .likeIfPresent(MemberUserDO::getMobile, reqVO.getMobile())
                 .betweenIfPresent(MemberUserDO::getLoginDate, reqVO.getLoginDate())
                 .likeIfPresent(MemberUserDO::getNickname, reqVO.getNickname())
+                .likeIfPresent(MemberUserDO::getName, reqVO.getName())
                 .betweenIfPresent(MemberUserDO::getCreateTime, reqVO.getCreateTime())
                 .eqIfPresent(MemberUserDO::getLevelId, reqVO.getLevelId())
                 .eqIfPresent(MemberUserDO::getGroupId, reqVO.getGroupId())

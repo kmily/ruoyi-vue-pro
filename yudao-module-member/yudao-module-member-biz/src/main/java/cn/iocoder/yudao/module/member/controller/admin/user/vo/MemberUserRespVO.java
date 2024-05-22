@@ -49,4 +49,10 @@ public class MemberUserRespVO extends MemberUserBaseVO {
     @Schema(description = "用户经验值", requiredMode  = Schema.RequiredMode.REQUIRED, example = "200")
     private Integer experience;
 
+    @Schema(description = "治疗进度", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private Integer progress;
+
+    @Schema(description = "第几周", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private Integer weekNum;
+
 }
