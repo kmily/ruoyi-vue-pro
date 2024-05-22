@@ -10,14 +10,14 @@ import lombok.*;
 /**
  * 问卷的题目
  */
-@TableName(value = "hlgyy_treatment_anAnswer", autoResultMap = true)
+@TableName(value = "hlgyy_survey_question", autoResultMap = true)
 @KeySequence("member_user_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AnAnswer extends TenantBaseDO {
+public class QuestionDO extends TenantBaseDO {
     /**
      * 题目ID
      */
@@ -30,14 +30,14 @@ public class AnAnswer extends TenantBaseDO {
     private Long belongSurveyId;
 
     /**
-     * 所属问卷的题目
+     * 问题标题
      */
-    private Long qstId;
+    private String qstTitle;
 
     /**
-     * 回答的内容,json格式
+     * 问题描述
      */
-    private String answer;
+    private String qstDesc;
 
     /**
      * 问题类型
@@ -45,4 +45,8 @@ public class AnAnswer extends TenantBaseDO {
      */
     private Integer qstType;
 
+    /**
+     * 题干json化数据
+     */
+    private String qstContext;
 }

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.therapy.controller.admin.survey;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyPageReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyRespVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveySaveReqVO;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "管理后台 - 治疗问卷")
@@ -26,8 +29,8 @@ public class SurveyController {
 
     @Resource
     private SurveyService surveyService;
-//    @Resource
-//    private DeptService deptService;
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建问卷")
@@ -41,6 +44,7 @@ public class SurveyController {
     @Operation(summary = "修改问卷")
 //    @PreAuthorize("@ss.hasPermission('system:user:update')")
     public CommonResult<Boolean> updateSurvey(@Valid @RequestBody SurveySaveReqVO reqVO) {
+        if(reqVO.getId()<=0) throw exception(BAD_REQUEST);
         surveyService.updateSurvey(reqVO);
         return success(true);
     }

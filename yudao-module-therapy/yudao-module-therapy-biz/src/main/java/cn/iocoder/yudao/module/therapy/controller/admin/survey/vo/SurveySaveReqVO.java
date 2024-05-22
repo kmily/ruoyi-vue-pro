@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.therapy.controller.admin.survey.vo;
 
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 @Schema(description = "管理后台 - 治疗问卷创建/修改 Request VO")
@@ -17,6 +19,7 @@ public class SurveySaveReqVO {
      * 调查标题
      */
     @Schema(description = "问卷名称", example = "身体治疗",requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotEmpty(message = "问卷名称不能为空")
     private String title;
 
     /**
@@ -30,11 +33,13 @@ public class SurveySaveReqVO {
      * 枚举 {@link SurveyType}
      */
     @Schema(description = "问卷类型,枚举:SurveyType", example = "身体治疗",requiredMode = Schema.RequiredMode.REQUIRED)
+    @InEnum(value = SurveyType.class, message = "问卷类型不正确")
     private Integer surveyType;
 
     /**
      * 问题
      */
     @Schema(description = "题目列表", example = "问题1,2,3",requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotEmpty(message = "题目不能为空")
     private List<SurveyQstSaveReqVO> questions;
 }
