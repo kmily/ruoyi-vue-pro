@@ -19,9 +19,9 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 /**
- * @Author:lidongw_1
+ * @Author: lidongw_1
  * @Date 2024/5/23
- * @Description: TODO
+ * @Description: 用户 APP - 用户个人中心
  **/
 
 @Tag(name = "用户 APP - 用户个人中心")
