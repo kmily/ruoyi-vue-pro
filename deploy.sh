@@ -70,7 +70,7 @@ fi
 # Step 4: 启动项目
 echo "Step 4: 正在启动项目..."
 cd "$deploy_dir"
-nohup java -jar yudao-server.jar --spring.profiles.active=dev > server.log 2>&1 &
+nohup java -DLOG_FILE=./logs/yudao-server.log -jar yudao-server.jar --spring.profiles.active=dev > server.log 2>&1 &
 
 echo "项目启动中..."
 
