@@ -26,7 +26,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 
 @Tag(name = "用户 APP - 用户个人中心")
 @RestController
-@RequestMapping("/member/user")
+@RequestMapping("/treatment/member/user")
 @Validated
 @Slf4j
 public class AppUserMemberController {

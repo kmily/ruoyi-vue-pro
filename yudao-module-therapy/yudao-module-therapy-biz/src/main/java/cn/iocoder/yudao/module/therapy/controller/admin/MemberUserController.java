@@ -25,7 +25,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "管理后台 - 患者管理")
 @RestController
-@RequestMapping("/member/user")
+@RequestMapping("/therapy/member/user")
 @Validated
 @Slf4j
 public class MemberUserController {
