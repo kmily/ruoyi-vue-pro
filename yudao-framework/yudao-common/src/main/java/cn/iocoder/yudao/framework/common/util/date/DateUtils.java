@@ -1,7 +1,11 @@
 package cn.iocoder.yudao.framework.common.util.date;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.*;
 import java.util.Calendar;
 import java.util.Date;
@@ -11,6 +15,7 @@ import java.util.Date;
  *
  * @author 芋道源码
  */
+@Slf4j
 public class DateUtils {
 
     /**
@@ -144,6 +149,17 @@ public class DateUtils {
      */
     public static boolean isYesterday(LocalDateTime date) {
         return LocalDateTimeUtil.isSameDay(date, LocalDateTime.now().minusDays(1));
+    }
+
+    public static Date toDate(String dateString){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date date = format.parse(dateString);
+            return date;
+        } catch (ParseException e) {
+            log.error("parse date error, input: {}",dateString,e);
+            return null;
+        }
     }
 
 }
