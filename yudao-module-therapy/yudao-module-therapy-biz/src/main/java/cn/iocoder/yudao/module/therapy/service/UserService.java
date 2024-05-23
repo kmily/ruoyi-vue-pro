@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.therapy.service;
 
 import cn.iocoder.yudao.module.therapy.controller.VO.SetAppointmentTimeReqVO;
-import cn.iocoder.yudao.module.therapy.controller.admin.VO.AdminSetAppointmentTimeVO;
-import cn.iocoder.yudao.module.therapy.controller.app.VO.AppMemberUserSetAppointmentTimeReqVO;
 
 /**
  * @Author:lidongw_1

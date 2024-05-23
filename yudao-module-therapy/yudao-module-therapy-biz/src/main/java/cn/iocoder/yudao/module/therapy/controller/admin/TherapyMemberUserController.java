@@ -28,7 +28,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RequestMapping("/therapy/member/user")
 @Validated
 @Slf4j
-public class MemberUserController {
+public class TherapyMemberUserController {
 
 
     @Resource
