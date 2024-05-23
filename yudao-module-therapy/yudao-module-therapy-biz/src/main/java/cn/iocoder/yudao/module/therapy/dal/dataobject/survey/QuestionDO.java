@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.therapy.dal.dataobject.survey;
 
 import cn.iocoder.boot.module.therapy.enums.SurveyQuestionType;
-import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import lombok.*;
 
 /**
@@ -17,7 +20,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class QuestionDO extends TenantBaseDO {
+public class QuestionDO extends BaseDO {
     /**
      * 题目ID
      */
@@ -30,14 +33,19 @@ public class QuestionDO extends TenantBaseDO {
     private Long belongSurveyId;
 
     /**
+     * 是否必答题
+     */
+    private boolean isRequired;
+
+    /**
      * 问题标题
      */
-    private String qstTitle;
+    private String title;
 
     /**
      * 问题描述
      */
-    private String qstDesc;
+    private String desc;
 
     /**
      * 问题类型
@@ -48,5 +56,6 @@ public class QuestionDO extends TenantBaseDO {
     /**
      * 题干json化数据
      */
-    private String qstContext;
+    @TableField(typeHandler = FastjsonTypeHandler.class)
+    private JSONObject qstContext;
 }

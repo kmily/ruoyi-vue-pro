@@ -26,7 +26,7 @@ public class SurveySaveReqVO {
      * 标签,逗号分割
      */
     @Schema(description = "标签", example = "身体治疗")
-    private String tags;
+    private List<String> tags;
 
     /**
      * 类型
@@ -35,6 +35,7 @@ public class SurveySaveReqVO {
     @Schema(description = "问卷类型,枚举:SurveyType", example = "身体治疗",requiredMode = Schema.RequiredMode.REQUIRED)
     @InEnum(value = SurveyType.class, message = "问卷类型不正确")
     private Integer surveyType;
+
 
     /**
      * 问题

@@ -107,11 +107,11 @@ public class MemberUserController {
         }
 
 //        // 处理用户标签返显
-//        Set<Long> tagIds = pageResult.getList().stream()
-//                .map(MemberUserDO::getTagIds)
-//                .filter(Objects::nonNull)
-//                .flatMap(Collection::stream)
-//                .collect(Collectors.toSet());
+        Set<Long> tagIds = pageResult.getList().stream()
+                .map(MemberUserDO::getTagIds)
+                .filter(Objects::nonNull)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
 //        List<MemberTagDO> tags = memberTagService.getTagList(tagIds);
 //        // 处理用户级别返显
 //        List<MemberLevelDO> levels = memberLevelService.getLevelList(

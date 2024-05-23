@@ -5,6 +5,8 @@ import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface SurveyQuestionMapper extends BaseMapperX<QuestionDO> {
     /**
@@ -16,5 +18,12 @@ public interface SurveyQuestionMapper extends BaseMapperX<QuestionDO> {
         LambdaQueryWrapper<QuestionDO> lambdaUpdateWrapper = new LambdaQueryWrapper<QuestionDO>()
                 .eq(QuestionDO::getBelongSurveyId, surveyId);
         delete(lambdaUpdateWrapper);
+    }
+
+    default List<QuestionDO> selectBySurveyId(Long surveyId){
+        LambdaQueryWrapper<QuestionDO> lambdaUpdateWrapper = new LambdaQueryWrapper<QuestionDO>()
+                .eq(QuestionDO::getBelongSurveyId, surveyId);
+
+        return selectList(lambdaUpdateWrapper);
     }
 }

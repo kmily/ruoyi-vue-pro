@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "管理后台 - 治疗问卷列表 Response VO")
 @Data
@@ -25,7 +26,7 @@ public class SurveyRespVO {
      * 标签,逗号分割
      */
     @Schema(description = "标签", requiredMode = Schema.RequiredMode.REQUIRED, example = "心理治疗")
-    private String tags;
+    private List<String> tags;
 
     /**
      * 类型

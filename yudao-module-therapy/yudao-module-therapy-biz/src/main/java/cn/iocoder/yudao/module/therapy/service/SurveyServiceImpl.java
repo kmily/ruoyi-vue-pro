@@ -1,11 +1,15 @@
 package cn.iocoder.yudao.module.therapy.service;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyPageReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveySaveReqVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.convert.SurveyConvert;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnAnswerDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
+import cn.iocoder.yudao.module.therapy.dal.mysql.survey.SurveyAnAnswerMapper;
 import cn.iocoder.yudao.module.therapy.dal.mysql.survey.SurveyQuestionMapper;
 import cn.iocoder.yudao.module.therapy.dal.mysql.survey.TreatmentSurveyMapper;
 import lombok.var;
@@ -14,10 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import static cn.iocoder.boot.enums.ErrorCodeConstants.SURVEY_EXISTS_UNFINISHED;
 import static cn.iocoder.boot.enums.ErrorCodeConstants.SURVEY_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -28,6 +32,9 @@ public class SurveyServiceImpl implements SurveyService {
     private TreatmentSurveyMapper treatmentSurveyMapper;
     @Resource
     private SurveyQuestionMapper surveyQuestionMapper;
+
+    @Resource
+    private SurveyAnAnswerMapper surveyAnAnswerMapper;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -72,7 +79,37 @@ public class SurveyServiceImpl implements SurveyService {
 
     @Override
     public PageResult<TreatmentSurveyDO> getSurveyPage(SurveyPageReqVO pageReqVO) {
-        PageResult<TreatmentSurveyDO> list=treatmentSurveyMapper.selectPage(pageReqVO);
-        return null;
+        return treatmentSurveyMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public TreatmentSurveyDO get(Long id) {
+        return treatmentSurveyMapper.selectById(id);
+    }
+
+    @Override
+    public List<QuestionDO> getQuestionBySurveyId(Long id) {
+        return surveyQuestionMapper.selectBySurveyId(id);
+    }
+
+    @Override
+    public void submitSurvey(SubmitSurveyReqVO reqVO) {
+        //判断问卷是否存在，状态是否正常
+        TreatmentSurveyDO tsDO = treatmentSurveyMapper.selectById(reqVO.getSurveyId());
+        if (Objects.isNull(tsDO)) throw exception(SURVEY_NOT_EXISTS);
+
+        //判断是否必答题有遗漏
+        Set<Long> qst1Set = reqVO.getQstList().stream().map(p -> p.getId()).collect(Collectors.toSet());
+        List<QuestionDO> qst = surveyQuestionMapper.selectBySurveyId(reqVO.getSurveyId());
+        Set<Long> qst2Set = qst.stream().filter(k -> k.isRequired()).map(k -> k.getId()).collect(Collectors.toSet());
+        qst2Set.removeAll(qst1Set);
+        if (qst2Set.size() > 0) {
+            throw exception(SURVEY_EXISTS_UNFINISHED);
+        }
+
+        //保存答案
+        Map<Long, QuestionDO> qstMap = CollectionUtils.convertMap(qst, QuestionDO::getId);
+        List<AnAnswerDO> anAnswerDOS = SurveyConvert.INSTANCE.convert(qstMap, reqVO.getQstList(), getLoginUserId());
+        surveyAnAnswerMapper.insertBatch(anAnswerDOS);
     }
 }
