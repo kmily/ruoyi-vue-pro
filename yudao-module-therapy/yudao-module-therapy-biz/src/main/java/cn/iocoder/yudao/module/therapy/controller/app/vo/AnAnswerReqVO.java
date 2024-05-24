@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.therapy.controller.app.vo;
 
 import cn.iocoder.boot.module.therapy.enums.SurveyQuestionType;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -31,6 +32,6 @@ public class AnAnswerReqVO {
      * 答案
      */
     @Schema(description = "答案,json格式",requiredMode = Schema.RequiredMode.REQUIRED,example = "{23}")
-    @NotNull(groups = JSONObject.class,message = "答案不能为空")
-    private JSONObject answer;
+    @NotNull(groups = JSONArray.class,message = "答案不能为空")
+    private JSONArray answer;
 }

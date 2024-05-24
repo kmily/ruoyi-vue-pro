@@ -17,14 +17,15 @@ import java.util.Objects;
 @AllArgsConstructor
 public enum EducationEnum implements IntArrayValuable {
 
-    PRIMARY_SCHOOL_DIPLOMA(0, "小学"),
-    MIDDLE_SCHOOL_DIPLOMA(1, "初中"),
-    HIGH_SCHOOL_DIPLOMA(2, "高中"),
-    COLLEGE_DIPLOMA(3, "大专"),
-    BACHELOR_DEGREE(4, "本科"),
-    MASTER_DEGREE(5, "硕士"),
-    DOCTORAL_DEGREE(6, "博士"),
-    NOTHING(7,"未受教育");
+    NOTHING(0,"未受教育"),
+    PRIMARY_SCHOOL_DIPLOMA(1, "小学"),
+    MIDDLE_SCHOOL_DIPLOMA(2, "初中"),
+    HIGH_SCHOOL_DIPLOMA(3, "高中"),
+    COLLEGE_DIPLOMA(4, "大专"),
+    BACHELOR_DEGREE(5, "本科"),
+    MASTER_DEGREE(6, "硕士"),
+    DOCTORAL_DEGREE(7, "博士"),
+    ;
 
     /**
      * 业务类型

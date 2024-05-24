@@ -3,13 +3,13 @@ package cn.iocoder.yudao.module.therapy.controller.admin.survey;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyPageReqVO;
-import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyRespVO;
-import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveySaveReqVO;
+import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.*;
 import cn.iocoder.yudao.module.therapy.convert.SurveyConvert;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
 import cn.iocoder.yudao.module.therapy.service.SurveyService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -87,10 +87,25 @@ public class SurveyController {
         if (Objects.isNull(tsDO)) {
             throw exception(SURVEY_NOT_EXISTS);
         }
-        List<QuestionDO> qstList=surveyService.getQuestionBySurveyId(id);
+        List<QuestionDO> qstList = surveyService.getQuestionBySurveyId(id);
 
-        return success(SurveyConvert.INSTANCE.convert(tsDO,qstList));
+        return success(SurveyConvert.INSTANCE.convert(tsDO, qstList));
     }
 
+    @GetMapping("/getSurveyAnswerPage")
+    @Parameter(name = "userId", description = "患者id", required = true, example = "1024")
+    @Operation(summary = "获得患者答题列表")
+    public CommonResult<PageResult<SurveyAnswerRespVO>> getSurveyAnswerPage(@Valid SurveyAnswerPageReqVO reqVO) {
+        PageResult<SurveyAnswerDO> pageResult = surveyService.getSurveyAnswerPage(reqVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(new PageResult<>(pageResult.getTotal()));
+        }
+        Set<Long> surveyIds = pageResult.getList().stream()
+                .map(SurveyAnswerDO::getBelongSurveyId)
+                .collect(Collectors.toSet());
+        List<TreatmentSurveyDO> treatmentSurveyDOS = surveyService.getSurveyByIds(surveyIds);
+        Map<Long, TreatmentSurveyDO> treatmentSurveyDOMap = CollectionUtils.convertMap(treatmentSurveyDOS, TreatmentSurveyDO::getId);
+        return success(new PageResult<>(SurveyConvert.INSTANCE.convertList(treatmentSurveyDOMap, pageResult.getList()), pageResult.getTotal()));
+    }
 
 }

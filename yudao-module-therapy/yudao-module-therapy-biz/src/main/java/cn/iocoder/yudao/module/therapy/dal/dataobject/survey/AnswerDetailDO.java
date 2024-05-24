@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.therapy.dal.dataobject.survey;
 
 import cn.iocoder.boot.module.therapy.enums.SurveyQuestionType;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -13,14 +14,14 @@ import lombok.*;
 /**
  * 问卷的题目
  */
-@TableName(value = "hlgyy_servey_anAnswer", autoResultMap = true)
+@TableName(value = "hlgyy_answer_detail", autoResultMap = true)
 @KeySequence("member_user_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AnAnswerDO extends BaseDO {
+public class AnswerDetailDO extends BaseDO {
     /**
      * 题目ID
      */
@@ -33,6 +34,11 @@ public class AnAnswerDO extends BaseDO {
     private Long belongSurveyId;
 
     /**
+     *
+     */
+    private Long answerId;
+
+    /**
      * 所属问卷的题目
      */
     private Long qstId;
@@ -41,13 +47,13 @@ public class AnAnswerDO extends BaseDO {
      * 回答的内容,json格式
      */
     @TableField(typeHandler = FastjsonTypeHandler.class)
-    private JSONObject answer;
+    private JSONArray answer;
 
     /**
      * 题干json化数据
      */
     @TableField(typeHandler = FastjsonTypeHandler.class)
-    private JSONObject qstContext;
+    private JSONArray qstContext;
 
     /**
      * 问题类型

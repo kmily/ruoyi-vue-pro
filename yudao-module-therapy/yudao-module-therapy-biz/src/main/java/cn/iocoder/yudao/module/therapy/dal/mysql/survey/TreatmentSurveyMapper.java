@@ -1,15 +1,12 @@
 package cn.iocoder.yudao.module.therapy.dal.mysql.survey;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyPageReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
+import jodd.util.StringUtil;
 import org.apache.ibatis.annotations.Mapper;
-
-import java.util.stream.Collectors;
 
 @Mapper
 public interface TreatmentSurveyMapper extends BaseMapperX<TreatmentSurveyDO> {
@@ -22,8 +19,8 @@ public interface TreatmentSurveyMapper extends BaseMapperX<TreatmentSurveyDO> {
                 .betweenIfPresent(TreatmentSurveyDO::getCreateTime, reqVO.getCreateTime())
                 .betweenIfPresent(TreatmentSurveyDO::getCreateTime, reqVO.getCreateTime())
                 .eqIfPresent(TreatmentSurveyDO::getSurveyType, reqVO.getSurveyType())
-                .likeIfPresent(TreatmentSurveyDO::getTags, reqVO.getTags())
-                .eqIfPresent(TreatmentSurveyDO::getCreator,reqVO.getCreator())
+                .eqIfPresent(TreatmentSurveyDO::getCreator, reqVO.getCreator())
+                .apply(StringUtil.isNotBlank(reqVO.getTag()), String.format("JSON_CONTAINS(tags, '[\"%s\"]')", reqVO.getTag()))
                 .orderByDesc(TreatmentSurveyDO::getId));
     }
 }

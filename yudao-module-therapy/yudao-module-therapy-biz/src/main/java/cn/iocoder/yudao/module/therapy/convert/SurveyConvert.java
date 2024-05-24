@@ -2,11 +2,13 @@ package cn.iocoder.yudao.module.therapy.convert;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyAnswerRespVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyQstSaveReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyRespVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveySaveReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.AnAnswerReqVO;
-import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnAnswerDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
 import org.mapstruct.Mapper;
@@ -56,23 +58,39 @@ public interface SurveyConvert {
         return vo;
     }
 
-    default List<AnAnswerDO> convert(Map<Long, QuestionDO> qstMap, List<AnAnswerReqVO> reqVOS, Long userId) {
-        List<AnAnswerDO> anAnswerDOS = new ArrayList<>();
+    default List<AnswerDetailDO> convert(Map<Long, QuestionDO> qstMap, List<AnAnswerReqVO> reqVOS, Long userId) {
+        List<AnswerDetailDO> anAnswerDOS = new ArrayList<>();
         for (AnAnswerReqVO item : reqVOS) {
-            AnAnswerDO answerDO = new AnAnswerDO();
+            AnswerDetailDO detailDO = new AnswerDetailDO();
             if (!qstMap.containsKey(item.getId())) throw exception(SURVEY_QUESTION_NOT_EXISTS);
 
             QuestionDO qst = qstMap.get(item.getId());
             if (!item.getQstType().equals(qst.getQstType())) throw exception(SURVEY_QUESTION_TYPE_CHANGE);
-            answerDO.setAnswer(item.getAnswer());
-            answerDO.setBelongSurveyId(qst.getBelongSurveyId());
-            answerDO.setQstType(item.getQstType());
-            answerDO.setCreator(userId.toString());
-            answerDO.setUpdater(userId.toString());
-            answerDO.setQstContext(qst.getQstContext());
-            answerDO.setQstId(qst.getId());
-            anAnswerDOS.add(answerDO);
+            detailDO.setAnswer(item.getAnswer());
+            detailDO.setBelongSurveyId(qst.getBelongSurveyId());
+            detailDO.setQstType(item.getQstType());
+            detailDO.setCreator(userId.toString());
+            detailDO.setUpdater(userId.toString());
+            detailDO.setQstContext(qst.getQstContext());
+            detailDO.setQstId(qst.getId());
+            anAnswerDOS.add(detailDO);
         }
         return anAnswerDOS;
     }
+
+    default List<SurveyAnswerRespVO> convertList(Map<Long, TreatmentSurveyDO> treatmentSurveyDOMap, List<SurveyAnswerDO> answerDOS) {
+        List<SurveyAnswerRespVO> respVOS = new ArrayList<>();
+        for (SurveyAnswerDO item : answerDOS) {
+            SurveyAnswerRespVO res = convert(item);
+            res.setSurveyId(item.getBelongSurveyId());
+            TreatmentSurveyDO temp = treatmentSurveyDOMap.get(item.getBelongSurveyId());
+            res.setTitle(temp.getTitle());
+            res.setSurveyType(temp.getSurveyType());
+            respVOS.add(res);
+        }
+        return respVOS;
+    }
+
+    SurveyAnswerRespVO convert(SurveyAnswerDO surveyAnswerDO);
+
 }
