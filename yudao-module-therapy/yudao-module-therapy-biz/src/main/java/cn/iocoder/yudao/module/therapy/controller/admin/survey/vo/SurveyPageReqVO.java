@@ -27,7 +27,7 @@ public class SurveyPageReqVO extends PageParam {
      * 标签,逗号分割
      */
     @Schema(description = "标签", example = "心理类")
-    private String tags;
+    private String tag;
 
     /**
      * 类型

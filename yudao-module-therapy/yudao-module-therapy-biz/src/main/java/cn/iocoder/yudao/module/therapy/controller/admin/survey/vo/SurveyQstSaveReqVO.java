@@ -3,7 +3,9 @@ package cn.iocoder.yudao.module.therapy.controller.admin.survey.vo;
 import cn.iocoder.boot.module.therapy.enums.SurveyQuestionType;
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -18,19 +20,14 @@ public class SurveyQstSaveReqVO {
      */
     @Schema(description = "题目", example = "你喜欢什么水果",requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "题目不能为空")
-    private String qstTitle;
+    private String title;
 
-    /**
-     * 问题描述
-     */
-    @Schema(description = "题目描述", example = "你喜欢什么水果",requiredMode = Schema.RequiredMode.REQUIRED)
-    private String qstDesc;
 
     /**
      * 是否必答题
      */
     @Schema(description = "是否必答题", example = "true",requiredMode = Schema.RequiredMode.REQUIRED)
-    private boolean isRequired;
+    private boolean required;
 
     /**
      * 问题类型
@@ -45,5 +42,6 @@ public class SurveyQstSaveReqVO {
      */
     @Schema(description = "题干,json化字符串", example = "苹果,香蕉...",requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "题干不能为空")
-    private JSONObject qstContext;
+    @JsonDeserialize
+    private JSONArray qstContext;
 }

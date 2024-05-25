@@ -1,12 +1,15 @@
 package cn.iocoder.yudao.module.therapy.service;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyAnswerPageReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyPageReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveySaveReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface SurveyService {
@@ -45,4 +48,8 @@ public interface SurveyService {
     List<QuestionDO> getQuestionBySurveyId(Long id);
 
     void submitSurvey(SubmitSurveyReqVO reqVO);
+
+    PageResult<SurveyAnswerDO> getSurveyAnswerPage(SurveyAnswerPageReqVO vo);
+
+    List<TreatmentSurveyDO> getSurveyByIds(Collection<Long> ids);
 }

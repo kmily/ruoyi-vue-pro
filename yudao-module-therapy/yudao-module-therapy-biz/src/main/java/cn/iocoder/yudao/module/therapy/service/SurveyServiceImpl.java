@@ -1,15 +1,19 @@
 package cn.iocoder.yudao.module.therapy.service;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyAnswerPageReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyPageReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveySaveReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.convert.SurveyConvert;
-import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnAnswerDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
-import cn.iocoder.yudao.module.therapy.dal.mysql.survey.SurveyAnAnswerMapper;
+import cn.iocoder.yudao.module.therapy.dal.mysql.survey.SurveyAnswerMapper;
+import cn.iocoder.yudao.module.therapy.dal.mysql.survey.SurveyAnswerDetailMapper;
 import cn.iocoder.yudao.module.therapy.dal.mysql.survey.SurveyQuestionMapper;
 import cn.iocoder.yudao.module.therapy.dal.mysql.survey.TreatmentSurveyMapper;
 import lombok.var;
@@ -32,9 +36,10 @@ public class SurveyServiceImpl implements SurveyService {
     private TreatmentSurveyMapper treatmentSurveyMapper;
     @Resource
     private SurveyQuestionMapper surveyQuestionMapper;
-
     @Resource
-    private SurveyAnAnswerMapper surveyAnAnswerMapper;
+    private SurveyAnswerMapper surveyAnswerMapper;
+    @Resource
+    private SurveyAnswerDetailMapper surveyAnswerDetailMapper;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -92,6 +97,7 @@ public class SurveyServiceImpl implements SurveyService {
         return surveyQuestionMapper.selectBySurveyId(id);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void submitSurvey(SubmitSurveyReqVO reqVO) {
         //判断问卷是否存在，状态是否正常
@@ -106,10 +112,24 @@ public class SurveyServiceImpl implements SurveyService {
         if (qst2Set.size() > 0) {
             throw exception(SURVEY_EXISTS_UNFINISHED);
         }
-
-        //保存答案
+        //保存一次回答
+        SurveyAnswerDO answerDO=new SurveyAnswerDO();
+        answerDO.setSource(reqVO.getSource());
+        answerDO.setBelongSurveyId(tsDO.getId());
+        surveyAnswerMapper.insert(answerDO);
+        //保存答案明细
         Map<Long, QuestionDO> qstMap = CollectionUtils.convertMap(qst, QuestionDO::getId);
-        List<AnAnswerDO> anAnswerDOS = SurveyConvert.INSTANCE.convert(qstMap, reqVO.getQstList(), getLoginUserId());
-        surveyAnAnswerMapper.insertBatch(anAnswerDOS);
+        List<AnswerDetailDO> anAnswerDOS = SurveyConvert.INSTANCE.convert(qstMap, reqVO.getQstList(), getLoginUserId());
+        surveyAnswerDetailMapper.insertBatch(anAnswerDOS);
+    }
+
+    @Override
+    public PageResult<SurveyAnswerDO> getSurveyAnswerPage(SurveyAnswerPageReqVO vo) {
+        return surveyAnswerMapper.selectPage(vo);
+    }
+
+    @Override
+    public List<TreatmentSurveyDO> getSurveyByIds(Collection<Long> ids) {
+        return treatmentSurveyMapper.selectBatchIds(ids);
     }
 }
