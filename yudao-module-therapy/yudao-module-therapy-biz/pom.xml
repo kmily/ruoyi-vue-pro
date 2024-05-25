@@ -36,6 +36,10 @@
             <version>${revision}</version>
         </dependency>
         <dependency>
+            <groupId>cn.bigmodel.openapi</groupId>
+            <artifactId>oapi-java-sdk</artifactId>
+        </dependency>
+        <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-member-api</artifactId>
             <version>${revision}</version>
