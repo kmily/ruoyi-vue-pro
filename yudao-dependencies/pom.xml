@@ -620,6 +620,13 @@
                 <version>${xercesImpl.version}</version>
             </dependency>
 
+            <!--   回龙观医院-青少年抑郁症项目   -->
+            <dependency>
+                <groupId>cn.bigmodel.openapi</groupId>
+                <artifactId>oapi-java-sdk</artifactId>
+                <version>release-V4-2.0.2</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

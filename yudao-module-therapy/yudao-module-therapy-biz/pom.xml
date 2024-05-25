@@ -35,6 +35,10 @@
             <artifactId>yudao-module-therapy-api</artifactId>
             <version>${revision}</version>
         </dependency>
+        <dependency>
+            <groupId>cn.bigmodel.openapi</groupId>
+            <artifactId>oapi-java-sdk</artifactId>
+        </dependency>
     </dependencies>
     <modelVersion>4.0.0</modelVersion>
 
