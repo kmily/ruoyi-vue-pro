@@ -32,4 +32,5 @@ public interface TreatmentInstanceMapper extends BaseMapperX<TreatmentInstanceDO
                         TreatmentInstanceDO.TreatmentStatus.INITIATED.getValue(),
                         TreatmentInstanceDO.TreatmentStatus.IN_PROGRESS.getValue()));
     }
+
 }

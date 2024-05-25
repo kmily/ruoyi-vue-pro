@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.therapy.dal.dataobject.definition;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.common.JsonFieldAccessible;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -14,7 +15,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TreatmentFlowDO extends BaseDO {
+public class TreatmentFlowDO extends BaseDO  implements JsonFieldAccessible {
 
     /**
      * 治疗流程ID
