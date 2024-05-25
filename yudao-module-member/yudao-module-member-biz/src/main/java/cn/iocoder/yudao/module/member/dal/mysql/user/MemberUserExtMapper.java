@@ -1,7 +1,8 @@
-package cn.iocoder.yudao.module.therapy.dal.mysql.definition;
+package cn.iocoder.yudao.module.member.dal.mysql.user;
+
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.module.therapy.dal.dataobject.user.MemberUserExtDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserExtDO;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.controller.admin.user;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -12,6 +13,7 @@ import cn.iocoder.yudao.module.member.dal.dataobject.group.MemberGroupDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.tag.MemberTagDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserExtDO;
 import cn.iocoder.yudao.module.member.enums.point.MemberPointBizTypeEnum;
 import cn.iocoder.yudao.module.member.service.group.MemberGroupService;
 import cn.iocoder.yudao.module.member.service.level.MemberLevelService;
@@ -94,7 +96,10 @@ public class MemberUserController {
     @PreAuthorize("@ss.hasPermission('member:user:query')")
     public CommonResult<MemberUserRespVO> getUser(@RequestParam("id") Long id) {
         MemberUserDO user = memberUserService.getUser(id);
-        return success(MemberUserConvert.INSTANCE.convert03(user));
+        MemberUserExtDO extDO= memberUserService.getUserExtInfo(id);
+        MemberUserRespVO respVO=MemberUserConvert.INSTANCE.convert03(user);
+        BeanUtil.copyProperties(extDO,respVO);
+        return success(respVO);
     }
 
     @GetMapping("/page")

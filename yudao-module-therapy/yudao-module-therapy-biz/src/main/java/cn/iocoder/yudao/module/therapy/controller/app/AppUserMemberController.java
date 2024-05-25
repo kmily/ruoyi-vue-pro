@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.therapy.controller.app;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.therapy.controller.app.VO.AppMemberUserSetAppointmentTimeReqVO;
-import cn.iocoder.yudao.module.therapy.service.UserService;
+import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -32,12 +32,12 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 public class AppUserMemberController {
 
     @Resource
-    private UserService userService;
+    private TreatmentService treatmentService;
 
     @PostMapping("/set-appointment-time")
     @Operation(summary = "设置预约时间")
     public CommonResult<Boolean> setAppointmentTime(@RequestBody @Valid AppMemberUserSetAppointmentTimeReqVO reqVO) {
-        userService.setAppointmentTime(getLoginUserId(),reqVO);
+        treatmentService.setAppointmentTime(getLoginUserId(),reqVO);
         return success(true);
     }
 }
