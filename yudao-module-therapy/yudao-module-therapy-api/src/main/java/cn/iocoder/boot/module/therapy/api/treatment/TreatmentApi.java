@@ -1,4 +1,4 @@
-package cn.iocoder.boot.api.treatment;
+package cn.iocoder.boot.module.therapy.api.treatment;
 
 
 public interface TreatmentApi {

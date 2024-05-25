@@ -1,9 +1,17 @@
 #!/bin/bash
 
+
+#接收传入一个参数，如果参数不为空就部署参数设置分支，否则部署默认分支
+if [ -n "$1" ]; then
+  branch=$1
+else
+  branch="test"
+fi
+
 # Step 1: 拉取最新代码
 echo "Step 1: 正在拉取最新代码..."
 cd /home/www/hospital_mdd
-git checkout dev
+git checkout $branch
 git pull
 if [ $? -ne 0 ]; then
   echo "拉取最新代码失败，请检查网络连接或者项目地址是否正确。"
@@ -34,7 +42,7 @@ if [ ! -d "$deploy_dir" ]; then
 fi
 
 echo "正在复制项目到部署目录..."
-cp -P -r /home/www/hospital_mdd/yudao-server/target/yudao-server.jar "$deploy_dir"
+cp -P -r -a /home/www/hospital_mdd/yudao-server/target/. "$deploy_dir"
 if [ $? -ne 0 ]; then
   echo "复制项目文件失败，请检查文件路径和权限。"
   exit 1
@@ -62,7 +70,27 @@ fi
 # Step 4: 启动项目
 echo "Step 4: 正在启动项目..."
 cd "$deploy_dir"
-nohup java -jar yudao-server.jar > server.log 2>&1 &
+nohup java -DLOG_FILE=./logs/yudao-server.log -jar yudao-server.jar --spring.profiles.active=dev > server.log 2>&1 &
+
 echo "项目启动中..."
 
-echo "部署完成。"
+# Step 5: 检查项目启动状态
+echo "Step 5: 正在检查项目启动状态..."
+#动态判断是否启动成功，最长 30s
+for i in {1..30}
+do
+  echo "正在检查项目启动状态，第 $i 次..."
+  sleep 5s
+  pid=$(pgrep -f "java.*yudao-server.jar")
+  if [ -n "$pid" ]; then
+    echo "项目启动成功，PID: $pid"
+    break
+  fi
+done
+
+pid=$(pgrep -f "java.*yudao-server.jar")
+#如果 PID 为空，说明项目启动失败
+if [ -z "$pid" ]; then
+  echo "项目启动失败，请查看日志文件 server.log 进行排查。"
+  exit 1
+fi

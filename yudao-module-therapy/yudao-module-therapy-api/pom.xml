@@ -11,6 +11,12 @@
 
     <artifactId>yudao-module-therapy-api</artifactId>
     <version>${revision}</version>
+    <dependencies>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-common</artifactId>
+        </dependency>
+    </dependencies>
 
 
 </project>

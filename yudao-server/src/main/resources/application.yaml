@@ -244,6 +244,10 @@ yudao:
       - rep_demo_jianpiao
       - tmp_report_data_1
       - tmp_report_data_income
+      - hlgyy_treatment_survey
+      - hlgyy_servey_Answer
+      - hlgyy_survey_question
+      - hlgyy_answer_detail
   sms-code: # 短信验证码相关的配置项
     expire-times: 10m
     send-frequency: 1m
