@@ -30,6 +30,7 @@ import static cn.iocoder.boot.enums.ErrorCodeConstants.SURVEY_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 
 @Tag(name = "管理后台 - 治疗问卷")
@@ -93,13 +94,14 @@ public class SurveyController {
     }
 
     @GetMapping("/getSurveyAnswerPage")
-    @Parameter(name = "userId", description = "患者id", required = true, example = "1024")
     @Operation(summary = "获得患者答题列表")
     public CommonResult<PageResult<SurveyAnswerRespVO>> getSurveyAnswerPage(@Valid SurveyAnswerPageReqVO reqVO) {
+        reqVO.setUserId(getLoginUserId());
         PageResult<SurveyAnswerDO> pageResult = surveyService.getSurveyAnswerPage(reqVO);
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(new PageResult<>(pageResult.getTotal()));
         }
+
         Set<Long> surveyIds = pageResult.getList().stream()
                 .map(SurveyAnswerDO::getBelongSurveyId)
                 .collect(Collectors.toSet());

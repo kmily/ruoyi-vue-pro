@@ -13,6 +13,6 @@ public class SurveyAnswerPageReqVO extends PageParam {
     /**
      * 一次答题ID
      */
-    @Schema(description = "患者ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "患者ID",  example = "1")
     private Long userId;
 }
