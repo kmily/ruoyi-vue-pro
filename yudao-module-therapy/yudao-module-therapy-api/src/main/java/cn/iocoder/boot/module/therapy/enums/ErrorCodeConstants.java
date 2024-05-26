@@ -1,4 +1,4 @@
-package cn.iocoder.boot.enums;
+package cn.iocoder.boot.module.therapy.enums;
 
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 
@@ -14,7 +14,7 @@ public interface ErrorCodeConstants {
     ErrorCode SURVEY_EXISTS_UNFINISHED = new ErrorCode(1_040_001_001, "有必答题没有未成");
     ErrorCode SURVEY_QUESTION_NOT_EXISTS = new ErrorCode(1_040_001_002, "问卷中不存这个题目");
     ErrorCode SURVEY_QUESTION_TYPE_CHANGE = new ErrorCode(1_040_001_003, "题目类型发生变更,请重新答题");
-
+    ErrorCode SURVEY_QUESTION_EMPTY = new ErrorCode(1_040_001_004, "问卷题目不能为空,请设置题目后提交");
     // ========== 治疗方案相关 1-040-002-000 ==========
     ErrorCode AUTH_LOGIN_BAD_CREDENTIALS = new ErrorCode(1_004_003_000, "登录失败，账号密码不正确");
     ErrorCode AUTH_LOGIN_USER_DISABLED = new ErrorCode(1_004_003_001, "登录失败，账号被禁用");
