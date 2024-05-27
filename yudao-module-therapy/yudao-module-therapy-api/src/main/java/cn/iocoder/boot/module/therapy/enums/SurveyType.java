@@ -15,8 +15,8 @@ import java.util.Objects;
 @AllArgsConstructor
 public enum SurveyType implements IntArrayValuable {
 
-    QUESTIONS(1, "问答"),
-    INTRODUCTION(2, "引导语"),
+    SCALE(1, "量表","scale"),
+    INTRODUCTION(2, "引导语",""),
     ;
 
     /**
@@ -27,6 +27,8 @@ public enum SurveyType implements IntArrayValuable {
      * 标题
      */
     private final String title;
+
+    private final String code;
 
 
     public static SurveyType getByType(Integer type) {

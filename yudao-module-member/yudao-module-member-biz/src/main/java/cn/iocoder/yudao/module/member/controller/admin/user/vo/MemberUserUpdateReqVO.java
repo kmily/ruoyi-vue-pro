@@ -17,4 +17,32 @@ public class MemberUserUpdateReqVO extends MemberUserBaseVO {
     @NotNull(message = "编号不能为空")
     private Long id;
 
+    /**
+     * 父母教育程序
+     */
+    @Schema(description = "父母教育程序",  example = "1")
+    private Integer parentEduType;
+    /**
+     * 学业情况
+     */
+    @Schema(description = "学业情况",  example = "2")
+    private Integer studyState;
+    /**
+     * 父母婚姻情况
+     */
+    @Schema(description = "父母婚姻情况",  example = "2")
+    private Integer parentMaritalState;
+    /**
+     * 生活状况
+     */
+    @Schema(description = "生活状况",  example = "3")
+    private Integer livingState;
+    /**
+     * 父母详细居住类型
+     */
+    @Schema(description = "父母详细居住类型",  example = "3")
+    private Integer parentLiveAreaType;
+
+
+
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.api.user;
 
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserExtDTO;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
@@ -42,6 +43,21 @@ public class MemberUserApiImpl implements MemberUserApi {
     @Override
     public MemberUserRespDTO getUserByMobile(String mobile) {
         return MemberUserConvert.INSTANCE.convert2(userService.getUserByMobile(mobile));
+    }
+
+    @Override
+    public MemberUserExtDTO getUserExtInfo(Long userId) {
+        return MemberUserConvert.INSTANCE.convert(userService.getUserExtInfo(userId));
+    }
+
+    @Override
+    public void saveUserExtInfo(MemberUserExtDTO dto) {
+        userService.saveUserExtInfo(dto);
+    }
+
+    @Override
+    public void updateMemberExtByUserId(MemberUserExtDTO dto) {
+        userService.updateMemberExtByUserId(dto);
     }
 
 }

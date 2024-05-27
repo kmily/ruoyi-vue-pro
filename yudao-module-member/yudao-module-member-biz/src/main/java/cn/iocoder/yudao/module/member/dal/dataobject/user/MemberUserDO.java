@@ -149,4 +149,9 @@ public class MemberUserDO extends TenantBaseDO {
      */
     private Integer eduType;
 
+    /**
+     * 患者详细地址
+     */
+    private String addresses;
+
 }

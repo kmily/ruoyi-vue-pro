@@ -3,10 +3,12 @@ package cn.iocoder.yudao.module.member.service.user;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserExtDTO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.*;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserExtDO;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -195,4 +197,8 @@ public interface MemberUserService {
      */
     MemberUserDO createUserByAdmin(String mobile, String pwd,String registerIp, Integer terminal);
 
+    MemberUserExtDO getUserExtInfo(Long userId);
+
+    void saveUserExtInfo(MemberUserExtDTO dto);
+    void updateMemberExtByUserId(MemberUserExtDTO dto);
 }

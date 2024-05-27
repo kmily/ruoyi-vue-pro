@@ -23,6 +23,10 @@ public class SurveyAnswerDO extends BaseDO {
      */
     @TableId
     private Long id;
+    /**
+     * 编码
+     */
+    private String belongSurveyCode;
 
     /**
      * 所属问卷
@@ -32,6 +36,7 @@ public class SurveyAnswerDO extends BaseDO {
 
     /**
      * 答题来源
+     * 字典：survey_answer_source
      */
     private Integer source;
 

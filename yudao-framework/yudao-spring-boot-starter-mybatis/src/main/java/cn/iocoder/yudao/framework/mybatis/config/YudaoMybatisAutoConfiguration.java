@@ -2,9 +2,11 @@ package cn.iocoder.yudao.framework.mybatis.config;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.mybatis.core.handler.DefaultDBFieldHandler;
+import cn.iocoder.yudao.framework.mybatis.core.injector.MpSqlInjector;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.incrementer.IKeyGenerator;
+import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.baomidou.mybatisplus.extension.incrementer.*;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
@@ -58,6 +60,11 @@ public class YudaoMybatisAutoConfiguration {
         }
         // 找不到合适的 IKeyGenerator 实现类
         throw new IllegalArgumentException(StrUtil.format("DbType{} 找不到合适的 IKeyGenerator 实现类", dbType));
+    }
+
+    @Bean
+    public ISqlInjector sqlInjector(){
+        return new MpSqlInjector();
     }
 
 }

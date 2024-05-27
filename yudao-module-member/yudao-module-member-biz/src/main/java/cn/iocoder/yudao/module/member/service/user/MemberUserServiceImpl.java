@@ -8,12 +8,15 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserExtDTO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.*;
 import cn.iocoder.yudao.module.member.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserExtDO;
+import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserExtMapper;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
 import cn.iocoder.yudao.module.member.mq.producer.user.MemberUserProducer;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
@@ -35,6 +38,7 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
@@ -65,6 +69,9 @@ public class MemberUserServiceImpl implements MemberUserService {
     @Resource
     private MemberUserProducer memberUserProducer;
 
+    @Resource
+    private MemberUserExtMapper memberUserExtMapper;
+
     @Override
     public MemberUserDO getUserByMobile(String mobile) {
         return memberUserMapper.selectByMobile(mobile);
@@ -84,31 +91,46 @@ public class MemberUserServiceImpl implements MemberUserService {
             return user;
         }
         // 用户不存在，则进行创建
-        return createUser(mobile, null, null, registerIp, terminal,null);
+        return createUser(mobile, null, null, registerIp, terminal, null);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public MemberUserDO createUserByAdmin(String mobile, String pwd,String registerIp, Integer terminal) {
+    public MemberUserDO createUserByAdmin(String mobile, String pwd, String registerIp, Integer terminal) {
         // 用户已经存在
         MemberUserDO user = memberUserMapper.selectByMobile(mobile);
         if (user != null) {
             return user;
         }
         // 用户不存在，则进行创建
-        return createUser(mobile, null, null, registerIp, terminal,pwd);
+        return createUser(mobile, null, null, registerIp, terminal, pwd);
+    }
+
+    @Override
+    public MemberUserExtDO getUserExtInfo(Long userId) {
+        return memberUserExtMapper.selectById(userId);
+    }
+
+    @Override
+    public void saveUserExtInfo(MemberUserExtDTO dto) {
+        memberUserExtMapper.insert(MemberUserConvert.INSTANCE.convert(dto));
+    }
+
+    @Override
+    public void updateMemberExtByUserId(MemberUserExtDTO dto) {
+        memberUserExtMapper.updateById(MemberUserConvert.INSTANCE.convert(dto));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public MemberUserDO createUser(String nickname, String avtar, String registerIp, Integer terminal) {
-        return createUser(null, nickname, avtar, registerIp, terminal,null);
+        return createUser(null, nickname, avtar, registerIp, terminal, null);
     }
 
     private MemberUserDO createUser(String mobile, String nickname, String avtar,
-                                    String registerIp, Integer terminal,String pwd) {
+                                    String registerIp, Integer terminal, String pwd) {
         // 生成密码
-        String password = StringUtils.isNotBlank(pwd)?pwd: IdUtil.fastSimpleUUID();
+        String password = StringUtils.isNotBlank(pwd) ? pwd : IdUtil.fastSimpleUUID();
         // 插入用户
         MemberUserDO user = new MemberUserDO();
         user.setMobile(mobile);
@@ -255,6 +277,16 @@ public class MemberUserServiceImpl implements MemberUserService {
         // 更新
         MemberUserDO updateObj = MemberUserConvert.INSTANCE.convert(updateReqVO);
         memberUserMapper.updateById(updateObj);
+        MemberUserExtDO extDO = MemberUserConvert.INSTANCE.convertExtDO(updateReqVO);
+        extDO.setCreateTime(LocalDateTime.now());
+        extDO.setUpdateTime(extDO.getCreateTime());
+        extDO.setUserId(updateObj.getId());
+        MemberUserExtDO oldExtDO = memberUserExtMapper.selectById(updateReqVO.getId());
+        if (Objects.isNull(oldExtDO)) {
+            memberUserExtMapper.insert(extDO);
+        } else {
+            memberUserExtMapper.updateById(extDO);
+        }
     }
 
     @VisibleForTesting

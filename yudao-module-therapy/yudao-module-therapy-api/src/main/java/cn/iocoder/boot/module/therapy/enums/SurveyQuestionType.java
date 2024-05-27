@@ -15,17 +15,17 @@ import java.util.Objects;
 @AllArgsConstructor
 public enum SurveyQuestionType implements IntArrayValuable {
 
-    RADIO(1, "单选题"),
-    CHECKBOX(2, "多选题"),
-    FILLBLANK(3,"填空题"),
-    INTRODUCTION(4,"引导语"),
-    SCALE(5,"量表"),
-    ;
+    RADIO(1,"radio", "单选题"),
+    CHECKBOX(2,"checkbox", "多选题"),
+//    FILLBLANK("3", "填空题"),
+    TREE(3,"tree", "树");
 
     /**
      * 业务类型
      */
     private final int type;
+
+    private final String code;
     /**
      * 标题
      */
@@ -36,7 +36,14 @@ public enum SurveyQuestionType implements IntArrayValuable {
         return EnumUtil.getBy(SurveyQuestionType.class,
                 e -> Objects.equals(type, e.getType()));
     }
+
+    public static SurveyQuestionType getByCode(String code) {
+        return EnumUtil.getBy(SurveyQuestionType.class,
+                e -> Objects.equals(code, e.getCode()));
+    }
+
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(SurveyQuestionType::getType).toArray();
+
     @Override
     public int[] array() {
         return ARRAYS;

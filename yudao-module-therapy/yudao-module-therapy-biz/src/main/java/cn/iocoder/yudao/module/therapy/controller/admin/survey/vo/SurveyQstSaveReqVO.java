@@ -22,11 +22,16 @@ public class SurveyQstSaveReqVO {
     @NotEmpty(message = "题目不能为空")
     private String title;
 
+    /**
+     * 问题描述
+     */
+    @Schema(description = "问卷描述", example = "这道题主要来了解你最近的心情")
+    private String description;
 
     /**
      * 是否必答题
      */
-    @Schema(description = "是否必答题", example = "true",requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "是否必答题", example = "true",requiredMode = Schema.RequiredMode.REQUIRED,defaultValue = "false")
     private boolean required;
 
     /**
