@@ -37,7 +37,7 @@ import static com.zhipu.oapi.demo.V4OkHttpClientTest.mapStreamToAccumulator;
 @Service
 public class ZhiPuAIChatServiceImpl implements AIChatService {
 
-    @Value("${zhipu.api.key:this-is-a-test-key}")
+    //@Value("${zhipu.api.key:this-is-a-test-key}")
     String API_KEY="7820338e5c0e1d9228f8c2a5e2bf2e0d.EIWUgIkQCoStAnBU";
 
     private ClientV4 client;
