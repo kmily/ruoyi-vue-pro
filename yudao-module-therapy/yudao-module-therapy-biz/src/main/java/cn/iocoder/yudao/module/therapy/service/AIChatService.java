@@ -16,6 +16,6 @@ public interface AIChatService {
     String chat(Long userId, String content);
 
 
-
+    String chatForStream(Long userId, String content);
 
 }
