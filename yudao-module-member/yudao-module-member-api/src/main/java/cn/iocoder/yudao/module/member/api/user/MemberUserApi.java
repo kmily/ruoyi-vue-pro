@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.api.user;
 
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserExtDTO;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 
 import java.util.Collection;
@@ -57,4 +58,10 @@ public interface MemberUserApi {
      * @return 用户信息
      */
     MemberUserRespDTO getUserByMobile(String mobile);
+
+    MemberUserExtDTO getUserExtInfo(Long userId);
+
+    void saveUserExtInfo(MemberUserExtDTO dto);
+
+    void updateMemberExtByUserId(MemberUserExtDTO dto);
 }

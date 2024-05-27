@@ -69,4 +69,10 @@ public class MemberUserBaseVO {
     @InEnum(EducationEnum.class)
     private Integer eduType;
 
+    /**
+     * 患者详细地址
+     */
+    @Schema(description = "患者详细地址",  example = "东三条3")
+    private String addresses;
+
 }

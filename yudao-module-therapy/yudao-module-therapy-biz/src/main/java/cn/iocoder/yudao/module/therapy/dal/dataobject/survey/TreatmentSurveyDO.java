@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.util.List;
@@ -31,9 +32,18 @@ public class TreatmentSurveyDO extends BaseDO {
     private Long id;
 
     /**
+     * 编码
+     */
+    private String code;
+    /**
      * 调查标题
      */
     private String title;
+
+    /**
+     * 问题标题
+     */
+    private String description;
 
     /**
      * 标签

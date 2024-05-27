@@ -32,9 +32,13 @@ public class AnswerDetailDO extends BaseDO {
      * 所属问卷
      */
     private Long belongSurveyId;
+    /**
+     * 所属问卷编码
+     */
+    private String belongSurveyCode;
 
     /**
-     *
+     *对应SurveyAnswerDO::ID
      */
     private Long answerId;
 
@@ -42,6 +46,10 @@ public class AnswerDetailDO extends BaseDO {
      * 所属问卷的题目
      */
     private Long qstId;
+    /**
+     * 所属题目编码
+     */
+    private String belongQstCode;
 
     /**
      * 回答的内容,json格式

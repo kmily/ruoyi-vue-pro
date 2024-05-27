@@ -17,8 +17,8 @@ public interface TreatmentInstanceMapper extends BaseMapperX<TreatmentInstanceDO
         }
         // Else init a new instance
         TreatmentInstanceDO instanceDO = new TreatmentInstanceDO();
-        instanceDO.setUser_id(userId);
-        instanceDO.setFlow_id(treatment.getId());
+        instanceDO.setUserId(userId);
+        instanceDO.setFlowId(treatment.getId());
         instanceDO.setStatus(TreatmentInstanceDO.TreatmentStatus.INITIATED.getValue());
         insert(instanceDO);
         return instanceDO;
@@ -26,10 +26,11 @@ public interface TreatmentInstanceMapper extends BaseMapperX<TreatmentInstanceDO
 
     default List<TreatmentInstanceDO> filterCurrentByUserAndTreatment(Long userId, Long treatmentId){
         return selectList(new LambdaQueryWrapper<TreatmentInstanceDO>()
-                .eq(TreatmentInstanceDO::getUser_id, userId)
-                .eq(TreatmentInstanceDO::getFlow_id, treatmentId)
+                .eq(TreatmentInstanceDO::getUserId, userId)
+                .eq(TreatmentInstanceDO::getFlowId, treatmentId)
                 .in(TreatmentInstanceDO::getStatus,
                         TreatmentInstanceDO.TreatmentStatus.INITIATED.getValue(),
                         TreatmentInstanceDO.TreatmentStatus.IN_PROGRESS.getValue()));
     }
+
 }

@@ -189,6 +189,7 @@ yudao:
       - cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants
       - cn.iocoder.yudao.module.system.enums.ErrorCodeConstants
       - cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants
+      - cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants
   tenant: # 多租户相关配置项
     enable: true
     ignore-urls:
@@ -248,6 +249,7 @@ yudao:
       - hlgyy_servey_Answer
       - hlgyy_survey_question
       - hlgyy_answer_detail
+      - hlgyy_member_user_ext
   sms-code: # 短信验证码相关的配置项
     expire-times: 10m
     send-frequency: 1m
