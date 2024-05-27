@@ -1,17 +1,13 @@
 package cn.iocoder.yudao.module.therapy.service;
 
-import cn.hutool.json.JSON;
 import cn.hutool.json.JSONObject;
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyAnswerPageReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyPageReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveySaveReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.convert.SurveyConvert;
-import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
@@ -26,14 +22,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
-import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.SURVEY_EXISTS_UNFINISHED;
 import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.SURVEY_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Service
 public class SurveyServiceImpl implements SurveyService {
@@ -51,11 +46,6 @@ public class SurveyServiceImpl implements SurveyService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Long createSurvey(SurveySaveReqVO vo) {
-
-//        treatmentSurveyDO.setCreator(getLoginUserId() + "");
-//        treatmentSurveyDO.setUpdater(treatmentSurveyDO.getCreator());
-//        treatmentSurveyDO.setCreateTime(LocalDateTime.now());
-//        treatmentSurveyDO.setUpdateTime(LocalDateTime.now());
         SurveyStrategy surveyStrategy = surveyStrategyFactory.getSurveyStrategy(SurveyType.getByType(vo.getSurveyType()).getCode());
         surveyStrategy.validationReqVO(vo);
 
@@ -85,9 +75,7 @@ public class SurveyServiceImpl implements SurveyService {
         if (Objects.isNull(tsDO)) throw exception(SURVEY_NOT_EXISTS);
         TreatmentSurveyDO treatmentSurveyDO = SurveyConvert.INSTANCE.convert(vo);
         treatmentSurveyDO.setCode(tsDO.getCode());
-//        treatmentSurveyDO.setUpdater(getLoginUserId() + "");
-//        treatmentSurveyDO.setUpdateTime(LocalDateTime.now());
-        treatmentSurveyMapper.updateBatch(treatmentSurveyDO);
+        treatmentSurveyMapper.updateById(treatmentSurveyDO);
 
         //先删除再插入
         surveyQuestionMapper.deleteBySurveyId(vo.getId());

@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class SurveySaveReqVO {
      * 调查标题
      */
     @Schema(description = "问卷名称", example = "身体治疗",requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "问卷名称不能为空")
+    @NotBlank(message = "问卷名称不能为空")
     private String title;
 
     /**
