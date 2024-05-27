@@ -586,11 +586,11 @@
                 </exclusions>
             </dependency>
 
-            <dependency>
-                <groupId>com.github.binarywang</groupId>
-                <artifactId>weixin-java-pay</artifactId>
-                <version>${weixin-java.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.github.binarywang</groupId>-->
+<!--                <artifactId>weixin-java-pay</artifactId>-->
+<!--                <version>${weixin-java.version}</version>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>com.github.binarywang</groupId>
                 <artifactId>wx-java-mp-spring-boot-starter</artifactId>
@@ -603,22 +603,23 @@
             </dependency>
 
             <!-- 积木报表-->
-            <dependency>
-                <groupId>org.jeecgframework.jimureport</groupId>
-                <artifactId>jimureport-spring-boot-starter</artifactId>
-                <version>${jimureport.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.alibaba</groupId>
-                        <artifactId>druid</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>xerces</groupId>
-                <artifactId>xercesImpl</artifactId>
-                <version>${xercesImpl.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.jeecgframework.jimureport</groupId>-->
+<!--                <artifactId>jimureport-spring-boot-starter</artifactId>-->
+<!--                <version>${jimureport.version}</version>-->
+<!--                <exclusions>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>com.alibaba</groupId>-->
+<!--                        <artifactId>druid</artifactId>-->
+<!--                    </exclusion>-->
+<!--                </exclusions>-->
+<!--            </dependency>-->
+
+<!--            <dependency>-->
+<!--                <groupId>xerces</groupId>-->
+<!--                <artifactId>xercesImpl</artifactId>-->
+<!--                <version>${xercesImpl.version}</version>-->
+<!--            </dependency>-->
 
             <!--   回龙观医院-青少年抑郁症项目   -->
             <dependency>
