@@ -43,9 +43,11 @@ public class TreatmentUserProgressDO {
     @TableId
     private Long id;
 
-    private Long user_id;
+    private Long userId;
 
-    private Long day_instance_id;
+    private Long dayInstanceId;
 
-    private int group_seq;
+    private Long dayAgroup;
+
+    private Long treatmentInstanceId;
 }

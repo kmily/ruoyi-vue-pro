@@ -49,17 +49,17 @@ public class TreatmentDayInstanceDO extends BaseDO {
     /**
      * 用户ID
      */
-    private Long user_id;
+    private Long userId;
 
     /**
      * 治疗流程实例ID
      */
-    private Long flow_instance_id;
+    private Long flowInstanceId;
 
     /**
      * 治疗流程Day ID
      */
-    private Long day_id;
+    private Long dayId;
 
     /**
      * 状态

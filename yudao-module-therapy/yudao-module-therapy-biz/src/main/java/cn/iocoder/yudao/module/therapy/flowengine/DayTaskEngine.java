@@ -3,12 +3,14 @@ package cn.iocoder.yudao.module.therapy.flowengine;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.*;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.*;
 import cn.iocoder.yudao.module.therapy.service.common.TreatmentStepItem;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class DayTaskEngine {
 
     @Resource
@@ -33,22 +35,23 @@ public class DayTaskEngine {
      * 构造函数
      * @param userCurrentStep 用户当前的步骤
      */
-    public DayTaskEngine(TreatmentStepItem userCurrentStep) {
+    public DayTaskEngine initWithCurrentStep(TreatmentStepItem userCurrentStep) {
         this.userCurrentStep = userCurrentStep;
         if(userCurrentStep.isStarted()){
             prepareUserCurrentStep();
         }
+        return this;
     }
 
     /**
      * 补充userCurrentStep的数据，增加每个instance所对应的流程模板
      */
     private void prepareUserCurrentStep(){
-        TreatmentFlowDO flowDO = treatmentFlowMapper.selectById(userCurrentStep.getFlowInstance().getFlow_id());
-        TreatmentFlowDayDO flowDayDO = treatmentFlowDayMapper.selectById(userCurrentStep.getDay().getDay_id());
-        if(!flowDayDO.is_break()) {
+        TreatmentFlowDO flowDO = treatmentFlowMapper.selectById(userCurrentStep.getFlowInstance().getFlowId());
+        TreatmentFlowDayDO flowDayDO = treatmentFlowDayMapper.selectById(userCurrentStep.getDay().getDayId());
+        if(!flowDayDO.isBreak()) {
             List<TreatmentDayitemInstanceDO> dayitemInstanceDOs = userCurrentStep.getDay_items();
-            List<Long> ids = dayitemInstanceDOs.stream().map(TreatmentDayitemInstanceDO::getDayitem_id).collect(Collectors.toList());
+            List<Long> ids = dayitemInstanceDOs.stream().map(TreatmentDayitemInstanceDO::getDayitemId).collect(Collectors.toList());
             List<TreatmentFlowDayitemDO> flowDayitemDOs = treatmentFlowDayitemMapper.selectBatchIds(ids);
             userCurrentStep.setFlowDayitemDOs(flowDayitemDOs);
         }
@@ -62,11 +65,11 @@ public class DayTaskEngine {
      */
     private TreatmentStepItem initAndGetFirstStep(){
         TreatmentInstanceDO flowInstanceDO = userCurrentStep.getFlowInstance();
-        Long flowId = flowInstanceDO.getFlow_id();
+        Long flowId = flowInstanceDO.getFlowId();
         TreatmentFlowDayDO firstFlowDayDO = treatmentFlowDayMapper.getFirstFlowDay(flowId);
         TreatmentDayInstanceDO dayInstanceDo = treatmentDayInstanceMapper.
                 initInstance(
-                        flowInstanceDO.getUser_id(),
+                        flowInstanceDO.getUserId(),
                         firstFlowDayDO.getId(),
                         flowId
                 );
@@ -75,13 +78,15 @@ public class DayTaskEngine {
         stepItem.setFlowInstance(flowInstanceDO);
         stepItem.setDay(dayInstanceDo);
         // if not a break day
-        if (!firstFlowDayDO.is_break()) {
-            List<TreatmentFlowDayitemDO> dayitemsDO = treatmentFlowDayitemMapper.getFirstFlowDayitems(firstFlowDayDO.getId());;
+        if (!firstFlowDayDO.isBreak()) {
+            List<TreatmentFlowDayitemDO> dayitemsDO = treatmentFlowDayitemMapper.getFirstGroupFlowDayitems(firstFlowDayDO.getId());;
             List<TreatmentDayitemInstanceDO> dayitemInstancesDO = treatmentDayitemInstanceMapper.initInstances(
-                    flowInstanceDO.getUser_id(),
+                    flowInstanceDO.getUserId(),
+                    dayInstanceDo,
                     dayitemsDO
             );
             stepItem.setDay_items(dayitemInstancesDO);
+            stepItem.setAgroup(dayitemsDO.get(0).getAgroup());
         }
         return stepItem;
     }
@@ -98,12 +103,20 @@ public class DayTaskEngine {
                 stepItem.setEnd(true);
                 return stepItem;
             }
-            List<TreatmentFlowDayitemDO> dayitemsDO = treatmentFlowDayitemMapper.getFirstFlowDayitems(nextDayDO.getId());;
-            List<TreatmentDayitemInstanceDO> dayitemInstancesDO = treatmentDayitemInstanceMapper.initInstances(
-                    userCurrentStep.getFlowInstance().getUser_id(),
-                    dayitemsDO
-            );
-            stepItem.setDay_items(dayitemInstancesDO);
+            stepItem = getNextStepItemOfNextDay(userCurrentStep);
+            // Obsolete, Please remove
+//            TreatmentDayInstanceDO nextDayInstanceDO = treatmentDayInstanceMapper.initInstance(
+//                    userCurrentStep.getFlowInstance().getUserId(),
+//                    nextDayDO.getId(),
+//                    userCurrentStep.getFlowInstance().getId()
+//            );
+//            List<TreatmentFlowDayitemDO> dayitemsDO = treatmentFlowDayitemMapper.getFirstFlowDayitems(nextDayDO.getId());;
+//            List<TreatmentDayitemInstanceDO> dayitemInstancesDO = treatmentDayitemInstanceMapper.initInstances(
+//                    userCurrentStep.getFlowInstance().getUserId(),
+//                    nextDayInstanceDO,
+//                    dayitemsDO
+//            );
+//            stepItem.setDay_items(dayitemInstancesDO);
         }else{
             // same day
             dayInstanceDO.setStatus(TreatmentDayInstanceDO.StatusEnum.IN_PROGRESS.getValue());
@@ -119,15 +132,15 @@ public class DayTaskEngine {
      * @param dayInstanceDO 疗程日实例
      */
     public void updateDayInstanceStatus(TreatmentDayInstanceDO dayInstanceDO){
-        TreatmentFlowDayDO flowDayDO = treatmentFlowDayMapper.selectById(dayInstanceDO.getDay_id());
-        if(flowDayDO.is_break()){
+        TreatmentFlowDayDO flowDayDO = treatmentFlowDayMapper.selectById(dayInstanceDO.getDayId());
+        if(flowDayDO.isBreak()){
             dayInstanceDO.setStatus(TreatmentDayInstanceDO.StatusEnum.COMPLETED.getValue());
             treatmentDayInstanceMapper.updateById(dayInstanceDO);
         }
         List<TreatmentFlowDayitemDO> flowDayitemDOS = treatmentFlowDayitemMapper.filterByDay(flowDayDO.getId());
         List<TreatmentDayitemInstanceDO> treatmentDayitemInstanceDOS = treatmentDayitemInstanceMapper.getUserDayitemInstances(
-                dayInstanceDO.getUser_id(),
-                dayInstanceDO.getFlow_instance_id(),
+                dayInstanceDO.getUserId(),
+                dayInstanceDO.getFlowInstanceId(),
                 flowDayitemDOS
         );
         boolean completed = true;
@@ -153,7 +166,7 @@ public class DayTaskEngine {
             //用户还没有开始
             return initAndGetFirstStep();
         }
-        if(userCurrentStep.getFlowDayDO().is_break()){
+        if(userCurrentStep.getFlowDayDO().isBreak()){
             //用户当前步骤是休息日
             return getBreakDayNextStepItem();
         }else{
@@ -165,7 +178,7 @@ public class DayTaskEngine {
                 // Update Yesterday Status
                 updateDayInstanceStatus(userCurrentStep.getDay()); //更新昨天的状态，TODO 在完成某个任务时更新
 
-                if(treatmentFlowDayitemMapper.hasNextGroup(userCurrentStep.getFlowDayDO().getId(), userCurrentStep.getGroup_seq())){
+                if(treatmentFlowDayitemMapper.hasNextGroup(userCurrentStep.getFlowDayDO().getId(), userCurrentStep.getAgroup())){
                     return getNextStepItemOfCurrentStepItemInSameDay(userCurrentStep);
                 }else{
                     boolean yesterdayDayItemsCompleted = userCurrentStep.getDay().getStatus() == TreatmentDayInstanceDO.StatusEnum.COMPLETED.getValue();
@@ -183,7 +196,7 @@ public class DayTaskEngine {
                 }
             }else{
                 //same day
-                if(treatmentFlowDayitemMapper.hasNextGroup(userCurrentStep.getFlowDayDO().getId(), userCurrentStep.getGroup_seq())){
+                if(treatmentFlowDayitemMapper.hasNextGroup(userCurrentStep.getFlowDayDO().getId(), userCurrentStep.getAgroup())){
                     return getNextStepItemOfCurrentStepItemInSameDay(userCurrentStep);
                 }else{
                     TreatmentStepItem stepItem =  TreatmentStepItem.clone(userCurrentStep);
@@ -197,25 +210,34 @@ public class DayTaskEngine {
 
     private TreatmentStepItem getNextStepItemOfCurrentStepItemInSameDay(TreatmentStepItem userCurrentStep){
         TreatmentFlowDayDO dayDO = userCurrentStep.getFlowDayDO();
-        List<TreatmentFlowDayitemDO> dayitemDOs = treatmentFlowDayitemMapper.getNextGroup(dayDO.getId(), userCurrentStep.getGroup_seq());
+        List<TreatmentFlowDayitemDO> dayitemDOs = treatmentFlowDayitemMapper.getNextGroup(dayDO.getId(), userCurrentStep.getAgroup());
         List<TreatmentDayitemInstanceDO> dayitemInstanceDOs = treatmentDayitemInstanceMapper.initInstances(
-                userCurrentStep.getFlowInstance().getUser_id(),
+                userCurrentStep.getFlowInstance().getUserId(),
+                userCurrentStep.getDay(),
                 dayitemDOs
         );
         TreatmentStepItem stepItem = TreatmentStepItem.clone(userCurrentStep);
         stepItem.setDay_items(dayitemInstanceDOs);
+        stepItem.setAgroup(dayitemDOs.get(0).getAgroup());
         return stepItem;
     }
 
     private TreatmentStepItem getNextStepItemOfNextDay(TreatmentStepItem userCurrentStep){
         TreatmentFlowDayDO nextDayDO = treatmentFlowDayMapper.getNextFlowDay(userCurrentStep.getFlowDayDO());
         TreatmentStepItem stepItem = TreatmentStepItem.clone(userCurrentStep);
-        List<TreatmentFlowDayitemDO> dayitemDOS = treatmentFlowDayitemMapper.getFirstFlowDayitems(nextDayDO.getId());;
+        List<TreatmentFlowDayitemDO> dayitemDOS = treatmentFlowDayitemMapper.getFirstGroupFlowDayitems(nextDayDO.getId());;
+        TreatmentDayInstanceDO nextDayInstanceDO = treatmentDayInstanceMapper.initInstance(
+                userCurrentStep.getFlowInstance().getUserId(),
+                nextDayDO.getId(),
+                userCurrentStep.getFlowInstance().getId()
+        );
         List<TreatmentDayitemInstanceDO> dayitemInstancesDO = treatmentDayitemInstanceMapper.initInstances(
-                userCurrentStep.getFlowInstance().getUser_id(),
+                userCurrentStep.getFlowInstance().getUserId(),
+                nextDayInstanceDO,
                 dayitemDOS
         );
         stepItem.setDay_items(dayitemInstancesDO);
+        stepItem.setAgroup(dayitemDOS.get(0).getAgroup());
         return stepItem;
     }
 }

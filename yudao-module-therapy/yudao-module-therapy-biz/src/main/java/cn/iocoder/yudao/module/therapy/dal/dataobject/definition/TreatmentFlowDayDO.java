@@ -21,7 +21,7 @@ public class TreatmentFlowDayDO extends BaseDO {
     /**
      * TreatmentFlowDO 的 id
      */
-    private Long flow_id;
+    private Long flowId;
 
     /**
      * 名称
@@ -36,7 +36,7 @@ public class TreatmentFlowDayDO extends BaseDO {
     /**
      * 是否休息日
      */
-    private boolean is_break;
+    private boolean isBreak;
 
     private Integer sequence;
 }

@@ -11,9 +11,10 @@ import java.util.List;
 @Mapper
 public interface TreatmentFlowDayitemMapper extends BaseMapperX<TreatmentFlowDayitemDO> {
 
-    default List<TreatmentFlowDayitemDO> getFirstFlowDayitems(Long dayId) {
+    default List<TreatmentFlowDayitemDO> getFirstGroupFlowDayitems(Long dayId) {
+        Long agroup = selectOne(new QueryWrapper<TreatmentFlowDayitemDO>().eq("day_id", dayId).orderByAsc("agroup").last("limit 1")).getAgroup();
         QueryWrapper<TreatmentFlowDayitemDO> queryWrapper = new QueryWrapper();
-        queryWrapper = queryWrapper.eq("day_id", dayId).orderByAsc("group_seq");
+        queryWrapper = queryWrapper.eq("day_id", dayId).eq("agroup", agroup);
         return selectList(queryWrapper);
     }
 
@@ -23,23 +24,33 @@ public interface TreatmentFlowDayitemMapper extends BaseMapperX<TreatmentFlowDay
         return selectList(queryWrapper);
     }
 
-    default boolean hasNextGroup(Long dayId, Integer groupSeq) {
+    default boolean hasNextGroup(Long dayId, Long agroup) {
         QueryWrapper<TreatmentFlowDayitemDO> queryWrapper = new QueryWrapper();
-        queryWrapper = queryWrapper.eq("day_id", dayId).gt("group_seq", groupSeq)
-                .orderByAsc("group_seq").last("limit 1");
+        queryWrapper = queryWrapper.eq("day_id", dayId).gt("agroup", agroup)
+                .orderByAsc("agroup").last("limit 1");
         return selectCount(queryWrapper) > 0;
     }
 
-    default List<TreatmentFlowDayitemDO> getNextGroup(Long dayId, Integer groupSeq) {
+    /**
+     * 获取当天下一组的所有任务
+     * @param dayId
+     * @param agroup
+     * @return
+     */
+    default List<TreatmentFlowDayitemDO> getNextGroup(Long dayId, Long agroup) {
         QueryWrapper<TreatmentFlowDayitemDO> queryWrapper = new QueryWrapper();
-        queryWrapper = queryWrapper.eq("day_id", dayId).gt("group_seq", groupSeq)
+        Long nextAgroup = selectOne(new QueryWrapper<TreatmentFlowDayitemDO>()
+                .eq("day_id", dayId)
+                .gt("agroup", agroup)
+                .orderByAsc("agroup").last("limit 1")).getAgroup();
+        queryWrapper = queryWrapper.eq("day_id", dayId).eq("agroup", nextAgroup)
                 .orderByAsc("group_seq");
         return selectList(queryWrapper);
     }
 
-    default List<TreatmentFlowDayitemDO> selectGroupItems(Long dayId, Integer groupSeq) {
+    default List<TreatmentFlowDayitemDO> selectGroupItems(Long dayId, Long agroup) {
         QueryWrapper<TreatmentFlowDayitemDO> queryWrapper = new QueryWrapper();
-        queryWrapper = queryWrapper.eq("day_id", dayId).eq("group_seq", groupSeq);
+        queryWrapper = queryWrapper.eq("day_id", dayId).eq("agroup", agroup).orderByAsc("group_seq");
         return selectList(queryWrapper);
     }
 }

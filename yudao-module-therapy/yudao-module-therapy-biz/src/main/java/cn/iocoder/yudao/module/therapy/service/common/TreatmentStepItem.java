@@ -20,7 +20,7 @@ public class TreatmentStepItem {
     private TreatmentInstanceDO flowInstance; // 当前流程实例
     private boolean isStarted = true;  // 用户是否已经开始整体的流程
     private boolean isEnd = false;  // 用户是否已经结束整体的流程
-    private int group_seq; // 当前组的序号
+    private long Agroup = -1; // 当前组的序号
     private ProcessStatus processStatus = ProcessStatus.IS_NEXT;
 
     // For DayTaskEngine usage only
@@ -34,7 +34,7 @@ public class TreatmentStepItem {
         newItem.setDay(item.getDay());
         newItem.setFlowInstance(item.getFlowInstance());
         newItem.setStarted(item.isStarted());
-        newItem.setGroup_seq(item.getGroup_seq());
+        newItem.setAgroup(item.getAgroup());
         return newItem;
     }
 }

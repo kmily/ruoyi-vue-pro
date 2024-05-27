@@ -35,13 +35,28 @@
             <artifactId>yudao-module-therapy-api</artifactId>
             <version>${revision}</version>
         </dependency>
+        <!-- Flowable 工作流相关 -->
         <dependency>
             <groupId>org.flowable</groupId>
-            <artifactId>flowable-engine</artifactId>
-            <version>7.0.0</version>
-            <scope>compile</scope>
+            <artifactId>flowable-spring-boot-starter-process</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring-boot-starter-actuator</artifactId>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>9</source>
+                    <target>9</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>yudao-module-therapy-biz</artifactId>

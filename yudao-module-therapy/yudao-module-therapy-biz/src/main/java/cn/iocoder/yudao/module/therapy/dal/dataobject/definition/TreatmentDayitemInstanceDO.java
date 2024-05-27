@@ -44,16 +44,18 @@ public class TreatmentDayitemInstanceDO extends BaseDO {
     @TableId
     private Long id;
 
-    private Long flow_instance_id;
+    private Long flowInstanceId;
 
-    private Long day_instance_id;
+    private Long dayInstanceId;
 
-    private Long dayitem_id;
+    private Long dayitemId;
 
     private int status;
 
-    private Long user_id;
+    private Long userId;
 
     private boolean required;
+
+    private String taskInstanceId;
 
 }

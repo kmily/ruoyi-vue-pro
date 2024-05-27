@@ -3,12 +3,14 @@ package cn.iocoder.yudao.module.therapy.service;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.*;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.*;
 import cn.iocoder.yudao.module.therapy.flowengine.DayTaskEngine;
-import cn.iocoder.yudao.module.therapy.service.common.StepResp;
 import cn.iocoder.yudao.module.therapy.service.common.TreatmentStepItem;
+import cn.iocoder.yudao.module.therapy.taskflow.GoalAndMotivationFlow;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class TreatmentServiceImpl implements TreatmentService {
@@ -20,6 +22,9 @@ public class TreatmentServiceImpl implements TreatmentService {
 
     @Resource
     private TreatmentDayitemInstanceMapper treatmentDayitemInstanceMapper;
+
+    @Resource
+    private  DayTaskEngine dayTaskEngine;
 
     @Override
     public Long initTreatmentInstance(Long userId, String treatmentCode) {
@@ -40,12 +45,11 @@ public class TreatmentServiceImpl implements TreatmentService {
     }
 
     @Override
-    public StepResp getNext(TreatmentStepItem userCurrentStep){
-        DayTaskEngine dayTaskEngine = new DayTaskEngine(userCurrentStep);
-        TreatmentStepItem stepItem =  dayTaskEngine.getNextStepItem();
-        StepResp stepResp = new StepResp();
-        stepResp.setStep(stepItem);
-        return stepResp;
+    public TreatmentStepItem getNext(TreatmentStepItem userCurrentStep){
+        dayTaskEngine.initWithCurrentStep(userCurrentStep);
+        TreatmentStepItem nextStepItem = dayTaskEngine.getNextStepItem();
+
+        return nextStepItem;
     }
 
     @Override

@@ -16,6 +16,7 @@ public class StepResp {
         //TODO Bug
         data.put("noMoreStepsToday", noMoreStepsToday);
         data.put("isPastDayStep", isPastDayStep);
+        data.put("step_items", step.getDay_items());
         return data;
     }
 }

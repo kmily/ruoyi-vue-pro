@@ -17,7 +17,7 @@ public interface TreatmentFlowDayMapper extends BaseMapperX<TreatmentFlowDayDO> 
 
     default TreatmentFlowDayDO getNextFlowDay(TreatmentFlowDayDO currentDay) {
         QueryWrapper<TreatmentFlowDayDO> queryWrapper = new QueryWrapper();
-        queryWrapper = queryWrapper.eq("flow_id", currentDay.getFlow_id()).gt("sequence", currentDay.getSequence())
+        queryWrapper = queryWrapper.eq("flow_id", currentDay.getFlowId()).gt("sequence", currentDay.getSequence())
                 .orderByAsc("sequence").last("limit 1");
         return selectOne(queryWrapper);
     }

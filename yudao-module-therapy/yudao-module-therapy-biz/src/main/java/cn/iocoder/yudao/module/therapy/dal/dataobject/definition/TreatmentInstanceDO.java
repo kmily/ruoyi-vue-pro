@@ -45,8 +45,8 @@ public class TreatmentInstanceDO extends BaseDO {
      */
     @TableId
     private Long id;
-    private Long user_id;
-    private Long flow_id;
+    private Long userId;
+    private Long flowId;
     private int status;
 
 }
