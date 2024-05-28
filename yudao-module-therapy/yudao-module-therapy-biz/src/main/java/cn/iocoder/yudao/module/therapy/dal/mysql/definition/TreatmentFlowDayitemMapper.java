@@ -2,7 +2,10 @@ package cn.iocoder.yudao.module.therapy.dal.mysql.definition;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDayitemDO;
+import com.alibaba.druid.wall.WallCheckResult;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -52,5 +55,15 @@ public interface TreatmentFlowDayitemMapper extends BaseMapperX<TreatmentFlowDay
         QueryWrapper<TreatmentFlowDayitemDO> queryWrapper = new QueryWrapper();
         queryWrapper = queryWrapper.eq("day_id", dayId).eq("agroup", agroup).orderByAsc("group_seq");
         return selectList(queryWrapper);
+    }
+
+    /**
+     * 通过计划删除所有子任务
+     * @param id
+     */
+    default void deleteByDayId(Long id){
+        LambdaQueryWrapper<TreatmentFlowDayitemDO> queryWrapper= Wrappers.lambdaQuery(TreatmentFlowDayitemDO.class)
+                .eq(TreatmentFlowDayitemDO::getDayId,id);
+        delete(queryWrapper);
     }
 }

@@ -3,6 +3,7 @@ import cn.iocoder.boot.module.therapy.enums.FlowType;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.common.JsonFieldAccessible;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,7 +24,7 @@ public class TreatmentFlowDO extends BaseDO  implements JsonFieldAccessible {
     /**
      * 治疗流程ID
      */
-    @TableId
+    @TableId(type = IdType.AUTO)
     private Long id;
     /**
      * 治疗流程名称

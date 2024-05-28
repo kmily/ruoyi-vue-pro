@@ -7,9 +7,11 @@ import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.FlowPlanReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.FlowTaskVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.SaveFlowReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDayDO;
 import cn.iocoder.yudao.module.therapy.service.common.TreatmentStepItem;
 
 import javax.validation.Valid;
+import java.util.List;
 
 
 public interface TreatmentService {
@@ -93,4 +95,11 @@ public interface TreatmentService {
      * @return
      */
     void delPlanTask(Long id);
+
+    /**
+     * 通过
+     * @param id
+     * @return
+     */
+    List<TreatmentFlowDayDO> getPlanListByFlowId(Long id);
 }

@@ -49,7 +49,7 @@ public class DayTaskEngine {
     private void prepareUserCurrentStep(){
         TreatmentFlowDO flowDO = treatmentFlowMapper.selectById(userCurrentStep.getFlowInstance().getFlowId());
         TreatmentFlowDayDO flowDayDO = treatmentFlowDayMapper.selectById(userCurrentStep.getDay().getDayId());
-        if(!flowDayDO.isBreak()) {
+        if(!flowDayDO.isHasBreak()) {
             List<TreatmentDayitemInstanceDO> dayitemInstanceDOs = userCurrentStep.getDay_items();
             List<Long> ids = dayitemInstanceDOs.stream().map(TreatmentDayitemInstanceDO::getDayitemId).collect(Collectors.toList());
             List<TreatmentFlowDayitemDO> flowDayitemDOs = treatmentFlowDayitemMapper.selectBatchIds(ids);
@@ -78,7 +78,7 @@ public class DayTaskEngine {
         stepItem.setFlowInstance(flowInstanceDO);
         stepItem.setDay(dayInstanceDo);
         // if not a break day
-        if (!firstFlowDayDO.isBreak()) {
+        if (!firstFlowDayDO.isHasBreak()) {
             List<TreatmentFlowDayitemDO> dayitemsDO = treatmentFlowDayitemMapper.getFirstGroupFlowDayitems(firstFlowDayDO.getId());;
             List<TreatmentDayitemInstanceDO> dayitemInstancesDO = treatmentDayitemInstanceMapper.initInstances(
                     flowInstanceDO.getUserId(),
@@ -133,7 +133,7 @@ public class DayTaskEngine {
      */
     public void updateDayInstanceStatus(TreatmentDayInstanceDO dayInstanceDO){
         TreatmentFlowDayDO flowDayDO = treatmentFlowDayMapper.selectById(dayInstanceDO.getDayId());
-        if(flowDayDO.isBreak()){
+        if(flowDayDO.isHasBreak()){
             dayInstanceDO.setStatus(TreatmentDayInstanceDO.StatusEnum.COMPLETED.getValue());
             treatmentDayInstanceMapper.updateById(dayInstanceDO);
         }
@@ -166,7 +166,7 @@ public class DayTaskEngine {
             //用户还没有开始
             return initAndGetFirstStep();
         }
-        if(userCurrentStep.getFlowDayDO().isBreak()){
+        if(userCurrentStep.getFlowDayDO().isHasBreak()){
             //用户当前步骤是休息日
             return getBreakDayNextStepItem();
         }else{

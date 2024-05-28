@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.SaveFlowReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.TreatmentFlowRespVO;
 import cn.iocoder.yudao.module.therapy.convert.TreatmentFlowConvert;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDayDO;
 import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,9 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -40,6 +39,7 @@ public class TreatmentFlowController {
 
     @Resource
     private AdminUserApi adminUserApi;
+
     @PostMapping("/createFlow")
     @Operation(summary = "创建方案")
 //    @PreAuthorize("@ss.hasPermission('system:user:create')")
@@ -71,7 +71,8 @@ public class TreatmentFlowController {
         treatmentService.updatePlan(reqVO);
         return success(true);
     }
-//
+
+    //
     @PutMapping("/deletePlan")
     @Operation(summary = "删除计划")
     @Parameter(name = "id", description = "计划id", required = true, example = "1024")
@@ -85,9 +86,18 @@ public class TreatmentFlowController {
     @Operation(summary = "获取方案")
     @Parameter(name = "id", description = "方案id", required = true, example = "1024")
 //    @PreAuthorize("@ss.hasPermission('system:user:create')")
-    public CommonResult<SaveFlowReqVO> getFlow(@RequestParam("id") Long id) {
+    public CommonResult<TreatmentFlowRespVO> getFlow(@RequestParam("id") Long id) {
         TreatmentFlowDO flow = treatmentService.getTreatmentFlow(id);
-        SaveFlowReqVO vo= BeanUtils.toBean(flow, SaveFlowReqVO.class);
+        if(Objects.isNull(flow)) return success(null);
+        TreatmentFlowRespVO vo = BeanUtils.toBean(flow, TreatmentFlowRespVO.class);
+        AdminUserRespDTO dto= adminUserApi.getUser(Long.parseLong(flow.getCreator()));
+        vo.setCreatorName(dto.getNickname());
+        //获取治疗日
+        vo.setPlanList(new ArrayList<>());
+        List<TreatmentFlowDayDO> flowDayDOS = treatmentService.getPlanListByFlowId(id);
+        for (TreatmentFlowDayDO item : flowDayDOS) {
+            vo.getPlanList().add(BeanUtils.toBean(item, FlowPlanReqVO.class));
+        }
         return success(vo);
     }
 
@@ -125,11 +135,20 @@ public class TreatmentFlowController {
     }
 
     @PutMapping("/deleteTask")
-    @Operation(summary = "删除计划")
+    @Operation(summary = "删除计划的任务")
     @Parameter(name = "id", description = "计划id", required = true, example = "1024")
 //    @PreAuthorize("@ss.hasPermission('system:user:create')")
     public CommonResult<Boolean> delTask(@RequestParam("id") Long id) {
         treatmentService.delPlanTask(id);
         return success(true);
     }
+
+//    @PutMapping("/getPlanList")
+//    @Operation(summary = "通过方案获取计划列表")
+//    @Parameter(name = "id", description = "方案id", required = true, example = "1024")
+////    @PreAuthorize("@ss.hasPermission('system:user:create')")
+//    public CommonResult<List<TreatmentFlowDayDO>> getPlanList(@RequestParam("id") Long id) {
+//        List<TreatmentFlowDayDO> flowDayDOS = treatmentService.getPlanListByFlowId(id);
+//        return success(flowDayDOS);
+//    }
 }

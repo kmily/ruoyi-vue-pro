@@ -36,7 +36,7 @@ public class TreatmentFlowDayDO extends BaseDO {
     /**
      * 是否休息日
      */
-    private boolean isBreak;
+    private boolean hasBreak;
 
     private Integer sequence;
 }

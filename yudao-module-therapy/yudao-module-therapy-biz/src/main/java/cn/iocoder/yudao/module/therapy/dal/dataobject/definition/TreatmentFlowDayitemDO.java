@@ -29,6 +29,9 @@ public class TreatmentFlowDayitemDO extends BaseDO implements JsonFieldAccessibl
 
     private Long dayId;
 
+    /**
+     * 方案id
+     */
     private Long flowId;
 
     private String remark;

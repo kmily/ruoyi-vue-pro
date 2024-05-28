@@ -27,7 +27,6 @@ public class FlowTaskVO {
     private Integer type;
 
     @Schema(description = "依赖项",  example = "1,2,3")
-    @NotBlank
     private String dependentItemIds;
 
     @Schema(description = "是否必做",  example = "true",defaultValue = "false")

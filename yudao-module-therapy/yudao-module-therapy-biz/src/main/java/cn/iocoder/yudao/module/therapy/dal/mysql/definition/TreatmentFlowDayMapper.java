@@ -2,7 +2,9 @@ package cn.iocoder.yudao.module.therapy.dal.mysql.definition;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDayDO;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -22,5 +24,12 @@ public interface TreatmentFlowDayMapper extends BaseMapperX<TreatmentFlowDayDO> 
         queryWrapper = queryWrapper.eq("flow_id", currentDay.getFlowId()).gt("sequence", currentDay.getSequence())
                 .orderByAsc("sequence").last("limit 1");
         return selectOne(queryWrapper);
+    }
+
+    default List<TreatmentFlowDayDO> getPlanListByFlowId(Long id){
+        LambdaQueryWrapper<TreatmentFlowDayDO> wrapper= Wrappers.lambdaQuery(TreatmentFlowDayDO.class)
+                .eq(TreatmentFlowDayDO::getFlowId,id)
+                .orderByAsc(TreatmentFlowDayDO::getSequence);
+        return selectList(wrapper);
     }
 }

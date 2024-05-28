@@ -19,7 +19,7 @@ public interface ErrorCodeConstants {
     ErrorCode TREATMENT_FLOW_NOT_EXISTS = new ErrorCode(1_040_002_000, "治疗方案不存在");
     ErrorCode TREATMENT_PLAN_NOT_EXISTS = new ErrorCode(1_004_002_001, "治疗计划不存在");
     ErrorCode TREATMENT_PLAN_TASK_NOT_EXISTS = new ErrorCode(1_004_003_002, "治疗计划的任务不存在");
-    ErrorCode AUTH_MOBILE_USED = new ErrorCode(1_004_003_007, "手机号已经被使用");
+    ErrorCode TREATMENT_PLAN_SEQ_EXISTS = new ErrorCode(1_004_003_003, "已经存在当天的治疗计划");
 
     // ========== xxxx相关 1-040-003-000 ==========
     ErrorCode ADDRESS_NOT_EXISTS = new ErrorCode(1_004_004_000, "用户收件地址不存在");

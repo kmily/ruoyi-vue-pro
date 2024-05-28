@@ -7,6 +7,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 public class SaveFlowReqVO {
@@ -28,6 +29,6 @@ public class SaveFlowReqVO {
     @InEnum(value = FlowType.class,message = "方案类型不对")
     private Integer type;
 
-//    @Schema(description = "创建人", example = "创建人")
-//    private String creatorName;
+    @Schema(description = "治疗日列表", example = "list")
+    private List<FlowPlanReqVO> planList;
 }

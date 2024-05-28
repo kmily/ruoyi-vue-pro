@@ -4,8 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import java.util.List;
 
 @Schema(description = "管理后台 - 治疗计划(治疗日) Request VO")
 @Data
@@ -28,7 +26,7 @@ public class FlowPlanReqVO {
     private String remark;
 
     @Schema(description = "是否休息日", example = "true",requiredMode=Schema.RequiredMode.REQUIRED)
-    private boolean iSbreak;
+    private boolean hasBreak;
 
 //    @Schema(description = "任务列表", example = "list",requiredMode=Schema.RequiredMode.REQUIRED)
 //    @NotEmpty(message = "任务列表不能为空")

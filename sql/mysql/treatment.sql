@@ -3,7 +3,7 @@ CREATE TABLE `hlgyy_treatment_flow`  (
       `id` bigint NOT NULL AUTO_INCREMENT COMMENT '治疗流程id',
       `name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '治疗流程名称',
       `code` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '治疗流程编码',
-      `status` tinyint NOT NULL DEFAULT 0 COMMENT '流程状态（0未发布 1已发布）',
+      `status` tinyint NOT NULL DEFAULT 0 COMMENT '流程状态（1未发布 0已发布）',
       `tenant_id` bigint NOT NULL COMMENT '租户id',
       `remark` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '备注',
       `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '创建者',
@@ -11,6 +11,7 @@ CREATE TABLE `hlgyy_treatment_flow`  (
       `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
       `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
       `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+      `type` tinyint NOT NULL DEFAULT 0 COMMENT '方案类型',
       PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '治疗流程模板';
 
@@ -30,19 +31,20 @@ CREATE TABLE `hlgyy_treatment_flow_days`  (
          `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
          `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
          `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-         `is_break` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否休息',
+         `hasBreak` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否休息',
          PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '治疗流程模板';
 
-insert into hlgyy_treatment_flow_days(id, name, flow_id, tenant_id,  is_break) values(1, 'Day 1', 1, 1 ,0);
-insert into hlgyy_treatment_flow_days(id, name, flow_id, tenant_id,  is_break) values(2, 'Day 2', 1, 1 ,0);
-insert into hlgyy_treatment_flow_days(id, name, flow_id, tenant_id,  is_break) values(3, 'Day 3', 1, 1 ,1);  # 休息日
+insert into hlgyy_treatment_flow_days(id, name, flow_id, tenant_id,  hasBreak) values(1, 'Day 1', 1, 1 ,0);
+insert into hlgyy_treatment_flow_days(id, name, flow_id, tenant_id,  hasBreak) values(2, 'Day 2', 1, 1 ,0);
+insert into hlgyy_treatment_flow_days(id, name, flow_id, tenant_id,  hasBreak) values(3, 'Day 3', 1, 1 ,1);  # 休息日
 insert into hlgyy_treatment_flow_days(id, name, flow_id, tenant_id,  is_break) values(4, 'Day 4', 1, 1 ,0);
 
 DROP TABLE IF EXISTS `hlgyy_treatment_flow_dayitem`; # 治疗流程模板的每日的项目
 CREATE TABLE `hlgyy_treatment_flow_dayitem`  (
      `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'id',
      `day_id` bigint NOT NULL COMMENT 'day id',
+     `flow_id` bigint NOT NULL COMMENT '方案id',
      `remark` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '备注',
      `settings` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '设置',
      `item_type` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '类型',
@@ -58,6 +60,7 @@ CREATE TABLE `hlgyy_treatment_flow_dayitem`  (
      `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
      `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
      `required` bit(1) NOT NULL DEFAULT b'1' COMMENT '是否必须',
+     `type` tinyint NOT NULL DEFAULT 0 COMMENT '任务类型',
      PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '治疗流程模板';
 
