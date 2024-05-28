@@ -8,21 +8,22 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserExtDTO;
 import cn.iocoder.yudao.module.therapy.controller.VO.SetAppointmentTimeReqVO;
+import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.FlowPlanReqVO;
+import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.FlowTaskVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.SaveFlowReqVO;
-import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemInstanceDO;
-import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDO;
-import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentInstanceDO;
-import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayitemInstanceMapper;
-import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentFlowMapper;
-import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentInstanceMapper;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.*;
+import cn.iocoder.yudao.module.therapy.dal.mysql.definition.*;
 import cn.iocoder.yudao.module.therapy.flowengine.DayTaskEngine;
 import cn.iocoder.yudao.module.therapy.service.common.TreatmentStepItem;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.TREATMENT_FLOW_NOT_EXISTS;
+import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 @Service
@@ -41,6 +42,11 @@ public class TreatmentServiceImpl implements TreatmentService {
 
     @Resource
     private MemberUserApi memberUserApi;
+
+    @Resource
+    private TreatmentFlowDayMapper treatmentFlowDayMapper;
+    @Resource
+    private TreatmentFlowDayitemMapper treatmentFlowDayitemMapper;
 
     @Override
     public Long initTreatmentInstance(Long userId, String treatmentCode) {
@@ -125,5 +131,74 @@ public class TreatmentServiceImpl implements TreatmentService {
     public PageResult<TreatmentFlowDO> getTreatmentFlowPage(PageParam pageReqVO) {
         return treatmentFlowMapper.selectPage(pageReqVO);
 
+    }
+
+    @Override
+    public Long addPlan(FlowPlanReqVO reqVO) {
+        TreatmentFlowDayDO dayDO=BeanUtils.toBean(reqVO,TreatmentFlowDayDO.class);
+        treatmentFlowDayMapper.insert(dayDO);
+        return dayDO.getId();
+//
+//        List<TreatmentFlowDayitemDO> flowDayitemDOS=new ArrayList<>();
+//        for (FlowTaskVO item:reqVO.getTaskList()) {
+//            TreatmentFlowDayitemDO dayitemDO=BeanUtils.toBean(item,TreatmentFlowDayitemDO.class);
+//            dayitemDO.setFlowId(dayDO.getFlowId());
+//            dayitemDO.setDayId(dayDO.getId());
+//            flowDayitemDOS.add(dayitemDO);
+//        }
+//        treatmentFlowDayitemMapper.insertBatch(flowDayitemDOS);
+    }
+
+    @Override
+    public void updatePlan(FlowPlanReqVO reqVO) {
+        TreatmentFlowDayDO dayDO= treatmentFlowDayMapper.selectById(reqVO.getId());
+        if(Objects.isNull(dayDO)){
+            throw exception(TREATMENT_PLAN_NOT_EXISTS);
+        }
+        TreatmentFlowDayDO up=BeanUtils.toBean(reqVO,TreatmentFlowDayDO.class);
+        treatmentFlowDayMapper.updateById(up);
+    }
+
+    @Override
+    public void delPlan(Long id) {
+        TreatmentFlowDayDO dayDO= treatmentFlowDayMapper.selectById(id);
+        if(Objects.isNull(dayDO)){
+            throw exception(TREATMENT_PLAN_NOT_EXISTS);
+        }
+        treatmentFlowDayMapper.deleteById(id);
+    }
+
+    @Override
+    public Long createPlanTask(FlowTaskVO vo) {
+        TreatmentFlowDayDO dayDO= treatmentFlowDayMapper.selectById(vo.getDayId());
+        if(Objects.isNull(dayDO)){
+            throw exception(TREATMENT_PLAN_NOT_EXISTS);
+        }
+        TreatmentFlowDayitemDO dayitemDO=BeanUtils.toBean(vo,TreatmentFlowDayitemDO.class);
+        treatmentFlowDayitemMapper.insert(dayitemDO);
+        return dayitemDO.getId();
+    }
+
+    @Override
+    public void updatePlanTask(FlowTaskVO vo) {
+        TreatmentFlowDayDO dayDO= treatmentFlowDayMapper.selectById(vo.getDayId());
+        if(Objects.isNull(dayDO)){
+            throw exception(TREATMENT_PLAN_NOT_EXISTS);
+        }
+        TreatmentFlowDayitemDO old= treatmentFlowDayitemMapper.selectById(vo.getId());
+        if(Objects.isNull(old)){
+            throw exception(TREATMENT_PLAN_TASK_NOT_EXISTS);
+        }
+        TreatmentFlowDayitemDO dayitemDO=BeanUtils.toBean(vo,TreatmentFlowDayitemDO.class);
+        treatmentFlowDayitemMapper.updateById(dayitemDO);
+    }
+
+    @Override
+    public void delPlanTask(Long id) {
+        TreatmentFlowDayitemDO old= treatmentFlowDayitemMapper.selectById(id);
+        if(Objects.isNull(old)){
+            throw exception(TREATMENT_PLAN_TASK_NOT_EXISTS);
+        }
+        treatmentFlowDayitemMapper.deleteById(id);
     }
 }

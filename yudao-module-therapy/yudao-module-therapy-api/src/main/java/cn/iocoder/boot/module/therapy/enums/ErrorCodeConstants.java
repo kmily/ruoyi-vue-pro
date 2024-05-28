@@ -17,8 +17,8 @@ public interface ErrorCodeConstants {
     ErrorCode SURVEY_QUESTION_EMPTY = new ErrorCode(1_040_001_004, "问卷题目不能为空,请设置题目后提交");
     // ========== 治疗方案相关 1-040-002-000 ==========
     ErrorCode TREATMENT_FLOW_NOT_EXISTS = new ErrorCode(1_040_002_000, "治疗方案不存在");
-    ErrorCode AUTH_LOGIN_USER_DISABLED = new ErrorCode(1_004_003_001, "登录失败，账号被禁用");
-    ErrorCode AUTH_SOCIAL_USER_NOT_FOUND = new ErrorCode(1_004_003_005, "登录失败，解析不到三方登录信息");
+    ErrorCode TREATMENT_PLAN_NOT_EXISTS = new ErrorCode(1_004_002_001, "治疗计划不存在");
+    ErrorCode TREATMENT_PLAN_TASK_NOT_EXISTS = new ErrorCode(1_004_003_002, "治疗计划的任务不存在");
     ErrorCode AUTH_MOBILE_USED = new ErrorCode(1_004_003_007, "手机号已经被使用");
 
     // ========== xxxx相关 1-040-003-000 ==========

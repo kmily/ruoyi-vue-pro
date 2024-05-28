@@ -18,7 +18,7 @@ public class FlowPlanReqVO {
     @Min(value = 1,message = "治疗方案id不对")
     private Long flowId;
 
-    @Schema(description = "治疗方案属于第几天", example = "2")
+    @Schema(description = "治疗方案属于第几天", example = "2",requiredMode=Schema.RequiredMode.REQUIRED)
     private Integer sequence;
 
     @Schema(description = "治疗日名称", example = "第3天治疗计划")
@@ -30,7 +30,7 @@ public class FlowPlanReqVO {
     @Schema(description = "是否休息日", example = "true",requiredMode=Schema.RequiredMode.REQUIRED)
     private boolean iSbreak;
 
-    @Schema(description = "任务列表", example = "list",requiredMode=Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "任务列表不能为空")
-    private List<FlowTaskVO> taskList;
+//    @Schema(description = "任务列表", example = "list",requiredMode=Schema.RequiredMode.REQUIRED)
+//    @NotEmpty(message = "任务列表不能为空")
+//    private List<FlowTaskVO> taskList;
 }

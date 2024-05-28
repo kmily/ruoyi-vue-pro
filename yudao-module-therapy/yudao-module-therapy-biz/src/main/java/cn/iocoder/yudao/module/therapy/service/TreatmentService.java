@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.therapy.service;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.therapy.controller.VO.SetAppointmentTimeReqVO;
+import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.FlowPlanReqVO;
+import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.FlowTaskVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.SaveFlowReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDO;
 import cn.iocoder.yudao.module.therapy.service.common.TreatmentStepItem;
@@ -53,5 +55,42 @@ public interface TreatmentService {
      */
     PageResult<TreatmentFlowDO> getTreatmentFlowPage(PageParam pageReqVO);
 
+    /**
+     * 添加计划
+     * @param reqVO
+     */
+    Long addPlan(FlowPlanReqVO reqVO);
 
+    /**
+     * 更新计划
+     * @param reqVO
+     */
+    void updatePlan(FlowPlanReqVO reqVO);
+
+    /**
+     * 删除计划
+     * @param id
+     */
+    void delPlan(Long id);
+
+    /**
+     * 创建计划子任务
+     * @param vo
+     * @return
+     */
+    Long createPlanTask(FlowTaskVO vo);
+
+    /**
+     * 更新计划子任务
+     * @param vo
+     * @return
+     */
+    void updatePlanTask(FlowTaskVO vo);
+
+    /**
+     * 删除计划子任务
+     * @param id
+     * @return
+     */
+    void delPlanTask(Long id);
 }

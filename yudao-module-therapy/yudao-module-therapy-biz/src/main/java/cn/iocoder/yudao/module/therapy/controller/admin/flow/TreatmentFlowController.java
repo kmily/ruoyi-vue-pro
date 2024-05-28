@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.FlowPlanReqVO;
+import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.FlowTaskVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.SaveFlowReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.TreatmentFlowRespVO;
 import cn.iocoder.yudao.module.therapy.convert.TreatmentFlowConvert;
@@ -60,24 +61,25 @@ public class TreatmentFlowController {
 //    @PreAuthorize("@ss.hasPermission('system:user:create')")
     public CommonResult<Long> addPlan(@Valid @RequestBody FlowPlanReqVO reqVO) {
 //        Long id = surveyService.createSurvey(reqVO);
-        return success(0L);
+        return success(treatmentService.addPlan(reqVO));
     }
 
     @PostMapping("/updatePlan")
     @Operation(summary = "更新计划")
 //    @PreAuthorize("@ss.hasPermission('system:user:create')")
     public CommonResult<Boolean> updatePlan(@Valid @RequestBody FlowPlanReqVO reqVO) {
-//        Long id = surveyService.createSurvey(reqVO);
+        treatmentService.updatePlan(reqVO);
         return success(true);
     }
 //
-//    @PostMapping("/deletePlan")
-//    @Operation(summary = "删除计划")
-////    @PreAuthorize("@ss.hasPermission('system:user:create')")
-//    public CommonResult<Long> delPlan(@Valid @RequestBody SurveySaveReqVO reqVO) {
-//        Long id = surveyService.createSurvey(reqVO);
-//        return success(id);
-//    }
+    @PutMapping("/deletePlan")
+    @Operation(summary = "删除计划")
+    @Parameter(name = "id", description = "计划id", required = true, example = "1024")
+//    @PreAuthorize("@ss.hasPermission('system:user:create')")
+    public CommonResult<Boolean> delPlan(@RequestParam("id") Long id) {
+        treatmentService.delPlan(id);
+        return success(true);
+    }
 
     @GetMapping("/getFlow")
     @Operation(summary = "获取方案")
@@ -104,5 +106,30 @@ public class TreatmentFlowController {
                 .collect(Collectors.toSet());
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
         return success(new PageResult<>(TreatmentFlowConvert.INSTANCE.convertList(pageResult.getList(), userMap), pageResult.getTotal()));
+    }
+
+    @PostMapping("/createTask")
+    @Operation(summary = "创建计划的任务")
+//    @PreAuthorize("@ss.hasPermission('system:user:create')")
+    public CommonResult<Long> createTask(@Valid @RequestBody FlowTaskVO reqVO) {
+        Long id = treatmentService.createPlanTask(reqVO);
+        return success(id);
+    }
+
+    @PostMapping("/updateTask")
+    @Operation(summary = "创建计划的任务")
+//    @PreAuthorize("@ss.hasPermission('system:user:create')")
+    public CommonResult<Boolean> updateTask(@Valid @RequestBody FlowTaskVO reqVO) {
+        treatmentService.updatePlanTask(reqVO);
+        return success(true);
+    }
+
+    @PutMapping("/deleteTask")
+    @Operation(summary = "删除计划")
+    @Parameter(name = "id", description = "计划id", required = true, example = "1024")
+//    @PreAuthorize("@ss.hasPermission('system:user:create')")
+    public CommonResult<Boolean> delTask(@RequestParam("id") Long id) {
+        treatmentService.delPlanTask(id);
+        return success(true);
     }
 }
