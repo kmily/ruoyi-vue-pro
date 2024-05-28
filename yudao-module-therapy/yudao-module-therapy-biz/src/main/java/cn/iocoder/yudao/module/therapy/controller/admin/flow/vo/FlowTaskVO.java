@@ -33,4 +33,7 @@ public class FlowTaskVO {
 
     @Schema(description = "顺序组",  example = "2",requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer agroup;
+
+    @Schema(description = "设置josn格式",  example = "{.....}")
+    private String settings;
 }
