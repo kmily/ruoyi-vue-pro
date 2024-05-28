@@ -13,9 +13,38 @@ public interface AIChatService {
      * @param content 内容
      * @return 结果
      */
-    String chat(Long userId, String content);
+    String chat(Long userId,String conversationId, String content);
 
+    /**
+     * @param userId 用户编号
+     * @param conversationId 会话编号
+     * @param content 用户聊天内容
+     * @return 结果
+     */
+    String chatForStream(Long userId, String conversationId, String content);
 
-    String chatForStream(Long userId, String content);
+    /**
+     * 数据分析
+     * @param sysPrompt 提示
+     * @param analyseData 分析数据
+     * @return 结果
+     */
+    String dataAnalyse (String sysPrompt, String analyseData);
+
+    /**
+     * 青少年问题分类
+     * @param problems 问题
+     * @return 结果
+     */
+    String teenProblemClassification (String problems);
+
+    /**
+     * 自动思维识别
+     * @param userId 用户编号
+     * @param conversationId 会话编号
+     * @param content 用户聊天问题
+     * @return 结果
+     */
+    String automaticThinkingRecognition(Long userId, String conversationId, String content);
 
 }
