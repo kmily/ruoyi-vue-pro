@@ -39,6 +39,7 @@ public interface SurveyService {
      * @return
      */
     TreatmentSurveyDO get(Long id);
+    void del(Long id);
 
     /**
      * 通过问卷获取

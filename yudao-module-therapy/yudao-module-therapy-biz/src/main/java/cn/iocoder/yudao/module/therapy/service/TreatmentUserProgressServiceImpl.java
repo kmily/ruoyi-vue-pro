@@ -122,4 +122,12 @@ public class TreatmentUserProgressServiceImpl implements  TreatmentUserProgressS
         }
     }
 
+    @Override
+    public void clearUserProgress(Long userId){
+        treatmentUserProgressMapper.delete(TreatmentUserProgressDO::getUserId, userId);
+        treatmentDayInstanceMapper.delete(TreatmentDayInstanceDO::getUserId, userId);
+        treatmentDayitemInstanceMapper.delete(TreatmentDayitemInstanceDO::getUserId, userId);
+        treatmentInstanceMapper.delete(TreatmentInstanceDO::getUserId, userId);
+    }
+
 }

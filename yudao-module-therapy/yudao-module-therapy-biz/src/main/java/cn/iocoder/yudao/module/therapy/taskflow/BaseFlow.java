@@ -11,4 +11,6 @@ public interface BaseFlow {
     String createProcessInstance(String bpmnName);
 
     void loadProcessInstance(String taskInstanceId);
+
+    void userSubmit(String taskId, Map<String, Object> variables);
 }

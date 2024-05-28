@@ -6,4 +6,6 @@ public interface TaskFlowService {
     Map getNext(Long userId, Long treatmentInstanceId, Long dayItemInstanceId);
 
     void createBpmnModel(Long flowDayitemId);
+
+    void userSubmit(Long dayitem_instance_id, String taskId, Map<String, Object> variables);
 }

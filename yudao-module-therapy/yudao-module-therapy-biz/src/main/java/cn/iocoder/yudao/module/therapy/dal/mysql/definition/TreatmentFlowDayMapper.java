@@ -5,6 +5,8 @@ import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDa
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 
 @Mapper
 public interface TreatmentFlowDayMapper extends BaseMapperX<TreatmentFlowDayDO> {
