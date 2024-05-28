@@ -77,7 +77,8 @@
             .then(response => response.json())
             .then(data => {
                 if (data.code === 0) {
-                    responseDiv.innerHTML = `<strong>答案:</strong> ${data.data}`;
+                    const formattedData = data.data.replace(/\n/g, '<br>');
+                    responseDiv.innerHTML = `<strong>答案:</strong> <br> ${formattedData}`;
                 } else {
                     responseDiv.innerHTML = `<strong>Error:</strong> ${data.msg || 'Unknown error'}`;
                 }
