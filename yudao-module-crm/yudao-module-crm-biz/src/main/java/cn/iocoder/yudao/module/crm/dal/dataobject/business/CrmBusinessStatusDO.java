@@ -19,7 +19,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CrmBusinessStatusDO {
+public class CrmBusinessStatusDO extends BaseDO {
 
     /**
      * 主键
