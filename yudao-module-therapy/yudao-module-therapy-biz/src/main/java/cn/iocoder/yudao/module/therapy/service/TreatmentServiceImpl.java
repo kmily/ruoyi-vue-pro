@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class TreatmentServiceImpl implements TreatmentService {
@@ -60,7 +61,8 @@ public class TreatmentServiceImpl implements TreatmentService {
     }
 
     @Override
-    public void completeDayitemInstance(Long userId, Long treatmentInstanceId, Long dayItemInstanceId){
+    public void completeDayitemInstance(Long userId,
+                                        Long dayItemInstanceId){
         TreatmentDayitemInstanceDO treatmentDayitemInstanceDO = treatmentDayitemInstanceMapper.selectByUserIdAndId(userId, dayItemInstanceId);
         treatmentDayitemInstanceDO.setStatus(TreatmentDayitemInstanceDO.StatusEnum.COMPLETED.getValue());
         treatmentDayitemInstanceMapper.updateById(treatmentDayitemInstanceDO);

@@ -75,4 +75,12 @@ public class TaskFlowServiceImpl implements TaskFlowService {
         BaseFlow taskFlow = getTaskFlow(userId, treatmentInstanceId, dayItemInstanceId);
         return taskFlow.run();
     }
+
+    @Override
+    public void userSubmit(Long dayitem_instance_id, String taskId, Map<String, Object> variables){
+        GoalAndMotivationFlow goalAndMotivationFlow = new GoalAndMotivationFlow();
+        TreatmentDayitemInstanceDO dayitemInstanceDO = treatmentDayitemInstanceMapper.selectById(dayitem_instance_id);
+        goalAndMotivationFlow.loadProcessInstance(dayitemInstanceDO.getTaskInstanceId());
+        goalAndMotivationFlow.userSubmit(taskId, variables);
+    }
 }

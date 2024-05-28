@@ -14,4 +14,6 @@ public interface TreatmentUserProgressService {
     Map<String, Object> convertDayitemInstanceToMap(TreatmentDayitemInstanceDO dayitemInstanceDO);
 
     void updateUserProgress(TreatmentStepItem stepItem);
+
+    void clearUserProgress(Long userId);
 }

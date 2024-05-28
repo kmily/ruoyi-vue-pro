@@ -13,7 +13,7 @@ public interface TreatmentService {
 
     TreatmentStepItem getNext(TreatmentStepItem userCurrentStep);
 
-    void completeDayitemInstance(Long userId, Long treatmentInstanceId, Long dayItemInstanceId);
+    void completeDayitemInstance(Long userId, Long dayItemInstanceId);
 
     boolean setAppointmentTime(Long userId, SetAppointmentTimeReqVO reqVO);
 }

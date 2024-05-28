@@ -69,20 +69,21 @@ public class TreatmentController {
         return success(data);
     }
 
-    @PostMapping("/{code}/{id}/subtask/{dayitem_instance_id}/complete")
+    @PostMapping("/dayitem/{dayitem_instance_id}/complete")
     @Operation(summary = "完成子任务")
     @PreAuthenticated
-    public CommonResult<Long> getNext(@PathVariable("code") String code, @PathVariable("id") Long treatmentInstanceId, @PathVariable("dayitem_instance_id") Long dayitem_instance_id) {
+    public CommonResult<Long> getNext(@PathVariable("dayitem_instance_id") Long dayitem_instance_id) {
         Long userId = getLoginUserId();
-        treatmentService.completeDayitemInstance(userId, treatmentInstanceId, dayitem_instance_id);
+        treatmentService.completeDayitemInstance(userId, dayitem_instance_id);
         return success(1L);
     }
 
-    @PostMapping("/{code}/{id}/subtask/{dayitem_instance_id}/next")
+    @PostMapping("/dayitem/{dayitem_instance_id}/next")
     @Operation(summary = "获取子任务下一项内容")
     @PreAuthenticated
-    public CommonResult<Map> subTaskGetNext(@PathVariable("code") String code, @PathVariable("id") Long treatmentInstanceId, @PathVariable("dayitem_instance_id") Long dayitem_instance_id) {
+    public CommonResult<Map> subTaskGetNext(@PathVariable("dayitem_instance_id") Long dayitem_instance_id) {
         Long userId = getLoginUserId();
+        Long treatmentInstanceId = 0L;
         Map data = taskFlowService.getNext(userId, treatmentInstanceId, dayitem_instance_id);
         return success(data);
     }
@@ -92,6 +93,26 @@ public class TreatmentController {
     @PreAuthenticated // TODO should be admin
     public CommonResult<Long> createBpmnModel(@PathVariable("code") String code, @PathVariable("dayitem_id") Long dayitem_id) {
         taskFlowService.createBpmnModel(dayitem_id);
+        return success(1L);
+    }
+
+    @PostMapping("/dayitem/{dayitem_instance_id}/stepsubmit")
+    @Operation(summary = "子任务step提交数据")
+    @PreAuthenticated
+    public CommonResult<Long> stepSubmit(@PathVariable("dayitem_instance_id") Long dayitem_instance_id,
+                                      @RequestBody Map<String, Object> requestBody) {
+        Long userId = getLoginUserId();
+        String taskId = requestBody.get("taskId").toString();
+        taskFlowService.userSubmit(dayitem_instance_id, taskId, requestBody);
+        return success(1L);
+    }
+
+    @PostMapping("/clear_user_progress")
+    @Operation(summary = "清空用户流程数据-临时测试用")
+    @PreAuthenticated
+    public CommonResult<Long> clearUserProgress() {
+        Long userId = getLoginUserId();
+        treatmentUserProgressService.clearUserProgress(userId);
         return success(1L);
     }
 
