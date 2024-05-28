@@ -27,7 +27,7 @@ public class DictDataSaveReqVO {
 
     @Schema(description = "字典值", requiredMode = Schema.RequiredMode.REQUIRED, example = "iocoder")
     @NotBlank(message = "字典键值不能为空")
-    @Size(max = 100, message = "字典键值长度不能超过100个字符")
+    @Size(max = 10000, message = "字典键值长度不能超过10000个字符")
     private String value;
 
     @Schema(description = "字典类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "sys_common_sex")
