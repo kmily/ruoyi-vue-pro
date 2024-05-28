@@ -29,9 +29,20 @@ public class TreatmentFlowDayitemDO extends BaseDO implements JsonFieldAccessibl
 
     private Long dayId;
 
+    private Long flowId;
+
     private String remark;
 
+    /**
+     * 废弃
+     */
     private String itemType;
+
+    /**
+     * 任务类型
+     * 枚举 {@link cn.iocoder.boot.module.therapy.enums.SurveyType}
+     */
+    private String type;
 
     private String settings;
 

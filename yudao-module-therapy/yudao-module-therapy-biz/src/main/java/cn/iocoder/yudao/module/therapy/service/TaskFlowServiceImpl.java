@@ -8,7 +8,6 @@ import cn.iocoder.yudao.module.therapy.taskflow.GoalAndMotivationFlow;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -28,6 +27,9 @@ public class TaskFlowServiceImpl implements TaskFlowService {
 
     @Resource
     TreatmentFlowDayitemMapper treatmentFlowDayitemMapper;
+
+    @Resource
+    private TreatmentFlowMapper treatmentFlowMapper;
 
     public BaseFlow getTaskFlow(Long userId, Long treatmentInstanceId, Long dayItemInstanceId){
         TreatmentDayitemInstanceDO dayitemInstanceDO = treatmentDayitemInstanceMapper.selectByUserIdAndId(userId, dayItemInstanceId);
