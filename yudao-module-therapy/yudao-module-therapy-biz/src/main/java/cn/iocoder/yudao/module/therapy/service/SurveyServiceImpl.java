@@ -78,7 +78,7 @@ public class SurveyServiceImpl implements SurveyService {
         treatmentSurveyMapper.updateById(treatmentSurveyDO);
 
         //先删除再插入
-        surveyQuestionMapper.deleteBySurveyId(vo.getId());
+        surveyQuestionMapper.deleteAbsoluteBySurveyId(vo.getId());
         List<QuestionDO> qst = new ArrayList<>();
         for (var item : vo.getQuestions()) {
             QuestionDO q = SurveyConvert.INSTANCE.convertQst(new JSONObject(item));
@@ -98,6 +98,12 @@ public class SurveyServiceImpl implements SurveyService {
     @Override
     public TreatmentSurveyDO get(Long id) {
         return treatmentSurveyMapper.selectById(id);
+    }
+
+    @Override
+    public void del(Long id) {
+        treatmentSurveyMapper.deleteById(id);
+        surveyQuestionMapper.deleteBySurveyId(id);
     }
 
     @Override

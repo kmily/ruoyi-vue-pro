@@ -28,6 +28,6 @@ public class SaveFlowReqVO {
     @InEnum(value = FlowType.class,message = "方案类型不对")
     private Integer type;
 
-    @Schema(description = "创建人", example = "创建人")
-    private String creatorName;
+//    @Schema(description = "创建人", example = "创建人")
+//    private String creatorName;
 }

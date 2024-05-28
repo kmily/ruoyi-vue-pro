@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.FlowPlanReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.SaveFlowReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.TreatmentFlowRespVO;
 import cn.iocoder.yudao.module.therapy.convert.TreatmentFlowConvert;
@@ -54,13 +55,21 @@ public class TreatmentFlowController {
         return success(true);
     }
 
-//    @PostMapping("/addPlan")
-//    @Operation(summary = "添加计划")
-////    @PreAuthorize("@ss.hasPermission('system:user:create')")
-//    public CommonResult<Long> addPlan(@Valid @RequestBody SurveySaveReqVO reqVO) {
+    @PostMapping("/addPlan")
+    @Operation(summary = "添加计划")
+//    @PreAuthorize("@ss.hasPermission('system:user:create')")
+    public CommonResult<Long> addPlan(@Valid @RequestBody FlowPlanReqVO reqVO) {
 //        Long id = surveyService.createSurvey(reqVO);
-//        return success(id);
-//    }
+        return success(0L);
+    }
+
+    @PostMapping("/updatePlan")
+    @Operation(summary = "更新计划")
+//    @PreAuthorize("@ss.hasPermission('system:user:create')")
+    public CommonResult<Boolean> updatePlan(@Valid @RequestBody FlowPlanReqVO reqVO) {
+//        Long id = surveyService.createSurvey(reqVO);
+        return success(true);
+    }
 //
 //    @PostMapping("/deletePlan")
 //    @Operation(summary = "删除计划")

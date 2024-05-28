@@ -93,6 +93,15 @@ public class SurveyController {
         return success(SurveyConvert.INSTANCE.convert(tsDO, qstList));
     }
 
+    @GetMapping("/delete")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @Operation(summary = "删除治疗问卷")
+//    @PreAuthorize("@ss.hasPermission('system:user:list')")
+    public CommonResult<Boolean> delSurvey(@RequestParam("id") Long id) {
+        surveyService.del(id);
+        return success(true);
+    }
+
     @GetMapping("/getSurveyAnswerPage")
     @Operation(summary = "获得患者答题列表")
     public CommonResult<PageResult<SurveyAnswerRespVO>> getSurveyAnswerPage(@Valid SurveyAnswerPageReqVO reqVO) {

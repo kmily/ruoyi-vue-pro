@@ -14,11 +14,17 @@ public interface SurveyQuestionMapper extends BaseMapperX<QuestionDO> {
      *
      * @param surveyId
      */
-    default void deleteBySurveyId(Long surveyId) {
+    default void deleteAbsoluteBySurveyId(Long surveyId) {
         LambdaQueryWrapper<QuestionDO> lambdaUpdateWrapper = new LambdaQueryWrapper<QuestionDO>()
                 .eq(QuestionDO::getBelongSurveyId, surveyId);
 //        delete(lambdaUpdateWrapper);
         this.deleteAbsoluteById(lambdaUpdateWrapper);
+    }
+
+    default void deleteBySurveyId(Long surveyId) {
+        LambdaQueryWrapper<QuestionDO> lambdaUpdateWrapper = new LambdaQueryWrapper<QuestionDO>()
+                .eq(QuestionDO::getBelongSurveyId, surveyId);
+        delete(lambdaUpdateWrapper);
     }
 
     default List<QuestionDO> selectBySurveyId(Long surveyId){

@@ -29,6 +29,8 @@ public class TreatmentFlowDayitemDO extends BaseDO implements JsonFieldAccessibl
 
     private Long dayId;
 
+    private Long flowId;
+
     private String remark;
 
     private String itemType;
@@ -46,6 +48,12 @@ public class TreatmentFlowDayitemDO extends BaseDO implements JsonFieldAccessibl
     private boolean required;
 
     private String taskFlowId;
+
+    /**
+     * 子任务类型
+     * 枚举 {@link cn.iocoder.boot.module.therapy.enums.SurveyType}
+     */
+    private Integer type;
 
     public Map getSettingsObj() {
         if(settings == null || settings.isEmpty())
