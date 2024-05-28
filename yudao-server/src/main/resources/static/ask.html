@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 问答接口</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f7f7f7;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .response {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<h1>AI 问答接口</h1>
+<form id="questionForm">
+    <textarea id="question" placeholder="输入你的问题..."></textarea>
+    <button type="submit">提交问题</button>
+</form>
+<div class="response" id="response"></div>
+
+<script>
+    document.getElementById('questionForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const question = document.getElementById('question').value;
+        const responseDiv = document.getElementById('response');
+        responseDiv.innerHTML = '正在处理你的问题...';
+
+        fetch('/app-api/therapy/ai/problem-classification', {
+            method: 'POST',
+            headers: {
+                'Accept-Language': 'en,zh-CN;q=0.9,zh;q=0.8',
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+                'Content-Type': 'application/json',
+                'Cookie': 'OUTFOX_SEARCH_USER_ID_NCOO=1443126581.0210335',
+                'Pragma': 'no-cache',
+                'Sec-Fetch-Dest': 'empty',
+                'Sec-Fetch-Mode': 'cors',
+                'Sec-Fetch-Site': 'same-origin',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+                'accept': '*/*',
+                'sec-ch-ua': '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"Windows"',
+                'tenant-id': '1'
+            },
+            body: JSON.stringify({ question })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 0) {
+                    responseDiv.innerHTML = `<strong>答案:</strong> ${data.data}`;
+                } else {
+                    responseDiv.innerHTML = `<strong>Error:</strong> ${data.msg || 'Unknown error'}`;
+                }
+            })
+            .catch(error => {
+                responseDiv.innerHTML = `<strong>Error:</strong> ${error}`;
+            });
+    });
+</script>
+</body>
+</html>
