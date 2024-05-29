@@ -52,6 +52,7 @@ public class SurveyServiceImpl implements SurveyService {
         TreatmentSurveyDO treatmentSurveyDO = SurveyConvert.INSTANCE.convert(vo);
         surveyStrategy.fillSurveyCode(treatmentSurveyDO);
         treatmentSurveyMapper.insert(treatmentSurveyDO);
+
         List<QuestionDO> qst = new ArrayList<>();
         for (var item : vo.getQuestions()) {
             QuestionDO q = SurveyConvert.INSTANCE.convertQst(new JSONObject(item));
@@ -114,23 +115,16 @@ public class SurveyServiceImpl implements SurveyService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void submitSurvey(SubmitSurveyReqVO reqVO) {
-//        //判断问卷是否存在，状态是否正常
-//        TreatmentSurveyDO tsDO = treatmentSurveyMapper.selectById(reqVO.getSurveyId());
-//        if (Objects.isNull(tsDO)) throw exception(SURVEY_NOT_EXISTS);
-//
-//        //判断是否必答题有遗漏
-//        Set<Long> qst1Set = reqVO.getQstList().stream().map(p -> p.getId()).collect(Collectors.toSet());
-//        List<QuestionDO> qst = surveyQuestionMapper.selectBySurveyId(reqVO.getSurveyId());
-//        Set<Long> qst2Set = qst.stream().filter(k -> k.isRequired()).map(k -> k.getId()).collect(Collectors.toSet());
-//        qst2Set.removeAll(qst1Set);
-//        if (qst2Set.size() > 0) {
-//            throw exception(SURVEY_EXISTS_UNFINISHED);
-//        }
+        //判断问卷是否存在，状态是否正常
+        TreatmentSurveyDO tsDO = treatmentSurveyMapper.selectById(reqVO.getSurveyId());
+        if (Objects.isNull(tsDO)) throw exception(SURVEY_NOT_EXISTS);
+        SurveyStrategy surveyStrategy = surveyStrategyFactory.getSurveyStrategy(SurveyType.getByType(tsDO.getSurveyType()).getCode());
+
+        //判断是否必答题有遗漏
+        List<QuestionDO> qsts = surveyQuestionMapper.selectBySurveyId(reqVO.getSurveyId());
+        surveyStrategy.checkLoseQuestion(reqVO, qsts);
 //        //保存一次回答
-//        SurveyAnswerDO answerDO = new SurveyAnswerDO();
-//        answerDO.setSource(reqVO.getSource());
-//        answerDO.setBelongSurveyId(tsDO.getId());
-//        surveyAnswerMapper.insert(answerDO);
+        surveyStrategy.saveAnswer(reqVO.getSource(), reqVO.getSurveyId());
 //        //保存答案明细
 //        Map<Long, QuestionDO> qstMap = CollectionUtils.convertMap(qst, QuestionDO::getId);
 //        List<AnswerDetailDO> anAnswerDOS = SurveyConvert.INSTANCE.convert(qstMap, reqVO.getQstList(), getLoginUserId());

@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.therapy.strategy;
 
-import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveySaveReqVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
-import jodd.util.StringUtil;
+
+import java.util.List;
 
 public interface SurveyStrategy {
     /**
@@ -19,13 +20,30 @@ public interface SurveyStrategy {
     /**
      * 填充题目code
      */
-    void fillSurveyCode(TreatmentSurveyDO surveyDO);
+    default void fillSurveyCode(TreatmentSurveyDO surveyDO){
+
+    }
 
     /**
      * 填充问题code
      * @param qst
      */
     default void fillQuestionCode(QuestionDO qst){
-        if (StringUtil.isBlank(qst.getCode())) qst.setCode(IdUtil.fastSimpleUUID());
+//        if (StringUtil.isBlank(qst.getCode())) qst.setCode(IdUtil.fastSimpleUUID());
     }
+
+    /**
+     * 检查是否有必答题没做
+     * @param reqVO
+     * @param qst
+     */
+    void checkLoseQuestion(SubmitSurveyReqVO reqVO, List<QuestionDO> qst);
+
+    /**
+     * 保存一次回答
+     * @param source
+     * @param surveyId
+     * @return
+     */
+    Long saveAnswer(Integer source, Long surveyId);
 }

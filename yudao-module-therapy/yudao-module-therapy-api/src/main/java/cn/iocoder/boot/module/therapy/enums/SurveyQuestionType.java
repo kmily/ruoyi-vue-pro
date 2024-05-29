@@ -17,8 +17,9 @@ public enum SurveyQuestionType implements IntArrayValuable {
 
     RADIO(1,"radio", "单选题"),
     CHECKBOX(2,"checkbox", "多选题"),
-//    FILLBLANK("3", "填空题"),
-    TREE(3,"tree", "树");
+    TREE(3,"tree", "树"),
+    SPAN(4,"span", "文本框"),
+    ;
 
     /**
      * 业务类型

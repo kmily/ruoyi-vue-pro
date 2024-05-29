@@ -137,7 +137,7 @@ public class TreatmentServiceImpl implements TreatmentService {
     @Override
     public Long addPlan(FlowPlanReqVO reqVO) {
         List<TreatmentFlowDayDO> list = treatmentFlowDayMapper.getPlanListByFlowId(reqVO.getFlowId());
-        if (list.size() > 0 || list.stream().filter(p -> p.getSequence().equals(reqVO.getSequence())).count() > 0) {
+        if (list.size() > 0 && list.stream().filter(p -> p.getSequence().equals(reqVO.getSequence())).count() > 0) {
             throw exception(TREATMENT_PLAN_SEQ_EXISTS);
         }
         TreatmentFlowDayDO dayDO = BeanUtils.toBean(reqVO, TreatmentFlowDayDO.class);
