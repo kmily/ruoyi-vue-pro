@@ -17,9 +17,12 @@ import java.util.Objects;
 @AllArgsConstructor
 public enum SurveyType implements IntArrayValuable {
 
-    SCALE(1, "量表","scale",Arrays.asList(SurveyQuestionType.RADIO)),
+    PHQ9_SCALE(1, "PHQ-9健康问卷","phq9_scale",Arrays.asList(SurveyQuestionType.RADIO)),
     STRATEGY_CARD(2, "对策卡","strategy_card",Arrays.asList(SurveyQuestionType.SPAN)),
     PROBLEM_GOAL_MOTIVE(3,"问题、目标与动机", "problem_goal_motive",Arrays.asList()),
+    GAD7_SCALE(4, "GAD-7自评量表","gad7_scale",Arrays.asList(SurveyQuestionType.RADIO)),
+    ISI_SCALE(5, "失眠严重指数","isi_scale",Arrays.asList(SurveyQuestionType.RADIO)),
+    MOOD_SCALE(6, "积极情绪和消极情绪量表","mood_scale",Arrays.asList(SurveyQuestionType.RADIO)),
     ;
 
     /**

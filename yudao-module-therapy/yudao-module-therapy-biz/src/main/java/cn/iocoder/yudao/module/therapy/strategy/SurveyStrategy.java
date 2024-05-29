@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.therapy.strategy;
 
+import cn.hutool.json.JSONObject;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveySaveReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
@@ -41,9 +42,19 @@ public interface SurveyStrategy {
 
     /**
      * 保存一次回答
-     * @param source
-     * @param surveyId
+     * @param reqVO
      * @return
      */
-    Long saveAnswer(Integer source, Long surveyId);
+    Long saveAnswer(SubmitSurveyReqVO reqVO);
+
+    /**
+     * 保存回答明细
+     * @param qst
+     * @param reqVO
+     */
+    void saveAnswerDetail(List<QuestionDO> qst,SubmitSurveyReqVO reqVO);
+
+    default JSONObject getSurveyReport(Long answerId){
+        return new JSONObject();
+    }
 }
