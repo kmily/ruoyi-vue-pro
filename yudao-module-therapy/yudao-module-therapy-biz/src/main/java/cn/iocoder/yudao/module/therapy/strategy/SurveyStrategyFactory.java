@@ -9,15 +9,20 @@ public class SurveyStrategyFactory {
     private final ApplicationContext applicationContext;
 
     @Autowired
-    public SurveyStrategyFactory(ApplicationContext applicationContext){
-        this.applicationContext=applicationContext;
+    public SurveyStrategyFactory(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
     }
 
-    public SurveyStrategy getSurveyStrategy(String type){
-        return applicationContext.getBean(this.getName(type), SurveyStrategy.class);
+    public SurveyStrategy getSurveyStrategy(String type) {
+        SurveyStrategy surveyStrategy = applicationContext.getBean(this.getName(type), SurveyStrategy.class);
+        if (surveyStrategy != null) {
+            return surveyStrategy;
+        }
+
+        return applicationContext.getBean(DefaultSurveyStrategy.class);
     }
 
-    private String getName(String type){
-        return String.format("%sSurveyStrategy",type);
+    private String getName(String type) {
+        return String.format("%sSurveyStrategy", type);
     }
 }

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.therapy.service;
 import cn.hutool.json.JSONObject;
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyAnswerPageReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyPageReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveySaveReqVO;
@@ -17,6 +18,7 @@ import cn.iocoder.yudao.module.therapy.dal.mysql.survey.SurveyQuestionMapper;
 import cn.iocoder.yudao.module.therapy.dal.mysql.survey.TreatmentSurveyMapper;
 import cn.iocoder.yudao.module.therapy.strategy.SurveyStrategy;
 import cn.iocoder.yudao.module.therapy.strategy.SurveyStrategyFactory;
+import jodd.util.StringUtil;
 import lombok.var;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.SURVEY_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 @Service
@@ -38,8 +41,7 @@ public class SurveyServiceImpl implements SurveyService {
     private SurveyQuestionMapper surveyQuestionMapper;
     @Resource
     private SurveyAnswerMapper surveyAnswerMapper;
-    @Resource
-    private SurveyAnswerDetailMapper surveyAnswerDetailMapper;
+
     @Resource
     private SurveyStrategyFactory surveyStrategyFactory;
 
@@ -52,6 +54,7 @@ public class SurveyServiceImpl implements SurveyService {
         TreatmentSurveyDO treatmentSurveyDO = SurveyConvert.INSTANCE.convert(vo);
         surveyStrategy.fillSurveyCode(treatmentSurveyDO);
         treatmentSurveyMapper.insert(treatmentSurveyDO);
+
         List<QuestionDO> qst = new ArrayList<>();
         for (var item : vo.getQuestions()) {
             QuestionDO q = SurveyConvert.INSTANCE.convertQst(new JSONObject(item));
@@ -113,28 +116,25 @@ public class SurveyServiceImpl implements SurveyService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void submitSurvey(SubmitSurveyReqVO reqVO) {
-//        //判断问卷是否存在，状态是否正常
-//        TreatmentSurveyDO tsDO = treatmentSurveyMapper.selectById(reqVO.getSurveyId());
-//        if (Objects.isNull(tsDO)) throw exception(SURVEY_NOT_EXISTS);
-//
-//        //判断是否必答题有遗漏
-//        Set<Long> qst1Set = reqVO.getQstList().stream().map(p -> p.getId()).collect(Collectors.toSet());
-//        List<QuestionDO> qst = surveyQuestionMapper.selectBySurveyId(reqVO.getSurveyId());
-//        Set<Long> qst2Set = qst.stream().filter(k -> k.isRequired()).map(k -> k.getId()).collect(Collectors.toSet());
-//        qst2Set.removeAll(qst1Set);
-//        if (qst2Set.size() > 0) {
-//            throw exception(SURVEY_EXISTS_UNFINISHED);
-//        }
-//        //保存一次回答
-//        SurveyAnswerDO answerDO = new SurveyAnswerDO();
-//        answerDO.setSource(reqVO.getSource());
-//        answerDO.setBelongSurveyId(tsDO.getId());
-//        surveyAnswerMapper.insert(answerDO);
-//        //保存答案明细
-//        Map<Long, QuestionDO> qstMap = CollectionUtils.convertMap(qst, QuestionDO::getId);
-//        List<AnswerDetailDO> anAnswerDOS = SurveyConvert.INSTANCE.convert(qstMap, reqVO.getQstList(), getLoginUserId());
-//        surveyAnswerDetailMapper.insertBatch(anAnswerDOS);
+    public Long submitSurvey(SubmitSurveyReqVO reqVO) {
+        if (StringUtil.isBlank(reqVO.getSurveyCode()) || Objects.isNull(reqVO.getId()) || reqVO.getSurveyId() <= 0) {
+            throw exception(BAD_REQUEST, "问卷id和code不能同时为空");
+        }
+        //判断问卷是否存在，状态是否正常
+        TreatmentSurveyDO tsDO = StringUtil.isBlank(reqVO.getSurveyCode())
+                ? treatmentSurveyMapper.selectByCode(reqVO.getSurveyCode()) : treatmentSurveyMapper.selectById(reqVO.getSurveyId());
+        if (Objects.isNull(tsDO)) throw exception(SURVEY_NOT_EXISTS);
+        SurveyStrategy surveyStrategy = surveyStrategyFactory.getSurveyStrategy(SurveyType.getByType(tsDO.getSurveyType()).getCode());
+
+        //判断是否必答题有遗漏
+        List<QuestionDO> qsts = surveyQuestionMapper.selectBySurveyId(reqVO.getSurveyId());
+        surveyStrategy.checkLoseQuestion(reqVO, qsts);
+        //保存一次回答
+        Long anSwerId = surveyStrategy.saveAnswer(reqVO);
+        //保存答案明细
+        reqVO.setId(anSwerId);
+        surveyStrategy.saveAnswerDetail(qsts, reqVO);
+        return anSwerId;
     }
 
     @Override

@@ -5,6 +5,8 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyPageReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import jodd.util.StringUtil;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -22,5 +24,11 @@ public interface TreatmentSurveyMapper extends BaseMapperX<TreatmentSurveyDO> {
                 .eqIfPresent(TreatmentSurveyDO::getCreator, reqVO.getCreator())
                 .apply(StringUtil.isNotBlank(reqVO.getTag()), String.format("JSON_CONTAINS(tags, '[\"%s\"]')", reqVO.getTag()))
                 .orderByDesc(TreatmentSurveyDO::getId));
+    }
+
+    default TreatmentSurveyDO selectByCode(String code){
+        LambdaQueryWrapper<TreatmentSurveyDO> queryWrapper= Wrappers.lambdaQuery(TreatmentSurveyDO.class)
+                .eq(TreatmentSurveyDO::getCode,code);
+        return selectOne(queryWrapper);
     }
 }

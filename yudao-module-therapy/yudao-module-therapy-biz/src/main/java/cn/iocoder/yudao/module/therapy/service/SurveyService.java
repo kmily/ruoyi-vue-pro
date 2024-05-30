@@ -48,7 +48,7 @@ public interface SurveyService {
      */
     List<QuestionDO> getQuestionBySurveyId(Long id);
 
-    void submitSurvey(SubmitSurveyReqVO reqVO);
+    Long submitSurvey(SubmitSurveyReqVO reqVO);
 
     PageResult<SurveyAnswerDO> getSurveyAnswerPage(SurveyAnswerPageReqVO vo);
 

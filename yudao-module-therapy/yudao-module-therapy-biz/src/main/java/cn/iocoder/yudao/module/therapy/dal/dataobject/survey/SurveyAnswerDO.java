@@ -23,10 +23,10 @@ public class SurveyAnswerDO extends BaseDO {
      */
     @TableId
     private Long id;
-    /**
-     * 编码
-     */
-    private String belongSurveyCode;
+//    /**
+//     * 编码
+//     */
+//    private String belongSurveyCode;
 
     /**
      * 所属问卷

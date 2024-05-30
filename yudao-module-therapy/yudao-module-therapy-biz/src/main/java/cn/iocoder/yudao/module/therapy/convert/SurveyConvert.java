@@ -7,6 +7,7 @@ import cn.iocoder.boot.module.therapy.enums.SurveyQuestionType;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.*;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.AnAnswerReqVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
@@ -21,6 +22,7 @@ import java.util.Map;
 import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.SURVEY_QUESTION_NOT_EXISTS;
 import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.SURVEY_QUESTION_TYPE_CHANGE;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Mapper
 public interface SurveyConvert {
@@ -30,13 +32,13 @@ public interface SurveyConvert {
 
     TreatmentSurveyDO convert(SurveySaveReqVO reqVO);
 
-    default QuestionDO convertQst(JSONObject vo){
-        QuestionDO qst=new QuestionDO();
-        QuestSaveReqVO newVO=JSONUtil.toBean(vo,QuestSaveReqVO.class);
+    default QuestionDO convertQst(JSONObject vo) {
+        QuestionDO qst = new QuestionDO();
+        QuestSaveReqVO newVO = JSONUtil.toBean(vo, QuestSaveReqVO.class);
         qst.setQstContext(vo);
         qst.setTitle(newVO.getTitle());
         qst.setQstType(SurveyQuestionType.getByCode(newVO.getType()).getType());
-        qst.setRequired(vo.getBool("$required",true));
+        qst.setRequired(vo.getBool("$required", true));
         qst.setCode(newVO.getField());
         return qst;
     }
@@ -67,21 +69,24 @@ public interface SurveyConvert {
         return vo;
     }
 
-    default List<AnswerDetailDO> convert(Map<Long, QuestionDO> qstMap, List<AnAnswerReqVO> reqVOS, Long userId) {
+    default List<AnswerDetailDO> convert(Map<String, QuestionDO> qstMap, SubmitSurveyReqVO reqVO) {
         List<AnswerDetailDO> anAnswerDOS = new ArrayList<>();
-        for (AnAnswerReqVO item : reqVOS) {
+        for (AnAnswerReqVO item : reqVO.getQstList()) {
             AnswerDetailDO detailDO = new AnswerDetailDO();
-            if (!qstMap.containsKey(item.getId())) throw exception(SURVEY_QUESTION_NOT_EXISTS);
+            if (!qstMap.containsKey(item.getQstCode())) throw exception(SURVEY_QUESTION_NOT_EXISTS);
 
-            QuestionDO qst = qstMap.get(item.getId());
+            QuestionDO qst = qstMap.get(item.getQstCode());
             if (!item.getQstType().equals(qst.getQstType())) throw exception(SURVEY_QUESTION_TYPE_CHANGE);
-            detailDO.setAnswer(item.getAnswer());
+            detailDO.setAnswerId(reqVO.getId());
             detailDO.setBelongSurveyId(qst.getBelongSurveyId());
+            detailDO.setBelongSurveyCode(qst.getBelongSurveyCode());
             detailDO.setQstType(item.getQstType());
-            detailDO.setCreator(userId.toString());
-            detailDO.setUpdater(userId.toString());
-//            detailDO.setQstContext(qst.getQstContext());
+            detailDO.setCreator(getLoginUserId().toString());
+            detailDO.setUpdater(getLoginUserId().toString());
+            detailDO.setQstContext(qst.getQstContext());
+            detailDO.setAnswer(item.getAnswer());
             detailDO.setQstId(qst.getId());
+            detailDO.setBelongQstCode(qst.getCode());
             anAnswerDOS.add(detailDO);
         }
         return anAnswerDOS;

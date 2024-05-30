@@ -5,7 +5,9 @@ import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -15,16 +17,12 @@ import java.util.Objects;
 @AllArgsConstructor
 public enum SurveyType implements IntArrayValuable {
 
-    SCALE(1, "量表引入","scale"),
-    GUIDE_LANGUAGE(2, "引导语","guide_language"),
-    PROBLEM_GOAL_MOTIVE(3,"问题、目标与动机", "problem_goal_motive"),
-    CURRENT_MOOD_SCORE(4,"当前情绪评分","current_mood_score"),
-    MOOD_RECOGNIZE_NAMED(5,"情绪识别和命名","mood_recognize_named"),
-    AUTO_MINDSET_RECOGNIZE(6,"自动化思维和识别","auto_mindset_recognize"),
-    TWELVE_MIND_DISTORT(7,"12种心理歪曲","twelve_mind_distort"),
-    COGNIZE_REESTABLISH(8,"认知重建","cognize_reestablish"),
-    HAPPLY_EXERCISE_LIST(9,"愉悦活动清单","happly_exercise_list"),
-    BEHAVIOUR_EXERCISE_PLAN(10,"行为活动计划","behaviour_exercise_plan")
+    PHQ9_SCALE(1, "PHQ-9健康问卷","phq9_scale",Arrays.asList(SurveyQuestionType.RADIO)),
+    STRATEGY_CARD(2, "对策卡","strategy_card",Arrays.asList(SurveyQuestionType.SPAN)),
+    PROBLEM_GOAL_MOTIVE(3,"问题、目标与动机", "problem_goal_motive",Arrays.asList()),
+    GAD7_SCALE(4, "GAD-7自评量表","gad7_scale",Arrays.asList(SurveyQuestionType.RADIO)),
+    ISI_SCALE(5, "失眠严重指数","isi_scale",Arrays.asList(SurveyQuestionType.RADIO)),
+    MOOD_SCALE(6, "积极情绪和消极情绪量表","mood_scale",Arrays.asList(SurveyQuestionType.RADIO)),
     ;
 
     /**
@@ -37,6 +35,8 @@ public enum SurveyType implements IntArrayValuable {
     private final String title;
 
     private final String code;
+
+    private final List<SurveyQuestionType> qsts;
 
 
     public static SurveyType getByType(Integer type) {

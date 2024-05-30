@@ -43,7 +43,7 @@ public class TreatmentFlowDayitemDO extends BaseDO implements JsonFieldAccessibl
 
     /**
      * 任务类型
-     * 枚举 {@link cn.iocoder.boot.module.therapy.enums.SurveyType}
+     * 枚举 {@link cn.iocoder.boot.module.therapy.enums.TaskType}
      */
     private String type;
 

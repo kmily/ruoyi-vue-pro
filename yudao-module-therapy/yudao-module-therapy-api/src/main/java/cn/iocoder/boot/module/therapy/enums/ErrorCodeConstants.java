@@ -15,6 +15,10 @@ public interface ErrorCodeConstants {
     ErrorCode SURVEY_QUESTION_NOT_EXISTS = new ErrorCode(1_040_001_002, "问卷中不存这个题目");
     ErrorCode SURVEY_QUESTION_TYPE_CHANGE = new ErrorCode(1_040_001_003, "题目类型发生变更,请重新答题");
     ErrorCode SURVEY_QUESTION_EMPTY = new ErrorCode(1_040_001_004, "问卷题目不能为空,请设置题目后提交");
+    ErrorCode QUESTION_NOT_EXISTS_SURVEY = new ErrorCode(1_040_001_004, "提交的问题不属于此问卷");
+
+    ErrorCode SURVEY_QUESTION_QUANTITY_INACCURACY = new ErrorCode(1_040_001_005, "问卷题目数量不对");
+
     // ========== 治疗方案相关 1-040-002-000 ==========
     ErrorCode TREATMENT_FLOW_NOT_EXISTS = new ErrorCode(1_040_002_000, "治疗方案不存在");
     ErrorCode TREATMENT_PLAN_NOT_EXISTS = new ErrorCode(1_004_002_001, "治疗计划不存在");
