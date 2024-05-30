@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.therapy.service;
 
+import reactor.core.publisher.Flux;
+
 /**
  * Author: Lidong Wang <lidongw_1@example.com>
  * Date 2024/5/24
@@ -40,11 +42,12 @@ public interface AIChatService {
 
     /**
      * 自动思维识别
-     * @param userId 用户编号
+     *
+     * @param userId         用户编号
      * @param conversationId 会话编号
-     * @param content 用户聊天问题
+     * @param content        用户聊天问题
      * @return 结果
      */
-    String automaticThinkingRecognition(Long userId, String conversationId, String content);
+    Flux<Object> automaticThinkingRecognition(Long userId, String conversationId, String content);
 
 }

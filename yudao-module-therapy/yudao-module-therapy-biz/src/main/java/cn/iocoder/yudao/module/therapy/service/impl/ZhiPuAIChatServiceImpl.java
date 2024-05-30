@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.therapy.service.impl;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 import cn.iocoder.yudao.module.system.service.dict.DictDataService;
 import cn.iocoder.yudao.module.therapy.service.AIChatService;
+import cn.iocoder.yudao.module.therapy.service.dto.SSEMsgDTO;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -12,17 +13,24 @@ import com.zhipu.oapi.ClientV4;
 import com.zhipu.oapi.Constants;
 import com.zhipu.oapi.service.v4.model.ChatCompletionRequest;
 import com.zhipu.oapi.service.v4.model.ChatMessage;
+import com.zhipu.oapi.service.v4.model.ChatMessageAccumulator;
 import com.zhipu.oapi.service.v4.model.ChatMessageRole;
 import com.zhipu.oapi.service.v4.model.Choice;
 import com.zhipu.oapi.service.v4.model.ModelApiResponse;
 import com.zhipu.oapi.service.v4.model.ModelData;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
+import liquibase.util.BooleanUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Author:lidongw_1
@@ -120,6 +128,7 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
 
     /**
      * 青少年问题分类
+     *
      * @param problems 问题
      * @return
      */
@@ -127,7 +136,7 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
     public String teenProblemClassification(String problems) {
         DictDataDO dictDataDO = dictDataService.parseDictData("ai_system_prompt", "juvenile_problems_classification");
         if (dictDataDO == null) {
-            log.error("dictDataDO is null, dictType:{} label:{}", "ai_system_prompt","juvenile_problems_classification");
+            log.error("dictDataDO is null, dictType:{} label:{}", "ai_system_prompt", "juvenile_problems_classification");
             return "系统提示未配置";
         }
 
@@ -138,30 +147,83 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
         messages.add(chatMessage);
         ModelApiResponse chat = chat(messages, false);
 
-        if (!chat.isSuccess()){
-            log.error("chat problem:{} error:{}",problems, JSON.toJSONString(chat));
+        if (!chat.isSuccess()) {
+            log.error("chat problem:{} error:{}", problems, JSON.toJSONString(chat));
             return "解析失败：" + chat.getMsg();
         }
 
         ModelData data = chat.getData();
         List<Choice> choices = data.getChoices();
         if (choices == null || choices.isEmpty()) {
-            log.error("chat problem:{} error:{}",problems, "choices为空");
-            return  "解析失败，choices为空";
+            log.error("chat problem:{} error:{}", problems, "choices为空");
+            return "解析失败，choices为空";
         }
         return String.valueOf(choices.get(0).getMessage().getContent());
     }
 
     /**
      * 自动化思维识别
+     *
      * @param userId         用户编号
      * @param conversationId 会话编号
      * @param content        用户聊天问题
      * @return
      */
     @Override
-    public String automaticThinkingRecognition(Long userId, String conversationId, String content) {
-        return "";
+    public Flux<Object> automaticThinkingRecognition(Long userId, String conversationId, String content) {
+
+        DictDataDO dictDataDO = dictDataService.parseDictData("ai_system_prompt", "automatic_thinking_recognition_prompt");
+        if (dictDataDO == null) {
+            log.warn("dictDataDO is null, dictType:{} label:{}", "ai_system_prompt", "juvenile_problems_classification");
+            return Flux.just("系统提示未配置", "----END----");
+        }
+
+        List<ChatMessage> messages = new ArrayList<>();
+        ChatMessage sysMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), dictDataDO.getValue());
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), content);
+        messages.add(sysMessage);
+        messages.add(chatMessage);
+        ModelApiResponse sseModelApiResp = chat(messages, true);
+        if (sseModelApiResp.isSuccess()) {
+            Flowable<SSEMsgDTO> flowable = sseModelApiResp.getFlowable().map(modelData -> {
+                // Convert ModelData to JSON string or desired string format
+                SSEMsgDTO jsonString = convertModelDataToString(modelData);
+                // Save to database
+                //saveToDatabase(jsonString);
+                log.info("AI Response :{}", JSON.toJSONString(jsonString));
+                return jsonString;
+            });
+
+            log.info("------END----");
+            return Flux.create(emitter -> flowable.subscribe(emitter::next, emitter::error, emitter::complete)).publishOn(Schedulers.boundedElastic());
+        } else {
+            return Flux.error(new RuntimeException("API call failed"));
+        }
+    }
+
+    private SSEMsgDTO convertModelDataToString(ModelData modelData) {
+        // Implement conversion logic
+        SSEMsgDTO sseMsgDTO = new SSEMsgDTO();
+        try {
+            Choice choice = modelData.getChoices().get(0);
+            sseMsgDTO.setContent(choice.getDelta().getContent());
+            sseMsgDTO.setId(modelData.getId());
+            sseMsgDTO.setFinished(BooleanUtil.parseBoolean(choice.getFinishReason()));
+            sseMsgDTO.setCode(200);
+            return  sseMsgDTO;
+        } catch (Exception e) {
+            sseMsgDTO.setCode(500);
+            sseMsgDTO.setContent("数据解析失败");
+            sseMsgDTO.setMsg(e.getMessage());
+            sseMsgDTO.setFinished(true);
+        }
+        return sseMsgDTO; // Simplified for this example
+    }
+
+    public static Flowable<ChatMessageAccumulator> mapStreamToAccumulator(Flowable<ModelData> flowable) {
+        return flowable.map(chunk -> {
+            return new ChatMessageAccumulator(chunk.getChoices().get(0).getDelta(), null, chunk.getChoices().get(0), chunk.getUsage(), chunk.getCreated(), chunk.getId());
+        });
     }
 
 
@@ -169,7 +231,14 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
         System.out.println("chat input: " + JSON.toJSONString(messages));
         String requestIdTemplate = "chat-%s";
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
-        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder().model(Constants.ModelChatGLM4).stream(isStream).invokeMethod(Constants.invokeMethod).messages(messages).requestId(requestId).build();
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                .model(Constants.ModelChatGLM4)
+                .stream(isStream)
+                .invokeMethod(Constants.invokeMethod)
+                .temperature(0.67f)
+                .messages(messages)
+                .requestId(requestId)
+                .build();
         ModelApiResponse modelApiResponse = client.invokeModelApi(chatCompletionRequest);
 
         log.info("chat response:{}", JSON.toJSONString(modelApiResponse));
