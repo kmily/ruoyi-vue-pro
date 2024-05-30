@@ -209,4 +209,9 @@ public class TreatmentServiceImpl implements TreatmentService {
     public List<TreatmentFlowDayDO> getPlanListByFlowId(Long id) {
         return treatmentFlowDayMapper.getPlanListByFlowId(id);
     }
+
+    @Override
+    public List<TreatmentFlowDayitemDO> getTaskListByDayId(Long id) {
+        return treatmentFlowDayitemMapper.getListByDayId(id);
+    }
 }

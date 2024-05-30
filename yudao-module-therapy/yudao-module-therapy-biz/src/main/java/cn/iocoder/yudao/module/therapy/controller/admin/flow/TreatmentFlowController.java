@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.therapy.controller.admin.flow;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -14,6 +15,7 @@ import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.TreatmentFlowRes
 import cn.iocoder.yudao.module.therapy.convert.TreatmentFlowConvert;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDayDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDayitemDO;
 import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -88,9 +90,9 @@ public class TreatmentFlowController {
 //    @PreAuthorize("@ss.hasPermission('system:user:create')")
     public CommonResult<TreatmentFlowRespVO> getFlow(@RequestParam("id") Long id) {
         TreatmentFlowDO flow = treatmentService.getTreatmentFlow(id);
-        if(Objects.isNull(flow)) return success(null);
+        if (Objects.isNull(flow)) return success(null);
         TreatmentFlowRespVO vo = BeanUtils.toBean(flow, TreatmentFlowRespVO.class);
-        AdminUserRespDTO dto= adminUserApi.getUser(Long.parseLong(flow.getCreator()));
+        AdminUserRespDTO dto = adminUserApi.getUser(Long.parseLong(flow.getCreator()));
         vo.setCreatorName(dto.getNickname());
         //获取治疗日
         vo.setPlanList(new ArrayList<>());
@@ -143,12 +145,20 @@ public class TreatmentFlowController {
         return success(true);
     }
 
-//    @PutMapping("/getPlanList")
-//    @Operation(summary = "通过方案获取计划列表")
-//    @Parameter(name = "id", description = "方案id", required = true, example = "1024")
-////    @PreAuthorize("@ss.hasPermission('system:user:create')")
-//    public CommonResult<List<TreatmentFlowDayDO>> getPlanList(@RequestParam("id") Long id) {
-//        List<TreatmentFlowDayDO> flowDayDOS = treatmentService.getPlanListByFlowId(id);
-//        return success(flowDayDOS);
-//    }
+    @PutMapping("/getTaskList")
+    @Operation(summary = "获取计划任务列表")
+    @Parameter(name = "id", description = "计划id", required = true, example = "1024")
+//    @PreAuthorize("@ss.hasPermission('system:user:create')")
+    public CommonResult<List<FlowTaskVO>> getTaskList(@RequestParam("id") Long id) {
+        List<TreatmentFlowDayitemDO> taskList = treatmentService.getTaskListByDayId(id);
+        if (CollectionUtil.isEmpty(taskList)) {
+            return success(new ArrayList<>());
+        }
+        List<FlowTaskVO> taskVOS = new ArrayList<>();
+        for (TreatmentFlowDayitemDO item : taskList) {
+            FlowTaskVO vo = BeanUtils.toBean(item, FlowTaskVO.class);
+            taskVOS.add(vo);
+        }
+        return success(taskVOS);
+    }
 }
