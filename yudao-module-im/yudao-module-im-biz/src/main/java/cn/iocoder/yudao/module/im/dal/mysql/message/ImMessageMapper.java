@@ -14,7 +14,7 @@ import java.util.List;
  * @author 芋道源码
  */
 @Mapper
-public interface MessageMapper extends BaseMapperX<ImMessageDO> {
+public interface ImMessageMapper extends BaseMapperX<ImMessageDO> {
 
     default List<ImMessageDO> selectMessageList(ImMessageDO message) {
         return selectList(new LambdaQueryWrapperX<ImMessageDO>()

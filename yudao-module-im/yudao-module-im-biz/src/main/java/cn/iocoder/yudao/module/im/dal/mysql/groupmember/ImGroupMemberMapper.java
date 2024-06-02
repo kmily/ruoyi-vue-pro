@@ -15,7 +15,7 @@ import java.util.List;
  * @author 芋道源码
  */
 @Mapper
-public interface GroupMemberMapper extends BaseMapperX<ImGroupMemberDO> {
+public interface ImGroupMemberMapper extends BaseMapperX<ImGroupMemberDO> {
 
     default PageResult<ImGroupMemberDO> selectPage(ImGroupMemberPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ImGroupMemberDO>()

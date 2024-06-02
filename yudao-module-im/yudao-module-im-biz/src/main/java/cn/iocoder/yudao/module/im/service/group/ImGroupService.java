@@ -11,7 +11,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
  *
  * @author 芋道源码
  */
-public interface GroupService {
+public interface ImGroupService {
 
     /**
      * 创建群

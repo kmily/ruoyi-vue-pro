@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversatio
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationUpdatePinnedReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationDO;
-import cn.iocoder.yudao.module.im.service.conversation.ConversationService;
+import cn.iocoder.yudao.module.im.service.conversation.ImConversationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -26,26 +26,26 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 public class ImConversationController {
 
     @Resource
-    private ConversationService conversationService;
+    private ImConversationService imConversationService;
 
     @GetMapping("/list")
     @Operation(summary = "获得用户的会话列表")
     public CommonResult<List<ImConversationRespVO>> getConversationList() {
-        List<ImConversationDO> conversationList = conversationService.getConversationList();
+        List<ImConversationDO> conversationList = imConversationService.getConversationList();
         return success(BeanUtils.toBean(conversationList, ImConversationRespVO.class));
     }
 
     @PostMapping("/update-pinned")
     @Operation(summary = "置顶会话")
     public CommonResult<Boolean> updatePinned(@Valid @RequestBody ImConversationUpdatePinnedReqVO updateReqVO) {
-        conversationService.updatePinned(getLoginUserId(),updateReqVO);
+        imConversationService.updatePinned(getLoginUserId(),updateReqVO);
         return success(true);
     }
 
     @PostMapping("/update-last-read-time")
     @Operation(summary = "更新最后已读时间")
     public CommonResult<Boolean> updateLastReadTime(@Valid @RequestBody ImConversationUpdateLastReadTimeReqVO updateReqVO) {
-        conversationService.updateLastReadTime(getLoginUserId(),updateReqVO);
+        imConversationService.updateLastReadTime(getLoginUserId(),updateReqVO);
         return success(true);
     }
 

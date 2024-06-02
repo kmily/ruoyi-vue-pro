@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-public interface GroupMemberService {
+public interface ImGroupMemberService {
 
     /**
      * 创建群成员

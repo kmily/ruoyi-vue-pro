@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageSendReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageSendRespVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
-import cn.iocoder.yudao.module.im.service.message.MessageService;
+import cn.iocoder.yudao.module.im.service.message.ImMessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,12 +28,12 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 public class ImMessageController {
 
     @Resource
-    private MessageService messageService;
+    private ImMessageService imMessageService;
 
     @PostMapping("/send")
     @Operation(summary = "发送消息")
     public CommonResult<ImMessageSendRespVO> sendMessage(@Valid @RequestBody ImMessageSendReqVO imMessageSendReqVO) {
-        ImMessageDO message = messageService.sendMessage(getLoginUserId(), imMessageSendReqVO);
+        ImMessageDO message = imMessageService.sendMessage(getLoginUserId(), imMessageSendReqVO);
         return success(BeanUtils.toBean(message, ImMessageSendRespVO.class));
     }
 
@@ -43,14 +43,14 @@ public class ImMessageController {
     @Parameter(name = "size", description = "条数", required = true, example = "10")
     public CommonResult<List<ImMessageRespVO>> pullMessageList(@RequestParam("sequence") Long sequence,
                                                                @RequestParam("size") Integer size) {
-        List<ImMessageDO> messages = messageService.pullMessageList(getLoginUserId(), sequence, size);
+        List<ImMessageDO> messages = imMessageService.pullMessageList(getLoginUserId(), sequence, size);
         return success(BeanUtils.toBean(messages, ImMessageRespVO.class));
     }
 
     @GetMapping("/list")
     @Operation(summary = "消息列表-根据接收人和发送时间进行分页查询")
     public CommonResult<List<ImMessageRespVO>> getMessageList(@Valid ImMessageListReqVO listReqVO) {
-        List<ImMessageDO> messagePage = messageService.getMessageList(getLoginUserId(), listReqVO);
+        List<ImMessageDO> messagePage = imMessageService.getMessageList(getLoginUserId(), listReqVO);
         return success(BeanUtils.toBean(messagePage, ImMessageRespVO.class));
     }
 

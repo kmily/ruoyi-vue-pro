@@ -6,11 +6,11 @@ import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageRespVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.inbox.ImInboxDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
-import cn.iocoder.yudao.module.im.dal.mysql.inbox.InboxMapper;
+import cn.iocoder.yudao.module.im.dal.mysql.inbox.ImInboxMapper;
 import cn.iocoder.yudao.module.im.dal.redis.inbox.InboxLockRedisDAO;
 import cn.iocoder.yudao.module.im.dal.redis.inbox.SequenceRedisDAO;
 import cn.iocoder.yudao.module.im.enums.conversation.ImConversationTypeEnum;
-import cn.iocoder.yudao.module.im.service.groupmember.GroupMemberService;
+import cn.iocoder.yudao.module.im.service.groupmember.ImGroupMemberService;
 import cn.iocoder.yudao.module.infra.api.websocket.WebSocketSenderApi;
 import jakarta.annotation.Resource;
 import org.dromara.hutool.core.date.DateUnit;
@@ -27,13 +27,13 @@ import java.util.List;
  */
 @Service
 @Validated
-public class InboxServiceImpl implements InboxService {
+public class ImInboxServiceImpl implements ImInboxService {
 
     private static final Long INBOX_LOCK_TIMEOUT = 120 * DateUnit.SECOND.getMillis();
     private static final String IM_MESSAGE_RECEIVE = "im-message-receive";
 
     @Resource
-    private InboxMapper inboxMapper;
+    private ImInboxMapper imInboxMapper;
 
     @Resource
     private SequenceRedisDAO sequenceRedisDAO;
@@ -43,7 +43,7 @@ public class InboxServiceImpl implements InboxService {
     @Resource
     private WebSocketSenderApi webSocketSenderApi;
     @Resource
-    private GroupMemberService groupMemberService;
+    private ImGroupMemberService imGroupMemberService;
 
     @Override
     public void saveInboxAndSendMessage(ImMessageDO message) {
@@ -55,14 +55,14 @@ public class InboxServiceImpl implements InboxService {
             saveInboxAndSendMessageForUser(message.getReceiverId(), message);
         } else if (message.getConversationType().equals(ImConversationTypeEnum.GROUP.getType())) {
             // 2.2 如果是群聊，发送给群聊的所有人
-            List<ImGroupMemberDO> groupMembers = groupMemberService.selectByGroupId(message.getReceiverId());
+            List<ImGroupMemberDO> groupMembers = imGroupMemberService.selectByGroupId(message.getReceiverId());
             groupMembers.forEach(groupMemberDO -> saveInboxAndSendMessageForUser(groupMemberDO.getUserId(), message));
         }
     }
 
     @Override
     public List<Long> selectMessageIdsByUserIdAndSequence(Long userId, Long sequence, Integer size) {
-        List<ImInboxDO> imInboxDOS = inboxMapper.selectListByUserIdAndSequence(userId, sequence, size);
+        List<ImInboxDO> imInboxDOS = imInboxMapper.selectListByUserIdAndSequence(userId, sequence, size);
         return imInboxDOS.stream().map(ImInboxDO::getMessageId).toList();
     }
 
@@ -77,7 +77,7 @@ public class InboxServiceImpl implements InboxService {
                     .setUserId(userId)
                     .setMessageId(message.getId())
                     .setSequence(userSequence);
-            inboxMapper.insert(inbox);
+            imInboxMapper.insert(inbox);
             // 3. 发送消息
             sendAsyncMessage(userId, message, userSequence);
         });

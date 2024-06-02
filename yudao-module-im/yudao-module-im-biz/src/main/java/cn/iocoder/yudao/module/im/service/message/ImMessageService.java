@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-public interface MessageService {
+public interface ImMessageService {
 
     /**
      * 获得历史消息

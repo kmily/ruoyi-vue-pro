@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.ImGroupMemberP
 import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.ImGroupMemberRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.ImGroupMemberSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
-import cn.iocoder.yudao.module.im.service.groupmember.GroupMemberService;
+import cn.iocoder.yudao.module.im.service.groupmember.ImGroupMemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,20 +35,20 @@ import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.E
 public class ImGroupMemberController {
 
     @Resource
-    private GroupMemberService groupMemberService;
+    private ImGroupMemberService imGroupMemberService;
 
     @PostMapping("/create")
     @Operation(summary = "创建群成员")
     @PreAuthorize("@ss.hasPermission('im:group-member:create')")
     public CommonResult<Long> createGroupMember(@Valid @RequestBody ImGroupMemberSaveReqVO createReqVO) {
-        return success(groupMemberService.createGroupMember(createReqVO));
+        return success(imGroupMemberService.createGroupMember(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新群成员")
     @PreAuthorize("@ss.hasPermission('im:group-member:update')")
     public CommonResult<Boolean> updateGroupMember(@Valid @RequestBody ImGroupMemberSaveReqVO updateReqVO) {
-        groupMemberService.updateGroupMember(updateReqVO);
+        imGroupMemberService.updateGroupMember(updateReqVO);
         return success(true);
     }
 
@@ -57,7 +57,7 @@ public class ImGroupMemberController {
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('im:group-member:delete')")
     public CommonResult<Boolean> deleteGroupMember(@RequestParam("id") Long id) {
-        groupMemberService.deleteGroupMember(id);
+        imGroupMemberService.deleteGroupMember(id);
         return success(true);
     }
 
@@ -66,7 +66,7 @@ public class ImGroupMemberController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('im:group-member:query')")
     public CommonResult<ImGroupMemberRespVO> getGroupMember(@RequestParam("id") Long id) {
-        ImGroupMemberDO groupMember = groupMemberService.getGroupMember(id);
+        ImGroupMemberDO groupMember = imGroupMemberService.getGroupMember(id);
         return success(BeanUtils.toBean(groupMember, ImGroupMemberRespVO.class));
     }
 
@@ -74,7 +74,7 @@ public class ImGroupMemberController {
     @Operation(summary = "获得群成员分页")
     @PreAuthorize("@ss.hasPermission('im:group-member:query')")
     public CommonResult<PageResult<ImGroupMemberRespVO>> getGroupMemberPage(@Valid ImGroupMemberPageReqVO pageReqVO) {
-        PageResult<ImGroupMemberDO> pageResult = groupMemberService.getGroupMemberPage(pageReqVO);
+        PageResult<ImGroupMemberDO> pageResult = imGroupMemberService.getGroupMemberPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, ImGroupMemberRespVO.class));
     }
 
@@ -85,7 +85,7 @@ public class ImGroupMemberController {
     public void exportGroupMemberExcel(@Valid ImGroupMemberPageReqVO pageReqVO,
                                        HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<ImGroupMemberDO> list = groupMemberService.getGroupMemberPage(pageReqVO).getList();
+        List<ImGroupMemberDO> list = imGroupMemberService.getGroupMemberPage(pageReqVO).getList();
         // 导出 Excel
         ExcelUtils.write(response, "群成员.xls", "数据", ImGroupMemberRespVO.class,
                 BeanUtils.toBean(list, ImGroupMemberRespVO.class));

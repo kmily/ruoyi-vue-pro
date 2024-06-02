@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.im.service.conversation;
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationUpdateLastReadTimeReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationUpdatePinnedReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationDO;
-import cn.iocoder.yudao.module.im.dal.mysql.conversation.ConversationMapper;
+import cn.iocoder.yudao.module.im.dal.mysql.conversation.ImConversationMapper;
 import cn.iocoder.yudao.module.im.enums.conversation.ImConversationTypeEnum;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -19,14 +19,14 @@ import java.util.List;
  */
 @Service
 @Validated
-public class ConversationServiceImpl implements ConversationService {
+public class ImConversationServiceImpl implements ImConversationService {
 
     @Resource
-    private ConversationMapper conversationMapper;
+    private ImConversationMapper imConversationMapper;
 
     @Override
     public List<ImConversationDO> getConversationList() {
-        return conversationMapper.selectList();
+        return imConversationMapper.selectList();
     }
 
     @Override
@@ -34,14 +34,14 @@ public class ConversationServiceImpl implements ConversationService {
         // 1. 获得会话编号
         String no = ImConversationTypeEnum.generateConversationNo(loginUserId, updateReqVO.getTargetId(), updateReqVO.getType());
         // 2. 查询会话
-        ImConversationDO conversation = conversationMapper.selectByNo(no);
+        ImConversationDO conversation = imConversationMapper.selectByNo(no);
         if (conversation == null) {
             // 2.1. 不存在，则插入
             conversation = insertConversation(no, loginUserId, updateReqVO.getTargetId(), updateReqVO.getType());
         }
         // 3. 更新会话
         conversation.setPinned(updateReqVO.getPinned());
-        conversationMapper.updateById(conversation);
+        imConversationMapper.updateById(conversation);
         // 4. 做对应更新的 notify 推送
     }
 
@@ -51,7 +51,7 @@ public class ConversationServiceImpl implements ConversationService {
         imConversationDO.setUserId(userId);
         imConversationDO.setTargetId(targetId);
         imConversationDO.setType(type);
-        conversationMapper.insert(imConversationDO);
+        imConversationMapper.insert(imConversationDO);
         return imConversationDO;
     }
 
@@ -60,14 +60,14 @@ public class ConversationServiceImpl implements ConversationService {
         // 1. 获得会话编号
         String no = ImConversationTypeEnum.generateConversationNo(loginUserId, updateReqVO.getTargetId(), updateReqVO.getType());
         // 2. 查询会话
-        ImConversationDO conversation = conversationMapper.selectByNo(no);
+        ImConversationDO conversation = imConversationMapper.selectByNo(no);
         if (conversation == null) {
             // 2.1. 不存在，则插入
             conversation = insertConversation(no, loginUserId, updateReqVO.getTargetId(), updateReqVO.getType());
         }
         // 3. 更新会话
         conversation.setLastReadTime(updateReqVO.getLastReadTime());
-        conversationMapper.updateById(conversation);
+        imConversationMapper.updateById(conversation);
         // 4. 做对应更新的 notify 推送
     }
 

@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
  * @author 芋道源码
  */
 @Mapper
-public interface ConversationMapper extends BaseMapperX<ImConversationDO> {
+public interface ImConversationMapper extends BaseMapperX<ImConversationDO> {
 
     default ImConversationDO selectByNo(String no){
         return selectOne(ImConversationDO::getNo, no);

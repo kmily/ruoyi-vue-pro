@@ -7,20 +7,19 @@ import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
-// TODO @hao：IM 前缀
 /**
  * IM 收件箱 Mapper
  *
  * @author 芋道源码
  */
 @Mapper
-public interface InboxMapper extends BaseMapperX<ImInboxDO> {
+public interface ImInboxMapper extends BaseMapperX<ImInboxDO> {
 
     default List<ImInboxDO> selectListByUserIdAndSequence(Long userId, Long sequence, Integer size) {
         return selectList(new LambdaQueryWrapperX<ImInboxDO>()
-                .gt(ImInboxDO::getUserId, userId)
-                .gt(ImInboxDO::getSequence, sequence)
-                .orderByAsc(ImInboxDO::getSequence)
+                .eq(ImInboxDO::getUserId, userId)
+                .gt(sequence != null, ImInboxDO::getSequence, sequence)
+                .orderByDesc(ImInboxDO::getSequence)
                 .last("LIMIT " + size));
     }
 

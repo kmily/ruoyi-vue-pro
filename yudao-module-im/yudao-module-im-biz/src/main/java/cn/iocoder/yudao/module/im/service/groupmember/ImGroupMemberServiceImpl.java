@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 
-import cn.iocoder.yudao.module.im.dal.mysql.groupmember.GroupMemberMapper;
+import cn.iocoder.yudao.module.im.dal.mysql.groupmember.ImGroupMemberMapper;
 
 import java.util.List;
 
@@ -23,16 +23,16 @@ import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
  */
 @Service
 @Validated
-public class GroupMemberServiceImpl implements GroupMemberService {
+public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
     @Resource
-    private GroupMemberMapper groupMemberMapper;
+    private ImGroupMemberMapper imGroupMemberMapper;
 
     @Override
     public Long createGroupMember(ImGroupMemberSaveReqVO createReqVO) {
         // 插入
         ImGroupMemberDO groupMember = BeanUtils.toBean(createReqVO, ImGroupMemberDO.class);
-        groupMemberMapper.insert(groupMember);
+        imGroupMemberMapper.insert(groupMember);
         // 返回
         return groupMember.getId();
     }
@@ -43,7 +43,7 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         validateGroupMemberExists(updateReqVO.getId());
         // 更新
         ImGroupMemberDO updateObj = BeanUtils.toBean(updateReqVO, ImGroupMemberDO.class);
-        groupMemberMapper.updateById(updateObj);
+        imGroupMemberMapper.updateById(updateObj);
     }
 
     @Override
@@ -51,28 +51,28 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         // 校验存在
         validateGroupMemberExists(id);
         // 删除
-        groupMemberMapper.deleteById(id);
+        imGroupMemberMapper.deleteById(id);
     }
 
     private void validateGroupMemberExists(Long id) {
-        if (groupMemberMapper.selectById(id) == null) {
+        if (imGroupMemberMapper.selectById(id) == null) {
             throw exception(GROUP_MEMBER_NOT_EXISTS);
         }
     }
 
     @Override
     public ImGroupMemberDO getGroupMember(Long id) {
-        return groupMemberMapper.selectById(id);
+        return imGroupMemberMapper.selectById(id);
     }
 
     @Override
     public PageResult<ImGroupMemberDO> getGroupMemberPage(ImGroupMemberPageReqVO pageReqVO) {
-        return groupMemberMapper.selectPage(pageReqVO);
+        return imGroupMemberMapper.selectPage(pageReqVO);
     }
 
     @Override
     public List<ImGroupMemberDO> selectByGroupId(Long groupId) {
-        return groupMemberMapper.selectListByGroupId(groupId);
+        return imGroupMemberMapper.selectListByGroupId(groupId);
     }
 
 }

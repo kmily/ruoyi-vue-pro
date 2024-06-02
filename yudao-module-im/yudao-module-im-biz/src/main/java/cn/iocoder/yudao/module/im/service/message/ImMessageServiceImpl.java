@@ -5,12 +5,12 @@ import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageListReqVO
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
-import cn.iocoder.yudao.module.im.dal.mysql.message.MessageMapper;
+import cn.iocoder.yudao.module.im.dal.mysql.message.ImMessageMapper;
 import cn.iocoder.yudao.module.im.enums.conversation.ImConversationTypeEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageSourceEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
-import cn.iocoder.yudao.module.im.service.groupmember.GroupMemberService;
-import cn.iocoder.yudao.module.im.service.inbox.InboxService;
+import cn.iocoder.yudao.module.im.service.groupmember.ImGroupMemberService;
+import cn.iocoder.yudao.module.im.service.inbox.ImInboxService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
@@ -33,16 +33,16 @@ import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.MESSAGE_RECEIV
 @Service
 @Validated
 @Slf4j
-public class MessageServiceImpl implements MessageService {
+public class ImMessageServiceImpl implements ImMessageService {
 
     @Resource
-    private MessageMapper messageMapper;
+    private ImMessageMapper imMessageMapper;
     @Resource
     private AdminUserApi adminUserApi;
     @Resource
-    private InboxService inboxService;
+    private ImInboxService imInboxService;
     @Resource
-    private GroupMemberService groupMemberService;
+    private ImGroupMemberService imGroupMemberService;
 
     @Override
     public List<ImMessageDO> getMessageList(Long loginUserId, ImMessageListReqVO listReqVO) {
@@ -52,13 +52,13 @@ public class MessageServiceImpl implements MessageService {
         ImMessageDO message = new ImMessageDO()
                 .setSendTime(listReqVO.getSendTime())
                 .setConversationNo(no);
-        return messageMapper.selectMessageList(message);
+        return imMessageMapper.selectMessageList(message);
     }
 
     @Override
     public List<ImMessageDO> pullMessageList(Long userId, Long sequence, Integer size) {
-        List<Long> messageIds = inboxService.selectMessageIdsByUserIdAndSequence(userId, sequence, size);
-        return messageMapper.selectBatchIds(messageIds);
+        List<Long> messageIds = imInboxService.selectMessageIdsByUserIdAndSequence(userId, sequence, size);
+        return imMessageMapper.selectBatchIds(messageIds);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class MessageServiceImpl implements MessageService {
         // 1. 保存消息
         ImMessageDO message = saveMessage(fromUserId, imMessageSendReqVO);
         // 2. 保存到收件箱，并发送消息
-        inboxService.saveInboxAndSendMessage(message);
+        imInboxService.saveInboxAndSendMessage(message);
         return message;
     }
 
@@ -83,7 +83,7 @@ public class MessageServiceImpl implements MessageService {
                 .setSendFrom(ImMessageSourceEnum.USER_SEND.getSource())
                 .setMessageStatus(ImMessageStatusEnum.SENDING.getStatus())
                 .setSendTime(TimeUtil.now());
-        messageMapper.insert(imMessageDO);
+        imMessageMapper.insert(imMessageDO);
         return imMessageDO;
     }
 
@@ -96,7 +96,7 @@ public class MessageServiceImpl implements MessageService {
             }
         } else if (message.getConversationType().equals(ImConversationTypeEnum.GROUP.getType())) {
             // 校验群聊是否存在
-            List<ImGroupMemberDO> imGroupMemberDOS = groupMemberService.selectByGroupId(message.getReceiverId());
+            List<ImGroupMemberDO> imGroupMemberDOS = imGroupMemberService.selectByGroupId(message.getReceiverId());
             if (imGroupMemberDOS.isEmpty()) {
                 throw exception(MESSAGE_RECEIVER_NOT_EXISTS);
             }

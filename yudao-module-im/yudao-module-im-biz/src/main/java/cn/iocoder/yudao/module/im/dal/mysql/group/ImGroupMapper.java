@@ -14,7 +14,7 @@ import cn.iocoder.yudao.module.im.controller.admin.group.vo.*;
  * @author 芋道源码
  */
 @Mapper
-public interface GroupMapper extends BaseMapperX<ImGroupDO> {
+public interface ImGroupMapper extends BaseMapperX<ImGroupDO> {
 
     default PageResult<ImGroupDO> selectPage(ImGroupPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ImGroupDO>()

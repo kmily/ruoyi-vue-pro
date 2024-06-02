@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-public interface InboxService {
+public interface ImInboxService {
 
     /**
      * 保存收件箱和发送消息

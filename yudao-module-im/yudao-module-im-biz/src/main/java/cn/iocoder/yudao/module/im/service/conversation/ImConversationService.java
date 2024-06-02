@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-public interface ConversationService {
+public interface ImConversationService {
 
     /**
      * 获得用户的会话列表
