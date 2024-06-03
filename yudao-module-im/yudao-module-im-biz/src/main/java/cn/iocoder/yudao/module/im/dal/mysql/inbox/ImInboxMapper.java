@@ -18,6 +18,7 @@ public interface ImInboxMapper extends BaseMapperX<ImInboxDO> {
     default List<ImInboxDO> selectListByUserIdAndSequence(Long userId, Long sequence, Integer size) {
         return selectList(new LambdaQueryWrapperX<ImInboxDO>()
                 .eq(ImInboxDO::getUserId, userId)
+//                .gtIfPresent() // TODO @hao：可以用这个，简化下面的 .gt(sequence != null, ImInboxDO::getSequence, sequence)
                 .gt(sequence != null, ImInboxDO::getSequence, sequence)
                 .orderByDesc(ImInboxDO::getSequence)
                 .last("LIMIT " + size));
