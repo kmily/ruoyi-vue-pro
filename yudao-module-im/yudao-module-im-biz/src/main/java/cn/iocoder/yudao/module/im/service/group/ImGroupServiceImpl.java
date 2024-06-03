@@ -14,7 +14,6 @@ import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMapper;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 
-// TODO @hao：前缀 IM
 /**
  * 群 Service 实现类
  *
