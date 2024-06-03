@@ -19,6 +19,7 @@ import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_
  *
  * @author 芋道源码
  */
+@Deprecated
 public class TenantRocketMQConsumeMessageHook implements ConsumeMessageHook {
 
     @Override
