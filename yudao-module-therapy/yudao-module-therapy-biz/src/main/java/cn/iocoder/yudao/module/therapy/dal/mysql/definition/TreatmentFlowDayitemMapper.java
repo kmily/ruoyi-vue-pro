@@ -14,7 +14,7 @@ import java.util.List;
 public interface TreatmentFlowDayitemMapper extends BaseMapperX<TreatmentFlowDayitemDO> {
 
     default List<TreatmentFlowDayitemDO> getFirstGroupFlowDayitems(Long dayId) {
-        Long agroup = selectOne(new QueryWrapper<TreatmentFlowDayitemDO>().eq("day_id", dayId).orderByAsc("agroup").last("limit 1")).getAgroup();
+        Integer agroup = selectOne(new QueryWrapper<TreatmentFlowDayitemDO>().eq("day_id", dayId).orderByAsc("agroup").last("limit 1")).getAgroup();
         QueryWrapper<TreatmentFlowDayitemDO> queryWrapper = new QueryWrapper();
         queryWrapper = queryWrapper.eq("day_id", dayId).eq("agroup", agroup);
         return selectList(queryWrapper);
@@ -41,7 +41,7 @@ public interface TreatmentFlowDayitemMapper extends BaseMapperX<TreatmentFlowDay
      */
     default List<TreatmentFlowDayitemDO> getNextGroup(Long dayId, Long agroup) {
         QueryWrapper<TreatmentFlowDayitemDO> queryWrapper = new QueryWrapper();
-        Long nextAgroup = selectOne(new QueryWrapper<TreatmentFlowDayitemDO>()
+        Integer nextAgroup = selectOne(new QueryWrapper<TreatmentFlowDayitemDO>()
                 .eq("day_id", dayId)
                 .gt("agroup", agroup)
                 .orderByAsc("agroup").last("limit 1")).getAgroup();

@@ -48,9 +48,29 @@ public interface SurveyService {
      */
     List<QuestionDO> getQuestionBySurveyId(Long id);
 
-    Long submitSurvey(SubmitSurveyReqVO reqVO);
+    /**
+     * 工具箱提交答案
+     * @param reqVO
+     * @return
+     */
+    Long submitSurveyForTools(SubmitSurveyReqVO reqVO);
+
+    /**
+     * 流程提交答案
+     * @param reqVO
+     * @return
+     */
+    Long submitSurveyForFlow(SubmitSurveyReqVO reqVO);
 
     PageResult<SurveyAnswerDO> getSurveyAnswerPage(SurveyAnswerPageReqVO vo);
 
     List<TreatmentSurveyDO> getSurveyByIds(Collection<Long> ids);
+
+    /**
+     * 初始化一次回答实例
+     * @param surveyCode
+     * @param source
+     * @return
+     */
+    Long initSurveyAnswer(String surveyCode,Integer source);
 }

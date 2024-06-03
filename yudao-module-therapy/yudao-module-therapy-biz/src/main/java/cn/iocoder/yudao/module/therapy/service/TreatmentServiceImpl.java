@@ -19,8 +19,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -170,6 +172,7 @@ public class TreatmentServiceImpl implements TreatmentService {
         treatmentFlowDayitemMapper.deleteByDayId(id);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Long createPlanTask(FlowTaskVO vo) {
         TreatmentFlowDayDO dayDO = treatmentFlowDayMapper.selectById(vo.getDayId());
@@ -178,8 +181,28 @@ public class TreatmentServiceImpl implements TreatmentService {
         }
         TreatmentFlowDayitemDO dayitemDO = BeanUtils.toBean(vo, TreatmentFlowDayitemDO.class);
         dayitemDO.setFlowId(dayDO.getFlowId());
-        treatmentFlowDayitemMapper.insert(dayitemDO);
-        return dayitemDO.getId();
+        if (Objects.isNull(vo.getBeforeId()) || vo.getBeforeId() <= 0L) {
+            dayitemDO.setAgroup(1);
+            treatmentFlowDayitemMapper.insert(dayitemDO);
+            return dayitemDO.getId();
+        } else {
+            List<TreatmentFlowDayitemDO> items = getTaskListByDayId(vo.getDayId()).stream()
+                    .sorted(Comparator.comparing(TreatmentFlowDayitemDO::getAgroup)).collect(Collectors.toList());
+            Integer agroup = 0;
+            for (TreatmentFlowDayitemDO item : items) {
+                if (item.getId().equals(vo.getBeforeId())) {
+                    agroup = item.getAgroup();
+                    dayitemDO.setAgroup(item.getAgroup());
+                }
+                if (agroup > 0) {
+                    item.setAgroup(++agroup);
+                    treatmentFlowDayitemMapper.updateById(item);
+                }
+            }
+            treatmentFlowDayitemMapper.insert(dayitemDO);
+            return dayitemDO.getId();
+        }
+
     }
 
     @Override
@@ -213,5 +236,10 @@ public class TreatmentServiceImpl implements TreatmentService {
     @Override
     public List<TreatmentFlowDayitemDO> getTaskListByDayId(Long id) {
         return treatmentFlowDayitemMapper.getListByDayId(id);
+    }
+
+    @Override
+    public TreatmentFlowDayitemDO getTask(Long id) {
+        return treatmentFlowDayitemMapper.selectById(id);
     }
 }

@@ -33,6 +33,11 @@ public class SurveyAnswerDO extends BaseDO {
      */
     private Long belongSurveyId;
 
+    /**
+     * 问卷类型
+     */
+    private Integer surveyType;
+
 
     /**
      * 答题来源

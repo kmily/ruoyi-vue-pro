@@ -59,7 +59,7 @@ public abstract class AbstractStrategy {
      */
     public void checkLoseQuestion(SubmitSurveyReqVO reqVO, List<QuestionDO> qst) {
         //必须一次全部提交
-        Set<Long> qst1Set = reqVO.getQstList().stream().map(p -> p.getId()).collect(Collectors.toSet());
+        Set<String> qst1Set = reqVO.getQstList().stream().map(p -> p.getQstCode()).collect(Collectors.toSet());
         Set<Long> qst2Set = qst.stream().filter(k -> k.isRequired()).map(k -> k.getId()).collect(Collectors.toSet());
         qst2Set.removeAll(qst1Set);
         if (qst2Set.size() > 0) {
