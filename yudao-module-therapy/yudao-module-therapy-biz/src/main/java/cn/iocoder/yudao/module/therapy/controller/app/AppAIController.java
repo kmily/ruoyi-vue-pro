@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.therapy.controller.app;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.AutomatedThinkingRequestVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.ProblemClassificationRequest;
 import cn.iocoder.yudao.module.therapy.service.AIChatService;
@@ -42,8 +43,11 @@ public class AppAIController {
     }
 
     @PostMapping(value = "/automated-thinking", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<Object> chat(@RequestBody AutomatedThinkingRequestVO req) {
-        return aiChatService.automaticThinkingRecognition(getLoginUserId(), req.getConversationId(), req.getContent());
+    public Flux<Object> chat(@Valid @RequestBody AutomatedThinkingRequestVO req) {
+
+        Long loginUserId = getLoginUserId();
+        loginUserId = NumberUtils.toLong(loginUserId,Long.valueOf(req.getConversationId().hashCode()));
+        return aiChatService.automaticThinkingRecognition(loginUserId, req.getConversationId(), req.getContent());
     }
 
 }

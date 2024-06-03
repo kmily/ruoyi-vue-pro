@@ -4,6 +4,7 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 /**
  * 数字的工具类，补全 {@link cn.hutool.core.util.NumberUtil} 的功能
@@ -59,6 +60,13 @@ public class NumberUtils {
             }
         }
         return NumberUtil.mul(values);
+    }
+
+    public static Long toLong(Number number, Long defaultValue) {
+        if (Objects.isNull(number)) {
+            return defaultValue;
+        }
+        return number.longValue();
     }
 
 }
