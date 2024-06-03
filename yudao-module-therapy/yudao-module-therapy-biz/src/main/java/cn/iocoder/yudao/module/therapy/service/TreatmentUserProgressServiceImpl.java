@@ -11,7 +11,6 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class TreatmentUserProgressServiceImpl implements  TreatmentUserProgressService{
@@ -87,24 +86,24 @@ public class TreatmentUserProgressServiceImpl implements  TreatmentUserProgressS
     @Override
     public TreatmentNextVO convertStepItemToRespFormat(TreatmentStepItem stepItem) {
         TreatmentNextVO data = new TreatmentNextVO();
-        data.setProcessStatus(stepItem.getProcessStatus().toString());
+        data.setProcess_status(stepItem.getProcessStatus().toString());
         if(!stepItem.getProcessStatus().equals(TreatmentStepItem.ProcessStatus.IS_NEXT)){
             StepItemVO sysInfoVO = generateSystemInfoVO(stepItem);
-            data.setStepItemType("SINGLE");
-            data.setStepItem(sysInfoVO);
+            data.setStep_item_type("SINGLE");
+            data.setStep_item(sysInfoVO);
         }else{
             if(stepItem.getDay_items().size() > 1){
-                data.setStepItemType("LIST");
+                data.setStep_item_type("LIST");
                 List<StepItemVO> stepItemVOS = new ArrayList<>();
                 for(TreatmentDayitemInstanceDO dayitemInstanceDO : stepItem.getDay_items()){
                     StepItemVO respItem = convertDayitemInstanceToMap(dayitemInstanceDO);
                     stepItemVOS.add(respItem);
                 }
-                data.setStepItems(stepItemVOS);
+                data.setStep_items(stepItemVOS);
             }else{
-                data.setStepItemType("SINGLE");
+                data.setStep_item_type("SINGLE");
                 StepItemVO stepItemVO = convertDayitemInstanceToMap(stepItem.getDay_items().get(0));
-                data.setStepItem(stepItemVO);
+                data.setStep_item(stepItemVO);
             }
         }
         return data;

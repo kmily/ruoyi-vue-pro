@@ -21,6 +21,10 @@ public abstract class BaseFlow {
 
     ProcessEngine processEngine;
 
+    public BaseFlow(){
+        processEngine = new Engine().getEngine();
+    }
+
     public Task getCurrentTask(){
         TaskService taskService = processEngine.getTaskService();
         Task currentTask = (Task) taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -41,14 +45,14 @@ public abstract class BaseFlow {
         BpmnModel bpmnModel = processEngine.getRepositoryService().getBpmnModel(currentTask.getProcessDefinitionId());
         UserTask userTask = (UserTask) bpmnModel.getFlowElement(activityId);
 
-        ExtensionElement ele =  userTask.getExtensionElements().get("content").get(0);
+        ExtensionElement ele =  userTask.getExtensionElements().get("bind").get(0);
         String content = ele.getElementText();
         Map<String, Object> data = new HashMap();
         try {
             data = new ObjectMapper().readValue(content, Map.class);
             result.put("step_type", data.get("step_type"));
-            Method method = this.getClass().getMethod("auto_" + (String) data.get("step_type"), Map.class);
-            Map stepResult = (Map) method.invoke(this, data.get("step_data"));
+            Method method = this.getClass().getMethod("auto_" + (String) data.get("step_type"), Map.class, Task.class);
+            Map stepResult = (Map) method.invoke(this, data.get("step_data"), currentTask);
             result.put("step_data", stepResult);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
@@ -67,8 +71,40 @@ public abstract class BaseFlow {
      * @param data
      * @return
      */
-    public Map auto_guide_language(Map data){
+    public Map auto_guide_language(Map data, Task currentTask){
+        TaskService taskService = processEngine.getTaskService();
+        taskService.complete(currentTask.getId());
         return data;
+    }
+
+    public Map auto_do_you_agree(Map data, Task currentTask){
+        TaskService taskService = processEngine.getTaskService();
+        return data;
+    }
+
+    Map<String, Object> getBindData(Task task){
+        String activityId = task.getTaskDefinitionKey(); // Get the task's definition key
+        BpmnModel bpmnModel = processEngine.getRepositoryService().getBpmnModel(task.getProcessDefinitionId());
+        UserTask userTask = (UserTask) bpmnModel.getFlowElement(activityId);
+        ExtensionElement ele =  userTask.getExtensionElements().get("bind").get(0);
+        String content = ele.getElementText();
+        Map<String, Object> data = new HashMap();
+        try {
+            data = new ObjectMapper().readValue(content, Map.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return data;
+    }
+
+    public void submit_do_you_agree(Map variables, Task currentTask){
+        TaskService taskService = processEngine.getTaskService();
+        Map<String, Object> currentVariable = (Map<String, Object>)variables.get("__current");
+        Map bindData = getBindData(currentTask);
+        String agreeKey = bindData.get("variable").toString();
+        RuntimeService runtimeService = processEngine.getRuntimeService();
+        runtimeService.setVariable( processInstance.getId(), agreeKey, (boolean) currentVariable.get(agreeKey));
+        taskService.complete(currentTask.getId());
     }
 
 
@@ -78,13 +114,13 @@ public abstract class BaseFlow {
             String activityId = task.getTaskDefinitionKey(); // Get the task's definition key
             BpmnModel bpmnModel = processEngine.getRepositoryService().getBpmnModel(task.getProcessDefinitionId());
             UserTask userTask = (UserTask) bpmnModel.getFlowElement(activityId);
-            ExtensionElement ele =  userTask.getExtensionElements().get("content").get(0);
+            ExtensionElement ele =  userTask.getExtensionElements().get("bind").get(0);
             String content = ele.getElementText();
             Map<String, Object> data = new HashMap();
             try {
                 data = new ObjectMapper().readValue(content, Map.class);
-                Method method = this.getClass().getMethod("submit_" + (String) data.get("step_type"), Map.class);
-                method.invoke(this, data.get("step_data"));
+                Method method = this.getClass().getMethod("submit_" + (String) data.get("step_type"), Map.class, Task.class);
+                method.invoke(this, variables, task);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             } catch (NoSuchMethodException e) {
@@ -133,22 +169,7 @@ public abstract class BaseFlow {
 
 
     void bindContentToUserTask(UserTask userTask, Map content){
-        ExtensionElement extensionElement = new ExtensionElement();
-        extensionElement.setName("bind"); // The name of your custom attribute
-        extensionElement.setNamespacePrefix("flowable"); // Namespace prefix
-        extensionElement.setNamespace("http://flowable.org/bpmn"); // Namespace
-        // please convert content to json text
-        String contentStr = "";
-        try {
-            contentStr = new ObjectMapper().writeValueAsString(content);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-
-
-        extensionElement.setElementText(contentStr); // The value of your custom attribute
-        List<ExtensionElement> etsElems = new ArrayList<>();
-        etsElems.add(extensionElement);
+        List<ExtensionElement> etsElems = createExtentionElement("bind", content);
         userTask.setExtensionElements(Collections.singletonMap("bind", etsElems));
     }
 
@@ -179,9 +200,15 @@ public abstract class BaseFlow {
             List<Map<String, Object>> groupSteps = (List<Map<String, Object>>) entry.getValue();
             List<FlowElement> steps = groupSteps.stream().map(this::convertToFlowElement).collect(Collectors.toList());
             stepGroups.put(groupKey, steps);
+            FlowElement lastStep = null;
             for(FlowElement step: steps){
                 process.addFlowElement(step);
+                if (lastStep != null){
+                    addSequenceRelation(process, lastStep, step);
+                }
+                lastStep = step;
             }
+
         }
 
         List<Map<String, String>> groupRelations = (List<Map<String, String>>) settings.get("group_relations");
@@ -220,6 +247,12 @@ public abstract class BaseFlow {
         process.addFlowElement(sequenceFlow);
     }
 
+
+    void addSequenceRelation(Process process, FlowElement source, FlowElement target){
+        SequenceFlow sequenceFlow = createSequenceFlow(generateTaskId(), source.getId(), target.getId());
+        process.addFlowElement(sequenceFlow);
+    }
+
     /**
      * 添加一个ExclusiveGate关系
      * @param process
@@ -248,9 +281,29 @@ public abstract class BaseFlow {
         process.addFlowElement(sequenceFlowFalse);
     }
 
+    FlowElement createStartEvent(Map<String, Object> step){
+        StartEvent startEvent = new StartEvent();
+        startEvent.setId(generateTaskId());
+        startEvent.setName((String) step.getOrDefault("name", "START"));
+        return startEvent;
+    }
+
+    FlowElement createEndEvent(Map<String, Object> step){
+        EndEvent endEvent = new EndEvent();
+        endEvent.setId(generateTaskId());
+        endEvent.setName((String) step.getOrDefault("name", "END"));
+        return endEvent;
+    }
+
 
     FlowElement convertToFlowElement(Map<String, Object> step){
-        boolean isServiceTask = (boolean) step.getOrDefault("is_service_task", false);
+        String stepType = (String) step.get("step_type");
+        if(stepType.equals("START")) {
+            return createStartEvent(step);
+        }else if(stepType.equals("END")) {
+            return createEndEvent(step);
+        }
+        boolean isServiceTask = (boolean) step.getOrDefault("service_task", false);
         if(isServiceTask){
          return createServiceTask(step);
         }else{
@@ -261,14 +314,14 @@ public abstract class BaseFlow {
     UserTask createUserTask(Map<String, Object> step){
         UserTask userTask = new UserTask();
         userTask.setId(generateTaskId());
-        userTask.setName((String) step.getOrDefault("name", ""));
+        userTask.setName((String) step.getOrDefault("step_type", ""));
         bindContentToUserTask(userTask, step);
         return userTask;
     }
 
-    void bindContentToServiceTask(ServiceTask serviceTask, Map content) {
+    private List<ExtensionElement> createExtentionElement(String name, Map content){
         ExtensionElement extensionElement = new ExtensionElement();
-        extensionElement.setName("bind"); // The name of your custom attribute
+        extensionElement.setName(name); // The name of your custom attribute
         extensionElement.setNamespacePrefix("flowable"); // Namespace prefix
         extensionElement.setNamespace("http://flowable.org/bpmn"); // Namespace
         // please convert content to json text
@@ -278,7 +331,16 @@ public abstract class BaseFlow {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        serviceTask.setExtensionElements(Collections.singletonMap("bind", Collections.singletonList(extensionElement)));
+
+        extensionElement.setElementText(contentStr); // The value of your custom attribute
+        List<ExtensionElement> etsElems = new ArrayList<>();
+        etsElems.add(extensionElement);
+        return etsElems;
+    }
+
+    void bindContentToServiceTask(ServiceTask serviceTask, Map content) {
+        List<ExtensionElement> etsElems = createExtentionElement("bind", content);
+        serviceTask.setExtensionElements(Collections.singletonMap("bind", etsElems));
     }
 
     ServiceTask createServiceTask(Map<String, Object> step){

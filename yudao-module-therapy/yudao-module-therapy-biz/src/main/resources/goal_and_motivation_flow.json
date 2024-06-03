@@ -15,7 +15,7 @@
       {
         "step_type":  "ai_check_primary_troubles",
         "step_data": {"survey_code": "DI-GAM" },
-        "service_task":  true, "implementation":  "org.xxx"
+        "service_task":  true, "implementation":  "cn.iocoder.yudao.module.therapy.taskflow.servicetasks.AICheckUserTroublesCategory"
       }
     ],
     "choose_trouble_category": [
@@ -23,7 +23,7 @@
       {"step_type": "trouble_category_qst", "step_data": {"survey_code": "DI-GAM"}}
     ],
     "try_treatment_confirm": [
-      {"step_type": "do_you_agree", "step_data": {"content":  "也许你现在还很难明确自己的问题，你希望先尝试治疗，跟随我们的治疗进程渐渐发现自己想要改变或解决的问题吗？", "confirm":  "愿意", "cancel":  "不愿意"}}
+      {"step_type": "do_you_agree", "step_data": {"content":  "也许你现在还很难明确自己的问题，你希望先尝试治疗，跟随我们的治疗进程渐渐发现自己想要改变或解决的问题吗？", "confirm":  "愿意", "cancel":  "不愿意", "variable": "try_treatment_confirm_result"}}
     ],
     "dont_try": [
       {"step_type": "guide_language", "step_data": {"content":  "选择不愿意则输出：□：或许你现在还没有做好接受治疗的准备，没有关系，我们可以慢慢来，在你希望得到改变的时候，我会一直在这里等你。"}}
@@ -63,7 +63,7 @@
     {"source": "guide", "target": "primary_troubles"},
     {"source": "primary_troubles", "type":  "ExclusiveGate",
       "next_true": "choose_trouble_category",
-      "next_false": "set_goals", "variable":  "primary_troubles_ai_check_result"},
+      "next_false": "set_goals", "variable":  "primary_troubles_is_set"},
     {"source": "choose_trouble_category", "target": "try_treatment_confirm"},
     {"source": "try_treatment_confirm", "type":  "ExclusiveGate",
       "next_true": "set_goals",

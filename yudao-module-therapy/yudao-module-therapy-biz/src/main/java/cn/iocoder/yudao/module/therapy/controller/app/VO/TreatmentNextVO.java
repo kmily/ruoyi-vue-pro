@@ -1,12 +1,9 @@
 package cn.iocoder.yudao.module.therapy.controller.app.VO;
 
-import cn.iocoder.yudao.module.therapy.controller.app.VO.StepItemVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Schema(description = "治疗交互 - 获取下一个 Response VO")
 @Data
@@ -35,14 +32,14 @@ public class TreatmentNextVO
 //    private String submitPath;
 
     @Schema(description = "步骤数据类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "SINGLE")
-    private String stepItemType = "SINGLE";
+    private String step_item_type = "SINGLE";
 
     @Schema(description = "步骤数据的状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "IS_NEXT")
-    private String processStatus = "IS_NEXT";
+    private String process_status = "IS_NEXT";
 
     @Schema(description = "步骤数据")
-    private StepItemVO stepItem;
+    private StepItemVO step_item;
 
     @Schema(description = "步骤数据")
-    private List<StepItemVO> stepItems;
+    private List<StepItemVO> step_items;
 }

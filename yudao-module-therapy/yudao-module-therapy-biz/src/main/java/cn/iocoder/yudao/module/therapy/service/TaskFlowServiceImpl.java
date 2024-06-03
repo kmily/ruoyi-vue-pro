@@ -36,7 +36,7 @@ public class TaskFlowServiceImpl implements TaskFlowService {
     public BaseFlow getTaskFlow(Long userId, Long treatmentInstanceId, Long dayItemInstanceId){
         TreatmentDayitemInstanceDO dayitemInstanceDO = treatmentDayitemInstanceMapper.selectByUserIdAndId(userId, dayItemInstanceId);
         TreatmentFlowDayitemDO flowDayitemDO = treatmentFlowDayitemMapper.selectById(dayitemInstanceDO.getDayitemId());
-        switch (flowDayitemDO.getType()){
+        switch (flowDayitemDO.getItemType()){
             case "problem_goal_motive":
                 GAMFlow goalAndMotivationFlow = new GAMFlow();
                 if(dayitemInstanceDO.getTaskInstanceId().isEmpty()){
@@ -45,7 +45,7 @@ public class TaskFlowServiceImpl implements TaskFlowService {
                         throw new RuntimeException("task flow id is null");
                     }
                     // create a new task instance
-                    String bmpnName = flowDayitemDO.getTaskFlowId();
+                    String bmpnName = goalAndMotivationFlow.getProcessName(flowDayitemDO.getId());
                     String taskInstanceId = goalAndMotivationFlow.createProcessInstance(bmpnName);
                     dayitemInstanceDO.setTaskInstanceId(taskInstanceId);
                     treatmentDayitemInstanceMapper.updateById(dayitemInstanceDO);
@@ -63,7 +63,7 @@ public class TaskFlowServiceImpl implements TaskFlowService {
     public void createBpmnModel(Long flowDayitemId){
         TreatmentFlowDayitemDO flowDayitemDO = treatmentFlowDayitemMapper.selectById(flowDayitemId);
         switch (flowDayitemDO.getItemType()){
-            case "goal_and_motivation":
+            case "problem_goal_motive":
                 GAMFlow goalAndMotivationFlow = new GAMFlow();
                 String taskFlowId = goalAndMotivationFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
                 flowDayitemDO.setTaskFlowId(taskFlowId);

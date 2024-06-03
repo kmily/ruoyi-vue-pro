@@ -71,27 +71,27 @@ insert into hlgyy_treatment_flow_days(id, name, flow_id, tenant_id, sequence,  h
 delete from hlgyy_treatment_flow_dayitem where id <= 10;
 # day 1
 insert into hlgyy_treatment_flow_dayitem(id, day_id, `type`, settings, dependent_item_ids, `agroup`, tenant_id)
-values (1, 1, 'guide_language', '{"content": "欢迎来到回龙观青少年心理康复中心线上治疗中心"}', '', 1, 1);
+values (1, 1, 2, '{"content": "欢迎来到回龙观青少年心理康复中心线上治疗中心"}', '', 1, 1);
 insert into hlgyy_treatment_flow_dayitem(id, day_id, `type`, settings, dependent_item_ids, `agroup`, tenant_id)
-values (2, 1, 'guide_language', '{"content": "请你做好准备"}', '', 2, 1);
+values (2, 1, 2, '{"content": "请你做好准备"}', '', 2, 1);
 insert into hlgyy_treatment_flow_dayitem(id, day_id, `type`, settings, dependent_item_ids, `agroup`, tenant_id)
-values (3, 1, 'scale', '{"survey_codes": ["a", "b", "c", "d"]}', '', 3, 1);
+values (3, 1, 1, '{"survey_codes": ["a", "b", "c", "d"]}', '', 3, 1);
 insert into hlgyy_treatment_flow_dayitem(id, day_id, `type`, settings, dependent_item_ids, `agroup`, tenant_id, required)
-values (4, 1, 'problem_goal_motive', '{}', '', 4, 1, 1);
+values (4, 1, 3, '{}', '', 4, 1, 1);
 insert into hlgyy_treatment_flow_dayitem(id, day_id, `type`, settings, dependent_item_ids, `agroup`, group_seq, tenant_id, required)
-values (5, 1, 'current_mood_score', '{}', '', 5, 0, 1, 0);
+values (5, 1, 4, '{}', '', 5, 0, 1, 0);
 insert into hlgyy_treatment_flow_dayitem(id, day_id, `type`, settings, dependent_item_ids, `agroup`, group_seq, tenant_id, required)
-values (6, 1, 'mood_recognize_named', '{}', '', 5, 1, 1, 0);
+values (6, 1, 5, '{}', '', 5, 1, 1, 0);
 # day 2
 insert into hlgyy_treatment_flow_dayitem(id, day_id, `type`, settings, dependent_item_ids, `agroup`, group_seq, tenant_id)
-values (7, 2, 'twelve_mind_distort', '{}', '', 1, 0, 1);
+values (7, 2, 7, '{}', '', 1, 0, 1);
 insert into hlgyy_treatment_flow_dayitem(id, day_id, `type`, settings, dependent_item_ids, `agroup`, group_seq, tenant_id)
-values (8, 2, 'twelve_mind_distort', '{}', '[7]', 1, 1, 1);
+values (8, 2, 7, '{}', '[7]', 1, 1, 1);
 # day 4
 insert into hlgyy_treatment_flow_dayitem(id, day_id, `type`, settings, dependent_item_ids, `agroup`, tenant_id)
-values (9, 4, 'twelve_mind_distort', '{}', '', 1, 1);
+values (9, 4, 7, '{}', '', 1, 1);
 insert into hlgyy_treatment_flow_dayitem(id, day_id, `type`, settings, dependent_item_ids, `agroup`, tenant_id)
-values (10, 4, 'twelve_mind_distort', '{}', '', 2, 1);
+values (10, 4, 7, '{}', '', 2, 1);
 # user_id = 287 is a test user
 delete from hlgyy_treatment_instance where user_id = 287;
 delete from hlgyy_treatment_dayitem_instance where user_id = 287;
