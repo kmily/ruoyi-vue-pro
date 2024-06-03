@@ -1,14 +1,20 @@
 package cn.iocoder.yudao.module.therapy.service.impl;
 
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 import cn.iocoder.yudao.module.system.service.dict.DictDataService;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.chat.ChatMessageDO;
+import cn.iocoder.yudao.module.therapy.dal.mysql.chat.ChatMessageMapper;
 import cn.iocoder.yudao.module.therapy.service.AIChatService;
 import cn.iocoder.yudao.module.therapy.service.dto.SSEMsgDTO;
+import cn.iocoder.yudao.module.therapy.service.enums.UserTypeEnum;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.xingyuv.captcha.util.JsonUtil;
 import com.zhipu.oapi.ClientV4;
 import com.zhipu.oapi.Constants;
 import com.zhipu.oapi.service.v4.model.ChatCompletionRequest;
@@ -22,12 +28,15 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import liquibase.util.BooleanUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.sql.SQLException;
+import java.sql.Wrapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -45,10 +54,15 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
     @Resource
     private DictDataService dictDataService;
 
+    @Resource
+    ChatMessageMapper chatMessageMapper;
+
     //@Value("${zhipu.api.key:this-is-a-test-key}")
     String API_KEY = "7820338e5c0e1d9228f8c2a5e2bf2e0d.EIWUgIkQCoStAnBU";
 
     private ClientV4 client;
+    @Autowired
+    private JsonUtils jsonUtils;
 
     @PostConstruct
     public void init() {
@@ -172,33 +186,81 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
     @Override
     public Flux<Object> automaticThinkingRecognition(Long userId, String conversationId, String content) {
 
+        //保存用户消息
+        saveUserChatMessage(conversationId, userId,0L, UserTypeEnum.USER, content);
         DictDataDO dictDataDO = dictDataService.parseDictData("ai_system_prompt", "automatic_thinking_recognition_prompt");
         if (dictDataDO == null) {
             log.warn("dictDataDO is null, dictType:{} label:{}", "ai_system_prompt", "juvenile_problems_classification");
             return Flux.just("系统提示未配置", "----END----");
         }
+        List<ChatMessage> chatMessages = assembleHistoryList(conversationId,dictDataDO.getValue());
+;
 
-        List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage sysMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), dictDataDO.getValue());
-        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), content);
-        messages.add(sysMessage);
-        messages.add(chatMessage);
-        ModelApiResponse sseModelApiResp = chat(messages, true);
+
+        ModelApiResponse sseModelApiResp = chat(chatMessages, true);
         if (sseModelApiResp.isSuccess()) {
+            StringBuffer sb =new StringBuffer();
             Flowable<SSEMsgDTO> flowable = sseModelApiResp.getFlowable().map(modelData -> {
                 // Convert ModelData to JSON string or desired string format
                 SSEMsgDTO jsonString = convertModelDataToString(modelData);
                 // Save to database
                 //saveToDatabase(jsonString);
                 log.info("AI Response :{}", JSON.toJSONString(jsonString));
+                sb.append(jsonString.getContent());
                 return jsonString;
             });
-
-            log.info("------END----");
-            return Flux.create(emitter -> flowable.subscribe(emitter::next, emitter::error, emitter::complete)).publishOn(Schedulers.boundedElastic());
+            return Flux.create(emitter -> flowable.subscribe(emitter::next, emitter::error,()->{
+                SSEMsgDTO sseMsgDTO = new SSEMsgDTO();
+                sseMsgDTO.setContent("----END----");
+                sseMsgDTO.setFinished(true);
+                sseMsgDTO.setCode(200);
+                emitter.next(JSON.toJSONString(sseMsgDTO));
+                saveUserChatMessage(conversationId, 0L,userId, UserTypeEnum.ROBOT, sb.toString());
+                emitter.complete();
+            })).publishOn(Schedulers.boundedElastic());
         } else {
             return Flux.error(new RuntimeException("API call failed"));
         }
+    }
+
+    private List<ChatMessage> assembleHistoryList(String conversationId,String sysPrompt){
+        List<ChatMessage> messages = new ArrayList<>();
+        ChatMessage sysMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(),sysPrompt );
+        messages.add(sysMessage);
+
+        QueryWrapper<ChatMessageDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("conversation_id",conversationId);
+        List<ChatMessageDO> chatMessageDOS = chatMessageMapper.selectList(queryWrapper);
+        for (ChatMessageDO chatMessageDO : chatMessageDOS) {
+            ChatMessage chatMessage = new ChatMessage();
+            if (UserTypeEnum.USER.name().compareToIgnoreCase(chatMessageDO.getSendUserType())==0) {
+                chatMessage.setRole(ChatMessageRole.USER.value());
+            } else {
+                chatMessage.setRole(ChatMessageRole.ASSISTANT.value());
+            }
+            chatMessage.setContent(chatMessageDO.getContent());
+            messages.add(chatMessage);
+        }
+        return messages;
+
+    }
+
+
+    /**
+     * 保存用户聊天消息
+     *
+     * @param conversationId 会话编号
+     * @param sendUserId     发送用户编号
+     * @param userType       用户类型
+     * @param message        消息内容
+     */
+    private void saveUserChatMessage(String conversationId, long sendUserId,long receiveUserId, UserTypeEnum userType,String message){
+
+        ChatMessageDO info = ChatMessageDO.builder().sendUserId(sendUserId).
+                sendUserType(userType.name()).conversationId(conversationId).content(message)
+                .receiveUserId(receiveUserId)
+                .build();
+        chatMessageMapper.insert(info);
     }
 
     private SSEMsgDTO convertModelDataToString(ModelData modelData) {

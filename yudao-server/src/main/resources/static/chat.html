@@ -16,7 +16,7 @@
     <div class="main-container">
         <div class="chat-container">
             <div class="chat-header">
-                <h4>你的 ChatGPT</h4>
+                <h4>ICB自动化思维识别 AI</h4>
             </div>
             <div class="chat-messages">
                 <ul class="chat-message-container">
@@ -28,8 +28,7 @@
                 </ul>
             </div>
             <div class="chat-input">
-                <input type="text" v-model="message" class="message-input" @keydown.enter="onSendMessage"
-                       placeholder="请输入您的消息...">
+                <textarea v-model="message" class="message-input" @keydown.enter="onSendMessage" placeholder="请输入您的消息..."></textarea>
                 <button type="submit" class="send-btn" @click="onSendMessage" :disabled="generating">发送</button>
             </div>
         </div>
@@ -40,6 +39,15 @@
 </body>
 
 <script>
+    function generateUUID() {
+        // Reference: https://stackoverflow.com/a/2117523/2918797
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+    <!-- 生成本次会话的uuid , 保持不一样-->
+    let conversationId = generateUUID();
     marked.setOptions({
         highlight: function (code, lang) {
             return hljs.highlightAuto(code).value;
@@ -55,7 +63,7 @@
             return {
                 message: '',
                 items: [
-                    {user: 'bot', messageType: 'TEXT', message: '欢迎使用ChatGPT', html: ''},
+                    {user: 'bot', messageType: 'TEXT', message: '欢迎使用自动化思维识别系统，你可以简单说下你的近况。', html: ''},
                 ],
                 generating: false
             }
@@ -99,11 +107,12 @@
                     headers: {
                         'accept': 'text/event-stream',
                         'Content-Type': 'application/json',
-                        'tenant-id': 1
+                        'tenant-id': 1,
+                        'Authorization': 'Bearer 25b0a7df89694ec6a4f2db892f7758c5'
 
                     },
                     payload: JSON.stringify({
-                        conversationId: this_.getUser(),
+                        conversationId: conversationId,
                         content: this_.message
                     }),
                 })
