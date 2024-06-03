@@ -8,10 +8,10 @@ import java.util.List;
 @Data
 public class TreatmentStepItem {
     public enum ProcessStatus {
-        IS_NEXT,
-        CURRENT_DAY_NO_MORE_STEP,
-        LAST_DAY_NOT_COMPLETE,
-        CURRENT_STEP_REQUIRES_COMPLETE,
+        IS_NEXT,  // 下一步
+        CURRENT_DAY_NO_MORE_STEP, // 当前疗程日没有更多步骤
+        LAST_DAY_NOT_COMPLETE, // 上一天存在治疗任务没有完成
+        CURRENT_STEP_REQUIRES_COMPLETE, // 当前步骤需要完成,请先完成当前步骤
     }
 
 

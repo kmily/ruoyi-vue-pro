@@ -52,8 +52,10 @@ public class DayTaskEngine {
         if(!flowDayDO.isHasBreak()) {
             List<TreatmentDayitemInstanceDO> dayitemInstanceDOs = userCurrentStep.getDay_items();
             List<Long> ids = dayitemInstanceDOs.stream().map(TreatmentDayitemInstanceDO::getDayitemId).collect(Collectors.toList());
-            List<TreatmentFlowDayitemDO> flowDayitemDOs = treatmentFlowDayitemMapper.selectBatchIds(ids);
-            userCurrentStep.setFlowDayitemDOs(flowDayitemDOs);
+            if(ids.size() > 0){
+                List<TreatmentFlowDayitemDO> flowDayitemDOs = treatmentFlowDayitemMapper.selectBatchIds(ids);
+                userCurrentStep.setFlowDayitemDOs(flowDayitemDOs);
+            }
         }
         userCurrentStep.setFlowDayDO(flowDayDO);
         userCurrentStep.setTreatmentFlowDO(flowDO);
