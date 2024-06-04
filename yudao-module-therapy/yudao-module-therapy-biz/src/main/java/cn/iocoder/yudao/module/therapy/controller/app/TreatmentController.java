@@ -109,7 +109,7 @@ public class TreatmentController {
                                       @RequestBody Map<String, Object> requestBody) {
         Long userId = getLoginUserId();
         BaseFlow flow = taskFlowService.getTaskFlow(userId, 0L, dayitem_instance_id);
-        String taskId = requestBody.get("step_id").toString();
+        String taskId = requestBody.get("__step_id").toString();
         taskFlowService.userSubmit(flow, dayitem_instance_id, taskId, requestBody);
         return success(1L);
     }

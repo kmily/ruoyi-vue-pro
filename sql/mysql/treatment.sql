@@ -60,7 +60,7 @@ CREATE TABLE `hlgyy_treatment_flow_dayitem`  (
 
 delete from hlgyy_treatment_flow where id = 1;
 insert into hlgyy_treatment_flow(id, name, tenant_id, code, status, creator, create_time, updater, update_time, deleted, `type`)
-values(1, '治疗流程1', 1 ,'main', 1, 'admin', now(), 'admin', now(), 0, 1);
+values(1, '治疗流程1', 1 ,'main', 1, '287', now(), '287', now(), 0, 1);
 
 delete from hlgyy_treatment_flow_days where id <= 4;
 insert into hlgyy_treatment_flow_days(id, name, flow_id, tenant_id, sequence,  has_break) values(1, 'Day 1', 1, 1 , 0, 0);

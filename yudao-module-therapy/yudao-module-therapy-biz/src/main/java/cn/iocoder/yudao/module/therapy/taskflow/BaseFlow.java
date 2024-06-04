@@ -1,12 +1,16 @@
 package cn.iocoder.yudao.module.therapy.taskflow;
 
+import cn.iocoder.yudao.module.therapy.service.TaskFlowService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.bpmn.model.*;
 import org.flowable.bpmn.model.Process;
+import org.flowable.engine.HistoryService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 
@@ -15,14 +19,22 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+
 
 public abstract class BaseFlow {
     ProcessInstance processInstance;
 
     ProcessEngine processEngine;
 
-    public BaseFlow(){
-        processEngine = new Engine().getEngine();
+    HistoricProcessInstance historicProcessInstance;
+
+
+    public BaseFlow(ProcessEngine engine){
+        processEngine = engine;
     }
 
     public Task getCurrentTask(){
@@ -36,8 +48,12 @@ public abstract class BaseFlow {
      * @return
      */
     public Map run(){
-        Task currentTask = getCurrentTask();
         HashMap result = new HashMap();
+        if(historicProcessInstance != null){
+            result.put("status", "COMPLETED");
+            return result;
+        }
+        Task currentTask = getCurrentTask();
         result.put("__step_id", currentTask.getId());
         result.put("__step_name", currentTask.getName());
 
@@ -120,7 +136,7 @@ public abstract class BaseFlow {
             try {
                 data = new ObjectMapper().readValue(content, Map.class);
                 Method method = this.getClass().getMethod("submit_" + (String) data.get("step_type"), Map.class, Task.class);
-                method.invoke(this, variables, task);
+                method.invoke(this, (Map) variables.get("data"), task);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             } catch (NoSuchMethodException e) {
@@ -142,10 +158,11 @@ public abstract class BaseFlow {
      * @param bmpnName
      * @return
      */
-    public String createProcessInstance(String bmpnName){
+    public String createProcessInstance(String bmpnName, Long dayItemInstanceId){
         RuntimeService runtimeService = processEngine.getRuntimeService();
 //        runtimeService.createProcessInstanceBuilder().processDefinitionKey(bmpnName);
         processInstance = runtimeService.startProcessInstanceByKey(bmpnName, new HashMap<String, Object>());
+        runtimeService.setVariable(processInstance.getId(), "dayItemInstanceId", dayItemInstanceId);
         return processInstance.getId();
     }
 
@@ -156,6 +173,13 @@ public abstract class BaseFlow {
     public void loadProcessInstance(String processInstanceId){
         RuntimeService runtimeService = processEngine.getRuntimeService();
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        if(processInstance == null){
+            HistoryService historyService = processEngine.getHistoryService();
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+            if (historicProcessInstance == null) {
+                throw new RuntimeException("No process instance found with id: " + processInstanceId);
+            }
+        }
     }
 
 
@@ -288,11 +312,26 @@ public abstract class BaseFlow {
         return startEvent;
     }
 
-    FlowElement createEndEvent(Map<String, Object> step){
+    EndEvent createEndEvent(Map<String, Object> step){
         EndEvent endEvent = new EndEvent();
         endEvent.setId(generateTaskId());
+        ExtensionAttribute ets = new ExtensionAttribute();
+        ets.setName("reason");
+        ets.setValue("completed");
+        endEvent.addAttribute(ets);
         endEvent.setName((String) step.getOrDefault("name", "END"));
         return endEvent;
+    }
+
+    public abstract void onFlowEnd(DelegateExecution execution);
+
+
+    FlowableListener getFlowableListener(){
+        FlowableListener listener = new FlowableListener();
+        listener.setEvent("end");
+        listener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+        listener.setImplementation("#{taskFlowService}");
+        return listener;
     }
 
 
@@ -301,7 +340,11 @@ public abstract class BaseFlow {
         if(stepType.equals("START")) {
             return createStartEvent(step);
         }else if(stepType.equals("END")) {
-            return createEndEvent(step);
+            EndEvent endEvent = createEndEvent(step);
+            List<FlowableListener> listeners = new ArrayList<>();
+            listeners.add(getFlowableListener());
+            endEvent.setExecutionListeners(listeners);
+            return endEvent;
         }
         boolean isServiceTask = (boolean) step.getOrDefault("service_task", false);
         if(isServiceTask){

@@ -58,6 +58,7 @@
       {"step_type": "END"}
     ]
   },
+
   "group_relations": [
     {"source": "start", "target": "guide"},
     {"source": "guide", "target": "primary_troubles"},
@@ -72,5 +73,8 @@
     {"source": "set_goals", "target": "find_out_motivation"},
     {"source": "find_out_motivation", "target": "review"},
     {"source": "review", "target": "end"}
-    ]
+  ],
+  "gr": [
+    {"source": "start", "target": "end"}
+  ]
 }
