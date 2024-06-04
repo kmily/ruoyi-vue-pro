@@ -110,4 +110,6 @@ public interface TreatmentService {
      * @return
      */
     List<TreatmentFlowDayitemDO> getTaskListByDayId(Long id);
+
+    TreatmentFlowDayitemDO getTask(Long id);
 }

@@ -52,7 +52,7 @@ public class TreatmentFlowDayitemDO extends BaseDO implements JsonFieldAccessibl
 
     private String dependentItemIds;
 
-    private Long agroup;
+    private Integer agroup;
 
     private Long groupSeq;
 

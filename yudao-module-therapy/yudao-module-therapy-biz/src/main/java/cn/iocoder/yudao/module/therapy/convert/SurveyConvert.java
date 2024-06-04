@@ -76,11 +76,11 @@ public interface SurveyConvert {
             if (!qstMap.containsKey(item.getQstCode())) throw exception(SURVEY_QUESTION_NOT_EXISTS);
 
             QuestionDO qst = qstMap.get(item.getQstCode());
-            if (!item.getQstType().equals(qst.getQstType())) throw exception(SURVEY_QUESTION_TYPE_CHANGE);
+//            if (!item.getQstType().equals(qst.getQstType())) throw exception(SURVEY_QUESTION_TYPE_CHANGE);
             detailDO.setAnswerId(reqVO.getId());
             detailDO.setBelongSurveyId(qst.getBelongSurveyId());
             detailDO.setBelongSurveyCode(qst.getBelongSurveyCode());
-            detailDO.setQstType(item.getQstType());
+//            detailDO.setQstType(item.getQstType());
             detailDO.setCreator(getLoginUserId().toString());
             detailDO.setUpdater(getLoginUserId().toString());
             detailDO.setQstContext(qst.getQstContext());

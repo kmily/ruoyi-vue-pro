@@ -124,6 +124,7 @@ public class TreatmentFlowController {
     @Operation(summary = "创建计划的任务")
 //    @PreAuthorize("@ss.hasPermission('system:user:create')")
     public CommonResult<Long> createTask(@Valid @RequestBody FlowTaskVO reqVO) {
+        reqVO.setId(0L);
         Long id = treatmentService.createPlanTask(reqVO);
         return success(id);
     }
@@ -145,7 +146,7 @@ public class TreatmentFlowController {
         return success(true);
     }
 
-    @PutMapping("/getTaskList")
+    @GetMapping("/getTaskList")
     @Operation(summary = "获取计划任务列表")
     @Parameter(name = "id", description = "计划id", required = true, example = "1024")
 //    @PreAuthorize("@ss.hasPermission('system:user:create')")
@@ -161,4 +162,15 @@ public class TreatmentFlowController {
         }
         return success(taskVOS);
     }
+
+    @GetMapping("/getTask")
+    @Operation(summary = "获取计划任务")
+    @Parameter(name = "id", description = "任务id", required = true, example = "1024")
+    public CommonResult<FlowTaskVO> getTask(@RequestParam("id") Long id) {
+        TreatmentFlowDayitemDO dayitemDO=treatmentService.getTask(id);
+        FlowTaskVO vo=BeanUtils.toBean(dayitemDO,FlowTaskVO.class);
+        return success(vo);
+    }
+
+
 }
