@@ -72,8 +72,8 @@ public abstract class AbstractStrategy {
             return reqVO.getId();
         }
         SurveyAnswerDO answerDO = new SurveyAnswerDO();
-        answerDO.setSource(reqVO.getSource());
-        answerDO.setBelongSurveyId(reqVO.getSurveyId());
+//        answerDO.setSource(reqVO.getSource());
+//        answerDO.setBelongSurveyId(reqVO.getSurveyId());
         surveyAnswerMapper.insert(answerDO);
         return answerDO.getId();
     }
