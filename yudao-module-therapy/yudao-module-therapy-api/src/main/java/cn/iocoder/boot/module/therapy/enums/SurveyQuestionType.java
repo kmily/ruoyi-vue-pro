@@ -19,6 +19,7 @@ public enum wSurveyQuestionType implements IntArrayValuable {
     CHECKBOX(2,"checkbox", "多选题"),
     TREE(3,"tree", "树"),
     SPAN(4,"span", "文本框"),
+    SPACES(5,"spaces", "占位题"),
     ;
 
     /**

@@ -79,7 +79,7 @@ public interface SurveyConvert {
 //            if (!item.getQstType().equals(qst.getQstType())) throw exception(SURVEY_QUESTION_TYPE_CHANGE);
             detailDO.setAnswerId(reqVO.getId());
             detailDO.setBelongSurveyId(qst.getBelongSurveyId());
-            detailDO.setBelongSurveyCode(qst.getBelongSurveyCode());
+//            detailDO.setBelongSurveyCode(qst.getBelongSurveyCode());
 //            detailDO.setQstType(item.getQstType());
             detailDO.setCreator(getLoginUserId().toString());
             detailDO.setUpdater(getLoginUserId().toString());
