@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.therapy.controller.app.VO;
+package cn.iocoder.yudao.module.therapy.controller.app.vo;
 
 import cn.iocoder.yudao.module.therapy.controller.vo.SetAppointmentTimeReqVO;
 import io.swagger.v3.oas.annotations.media.Schema;

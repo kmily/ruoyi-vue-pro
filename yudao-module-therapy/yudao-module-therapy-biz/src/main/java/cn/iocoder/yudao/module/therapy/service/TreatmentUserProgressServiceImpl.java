@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.therapy.service;
 
-import cn.iocoder.yudao.module.therapy.controller.app.VO.StepItemVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.StepItemVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.*;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.*;
 import cn.iocoder.yudao.module.therapy.service.common.TreatmentStepItem;
 import org.springframework.stereotype.Service;
-import cn.iocoder.yudao.module.therapy.controller.app.VO.TreatmentNextVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.TreatmentNextVO;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;

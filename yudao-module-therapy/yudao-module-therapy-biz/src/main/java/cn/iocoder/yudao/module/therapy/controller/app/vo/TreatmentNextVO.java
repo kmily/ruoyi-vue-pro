@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.therapy.controller.app.VO;
+package cn.iocoder.yudao.module.therapy.controller.app.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;

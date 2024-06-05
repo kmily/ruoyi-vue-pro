@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.therapy.controller.app;
 
 import cn.iocoder.yudao.module.therapy.controller.vo.TreatmentInstanceVO;
-import cn.iocoder.yudao.module.therapy.controller.app.VO.TreatmentNextVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.TreatmentNextVO;
 import cn.iocoder.yudao.module.therapy.service.TaskFlowService;
 import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;

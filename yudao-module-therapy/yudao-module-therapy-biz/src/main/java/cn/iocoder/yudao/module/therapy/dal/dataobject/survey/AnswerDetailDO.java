@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.module.therapy.dal.dataobject.survey;
 
 import cn.hutool.json.JSONObject;
-import cn.iocoder.boot.module.therapy.enums.SurveyQuestionType;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
