@@ -67,24 +67,24 @@ public abstract class AbstractStrategy {
         }
     }
 
-    public Long saveAnswer(SubmitSurveyReqVO reqVO) {
-        if (reqVO.getId() > 0) {
-            return reqVO.getId();
-        }
-        SurveyAnswerDO answerDO = new SurveyAnswerDO();
-//        answerDO.setSource(reqVO.getSource());
-//        answerDO.setBelongSurveyId(reqVO.getSurveyId());
-        surveyAnswerMapper.insert(answerDO);
-        return answerDO.getId();
-    }
+//    public Long saveAnswer(SubmitSurveyReqVO reqVO) {
+//        if (reqVO.getId() > 0) {
+//            return reqVO.getId();
+//        }
+//        SurveyAnswerDO answerDO = new SurveyAnswerDO();
+////        answerDO.setSource(reqVO.getSource());
+////        answerDO.setBelongSurveyId(reqVO.getSurveyId());
+//        surveyAnswerMapper.insert(answerDO);
+//        return answerDO.getId();
+//    }
+//
+//    public void saveAnswerDetail(List<QuestionDO> qst, SubmitSurveyReqVO reqVO) {
+//        Map<String, QuestionDO> qstMap = CollectionUtils.convertMap(qst, QuestionDO::getCode);
+//        List<AnswerDetailDO> anAnswerDOS = SurveyConvert.INSTANCE.convert(qstMap, reqVO);
+//        surveyAnswerDetailMapper.insertBatch(anAnswerDOS);
+//    }
 
-    public void saveAnswerDetail(List<QuestionDO> qst, SubmitSurveyReqVO reqVO) {
-        Map<String, QuestionDO> qstMap = CollectionUtils.convertMap(qst, QuestionDO::getCode);
-        List<AnswerDetailDO> anAnswerDOS = SurveyConvert.INSTANCE.convert(qstMap, reqVO);
-        surveyAnswerDetailMapper.insertBatch(anAnswerDOS);
-    }
-
-    public void fillQuestion(SurveySaveReqVO vo){
-
-    }
+//    public void fillQuestion(SurveySaveReqVO vo){
+//
+//    }
 }

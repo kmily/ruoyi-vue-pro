@@ -59,7 +59,7 @@ public class SurveyServiceImpl implements SurveyService {
         surveyStrategy.fillSurveyCode(treatmentSurveyDO);
         treatmentSurveyMapper.insert(treatmentSurveyDO);
 
-        surveyStrategy.fillQuestion(vo);
+        surveyStrategy.fillQuestion(vo);//填充题目,量表除外
         if (CollectionUtil.isNotEmpty(vo.getQuestions())) {
             List<QuestionDO> qst = new ArrayList<>();
             for (var item : vo.getQuestions()) {
@@ -83,7 +83,7 @@ public class SurveyServiceImpl implements SurveyService {
         TreatmentSurveyDO tsDO = treatmentSurveyMapper.selectById(vo.getId());
         if (Objects.isNull(tsDO)) throw exception(SURVEY_NOT_EXISTS);
         TreatmentSurveyDO treatmentSurveyDO = SurveyConvert.INSTANCE.convert(vo);
-//        treatmentSurveyDO.setCode(tsDO.getCode());
+        treatmentSurveyDO.setCode(tsDO.getCode());//不能改变原来code,可能后面已经使用了
         treatmentSurveyMapper.updateById(treatmentSurveyDO);
 
         //先删除再插入
@@ -133,51 +133,7 @@ public class SurveyServiceImpl implements SurveyService {
         }
 
         if (Objects.nonNull(reqVO.getId()) && reqVO.getId() > 0) {//编辑原有
-            //检查之前的答题是不是存在
-            SurveyAnswerDO answerDO = surveyAnswerMapper.selectById(reqVO.getId());
-            if (Objects.isNull(answerDO)) {
-                throw exception(SURVEY_ANSWER_NOT_EXISTS);
-            }
-            //检查题目是否属于问卷
-            List<QuestionDO> ts = surveyQuestionMapper.selectBySurveyId(answerDO.getBelongSurveyId());
-            Set<String> set1 = reqVO.getQstList().stream().map(p -> p.getQstCode()).collect(Collectors.toSet());
-            Set<String> set2 = ts.stream().map(p -> p.getCode()).collect(Collectors.toSet());
-            set1.removeAll(set2);
-            if (set1.size() > 0) {
-                throw exception(QUESTION_NOT_EXISTS_SURVEY);
-            }
-            //确定是更新还是新插入
-            Map<String, QuestionDO> mapQst = CollectionUtils.convertMap(ts, QuestionDO::getCode);
-            List<AnswerDetailDO> details = surveyAnswerDetailMapper.getByAnswerId(reqVO.getId());
-            Map<String, AnswerDetailDO> map = CollectionUtils.convertMap(details, AnswerDetailDO::getBelongQstCode);
-            List<AnswerDetailDO> newDetails = new ArrayList<>();
-            List<AnswerDetailDO> oldDetails = new ArrayList<>();
-            for (AnAnswerReqVO item : reqVO.getQstList()) {
-                if (map.containsKey(item.getQstCode())) {
-                    AnswerDetailDO temp = map.get(item.getQstCode());
-                    temp.setAnswer(item.getAnswer());
-                    oldDetails.add(temp);
-                } else {
-                    AnswerDetailDO detailDO = new AnswerDetailDO();
-                    if (!mapQst.containsKey(item.getQstCode())) throw exception(SURVEY_QUESTION_NOT_EXISTS);
-                    QuestionDO qst = mapQst.get(item.getQstCode());
-                    detailDO.setAnswerId(reqVO.getId());
-                    detailDO.setBelongSurveyId(qst.getBelongSurveyId());
-                    detailDO.setCreator(getLoginUserId().toString());
-                    detailDO.setUpdater(getLoginUserId().toString());
-                    detailDO.setQstContext(qst.getQstContext());
-                    detailDO.setAnswer(item.getAnswer());
-                    detailDO.setQstId(qst.getId());
-                    detailDO.setBelongQstCode(qst.getCode());
-                    newDetails.add(detailDO);
-                }
-            }
-            if (CollectionUtil.isNotEmpty(oldDetails)) {
-                surveyAnswerDetailMapper.updateBatch(oldDetails);
-            }
-            if (CollectionUtil.isNotEmpty(newDetails)) {
-                surveyAnswerDetailMapper.insertBatch(newDetails);
-            }
+            updateOrAddAnswer(reqVO);
             return reqVO.getId();
         } else {//通过类型创建答题
             //获取问卷通过类型
@@ -200,7 +156,7 @@ public class SurveyServiceImpl implements SurveyService {
                 AnswerDetailDO detailDO = new AnswerDetailDO();
                 if (!mapQst.containsKey(item.getQstCode())) throw exception(SURVEY_QUESTION_NOT_EXISTS);
                 QuestionDO qst = mapQst.get(item.getQstCode());
-                detailDO.setAnswerId(reqVO.getId());
+                detailDO.setAnswerId(answerId);
                 detailDO.setBelongSurveyId(qst.getBelongSurveyId());
                 detailDO.setCreator(getLoginUserId().toString());
                 detailDO.setUpdater(getLoginUserId().toString());
@@ -215,15 +171,7 @@ public class SurveyServiceImpl implements SurveyService {
         }
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    @Override
-    public Long submitSurveyForFlow(SubmitSurveyReqVO reqVO) {
-        if (CollectionUtil.isEmpty(reqVO.getQstList())) {
-            throw exception(BAD_REQUEST, "提交的答案是空的");
-        }
-        if (Objects.isNull(reqVO.getId()) || reqVO.getId() <= 0) {
-            throw exception(BAD_REQUEST, "id不能为空");
-        }
+    private void updateOrAddAnswer(SubmitSurveyReqVO reqVO) {
         //检查之前的答题是不是存在
         SurveyAnswerDO answerDO = surveyAnswerMapper.selectById(reqVO.getId());
         if (Objects.isNull(answerDO)) {
@@ -254,12 +202,13 @@ public class SurveyServiceImpl implements SurveyService {
                 QuestionDO qst = mapQst.get(item.getQstCode());
                 detailDO.setAnswerId(reqVO.getId());
                 detailDO.setBelongSurveyId(qst.getBelongSurveyId());
-                detailDO.setCreator(getLoginUserId().toString());
-                detailDO.setUpdater(getLoginUserId().toString());
+//                    detailDO.setCreator(getLoginUserId().toString());
+//                    detailDO.setUpdater(getLoginUserId().toString());
                 detailDO.setQstContext(qst.getQstContext());
                 detailDO.setAnswer(item.getAnswer());
                 detailDO.setQstId(qst.getId());
                 detailDO.setBelongQstCode(qst.getCode());
+                detailDO.setQstType(qst.getQstType());
                 newDetails.add(detailDO);
             }
         }
@@ -269,6 +218,64 @@ public class SurveyServiceImpl implements SurveyService {
         if (CollectionUtil.isNotEmpty(newDetails)) {
             surveyAnswerDetailMapper.insertBatch(newDetails);
         }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Long submitSurveyForFlow(SubmitSurveyReqVO reqVO) {
+        if (CollectionUtil.isEmpty(reqVO.getQstList())) {
+            throw exception(BAD_REQUEST, "提交的答案是空的");
+        }
+        if (Objects.isNull(reqVO.getId()) || reqVO.getId() <= 0) {
+            throw exception(BAD_REQUEST, "id不能为空");
+        }
+        updateOrAddAnswer(reqVO);
+//        //检查之前的答题是不是存在
+//        SurveyAnswerDO answerDO = surveyAnswerMapper.selectById(reqVO.getId());
+//        if (Objects.isNull(answerDO)) {
+//            throw exception(SURVEY_ANSWER_NOT_EXISTS);
+//        }
+//        //检查题目是否属于问卷
+//        List<QuestionDO> ts = surveyQuestionMapper.selectBySurveyId(answerDO.getBelongSurveyId());
+//        Set<String> set1 = reqVO.getQstList().stream().map(p -> p.getQstCode()).collect(Collectors.toSet());
+//        Set<String> set2 = ts.stream().map(p -> p.getCode()).collect(Collectors.toSet());
+//        set1.removeAll(set2);
+//        if (set1.size() > 0) {
+//            throw exception(QUESTION_NOT_EXISTS_SURVEY);
+//        }
+//        //确定是更新还是新插入
+//        Map<String, QuestionDO> mapQst = CollectionUtils.convertMap(ts, QuestionDO::getCode);
+//        List<AnswerDetailDO> details = surveyAnswerDetailMapper.getByAnswerId(reqVO.getId());
+//        Map<String, AnswerDetailDO> map = CollectionUtils.convertMap(details, AnswerDetailDO::getBelongQstCode);
+//        List<AnswerDetailDO> newDetails = new ArrayList<>();
+//        List<AnswerDetailDO> oldDetails = new ArrayList<>();
+//        for (AnAnswerReqVO item : reqVO.getQstList()) {
+//            if (map.containsKey(item.getQstCode())) {
+//                AnswerDetailDO temp = map.get(item.getQstCode());
+//                temp.setAnswer(item.getAnswer());
+//                oldDetails.add(temp);
+//            } else {
+//                AnswerDetailDO detailDO = new AnswerDetailDO();
+//                if (!mapQst.containsKey(item.getQstCode())) throw exception(SURVEY_QUESTION_NOT_EXISTS);
+//                QuestionDO qst = mapQst.get(item.getQstCode());
+//                detailDO.setAnswerId(reqVO.getId());
+//                detailDO.setBelongSurveyId(qst.getBelongSurveyId());
+////                detailDO.setCreator(getLoginUserId().toString());
+////                detailDO.setUpdater(getLoginUserId().toString());
+//                detailDO.setQstContext(qst.getQstContext());
+//                detailDO.setAnswer(item.getAnswer());
+//                detailDO.setQstId(qst.getId());
+//                detailDO.setBelongQstCode(qst.getCode());
+//                detailDO.setQstType(qst.getQstType());
+//                newDetails.add(detailDO);
+//            }
+//        }
+//        if (CollectionUtil.isNotEmpty(oldDetails)) {
+//            surveyAnswerDetailMapper.updateBatch(oldDetails);
+//        }
+//        if (CollectionUtil.isNotEmpty(newDetails)) {
+//            surveyAnswerDetailMapper.insertBatch(newDetails);
+//        }
         return reqVO.getId();
     }
 
@@ -296,6 +303,6 @@ public class SurveyServiceImpl implements SurveyService {
 
     @Override
     public List<AnswerDetailDO> getAnswerDetailByAnswerId(Long answerId) {
-        return null;
+        return surveyAnswerDetailMapper.getByAnswerId(answerId);
     }
 }

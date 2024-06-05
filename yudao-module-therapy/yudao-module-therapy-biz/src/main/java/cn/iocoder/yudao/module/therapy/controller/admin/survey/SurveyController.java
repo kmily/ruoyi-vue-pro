@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.*;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.convert.SurveyConvert;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
@@ -117,6 +118,29 @@ public class SurveyController {
         List<TreatmentSurveyDO> treatmentSurveyDOS = surveyService.getSurveyByIds(surveyIds);
         Map<Long, TreatmentSurveyDO> treatmentSurveyDOMap = CollectionUtils.convertMap(treatmentSurveyDOS, TreatmentSurveyDO::getId);
         return success(new PageResult<>(SurveyConvert.INSTANCE.convertList(treatmentSurveyDOMap, pageResult.getList()), pageResult.getTotal()));
+    }
+
+    @GetMapping("/initSurveyAnswer")
+    @Parameter(name = "surveyCode", description = "问卷code", required = true, example = "1024")
+    @Parameter(name = "source", description = "source", required = true, example = "1024")
+    @Operation(summary = "实例化答题实例")
+    public CommonResult<Long> initSurveyAnswer(@RequestParam("surveyCode") String surveyCode,@RequestParam("source") Integer source){
+        return success(surveyService.initSurveyAnswer(surveyCode,source));
+    }
+
+    @PostMapping("/submitForTools")
+    @Operation(summary = "流程提交问卷")
+//    @PreAuthorize("@ss.hasPermission('system:user:create')")
+    public CommonResult<Long> submitForTools(@Valid @RequestBody SubmitSurveyReqVO reqVO) {
+//        reqVO.setSource(2);
+        return success(surveyService.submitSurveyForTools(reqVO));
+    }
+
+    @PostMapping("/submitForFlow")
+    @Operation(summary = "工具箱提交问卷")
+    public CommonResult<Long> submitForFlow(@Valid @RequestBody SubmitSurveyReqVO reqVO){
+//        reqVO.setSource(1);
+        return success(surveyService.submitSurveyForFlow(reqVO));
     }
 
 }

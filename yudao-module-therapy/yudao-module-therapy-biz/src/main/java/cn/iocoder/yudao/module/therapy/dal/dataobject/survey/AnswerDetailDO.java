@@ -63,7 +63,7 @@ public class AnswerDetailDO extends BaseDO {
 
     /**
      * 问题类型
-     * 枚举 {@link SurveyQuestionType}
+     * 枚举 {@link cn.iocoder.boot.module.therapy.enums.SurveyQuestionType}
      */
     private Integer qstType;
 

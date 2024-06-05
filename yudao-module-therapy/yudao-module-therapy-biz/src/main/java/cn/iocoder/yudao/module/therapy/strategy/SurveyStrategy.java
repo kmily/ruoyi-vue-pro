@@ -42,21 +42,21 @@ public interface SurveyStrategy {
      */
     void checkLoseQuestion(SubmitSurveyReqVO reqVO, List<QuestionDO> qst);
 
-    /**
-     * 保存一次回答
-     *
-     * @param reqVO
-     * @return
-     */
-    Long saveAnswer(SubmitSurveyReqVO reqVO);
-
-    /**
-     * 保存回答明细
-     *
-     * @param qst
-     * @param reqVO
-     */
-    void saveAnswerDetail(List<QuestionDO> qst, SubmitSurveyReqVO reqVO);
+//    /**
+//     * 保存一次回答
+//     *
+//     * @param reqVO
+//     * @return
+//     */
+//    Long saveAnswer(SubmitSurveyReqVO reqVO);
+//
+//    /**
+//     * 保存回答明细
+//     *
+//     * @param qst
+//     * @param reqVO
+//     */
+//    void saveAnswerDetail(List<QuestionDO> qst, SubmitSurveyReqVO reqVO);
 
     /**
      * 获取报告
@@ -70,7 +70,9 @@ public interface SurveyStrategy {
 
     /**
      * 补充问题列表
+     *
      * @param vo
      */
-    void fillQuestion(SurveySaveReqVO vo);
+    default void fillQuestion(SurveySaveReqVO vo) {
+    }
 }
