@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.therapy.dal.dataobject.survey;
 
-import cn.iocoder.boot.module.therapy.enums.SurveyQuestionType;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;

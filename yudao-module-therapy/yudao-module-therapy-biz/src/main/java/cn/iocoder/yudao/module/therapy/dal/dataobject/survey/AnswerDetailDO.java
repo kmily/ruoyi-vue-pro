@@ -32,10 +32,10 @@ public class AnswerDetailDO extends BaseDO {
      * 所属问卷
      */
     private Long belongSurveyId;
-    /**
-     * 所属问卷编码
-     */
-    private String belongSurveyCode;
+//    /**
+//     * 所属问卷编码
+//     */
+//    private String belongSurveyCode;
 
     /**
      *对应SurveyAnswerDO::ID

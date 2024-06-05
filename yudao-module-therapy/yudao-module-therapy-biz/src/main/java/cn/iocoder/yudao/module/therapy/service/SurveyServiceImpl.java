@@ -4,14 +4,19 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.json.JSONObject;
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyAnswerPageReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyPageReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveySaveReqVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.AnAnswerReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.convert.SurveyConvert;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
+import cn.iocoder.yudao.module.therapy.dal.mysql.survey.SurveyAnswerDetailMapper;
 import cn.iocoder.yudao.module.therapy.dal.mysql.survey.SurveyAnswerMapper;
 import cn.iocoder.yudao.module.therapy.dal.mysql.survey.SurveyQuestionMapper;
 import cn.iocoder.yudao.module.therapy.dal.mysql.survey.TreatmentSurveyMapper;
@@ -22,14 +27,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.SURVEY_NOT_EXISTS;
+import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.SURVEY_QUESTION_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Service
 public class SurveyServiceImpl implements SurveyService {
@@ -43,6 +48,9 @@ public class SurveyServiceImpl implements SurveyService {
     @Resource
     private SurveyStrategyFactory surveyStrategyFactory;
 
+    @Resource
+    private SurveyAnswerDetailMapper surveyAnswerDetailMapper;
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Long createSurvey(SurveySaveReqVO vo) {
@@ -53,6 +61,7 @@ public class SurveyServiceImpl implements SurveyService {
         surveyStrategy.fillSurveyCode(treatmentSurveyDO);
         treatmentSurveyMapper.insert(treatmentSurveyDO);
 
+        surveyStrategy.fillQuestion(vo);
         if (CollectionUtil.isNotEmpty(vo.getQuestions())) {
             List<QuestionDO> qst = new ArrayList<>();
             for (var item : vo.getQuestions()) {
@@ -76,11 +85,12 @@ public class SurveyServiceImpl implements SurveyService {
         TreatmentSurveyDO tsDO = treatmentSurveyMapper.selectById(vo.getId());
         if (Objects.isNull(tsDO)) throw exception(SURVEY_NOT_EXISTS);
         TreatmentSurveyDO treatmentSurveyDO = SurveyConvert.INSTANCE.convert(vo);
-        treatmentSurveyDO.setCode(tsDO.getCode());
+//        treatmentSurveyDO.setCode(tsDO.getCode());
         treatmentSurveyMapper.updateById(treatmentSurveyDO);
 
         //先删除再插入
         surveyQuestionMapper.deleteAbsoluteBySurveyId(vo.getId());
+        surveyStrategy.fillQuestion(vo);
         List<QuestionDO> qst = new ArrayList<>();
         for (var item : vo.getQuestions()) {
             QuestionDO q = SurveyConvert.INSTANCE.convertQst(new JSONObject(item));
@@ -116,26 +126,66 @@ public class SurveyServiceImpl implements SurveyService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Long submitSurveyForTools(SubmitSurveyReqVO reqVO) {
+        if(CollectionUtil.isEmpty(reqVO.getQstList())){
+            throw exception(1,"提交的答案是空的");
+        }
         if ((Objects.isNull(reqVO.getSurveyType()) || Objects.isNull(SurveyType.getByType(reqVO.getSurveyType())))
                 && (Objects.isNull(reqVO.getId()) || reqVO.getId() <= 0)) {
             throw exception(BAD_REQUEST, "id和type不能同时为空");
         }
+        //编辑原有
+        if (Objects.nonNull(reqVO.getId()) && reqVO.getId() > 0) {
+            //检查之前的答题是不是存在
+            SurveyAnswerDO answerDO = surveyAnswerMapper.selectById(reqVO.getId());
+            if (Objects.isNull(answerDO)) {
+                throw exception(1, "答题实例不存在");
+            }
+            //检查题目是否属于问卷
+            List<QuestionDO> ts = surveyQuestionMapper.selectBySurveyId(answerDO.getBelongSurveyId());
+            Set<String> set1 = reqVO.getQstList().stream().map(p -> p.getQstCode()).collect(Collectors.toSet());
+            Set<String> set2 = ts.stream().map(p -> p.getCode()).collect(Collectors.toSet());
+            set1.removeAll(set2);
+            if (set1.size() > 0) {
+                throw exception(1, "有的题目不在问卷里");
+            }
+            //确定是更新还是新插入
+            Map<String,QuestionDO> mapQst=CollectionUtils.convertMap(ts,QuestionDO::getCode);
+            List<AnswerDetailDO> details= surveyAnswerDetailMapper.getByAnswerId(reqVO.getId());
+            Map<String,AnswerDetailDO> map= CollectionUtils.convertMap(details,AnswerDetailDO::getBelongQstCode);
+            List<AnswerDetailDO> newDetails=new ArrayList<>();
+            List<AnswerDetailDO> oldDetails=new ArrayList<>();
+            for(AnAnswerReqVO item:reqVO.getQstList()){
+                if(map.containsKey(item.getQstCode())){
+                    AnswerDetailDO temp=map.get(item.getQstCode());
+                    temp.setAnswer(item.getAnswer());
+                    oldDetails.add(temp);
+                }else {
+                    AnswerDetailDO detailDO = new AnswerDetailDO();
+                    if (!mapQst.containsKey(item.getQstCode())) throw exception(SURVEY_QUESTION_NOT_EXISTS);
+                    QuestionDO qst = mapQst.get(item.getQstCode());
+                    detailDO.setAnswerId(reqVO.getId());
+                    detailDO.setBelongSurveyId(qst.getBelongSurveyId());
+                    detailDO.setCreator(getLoginUserId().toString());
+                    detailDO.setUpdater(getLoginUserId().toString());
+                    detailDO.setQstContext(qst.getQstContext());
+                    detailDO.setAnswer(item.getAnswer());
+                    detailDO.setQstId(qst.getId());
+                    detailDO.setBelongQstCode(qst.getCode());
+                    newDetails.add(detailDO);
+                }
+            }
+            if(CollectionUtil.isNotEmpty(oldDetails)){
+                surveyAnswerDetailMapper.updateBatch(oldDetails);
+            }
+            if(CollectionUtil.isNotEmpty(newDetails)){
+                surveyAnswerDetailMapper.insertBatch(newDetails);
+            }
+            return reqVO.getId();
+        }else {
+            Long answerId=this.initSurveyAnswer("0",reqVO.getSource());
+        }
+
         return 0L;
-        //判断问卷是否存在，状态是否正常
-//        TreatmentSurveyDO tsDO = StringUtil.isBlank(reqVO.getSurveyCode())
-//                ? treatmentSurveyMapper.selectByCode(reqVO.getSurveyCode()) : treatmentSurveyMapper.selectById(reqVO.getSurveyId());
-//        if (Objects.isNull(tsDO)) throw exception(SURVEY_NOT_EXISTS);
-//        SurveyStrategy surveyStrategy = surveyStrategyFactory.getSurveyStrategy(SurveyType.getByType(tsDO.getSurveyType()).getCode());
-//
-//        //判断是否必答题有遗漏
-//        List<QuestionDO> qsts = surveyQuestionMapper.selectBySurveyId(reqVO.getSurveyId());
-//        surveyStrategy.checkLoseQuestion(reqVO, qsts);
-//        //保存一次回答
-//        Long anSwerId = surveyStrategy.saveAnswer(reqVO);
-//        //保存答案明细
-//        reqVO.setId(anSwerId);
-//        surveyStrategy.saveAnswerDetail(qsts, reqVO);
-//        return anSwerId;
     }
 
     @Override

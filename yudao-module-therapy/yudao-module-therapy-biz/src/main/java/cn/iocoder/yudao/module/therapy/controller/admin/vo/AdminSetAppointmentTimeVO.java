@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.module.therapy.controller.admin.VO;
+package cn.iocoder.yudao.module.therapy.controller.admin.vo;
 
-import cn.iocoder.yudao.module.therapy.controller.VO.SetAppointmentTimeReqVO;
+import cn.iocoder.yudao.module.therapy.controller.vo.SetAppointmentTimeReqVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 

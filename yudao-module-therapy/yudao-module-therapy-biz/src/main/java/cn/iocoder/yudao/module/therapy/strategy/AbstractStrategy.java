@@ -83,4 +83,8 @@ public abstract class AbstractStrategy {
         List<AnswerDetailDO> anAnswerDOS = SurveyConvert.INSTANCE.convert(qstMap, reqVO);
         surveyAnswerDetailMapper.insertBatch(anAnswerDOS);
     }
+
+    public void fillQuestion(SurveySaveReqVO vo){
+
+    }
 }
