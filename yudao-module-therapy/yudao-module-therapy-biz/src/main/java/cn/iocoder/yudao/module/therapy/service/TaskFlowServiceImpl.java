@@ -5,10 +5,9 @@ import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDa
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.*;
 import cn.iocoder.yudao.module.therapy.taskflow.BaseFlow;
 import cn.iocoder.yudao.module.therapy.taskflow.Engine;
-import cn.iocoder.yudao.module.therapy.taskflow.GAMFlow;
+import cn.iocoder.yudao.module.therapy.taskflow.GoalAndMotivationFlow;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +37,7 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
     private TreatmentFlowMapper treatmentFlowMapper;
 
     @Resource
-    GAMFlow gamFlow;
+    GoalAndMotivationFlow goalAndMotivationFlow;
 
     @Resource
     private Engine engine;
@@ -54,15 +53,15 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
                         throw new RuntimeException("task flow id is null");
                     }
                     // create a new task instance
-                    String bmpnName = gamFlow.getProcessName(flowDayitemDO.getId());
-                    String taskInstanceId = gamFlow.createProcessInstance(bmpnName, dayItemInstanceId);
+                    String bmpnName = goalAndMotivationFlow.getProcessName(flowDayitemDO.getId());
+                    String taskInstanceId = goalAndMotivationFlow.createProcessInstance(bmpnName, dayItemInstanceId);
                     dayitemInstanceDO.setTaskInstanceId(taskInstanceId);
                     treatmentDayitemInstanceMapper.updateById(dayitemInstanceDO);
                 }else{
                     // get the task instance
-                    gamFlow.loadProcessInstance(dayitemInstanceDO.getTaskInstanceId());
+                    goalAndMotivationFlow.loadProcessInstance(dayitemInstanceDO.getTaskInstanceId());
                 }
-                return gamFlow;
+                return goalAndMotivationFlow;
             default:
                 return null;
         }
@@ -73,7 +72,7 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
         TreatmentFlowDayitemDO flowDayitemDO = treatmentFlowDayitemMapper.selectById(flowDayitemId);
         switch (flowDayitemDO.getItemType()){
             case "problem_goal_motive":
-                GAMFlow goalAndMotivationFlow = new GAMFlow(engine.getEngine());
+                GoalAndMotivationFlow goalAndMotivationFlow = new GoalAndMotivationFlow(engine.getEngine());
                 String taskFlowId = goalAndMotivationFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
                 flowDayitemDO.setTaskFlowId(taskFlowId);
                 treatmentFlowDayitemMapper.updateById(flowDayitemDO);

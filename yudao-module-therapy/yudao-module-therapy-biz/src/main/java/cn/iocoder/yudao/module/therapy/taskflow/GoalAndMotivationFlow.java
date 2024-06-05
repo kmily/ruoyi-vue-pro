@@ -1,374 +1,140 @@
 package cn.iocoder.yudao.module.therapy.taskflow;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayitemInstanceMapper;
+import cn.iocoder.yudao.module.therapy.service.SurveyService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.*;
-import org.flowable.bpmn.model.Process;
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.TaskService;
-import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.*;
+
+import java.nio.charset.StandardCharsets;
+
+import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.task.api.Task;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import javax.annotation.Resource;
 
-/**
- * 目标与动机流程
- */
 
 @Component
-public class GoalAndMotivationFlow{
-//    /**
-//     *  Settings: {
-//     *      "beginning_steps": [
-//     *          {"type": "guide", "content": "请描述您的目标和动机"},
-//     *          {"type": "guide", "content": "请至少写出3个"},
-//     *          {"type": "user_input", "key": "my_objectives"}
-//     *      ],
-//     *      "ending_steps": [
-//     *          {"type": "guide", "content": "感谢您的参与"}
-//     *      ],
-//     *      "agree_steps": [
-//     *          {"type": "questions", "question_id": 3, "key": "investigation"},
-//     *      ],
-//     *      "disagree_steps": [
-//     *          {"type": "guide", "content": "请你下次再来吧" }
-//     *      ],
-//     *  }
-//     *
-//     *
-//     *
-//     *
-//     *
-//     *
-//     */
-//
-//    String USER_CONTINUE_TASK_NAME = "UserContinueTask";
-//    String USER_GUIDE_TEXT_TASK_NAME = "UserGuideText";
-//    String USER_INPUT_TASK_NAME = "UserInputTask"; // 需要用户输入
-//
-//    ProcessInstance processInstance;
-//
-//    ProcessEngine processEngine;
-//
-//
-//    public GoalAndMotivationFlow(){
-//        processEngine = new Engine().getEngine();
-//    }
-//
-//    private Map getDefaultSettings(){
-//        HashMap settings = new HashMap();
-//        Map<String, Object> guide1 = new HashMap<>();
-//        guide1.put("type", "guide");
-//        guide1.put("content", "请描述您的目标和动机");
-//
-//        Map<String, Object> guide2 = new HashMap<>();
-//        guide2.put("type", "guide");
-//        guide2.put("content", "请至少写出3个");
-//
-//        Map<String, Object> userInput = new HashMap<>();
-//        userInput.put("type", "user_input");
-//        userInput.put("key", "my_objectives");
-//
-//        settings.put("beginning_steps", Arrays.asList(guide1, guide2, userInput));
-//
-//        Map<String, Object> endingStep = new HashMap<>();
-//        endingStep.put("type", "guide");
-//        endingStep.put("content", "感谢您的参与");
-//
-//        settings.put("ending_steps", Arrays.asList(endingStep));
-//
-//        Map<String, Object> agreeStep = new HashMap<>();
-//        agreeStep.put("type", "questions");
-//        agreeStep.put("question_id", 3);
-//        agreeStep.put("key", "investigation");
-//
-//        settings.put("agree_steps", Arrays.asList(agreeStep));
-//
-//        Map<String, Object> disagreeStep = new HashMap<>();
-//        disagreeStep.put("type", "guide");
-//        disagreeStep.put("content", "请你下次再来吧");
-//
-//        settings.put("disagree_steps", Arrays.asList(disagreeStep));
-//        return settings;
-//    }
-//
-//
-//    @Override
-//    public String deploy(Long id, Map<String, Object> settings){
-//        settings = getDefaultSettings();
-//        BpmnModel bpmnModel = createBPMNModel(id, settings);
-//        RepositoryService repositoryService = processEngine.getRepositoryService();
-//        repositoryService.createDeployment()
-//                .addBpmnModel("GoalAndMotivationFlow-" + String.valueOf(id) + ".bpmn", bpmnModel)
-//                .deploy();
-//
-//        System.out.println(new String(new BpmnXMLConverter().convertToXML(bpmnModel), StandardCharsets.UTF_8));
-////        processEngine.getRepositoryService().getBpmnModel(bmpnName);
-////                .latestVersion()
-////                .singleResult().getId());
-////        new BpmnXMLConverter().convertToXML(tmpModel);
-//
-//            return "GoalAndMotivationFlow-" + String.valueOf(id);
-//    }
-//
-//    @Override
-//    public String createProcessInstance(String bmpnName){
+public class GoalAndMotivationFlow extends BaseFlow{
+    @Resource
+    TreatmentDayitemInstanceMapper treatmentDayitemInstanceMapper;
+
+    @Resource
+    SurveyService surveyService;
+
+    public GoalAndMotivationFlow(ProcessEngine engine) {
+        super(engine);
+    }
+
+    public String deploy(Long id, Map<String, Object> settings) {
+        // read settings from resources/goal_and_motivation_settings.json
+        ObjectMapper objectMapper = new ObjectMapper();
+        try (InputStream inputStream = getClass().getResourceAsStream("/goal_and_motivation_flow.json")) {
+            settings = objectMapper.readValue(inputStream, Map.class);
+            // use settings
+        } catch (IOException e) {
+            // handle exception
+            throw new RuntimeException("Failed to read settings from resources/goal_and_motivation_settings.json");
+        }
+        BpmnModel bpmnModel = createBPMNModel(id, settings);
+        RepositoryService repositoryService = processEngine.getRepositoryService();
+        repositoryService.createDeployment()
+                .addBpmnModel("GoalAndMotivationFlow-" + String.valueOf(id) + ".bpmn", bpmnModel)
+                .deploy();
+        System.out.println(new String(new BpmnXMLConverter().convertToXML(bpmnModel), StandardCharsets.UTF_8));
+        return getProcessName(id);
+    }
+
+
+    @Override
+    public String getProcessName(Long id) {
+        return "GOAL_AND_MOTIVATION-"  + String.valueOf(id);
+    }
+
+    @Override
+    public void onFlowEnd(DelegateExecution execution) {
+        // TODO
+        Map variables = execution.getVariables();
+        Long dayItemInstanceId = (Long) variables.get("dayItemInstanceId");
+
+        treatmentDayitemInstanceMapper.finishDayItemInstance(dayItemInstanceId);
+    }
+
+    public Map<String, Object> auto_primary_troubles_qst(Map data, Task currentTask){
+        int sourceTypeCustomize = 2;
+        Long instance_id =  surveyService.initSurveyAnswer("GOAL_AND_MOTIVATION", sourceTypeCustomize);
+        data.put("instance_id", instance_id);
+        RuntimeService runtimeService = processEngine.getRuntimeService();
+        runtimeService.setVariable(processInstance.getId(), "survey_instance_id", instance_id);
+        return data;
+    }
+
+    private Long submitSurveyData(Map variables){
+        Map survey = (Map) variables.get("__survey");
+        Map surveyData = (Map) survey.get("data");
+        SubmitSurveyReqVO submitSurveyReqVO = new ObjectMapper().convertValue(surveyData, SubmitSurveyReqVO.class);
+        return surveyService.submitSurveyForFlow(submitSurveyReqVO);
+
+    }
+
+    public void submit_primary_troubles_qst(Map variables, Task currentTask){
+        // set troubles text, for later llm use
+        Map stepVariables = (Map<String, Object>)variables.get("__current");
+        List<String> troubles =  (List<String>) stepVariables.get("troubles");
+        RuntimeService runtimeService = processEngine.getRuntimeService();
+        runtimeService.setVariable(currentTask.getProcessInstanceId(), "troubles", troubles);
+
+        // submit survey data
+        submitSurveyData(variables);
+    }
+
+    public  Map<String, Object> auto_set_goal_qst(Map data, Task currentTask){
+        Map variables = getVariables();
+        data.put("instance_id", (Long) variables.get("survey_instance_id"));
+        // TODO read survey data from survey service
+        Map instanceData = new HashMap<>();
+        data.put("instance_data", instanceData);
+
+        return data;
+    }
+
+    private Map getVariables(){
+        RuntimeService runtimeService = processEngine.getRuntimeService();
+        return runtimeService.getVariables(processInstance.getId());
+    }
+
+
+
+
+    public void submit_set_goal_qst(Map variables, Task currentTask){
+        // TODO submit question instance
+        submitSurveyData(variables);
+//        Map stepVariables = (Map<String, Object>)variables.get("__current");
+//        String goal =  (String) stepVariables.get("goal");
 //        RuntimeService runtimeService = processEngine.getRuntimeService();
-////        runtimeService.createProcessInstanceBuilder().processDefinitionKey(bmpnName);
-//        processInstance = runtimeService.startProcessInstanceByKey(bmpnName, new HashMap<String, Object>());
-//        return processInstance.getId();
-//    }
-//
-//    @Override
-//    public void loadProcessInstance(String processInstanceId){
-//        RuntimeService runtimeService = processEngine.getRuntimeService();
-//        processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-//    }
-//
-//    @Override
-//    public void userSubmit(String taskId, Map<String, Object> variables) {
-//        Task task = getCurrentTask();
-//        if(taskId.equals(task.getId())) {
-//            TaskService taskService = processEngine.getTaskService();
-//            taskService.complete(taskId, variables);
-//        }else{
-//            throw new RuntimeException("Task id is not correct");
-//        }
-//    }
-//
-//    private void bindContentToUserTask(UserTask userTask, Map content){
-//        ExtensionElement extensionElement = new ExtensionElement();
-//        extensionElement.setName("content"); // The name of your custom attribute
-//        extensionElement.setNamespacePrefix("flowable"); // Namespace prefix
-//        extensionElement.setNamespace("http://flowable.org/bpmn"); // Namespace
-//        // please convert content to json text
-//        String contentStr = "";
-//        try {
-//            contentStr = new ObjectMapper().writeValueAsString(content);
-//        } catch (JsonProcessingException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//
-//        extensionElement.setElementText(contentStr); // The value of your custom attribute
-//        List<ExtensionElement> etsElems = new ArrayList<>();
-//        etsElems.add(extensionElement);
-//        userTask.setExtensionElements(Collections.singletonMap("content", etsElems));
-//    }
-//
-//    String generateTaskId(){
-//        return "name-" + UUID.randomUUID().toString();
-//    }
-//
-//
-//    private FlowElement createCustomizedTask(Map<String, Object> step){
-//        String type = (String) step.get("type");
-//        switch (type) {
-//            case "guide":
-//                UserTask guideTask = new UserTask();
-//                guideTask.setId(generateTaskId());
-//                guideTask.setName(USER_GUIDE_TEXT_TASK_NAME);
-//
-//                ExtensionElement extensionElement = new ExtensionElement();
-//                extensionElement.setName("content"); // The name of your custom attribute
-//                extensionElement.setNamespacePrefix("flowable"); // Namespace prefix
-//                extensionElement.setNamespace("http://flowable.org/bpmn"); // Namespace
-//                extensionElement.setElementText((String) step.get("content")); // The value of your custom attribute
-//                List<ExtensionElement> etsElems = new ArrayList<>();
-//                etsElems.add(extensionElement);
-//                guideTask.setExtensionElements(Collections.singletonMap("content", etsElems));
-//                return guideTask;
-//            case "user_input": {
-//                String key = (String) step.get("key");
-//                UserTask userTask = new UserTask();
-//                userTask.setId(generateTaskId());
-//                userTask.setName("user_input-" + userTask.getId());
-//                step.put("item_type", "user_input");
-//                bindContentToUserTask(userTask, step);
-//                return userTask;
-//            }
-//            case "questions": {
-//                String question_id = String.valueOf(step.get("question_id")) ;
-//                String key = (String) step.get("key");
-//                UserTask userTask = new UserTask();
-//                userTask.setId(generateTaskId());
-//                userTask.setName("questions-" + userTask.getId());
-//                step.put("item_type", "questions");
-//                bindContentToUserTask(userTask, step);
-//                return userTask;
-//            }
-//        }
-//        throw new RuntimeException("Step type is not correct: " + type);
-//    }
-//
-//    public Task getCurrentTask(){
-//        TaskService taskService = processEngine.getTaskService();
-//        Task currentTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-//        return currentTask;
-//    }
-//
-//    public void completeTask(String taskId){
-//        Task currentTask = getCurrentTask();
-//        if(Objects.equals(taskId, currentTask.getId())){
-//            TaskService taskService = processEngine.getTaskService();
-//            taskService.complete(taskId);
-//        }else{
-//            throw new RuntimeException("Task id is not correct");
-//        }
-//    }
-//
-//    public UserTask createUserInputTask(Map<String, Object> content){
-//        UserTask userInputTask = new UserTask();
-//        userInputTask.setId(generateTaskId());
-//        userInputTask.setName(USER_INPUT_TASK_NAME);
-//        bindContentToUserTask(userInputTask, content);
-//        return userInputTask;
-//    }
-//
-//    public BpmnModel createBPMNModel(Long id, Map<String, Object> settings) {
-//        BpmnModel bpmnModel = new BpmnModel();
-//        Process process = new Process();
-//        String processName = "GoalAndMotivationFlow-" + id;
-//        process.setId(processName);
-//        process.setName(processName);
-//        bpmnModel.addProcess(process);
-//
-//        // Start event
-//        StartEvent startEvent = new StartEvent();
-//        startEvent.setId("start");
-//        process.addFlowElement(startEvent);
-//        //
-//        List<Map<String, Object>> beginning_steps = (List<Map<String, Object>>) settings.get("beginning_steps");
-//        FlowElement lastElement = appendBatchTask(process, startEvent, beginning_steps);
-//
-//        // Add user agree task
-//        HashMap<String, Object> userAgreeContent = new HashMap<>();
-//        userAgreeContent.put("item_type", "user_agree");
-//        userAgreeContent.put("content", "请问您还继续吗？");
-//        userAgreeContent.put("need_feedback", true);
-//
-//        UserTask userAgreeTask = createUserInputTask(userAgreeContent);
-//        process.addFlowElement(userAgreeTask);
-//        SequenceFlow sequenceFlow = createSequenceFlow(generateTaskId(), lastElement.getId(), userAgreeTask.getId());
-//        process.addFlowElement(sequenceFlow);
-//
-//        // AI check task
-//        ServiceTask aiCheckTask = new ServiceTask();
-//        aiCheckTask.setId(generateTaskId());
-//        aiCheckTask.setName("AI检查用户输入");
-//        aiCheckTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
-//        aiCheckTask.setImplementation("cn.iocoder.yudao.module.therapy.taskflow.servicetasks.AICheckUserAgreementStepDelegate");
-//        process.addFlowElement(aiCheckTask);
-//        sequenceFlow = createSequenceFlow(generateTaskId(), userAgreeTask.getId(), aiCheckTask.getId());
-//        process.addFlowElement(sequenceFlow);
-//
-//
-//        // Add exclusive gateway
-//        ExclusiveGateway exclusiveGateway = new ExclusiveGateway();
-//        exclusiveGateway.setId(generateTaskId());
-//        exclusiveGateway.setName("用户是否同意");
-//        process.addFlowElement(exclusiveGateway);
-//
-//
-//        FlowElement aiToGateFlow = createSequenceFlow(generateTaskId(), aiCheckTask.getId(), exclusiveGateway.getId());
-//        process.addFlowElement(aiToGateFlow);
-//
-//        // Add agree steps
-//        List<Map<String, Object>> agree_steps = (List<Map<String, Object>>) settings.get("agree_steps");
-//        List<Map<String, Object>> disagree_steps = (List<Map<String, Object>>) settings.get("disagree_steps");
-//
-//        FlowElement lastElementOfAgree = appendBatchTask(process, exclusiveGateway, agree_steps);
-//        FlowElement lastElementOfDisagree = appendBatchTask(process,  exclusiveGateway, disagree_steps);
-//        // Add ending steps
-//        lastElement = appendBatchTask(process, (List<Map<String, Object>>) settings.get("ending_steps"),Arrays.asList(lastElementOfAgree, lastElementOfDisagree));
-//
-//
-//        // End event
-//        EndEvent endEvent = new EndEvent();
-//        endEvent.setId("end");
-//        process.addFlowElement(endEvent);
-//
-//        process.addFlowElement(createSequenceFlow(generateTaskId(), lastElement.getId(), endEvent.getId()));
-//
-//        // Exclusive gateway
-//        return bpmnModel;
-//
-//    }
-//
-//    String WAIT_FOR_SIGNAL_TASK_NAME = "Wait for Signal";
-//    private FlowElement appendUserContinueTask(Process process, FlowElement element){
-//        // User Continue Task
-//        UserTask userContinueTask = new UserTask();
-//        String userContinueTaskId = generateTaskId();
-//        userContinueTask.setId(userContinueTaskId);
-//        userContinueTask.setName(USER_CONTINUE_TASK_NAME);
-//
-//        process.addFlowElement(userContinueTask);
-//        process.addFlowElement(createSequenceFlow(generateTaskId(), element.getId(), userContinueTask.getId()));
-//        return userContinueTask;
-//    }
-//
-//
-//
-//    @Override
-//    public Map run(){
-//        Task currentTask = getCurrentTask();
-//        HashMap result = new HashMap();
-//        result.put("__task_id", currentTask.getId());
-//        result.put("__task_name", currentTask.getName());
-//        if(currentTask.getName().equals(USER_GUIDE_TEXT_TASK_NAME)){
-//            String activityId = currentTask.getTaskDefinitionKey(); // Get the task's definition key
-//            BpmnModel bpmnModel = processEngine.getRepositoryService().getBpmnModel(currentTask.getProcessDefinitionId());
-//            UserTask userTask = (UserTask) bpmnModel.getFlowElement(activityId);
-//
-//            ExtensionElement ele =  userTask.getExtensionElements().get("content").get(0);
-//            String guideText = ele.getElementText();
-//            result.put("item_type", "guide");
-//            result.put("content", guideText);
-//            TaskService taskService = processEngine.getTaskService();
-//            taskService.complete(currentTask.getId());
-//        }else if (currentTask.getName().equals(USER_INPUT_TASK_NAME)){
-//
-//            String activityId = currentTask.getTaskDefinitionKey(); // Get the task's definition key
-//            BpmnModel bpmnModel = processEngine.getRepositoryService().getBpmnModel(currentTask.getProcessDefinitionId());
-//            UserTask userTask = (UserTask) bpmnModel.getFlowElement(activityId);
-//
-//            ExtensionElement ele =  userTask.getExtensionElements().get("content").get(0);
-//            String content = ele.getElementText();
-//            Map<String, Object> data = new HashMap();
-//            try {
-//                data = new ObjectMapper().readValue(content, Map.class);
-//                for (Map.Entry<String, Object> entry : data.entrySet()) {
-//                    result.put(entry.getKey(), entry.getValue());
-//                }
-//            } catch (JsonProcessingException e) {
-//                throw new RuntimeException(e);
-//            }
-//
-//        }else{
-//
-//            String activityId = currentTask.getTaskDefinitionKey(); // Get the task's definition key
-//            BpmnModel bpmnModel = processEngine.getRepositoryService().getBpmnModel(currentTask.getProcessDefinitionId());
-//            UserTask userTask = (UserTask) bpmnModel.getFlowElement(activityId);
-//
-//            ExtensionElement ele =  userTask.getExtensionElements().get("content").get(0);
-//            String content = ele.getElementText();
-//            Map<String, Object> data = new HashMap();
-//            try {
-//                data = new ObjectMapper().readValue(content, Map.class);
-//                for (Map.Entry<String, Object> entry : data.entrySet()) {
-//                    result.put(entry.getKey(), entry.getValue());
-//                }
-//            } catch (JsonProcessingException e) {
-//                throw new RuntimeException(e);
-//            }
-//
-//        }
-//        return result;
-//    }
+//        runtimeService.setVariable(currentTask.getProcessInstanceId(), "goal", goal);
+    }
+
+    public Map<String, Object> auto_my_actions_qst(Map data, Task currentTask){
+        // TODO init question instance
+        Map variables = getVariables();
+        data.put("instance_id", variables.get("survey_instance_id"));
+
+        Map instanceData = new HashMap<>();
+        data.put("instance_data", instanceData);
+        return data;
+    }
+
+    public void submit_my_actions_qst(Map variables, Task currentTask) {
+        // TODO submit question instance
+        submitSurveyData(variables);
+    }
 }

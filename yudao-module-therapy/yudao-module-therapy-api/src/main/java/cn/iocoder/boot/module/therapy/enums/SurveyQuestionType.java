@@ -13,7 +13,7 @@ import java.util.Objects;
  */
 @Getter
 @AllArgsConstructor
-public enum SurveyQuestionType implements IntArrayValuable {
+public enum wSurveyQuestionType implements IntArrayValuable {
 
     RADIO(1,"radio", "单选题"),
     CHECKBOX(2,"checkbox", "多选题"),
