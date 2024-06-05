@@ -21,14 +21,14 @@ public class SubmitSurveyReqVO {
 
 //    @Schema(description = "问卷ID,code和id二选一",example = "23")
 ////    @Min(value = 1,message = "问卷ID不正确")
-    private Long surveyId;
+//    private Long surveyId;
     @Schema(description = "问卷类型,当id为0时此参数必须赋值,",example = "2")
 //    @Min(value = 1,message = "问卷ID不正确")
     private Integer surveyType;
 
 //    @Schema(description = "来源",requiredMode = Schema.RequiredMode.REQUIRED,example = "23")
 //    @Min(value = 1,message = "来源参数不对")
-    private Integer source;
+//    private Integer source;
 
     @Schema(description = "问卷答案",requiredMode = Schema.RequiredMode.REQUIRED,example = "[{},{}.....]")
     @NotEmpty(message = "答案列表为不能为空")
