@@ -29,14 +29,14 @@ public class AppSurveyController {
     @Operation(summary = "流程提交问卷")
 //    @PreAuthorize("@ss.hasPermission('system:user:create')")
     public CommonResult<Long> submitForTools(@Valid @RequestBody SubmitSurveyReqVO reqVO) {
-        reqVO.setSource(2);
+//        reqVO.setSource(2);
         return success(surveyService.submitSurveyForTools(reqVO));
     }
 
     @PostMapping("/submitForFlow")
     @Operation(summary = "工具箱提交问卷")
     public CommonResult<Long> submitForFlow(@Valid @RequestBody SubmitSurveyReqVO reqVO){
-        reqVO.setSource(1);
+//        reqVO.setSource(1);
         return success(surveyService.submitSurveyForFlow(reqVO));
     }
 }
