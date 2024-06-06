@@ -139,6 +139,7 @@ CREATE TABLE `hlgyy_treatment_dayitem_instance`  (
      `flow_instance_id` bigint not null COMMENT '治疗day instance id',
      `day_instance_id` bigint not null COMMENT '治疗day instance id',
      `dayitem_id` bigint NOT NULL COMMENT '治疗流程模板的每日的项目id',
+     `ext_attr` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '扩展属性',
      `task_instance_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '任务流任务实例id',
      `status` tinyint NOT NULL DEFAULT 0 COMMENT '流程状态（0未开始 1进行中 2已完成 3已取消）',
      `user_input` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '用户输入',
