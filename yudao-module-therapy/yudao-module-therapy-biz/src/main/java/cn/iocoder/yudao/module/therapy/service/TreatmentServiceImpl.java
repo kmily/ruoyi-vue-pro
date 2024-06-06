@@ -84,14 +84,11 @@ public class TreatmentServiceImpl implements TreatmentService {
     }
 
     public boolean setAppointmentTime(Long userId, SetAppointmentTimeReqVO reqVO) {
-        MemberUserExtDTO dto = memberUserApi.getUserExtInfo(userId);
-        if (dto != null) {
-            dto.setAppointmentDate(reqVO.getAppointmentDate());
-            dto.setAppointmentTimeRange(reqVO.getAppointmentPeriodTime());
-            memberUserApi.updateMemberExtByUserId(dto);
-        } else {
-            memberUserApi.saveUserExtInfo(dto);
-        }
+        MemberUserExtDTO dto=new MemberUserExtDTO();
+        dto.setUserId(userId);
+        dto.setAppointmentDate(reqVO.getAppointmentDate());
+        dto.setAppointmentTimeRange(reqVO.getAppointmentTimeRange());
+        memberUserApi.updateMemberExtByUserId(dto);
 
         return true;
     }

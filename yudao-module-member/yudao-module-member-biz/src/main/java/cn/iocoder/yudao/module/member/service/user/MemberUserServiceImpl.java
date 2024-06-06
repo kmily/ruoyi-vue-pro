@@ -112,6 +112,11 @@ public class MemberUserServiceImpl implements MemberUserService {
     }
 
     @Override
+    public List<MemberUserExtDO> getUserExtInfoList(List<Long> userIds) {
+        return memberUserExtMapper.getList(userIds);
+    }
+
+    @Override
     public void saveUserExtInfo(MemberUserExtDTO dto) {
         memberUserExtMapper.insert(MemberUserConvert.INSTANCE.convert(dto));
     }

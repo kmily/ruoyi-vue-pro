@@ -38,7 +38,7 @@ public class MemberUserExtDO implements Serializable, TransPojo {
     @TableId
     private Long userId;
     private Date appointmentDate;
-    private String appointmentTimeRange;
+    private Integer appointmentTimeRange;
     /**
      * 父母教育程序
      * 字典类型:edu_type

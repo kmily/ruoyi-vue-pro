@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.*;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.AppAuthLoginReqVO;
@@ -132,6 +133,10 @@ public class MemberUserController {
         List<Long> userIds = pageResult.getList().stream().map(p -> p.getId()).collect(Collectors.toList());
         Map<Long, TreatmentInstanceDO> map = treatmentStatisticsDataService.queryLatestTreatmentInstanceId(userIds);
         Map<Long, List<String>> map1 = treatmentStatisticsDataService.queryPsycoTroubleCategory(userIds);
+        //处理扩展信息
+        List<MemberUserExtDO> extDOS=memberUserService.getUserExtInfoList(userIds);
+        Map<Long,MemberUserExtDO> map2=CollectionUtils.convertMap(extDOS,MemberUserExtDO::getUserId);
+
         PageResult<MemberUserRespVO> res = MemberUserConvert.INSTANCE.convertPage(pageResult);
         for (MemberUserRespVO item : res.getList()) {
             if (map.containsKey(item.getId())) {
@@ -142,8 +147,13 @@ public class MemberUserController {
             if (map1 != null && map1.containsKey(item.getId())) {
                 item.setLlm(map1.get(item.getId()));
             }
+            if (map2 != null && map2.containsKey(item.getId())) {
+                item.setAppointmentDate(map2.get(item.getId()).getAppointmentDate());
+                item.setAppointmentTimeRange(map2.get(item.getId()).getAppointmentTimeRange());
+            }
         }
-        return success(MemberUserConvert.INSTANCE.convertPage(pageResult));
+
+        return success(res);
     }
 
     @PostMapping("/create")

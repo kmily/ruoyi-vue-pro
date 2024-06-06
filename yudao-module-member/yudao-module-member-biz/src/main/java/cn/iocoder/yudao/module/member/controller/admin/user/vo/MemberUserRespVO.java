@@ -5,7 +5,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Schema(description = "管理后台 - 会员用户 Response VO")
@@ -49,11 +52,11 @@ public class MemberUserRespVO extends MemberUserBaseVO {
     @Schema(description = "用户经验值", requiredMode  = Schema.RequiredMode.REQUIRED, example = "200")
     private Integer experience;
 
-    @Schema(description = "治疗进度", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    private Integer progress;
-
-    @Schema(description = "第几周", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    private Integer weekNum;
+//    @Schema(description = "治疗进度", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+//    private Integer progress;
+//
+//    @Schema(description = "第几周", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+//    private Integer weekNum;
     // ========== 扩展信息 ==========
     /**
      * 父母教育程序
@@ -93,5 +96,11 @@ public class MemberUserRespVO extends MemberUserBaseVO {
 
     @Schema(description = "LLM分类",  example = "3")
     private List<String> llm;
+
+    @Schema(description = "预约时间",example = "2024-05-23")
+    private Date appointmentDate;
+
+    @Schema(description = "预约时间段,字典:booking_time", example = "1")
+    private Integer appointmentTimeRange;
 
 }
