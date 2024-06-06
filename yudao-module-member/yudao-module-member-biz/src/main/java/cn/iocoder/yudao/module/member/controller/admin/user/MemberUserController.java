@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.*;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.AppAuthLoginReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserResetPasswordReqVO;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.group.MemberGroupDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
@@ -134,6 +135,13 @@ public class MemberUserController {
         String ip = ServletUtils.getClientIP(request);
         MemberUserDO userDO = memberUserService.createUserByAdmin(reqVO.getMobile(), reqVO.getPassword(), "", TerminalEnum.ADMIN_WEB.getTerminal());
         return success(MemberUserConvert.INSTANCE.convert04(userDO));
+    }
+
+    @PutMapping("/reset-password")
+    @Operation(summary = "重置密码", description = "用户忘记密码时使用")
+    public CommonResult<Boolean> resetUserPassword(@RequestBody @Valid AppMemberUserResetPasswordReqVO reqVO) {
+        memberUserService.resetUserPassword(reqVO);
+        return success(true);
     }
 
 }

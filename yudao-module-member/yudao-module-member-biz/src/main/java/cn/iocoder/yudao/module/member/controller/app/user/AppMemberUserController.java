@@ -65,20 +65,20 @@ public class AppMemberUserController {
         return success(true);
     }
 
-    @PutMapping("/update-password")
-    @Operation(summary = "修改用户密码", description = "用户修改密码时使用")
-    @PreAuthenticated
-    public CommonResult<Boolean> updateUserPassword(@RequestBody @Valid AppMemberUserUpdatePasswordReqVO reqVO) {
-        userService.updateUserPassword(getLoginUserId(), reqVO);
-        return success(true);
-    }
-
-    @PutMapping("/reset-password")
-    @Operation(summary = "重置密码", description = "用户忘记密码时使用")
-    public CommonResult<Boolean> resetUserPassword(@RequestBody @Valid AppMemberUserResetPasswordReqVO reqVO) {
-        userService.resetUserPassword(reqVO);
-        return success(true);
-    }
+//    @PutMapping("/update-password")
+//    @Operation(summary = "修改用户密码", description = "用户修改密码时使用")
+//    @PreAuthenticated
+//    public CommonResult<Boolean> updateUserPassword(@RequestBody @Valid AppMemberUserUpdatePasswordReqVO reqVO) {
+//        userService.updateUserPassword(getLoginUserId(), reqVO);
+//        return success(true);
+//    }
+//
+//    @PutMapping("/reset-password")
+//    @Operation(summary = "重置密码", description = "用户忘记密码时使用")
+//    public CommonResult<Boolean> resetUserPassword(@RequestBody @Valid AppMemberUserResetPasswordReqVO reqVO) {
+//        userService.resetUserPassword(reqVO);
+//        return success(true);
+//    }
 
 }
 
