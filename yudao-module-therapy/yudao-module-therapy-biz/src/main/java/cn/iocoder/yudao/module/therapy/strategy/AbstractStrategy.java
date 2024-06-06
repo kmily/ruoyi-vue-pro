@@ -20,8 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.SURVEY_EXISTS_UNFINISHED;
-import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.SURVEY_QUESTION_EMPTY;
+import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -87,4 +86,17 @@ public abstract class AbstractStrategy {
 //    public void fillQuestion(SurveySaveReqVO vo){
 //
 //    }
+    /**
+     * 检查题目是否属于问卷
+     * @param reqVO
+     * @param qst
+     */
+    public void checkQuestionExistsSurvey(SubmitSurveyReqVO reqVO, List<QuestionDO> qst){
+        Set<String> set1 = reqVO.getQstList().stream().map(p -> p.getQstCode()).collect(Collectors.toSet());
+        Set<String> set2 = qst.stream().map(p -> p.getCode()).collect(Collectors.toSet());
+        set1.removeAll(set2);
+        if (set1.size() > 0) {
+            throw exception(QUESTION_NOT_EXISTS_SURVEY);
+        }
+    }
 }

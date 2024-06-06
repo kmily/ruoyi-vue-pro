@@ -19,15 +19,17 @@ public interface TreatmentStatisticsDataService {
     Map<Long, List<String>> queryPsycoTroubleCategory(List<Long> treatmentInstanceIds);
 
 
-    /**
-     * 查询治疗状态
-     * @param treatmentInstanceIds
-     * @return
-     *
-     * e.g.
-     * param: [1, 2]
-     * return : {1=TreatmentStatus.COMPLETED, 2=TreatmentStatus.CANCELED}
-     *
-     */
-    Map<Long, TreatmentInstanceDO.TreatmentStatus> queryTreatmentStatus(List<Long> treatmentInstanceIds);
+//    /**
+//     * 查询治疗状态
+//     * @param treatmentInstanceIds
+//     * @return
+//     *
+//     * e.g.
+//     * param: [1, 2]
+//     * return : {1=TreatmentStatus.COMPLETED, 2=TreatmentStatus.CANCELED}
+//     *
+//     */
+//    Map<Long, TreatmentInstanceDO.TreatmentStatus> queryTreatmentStatus(List<Long> treatmentInstanceIds);
+
+    Map<Long,TreatmentInstanceDO> queryLatestTreatmentInstanceId(List<Long> userIds);
 }

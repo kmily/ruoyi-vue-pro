@@ -21,6 +21,8 @@ import cn.iocoder.yudao.module.member.service.level.MemberLevelService;
 import cn.iocoder.yudao.module.member.service.point.MemberPointRecordService;
 import cn.iocoder.yudao.module.member.service.tag.MemberTagService;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentInstanceDO;
+import cn.iocoder.yudao.module.therapy.service.TreatmentStatisticsDataService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,10 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -49,14 +48,17 @@ public class MemberUserController {
 
     @Resource
     private MemberUserService memberUserService;
-    @Resource
-    private MemberTagService memberTagService;
+    //    @Resource
+//    private MemberTagService memberTagService;
     @Resource
     private MemberLevelService memberLevelService;
-    @Resource
-    private MemberGroupService memberGroupService;
+    //    @Resource
+//    private MemberGroupService memberGroupService;
     @Resource
     private MemberPointRecordService memberPointRecordService;
+
+    @Resource
+    private TreatmentStatisticsDataService treatmentStatisticsDataService;
 
     @PutMapping("/update")
     @Operation(summary = "更新会员用户")
@@ -97,9 +99,9 @@ public class MemberUserController {
     @PreAuthorize("@ss.hasPermission('member:user:query')")
     public CommonResult<MemberUserRespVO> getUser(@RequestParam("id") Long id) {
         MemberUserDO user = memberUserService.getUser(id);
-        MemberUserExtDO extDO= memberUserService.getUserExtInfo(id);
-        MemberUserRespVO respVO=MemberUserConvert.INSTANCE.convert03(user);
-        BeanUtil.copyProperties(extDO,respVO);
+        MemberUserExtDO extDO = memberUserService.getUserExtInfo(id);
+        MemberUserRespVO respVO = MemberUserConvert.INSTANCE.convert03(user);
+        BeanUtil.copyProperties(extDO, respVO);
         return success(respVO);
     }
 
@@ -113,11 +115,11 @@ public class MemberUserController {
         }
 
 //        // 处理用户标签返显
-        Set<Long> tagIds = pageResult.getList().stream()
-                .map(MemberUserDO::getTagIds)
-                .filter(Objects::nonNull)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toSet());
+//        Set<Long> tagIds = pageResult.getList().stream()
+//                .map(MemberUserDO::getTagIds)
+//                .filter(Objects::nonNull)
+//                .flatMap(Collection::stream)
+//                .collect(Collectors.toSet());
 //        List<MemberTagDO> tags = memberTagService.getTagList(tagIds);
 //        // 处理用户级别返显
 //        List<MemberLevelDO> levels = memberLevelService.getLevelList(
@@ -126,6 +128,21 @@ public class MemberUserController {
 //        List<MemberGroupDO> groups = memberGroupService.getGroupList(
 //                convertSet(pageResult.getList(), MemberUserDO::getGroupId));
 //        return success(MemberUserConvert.INSTANCE.convertPage(pageResult, tags, levels, groups));
+        //处理患者最新的治疗流程返显
+        List<Long> userIds = pageResult.getList().stream().map(p -> p.getId()).collect(Collectors.toList());
+        Map<Long, TreatmentInstanceDO> map = treatmentStatisticsDataService.queryLatestTreatmentInstanceId(userIds);
+        Map<Long, List<String>> map1 = treatmentStatisticsDataService.queryPsycoTroubleCategory(userIds);
+        PageResult<MemberUserRespVO> res = MemberUserConvert.INSTANCE.convertPage(pageResult);
+        for (MemberUserRespVO item : res.getList()) {
+            if (map.containsKey(item.getId())) {
+                TreatmentInstanceDO instanceDO = map.get(item.getId());
+                item.setInstanceState(instanceDO.getStatus());
+                item.setTreatmentInstanceId(instanceDO.getId());
+            }
+            if (map1 != null && map1.containsKey(item.getId())) {
+                item.setLlm(map1.get(item.getId()));
+            }
+        }
         return success(MemberUserConvert.INSTANCE.convertPage(pageResult));
     }
 

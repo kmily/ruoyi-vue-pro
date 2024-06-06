@@ -63,4 +63,8 @@ public class DefaultSurveyStrategy extends AbstractStrategy implements SurveyStr
         vo.getQuestions().add(map3.toString());
     }
 
+    @Override
+    public void checkQuestionExistsSurvey(SubmitSurveyReqVO reqVO, List<QuestionDO> qst){
+
+    }
 }

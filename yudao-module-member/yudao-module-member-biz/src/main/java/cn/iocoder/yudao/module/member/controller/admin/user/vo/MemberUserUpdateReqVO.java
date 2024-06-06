@@ -28,20 +28,20 @@ public class MemberUserUpdateReqVO extends MemberUserBaseVO {
     @Schema(description = "学业情况",  example = "2")
     private Integer studyState;
     /**
-     * 父母婚姻情况
+     * 婚姻情况
      */
-    @Schema(description = "父母婚姻情况",  example = "2")
-    private Integer parentMaritalState;
+    @Schema(description = "婚姻情况",  example = "2")
+    private Integer maritalState;
     /**
      * 生活状况
      */
     @Schema(description = "生活状况",  example = "3")
     private Integer livingState;
     /**
-     * 父母详细居住类型
+     * 居住类型
      */
-    @Schema(description = "父母详细居住类型",  example = "3")
-    private Integer parentLiveAreaType;
+    @Schema(description = "居住类型",  example = "3")
+    private Integer liveAreaType;
 
 
 

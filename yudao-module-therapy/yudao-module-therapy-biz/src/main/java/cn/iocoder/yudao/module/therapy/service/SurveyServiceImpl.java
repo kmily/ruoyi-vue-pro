@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.therapy.service;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.json.JSONObject;
+import cn.iocoder.boot.module.therapy.enums.SurveyQuestionType;
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -177,14 +178,12 @@ public class SurveyServiceImpl implements SurveyService {
         if (Objects.isNull(answerDO)) {
             throw exception(SURVEY_ANSWER_NOT_EXISTS);
         }
+        SurveyStrategy surveyStrategy = surveyStrategyFactory.getSurveyStrategy(SurveyType.getByType(answerDO.getSurveyType()).getCode());
+
         //检查题目是否属于问卷
         List<QuestionDO> ts = surveyQuestionMapper.selectBySurveyId(answerDO.getBelongSurveyId());
-        Set<String> set1 = reqVO.getQstList().stream().map(p -> p.getQstCode()).collect(Collectors.toSet());
-        Set<String> set2 = ts.stream().map(p -> p.getCode()).collect(Collectors.toSet());
-        set1.removeAll(set2);
-        if (set1.size() > 0) {
-            throw exception(QUESTION_NOT_EXISTS_SURVEY);
-        }
+        surveyStrategy.checkQuestionExistsSurvey(reqVO, ts);
+
         //确定是更新还是新插入
         Map<String, QuestionDO> mapQst = CollectionUtils.convertMap(ts, QuestionDO::getCode);
         List<AnswerDetailDO> details = surveyAnswerDetailMapper.getByAnswerId(reqVO.getId());
@@ -198,17 +197,17 @@ public class SurveyServiceImpl implements SurveyService {
                 oldDetails.add(temp);
             } else {
                 AnswerDetailDO detailDO = new AnswerDetailDO();
-                if (!mapQst.containsKey(item.getQstCode())) throw exception(SURVEY_QUESTION_NOT_EXISTS);
-                QuestionDO qst = mapQst.get(item.getQstCode());
+                QuestionDO qst = null;
+                if (!mapQst.containsKey(item.getQstCode())) {
+                    qst = mapQst.get(item.getQstCode());
+                }
                 detailDO.setAnswerId(reqVO.getId());
-                detailDO.setBelongSurveyId(qst.getBelongSurveyId());
-//                    detailDO.setCreator(getLoginUserId().toString());
-//                    detailDO.setUpdater(getLoginUserId().toString());
-                detailDO.setQstContext(qst.getQstContext());
+                detailDO.setBelongSurveyId(answerDO.getBelongSurveyId());
+                detailDO.setQstContext(Objects.isNull(qst) ? null : qst.getQstContext());
                 detailDO.setAnswer(item.getAnswer());
-                detailDO.setQstId(qst.getId());
-                detailDO.setBelongQstCode(qst.getCode());
-                detailDO.setQstType(qst.getQstType());
+                detailDO.setQstId(Objects.isNull(qst) ? null : qst.getId());
+                detailDO.setBelongQstCode(item.getQstCode());
+                detailDO.setQstType(Objects.isNull(qst) ? SurveyQuestionType.SPACES.getType() : qst.getQstType());
                 newDetails.add(detailDO);
             }
         }
@@ -230,52 +229,7 @@ public class SurveyServiceImpl implements SurveyService {
             throw exception(BAD_REQUEST, "id不能为空");
         }
         updateOrAddAnswer(reqVO);
-//        //检查之前的答题是不是存在
-//        SurveyAnswerDO answerDO = surveyAnswerMapper.selectById(reqVO.getId());
-//        if (Objects.isNull(answerDO)) {
-//            throw exception(SURVEY_ANSWER_NOT_EXISTS);
-//        }
-//        //检查题目是否属于问卷
-//        List<QuestionDO> ts = surveyQuestionMapper.selectBySurveyId(answerDO.getBelongSurveyId());
-//        Set<String> set1 = reqVO.getQstList().stream().map(p -> p.getQstCode()).collect(Collectors.toSet());
-//        Set<String> set2 = ts.stream().map(p -> p.getCode()).collect(Collectors.toSet());
-//        set1.removeAll(set2);
-//        if (set1.size() > 0) {
-//            throw exception(QUESTION_NOT_EXISTS_SURVEY);
-//        }
-//        //确定是更新还是新插入
-//        Map<String, QuestionDO> mapQst = CollectionUtils.convertMap(ts, QuestionDO::getCode);
-//        List<AnswerDetailDO> details = surveyAnswerDetailMapper.getByAnswerId(reqVO.getId());
-//        Map<String, AnswerDetailDO> map = CollectionUtils.convertMap(details, AnswerDetailDO::getBelongQstCode);
-//        List<AnswerDetailDO> newDetails = new ArrayList<>();
-//        List<AnswerDetailDO> oldDetails = new ArrayList<>();
-//        for (AnAnswerReqVO item : reqVO.getQstList()) {
-//            if (map.containsKey(item.getQstCode())) {
-//                AnswerDetailDO temp = map.get(item.getQstCode());
-//                temp.setAnswer(item.getAnswer());
-//                oldDetails.add(temp);
-//            } else {
-//                AnswerDetailDO detailDO = new AnswerDetailDO();
-//                if (!mapQst.containsKey(item.getQstCode())) throw exception(SURVEY_QUESTION_NOT_EXISTS);
-//                QuestionDO qst = mapQst.get(item.getQstCode());
-//                detailDO.setAnswerId(reqVO.getId());
-//                detailDO.setBelongSurveyId(qst.getBelongSurveyId());
-////                detailDO.setCreator(getLoginUserId().toString());
-////                detailDO.setUpdater(getLoginUserId().toString());
-//                detailDO.setQstContext(qst.getQstContext());
-//                detailDO.setAnswer(item.getAnswer());
-//                detailDO.setQstId(qst.getId());
-//                detailDO.setBelongQstCode(qst.getCode());
-//                detailDO.setQstType(qst.getQstType());
-//                newDetails.add(detailDO);
-//            }
-//        }
-//        if (CollectionUtil.isNotEmpty(oldDetails)) {
-//            surveyAnswerDetailMapper.updateBatch(oldDetails);
-//        }
-//        if (CollectionUtil.isNotEmpty(newDetails)) {
-//            surveyAnswerDetailMapper.insertBatch(newDetails);
-//        }
+
         return reqVO.getId();
     }
 

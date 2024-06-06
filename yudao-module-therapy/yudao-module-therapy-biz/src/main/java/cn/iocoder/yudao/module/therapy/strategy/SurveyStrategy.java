@@ -42,22 +42,12 @@ public interface SurveyStrategy {
      */
     void checkLoseQuestion(SubmitSurveyReqVO reqVO, List<QuestionDO> qst);
 
-//    /**
-//     * 保存一次回答
-//     *
-//     * @param reqVO
-//     * @return
-//     */
-//    Long saveAnswer(SubmitSurveyReqVO reqVO);
-//
-//    /**
-//     * 保存回答明细
-//     *
-//     * @param qst
-//     * @param reqVO
-//     */
-//    void saveAnswerDetail(List<QuestionDO> qst, SubmitSurveyReqVO reqVO);
-
+    /**
+     * 检查题目是否属于问卷
+     * @param reqVO
+     * @param qst
+     */
+    void checkQuestionExistsSurvey(SubmitSurveyReqVO reqVO, List<QuestionDO> qst);
     /**
      * 获取报告
      *

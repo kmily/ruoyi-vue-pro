@@ -11,8 +11,11 @@ import java.time.LocalDateTime;
 @Data
 public class SurveyAnswerPageReqVO extends PageParam {
     /**
-     * 一次答题ID
+     * 患者ID
      */
     @Schema(description = "患者ID",  example = "1")
     private Long userId;
+
+    @Schema(description = "问卷类型",  example = "1")
+    private Integer surveyType;
 }
