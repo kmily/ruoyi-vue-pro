@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
+import cn.iocoder.boot.module.therapy.enums.SurveyType;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayitemInstanceMapper;
 import cn.iocoder.yudao.module.therapy.service.SurveyService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +23,10 @@ import org.flowable.task.api.Task;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+
+import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.QUESTION_NOT_EXISTS_SURVEY;
+import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.TREATMENT_DAYITEM_STEP_PARAMS_ERROR;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 
 @Component
@@ -62,7 +68,6 @@ public class GoalAndMotivationFlow extends BaseFlow{
 
     @Override
     public void onFlowEnd(DelegateExecution execution) {
-        // TODO
         Map variables = execution.getVariables();
         Long dayItemInstanceId = (Long) variables.get("dayItemInstanceId");
 
@@ -70,31 +75,30 @@ public class GoalAndMotivationFlow extends BaseFlow{
     }
 
     public Map<String, Object> auto_primary_troubles_qst(Map data, Task currentTask){
-        int sourceTypeCustomize = 2;
-        Long instance_id =  surveyService.initSurveyAnswer("GOAL_AND_MOTIVATION", sourceTypeCustomize);
-        data.put("instance_id", instance_id);
         RuntimeService runtimeService = processEngine.getRuntimeService();
-        runtimeService.setVariable(processInstance.getId(), "survey_instance_id", instance_id);
+        Long instance_id = (Long) runtimeService.getVariable(processInstance.getId(), "survey_instance_id");
+        if(instance_id == null) {
+            instance_id = surveyService.initSurveyAnswer(SurveyType.PROBLEM_GOAL_MOTIVE.getCode(), 2);
+            runtimeService.setVariable(processInstance.getId(), "survey_instance_id", instance_id);
+        }
+        data.put("instance_id", instance_id);
         return data;
     }
 
-    private Long submitSurveyData(Map variables){
-        Map survey = (Map) variables.get("__survey");
-        Map surveyData = (Map) survey.get("data");
-        SubmitSurveyReqVO submitSurveyReqVO = new ObjectMapper().convertValue(surveyData, SubmitSurveyReqVO.class);
-        return surveyService.submitSurveyForFlow(submitSurveyReqVO);
 
-    }
-
-    public void submit_primary_troubles_qst(Map variables, Task currentTask){
+    public void submit_primary_troubles_qst(DayitemStepSubmitReqVO submitReqVO, Task currentTask){
         // set troubles text, for later llm use
-        Map stepVariables = (Map<String, Object>)variables.get("__current");
-        List<String> troubles =  (List<String>) stepVariables.get("troubles");
+        Map stepVariables = submitReqVO.getStep_data().getCurrent();
+        List<String> troubles;
+        try {
+            troubles =  (List<String>) stepVariables.get("troubles");
+        } catch (Exception e) {
+            throw exception(TREATMENT_DAYITEM_STEP_PARAMS_ERROR);
+        }
         RuntimeService runtimeService = processEngine.getRuntimeService();
         runtimeService.setVariable(currentTask.getProcessInstanceId(), "troubles", troubles);
-
         // submit survey data
-        submitSurveyData(variables);
+        surveyService.submitSurveyForFlow(submitReqVO.getStep_data().getSurvey());
     }
 
     public  Map<String, Object> auto_set_goal_qst(Map data, Task currentTask){
@@ -115,27 +119,20 @@ public class GoalAndMotivationFlow extends BaseFlow{
 
 
 
-    public void submit_set_goal_qst(Map variables, Task currentTask){
-        // TODO submit question instance
-        submitSurveyData(variables);
-//        Map stepVariables = (Map<String, Object>)variables.get("__current");
-//        String goal =  (String) stepVariables.get("goal");
-//        RuntimeService runtimeService = processEngine.getRuntimeService();
-//        runtimeService.setVariable(currentTask.getProcessInstanceId(), "goal", goal);
+    public void submit_set_goal_qst(DayitemStepSubmitReqVO submitReqVO, Task currentTask){
+        surveyService.submitSurveyForFlow(submitReqVO.getStep_data().getSurvey());
     }
 
     public Map<String, Object> auto_my_actions_qst(Map data, Task currentTask){
-        // TODO init question instance
         Map variables = getVariables();
         data.put("instance_id", variables.get("survey_instance_id"));
 
-        Map instanceData = new HashMap<>();
+        List<AnswerDetailDO> instanceData = surveyService.getAnswerDetailByAnswerId((Long) variables.get("survey_instance_id"));
         data.put("instance_data", instanceData);
         return data;
     }
 
-    public void submit_my_actions_qst(Map variables, Task currentTask) {
-        // TODO submit question instance
-        submitSurveyData(variables);
+    public void submit_my_actions_qst(DayitemStepSubmitReqVO submitReqVO, Task currentTask){
+        surveyService.submitSurveyForFlow(submitReqVO.getStep_data().getSurvey());
     }
 }

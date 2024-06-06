@@ -1,7 +1,11 @@
 package cn.iocoder.yudao.module.therapy.controller.app;
 
+import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemNextStepRespVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitRespVO;
 import cn.iocoder.yudao.module.therapy.controller.vo.TreatmentInstanceVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.TreatmentNextVO;
+import cn.iocoder.yudao.module.therapy.convert.DayitemNextStepConvert;
 import cn.iocoder.yudao.module.therapy.service.TaskFlowService;
 import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -87,11 +91,11 @@ public class TreatmentController {
     @PostMapping("/dayitem/{dayitem_instance_id}/next")
     @Operation(summary = "获取子任务下一项内容")
     @PreAuthenticated
-    public CommonResult<Map> subTaskGetNext(@PathVariable("dayitem_instance_id") Long dayitem_instance_id) {
+    public CommonResult<DayitemNextStepRespVO> subTaskGetNext(@PathVariable("dayitem_instance_id") Long dayitem_instance_id) {
         Long userId = getLoginUserId();
         Long treatmentInstanceId = 0L;
         Map data = taskFlowService.getNext(userId, treatmentInstanceId, dayitem_instance_id);
-        return success(data);
+        return success(DayitemNextStepConvert.convert(data));
     }
 
     @PostMapping("/{code}/taskflow/{dayitem_id}/create")
@@ -105,13 +109,17 @@ public class TreatmentController {
     @PostMapping("/dayitem/{dayitem_instance_id}/stepsubmit")
     @Operation(summary = "子任务step提交数据")
     @PreAuthenticated
-    public CommonResult<Long> stepSubmit(@PathVariable("dayitem_instance_id") Long dayitem_instance_id,
-                                      @RequestBody Map<String, Object> requestBody) {
+    public CommonResult<DayitemStepSubmitRespVO> stepSubmit(@PathVariable("dayitem_instance_id") Long dayitem_instance_id,
+                                                            @RequestBody DayitemStepSubmitReqVO submitReqVO) {
         Long userId = getLoginUserId();
         BaseFlow flow = taskFlowService.getTaskFlow(userId, 0L, dayitem_instance_id);
-        String taskId = requestBody.get("__step_id").toString();
-        taskFlowService.userSubmit(flow, dayitem_instance_id, taskId, requestBody);
-        return success(1L);
+        String taskId = submitReqVO.getStep_id();
+        taskFlowService.userSubmit(flow, dayitem_instance_id, taskId, submitReqVO);
+        DayitemStepSubmitRespVO resp = new DayitemStepSubmitRespVO();
+        DayitemStepSubmitRespVO.StepRespVO stepRespVO = new DayitemStepSubmitRespVO.StepRespVO();
+        stepRespVO.setStatus("SUCCESS");
+        resp.setStep_resp(stepRespVO);
+        return success(resp);
     }
 
     @PostMapping("/clear_user_progress")

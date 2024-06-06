@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.therapy.service;
 
+import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemInstanceDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDayitemDO;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.*;
@@ -89,10 +90,10 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
     }
 
     @Override
-    public void userSubmit(BaseFlow taskFlow, Long dayitem_instance_id, String taskId, Map<String, Object> variables){
+    public void userSubmit(BaseFlow taskFlow, Long dayitem_instance_id, String taskId, DayitemStepSubmitReqVO submitReqVO){
         TreatmentDayitemInstanceDO dayitemInstanceDO = treatmentDayitemInstanceMapper.selectById(dayitem_instance_id);
         taskFlow.loadProcessInstance(dayitemInstanceDO.getTaskInstanceId());
-        taskFlow.userSubmit(taskId, variables);
+        taskFlow.userSubmit(taskId, submitReqVO);
     }
 
     @Override

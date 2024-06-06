@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.therapy.taskflow;
 
-import cn.iocoder.yudao.module.therapy.service.TaskFlowService;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.bpmn.model.*;
@@ -19,10 +19,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 
 public abstract class BaseFlow {
@@ -69,6 +65,11 @@ public abstract class BaseFlow {
             result.put("step_type", data.get("step_type"));
             Method method = this.getClass().getMethod("auto_" + (String) data.get("step_type"), Map.class, Task.class);
             Map stepResult = (Map) method.invoke(this, data.get("step_data"), currentTask);
+            boolean requireSubmit = (boolean) data.getOrDefault("submit", true);
+            if(!requireSubmit || data.get("step_type").equals("guide_language")){
+                TaskService taskService = processEngine.getTaskService();
+                taskService.complete(currentTask.getId());
+            }
             result.put("step_data", stepResult);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
@@ -88,8 +89,7 @@ public abstract class BaseFlow {
      * @return
      */
     public Map auto_guide_language(Map data, Task currentTask){
-        TaskService taskService = processEngine.getTaskService();
-        taskService.complete(currentTask.getId());
+
         return data;
     }
 
@@ -113,9 +113,9 @@ public abstract class BaseFlow {
         return data;
     }
 
-    public void submit_do_you_agree(Map variables, Task currentTask){
+    public void submit_do_you_agree(DayitemStepSubmitReqVO submitReqVO , Task currentTask){
         TaskService taskService = processEngine.getTaskService();
-        Map<String, Object> currentVariable = (Map<String, Object>)variables.get("__current");
+        Map<String, Object> currentVariable = submitReqVO.getStep_data().getCurrent();
         Map bindData = getBindData(currentTask);
         String agreeKey = bindData.get("variable").toString();
         RuntimeService runtimeService = processEngine.getRuntimeService();
@@ -124,7 +124,7 @@ public abstract class BaseFlow {
     }
 
 
-    public void userSubmit(String taskId, Map<String, Object> variables) {
+    public void userSubmit(String taskId, DayitemStepSubmitReqVO submitReqVO) {
         Task task = getCurrentTask();
         if(taskId.equals(task.getId())) {
             String activityId = task.getTaskDefinitionKey(); // Get the task's definition key
@@ -135,8 +135,8 @@ public abstract class BaseFlow {
             Map<String, Object> data = new HashMap();
             try {
                 data = new ObjectMapper().readValue(content, Map.class);
-                Method method = this.getClass().getMethod("submit_" + (String) data.get("step_type"), Map.class, Task.class);
-                method.invoke(this, (Map) variables.get("data"), task);
+                Method method = this.getClass().getMethod("submit_" + (String) data.get("step_type"), DayitemStepSubmitReqVO.class, Task.class);
+                method.invoke(this, submitReqVO, task);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             } catch (NoSuchMethodException e) {
@@ -147,7 +147,7 @@ public abstract class BaseFlow {
                 throw new RuntimeException(e);
             }
             TaskService taskService = processEngine.getTaskService();
-            taskService.complete(taskId, variables);
+            taskService.complete(taskId);
         }else{
             throw new RuntimeException("Task id is not correct");
         }

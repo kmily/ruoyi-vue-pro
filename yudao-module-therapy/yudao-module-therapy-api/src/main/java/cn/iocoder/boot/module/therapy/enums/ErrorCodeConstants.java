@@ -25,8 +25,12 @@ public interface ErrorCodeConstants {
     ErrorCode TREATMENT_PLAN_TASK_NOT_EXISTS = new ErrorCode(1_004_003_002, "治疗计划的任务不存在");
     ErrorCode TREATMENT_PLAN_SEQ_EXISTS = new ErrorCode(1_004_003_003, "已经存在当天的治疗计划");
 
+
     // ========== xxxx相关 1-040-003-000 ==========
     ErrorCode ADDRESS_NOT_EXISTS = new ErrorCode(1_004_004_000, "用户收件地址不存在");
+
+    //治疗流程相关
+    ErrorCode TREATMENT_DAYITEM_STEP_PARAMS_ERROR = new ErrorCode(1_050_001_001, "治疗子任务步骤参数错误");
 
 
 }

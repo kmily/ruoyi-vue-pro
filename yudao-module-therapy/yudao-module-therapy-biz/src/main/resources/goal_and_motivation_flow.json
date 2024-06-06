@@ -11,16 +11,16 @@
       {"step_type": "guide_language", "step_data": {"content":  "准确地识别自己的首要问题可能是困难的，你可以使用下面这些问题来帮助自己思考："}}
     ],
     "primary_troubles": [
-      {"step_type":  "primary_troubles_qst", "step_data": {"survey_code": "DI-GAM" }},
+      {"step_type":  "primary_troubles_qst", "step_data": {}},
       {
         "step_type":  "ai_check_primary_troubles",
-        "step_data": {"survey_code": "DI-GAM" },
+        "step_data": {},
         "service_task":  true, "implementation":  "cn.iocoder.yudao.module.therapy.taskflow.servicetasks.AICheckUserTroublesCategory"
       }
     ],
     "choose_trouble_category": [
       {"step_type": "guide_language", "step_data": {"content":  "可能你一时间还想不到自己面临的具体问题是什么，试着看看你是否存在下面这几类问题呢？你可以选择最多10个自己可能存在的问题类型。（以下内容各项以选项形式展示，可分页，每页展示10个，在末页增加“不存在上述问题”选项）"}},
-      {"step_type": "trouble_category_qst", "step_data": {"survey_code": "DI-GAM"}}
+      {"step_type": "trouble_category_qst", "step_data": {}}
     ],
     "try_treatment_confirm": [
       {"step_type": "do_you_agree", "step_data": {"content":  "也许你现在还很难明确自己的问题，你希望先尝试治疗，跟随我们的治疗进程渐渐发现自己想要改变或解决的问题吗？", "confirm":  "愿意", "cancel":  "不愿意", "variable": "try_treatment_confirm_result"}}
@@ -37,14 +37,14 @@
       {"step_type": "guide_language", "step_data": {"content":  "可达成：确保你的目标是现实的，是你可以实际达成的。比如，‘数学成绩从C提升到B’比‘直接从C跳到A+’更加可行。"}},
       {"step_type": "guide_language", "step_data": {"content":  "相关：你的目标应该和你想要解决的首要问题直接相关。如果你的问题是关于社交焦虑，那么‘每周参加一次社交活动’可能比‘学会新的乐器’更有帮助。"}},
       {"step_type": "guide_language", "step_data": {"content":  "有时间限制：给自己设一个期限。比如，‘在接下来的两个月里，我会提高我的数学成绩’。"}},
-      {"step_type": "set_goal_qst","step_data": {"survey_code": "DI-GAM"}}
+      {"step_type": "set_goal_qst","step_data": {}}
     ],
     "find_out_motivation": [
       {"step_type": "guide_language", "step_data": {"content":  "接下来，我们会深入探讨改变的动机。在知道了你的首要问题和设定了SMART目标后，你可能已经准备好开始这段治疗旅程了。也许现在你对参与治疗实现目标充满动力，也许你对是否需要做出改变感到犹豫和不知所措。走出你习惯的“舒适区”可能是一件困难的事情，对是否进行后续的治疗并坚持感到疑虑是正常的。"}},
       {"step_type": "guide_language", "step_data": {"content":  "在治疗开始前，思考改变和不改变的利弊会有所帮助。"}},
       {"step_type": "guide_language", "step_data": {"content":  "这是一个用来帮助你理解如何权衡改变的好处与代价的例子："}},
       {"step_type": "guide_language", "step_data": {"content":  "问题与目标：我经常担心妈妈不在我身边时会不安全，我需要不停打电话给妈妈以确认妈妈是安全的。我希望能减少打电话的次数。\n不改变的好处--维持现状是好事的原因:\n--如果我一直给妈妈打电话，我更有可能知道妈妈是安全的。\n不改变的代价--难以维持现状的原因：\n--当妈妈没有按时出现时，我会在打篮球时一直感到不舒服。\n改变的好处--改变是好事的原因\n--我可以和朋友做更多的事情；我不会那么频繁地打扰妈妈。\n改变的代价--改变很难的原因\n--如果我不打电话确定她是否安全，一开始我可能会更担心妈妈。"}},
-      {"step_type": "my_actions_qst","step_data": {"survey_code": "DI-GAM"}}
+      {"step_type": "my_actions_qst","step_data": {}}
     ],
     "review": [
       {"step_type": "guide_language", "step_data": {"content":  "现在，再回顾一下你写了些什么。综合所有因素，做出一些改变值得吗？你愿意试一试吗？我们希望如此！"}},
