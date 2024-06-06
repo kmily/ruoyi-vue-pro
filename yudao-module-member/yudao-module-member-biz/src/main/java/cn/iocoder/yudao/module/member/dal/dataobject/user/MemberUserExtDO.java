@@ -50,20 +50,20 @@ public class MemberUserExtDO implements Serializable, TransPojo {
      */
     private Integer studyState;
     /**
-     * 父母婚姻情况
+     * 婚姻情况
      * 字典类型:marital_state
      */
-    private Integer parentMaritalState;
+    private Integer maritalState;
     /**
      * 生活状况
      * 字典类型:living_state
      */
     private Integer livingState;
     /**
-     * 父母详细居住地类型
+     * 居住地类型
      * 字典类型:live_area_type
      */
-    private Integer parentLiveAreaType;
+    private Integer liveAreaType;
 
     /**
      * 创建时间

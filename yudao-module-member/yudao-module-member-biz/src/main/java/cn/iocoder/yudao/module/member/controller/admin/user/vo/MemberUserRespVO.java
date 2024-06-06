@@ -66,19 +66,32 @@ public class MemberUserRespVO extends MemberUserBaseVO {
     @Schema(description = "学业情况",  example = "2")
     private Integer studyState;
     /**
-     * 父母婚姻情况
+     * 婚姻情况
      */
-    @Schema(description = "父母婚姻情况",  example = "2")
-    private Integer parentMaritalState;
+    @Schema(description = "婚姻情况",  example = "2")
+    private Integer maritalState;
     /**
      * 生活状况
      */
     @Schema(description = "生活状况",  example = "3")
     private Integer livingState;
     /**
-     * 父母详细居住地类型
+     * 居住地类型
      */
-    @Schema(description = "父母详细居住地类型",  example = "3")
-    private Integer parentLiveAreaType;
+    @Schema(description = "细居住地类型",  example = "3")
+    private Integer liveAreaType;
+
+    // ========== 治疗信息信息 ==========
+    /**
+     * 最新治疗流程id
+     */
+    @Schema(description = "最新治疗流程id",  example = "3")
+    private Long treatmentInstanceId;
+
+    @Schema(description = "治疗进度状态",  example = "3")
+    private Integer instanceState;
+
+    @Schema(description = "LLM分类",  example = "3")
+    private List<String> llm;
 
 }
