@@ -23,4 +23,7 @@ public class DayitemNextStepRespVO {
     @Schema(description = "步骤数据", requiredMode = Schema.RequiredMode.REQUIRED, example = "...")
     private Map<String, Object> step_data;
 
+    @Schema(description = "步骤状态", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "COMPLETED")
+    private String step_status;
+
 }

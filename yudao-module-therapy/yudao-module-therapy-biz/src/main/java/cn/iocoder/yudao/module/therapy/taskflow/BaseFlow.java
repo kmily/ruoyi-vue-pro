@@ -46,7 +46,10 @@ public abstract class BaseFlow {
     public Map run(){
         HashMap result = new HashMap();
         if(historicProcessInstance != null){
-            result.put("status", "COMPLETED");
+            result.put("step_type", "END");
+            Map stepData = new HashMap();
+            stepData.put("content", "流程已经结束了");
+            result.put("step_data", stepData);
             return result;
         }
         Task currentTask = getCurrentTask();
