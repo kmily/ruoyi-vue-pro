@@ -104,10 +104,8 @@ public class GoalAndMotivationFlow extends BaseFlow{
     public  Map<String, Object> auto_set_goal_qst(Map data, Task currentTask){
         Map variables = getVariables();
         data.put("instance_id", (Long) variables.get("survey_instance_id"));
-        // TODO read survey data from survey service
-        Map instanceData = new HashMap<>();
+        List<AnswerDetailDO> instanceData = surveyService.getAnswerDetailByAnswerId((Long) variables.get("survey_instance_id"));
         data.put("instance_data", instanceData);
-
         return data;
     }
 
