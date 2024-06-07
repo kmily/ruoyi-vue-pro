@@ -112,6 +112,11 @@ public class MemberUserServiceImpl implements MemberUserService {
     }
 
     @Override
+    public List<MemberUserExtDO> getUserExtInfoList(List<Long> userIds) {
+        return memberUserExtMapper.getList(userIds);
+    }
+
+    @Override
     public void saveUserExtInfo(MemberUserExtDTO dto) {
         memberUserExtMapper.insert(MemberUserConvert.INSTANCE.convert(dto));
     }
@@ -235,8 +240,8 @@ public class MemberUserServiceImpl implements MemberUserService {
         MemberUserDO user = validateUserExists(reqVO.getMobile());
 
         // 使用验证码
-        smsCodeApi.useSmsCode(AuthConvert.INSTANCE.convert(reqVO, SmsSceneEnum.MEMBER_RESET_PASSWORD,
-                getClientIP()));
+//        smsCodeApi.useSmsCode(AuthConvert.INSTANCE.convert(reqVO, SmsSceneEnum.MEMBER_RESET_PASSWORD,
+//                getClientIP()));
 
         // 更新密码
         memberUserMapper.updateById(MemberUserDO.builder().id(user.getId())

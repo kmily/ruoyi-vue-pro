@@ -1,0 +1,80 @@
+{
+  "group_nodes": {
+    "start": [ {"step_type": "START"}],
+    "guide": [
+      {"step_type": "guide_language", "step_data": {"content":  "每个人的旅程都是独一无二的，就像你的治疗之旅一样。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "欢迎来到你个人成长的旅程。在这个过程中，我们将一起探索如何识别和解决你生活中的挑战。这段旅程有时可能会让你感到艰难，但记住，每一步都是朝着更好的自己迈进。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "在我们的旅程开始之前，让我们首先来确定我们面对的首要问题。首要问题就是指那些阻碍你享受生活和感受成功的问题。它们可能是情绪上的，比如深感伤心、焦虑或愤怒；也可能是行为上的，比如难以建立友谊、学业挑战，或其他你认为对你或他人有害的事情。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "识别首要问题的第一步，是自问：在我的生活中，有什么我希望改变的？这些问题是如何影响我的日常生活的？最后，如果这些问题得到解决，我希望我的生活会有怎样的改变？"}},
+      {"step_type": "guide_language", "step_data": {"content":  "准确地识别自己的首要问题可能是困难的，你可以使用下面这些问题来帮助自己思考："}},
+      {"step_type": "guide_language", "step_data": {"content":  "在我的生活中，有什么是我希望改变的?\n是什么让我认为自己需要接受治疗?\n恐惧/担忧/伤心/愤怒阻止了我做什么或在哪些方面对我造成了阻碍?\n如果我没有感觉到如此的恐惧/担忧/伤心/愤怒，我的生活会有什么不同?\n我与朋友和家人的关系让我觉得有多幸福?\n如果有人要帮我解决一个问题，我会选择哪一个?\n我的父母、朋友、兄弟姐妹等人会认为我最大的问题是什么?我同意吗?"}},
+      {"step_type": "guide_language", "step_data": {"content":  "准确地识别自己的首要问题可能是困难的，你可以使用下面这些问题来帮助自己思考："}}
+    ],
+    "primary_troubles": [
+      {"step_type":  "primary_troubles_qst", "step_data": {}},
+      {
+        "step_type":  "ai_check_primary_troubles",
+        "step_data": {},
+        "service_task":  true, "implementation":  "cn.iocoder.yudao.module.therapy.taskflow.servicetasks.AICheckUserTroublesCategory"
+      }
+    ],
+    "choose_trouble_category": [
+      {"step_type": "guide_language", "step_data": {"content":  "可能你一时间还想不到自己面临的具体问题是什么，试着看看你是否存在下面这几类问题呢？你可以选择最多10个自己可能存在的问题类型。（以下内容各项以选项形式展示，可分页，每页展示10个，在末页增加“不存在上述问题”选项）"}},
+      {"step_type": "trouble_category_qst", "step_data": {}}
+    ],
+    "try_treatment_confirm": [
+      {"step_type": "do_you_agree", "step_data": {"content":  "也许你现在还很难明确自己的问题，你希望先尝试治疗，跟随我们的治疗进程渐渐发现自己想要改变或解决的问题吗？", "confirm":  "愿意", "cancel":  "不愿意", "variable": "try_treatment_confirm_result"}}
+    ],
+    "dont_try": [
+      {"step_type": "guide_language", "step_data": {"content":  "选择不愿意则输出：□：或许你现在还没有做好接受治疗的准备，没有关系，我们可以慢慢来，在你希望得到改变的时候，我会一直在这里等你。"}}
+    ],
+    "set_goals":[
+      {"step_type": "guide_language", "step_data": {"content":  "在识别出首要问题后，我们的下一步是设定与首要问题相关的治疗目标。如果某个问题是你生活中不顺利的事情，就可以把它对应的目标设置为能帮助你解决这个问题的内容。确定问题和目标是很重要的，因为目标能帮助我们找到解决或改变问题的方法，并激励我们采取行动！"}},
+      {"step_type": "guide_language", "step_data": {"content":  "笼统或过高的目标可能会在我们实现目标的过程中造成困扰，使用SMART目标设定法，可以让我们的目标更明确，更清晰地实现。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "SMART目标指的是具体（Specific）、可测量（Measurable）、可达成（Attainable）、相关（Relevant）、有时间限制（Time-bound）的目标。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "具体：你的目标需要明确具体。不是‘我想变得更热情’，而是‘我想每天至少和一个朋友进行十分钟的对话’。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "可测量：你如何知道自己是否接近目标？设立可以观察和衡量的标准。比如，‘每周至少完成三次数学作业’。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "可达成：确保你的目标是现实的，是你可以实际达成的。比如，‘数学成绩从C提升到B’比‘直接从C跳到A+’更加可行。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "相关：你的目标应该和你想要解决的首要问题直接相关。如果你的问题是关于社交焦虑，那么‘每周参加一次社交活动’可能比‘学会新的乐器’更有帮助。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "有时间限制：给自己设一个期限。比如，‘在接下来的两个月里，我会提高我的数学成绩’。"}},
+      {"step_type": "set_goal_qst","step_data": {}}
+    ],
+    "find_out_motivation": [
+      {"step_type": "guide_language", "step_data": {"content":  "接下来，我们会深入探讨改变的动机。在知道了你的首要问题和设定了SMART目标后，你可能已经准备好开始这段治疗旅程了。也许现在你对参与治疗实现目标充满动力，也许你对是否需要做出改变感到犹豫和不知所措。走出你习惯的“舒适区”可能是一件困难的事情，对是否进行后续的治疗并坚持感到疑虑是正常的。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "在治疗开始前，思考改变和不改变的利弊会有所帮助。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "这是一个用来帮助你理解如何权衡改变的好处与代价的例子："}},
+      {"step_type": "guide_language", "step_data": {"content":  "问题与目标：我经常担心妈妈不在我身边时会不安全，我需要不停打电话给妈妈以确认妈妈是安全的。我希望能减少打电话的次数。\n不改变的好处--维持现状是好事的原因:\n--如果我一直给妈妈打电话，我更有可能知道妈妈是安全的。\n不改变的代价--难以维持现状的原因：\n--当妈妈没有按时出现时，我会在打篮球时一直感到不舒服。\n改变的好处--改变是好事的原因\n--我可以和朋友做更多的事情；我不会那么频繁地打扰妈妈。\n改变的代价--改变很难的原因\n--如果我不打电话确定她是否安全，一开始我可能会更担心妈妈。"}},
+      {"step_type": "my_actions_qst","step_data": {}}
+    ],
+    "review": [
+      {"step_type": "guide_language", "step_data": {"content":  "现在，再回顾一下你写了些什么。综合所有因素，做出一些改变值得吗？你愿意试一试吗？我们希望如此！"}},
+      {"step_type": "guide_language", "step_data": {"content":  "想想对于其他的目标，你会怎么来权衡改变的利弊呢。你可以在“我的工具”-“我的问题、目标与动机”工具中，进行查看、修改和填写，你也可以随时根据情况来修改或新建自己的问题和目标。（附链接）"}},
+      {"step_type": "guide_language", "step_data": {"content":  "也许治疗旅程中你可能有时会感到难以坚持，记得来回顾你想实现的目标和期望的美好生活，为什么你想要做出改变。相信你会变得更好！\n"}}
+    ],
+    "end": [
+      {"step_type": "END"}
+    ],
+    "abort": [
+      {"step_type": "END"}
+    ]
+  },
+
+  "group_relations": [
+    {"source": "start", "target": "guide"},
+    {"source": "guide", "target": "primary_troubles"},
+    {"source": "primary_troubles", "type":  "ExclusiveGate",
+      "next_true": "choose_trouble_category",
+      "next_false": "set_goals", "variable":  "primary_troubles_is_set"},
+    {"source": "choose_trouble_category", "target": "try_treatment_confirm"},
+    {"source": "try_treatment_confirm", "type":  "ExclusiveGate",
+      "next_true": "set_goals",
+      "next_false": "dont_try", "variable":  "try_treatment_confirm_result"},
+    {"source": "dont_try", "target": "abort"},
+    {"source": "set_goals", "target": "find_out_motivation"},
+    {"source": "find_out_motivation", "target": "review"},
+    {"source": "review", "target": "end"}
+  ],
+  "gr": [
+    {"source": "start", "target": "end"}
+  ]
+}

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.therapy.dal.dataobject.definition;
 
+import cn.iocoder.boot.module.therapy.enums.TaskType;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.common.JsonFieldAccessible;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -36,10 +37,10 @@ public class TreatmentFlowDayitemDO extends BaseDO implements JsonFieldAccessibl
 
     private String remark;
 
-    /**
-     * 废弃
-     */
-    private String itemType;
+//    /**
+//     * 废弃
+//     */
+//    private String itemType;
 
     /**
      * 任务类型
@@ -51,7 +52,7 @@ public class TreatmentFlowDayitemDO extends BaseDO implements JsonFieldAccessibl
 
     private String dependentItemIds;
 
-    private Long agroup;
+    private Integer agroup;
 
     private Long groupSeq;
 
@@ -76,4 +77,8 @@ public class TreatmentFlowDayitemDO extends BaseDO implements JsonFieldAccessibl
         this.settings = objectMapper.valueToTree(settings).toString();
     }
 
+    public String getItemType() {
+        TaskType taskType = TaskType.getByType(Integer.valueOf(type));
+        return taskType.getCode();
+    }
 }

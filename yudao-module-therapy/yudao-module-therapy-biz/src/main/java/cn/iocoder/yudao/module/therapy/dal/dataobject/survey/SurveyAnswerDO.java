@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.therapy.dal.dataobject.survey;
 
-import cn.iocoder.boot.module.therapy.enums.SurveyQuestionType;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -32,6 +31,11 @@ public class SurveyAnswerDO extends BaseDO {
      * 所属问卷
      */
     private Long belongSurveyId;
+
+    /**
+     * 问卷类型
+     */
+    private Integer surveyType;
 
 
     /**

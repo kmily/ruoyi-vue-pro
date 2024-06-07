@@ -1,15 +1,16 @@
 package cn.iocoder.yudao.module.therapy.service;
 
+import cn.iocoder.yudao.module.therapy.controller.app.vo.StepItemVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.*;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.*;
 import cn.iocoder.yudao.module.therapy.service.common.TreatmentStepItem;
 import org.springframework.stereotype.Service;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.TreatmentNextVO;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class TreatmentUserProgressServiceImpl implements  TreatmentUserProgressService{
@@ -55,52 +56,55 @@ public class TreatmentUserProgressServiceImpl implements  TreatmentUserProgressS
         return stepItem;
     }
 
-    public Map<String, Object> convertDayitemInstanceToMap(TreatmentDayitemInstanceDO dayitemInstanceDO) {
-        HashMap<String, Object> data = new HashMap<>();
+    public StepItemVO convertDayitemInstanceToMap(TreatmentDayitemInstanceDO dayitemInstanceDO) {
+        StepItemVO data = new StepItemVO();
         TreatmentFlowDayitemDO flowDayitemDO = treatmentFlowDayitemMapper.selectById(dayitemInstanceDO.getDayitemId());
-        data.put("id", dayitemInstanceDO.getId());
-        data.put("required", flowDayitemDO.isRequired());
-        data.put("item_type", flowDayitemDO.getItemType());
-        data.put("settings", flowDayitemDO.getSettingsObj());
+        data.setId(dayitemInstanceDO.getId());
+        data.setRequired(flowDayitemDO.isRequired());
+        data.setItem_type(flowDayitemDO.getItemType());
+        data.setSettings(flowDayitemDO.getSettingsObj());
         return data;
     }
-    @Override
-    public Map<String, Object> convertStepItemToRespFormat(TreatmentStepItem stepItem) {
-        HashMap<String, Object> data = new HashMap<>();
-        data.put("process_status", stepItem.getProcessStatus());
-        HashMap sysInfo = new HashMap<String, String>();
-        sysInfo.put("type", "SYS_INFO");
+
+    private StepItemVO generateSystemInfoVO(TreatmentStepItem stepItem){
+        StepItemVO sysInfo = new StepItemVO();
+        HashMap settings = new HashMap<String, String>();
+        sysInfo.setItem_type("SYS_INFO");
+        sysInfo.setRequired(false);
         switch (stepItem.getProcessStatus()){
-            case IS_NEXT:
-                break;
             case CURRENT_DAY_NO_MORE_STEP:
-                sysInfo.put("content", "今天已经没有更多任务了哦~");
-                data.put("step_item", sysInfo);
-                data.put("step_item_type", "SINGLE");
-                return data;
+                settings.put("content", "今天已经没有更多任务了哦~");
             case LAST_DAY_NOT_COMPLETE:
-                sysInfo.put("content", "请先完成之前的必做任务哦~");
-                data.put("step_item", sysInfo);
-                data.put("step_item_type", "SINGLE");
-                return data;
+                settings.put("content", "请先完成之前的必做任务哦~");
             case CURRENT_STEP_REQUIRES_COMPLETE:
-                sysInfo.put("content", "请先完成当前任务才能继续哦~");
-                data.put("step_item", sysInfo);
-                data.put("step_item_type", "SINGLE");
-                return data;
+                settings.put("content", "请先完成当前任务才能继续哦~");
         }
-        if(stepItem.getDay_items().size() > 1){
-            data.put("step_item_type", "LIST");
-            List<Map<String, Object>> respItems = new ArrayList<>();
-            for(TreatmentDayitemInstanceDO dayitemInstanceDO : stepItem.getDay_items()){
-                Map<String, Object> respItem = convertDayitemInstanceToMap(dayitemInstanceDO);
-                respItems.add(respItem);
-            }
-            data.put("step_item", respItems);
+        sysInfo.setSettings(settings);
+        return sysInfo;
+    }
+
+    @Override
+    public TreatmentNextVO convertStepItemToRespFormat(TreatmentStepItem stepItem) {
+        TreatmentNextVO data = new TreatmentNextVO();
+        data.setProcess_status(stepItem.getProcessStatus().toString());
+        if(!stepItem.getProcessStatus().equals(TreatmentStepItem.ProcessStatus.IS_NEXT)){
+            StepItemVO sysInfoVO = generateSystemInfoVO(stepItem);
+            data.setStep_item_type("SINGLE");
+            data.setStep_item(sysInfoVO);
         }else{
-            data.put("step_item_type", "SINGLE");
-            Map<String, Object> respItem = convertDayitemInstanceToMap(stepItem.getDay_items().get(0));
-            data.put("step_item", respItem);
+            if(stepItem.getDay_items().size() > 1){
+                data.setStep_item_type("LIST");
+                List<StepItemVO> stepItemVOS = new ArrayList<>();
+                for(TreatmentDayitemInstanceDO dayitemInstanceDO : stepItem.getDay_items()){
+                    StepItemVO respItem = convertDayitemInstanceToMap(dayitemInstanceDO);
+                    stepItemVOS.add(respItem);
+                }
+                data.setStep_items(stepItemVOS);
+            }else{
+                data.setStep_item_type("SINGLE");
+                StepItemVO stepItemVO = convertDayitemInstanceToMap(stepItem.getDay_items().get(0));
+                data.setStep_item(stepItemVO);
+            }
         }
         return data;
     }

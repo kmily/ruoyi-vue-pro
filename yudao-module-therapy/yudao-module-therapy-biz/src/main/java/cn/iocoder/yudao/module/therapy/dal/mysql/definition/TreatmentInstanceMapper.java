@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDO
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentInstanceDO;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -32,5 +33,14 @@ public interface TreatmentInstanceMapper extends BaseMapperX<TreatmentInstanceDO
                         TreatmentInstanceDO.TreatmentStatus.INITIATED.getValue(),
                         TreatmentInstanceDO.TreatmentStatus.IN_PROGRESS.getValue()));
     }
+
+    default TreatmentInstanceDO getLatestByUserId(Long userId){
+        LambdaQueryWrapper<TreatmentInstanceDO> queryWrapper= Wrappers.lambdaQuery(TreatmentInstanceDO.class)
+                .eq(TreatmentInstanceDO::getUserId,userId)
+                .orderByDesc(TreatmentInstanceDO::getId)
+                .last("LIMIT 1");
+        return selectOne(queryWrapper);
+    }
+
 
 }

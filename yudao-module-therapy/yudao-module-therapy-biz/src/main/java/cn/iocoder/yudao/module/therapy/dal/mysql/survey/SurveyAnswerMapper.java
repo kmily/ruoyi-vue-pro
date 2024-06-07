@@ -19,6 +19,7 @@ public interface SurveyAnswerMapper extends BaseMapperX<SurveyAnswerDO> {
         // 分页查询
         return selectPage(reqVO, new LambdaQueryWrapperX<SurveyAnswerDO>()
                 .eq(SurveyAnswerDO::getCreator, reqVO.getUserId().toString())
+                .eqIfPresent(SurveyAnswerDO::getSurveyType,reqVO.getSurveyType())
                 .orderByDesc(SurveyAnswerDO::getId));
     }
 

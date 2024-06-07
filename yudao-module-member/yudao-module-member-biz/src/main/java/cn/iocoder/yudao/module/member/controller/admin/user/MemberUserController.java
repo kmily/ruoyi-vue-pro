@@ -5,9 +5,11 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.*;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.AppAuthLoginReqVO;
+import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserResetPasswordReqVO;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.group.MemberGroupDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
@@ -20,6 +22,8 @@ import cn.iocoder.yudao.module.member.service.level.MemberLevelService;
 import cn.iocoder.yudao.module.member.service.point.MemberPointRecordService;
 import cn.iocoder.yudao.module.member.service.tag.MemberTagService;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentInstanceDO;
+import cn.iocoder.yudao.module.therapy.service.TreatmentStatisticsDataService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,10 +34,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -48,14 +49,17 @@ public class MemberUserController {
 
     @Resource
     private MemberUserService memberUserService;
-    @Resource
-    private MemberTagService memberTagService;
+    //    @Resource
+//    private MemberTagService memberTagService;
     @Resource
     private MemberLevelService memberLevelService;
-    @Resource
-    private MemberGroupService memberGroupService;
+    //    @Resource
+//    private MemberGroupService memberGroupService;
     @Resource
     private MemberPointRecordService memberPointRecordService;
+
+    @Resource
+    private TreatmentStatisticsDataService treatmentStatisticsDataService;
 
     @PutMapping("/update")
     @Operation(summary = "更新会员用户")
@@ -96,9 +100,9 @@ public class MemberUserController {
     @PreAuthorize("@ss.hasPermission('member:user:query')")
     public CommonResult<MemberUserRespVO> getUser(@RequestParam("id") Long id) {
         MemberUserDO user = memberUserService.getUser(id);
-        MemberUserExtDO extDO= memberUserService.getUserExtInfo(id);
-        MemberUserRespVO respVO=MemberUserConvert.INSTANCE.convert03(user);
-        BeanUtil.copyProperties(extDO,respVO);
+        MemberUserExtDO extDO = memberUserService.getUserExtInfo(id);
+        MemberUserRespVO respVO = MemberUserConvert.INSTANCE.convert03(user);
+        BeanUtil.copyProperties(extDO, respVO);
         return success(respVO);
     }
 
@@ -112,11 +116,11 @@ public class MemberUserController {
         }
 
 //        // 处理用户标签返显
-        Set<Long> tagIds = pageResult.getList().stream()
-                .map(MemberUserDO::getTagIds)
-                .filter(Objects::nonNull)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toSet());
+//        Set<Long> tagIds = pageResult.getList().stream()
+//                .map(MemberUserDO::getTagIds)
+//                .filter(Objects::nonNull)
+//                .flatMap(Collection::stream)
+//                .collect(Collectors.toSet());
 //        List<MemberTagDO> tags = memberTagService.getTagList(tagIds);
 //        // 处理用户级别返显
 //        List<MemberLevelDO> levels = memberLevelService.getLevelList(
@@ -125,7 +129,31 @@ public class MemberUserController {
 //        List<MemberGroupDO> groups = memberGroupService.getGroupList(
 //                convertSet(pageResult.getList(), MemberUserDO::getGroupId));
 //        return success(MemberUserConvert.INSTANCE.convertPage(pageResult, tags, levels, groups));
-        return success(MemberUserConvert.INSTANCE.convertPage(pageResult));
+        //处理患者最新的治疗流程返显
+        List<Long> userIds = pageResult.getList().stream().map(p -> p.getId()).collect(Collectors.toList());
+        Map<Long, TreatmentInstanceDO> map = treatmentStatisticsDataService.queryLatestTreatmentInstanceId(userIds);
+        Map<Long, List<String>> map1 = treatmentStatisticsDataService.queryPsycoTroubleCategory(userIds);
+        //处理扩展信息
+        List<MemberUserExtDO> extDOS=memberUserService.getUserExtInfoList(userIds);
+        Map<Long,MemberUserExtDO> map2=CollectionUtils.convertMap(extDOS,MemberUserExtDO::getUserId);
+
+        PageResult<MemberUserRespVO> res = MemberUserConvert.INSTANCE.convertPage(pageResult);
+        for (MemberUserRespVO item : res.getList()) {
+            if (map.containsKey(item.getId())) {
+                TreatmentInstanceDO instanceDO = map.get(item.getId());
+                item.setInstanceState(instanceDO.getStatus());
+                item.setTreatmentInstanceId(instanceDO.getId());
+            }
+            if (map1 != null && map1.containsKey(item.getId())) {
+                item.setLlm(map1.get(item.getId()));
+            }
+            if (map2 != null && map2.containsKey(item.getId())) {
+                item.setAppointmentDate(map2.get(item.getId()).getAppointmentDate());
+                item.setAppointmentTimeRange(map2.get(item.getId()).getAppointmentTimeRange());
+            }
+        }
+
+        return success(res);
     }
 
     @PostMapping("/create")
@@ -134,6 +162,13 @@ public class MemberUserController {
         String ip = ServletUtils.getClientIP(request);
         MemberUserDO userDO = memberUserService.createUserByAdmin(reqVO.getMobile(), reqVO.getPassword(), "", TerminalEnum.ADMIN_WEB.getTerminal());
         return success(MemberUserConvert.INSTANCE.convert04(userDO));
+    }
+
+    @PutMapping("/reset-password")
+    @Operation(summary = "重置密码", description = "用户忘记密码时使用")
+    public CommonResult<Boolean> resetUserPassword(@RequestBody @Valid AppMemberUserResetPasswordReqVO reqVO) {
+        memberUserService.resetUserPassword(reqVO);
+        return success(true);
     }
 
 }

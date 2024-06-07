@@ -31,4 +31,13 @@ public interface TreatmentSurveyMapper extends BaseMapperX<TreatmentSurveyDO> {
                 .eq(TreatmentSurveyDO::getCode,code);
         return selectOne(queryWrapper);
     }
+
+    default TreatmentSurveyDO selectFirstByType(Integer type){
+        LambdaQueryWrapper<TreatmentSurveyDO> queryWrapper= Wrappers.lambdaQuery(TreatmentSurveyDO.class)
+                .eq(TreatmentSurveyDO::getSurveyType,type)
+                .orderByDesc(TreatmentSurveyDO::getId)
+                .last("limit 1");
+
+        return selectOne(queryWrapper);
+    }
 }

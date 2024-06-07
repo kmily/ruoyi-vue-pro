@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.module.therapy.dal.dataobject.survey;
 
 import cn.hutool.json.JSONObject;
-import cn.iocoder.boot.module.therapy.enums.SurveyQuestionType;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -32,10 +30,10 @@ public class AnswerDetailDO extends BaseDO {
      * 所属问卷
      */
     private Long belongSurveyId;
-    /**
-     * 所属问卷编码
-     */
-    private String belongSurveyCode;
+//    /**
+//     * 所属问卷编码
+//     */
+//    private String belongSurveyCode;
 
     /**
      *对应SurveyAnswerDO::ID
@@ -65,7 +63,7 @@ public class AnswerDetailDO extends BaseDO {
 
     /**
      * 问题类型
-     * 枚举 {@link SurveyQuestionType}
+     * 枚举 {@link cn.iocoder.boot.module.therapy.enums.SurveyQuestionType}
      */
     private Integer qstType;
 

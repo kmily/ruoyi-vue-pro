@@ -1,12 +1,16 @@
 package cn.iocoder.yudao.module.therapy.dal.dataobject.definition;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Map;
 
 @TableName("hlgyy_treatment_dayitem_instance")
 @Data
@@ -57,5 +61,16 @@ public class TreatmentDayitemInstanceDO extends BaseDO {
     private boolean required;
 
     private String taskInstanceId;
+
+    private String extAttr;
+
+    public JSONObject getExtAttrObj() {
+        return JSON.parseObject(extAttr);
+    }
+
+    void setExtAttrObj(JSONObject extAttr) {
+        this.extAttr = extAttr.toJSONString();
+    }
+
 
 }

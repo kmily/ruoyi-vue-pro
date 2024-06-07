@@ -14,12 +14,17 @@ public class SurveyStrategyFactory {
     }
 
     public SurveyStrategy getSurveyStrategy(String type) {
-        SurveyStrategy surveyStrategy = applicationContext.getBean(this.getName(type), SurveyStrategy.class);
-        if (surveyStrategy != null) {
-            return surveyStrategy;
+        if(applicationContext.containsBean(this.getName(type))){
+            return applicationContext.getBean(this.getName(type), SurveyStrategy.class);
+        }else {
+            return applicationContext.getBean(DefaultSurveyStrategy.class);
         }
+//        SurveyStrategy surveyStrategy = applicationContext.getBean(this.getName(type), SurveyStrategy.class);
+//        if (surveyStrategy != null) {
+//            return surveyStrategy;
+//        }
 
-        return applicationContext.getBean(DefaultSurveyStrategy.class);
+
     }
 
     private String getName(String type) {

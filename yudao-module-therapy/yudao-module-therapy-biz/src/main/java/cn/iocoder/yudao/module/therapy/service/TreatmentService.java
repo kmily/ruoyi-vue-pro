@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.therapy.service;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.therapy.controller.VO.SetAppointmentTimeReqVO;
+import cn.iocoder.yudao.module.therapy.controller.vo.SetAppointmentTimeReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.FlowPlanReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.FlowTaskVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.SaveFlowReqVO;
@@ -110,4 +110,6 @@ public interface TreatmentService {
      * @return
      */
     List<TreatmentFlowDayitemDO> getTaskListByDayId(Long id);
+
+    TreatmentFlowDayitemDO getTask(Long id);
 }

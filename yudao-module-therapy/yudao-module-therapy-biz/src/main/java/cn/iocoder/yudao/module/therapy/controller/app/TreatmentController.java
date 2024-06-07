@@ -1,14 +1,18 @@
 package cn.iocoder.yudao.module.therapy.controller.app;
 
-import cn.iocoder.yudao.module.therapy.controller.app.vo.GetNextRespVO;
-import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemInstanceDO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemNextStepRespVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitRespVO;
+import cn.iocoder.yudao.module.therapy.controller.vo.TreatmentInstanceVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.TreatmentNextVO;
+import cn.iocoder.yudao.module.therapy.convert.DayitemNextStepConvert;
 import cn.iocoder.yudao.module.therapy.service.TaskFlowService;
 import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.therapy.service.TreatmentUserProgressService;
-import cn.iocoder.yudao.module.therapy.service.common.StepResp;
 import cn.iocoder.yudao.module.therapy.service.common.TreatmentStepItem;
+import cn.iocoder.yudao.module.therapy.taskflow.BaseFlow;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
@@ -40,9 +44,12 @@ public class TreatmentController {
 //    @Parameter(name="code", description = "治疗流程Code", required = true, example = "main")
 //    @PreAuthorize("@ss.hasPermission('bpm:category:create')")
     @PreAuthenticated
-    public CommonResult<Long> initTreatmentInstance(@PathVariable("code") String code) {
+    public CommonResult<TreatmentInstanceVO> initTreatmentInstance(@PathVariable("code") String code) {
         Long userId = getLoginUserId();
-        return success(treatmentService.initTreatmentInstance(userId, code));
+        Long treatmentInstanceId = treatmentService.initTreatmentInstance(userId, code);
+        TreatmentInstanceVO resp = new TreatmentInstanceVO();
+        resp.setId(treatmentInstanceId);
+        return success(resp);
     }
 
 
@@ -51,20 +58,23 @@ public class TreatmentController {
 //    @Parameter(name="code", description = "治疗流程Code", required = true, example = "main")
 //    @PreAuthorize("@ss.hasPermission('bpm:category:create')")
     @PreAuthenticated
-    public CommonResult<Long> getTreatmentInstance(@PathVariable("code") String code) {
+    public CommonResult<TreatmentInstanceVO> getTreatmentInstance(@PathVariable("code") String code) {
         Long userId = getLoginUserId();
-        return success(treatmentService.getCurrentTreatmentInstance(userId, code));
+        Long treatmentInstanceId = treatmentService.getCurrentTreatmentInstance(userId, code);
+        TreatmentInstanceVO resp = new TreatmentInstanceVO();
+        resp.setId(treatmentInstanceId);
+        return success(resp);
     }
 
 
     @PostMapping("/{code}/{id}/next")
     @Operation(summary = "获取用户治疗下一项内容")
     @PreAuthenticated
-    public CommonResult<Map> getNext(@PathVariable("code") String code, @PathVariable("id") Long treatmentInstanceId) {
+    public CommonResult<TreatmentNextVO> getNext(@PathVariable("code") String code, @PathVariable("id") Long treatmentInstanceId) {
         Long userId = getLoginUserId();
         TreatmentStepItem userCurrentStep = treatmentUserProgressService.getTreatmentUserProgress(userId, treatmentInstanceId);
         TreatmentStepItem stepItem = treatmentService.getNext(userCurrentStep);
-        Map data = treatmentUserProgressService.convertStepItemToRespFormat(stepItem);
+        TreatmentNextVO data = treatmentUserProgressService.convertStepItemToRespFormat(stepItem);
         treatmentUserProgressService.updateUserProgress(stepItem);
         return success(data);
     }
@@ -81,11 +91,11 @@ public class TreatmentController {
     @PostMapping("/dayitem/{dayitem_instance_id}/next")
     @Operation(summary = "获取子任务下一项内容")
     @PreAuthenticated
-    public CommonResult<Map> subTaskGetNext(@PathVariable("dayitem_instance_id") Long dayitem_instance_id) {
+    public CommonResult<DayitemNextStepRespVO> subTaskGetNext(@PathVariable("dayitem_instance_id") Long dayitem_instance_id) {
         Long userId = getLoginUserId();
         Long treatmentInstanceId = 0L;
         Map data = taskFlowService.getNext(userId, treatmentInstanceId, dayitem_instance_id);
-        return success(data);
+        return success(DayitemNextStepConvert.convert(data));
     }
 
     @PostMapping("/{code}/taskflow/{dayitem_id}/create")
@@ -99,12 +109,17 @@ public class TreatmentController {
     @PostMapping("/dayitem/{dayitem_instance_id}/stepsubmit")
     @Operation(summary = "子任务step提交数据")
     @PreAuthenticated
-    public CommonResult<Long> stepSubmit(@PathVariable("dayitem_instance_id") Long dayitem_instance_id,
-                                      @RequestBody Map<String, Object> requestBody) {
+    public CommonResult<DayitemStepSubmitRespVO> stepSubmit(@PathVariable("dayitem_instance_id") Long dayitem_instance_id,
+                                                            @RequestBody DayitemStepSubmitReqVO submitReqVO) {
         Long userId = getLoginUserId();
-        String taskId = requestBody.get("taskId").toString();
-        taskFlowService.userSubmit(dayitem_instance_id, taskId, requestBody);
-        return success(1L);
+        BaseFlow flow = taskFlowService.getTaskFlow(userId, 0L, dayitem_instance_id);
+        String taskId = submitReqVO.getStep_id();
+        taskFlowService.userSubmit(flow, dayitem_instance_id, taskId, submitReqVO);
+        DayitemStepSubmitRespVO resp = new DayitemStepSubmitRespVO();
+        DayitemStepSubmitRespVO.StepRespVO stepRespVO = new DayitemStepSubmitRespVO.StepRespVO();
+        stepRespVO.setStatus("SUCCESS");
+        resp.setStep_resp(stepRespVO);
+        return success(resp);
     }
 
     @PostMapping("/clear_user_progress")
@@ -114,6 +129,10 @@ public class TreatmentController {
         Long userId = getLoginUserId();
         treatmentUserProgressService.clearUserProgress(userId);
         return success(1L);
+//        truncate table hlgyy_treatment_user_progress;
+//        truncate table hlgyy_treatment_dayitem_instance;
+//        truncate table hlgyy_treatment_day_instance;
+//        truncate table hlgyy_treatment_instance;
     }
 
 

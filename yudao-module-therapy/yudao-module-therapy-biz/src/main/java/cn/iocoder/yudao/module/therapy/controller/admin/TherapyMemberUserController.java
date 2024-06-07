@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.therapy.controller.admin;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.therapy.controller.admin.VO.AdminSetAppointmentTimeVO;
+import cn.iocoder.yudao.module.therapy.controller.admin.vo.AdminSetAppointmentTimeVO;
 import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

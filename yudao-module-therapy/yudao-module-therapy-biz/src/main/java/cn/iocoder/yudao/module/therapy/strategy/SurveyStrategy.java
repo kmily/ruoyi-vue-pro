@@ -11,50 +11,58 @@ import java.util.List;
 public interface SurveyStrategy {
     /**
      * 验证创建/更新参数
+     *
      * @param vo
      */
-    default void validationReqVO(SurveySaveReqVO vo)
-    {
+    default void validationReqVO(SurveySaveReqVO vo) {
         return;
     }
 
     /**
      * 填充题目code
      */
-    default void fillSurveyCode(TreatmentSurveyDO surveyDO){
+    default void fillSurveyCode(TreatmentSurveyDO surveyDO) {
 
     }
 
     /**
      * 填充问题code
+     *
      * @param qst
      */
-    default void fillQuestionCode(QuestionDO qst){
+    default void fillQuestionCode(QuestionDO qst) {
 //        if (StringUtil.isBlank(qst.getCode())) qst.setCode(IdUtil.fastSimpleUUID());
     }
 
     /**
      * 检查是否有必答题没做
+     *
      * @param reqVO
      * @param qst
      */
     void checkLoseQuestion(SubmitSurveyReqVO reqVO, List<QuestionDO> qst);
 
     /**
-     * 保存一次回答
+     * 检查题目是否属于问卷
      * @param reqVO
+     * @param qst
+     */
+    void checkQuestionExistsSurvey(SubmitSurveyReqVO reqVO, List<QuestionDO> qst);
+    /**
+     * 获取报告
+     *
+     * @param answerId
      * @return
      */
-    Long saveAnswer(SubmitSurveyReqVO reqVO);
+    default JSONObject getSurveyReport(Long answerId) {
+        return new JSONObject();
+    }
 
     /**
-     * 保存回答明细
-     * @param qst
-     * @param reqVO
+     * 补充问题列表
+     *
+     * @param vo
      */
-    void saveAnswerDetail(List<QuestionDO> qst,SubmitSurveyReqVO reqVO);
-
-    default JSONObject getSurveyReport(Long answerId){
-        return new JSONObject();
+    default void fillQuestion(SurveySaveReqVO vo) {
     }
 }

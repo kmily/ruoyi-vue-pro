@@ -71,4 +71,6 @@ public interface MemberUserConvert {
 
     MemberUserExtDO convertExtDO(MemberUserUpdateReqVO bean);
 
+    List<MemberUserExtDTO> convertExtList(List<MemberUserExtDO> bean);
+
 }

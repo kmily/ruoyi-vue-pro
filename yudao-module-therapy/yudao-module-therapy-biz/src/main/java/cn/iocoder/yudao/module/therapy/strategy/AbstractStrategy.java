@@ -20,8 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.SURVEY_EXISTS_UNFINISHED;
-import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.SURVEY_QUESTION_EMPTY;
+import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -59,7 +58,7 @@ public abstract class AbstractStrategy {
      */
     public void checkLoseQuestion(SubmitSurveyReqVO reqVO, List<QuestionDO> qst) {
         //必须一次全部提交
-        Set<Long> qst1Set = reqVO.getQstList().stream().map(p -> p.getId()).collect(Collectors.toSet());
+        Set<String> qst1Set = reqVO.getQstList().stream().map(p -> p.getQstCode()).collect(Collectors.toSet());
         Set<Long> qst2Set = qst.stream().filter(k -> k.isRequired()).map(k -> k.getId()).collect(Collectors.toSet());
         qst2Set.removeAll(qst1Set);
         if (qst2Set.size() > 0) {
@@ -67,20 +66,37 @@ public abstract class AbstractStrategy {
         }
     }
 
-    public Long saveAnswer(SubmitSurveyReqVO reqVO) {
-        if (reqVO.getId() > 0) {
-            return reqVO.getId();
-        }
-        SurveyAnswerDO answerDO = new SurveyAnswerDO();
-        answerDO.setSource(reqVO.getSource());
-        answerDO.setBelongSurveyId(reqVO.getSurveyId());
-        surveyAnswerMapper.insert(answerDO);
-        return answerDO.getId();
-    }
+//    public Long saveAnswer(SubmitSurveyReqVO reqVO) {
+//        if (reqVO.getId() > 0) {
+//            return reqVO.getId();
+//        }
+//        SurveyAnswerDO answerDO = new SurveyAnswerDO();
+////        answerDO.setSource(reqVO.getSource());
+////        answerDO.setBelongSurveyId(reqVO.getSurveyId());
+//        surveyAnswerMapper.insert(answerDO);
+//        return answerDO.getId();
+//    }
+//
+//    public void saveAnswerDetail(List<QuestionDO> qst, SubmitSurveyReqVO reqVO) {
+//        Map<String, QuestionDO> qstMap = CollectionUtils.convertMap(qst, QuestionDO::getCode);
+//        List<AnswerDetailDO> anAnswerDOS = SurveyConvert.INSTANCE.convert(qstMap, reqVO);
+//        surveyAnswerDetailMapper.insertBatch(anAnswerDOS);
+//    }
 
-    public void saveAnswerDetail(List<QuestionDO> qst, SubmitSurveyReqVO reqVO) {
-        Map<String, QuestionDO> qstMap = CollectionUtils.convertMap(qst, QuestionDO::getCode);
-        List<AnswerDetailDO> anAnswerDOS = SurveyConvert.INSTANCE.convert(qstMap, reqVO);
-        surveyAnswerDetailMapper.insertBatch(anAnswerDOS);
+//    public void fillQuestion(SurveySaveReqVO vo){
+//
+//    }
+    /**
+     * 检查题目是否属于问卷
+     * @param reqVO
+     * @param qst
+     */
+    public void checkQuestionExistsSurvey(SubmitSurveyReqVO reqVO, List<QuestionDO> qst){
+        Set<String> set1 = reqVO.getQstList().stream().map(p -> p.getQstCode()).collect(Collectors.toSet());
+        Set<String> set2 = qst.stream().map(p -> p.getCode()).collect(Collectors.toSet());
+        set1.removeAll(set2);
+        if (set1.size() > 0) {
+            throw exception(QUESTION_NOT_EXISTS_SURVEY);
+        }
     }
 }

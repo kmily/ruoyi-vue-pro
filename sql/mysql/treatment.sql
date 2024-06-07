@@ -15,8 +15,7 @@ CREATE TABLE `hlgyy_treatment_flow`  (
       PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '治疗流程模板';
 
-insert into hlgyy_treatment_flow(id, name, tenant_id, code, status, creator, create_time, updater, update_time, deleted)
-values(1, '治疗流程1', 1 ,'main', 1, 'admin', now(), 'admin', now(), 0);
+
 
 DROP TABLE IF EXISTS `hlgyy_treatment_flow_days`; # 治疗流程模板的每日
 CREATE TABLE `hlgyy_treatment_flow_days`  (
@@ -31,14 +30,9 @@ CREATE TABLE `hlgyy_treatment_flow_days`  (
          `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
          `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
          `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-         `hasBreak` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否休息',
+         `has_break` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否休息',
          PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '治疗流程模板';
-
-insert into hlgyy_treatment_flow_days(id, name, flow_id, tenant_id,  hasBreak) values(1, 'Day 1', 1, 1 ,0);
-insert into hlgyy_treatment_flow_days(id, name, flow_id, tenant_id,  hasBreak) values(2, 'Day 2', 1, 1 ,0);
-insert into hlgyy_treatment_flow_days(id, name, flow_id, tenant_id,  hasBreak) values(3, 'Day 3', 1, 1 ,1);  # 休息日
-insert into hlgyy_treatment_flow_days(id, name, flow_id, tenant_id,  is_break) values(4, 'Day 4', 1, 1 ,0);
 
 DROP TABLE IF EXISTS `hlgyy_treatment_flow_dayitem`; # 治疗流程模板的每日的项目
 CREATE TABLE `hlgyy_treatment_flow_dayitem`  (
@@ -64,29 +58,45 @@ CREATE TABLE `hlgyy_treatment_flow_dayitem`  (
      PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '治疗流程模板';
 
+delete from hlgyy_treatment_flow where id = 1;
+insert into hlgyy_treatment_flow(id, name, tenant_id, code, status, creator, create_time, updater, update_time, deleted, `type`)
+values(1, '治疗流程1', 1 ,'main', 1, '287', now(), '287', now(), 0, 1);
+
+delete from hlgyy_treatment_flow_days where id <= 4;
+insert into hlgyy_treatment_flow_days(id, name, flow_id, tenant_id, sequence,  has_break) values(1, 'Day 1', 1, 1 , 0, 0);
+insert into hlgyy_treatment_flow_days(id, name, flow_id, tenant_id, sequence,  has_break) values(2, 'Day 2', 1, 1 , 1, 0);
+insert into hlgyy_treatment_flow_days(id, name, flow_id, tenant_id, sequence,  has_break) values(3, 'Day 3', 1, 1 , 2, 1);  # 休息日
+insert into hlgyy_treatment_flow_days(id, name, flow_id, tenant_id, sequence,  has_break) values(4, 'Day 4', 1, 1 ,3, 0);
+
+delete from hlgyy_treatment_flow_dayitem where id <= 10;
 # day 1
-insert into hlgyy_treatment_flow_dayitem(id, day_id, item_type, settings, dependent_item_ids, `agroup`, tenant_id)
-values (1, 1, 'guide', '{"content": "欢迎来到回龙观青少年心理康复中心线上治疗中心"}', '', 1, 1);
-insert into hlgyy_treatment_flow_dayitem(id, day_id, item_type, settings, dependent_item_ids, `agroup`, tenant_id)
-values (2, 1, 'request_to_continue', '{"content": "现在需要对你的心理状况进行一个评估，请问你准备好了吗？", "confirm": "好的", "cancel": "暂时不用"}', '', 2, 1);
-insert into hlgyy_treatment_flow_dayitem(id, day_id, item_type, settings, dependent_item_ids, `agroup`, tenant_id)
-values (3, 1, 'liangbiao', '{"title": "请先做一下量表", "description": "这个是用来评估心理得分的，请点击下方链接，分别完成作答", "wenjuan_codes": ["lb001", "lb002"]}', '', 3, 1);
-insert into hlgyy_treatment_flow_dayitem(id, day_id, item_type, settings, dependent_item_ids, `agroup`, tenant_id)
-values (4, 1, 'goal_and_motivation', '{"title": "目标与动机", "description": "目标与动机非常重要，请认证思考"}', '', 4, 1);
-insert into hlgyy_treatment_flow_dayitem(id, day_id, item_type, settings, dependent_item_ids, `agroup`, group_seq, tenant_id, required)
-values (5, 1, 'video_lessons', '{"title": "视频课程", "description": "可以看下视频熟悉下我们的流程", "video_ids": [1,2,3,4]}', '', 5, 0, 1, 0);
-insert into hlgyy_treatment_flow_dayitem(id, day_id, item_type, settings, dependent_item_ids, `agroup`, group_seq, tenant_id, required)
-values (6, 1, 'diary', '{"title": "日记", "description": "每日记录心情日记"}', '', 5, 1, 1, 0);
+insert into hlgyy_treatment_flow_dayitem(id, day_id, `type`, settings, dependent_item_ids, `agroup`, tenant_id)
+values (1, 1, 2, '{"content": "欢迎来到回龙观青少年心理康复中心线上治疗中心"}', '', 1, 1);
+insert into hlgyy_treatment_flow_dayitem(id, day_id, `type`, settings, dependent_item_ids, `agroup`, tenant_id)
+values (2, 1, 2, '{"content": "请你做好准备"}', '', 2, 1);
+insert into hlgyy_treatment_flow_dayitem(id, day_id, `type`, settings, dependent_item_ids, `agroup`, tenant_id)
+values (3, 1, 1, '{"survey_codes": ["a", "b", "c", "d"]}', '', 3, 1);
+insert into hlgyy_treatment_flow_dayitem(id, day_id, `type`, settings, dependent_item_ids, `agroup`, tenant_id, required)
+values (4, 1, 3, '{}', '', 4, 1, 1);
+insert into hlgyy_treatment_flow_dayitem(id, day_id, `type`, settings, dependent_item_ids, `agroup`, group_seq, tenant_id, required)
+values (5, 1, 4, '{}', '', 5, 0, 1, 0);
+insert into hlgyy_treatment_flow_dayitem(id, day_id, `type`, settings, dependent_item_ids, `agroup`, group_seq, tenant_id, required)
+values (6, 1, 5, '{}', '', 5, 1, 1, 0);
 # day 2
-insert into hlgyy_treatment_flow_dayitem(id, day_id, item_type, settings, dependent_item_ids, `agroup`, group_seq, tenant_id)
-values (7, 2, 'video_lessons', '{"title": "视频课程", "description": "第一个视频", "video_ids": [5]}', '', 1, 0, 1);
-insert into hlgyy_treatment_flow_dayitem(id, day_id, item_type, settings, dependent_item_ids, `agroup`, group_seq, tenant_id)
-values (8, 2, 'video_lessons', '{"title": "视频课程", "description": "第二个视频", "video_ids": [6]}', '[7]', 1, 1, 1);
+insert into hlgyy_treatment_flow_dayitem(id, day_id, `type`, settings, dependent_item_ids, `agroup`, group_seq, tenant_id)
+values (7, 2, 7, '{}', '', 1, 0, 1);
+insert into hlgyy_treatment_flow_dayitem(id, day_id, `type`, settings, dependent_item_ids, `agroup`, group_seq, tenant_id)
+values (8, 2, 7, '{}', '[7]', 1, 1, 1);
 # day 4
-insert into hlgyy_treatment_flow_dayitem(id, day_id, item_type, settings, dependent_item_ids, `agroup`, tenant_id)
-values (9, 4, 'video_lessons', '{"title": "视频课程", "description": "第一个视频", "video_ids": [7]}', '', 1, 1);
-insert into hlgyy_treatment_flow_dayitem(id, day_id, item_type, settings, dependent_item_ids, `agroup`, tenant_id)
-values (10, 4, 'video_lessons', '{"title": "视频课程", "description": "第二个视频", "video_ids": [8]}', '', 2, 1);
+insert into hlgyy_treatment_flow_dayitem(id, day_id, `type`, settings, dependent_item_ids, `agroup`, tenant_id)
+values (9, 4, 7, '{}', '', 1, 1);
+insert into hlgyy_treatment_flow_dayitem(id, day_id, `type`, settings, dependent_item_ids, `agroup`, tenant_id)
+values (10, 4, 7, '{}', '', 2, 1);
+# user_id = 287 is a test user
+delete from hlgyy_treatment_instance where user_id = 287;
+delete from hlgyy_treatment_dayitem_instance where user_id = 287;
+delete from hlgyy_treatment_day_instance where user_id = 287;
+delete from hlgyy_treatment_user_progress where user_id = 287;
 
 DROP TABLE IF EXISTS `hlgyy_treatment_instance`;
 CREATE TABLE `hlgyy_treatment_instance`  (
@@ -129,6 +139,7 @@ CREATE TABLE `hlgyy_treatment_dayitem_instance`  (
      `flow_instance_id` bigint not null COMMENT '治疗day instance id',
      `day_instance_id` bigint not null COMMENT '治疗day instance id',
      `dayitem_id` bigint NOT NULL COMMENT '治疗流程模板的每日的项目id',
+     `ext_attr` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '扩展属性',
      `task_instance_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '任务流任务实例id',
      `status` tinyint NOT NULL DEFAULT 0 COMMENT '流程状态（0未开始 1进行中 2已完成 3已取消）',
      `user_input` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '用户输入',
@@ -158,4 +169,23 @@ CREATE TABLE `hlgyy_treatment_user_progress`  (
       `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
       PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '治疗流程实例';
+
+
+DROP TABLE IF EXISTS `hlgyy_treatment_chat_history`;
+CREATE TABLE 'hlgyy_treatment_chat_history'  (
+`id` bigint NOT NULL AUTO_INCREMENT COMMENT '治疗流程的聊天消息',
+`message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '消息',
+`user_id` bigint NOT NULL COMMENT '用户id',
+`treatment_instance_id` bigint NOT NULL COMMENT '治疗流程实例id',
+`is_system` bit(1) NOT NULL DEFAULT b'1' COMMENT '是否系统消息',
+
+`creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '创建者',
+`create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+`updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+`update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+`deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '治疗流程实例';
+
+
 

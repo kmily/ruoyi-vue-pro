@@ -198,7 +198,7 @@ public interface MemberUserService {
     MemberUserDO createUserByAdmin(String mobile, String pwd,String registerIp, Integer terminal);
 
     MemberUserExtDO getUserExtInfo(Long userId);
-
+    List<MemberUserExtDO> getUserExtInfoList(List<Long> userIds);
     void saveUserExtInfo(MemberUserExtDTO dto);
     void updateMemberExtByUserId(MemberUserExtDTO dto);
 }

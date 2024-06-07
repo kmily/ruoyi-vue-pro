@@ -49,4 +49,10 @@ public interface TreatmentDayitemInstanceMapper extends BaseMapperX<TreatmentDay
     }
 
 
+    default void finishDayItemInstance(Long dayItemInstanceId){
+        TreatmentDayitemInstanceDO instanceDO = selectById(dayItemInstanceId);
+        instanceDO.setStatus(TreatmentDayitemInstanceDO.StatusEnum.COMPLETED.getValue());
+        updateById(instanceDO);
+    }
+
 }

@@ -11,6 +11,10 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.USER_NOT_EXISTS;
 
 /**
  * 会员用户的 API 实现类
@@ -50,6 +54,11 @@ public class MemberUserApiImpl implements MemberUserApi {
         return MemberUserConvert.INSTANCE.convert(userService.getUserExtInfo(userId));
     }
 
+//    @Override
+//    public List<MemberUserExtDTO> getUserExtInfoList(List<Long> userIds) {
+//        return MemberUserConvert.INSTANCE.convertExtList(userService.getUserExtInfoList(userIds));
+//    }
+
     @Override
     public void saveUserExtInfo(MemberUserExtDTO dto) {
         userService.saveUserExtInfo(dto);
@@ -57,6 +66,9 @@ public class MemberUserApiImpl implements MemberUserApi {
 
     @Override
     public void updateMemberExtByUserId(MemberUserExtDTO dto) {
+        if(Objects.isNull(userService.getUserExtInfo(dto.getUserId()))){
+            throw exception(USER_NOT_EXISTS);
+        }
         userService.updateMemberExtByUserId(dto);
     }
 

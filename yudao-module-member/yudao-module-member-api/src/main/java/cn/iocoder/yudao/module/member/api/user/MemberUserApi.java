@@ -61,6 +61,8 @@ public interface MemberUserApi {
 
     MemberUserExtDTO getUserExtInfo(Long userId);
 
+//    List<MemberUserExtDTO> getUserExtInfoList(List<Long> userIds);
+
     void saveUserExtInfo(MemberUserExtDTO dto);
 
     void updateMemberExtByUserId(MemberUserExtDTO dto);
