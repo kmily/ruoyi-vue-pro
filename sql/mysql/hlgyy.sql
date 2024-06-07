@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS `hlgyy_member_user_ext`;
+# DROP TABLE IF EXISTS `hlgyy_member_user_ext`;
 create table hlgyy_member_user_ext
 (
     `id`                     bigint auto_increment comment '自增ID',
@@ -14,7 +14,7 @@ create table hlgyy_member_user_ext
 )ENGINE = InnoDB comment '治疗用户扩展表' CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 
-DROP TABLE IF EXISTS `hlgyy_ai_chat_message`;
+# DROP TABLE IF EXISTS `hlgyy_ai_chat_message`;
 create table hlgyy_icbt_db.hlgyy_ai_chat_message
 (
     id              bigint auto_increment comment 'auto id'
@@ -32,4 +32,28 @@ create table hlgyy_icbt_db.hlgyy_ai_chat_message
 
 create index idx_create_time
     on hlgyy_icbt_db.hlgyy_ai_chat_message (created_at);
+
+
+
+create table hlgyy_icbt_db.hlgyy_answer_detail
+(
+    id               bigint auto_increment
+        primary key,
+    belongSurveyId   bigint                       not null comment '所属问卷',
+    belongSurveyCode varchar(255)                 not null comment '所属问卷编码',
+    belongAnswerId   bigint                       not null comment '一次答题id',
+    belongQstCode    varchar(255)                 not null comment '所属问卷题目编码',
+    qstId            bigint                       not null comment '所属问卷题目',
+    answer           longtext collate utf8mb4_bin null comment '答案',
+    qstType          tinyint                      not null comment '问题类型',
+    qstContext       longtext collate utf8mb4_bin null comment '题干',
+    createTime       datetime                     not null comment '创建时间',
+    creator          varchar(50) charset latin1   not null comment '创建人',
+    updater          varchar(50) charset latin1   not null comment '最后更新人',
+    updateTime       datetime                     not null comment '最后更新时间',
+    deleted          bit default b'0'             null
+);
+
+create index ix_belongSurveyId
+    on hlgyy_icbt_db.hlgyy_answer_detail (belongSurveyId);
 

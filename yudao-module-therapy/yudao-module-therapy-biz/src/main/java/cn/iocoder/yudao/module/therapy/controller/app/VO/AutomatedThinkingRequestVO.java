@@ -14,7 +14,7 @@ public class AutomatedThinkingRequestVO {
         @Schema(description = "会话ID",requiredMode = Schema.RequiredMode.REQUIRED,example = "uuid")
         private String conversationId;
 
-        @Schema(description = "会话内容",requiredMode = Schema.RequiredMode.REQUIRED,example = "uuid")
+        @Schema(description = "会话内容",requiredMode = Schema.RequiredMode.REQUIRED,example = "你好")
         private String content;
 
 }
