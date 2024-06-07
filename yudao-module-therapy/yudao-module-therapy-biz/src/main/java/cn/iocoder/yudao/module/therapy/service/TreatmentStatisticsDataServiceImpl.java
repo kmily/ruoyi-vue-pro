@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static cn.iocoder.yudao.module.therapy.taskflow.Const.USER_TROUBLE_CATEGORIES;
+
 @Service
 public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDataService {
     @Resource
@@ -34,7 +36,7 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
         Map<Long, List<String>> res = new HashMap();
         for(TreatmentDayitemInstanceDO dayitemInstanceDO : dayitemInstanceDOS){
             JSONObject extAttr = dayitemInstanceDO.getExtAttrObj();
-            List<String> troubles = (List<String>) extAttr.getOrDefault("psycoTroubleCategory", new ArrayList<String>());
+            List<String> troubles = (List<String>) extAttr.getOrDefault(USER_TROUBLE_CATEGORIES, new ArrayList<String>());
             res.put(dayitemInstanceDO.getId(), troubles);
         }
         return res;

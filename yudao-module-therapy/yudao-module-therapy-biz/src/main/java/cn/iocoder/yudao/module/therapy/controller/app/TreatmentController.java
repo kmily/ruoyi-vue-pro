@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitRespVO
 import cn.iocoder.yudao.module.therapy.controller.vo.TreatmentInstanceVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.TreatmentNextVO;
 import cn.iocoder.yudao.module.therapy.convert.DayitemNextStepConvert;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemInstanceDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDayitemDO;
 import cn.iocoder.yudao.module.therapy.service.TaskFlowService;
 import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -112,7 +114,7 @@ public class TreatmentController {
     public CommonResult<DayitemStepSubmitRespVO> stepSubmit(@PathVariable("dayitem_instance_id") Long dayitem_instance_id,
                                                             @RequestBody DayitemStepSubmitReqVO submitReqVO) {
         Long userId = getLoginUserId();
-        BaseFlow flow = taskFlowService.getTaskFlow(userId, 0L, dayitem_instance_id);
+        BaseFlow flow = taskFlowService.getTaskFlow(userId, dayitem_instance_id);
         String taskId = submitReqVO.getStep_id();
         taskFlowService.userSubmit(flow, dayitem_instance_id, taskId, submitReqVO);
         DayitemStepSubmitRespVO resp = new DayitemStepSubmitRespVO();
