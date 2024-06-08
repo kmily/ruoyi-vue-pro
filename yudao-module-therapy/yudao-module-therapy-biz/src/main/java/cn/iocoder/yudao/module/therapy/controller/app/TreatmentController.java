@@ -1,14 +1,15 @@
 package cn.iocoder.yudao.module.therapy.controller.app;
 
-import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemNextStepRespVO;
-import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
-import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitRespVO;
+import cn.hutool.json.ObjectMapper;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.*;
 import cn.iocoder.yudao.module.therapy.controller.vo.TreatmentInstanceVO;
-import cn.iocoder.yudao.module.therapy.controller.app.vo.TreatmentNextVO;
 import cn.iocoder.yudao.module.therapy.convert.DayitemNextStepConvert;
+import cn.iocoder.yudao.module.therapy.convert.TreatmentChatHistoryConvert;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentChatHistoryDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemInstanceDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDayitemDO;
 import cn.iocoder.yudao.module.therapy.service.TaskFlowService;
+import cn.iocoder.yudao.module.therapy.service.TreatmentChatHistoryService;
 import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
+import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -40,6 +42,9 @@ public class TreatmentController {
 
     @Resource
     private TaskFlowService taskFlowService;
+
+    @Resource
+    private TreatmentChatHistoryService treatmentChatHistoryService;
 
     @PostMapping("/{code}")
     @Operation(summary = "初始化治疗流程")
@@ -78,7 +83,17 @@ public class TreatmentController {
         TreatmentStepItem stepItem = treatmentService.getNext(userCurrentStep);
         TreatmentNextVO data = treatmentUserProgressService.convertStepItemToRespFormat(stepItem);
         treatmentUserProgressService.updateUserProgress(stepItem);
+        treatmentChatHistoryService.addChatHistory(userId, treatmentInstanceId, data, true);
         return success(data);
+    }
+
+    @GetMapping("/{code}/{id}/chat-history")
+    @Operation(summary = "获取用户治疗的聊天记录-主聊天页面")
+    @PreAuthenticated
+    public CommonResult<List<TreatmentHistoryChatMessageVO>> getChatHistory(@PathVariable("code") String code, @PathVariable("id") Long treatmentInstanceId) {
+        Long userId = getLoginUserId();
+        List<TreatmentChatHistoryDO> messages =  treatmentChatHistoryService.queryChatHistory(userId, treatmentInstanceId);
+        return success(TreatmentChatHistoryConvert.convert(messages));
     }
 
     @PostMapping("/dayitem/{dayitem_instance_id}/complete")
@@ -97,7 +112,18 @@ public class TreatmentController {
         Long userId = getLoginUserId();
         Long treatmentInstanceId = 0L;
         Map data = taskFlowService.getNext(userId, treatmentInstanceId, dayitem_instance_id);
-        return success(DayitemNextStepConvert.convert(data));
+        DayitemNextStepRespVO result = DayitemNextStepConvert.convert(data);
+        treatmentChatHistoryService.addTaskChatHistory(userId, treatmentInstanceId, dayitem_instance_id, result, true);
+        return success(result);
+    }
+
+    @GetMapping("/dayitem/{dayitem_instance_id}/chat-history")
+    @Operation(summary = "获取用户治疗的聊天记录-子任务页面")
+    @PreAuthenticated
+    public CommonResult<List<TreatmentHistoryChatMessageVO>> getTaskChatHistory(@PathVariable("dayitem_instance_id") Long dayitem_instance_id) {
+        Long userId = getLoginUserId();
+        List<TreatmentChatHistoryDO> messages =  treatmentChatHistoryService.queryTaskChatHistory(userId, dayitem_instance_id);
+        return success(TreatmentChatHistoryConvert.convert(messages));
     }
 
     @PostMapping("/{code}/taskflow/{dayitem_id}/create")
