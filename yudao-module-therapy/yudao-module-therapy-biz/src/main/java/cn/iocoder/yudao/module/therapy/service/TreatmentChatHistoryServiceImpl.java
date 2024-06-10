@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentChatHistory
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -26,6 +27,7 @@ public class TreatmentChatHistoryServiceImpl implements TreatmentChatHistoryServ
     @Override
     public void addChatHistory(Long userId, Long treatmentInstanceId, TreatmentNextVO nextVO, boolean isSystem) {
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
         String jsonString = null;
         try {
             jsonString = objectMapper.writeValueAsString(nextVO);
@@ -49,6 +51,7 @@ public class TreatmentChatHistoryServiceImpl implements TreatmentChatHistoryServ
     @Override
     public void addTaskChatHistory(Long userId, Long treatmentInstanceId, Long treatmentDayitemInstanceId, DayitemNextStepRespVO stepRespVO, boolean isSystem) {
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
         String jsonString = null;
         try {
             jsonString = objectMapper.writeValueAsString(stepRespVO);
