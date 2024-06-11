@@ -72,5 +72,14 @@ public class TreatmentDayitemInstanceDO extends BaseDO {
         this.extAttr = extAttr.toJSONString();
     }
 
+    public void updateExtAttr(String key, Object val) {
+        JSONObject jsonObject = getExtAttrObj();
+        if(jsonObject== null){
+            jsonObject = new JSONObject();
+        }
+        jsonObject.put(key, val);
+        setExtAttrObj(jsonObject);
+    }
+
 
 }

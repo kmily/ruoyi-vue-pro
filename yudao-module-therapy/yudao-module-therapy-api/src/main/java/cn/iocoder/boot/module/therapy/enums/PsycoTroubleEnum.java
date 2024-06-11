@@ -1,6 +1,7 @@
 package cn.iocoder.boot.module.therapy.enums;
 
 
+
 public enum PsycoTroubleEnum {
     UNKNOWN(0, "未知", "unknown"),
     PSYCO_ASPECT(1, "心理层面", "psyco_aspect"),
@@ -20,5 +21,9 @@ public enum PsycoTroubleEnum {
         this.intVal = intVal;
         this.category = category;
         this.code = code;
+    }
+
+    public String getCategory() {
+        return category;
     }
 }

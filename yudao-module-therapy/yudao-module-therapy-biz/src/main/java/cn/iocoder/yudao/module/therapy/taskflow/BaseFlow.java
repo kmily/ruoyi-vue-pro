@@ -15,27 +15,26 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 
 
+import javax.annotation.PreDestroy;
+import java.awt.event.ContainerAdapter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static cn.iocoder.yudao.module.therapy.taskflow.Const.DAYITEM_INSTANCE_ID;
+
 
 public abstract class BaseFlow {
-    ProcessInstance processInstance;
-
     ProcessEngine processEngine;
-
-    HistoricProcessInstance historicProcessInstance;
-
 
     public BaseFlow(ProcessEngine engine){
         processEngine = engine;
     }
 
-    public Task getCurrentTask(){
+    public Task getCurrentTask(Container container){
         TaskService taskService = processEngine.getTaskService();
-        Task currentTask = (Task) taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Task currentTask = (Task) taskService.createTaskQuery().processInstanceId(container.getProcessInstanceId()).singleResult();
         return currentTask;
     }
 
@@ -43,16 +42,16 @@ public abstract class BaseFlow {
      * 运行流程, 返回下一步的信息
      * @return
      */
-    public Map run(){
+    public Map run(Container container){
         HashMap result = new HashMap();
-        if(historicProcessInstance != null){
+        if(container.getHistoricProcessInstance() != null){
             result.put("step_type", "END");
             Map stepData = new HashMap();
             stepData.put("content", "流程已经结束了");
             result.put("step_data", stepData);
             return result;
         }
-        Task currentTask = getCurrentTask();
+        Task currentTask = getCurrentTask(container);
         result.put("__step_id", currentTask.getId());
         result.put("__step_name", currentTask.getName());
 
@@ -66,8 +65,8 @@ public abstract class BaseFlow {
         try {
             data = new ObjectMapper().readValue(content, Map.class);
             result.put("step_type", data.get("step_type"));
-            Method method = this.getClass().getMethod("auto_" + (String) data.get("step_type"), Map.class, Task.class);
-            Map stepResult = (Map) method.invoke(this, data.get("step_data"), currentTask);
+            Method method = this.getClass().getMethod("auto_" + (String) data.get("step_type"), Container.class, Map.class, Task.class);
+            Map stepResult = (Map) method.invoke(this, container, data.get("step_data"), currentTask);
             boolean requireSubmit = (boolean) data.getOrDefault("submit", true);
             if(!requireSubmit || data.get("step_type").equals("guide_language")){
                 TaskService taskService = processEngine.getTaskService();
@@ -91,12 +90,12 @@ public abstract class BaseFlow {
      * @param data
      * @return
      */
-    public Map auto_guide_language(Map data, Task currentTask){
+    public Map auto_guide_language(Container container, Map data, Task currentTask){
 
         return data;
     }
 
-    public Map auto_do_you_agree(Map data, Task currentTask){
+    public Map auto_do_you_agree(Container container, Map data, Task currentTask){
         TaskService taskService = processEngine.getTaskService();
         return data;
     }
@@ -116,19 +115,17 @@ public abstract class BaseFlow {
         return data;
     }
 
-    public void submit_do_you_agree(DayitemStepSubmitReqVO submitReqVO , Task currentTask){
-        TaskService taskService = processEngine.getTaskService();
+    public void submit_do_you_agree(Container container, DayitemStepSubmitReqVO submitReqVO , Task currentTask){
         Map<String, Object> currentVariable = submitReqVO.getStep_data().getCurrent();
         Map bindData = getBindData(currentTask);
-        String agreeKey = bindData.get("variable").toString();
+        String agreeKey = ((Map) bindData.get("step_data")).get("variable").toString();
         RuntimeService runtimeService = processEngine.getRuntimeService();
-        runtimeService.setVariable( processInstance.getId(), agreeKey, (boolean) currentVariable.get(agreeKey));
-        taskService.complete(currentTask.getId());
+        runtimeService.setVariable( container.getProcessInstance().getId(), agreeKey, (boolean) currentVariable.get(agreeKey));
     }
 
 
-    public void userSubmit(String taskId, DayitemStepSubmitReqVO submitReqVO) {
-        Task task = getCurrentTask();
+    public void userSubmit(Container container, String taskId, DayitemStepSubmitReqVO submitReqVO) {
+        Task task = getCurrentTask(container);
         if(taskId.equals(task.getId())) {
             String activityId = task.getTaskDefinitionKey(); // Get the task's definition key
             BpmnModel bpmnModel = processEngine.getRepositoryService().getBpmnModel(task.getProcessDefinitionId());
@@ -138,8 +135,8 @@ public abstract class BaseFlow {
             Map<String, Object> data = new HashMap();
             try {
                 data = new ObjectMapper().readValue(content, Map.class);
-                Method method = this.getClass().getMethod("submit_" + (String) data.get("step_type"), DayitemStepSubmitReqVO.class, Task.class);
-                method.invoke(this, submitReqVO, task);
+                Method method = this.getClass().getMethod("submit_" + (String) data.get("step_type"), Container.class, DayitemStepSubmitReqVO.class, Task.class);
+                method.invoke(this, container, submitReqVO, task);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             } catch (NoSuchMethodException e) {
@@ -161,28 +158,34 @@ public abstract class BaseFlow {
      * @param bmpnName
      * @return
      */
-    public String createProcessInstance(String bmpnName, Long dayItemInstanceId){
+    public Container createProcessInstance(String bmpnName, Long dayItemInstanceId){
         RuntimeService runtimeService = processEngine.getRuntimeService();
 //        runtimeService.createProcessInstanceBuilder().processDefinitionKey(bmpnName);
-        processInstance = runtimeService.startProcessInstanceByKey(bmpnName, new HashMap<String, Object>());
-        runtimeService.setVariable(processInstance.getId(), "dayItemInstanceId", dayItemInstanceId);
-        return processInstance.getId();
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(bmpnName, new HashMap<String, Object>());
+        runtimeService.setVariable(processInstance.getId(), DAYITEM_INSTANCE_ID, dayItemInstanceId);
+        Container container = new Container();
+        container.setProcessInstance(processInstance);
+        return container;
     }
 
     /**
      * 加载流程实例
      * @param processInstanceId
      */
-    public void loadProcessInstance(String processInstanceId){
+    public Container loadProcessInstance(String processInstanceId){
         RuntimeService runtimeService = processEngine.getRuntimeService();
-        processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        Container container = new Container();
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        container.setProcessInstance(processInstance);
         if(processInstance == null){
             HistoryService historyService = processEngine.getHistoryService();
-            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
             if (historicProcessInstance == null) {
                 throw new RuntimeException("No process instance found with id: " + processInstanceId);
             }
+            container.setHistoricProcessInstance(historicProcessInstance);
         }
+        return container;
     }
 
 
@@ -246,9 +249,9 @@ public abstract class BaseFlow {
             if(flowType.equals("Sequence")){
                 addSequenceRelation(process, stepGroups.get(sourceGroup), stepGroups.get(targetGroup));
             }else if (flowType.equals("ExclusiveGate")){
-                String nextTrue = groupRelation.getOrDefault("next_true", "");
-                String nextFalse = groupRelation.getOrDefault("next_false", "");
-                String variableName = groupRelation.getOrDefault("variable", "");
+                String nextTrue = groupRelation.get("next_true");
+                String nextFalse = groupRelation.get("next_false");
+                String variableName = groupRelation.get("variable");
                 addExclusiveGateRelation(process, stepGroups.get(sourceGroup),
                         stepGroups.get(nextTrue), stepGroups.get(nextFalse),
                         variableName);
@@ -393,9 +396,17 @@ public abstract class BaseFlow {
         ServiceTask serviceTask = new ServiceTask();
         serviceTask.setId(generateTaskId());
         serviceTask.setName((String) step.getOrDefault("name", ""));
-        serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
-        serviceTask.setImplementation((String) step.get("implementation"));
+        if(step.getOrDefault("delegateExpression", "").equals("")){
+            // Delegate expression is empty, use implementation
+            serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
+            serviceTask.setImplementation((String) step.get("implementation"));
+        }else{
+            serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+            serviceTask.setImplementation((String) step.get("delegateExpression"));
+        }
         bindContentToServiceTask(serviceTask, step);
         return serviceTask;
     }
+
+
 }

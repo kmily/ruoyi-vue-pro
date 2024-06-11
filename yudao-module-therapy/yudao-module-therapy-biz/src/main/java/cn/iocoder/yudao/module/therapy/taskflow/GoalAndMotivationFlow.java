@@ -2,14 +2,17 @@ package cn.iocoder.yudao.module.therapy.taskflow;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayitemInstanceMapper;
+import cn.iocoder.yudao.module.therapy.service.DayitemInstanceService;
 import cn.iocoder.yudao.module.therapy.service.SurveyService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
@@ -20,22 +23,27 @@ import java.nio.charset.StandardCharsets;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.task.api.Task;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
-import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.QUESTION_NOT_EXISTS_SURVEY;
 import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.TREATMENT_DAYITEM_STEP_PARAMS_ERROR;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.therapy.taskflow.Const.*;
 
 
 @Component
+@Scope("prototype")
 public class GoalAndMotivationFlow extends BaseFlow{
     @Resource
     TreatmentDayitemInstanceMapper treatmentDayitemInstanceMapper;
 
     @Resource
     SurveyService surveyService;
+
+    @Resource
+    DayitemInstanceService dayitemInstanceService;
 
     public GoalAndMotivationFlow(ProcessEngine engine) {
         super(engine);
@@ -69,68 +77,127 @@ public class GoalAndMotivationFlow extends BaseFlow{
     @Override
     public void onFlowEnd(DelegateExecution execution) {
         Map variables = execution.getVariables();
-        Long dayItemInstanceId = (Long) variables.get("dayItemInstanceId");
+        Long dayItemInstanceId = (Long) variables.get(DAYITEM_INSTANCE_ID);
 
         treatmentDayitemInstanceMapper.finishDayItemInstance(dayItemInstanceId);
     }
 
-    public Map<String, Object> auto_primary_troubles_qst(Map data, Task currentTask){
+    /**
+     * 烦恼问题描述
+     * @param data
+     * @param currentTask
+     * @return
+     */
+    public Map<String, Object> auto_primary_troubles_qst(Container container, Map data, Task currentTask){
         RuntimeService runtimeService = processEngine.getRuntimeService();
-        Long instance_id = (Long) runtimeService.getVariable(processInstance.getId(), "survey_instance_id");
+        Long instance_id = (Long) runtimeService.getVariable(container.getProcessInstanceId(), SURVEY_INSTANCE_ID);
         if(instance_id == null) {
-            instance_id = surveyService.initSurveyAnswer(SurveyType.PROBLEM_GOAL_MOTIVE.getCode(), 2);
-            runtimeService.setVariable(processInstance.getId(), "survey_instance_id", instance_id);
+            instance_id = surveyService.initSurveyAnswer(SurveyType.PROBLEM_GOAL_MOTIVE.getCode(), SURVEY_SOURCE_TYPE);
+            runtimeService.setVariable(container.getProcessInstanceId(), SURVEY_INSTANCE_ID, instance_id);
         }
         data.put("instance_id", instance_id);
         return data;
     }
 
 
-    public void submit_primary_troubles_qst(DayitemStepSubmitReqVO submitReqVO, Task currentTask){
+    /**
+     * 提交问题描述
+     * @param submitReqVO
+     * @param currentTask
+     */
+    public void submit_primary_troubles_qst(Container container,DayitemStepSubmitReqVO submitReqVO, Task currentTask){
         // set troubles text, for later llm use
         Map stepVariables = submitReqVO.getStep_data().getCurrent();
+        if (stepVariables == null){
+            return;
+        }
+
         List<String> troubles;
-        try {
-            troubles =  (List<String>) stepVariables.get("troubles");
-        } catch (Exception e) {
+        troubles =  (List<String>) stepVariables.getOrDefault("troubles", new ArrayList<>());
+        if(troubles.size() > 0){
+            RuntimeService runtimeService = processEngine.getRuntimeService();
+            runtimeService.setVariable(currentTask.getProcessInstanceId(), "troubles", troubles);
+            // submit survey data
+            SubmitSurveyReqVO survey = submitReqVO.getStep_data().getSurvey();
+            if(survey != null){
+                surveyService.submitSurveyForFlow(survey);
+            }
+        }
+    }
+
+    /**
+     * 设定目标
+     * @param data
+     * @param currentTask
+     * @return
+     */
+    public  Map<String, Object> auto_set_goal_qst(Container container, Map data, Task currentTask){
+        Map variables = getVariables(container);
+        data.put("instance_id", (Long) variables.get(SURVEY_INSTANCE_ID));
+        List<AnswerDetailDO> instanceData = surveyService.getAnswerDetailByAnswerId((Long) variables.get(SURVEY_INSTANCE_ID));
+        data.put("instance_data", instanceData);
+        return data;
+    }
+
+    private Map getVariables(Container container){
+        RuntimeService runtimeService = processEngine.getRuntimeService();
+        return runtimeService.getVariables(container.getProcessInstanceId());
+    }
+
+
+    /**
+     * 提交设定目标
+     * @param submitReqVO
+     * @param currentTask
+     */
+    public void submit_set_goal_qst(Container container, DayitemStepSubmitReqVO submitReqVO, Task currentTask){
+        surveyService.submitSurveyForFlow(submitReqVO.getStep_data().getSurvey());
+    }
+
+    /**
+     * 我的行动
+     * @param data
+     * @param currentTask
+     * @return
+     */
+    public Map<String, Object> auto_my_actions_qst(Container container,Map data, Task currentTask){
+        Map variables = getVariables(container);
+        data.put("instance_id", variables.get(SURVEY_INSTANCE_ID));
+
+        List<AnswerDetailDO> instanceData = surveyService.getAnswerDetailByAnswerId((Long) variables.get(SURVEY_INSTANCE_ID));
+        data.put("instance_data", instanceData);
+        return data;
+    }
+
+    public void submit_my_actions_qst(Container container, DayitemStepSubmitReqVO submitReqVO, Task currentTask){
+        surveyService.submitSurveyForFlow(submitReqVO.getStep_data().getSurvey());
+    }
+
+    /**
+     * 问题分类选择
+     * @param data
+     * @param currentTask
+     * @return
+     */
+    public Map<String, Object> auto_trouble_category_qst(Container container,Map data, Task currentTask){
+        Map variables = getVariables(container);
+        data.put("instance_id", variables.get(SURVEY_INSTANCE_ID));
+        return data;
+    }
+
+    /**
+     * 提交问题分类选择
+     * @param submitReqVO
+     * @param currentTask
+     */
+    public void submit_trouble_category_qst(Container container,DayitemStepSubmitReqVO submitReqVO, Task currentTask){
+        Map variables = getVariables(container);
+        Long dayitemInstanceId = (Long) variables.get(DAYITEM_INSTANCE_ID);
+        List<String> troublesCategory = (List<String>) submitReqVO.getStep_data().getStore().get(USER_TROUBLE_CATEGORIES);
+        if(troublesCategory == null || troublesCategory.size() == 0 ){
             throw exception(TREATMENT_DAYITEM_STEP_PARAMS_ERROR);
         }
-        RuntimeService runtimeService = processEngine.getRuntimeService();
-        runtimeService.setVariable(currentTask.getProcessInstanceId(), "troubles", troubles);
-        // submit survey data
-        surveyService.submitSurveyForFlow(submitReqVO.getStep_data().getSurvey());
-    }
-
-    public  Map<String, Object> auto_set_goal_qst(Map data, Task currentTask){
-        Map variables = getVariables();
-        data.put("instance_id", (Long) variables.get("survey_instance_id"));
-        List<AnswerDetailDO> instanceData = surveyService.getAnswerDetailByAnswerId((Long) variables.get("survey_instance_id"));
-        data.put("instance_data", instanceData);
-        return data;
-    }
-
-    private Map getVariables(){
-        RuntimeService runtimeService = processEngine.getRuntimeService();
-        return runtimeService.getVariables(processInstance.getId());
-    }
-
-
-
-
-    public void submit_set_goal_qst(DayitemStepSubmitReqVO submitReqVO, Task currentTask){
-        surveyService.submitSurveyForFlow(submitReqVO.getStep_data().getSurvey());
-    }
-
-    public Map<String, Object> auto_my_actions_qst(Map data, Task currentTask){
-        Map variables = getVariables();
-        data.put("instance_id", variables.get("survey_instance_id"));
-
-        List<AnswerDetailDO> instanceData = surveyService.getAnswerDetailByAnswerId((Long) variables.get("survey_instance_id"));
-        data.put("instance_data", instanceData);
-        return data;
-    }
-
-    public void submit_my_actions_qst(DayitemStepSubmitReqVO submitReqVO, Task currentTask){
+        dayitemInstanceService.updateDayitemInstanceExtAttr(dayitemInstanceId, USER_TROUBLE_CATEGORIES, troublesCategory);
         surveyService.submitSurveyForFlow(submitReqVO.getStep_data().getSurvey());
     }
 }

@@ -15,6 +15,8 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.yudao.module.therapy.taskflow.Const.DAYITEM_INSTANCE_ID;
+
 @Component
 public class MoodScoreFlow extends BaseFlow {
     @Resource
@@ -36,25 +38,25 @@ public class MoodScoreFlow extends BaseFlow {
     @Override
     public void onFlowEnd(DelegateExecution execution) {
         Map variables = execution.getVariables();
-        Long dayItemInstanceId = (Long) variables.get("dayItemInstanceId");
+        Long dayItemInstanceId = (Long) variables.get(DAYITEM_INSTANCE_ID);
         treatmentDayitemInstanceMapper.finishDayItemInstance(dayItemInstanceId);
     }
 
-    public Map<String, Object> auto_mood_ruler_qst(Map data, Task currentTask){
+    public Map<String, Object> auto_mood_ruler_qst(Container container,Map data, Task currentTask){
         return data;
     }
 
-    public void submit_mood_ruler_qst(Map variables, Task currentTask){
+    public void submit_mood_ruler_qst(Container container,Map variables, Task currentTask){
         RuntimeService runtimeService = processEngine.getRuntimeService();
         int moodScore = (int) variables.get("moodScore");
-        runtimeService.setVariable(processInstance.getId(), "moodScore", moodScore);
+        runtimeService.setVariable(container.getProcessInstanceId(), "moodScore", moodScore);
     }
 
-    public void auto_mood_respond(Map data, Task currentTask){
+    public void auto_mood_respond(Container container,Map data, Task currentTask){
         data.put("content", "你的心情评分是" + data.get("moodScore"));
     }
 
-    public void auto_mood_diary_qst(Map data, Task currentTask){
+    public void auto_mood_diary_qst(Container container,Map data, Task currentTask){
         data.put("content", "请填写今天的心情日记");
     }
 }

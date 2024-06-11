@@ -15,7 +15,9 @@
       {
         "step_type":  "ai_check_primary_troubles",
         "step_data": {},
-        "service_task":  true, "implementation":  "cn.iocoder.yudao.module.therapy.taskflow.servicetasks.AICheckUserTroublesCategory"
+        "service_task":  true,
+        "delegateExpression": "#{aICheckUserTroublesCategory}",
+        "implementation--omit":  "cn.iocoder.yudao.module.therapy.taskflow.servicetasks.AICheckUserTroublesCategory"
       }
     ],
     "choose_trouble_category": [
@@ -63,8 +65,8 @@
     {"source": "start", "target": "guide"},
     {"source": "guide", "target": "primary_troubles"},
     {"source": "primary_troubles", "type":  "ExclusiveGate",
-      "next_true": "choose_trouble_category",
-      "next_false": "set_goals", "variable":  "primary_troubles_is_set"},
+      "next_true": "set_goals",
+      "next_false": "choose_trouble_category", "variable":  "primary_troubles_is_set"},
     {"source": "choose_trouble_category", "target": "try_treatment_confirm"},
     {"source": "try_treatment_confirm", "type":  "ExclusiveGate",
       "next_true": "set_goals",
