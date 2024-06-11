@@ -96,6 +96,16 @@ public class TreatmentController {
         return success(TreatmentChatHistoryConvert.convert(messages));
     }
 
+    @PostMapping("/{code}/{id}/chat-history")
+    @Operation(summary = "获取用户治疗的聊天记录-主聊天页面")
+    @PreAuthenticated
+    public CommonResult<Long> addChatHistory(@PathVariable("code") String code,
+                                             @PathVariable("id") Long treatmentInstanceId,
+                                             @RequestBody Map map) {
+        treatmentChatHistoryService.addUserChatMessage(getLoginUserId(), treatmentInstanceId, map);
+        return success(1L);
+    }
+
     @PostMapping("/dayitem/{dayitem_instance_id}/complete")
     @Operation(summary = "完成子任务")
     @PreAuthenticated
@@ -126,6 +136,17 @@ public class TreatmentController {
         return success(TreatmentChatHistoryConvert.convert(messages));
     }
 
+    @PostMapping("/dayitem/{dayitem_instance_id}/chat-history")
+    @Operation(summary = "获取用户治疗的聊天记录-子任务页面")
+    @PreAuthenticated
+    public CommonResult<Long> getTaskChatHistory(
+            @PathVariable("dayitem_instance_id") Long dayitem_instance_id,
+            @RequestBody Map map) {
+        Long userId = getLoginUserId();
+        treatmentChatHistoryService.addTaskUserChatMessage(userId, 0L, dayitem_instance_id, map);
+        return success(1L);
+    }
+
     @PostMapping("/{code}/taskflow/{dayitem_id}/create")
     @Operation(summary = "创建任务流程")
     @PreAuthenticated // TODO should be admin
@@ -147,6 +168,7 @@ public class TreatmentController {
         DayitemStepSubmitRespVO.StepRespVO stepRespVO = new DayitemStepSubmitRespVO.StepRespVO();
         stepRespVO.setStatus("SUCCESS");
         resp.setStep_resp(stepRespVO);
+        treatmentChatHistoryService.addTaskUserSubmitMessage(userId, 0L, dayitem_instance_id, submitReqVO);
         return success(resp);
     }
 

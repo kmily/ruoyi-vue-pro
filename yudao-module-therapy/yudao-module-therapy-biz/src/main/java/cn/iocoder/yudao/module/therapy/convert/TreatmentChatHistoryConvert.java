@@ -14,6 +14,7 @@ public class TreatmentChatHistoryConvert {
             vo.setMessage(item.getMessage());
             vo.setIsSystem(item.isSystem());
             vo.setCreateTime(item.getCreateTime());
+            vo.setSource(item.getSource());
             result.add(vo);
         }
         return result;

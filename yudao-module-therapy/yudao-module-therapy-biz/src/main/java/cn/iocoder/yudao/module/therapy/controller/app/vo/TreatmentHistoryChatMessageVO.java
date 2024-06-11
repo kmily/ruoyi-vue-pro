@@ -18,4 +18,7 @@ public class TreatmentHistoryChatMessageVO {
 
         @Schema(description = "消息时间", example = "")
         private LocalDateTime createTime;
+
+        @Schema(description = "消息来源", example = "system")
+        private String source;
 }

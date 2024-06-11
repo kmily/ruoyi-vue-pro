@@ -179,6 +179,7 @@ CREATE TABLE `hlgyy_treatment_chat_history`  (
 `treatment_instance_id` bigint NOT NULL COMMENT '治疗流程实例id',
 `is_system` bit(1) NOT NULL DEFAULT b'1' COMMENT '是否系统消息',
 `treatment_dayitem_instance_id` bigint NOT NULL COMMENT '治疗流程实例每日项目 id',
+`source` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'system' COMMENT '消息来源',
 
 `tenant_id` bigint NOT NULL COMMENT '租户id',
 `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '创建者',

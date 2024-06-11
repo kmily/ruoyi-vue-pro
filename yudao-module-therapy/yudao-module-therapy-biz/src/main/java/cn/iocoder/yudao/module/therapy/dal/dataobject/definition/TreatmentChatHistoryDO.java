@@ -15,6 +15,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TreatmentChatHistoryDO extends BaseDO {
+    public static String SOURCE_SYSTEM = "system";
+    public static String SOURCE_USER = "user";
+    public static String SOURCE_USER_SUBMIT = "user_submit";
+
 
     public static final Long MAIN_TREATMENT_DAYITEM_INSTANCE_ID = 0L; // 主治疗日程项实例，用0表示
 
@@ -30,4 +34,6 @@ public class TreatmentChatHistoryDO extends BaseDO {
     private boolean isSystem;
 
     private Long treatmentDayitemInstanceId;
+
+    private String source; // system, user, user_sumbit
 }
