@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.therapy.service.impl;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 import cn.iocoder.yudao.module.system.service.dict.DictDataService;
+import cn.iocoder.yudao.module.therapy.controller.admin.VO.AutomaticThinkingRecognitionChatHistoriesVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.chat.ChatMessageDO;
 import cn.iocoder.yudao.module.therapy.dal.mysql.chat.ChatMessageMapper;
 import cn.iocoder.yudao.module.therapy.service.AIChatService;
@@ -14,7 +15,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.xingyuv.captcha.util.JsonUtil;
 import com.zhipu.oapi.ClientV4;
 import com.zhipu.oapi.Constants;
 import com.zhipu.oapi.service.v4.model.ChatCompletionRequest;
@@ -24,7 +24,6 @@ import com.zhipu.oapi.service.v4.model.ChatMessageRole;
 import com.zhipu.oapi.service.v4.model.Choice;
 import com.zhipu.oapi.service.v4.model.ModelApiResponse;
 import com.zhipu.oapi.service.v4.model.ModelData;
-import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import liquibase.util.BooleanUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -35,11 +34,9 @@ import reactor.core.scheduler.Schedulers;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.sql.SQLException;
-import java.sql.Wrapper;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Author:lidongw_1
@@ -184,14 +181,19 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
      * @return
      */
     @Override
-    public Flux<Object> automaticThinkingRecognition(Long userId, String conversationId, String content) {
+    public Flux<SSEMsgDTO> automaticThinkingRecognition(Long userId, String conversationId, String content) {
 
         //保存用户消息
         saveUserChatMessage(conversationId, userId,0L, UserTypeEnum.USER, content);
         DictDataDO dictDataDO = dictDataService.parseDictData("ai_system_prompt", "automatic_thinking_recognition_prompt");
         if (dictDataDO == null) {
+            SSEMsgDTO sseMsgDTO = new SSEMsgDTO();
+            sseMsgDTO.setContent("----END----");
+            sseMsgDTO.setFinished(true);
+            sseMsgDTO.setCode(500);
+            sseMsgDTO.setMsg("系统提示未配置");
             log.warn("dictDataDO is null, dictType:{} label:{}", "ai_system_prompt", "juvenile_problems_classification");
-            return Flux.just("系统提示未配置", "----END----");
+            return Flux.just(sseMsgDTO);
         }
         List<ChatMessage> chatMessages = assembleHistoryList(conversationId,dictDataDO.getValue());
 ;
@@ -214,13 +216,28 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
                 sseMsgDTO.setContent("----END----");
                 sseMsgDTO.setFinished(true);
                 sseMsgDTO.setCode(200);
-                emitter.next(JSON.toJSONString(sseMsgDTO));
+                emitter.next(sseMsgDTO);
                 saveUserChatMessage(conversationId, 0L,userId, UserTypeEnum.ROBOT, sb.toString());
                 emitter.complete();
-            })).publishOn(Schedulers.boundedElastic());
+            })).publishOn(Schedulers.boundedElastic()).cast(SSEMsgDTO.class);
         } else {
-            return Flux.error(new RuntimeException("API call failed"));
+            return Flux.error(new RuntimeException("API call failed")).cast(SSEMsgDTO.class);
         }
+    }
+
+    @Override
+    public List<ChatMessageDO> queryChatHistories(Long userId, Integer pageNo, Integer pageSize) {
+
+        QueryWrapper<ChatMessageDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("send_user_id",userId);
+        queryWrapper.or();
+        queryWrapper.eq("receive_user_id",userId);
+        queryWrapper.orderByDesc("id");
+        //分页
+        queryWrapper.last("limit " + (pageNo - 1) * pageSize + "," + pageSize);
+        List<ChatMessageDO> chatMessageDOS = chatMessageMapper.selectList(queryWrapper);
+
+        return chatMessageDOS;
     }
 
     private List<ChatMessage> assembleHistoryList(String conversationId,String sysPrompt){
