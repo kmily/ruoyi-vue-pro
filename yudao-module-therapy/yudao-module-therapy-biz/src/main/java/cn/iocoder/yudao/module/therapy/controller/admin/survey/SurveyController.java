@@ -1,18 +1,23 @@
 package cn.iocoder.yudao.module.therapy.controller.admin.survey;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.*;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.TreatmentScheduleRespVO;
 import cn.iocoder.yudao.module.therapy.convert.SurveyConvert;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentScheduleDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
 import cn.iocoder.yudao.module.therapy.service.SurveyService;
+import cn.iocoder.yudao.module.therapy.service.TreatmentScheduleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,13 +26,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.SURVEY_NOT_EXISTS;
+import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.SURVEY_QUESTION_TYPE_CHANGE;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -44,6 +47,8 @@ public class SurveyController {
     private SurveyService surveyService;
     @Resource
     private AdminUserApi adminUserApi;
+    @Resource
+    private TreatmentScheduleService treatmentScheduleService;
 
     @PostMapping("/create")
     @Operation(summary = "创建问卷")
@@ -107,6 +112,10 @@ public class SurveyController {
     @Operation(summary = "获得患者答题列表")
     public CommonResult<PageResult<SurveyAnswerRespVO>> getSurveyAnswerPage(@Valid SurveyAnswerPageReqVO reqVO) {
         reqVO.setUserId(getLoginUserId());
+        if (reqVO.getSurveyType().equals(SurveyType.SCHEDULE_LIST)) {
+            return success(this.getScheduleList(reqVO));
+        }
+
         PageResult<SurveyAnswerDO> pageResult = surveyService.getSurveyAnswerPage(reqVO);
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(new PageResult<>(pageResult.getTotal()));
@@ -120,12 +129,28 @@ public class SurveyController {
         return success(new PageResult<>(SurveyConvert.INSTANCE.convertList(treatmentSurveyDOMap, pageResult.getList()), pageResult.getTotal()));
     }
 
+    private PageResult<SurveyAnswerRespVO> getScheduleList(SurveyAnswerPageReqVO reqVO) {
+        PageResult<TreatmentScheduleDO> result = treatmentScheduleService.getTreatmentSchedulePage(reqVO);
+        List<SurveyAnswerRespVO> list = new ArrayList<>();
+        for (TreatmentScheduleDO item : result.getList()) {
+            SurveyAnswerRespVO respVO = new SurveyAnswerRespVO();
+            respVO.setId(item.getId());
+            respVO.setTitle(item.getName());
+            respVO.setCreateTime(item.getCreateTime());
+            respVO.setUpdateTime(item.getUpdateTime());
+            respVO.setSource(2);
+            respVO.setSurveyType(SurveyType.SCHEDULE_LIST.getType());
+            list.add(respVO);
+        }
+        return new PageResult<>(list, result.getTotal());
+    }
+
     @GetMapping("/initSurveyAnswer")
     @Parameter(name = "surveyCode", description = "问卷code", required = true, example = "1024")
     @Parameter(name = "source", description = "source", required = true, example = "1024")
     @Operation(summary = "实例化答题实例")
-    public CommonResult<Long> initSurveyAnswer(@RequestParam("surveyCode") String surveyCode,@RequestParam("source") Integer source){
-        return success(surveyService.initSurveyAnswer(surveyCode,source));
+    public CommonResult<Long> initSurveyAnswer(@RequestParam("surveyCode") String surveyCode, @RequestParam("source") Integer source) {
+        return success(surveyService.initSurveyAnswer(surveyCode, source));
     }
 
     @PostMapping("/submitForTools")
@@ -138,9 +163,18 @@ public class SurveyController {
 
     @PostMapping("/submitForFlow")
     @Operation(summary = "工具箱提交问卷")
-    public CommonResult<Long> submitForFlow(@Valid @RequestBody SubmitSurveyReqVO reqVO){
+    public CommonResult<Long> submitForFlow(@Valid @RequestBody SubmitSurveyReqVO reqVO) {
 //        reqVO.setSource(1);
         return success(surveyService.submitSurveyForFlow(reqVO));
+    }
+
+    @GetMapping("/getSchedule")
+    @Operation(summary = "获得患者日程")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+//    @PreAuthorize("@ss.hasPermission('hlgyy:treatment-schedule:query')")
+    public CommonResult<TreatmentScheduleRespVO> getTreatmentSchedule(@RequestParam("id") Long id) {
+        TreatmentScheduleDO treatmentSchedule = treatmentScheduleService.getTreatmentSchedule(id);
+        return success(BeanUtils.toBean(treatmentSchedule, TreatmentScheduleRespVO.class));
     }
 
 }

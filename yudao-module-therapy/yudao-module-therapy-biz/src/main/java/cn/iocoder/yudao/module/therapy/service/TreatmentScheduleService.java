@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.therapy.service;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyAnswerPageReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SignInReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.TreatmentScheduleSaveReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentScheduleDO;
@@ -39,12 +40,14 @@ public interface TreatmentScheduleService {
 
     List<TreatmentScheduleDO> getScheduleList(LocalDate day);
 
-//    /**
-//     * 获得患者日程分页
-//     *
-//     * @param pageReqVO 分页查询
-//     * @return 患者日程分页
-//     */
-//    PageResult<TreatmentScheduleDO> getTreatmentSchedulePage(TreatmentSchedulePageReqVO pageReqVO);
+    /**
+     * 获得患者日程分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 患者日程分页
+     */
+    PageResult<TreatmentScheduleDO> getTreatmentSchedulePage(SurveyAnswerPageReqVO pageReqVO);
+
+
 
 }

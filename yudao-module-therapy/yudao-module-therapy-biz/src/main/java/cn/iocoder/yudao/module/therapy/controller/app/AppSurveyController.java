@@ -93,12 +93,4 @@ public class AppSurveyController {
         return success(BeanUtils.toBean(pageResult, TreatmentScheduleRespVO.class));
     }
 
-//    @GetMapping("/page")
-//    @Operation(summary = "获得患者日程分页")
-//    @PreAuthorize("@ss.hasPermission('hlgyy:treatment-schedule:query')")
-//    public CommonResult<PageResult<TreatmentScheduleRespVO>> getTreatmentSchedulePage(@Valid TreatmentSchedulePageReqVO pageReqVO) {
-//        PageResult<TreatmentScheduleDO> pageResult = treatmentScheduleService.getTreatmentSchedulePage(pageReqVO);
-//        return success(BeanUtils.toBean(pageResult, TreatmentScheduleRespVO.class));
-//    }
-
 }
