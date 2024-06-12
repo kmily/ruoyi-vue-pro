@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.im.service.message;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageListReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
@@ -19,6 +20,7 @@ import org.dromara.hutool.core.date.TimeUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -57,6 +59,9 @@ public class ImMessageServiceImpl implements ImMessageService {
     @Override
     public List<ImMessageDO> pullMessageList(Long userId, Long sequence, Integer size) {
         List<Long> messageIds = imInboxService.selectMessageIdsByUserIdAndSequence(userId, sequence, size);
+        if (CollUtil.isEmpty(messageIds)) {
+            return Collections.emptyList();
+        }
         return imMessageMapper.selectBatchIds(messageIds);
     }
 
@@ -70,6 +75,7 @@ public class ImMessageServiceImpl implements ImMessageService {
     }
 
     private ImMessageDO saveMessage(Long fromUserId, ImMessageSendReqVO message) {
+        // TODO 芋艿：消息格式的校验
         // 1. 校验接收人是否存在
         validateReceiverIdExists(message);
         // 2. 查询发送人信息

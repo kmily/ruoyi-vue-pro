@@ -33,10 +33,13 @@ public enum ImMessageContentTypeEnum implements IntArrayValuable {
     QUOTE(114, "引用消息"),
     FACE(115, "表情消息"),
     ADVANCED_REVOKE(118, "高级撤回消息"),
+
     // ========== 好友通知 1200-1299 ===========
     FRIEND_ADDED(1201, "双方成为好友通知"),
+
     // ========== 系统通知 1400 ==========
     OA_NOTIFICATION(1400, "系统通知"),
+
     // ========== 群相关 1500-1599 ==========
     GROUP_CREATED(1501, "群创建通知"),
     GROUP_INFO_CHANGED(1502, "群信息改变通知"),
@@ -53,6 +56,7 @@ public enum ImMessageContentTypeEnum implements IntArrayValuable {
     GROUP_ANNOUNCEMENT_UPDATED(1519, "群公告改变通知"),
     GROUP_NAME_UPDATED(1520, "群名称改变通知"),
 
+    // TODO 芋艿：其它
     BURN_CHANGE(1701, "阅后即焚开启或关闭通知"),
     REVOKE(2101, "撤回消息通知");;
 
