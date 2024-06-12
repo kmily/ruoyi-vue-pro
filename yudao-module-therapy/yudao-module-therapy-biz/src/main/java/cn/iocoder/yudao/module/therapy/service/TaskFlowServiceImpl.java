@@ -4,10 +4,7 @@ import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemInstanceDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDayitemDO;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.*;
-import cn.iocoder.yudao.module.therapy.taskflow.BaseFlow;
-import cn.iocoder.yudao.module.therapy.taskflow.Container;
-import cn.iocoder.yudao.module.therapy.taskflow.Engine;
-import cn.iocoder.yudao.module.therapy.taskflow.GoalAndMotivationFlow;
+import cn.iocoder.yudao.module.therapy.taskflow.*;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.springframework.stereotype.Component;
@@ -45,6 +42,9 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
     GoalAndMotivationFlow goalAndMotivationFlow;
 
     @Resource
+    ScaleFlow scaleFlow;
+
+    @Resource
     private Engine engine;
 
     private Container getContainer(BaseFlow flow, TreatmentDayitemInstanceDO dayitemInstanceDO, TreatmentFlowDayitemDO flowDayitemDO){
@@ -69,6 +69,8 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
         switch (flowDayitemDO.getItemType()){
             case "problem_goal_motive":
                 return goalAndMotivationFlow;
+            case "scale":
+                return scaleFlow;
             default:
                 return null;
         }
@@ -91,8 +93,14 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
                 flowDayitemDO.setTaskFlowId(taskFlowId);
                 treatmentFlowDayitemMapper.updateById(flowDayitemDO);
                 break;
-            default:
+            case "scale":
+                ScaleFlow scaleFlow = new ScaleFlow(engine.getEngine());
+                String scaleFlowId = scaleFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
+                flowDayitemDO.setTaskFlowId(scaleFlowId);
+                treatmentFlowDayitemMapper.updateById(flowDayitemDO);
                 break;
+            default:
+                throw new RuntimeException("not supported task flow");
         }
     }
 

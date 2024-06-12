@@ -3,12 +3,10 @@ package cn.iocoder.yudao.module.therapy.taskflow;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.*;
 import org.flowable.bpmn.model.Process;
-import org.flowable.engine.HistoryService;
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.TaskService;
+import org.flowable.engine.*;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -17,8 +15,11 @@ import org.flowable.task.api.Task;
 
 import javax.annotation.PreDestroy;
 import java.awt.event.ContainerAdapter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -260,6 +261,26 @@ public abstract class BaseFlow {
             }
         }
         return bpmnModel;
+    }
+
+
+    public String deploy(Long id, String settingsResourceFile) {
+        Map settings;
+        ObjectMapper objectMapper = new ObjectMapper();
+        try (InputStream inputStream = getClass().getResourceAsStream(settingsResourceFile)) {
+            settings = objectMapper.readValue(inputStream, Map.class);
+            // use settings
+        } catch (IOException e) {
+            // handle exception
+            throw new RuntimeException("Failed to read settings from resources/scale.json");
+        }
+        BpmnModel bpmnModel = createBPMNModel(id, settings);
+        RepositoryService repositoryService = processEngine.getRepositoryService();
+        repositoryService.createDeployment()
+                .addBpmnModel("GoalAndMotivationFlow-" + String.valueOf(id) + ".bpmn", bpmnModel)
+                .deploy();
+        System.out.println(new String(new BpmnXMLConverter().convertToXML(bpmnModel), StandardCharsets.UTF_8));
+        return getProcessName(id);
     }
 
 

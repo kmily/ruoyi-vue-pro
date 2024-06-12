@@ -259,4 +259,9 @@ public class SurveyServiceImpl implements SurveyService {
     public List<AnswerDetailDO> getAnswerDetailByAnswerId(Long answerId) {
         return surveyAnswerDetailMapper.getByAnswerId(answerId);
     }
+
+    public Long getSurveyIdByCode(String surveyCode){
+        TreatmentSurveyDO treatmentSurveyDO = treatmentSurveyMapper.selectByCode(surveyCode);
+        return treatmentSurveyDO.getId();
+    }
 }
