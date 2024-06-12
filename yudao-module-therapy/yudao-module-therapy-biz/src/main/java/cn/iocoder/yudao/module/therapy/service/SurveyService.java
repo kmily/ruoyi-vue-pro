@@ -97,5 +97,7 @@ public interface SurveyService {
      */
     List<AnswerDetailDO> getAnswerDetailByAnswerId(Long answerId);
 
+    Long getSurveyIdByCode(String surveyCode);
+
 
 }
