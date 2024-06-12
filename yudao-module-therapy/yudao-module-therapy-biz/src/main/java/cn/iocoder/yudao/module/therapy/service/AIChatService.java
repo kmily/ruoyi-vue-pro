@@ -1,6 +1,11 @@
 package cn.iocoder.yudao.module.therapy.service;
 
+import cn.iocoder.yudao.module.therapy.controller.admin.VO.AutomaticThinkingRecognitionChatHistoriesVO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.chat.ChatMessageDO;
+import cn.iocoder.yudao.module.therapy.service.dto.SSEMsgDTO;
 import reactor.core.publisher.Flux;
+
+import java.util.List;
 
 /**
  * Author: Lidong Wang <lidongw_1@example.com>
@@ -48,6 +53,7 @@ public interface AIChatService {
      * @param content        用户聊天问题
      * @return 结果
      */
-    Flux<Object> automaticThinkingRecognition(Long userId, String conversationId, String content);
+    Flux<SSEMsgDTO> automaticThinkingRecognition(Long userId, String conversationId, String content);
 
+    List<ChatMessageDO> queryChatHistories(Long userId, Integer pageNo, Integer pageSize);
 }

@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.AutomatedThinkingRequestVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.ProblemClassificationRequest;
 import cn.iocoder.yudao.module.therapy.service.AIChatService;
+import cn.iocoder.yudao.module.therapy.service.dto.SSEMsgDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
@@ -43,7 +44,7 @@ public class AppAIController {
     }
 
     @PostMapping(value = "/automated-thinking", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<Object> chat(@Valid @RequestBody AutomatedThinkingRequestVO req) {
+    public Flux<SSEMsgDTO> chat(@Valid @RequestBody AutomatedThinkingRequestVO req) {
 
         Long loginUserId = getLoginUserId();
         loginUserId = NumberUtils.toLong(loginUserId,Long.valueOf(req.getConversationId().hashCode()));

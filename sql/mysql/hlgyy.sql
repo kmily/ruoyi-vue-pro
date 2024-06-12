@@ -1,3 +1,18 @@
+# DROP TABLE IF EXISTS `hlgyy_member_user_ext`;
+create table hlgyy_member_user_ext
+(
+    `id`                     bigint auto_increment comment '自增ID',
+    `appointment_date`       date                                null comment '预约日期',
+    `appointment_time_range` varchar(20)                         not null comment '预约时间段范围',
+    `user_id`                bigint                              null comment '用户 ID',
+    `created_at`             timestamp default current_timestamp null comment '创建时间',
+    `updated_at`             timestamp default current_timestamp null on update CURRENT_TIMESTAMP,
+    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+    `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`) USING BTREE,
+    constraint `uniq_idx_user_id` unique key (user_id)
+)ENGINE = InnoDB comment '治疗用户扩展表' CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 DROP TABLE IF EXISTS `hlgyy_member_user_ext`;
 CREATE TABLE `hlgyy_member_user_ext`  (
   `user_id` bigint NOT NULL COMMENT '用户 ID',
@@ -34,4 +49,28 @@ create table hlgyy_icbt_db.hlgyy_ai_chat_message
 
 create index idx_create_time
     on hlgyy_icbt_db.hlgyy_ai_chat_message (created_at);
+
+
+
+create table hlgyy_icbt_db.hlgyy_answer_detail
+(
+    id               bigint auto_increment
+        primary key,
+    belongSurveyId   bigint                       not null comment '所属问卷',
+    belongSurveyCode varchar(255)                 not null comment '所属问卷编码',
+    belongAnswerId   bigint                       not null comment '一次答题id',
+    belongQstCode    varchar(255)                 not null comment '所属问卷题目编码',
+    qstId            bigint                       not null comment '所属问卷题目',
+    answer           longtext collate utf8mb4_bin null comment '答案',
+    qstType          tinyint                      not null comment '问题类型',
+    qstContext       longtext collate utf8mb4_bin null comment '题干',
+    createTime       datetime                     not null comment '创建时间',
+    creator          varchar(50) charset latin1   not null comment '创建人',
+    updater          varchar(50) charset latin1   not null comment '最后更新人',
+    updateTime       datetime                     not null comment '最后更新时间',
+    deleted          bit default b'0'             null
+);
+
+create index ix_belongSurveyId
+    on hlgyy_icbt_db.hlgyy_answer_detail (belongSurveyId);
 

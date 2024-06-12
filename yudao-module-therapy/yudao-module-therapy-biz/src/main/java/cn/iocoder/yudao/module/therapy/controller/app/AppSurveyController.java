@@ -1,18 +1,27 @@
 package cn.iocoder.yudao.module.therapy.controller.app;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.SignInReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.TreatmentScheduleRespVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.TreatmentScheduleSaveReqVO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentScheduleDO;
 import cn.iocoder.yudao.module.therapy.service.SurveyService;
+import cn.iocoder.yudao.module.therapy.service.TreatmentScheduleService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.repository.query.Param;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -24,7 +33,8 @@ public class AppSurveyController {
 
     @Resource
     private SurveyService surveyService;
-
+    @Resource
+    private TreatmentScheduleService treatmentScheduleService;
     @PostMapping("/submitForTools")
     @Operation(summary = "流程提交问卷")
 //    @PreAuthorize("@ss.hasPermission('system:user:create')")
@@ -39,4 +49,56 @@ public class AppSurveyController {
 //        reqVO.setSource(1);
         return success(surveyService.submitSurveyForFlow(reqVO));
     }
+
+
+
+    @PostMapping("/create")
+    @Operation(summary = "创建患者日程")
+//    @PreAuthorize("@ss.hasPermission('hlgyy:treatment-schedule:create')")
+    public CommonResult<Long> createTreatmentSchedule(@Valid @RequestBody TreatmentScheduleSaveReqVO createReqVO) {
+        return success(treatmentScheduleService.createTreatmentSchedule(createReqVO));
+    }
+
+    @DeleteMapping("/delete")
+    @Operation(summary = "删除患者日程")
+    @Parameter(name = "id", description = "编号", required = true)
+//    @PreAuthorize("@ss.hasPermission('hlgyy:treatment-schedule:delete')")
+    public CommonResult<Boolean> deleteTreatmentSchedule(@RequestParam("id") Long id) {
+        treatmentScheduleService.deleteTreatmentSchedule(id);
+        return success(true);
+    }
+
+    @GetMapping("/get")
+    @Operation(summary = "获得患者日程")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+//    @PreAuthorize("@ss.hasPermission('hlgyy:treatment-schedule:query')")
+    public CommonResult<TreatmentScheduleRespVO> getTreatmentSchedule(@RequestParam("id") Long id) {
+        TreatmentScheduleDO treatmentSchedule = treatmentScheduleService.getTreatmentSchedule(id);
+        return success(BeanUtils.toBean(treatmentSchedule, TreatmentScheduleRespVO.class));
+    }
+
+    @PostMapping("/signIn")
+    @Operation(summary = "创建患者日程")
+//    @PreAuthorize("@ss.hasPermission('hlgyy:treatment-schedule:create')")
+    public CommonResult<Boolean> signIn(@Valid @RequestBody SignInReqVO reqVO) {
+        treatmentScheduleService.signIn(reqVO);
+        return success(true);
+    }
+
+    @GetMapping("/list")
+    @Operation(summary = "获得患者指定日期日程")
+//    @PreAuthorize("@ss.hasPermission('hlgyy:treatment-schedule:query')")
+    public CommonResult<List<TreatmentScheduleRespVO>> getTreatmentSchedulePage(@Valid @Param("day") LocalDate day) {
+        List<TreatmentScheduleDO> pageResult = treatmentScheduleService.getScheduleList(day);
+        return success(BeanUtils.toBean(pageResult, TreatmentScheduleRespVO.class));
+    }
+
+//    @GetMapping("/page")
+//    @Operation(summary = "获得患者日程分页")
+//    @PreAuthorize("@ss.hasPermission('hlgyy:treatment-schedule:query')")
+//    public CommonResult<PageResult<TreatmentScheduleRespVO>> getTreatmentSchedulePage(@Valid TreatmentSchedulePageReqVO pageReqVO) {
+//        PageResult<TreatmentScheduleDO> pageResult = treatmentScheduleService.getTreatmentSchedulePage(pageReqVO);
+//        return success(BeanUtils.toBean(pageResult, TreatmentScheduleRespVO.class));
+//    }
+
 }
