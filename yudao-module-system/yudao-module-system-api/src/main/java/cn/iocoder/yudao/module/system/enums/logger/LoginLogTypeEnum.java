@@ -14,9 +14,11 @@ public enum LoginLogTypeEnum {
     LOGIN_SOCIAL(101), // 使用社交登录
     LOGIN_MOBILE(103), // 使用手机登陆
     LOGIN_SMS(104), // 使用短信登陆
+    LOGIN_IMPERSONATE(105), // 模拟身份登陆
 
     LOGOUT_SELF(200),  // 自己主动登出
     LOGOUT_DELETE(202), // 强制退出
+    STOP_IMPERSONATE(203), // 退出模拟身份登陆
     ;
 
     /**

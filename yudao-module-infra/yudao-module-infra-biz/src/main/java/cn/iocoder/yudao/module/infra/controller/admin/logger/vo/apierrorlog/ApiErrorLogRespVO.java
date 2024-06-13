@@ -17,7 +17,7 @@ public class ApiErrorLogRespVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @ExcelProperty("编号")
-    private Integer id;
+    private Long id;
 
     @Schema(description = "链路追踪编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "66600cb6-7852-11eb-9439-0242ac130002")
     @ExcelProperty("链路追踪编号")

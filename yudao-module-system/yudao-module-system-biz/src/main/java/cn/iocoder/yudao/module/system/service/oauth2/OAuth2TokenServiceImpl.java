@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.service.oauth2;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapBuilder;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -10,6 +11,7 @@ import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstant
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.token.OAuth2AccessTokenPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
@@ -29,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -170,15 +173,26 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
     /**
      * 加载用户信息，方便 {@link cn.iocoder.yudao.framework.security.core.LoginUser} 获取到昵称、部门等信息
      *
-     * @param userId 用户编号
+     * @param userId   用户编号
      * @param userType 用户类型
      * @return 用户信息
      */
     private Map<String, String> buildUserInfo(Long userId, Integer userType) {
         if (userType.equals(UserTypeEnum.ADMIN.getValue())) {
             AdminUserDO user = adminUserService.getUser(userId);
-            return MapUtil.builder(LoginUser.INFO_KEY_NICKNAME, user.getNickname())
-                    .put(LoginUser.INFO_KEY_DEPT_ID, StrUtil.toStringOrNull(user.getDeptId())).build();
+
+            MapBuilder<String, String> builder = MapUtil.builder(LoginUser.INFO_KEY_NICKNAME, user.getNickname())
+                    .put(LoginUser.INFO_KEY_DEPT_ID, StrUtil.toStringOrNull(user.getDeptId()));
+
+            Optional.ofNullable(SecurityFrameworkUtils.getLoginUser())
+                    // 未设置初始用户
+                    .filter(loginUser -> StrUtil.isEmpty(loginUser.getInfo().get(LoginUser.INFO_KEY_SOURCE_USER_ID)))
+                    // 已登录用户调用到该方法判定为模拟身份登录
+                    .ifPresent(loginUser ->
+                            builder.put(LoginUser.INFO_KEY_SOURCE_USER_ID, String.valueOf(loginUser.getId()))
+                                    .put(LoginUser.INFO_KEY_SOURCE_TENANT_ID, String.valueOf(loginUser.getTenantId()))
+                    );
+            return builder.build();
         } else if (userType.equals(UserTypeEnum.MEMBER.getValue())) {
             // 注意：目前 Member 暂时不读取，可以按需实现
             return Collections.emptyMap();

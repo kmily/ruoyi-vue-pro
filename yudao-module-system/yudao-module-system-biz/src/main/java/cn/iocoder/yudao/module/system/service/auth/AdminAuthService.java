@@ -70,4 +70,18 @@ public interface AdminAuthService {
      */
     AuthLoginRespVO refreshToken(String refreshToken);
 
+    /**
+     * 模拟身份登录
+     *
+     * @param reqVO 模拟身份登录入参
+     * @return 登录结果
+     */
+    AuthLoginRespVO impersonate(AuthImpersonateLoginReqVO reqVO);
+
+    /**
+     * 退出模拟身份登录
+     *
+     * @return 原用户登录结果
+     */
+    AuthLoginRespVO stopImpersonation();
 }
