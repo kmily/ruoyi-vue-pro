@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.therapy.strategy;
 
+import cn.iocoder.yudao.module.therapy.config.ScaleReportAutoConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -7,5 +9,11 @@ import org.springframework.stereotype.Component;
  */
 @Component("isi_scaleSurveyStrategy")
 public class ISIScaleSurveyStrategy extends AbstractStrategy implements SurveyStrategy {
+    @Autowired
+    private ScaleReportAutoConfiguration scaleReportAutoConfiguration;
 
+    @Override
+    public void generateReport(Long answerId) {
+        super.generateReport(answerId,scaleReportAutoConfiguration.getIsi());
+    }
 }

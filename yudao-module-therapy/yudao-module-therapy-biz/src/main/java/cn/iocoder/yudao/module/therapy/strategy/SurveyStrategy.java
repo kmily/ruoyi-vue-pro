@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.therapy.strategy;
 import cn.hutool.json.JSONObject;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveySaveReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
 
@@ -65,4 +66,9 @@ public interface SurveyStrategy {
      */
     default void fillQuestion(SurveySaveReqVO vo) {
     }
+
+    /**
+     * 生成报告
+     */
+    default void generateReport(Long details){}
 }

@@ -168,6 +168,8 @@ public class SurveyServiceImpl implements SurveyService {
                 newDetails.add(detailDO);
             }
             surveyAnswerDetailMapper.insertBatch(newDetails);
+            SurveyStrategy surveyStrategy = surveyStrategyFactory.getSurveyStrategy(SurveyType.getByType(tsdo.getSurveyType()).getCode());
+            surveyStrategy.generateReport(answerId);
             return answerId;
         }
     }
@@ -217,6 +219,8 @@ public class SurveyServiceImpl implements SurveyService {
         if (CollectionUtil.isNotEmpty(newDetails)) {
             surveyAnswerDetailMapper.insertBatch(newDetails);
         }
+
+        surveyStrategy.generateReport(answerDO.getId());
     }
 
     @Transactional(rollbackFor = Exception.class)

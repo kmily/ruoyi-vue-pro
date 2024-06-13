@@ -168,13 +168,6 @@ public class SurveyController {
         return success(surveyService.submitSurveyForFlow(reqVO));
     }
 
-    @GetMapping("/getSchedule")
-    @Operation(summary = "获得患者日程")
-    @Parameter(name = "id", description = "编号", required = true, example = "1024")
-//    @PreAuthorize("@ss.hasPermission('hlgyy:treatment-schedule:query')")
-    public CommonResult<TreatmentScheduleRespVO> getTreatmentSchedule(@RequestParam("id") Long id) {
-        TreatmentScheduleDO treatmentSchedule = treatmentScheduleService.getTreatmentSchedule(id);
-        return success(BeanUtils.toBean(treatmentSchedule, TreatmentScheduleRespVO.class));
-    }
+
 
 }
