@@ -82,7 +82,7 @@ public class MoodScoreFlow extends BaseFlow {
         Long instance_id = (Long) variables.get("instance_id");
         Map result = new HashMap<>();
         result.put("instance_id", instance_id);
-        return data;
+        return result;
     }
 
     public void submit_mood_diary_qst(Container container,DayitemStepSubmitReqVO submitReqVO, Task currentTask){
