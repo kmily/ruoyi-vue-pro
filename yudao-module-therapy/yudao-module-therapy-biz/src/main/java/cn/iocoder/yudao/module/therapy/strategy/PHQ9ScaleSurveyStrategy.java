@@ -16,11 +16,12 @@ public class PHQ9ScaleSurveyStrategy extends AbstractStrategy implements SurveyS
         return SurveyStrategy.super.getSurveyReport(answerId);
     }
 
+    @Override
+    public void generateReport(Long details) {
+        super.generateScaleReport(details,scaleReportAutoConfiguration.getPhq9());
+    }
+
     @Autowired
     private ScaleReportAutoConfiguration scaleReportAutoConfiguration;
 
-    @Override
-    public void generateReport(Long answerId) {
-        super.generateReport(answerId,scaleReportAutoConfiguration.getPhq9());
-    }
 }

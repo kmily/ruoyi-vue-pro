@@ -30,14 +30,14 @@ public interface SurveyAnswerMapper extends BaseMapperX<SurveyAnswerDO> {
     }
 
     default List<SurveyAnswerDO> selectBySurveysAndDate(Long userId, LocalDate begin, LocalDate end, List<Integer> types) {
-        return selectList(Wrappers.lambdaQuery(SurveyAnswerDO.class)
+        return selectList(new LambdaQueryWrapperX<SurveyAnswerDO>()
                 .eq(SurveyAnswerDO::getCreator, userId)
-                .between(SurveyAnswerDO::getCreateTime, begin, end)
+                .betweenIfPresent(SurveyAnswerDO::getCreateTime, begin, end)
                 .in(SurveyAnswerDO::getSurveyType, types));
 
     }
 
-    default List<SurveyAnswerDO> selectBySurveyTypeAndUserId(Long userId,List<Integer> surveyType) {
+    default List<SurveyAnswerDO> selectBySurveyTypeAndUserId(Long userId, List<Integer> surveyType) {
         return selectList(Wrappers.lambdaQuery(SurveyAnswerDO.class)
                 .in(SurveyAnswerDO::getSurveyType, surveyType)
                 .eq(SurveyAnswerDO::getCreator, userId));

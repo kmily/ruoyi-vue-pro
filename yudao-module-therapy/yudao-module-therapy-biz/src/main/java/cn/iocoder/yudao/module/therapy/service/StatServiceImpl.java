@@ -100,8 +100,8 @@ public class StatServiceImpl implements StatService {
     }
 
     @Override
-    public List<SurveyAnswerDO> getMoodScoringList(Long userId, LocalDate begin, LocalDate end) {
-        return surveyAnswerMapper.selectBySurveysAndDate(userId,begin,end,Arrays.asList(SurveyType.MOOD_MARK.getType()));
+    public List<SurveyAnswerDO> getAnswerList(Long userId, LocalDate begin, LocalDate end,List<Integer> types) {
+        return surveyAnswerMapper.selectBySurveysAndDate(userId,begin,end,types);
     }
 
     @Override

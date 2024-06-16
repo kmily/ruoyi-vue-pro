@@ -264,8 +264,37 @@ public class SurveyServiceImpl implements SurveyService {
         return surveyAnswerDetailMapper.getByAnswerId(answerId);
     }
 
-    public Long getSurveyIdByCode(String surveyCode){
+    public Long getSurveyIdByCode(String surveyCode) {
         TreatmentSurveyDO treatmentSurveyDO = treatmentSurveyMapper.selectByCode(surveyCode);
         return treatmentSurveyDO.getId();
+    }
+
+    @Override
+    public SurveyAnswerDO getAnswerDO(Long id) {
+        return surveyAnswerMapper.selectById(id);
+    }
+
+    @Override
+    public SubmitSurveyReqVO getGoalMotive() {
+        List<SurveyAnswerDO> surveyAnswerDOS = surveyAnswerMapper.selectBySurveyTypeAndUserId(getLoginUserId(), Arrays.asList(SurveyType.PROBLEM_GOAL_MOTIVE.getType()));
+        Optional<SurveyAnswerDO> optional = surveyAnswerDOS.stream().max(Comparator.comparingLong(SurveyAnswerDO::getId));
+        if (!optional.isPresent()) {
+            return null;
+        }
+        List<AnswerDetailDO> answerDetailDOS = surveyAnswerDetailMapper.getByAnswerId(optional.get().getId());
+        if (CollectionUtil.isEmpty(answerDetailDOS)) {
+            return null;
+        }
+        SubmitSurveyReqVO vo = new SubmitSurveyReqVO();
+        vo.setId(optional.get().getId());
+        vo.setSurveyType(optional.get().getSurveyType());
+        vo.setQstList(new ArrayList<>());
+        for (AnswerDetailDO item : answerDetailDOS) {
+            AnAnswerReqVO reqVO=new AnAnswerReqVO();
+            reqVO.setQstCode(item.getBelongQstCode());
+            reqVO.setAnswer(item.getAnswer());
+            vo.getQstList().add(reqVO);
+        }
+        return vo;
     }
 }

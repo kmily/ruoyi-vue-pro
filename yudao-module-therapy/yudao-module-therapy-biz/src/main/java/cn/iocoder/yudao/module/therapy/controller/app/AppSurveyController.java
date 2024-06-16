@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.therapy.controller.app;
 
+import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SignInReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.TreatmentScheduleRespVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.TreatmentScheduleSaveReqVO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentScheduleDO;
 import cn.iocoder.yudao.module.therapy.service.SurveyService;
 import cn.iocoder.yudao.module.therapy.service.TreatmentScheduleService;
@@ -20,10 +22,12 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "C端 - 治疗问卷")
 @RestController
@@ -35,8 +39,9 @@ public class AppSurveyController {
     private SurveyService surveyService;
     @Resource
     private TreatmentScheduleService treatmentScheduleService;
+
     @PostMapping("/submitForTools")
-    @Operation(summary = "流程提交问卷")
+    @Operation(summary = "工具箱提交问卷")
 //    @PreAuthorize("@ss.hasPermission('system:user:create')")
     public CommonResult<Long> submitForTools(@Valid @RequestBody SubmitSurveyReqVO reqVO) {
 //        reqVO.setSource(2);
@@ -44,12 +49,11 @@ public class AppSurveyController {
     }
 
     @PostMapping("/submitForFlow")
-    @Operation(summary = "工具箱提交问卷")
-    public CommonResult<Long> submitForFlow(@Valid @RequestBody SubmitSurveyReqVO reqVO){
+    @Operation(summary = "流程提交问卷")
+    public CommonResult<Long> submitForFlow(@Valid @RequestBody SubmitSurveyReqVO reqVO) {
 //        reqVO.setSource(1);
         return success(surveyService.submitSurveyForFlow(reqVO));
     }
-
 
 
     @PostMapping("/createSchedule")
@@ -92,5 +96,12 @@ public class AppSurveyController {
         List<TreatmentScheduleDO> pageResult = treatmentScheduleService.getScheduleList(day);
         return success(BeanUtils.toBean(pageResult, TreatmentScheduleRespVO.class));
     }
+
+    @GetMapping("/getGoalMotive")
+    @Operation(summary = "获取目标与动机详情")
+    public CommonResult<SubmitSurveyReqVO> getGoalMotive() {
+        return success(surveyService.getGoalMotive());
+    }
+
 
 }

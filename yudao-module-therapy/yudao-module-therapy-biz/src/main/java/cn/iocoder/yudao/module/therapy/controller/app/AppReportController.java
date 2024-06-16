@@ -5,33 +5,29 @@ import cn.hutool.json.JSONObject;
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
-import cn.iocoder.yudao.module.therapy.controller.app.vo.AutomatedThinkingRequestVO;
-import cn.iocoder.yudao.module.therapy.controller.app.vo.ProblemClassificationRequest;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.AnAnswerReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.ScheduleStateRespVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
-import cn.iocoder.yudao.module.therapy.service.AIChatService;
 import cn.iocoder.yudao.module.therapy.service.StatService;
-import cn.iocoder.yudao.module.therapy.service.dto.SSEMsgDTO;
-import com.alibaba.fastjson.JSON;
-import com.xingyuv.captcha.util.JsonUtil;
+import cn.iocoder.yudao.module.therapy.service.SurveyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.validation.Valid;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.SURVEY_ANSWER_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -48,6 +44,9 @@ public class AppReportController {
 
     @Resource
     private StatService statService;
+
+    @Resource
+    private SurveyService surveyService;
 
     @GetMapping("/scheduleStat")
     @Operation(summary = "行为活动计划统计")
@@ -92,7 +91,7 @@ public class AppReportController {
     @Parameter(name = "end", description = "结束日期:yyyy-MM-dd", required = true, example = "2024-06-01")
     public CommonResult<List<KeyValue>> moodScoring(@RequestParam("begin") LocalDate begin
             , @RequestParam("end") LocalDate end) {
-        List<SurveyAnswerDO> answerDOS = statService.getMoodScoringList(getLoginUserId(), begin, end);
+        List<SurveyAnswerDO> answerDOS = statService.getAnswerList(getLoginUserId(), begin, end, Arrays.asList(SurveyType.MOOD_MARK.getType()));
         List<KeyValue> res = new ArrayList<>();
         if (CollectionUtil.isNotEmpty(answerDOS)) {
             for (SurveyAnswerDO item : answerDOS) {
@@ -105,4 +104,46 @@ public class AppReportController {
         return success(res);
     }
 
+    @GetMapping(value = "/autoThoughtRecognition")
+    @Operation(summary = "自动化思维识别列表")
+    public CommonResult<List<SurveyAnswerDO>> autoThoughtRecognition() {
+        List<SurveyAnswerDO> answerDOS = statService.getAnswerList(getLoginUserId(), null, null, Arrays.asList(SurveyType.AUTO_THOUGHT_RECOGNITION.getType()));
+        return success(answerDOS);
+    }
+
+    @GetMapping(value = "/getCommonDetail")
+    @Operation(summary = "获取通用报告")
+    @Parameter(name = "id", description = "报告id", required = true, example = "1024")
+    public CommonResult<SubmitSurveyReqVO> getCommonDetail(@RequestParam("id") Long id) {
+        SubmitSurveyReqVO res = new SubmitSurveyReqVO();
+        SurveyAnswerDO answerDO = surveyService.getAnswerDO(id);
+        if (Objects.isNull(answerDO)) {
+            throw exception(SURVEY_ANSWER_NOT_EXISTS);
+        }
+        List<AnswerDetailDO> detailDOS = surveyService.getAnswerDetailByAnswerId(id);
+        res.setId(id);
+        res.setSurveyType(answerDO.getSurveyType());
+        res.setQstList(new ArrayList<>());
+        for (AnswerDetailDO item : detailDOS) {
+            AnAnswerReqVO vo = new AnAnswerReqVO();
+            vo.setAnswer(item.getAnswer());
+            vo.setQstCode(item.getBelongQstCode());
+            res.getQstList().add(vo);
+        }
+        return success(res);
+    }
+
+    @GetMapping(value = "/cognizeRebuild")
+    @Operation(summary = "认知重建报告列表")
+    public CommonResult<List<SurveyAnswerDO>> cognizeRebuild() {
+        List<SurveyAnswerDO> answerDOS = statService.getAnswerList(getLoginUserId(), null, null, Arrays.asList(SurveyType.COGNIZE_REBUILD.getType()));
+        return success(answerDOS);
+    }
+
+    @GetMapping("/getMoodDiary")
+    @Operation(summary = "获取心情日记")
+    public CommonResult<List<SurveyAnswerDO>> getMoodDiary() {
+        List<SurveyAnswerDO> answerDOS = statService.getAnswerList(getLoginUserId(), null, null, Arrays.asList(SurveyType.MOOD_DIARY.getType()));
+        return success(answerDOS);
+    }
 }

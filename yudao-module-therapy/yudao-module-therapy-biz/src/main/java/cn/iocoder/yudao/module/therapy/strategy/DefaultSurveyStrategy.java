@@ -25,7 +25,7 @@ public class DefaultSurveyStrategy extends AbstractStrategy implements SurveyStr
 
     @Override
     public void validationReqVO(SurveySaveReqVO vo) {
-//        super.validationReqVO(vo);
+        SurveyStrategy.super.validationReqVO(vo);
     }
 
     @Override
@@ -65,12 +65,12 @@ public class DefaultSurveyStrategy extends AbstractStrategy implements SurveyStr
     }
 
     @Override
-    public void checkQuestionExistsSurvey(SubmitSurveyReqVO reqVO, List<QuestionDO> qst){
-
+    public void generateReport(Long details) {
+        SurveyStrategy.super.generateReport(details);
     }
 
     @Override
-    public void generateReport(Long answerId) {
-        SurveyStrategy.super.generateReport(answerId);
+    public void checkQuestionExistsSurvey(SubmitSurveyReqVO reqVO, List<QuestionDO> qst){
+        SurveyStrategy.super.checkQuestionExistsSurvey(reqVO,qst);
     }
 }

@@ -15,9 +15,7 @@ public interface SurveyStrategy {
      *
      * @param vo
      */
-    default void validationReqVO(SurveySaveReqVO vo) {
-        return;
-    }
+    default void validationReqVO(SurveySaveReqVO vo) {}
 
     /**
      * 填充题目code
@@ -41,14 +39,14 @@ public interface SurveyStrategy {
      * @param reqVO
      * @param qst
      */
-    void checkLoseQuestion(SubmitSurveyReqVO reqVO, List<QuestionDO> qst);
+    default void checkLoseQuestion(SubmitSurveyReqVO reqVO, List<QuestionDO> qst){}
 
     /**
      * 检查题目是否属于问卷
      * @param reqVO
      * @param qst
      */
-    void checkQuestionExistsSurvey(SubmitSurveyReqVO reqVO, List<QuestionDO> qst);
+    default void checkQuestionExistsSurvey(SubmitSurveyReqVO reqVO, List<QuestionDO> qst){}
     /**
      * 获取报告
      *

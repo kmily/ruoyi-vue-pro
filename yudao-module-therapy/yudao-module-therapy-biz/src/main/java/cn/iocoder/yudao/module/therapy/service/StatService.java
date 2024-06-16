@@ -43,7 +43,6 @@ public interface StatService {
      * @param userId
      * @return
      */
-    List<SurveyAnswerDO> getMoodScoringList(Long userId, LocalDate begin,LocalDate end);
-
+    List<SurveyAnswerDO> getAnswerList(Long userId, LocalDate begin, LocalDate end,List<Integer> types);
 
 }
