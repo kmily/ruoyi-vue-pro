@@ -52,6 +52,11 @@ public class TreatmentSurveyDO extends BaseDO {
     private List<String> tags;
 
     /**
+     * 关联问卷
+     */
+    @TableField(typeHandler = FastjsonTypeHandler.class)
+    private List<Long> relSurveyList;
+    /**
      * 类型
      * 枚举 {@link SurveyType}
      */

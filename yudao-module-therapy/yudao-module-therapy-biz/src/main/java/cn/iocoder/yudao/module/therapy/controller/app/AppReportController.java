@@ -86,7 +86,7 @@ public class AppReportController {
     }
 
     @GetMapping(value = "/moodScoring")
-    @Operation(summary = "量表报告拆线图数据")
+    @Operation(summary = "每日心情评分拆线图数据")
     @Parameter(name = "begin", description = "开始日期:yyyy-MM-dd", required = true, example = "2024-06-01")
     @Parameter(name = "end", description = "结束日期:yyyy-MM-dd", required = true, example = "2024-06-01")
     public CommonResult<List<KeyValue>> moodScoring(@RequestParam("begin") LocalDate begin
