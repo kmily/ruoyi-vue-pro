@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.therapy.service;
 
+import cn.iocoder.boot.module.therapy.enums.TaskType;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemInstanceDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDayitemDO;
@@ -47,6 +48,9 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
     @Resource
     private Engine engine;
 
+    @Resource
+    private MoodScoreFlow moodScoreFlow;
+
     private Container getContainer(BaseFlow flow, TreatmentDayitemInstanceDO dayitemInstanceDO, TreatmentFlowDayitemDO flowDayitemDO){
         Container container =  new Container();
         if(dayitemInstanceDO.getTaskInstanceId().isEmpty()){
@@ -71,8 +75,10 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
                 return goalAndMotivationFlow;
             case "scale":
                 return scaleFlow;
+            case "current_mood_score":
+                return moodScoreFlow;
             default:
-                return null;
+                throw new RuntimeException("not supported task flow");
         }
     }
 
@@ -97,6 +103,12 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
                 ScaleFlow scaleFlow = new ScaleFlow(engine.getEngine());
                 String scaleFlowId = scaleFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
                 flowDayitemDO.setTaskFlowId(scaleFlowId);
+                treatmentFlowDayitemMapper.updateById(flowDayitemDO);
+                break;
+            case "current_mood_score":
+                MoodScoreFlow moodScoreFlow = new MoodScoreFlow(engine.getEngine());
+                String moodScoreFlowId = moodScoreFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
+                flowDayitemDO.setTaskFlowId(moodScoreFlowId);
                 treatmentFlowDayitemMapper.updateById(flowDayitemDO);
                 break;
             default:

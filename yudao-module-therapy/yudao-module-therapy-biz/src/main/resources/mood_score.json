@@ -7,7 +7,19 @@
       {"step_type": "guide_language", "step_data": {"content":  "每天结束时，或者在你经历了重大情绪变化的时候，试着给你的情绪状态打个分数。记下这个分数，也许还可以旁边简短记述为什么会有这样的评分。这样做可以帮助你看到情绪在一天或一段时间内的变化。"}},
       {"step_type": "guide_language", "step_data": {"content":  "现在，让我们试试，回忆一下你感觉最糟糕时的感受，让我们把它确定为10分；再回忆一下你感觉很好的时候，把它确定为0分。再想想现在自己的状态，你觉得自己此刻的心情可以打多少分呢？"}},
       {"step_type": "mood_ruler_qst", "step_data": {}},
-      {"step_type": "mood_respond", "step_data": {}, "submit":  false},
+      {"step_type": "mood_respond", "step_data": {
+        "0": "0分",
+        "1": "0分",
+        "2": "0分",
+        "3": "0分",
+        "4": "0分",
+        "5": "0分",
+        "6": "0分",
+        "7": "0分",
+        "8": "0分",
+        "9": "0分",
+        "10": "0分"
+      }, "submit":  false},
       {"step_type": "guide_language", "step_data": {"content":  "可以和我说说今天发生了什么事吗？你现在的心情可能和什么有关系？这里是一个“情绪日记”版块，你可以选择在这里进行记录。这些记录可以帮助我们整理自己的生活，了解是哪些事件、人物或想法在长期影响着我们。"}},
       {"step_type": "mood_diary_qst", "step_data": {}}
     ],

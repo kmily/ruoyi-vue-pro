@@ -39,6 +39,11 @@ public abstract class BaseFlow {
         return currentTask;
     }
 
+    protected Map getVariables(Container container){
+        RuntimeService runtimeService = processEngine.getRuntimeService();
+        return runtimeService.getVariables(container.getProcessInstanceId());
+    }
+
     /**
      * 运行流程, 返回下一步的信息
      * @return

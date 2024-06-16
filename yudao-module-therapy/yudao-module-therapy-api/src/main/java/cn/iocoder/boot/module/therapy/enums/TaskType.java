@@ -48,4 +48,9 @@ public enum TaskType implements IntArrayValuable {
     public int[] array() {
         return ARRAYS;
     }
+
+
+    public String getCode(){
+        return this.code;
+    }
 }

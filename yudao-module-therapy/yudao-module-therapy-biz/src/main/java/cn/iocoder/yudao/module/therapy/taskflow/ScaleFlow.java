@@ -83,7 +83,7 @@ public class ScaleFlow extends BaseFlow{
         return surveyService.submitSurveyForFlow(submitSurveyReqVO);
     }
 
-    private Map getVariables(Container container){
+    protected Map getVariables(Container container){
         RuntimeService runtimeService = processEngine.getRuntimeService();
         return runtimeService.getVariables(container.getProcessInstanceId());
     }

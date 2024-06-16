@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.therapy.taskflow;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -139,7 +138,7 @@ public class GoalAndMotivationFlow extends BaseFlow{
         return data;
     }
 
-    private Map getVariables(Container container){
+    protected Map getVariables(Container container){
         RuntimeService runtimeService = processEngine.getRuntimeService();
         return runtimeService.getVariables(container.getProcessInstanceId());
     }

@@ -1,0 +1,26 @@
+{
+  "group_nodes": {
+    "start": [ {"step_type": "START"}],
+    "steps": [
+      {"step_type": "guide_language", "step_data": {"content":  "在寻找改善情绪的方法前，知道我们正在经历的到底是什么样的情绪是重要的。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "生活中有许多描述情绪的词语：开心、伤心、愤怒等等，你是否停下来仔细思考过他们的含义呢？在体验到这种情绪的时候，你的感受是什么样的呢？"}},
+      {"step_type": "guide_language", "step_data": {"content":  "“平静”、“快乐”、“坚定”、“愤怒”、“悲伤”、“恐惧”是我们常见的六种基本情绪，但有时，我们的情感体验是更细腻和复杂的，只用这些词语来形容我们的情绪是远远不足的。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "下面的“情绪轮盘”或许是一个能够帮助你命名自己当下情绪体验的工具，想想这些情绪你是否都经历过呢？在经历它们的时候你有什么样的体会？你还经历过什么样的情绪呢？"}},
+      {"step_type": "mood_categories", "step_data": {}},
+      {"step_type": "guide_language", "step_data": {"content":"想象一下，如果你从未体验到情绪，你的生活会是什么样的?如果你从未感受到高兴、伤心、生气、害怕或担忧，你的生活会更容易或更艰难一些吗?你觉得会有什么不同?"}},
+      {"step_type": "guide_language", "step_data": {"content":"也许你会认为，如果能更少感到生气、害怕或者担忧，将是一件不错的事。"}},
+      {"step_type": "guide_language", "step_data": {"content":"然而，尽管这些情绪以及其他一些情绪时常让人感到不愉快，但情绪的出现是正常的、自然的，也是生存所必需的。情绪会给我们一个信号，告诉我们在身处的环境中有些事情正在发生需要引起我们的注意了。"}},
+      {"step_type": "guide_language", "step_data": {"content":"情绪不想被忽视，因为它想告诉我们需要采取重要的行动。"}},
+      {"step_type": "guide_language", "step_data": {"content":"比如，当你在马路上行走，突然有一辆车在向你冲来，你可能会感到惊吓和害怕，然后你会尽可能快地离开危险区域。这时候，能够感到恐惧极其重要，让你知道危险的事情正在发生，并帮助你弄明白危险或者威胁来自何处，然后努力避开它。\n许多时候，我们的情绪会自动地指导我们的行为，于是我们不必花时间考虑要怎么做。"}},
+      {"step_type": "guide_language", "step_data": {"content":"在下图中选择你在过去一周里经历过的最主要的几种的情绪，为它们排个序，使用一些问题来帮助你思考。"}},
+      {"step_type": "mood_categories_qst", "step_data": {}}
+    ],
+    "end": [
+      {"step_type": "END"}
+    ]
+  },
+  "group_relations": [
+    {"source": "start", "target": "steps"},
+    {"source": "steps", "target": "end"}
+  ]
+}

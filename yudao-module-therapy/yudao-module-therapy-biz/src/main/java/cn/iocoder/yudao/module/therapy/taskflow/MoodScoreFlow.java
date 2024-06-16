@@ -1,21 +1,23 @@
 package cn.iocoder.yudao.module.therapy.taskflow;
 
-
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
-import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayitemInstanceMapper;
 import cn.iocoder.yudao.module.therapy.service.SurveyService;
-import org.flowable.bpmn.model.Task;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
+import org.flowable.task.api.Task;
 
-import static cn.iocoder.yudao.module.therapy.taskflow.Const.DAYITEM_INSTANCE_ID;
+import static cn.iocoder.yudao.module.therapy.taskflow.Const.*;
+import static cn.iocoder.yudao.module.therapy.taskflow.Const.SURVEY_INSTANCE_ID;
+
 
 @Component
 public class MoodScoreFlow extends BaseFlow {
@@ -28,6 +30,12 @@ public class MoodScoreFlow extends BaseFlow {
     public MoodScoreFlow(ProcessEngine engine) {
         super(engine);
     }
+
+
+    public String deploy(Long id, Map<String, Object> settings) {
+        return super.deploy(id, "/mood_score.json");
+    }
+
 
 
     @Override
@@ -43,20 +51,42 @@ public class MoodScoreFlow extends BaseFlow {
     }
 
     public Map<String, Object> auto_mood_ruler_qst(Container container,Map data, Task currentTask){
+        RuntimeService runtimeService = processEngine.getRuntimeService();
+        Long instance_id = (Long) runtimeService.getVariable(container.getProcessInstanceId(), SURVEY_INSTANCE_ID);
+        if(instance_id == null) {
+            instance_id = surveyService.initSurveyAnswer(SurveyType.MOOD_SCORE.getCode(), SURVEY_SOURCE_TYPE);
+            runtimeService.setVariable(container.getProcessInstanceId(), SURVEY_INSTANCE_ID, instance_id);
+        }
+        data.put("instance_id", instance_id);
         return data;
     }
 
-    public void submit_mood_ruler_qst(Container container,Map variables, Task currentTask){
+    public void submit_mood_ruler_qst(Container container, DayitemStepSubmitReqVO submitReqVO, Task currentTask){
         RuntimeService runtimeService = processEngine.getRuntimeService();
-        int moodScore = (int) variables.get("moodScore");
+        int moodScore = (int) submitReqVO.getStep_data().getStore().get("moodScore");
         runtimeService.setVariable(container.getProcessInstanceId(), "moodScore", moodScore);
+        SubmitSurveyReqVO survey = submitReqVO.getStep_data().getSurvey();
+        surveyService.submitSurveyForFlow(survey);
     }
 
-    public void auto_mood_respond(Container container,Map data, Task currentTask){
-        data.put("content", "你的心情评分是" + data.get("moodScore"));
+    public Map auto_mood_respond(Container container,Map data, Task currentTask){
+        Map variables = super.getVariables(container);
+        int moodScore = (int) variables.get("moodScore");
+        Map result = new HashMap<>();
+        result.put("content", data.get(String.valueOf(moodScore)));
+        return result;
     }
 
-    public void auto_mood_diary_qst(Container container,Map data, Task currentTask){
-        data.put("content", "请填写今天的心情日记");
+    public Map auto_mood_diary_qst(Container container,Map data, Task currentTask){
+        Map variables = super.getVariables(container);
+        Long instance_id = (Long) variables.get("instance_id");
+        Map result = new HashMap<>();
+        result.put("instance_id", instance_id);
+        return data;
+    }
+
+    public void submit_mood_diary_qst(Container container,DayitemStepSubmitReqVO submitReqVO, Task currentTask){
+        SubmitSurveyReqVO survey = submitReqVO.getStep_data().getSurvey();
+        surveyService.submitSurveyForFlow(survey);
     }
 }
