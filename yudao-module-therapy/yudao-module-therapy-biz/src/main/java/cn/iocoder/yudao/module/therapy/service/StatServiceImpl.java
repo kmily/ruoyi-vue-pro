@@ -35,7 +35,10 @@ public class StatServiceImpl implements StatService {
             if (Objects.nonNull(map)) {
                 ScheduleStateRespVO vo = new ScheduleStateRespVO();
                 vo.setDay(LocalDate.now().plusDays(i).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-                vo.setNum((Integer) map.getOrDefault("count", 0));
+                vo.setNum((Long) map.getOrDefault("count", 0));
+                if(vo.getNum()<=0){
+                    continue;
+                }
                 Integer score = (Integer) map.getOrDefault("score", 0);
                 vo.setScore(Math.round(score / vo.getNum()));
                 rsp.add(vo);

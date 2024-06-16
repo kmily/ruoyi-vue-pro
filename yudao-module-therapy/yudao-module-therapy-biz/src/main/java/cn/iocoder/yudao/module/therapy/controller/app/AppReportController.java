@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.therapy.service.SurveyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -89,8 +90,8 @@ public class AppReportController {
     @Operation(summary = "每日心情评分拆线图数据")
     @Parameter(name = "begin", description = "开始日期:yyyy-MM-dd", required = true, example = "2024-06-01")
     @Parameter(name = "end", description = "结束日期:yyyy-MM-dd", required = true, example = "2024-06-01")
-    public CommonResult<List<KeyValue>> moodScoring(@RequestParam("begin") LocalDate begin
-            , @RequestParam("end") LocalDate end) {
+    public CommonResult<List<KeyValue>> moodScoring(@RequestParam("begin") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate begin
+            , @RequestParam("end")@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
         List<SurveyAnswerDO> answerDOS = statService.getAnswerList(getLoginUserId(), begin, end, Arrays.asList(SurveyType.MOOD_MARK.getType()));
         List<KeyValue> res = new ArrayList<>();
         if (CollectionUtil.isNotEmpty(answerDOS)) {

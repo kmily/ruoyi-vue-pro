@@ -12,7 +12,7 @@ public class ScheduleStateRespVO {
     @Schema(description = "日期,格式yyyy-MM-dd", example = "2024-06-12")
     private String day;
     @Schema(description = "活动量", example = "23")
-    private Integer num;
+    private Long num;
     @Schema(description = "情绪水平", example = "67")
     private Integer score;
 
