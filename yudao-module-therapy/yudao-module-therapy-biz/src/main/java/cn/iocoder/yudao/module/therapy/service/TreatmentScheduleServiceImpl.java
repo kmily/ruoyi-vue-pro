@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.therapy.service;
 
 import cn.iocoder.boot.module.therapy.enums.SignState;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyAnswerPageReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SignInReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.TreatmentScheduleSaveReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentScheduleDO;
@@ -12,7 +14,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.*;
@@ -76,5 +77,10 @@ public class TreatmentScheduleServiceImpl implements TreatmentScheduleService {
     @Override
     public List<TreatmentScheduleDO> getScheduleList(LocalDate day) {
         return treatmentScheduleMapper.getScheduleList(day);
+    }
+
+    @Override
+    public PageResult<TreatmentScheduleDO> getTreatmentSchedulePage(SurveyAnswerPageReqVO pageReqVO) {
+        return treatmentScheduleMapper.selectPage(pageReqVO);
     }
 }

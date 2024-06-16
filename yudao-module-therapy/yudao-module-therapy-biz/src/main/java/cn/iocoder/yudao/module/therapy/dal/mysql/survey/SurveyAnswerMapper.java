@@ -4,12 +4,12 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyAnswerPageReqVO;
-import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyPageReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
-import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import jodd.util.StringUtil;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.time.LocalDate;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -19,13 +19,27 @@ public interface SurveyAnswerMapper extends BaseMapperX<SurveyAnswerDO> {
         // 分页查询
         return selectPage(reqVO, new LambdaQueryWrapperX<SurveyAnswerDO>()
                 .eq(SurveyAnswerDO::getCreator, reqVO.getUserId().toString())
-                .eqIfPresent(SurveyAnswerDO::getSurveyType,reqVO.getSurveyType())
+                .eqIfPresent(SurveyAnswerDO::getSurveyType, reqVO.getSurveyType())
                 .orderByDesc(SurveyAnswerDO::getId));
     }
 
-    default SurveyAnswerDO selectBySurveyIdAndUserId(Long surveyId){
+    default SurveyAnswerDO selectBySurveyIdAndUserId(Long surveyId) {
         return selectOne(Wrappers.lambdaQuery(SurveyAnswerDO.class)
-                .eq(SurveyAnswerDO::getBelongSurveyId,surveyId)
-                .eq(SurveyAnswerDO::getCreator,getLoginUserId()));
+                .eq(SurveyAnswerDO::getBelongSurveyId, surveyId)
+                .eq(SurveyAnswerDO::getCreator, getLoginUserId()));
+    }
+
+    default List<SurveyAnswerDO> selectBySurveysAndDate(Long userId, LocalDate begin, LocalDate end, List<Integer> types) {
+        return selectList(Wrappers.lambdaQuery(SurveyAnswerDO.class)
+                .eq(SurveyAnswerDO::getCreator, userId)
+                .between(SurveyAnswerDO::getCreateTime, begin, end)
+                .in(SurveyAnswerDO::getSurveyType, types));
+
+    }
+
+    default List<SurveyAnswerDO> selectBySurveyTypeAndUserId(Long userId,List<Integer> surveyType) {
+        return selectList(Wrappers.lambdaQuery(SurveyAnswerDO.class)
+                .in(SurveyAnswerDO::getSurveyType, surveyType)
+                .eq(SurveyAnswerDO::getCreator, userId));
     }
 }

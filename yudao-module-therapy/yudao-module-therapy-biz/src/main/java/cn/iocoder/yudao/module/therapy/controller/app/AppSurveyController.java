@@ -52,14 +52,14 @@ public class AppSurveyController {
 
 
 
-    @PostMapping("/create")
+    @PostMapping("/createSchedule")
     @Operation(summary = "创建患者日程")
 //    @PreAuthorize("@ss.hasPermission('hlgyy:treatment-schedule:create')")
     public CommonResult<Long> createTreatmentSchedule(@Valid @RequestBody TreatmentScheduleSaveReqVO createReqVO) {
         return success(treatmentScheduleService.createTreatmentSchedule(createReqVO));
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/deleteSchedule")
     @Operation(summary = "删除患者日程")
     @Parameter(name = "id", description = "编号", required = true)
 //    @PreAuthorize("@ss.hasPermission('hlgyy:treatment-schedule:delete')")
@@ -68,7 +68,7 @@ public class AppSurveyController {
         return success(true);
     }
 
-    @GetMapping("/get")
+    @GetMapping("/getSchedule")
     @Operation(summary = "获得患者日程")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
 //    @PreAuthorize("@ss.hasPermission('hlgyy:treatment-schedule:query')")
@@ -78,27 +78,19 @@ public class AppSurveyController {
     }
 
     @PostMapping("/signIn")
-    @Operation(summary = "创建患者日程")
+    @Operation(summary = "签到")
 //    @PreAuthorize("@ss.hasPermission('hlgyy:treatment-schedule:create')")
     public CommonResult<Boolean> signIn(@Valid @RequestBody SignInReqVO reqVO) {
         treatmentScheduleService.signIn(reqVO);
         return success(true);
     }
 
-    @GetMapping("/list")
-    @Operation(summary = "获得患者指定日期日程")
+    @GetMapping("/listSchedule")
+    @Operation(summary = "获得患者指定日期日程列表")
 //    @PreAuthorize("@ss.hasPermission('hlgyy:treatment-schedule:query')")
     public CommonResult<List<TreatmentScheduleRespVO>> getTreatmentSchedulePage(@Valid @Param("day") LocalDate day) {
         List<TreatmentScheduleDO> pageResult = treatmentScheduleService.getScheduleList(day);
         return success(BeanUtils.toBean(pageResult, TreatmentScheduleRespVO.class));
     }
-
-//    @GetMapping("/page")
-//    @Operation(summary = "获得患者日程分页")
-//    @PreAuthorize("@ss.hasPermission('hlgyy:treatment-schedule:query')")
-//    public CommonResult<PageResult<TreatmentScheduleRespVO>> getTreatmentSchedulePage(@Valid TreatmentSchedulePageReqVO pageReqVO) {
-//        PageResult<TreatmentScheduleDO> pageResult = treatmentScheduleService.getTreatmentSchedulePage(pageReqVO);
-//        return success(BeanUtils.toBean(pageResult, TreatmentScheduleRespVO.class));
-//    }
 
 }

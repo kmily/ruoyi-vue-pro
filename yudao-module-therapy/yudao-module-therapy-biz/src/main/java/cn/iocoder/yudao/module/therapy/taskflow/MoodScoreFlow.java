@@ -54,7 +54,7 @@ public class MoodScoreFlow extends BaseFlow {
         RuntimeService runtimeService = processEngine.getRuntimeService();
         Long instance_id = (Long) runtimeService.getVariable(container.getProcessInstanceId(), SURVEY_INSTANCE_ID);
         if(instance_id == null) {
-            instance_id = surveyService.initSurveyAnswer(SurveyType.MOOD_SCORE.getCode(), SURVEY_SOURCE_TYPE);
+            instance_id = surveyService.initSurveyAnswer(SurveyType.MOOD_MARK.getCode(), SURVEY_SOURCE_TYPE);
             runtimeService.setVariable(container.getProcessInstanceId(), SURVEY_INSTANCE_ID, instance_id);
         }
         data.put("instance_id", instance_id);

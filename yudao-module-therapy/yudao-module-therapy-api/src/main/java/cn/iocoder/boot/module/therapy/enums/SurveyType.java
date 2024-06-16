@@ -23,7 +23,10 @@ public enum SurveyType implements IntArrayValuable {
     GAD7_SCALE(4, "GAD-7自评量表","gad7_scale",Arrays.asList(SurveyQuestionType.RADIO)),
     ISI_SCALE(5, "失眠严重指数","isi_scale",Arrays.asList(SurveyQuestionType.RADIO)),
     MOOD_SCALE(6, "积极情绪和消极情绪量表","mood_scale",Arrays.asList(SurveyQuestionType.RADIO)),
-    MOOD_SCORE(7, "心情评分","mood_score",Arrays.asList(SurveyQuestionType.RADIO)),
+    SCHEDULE_LIST(7, "行为活动记录表","schedule_list",null),
+    MOOD_MARK(8, "情绪评分","mood_mark",null),
+    MOOD_DIARY(9, "心情日记","mood_diary",null),
+    MOOD_RECOGNITION(10, "情绪识别","mood_recognition",null),
     ;
 
     /**

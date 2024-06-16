@@ -1,8 +1,11 @@
 package cn.iocoder.yudao.module.therapy.strategy;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.therapy.config.ScaleReportAutoConfiguration;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveySaveReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.convert.SurveyConvert;
@@ -17,6 +20,7 @@ import jodd.util.StringUtil;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -98,5 +102,30 @@ public abstract class AbstractStrategy {
         if (set1.size() > 0) {
             throw exception(QUESTION_NOT_EXISTS_SURVEY);
         }
+    }
+
+
+    public void generateReport(Long answerId,List<ScaleReportAutoConfiguration.Grade> grades) {
+        List<AnswerDetailDO> detailDOS = surveyAnswerDetailMapper.getByAnswerId(answerId);
+        if (CollectionUtil.isEmpty(detailDOS)) {
+            return;
+        }
+        Integer score = 0;
+        for (AnswerDetailDO item : detailDOS) {
+            if (Objects.isNull(item.getAnswer())) {
+                score += item.getAnswer().getInt("val", 0);
+            }
+        }
+        Integer finalScore = score;
+        ScaleReportAutoConfiguration.Grade grade=grades.stream().filter(p->p.getBegin()<= finalScore && p.getEnd()>= finalScore).findFirst().get();
+        SurveyAnswerDO answerDO = surveyAnswerMapper.selectById(answerId);
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.set("score",score);
+        jsonObject.set("explain",grade.getExplain());
+        jsonObject.set("shortExplain",grade.getShortExplain());
+        jsonObject.set("begin",grade.getBegin());
+        jsonObject.set("end",grade.getEnd());
+        answerDO.setReprot(jsonObject.toString());
+        surveyAnswerMapper.updateById(answerDO);
     }
 }

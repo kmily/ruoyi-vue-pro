@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.therapy.strategy;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.json.JSONObject;
 import cn.iocoder.boot.module.therapy.enums.SurveyQuestionType;
+import cn.iocoder.yudao.module.therapy.config.ScaleReportAutoConfiguration;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveySaveReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
@@ -66,5 +67,10 @@ public class DefaultSurveyStrategy extends AbstractStrategy implements SurveyStr
     @Override
     public void checkQuestionExistsSurvey(SubmitSurveyReqVO reqVO, List<QuestionDO> qst){
 
+    }
+
+    @Override
+    public void generateReport(Long answerId) {
+        SurveyStrategy.super.generateReport(answerId);
     }
 }
