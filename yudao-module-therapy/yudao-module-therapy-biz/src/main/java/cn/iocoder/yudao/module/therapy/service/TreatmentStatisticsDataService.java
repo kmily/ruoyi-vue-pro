@@ -22,4 +22,6 @@ public interface TreatmentStatisticsDataService {
     List<TreatmentDayitemInstanceDO> queryTreatmentProgressDetail(Long treatmentInstanceId);
 
     Map<Long,TreatmentInstanceDO> queryLatestTreatmentInstanceId(List<Long> userIds);
+
+    List<String> queryUserGoals(Long userId);
 }

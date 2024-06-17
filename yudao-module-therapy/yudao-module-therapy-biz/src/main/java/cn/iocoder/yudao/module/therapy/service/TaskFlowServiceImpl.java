@@ -43,6 +43,12 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
     GoalAndMotivationFlow goalAndMotivationFlow;
 
     @Resource
+    MoodRecognizeNamedFlow moodRecognizeNamedFlow;
+
+    @Resource
+    AutoMindsetRecognize autoMindsetRecognize;
+
+    @Resource
     ScaleFlow scaleFlow;
 
     @Resource
@@ -71,12 +77,16 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
     @Override
     public BaseFlow getTaskFlow(TreatmentFlowDayitemDO flowDayitemDO){
         switch (flowDayitemDO.getItemType()){
-            case "problem_goal_motive":
+            case "problem_goal_motive": // 目标与动机
                 return goalAndMotivationFlow;
-            case "scale":
+            case "scale": // 初步评估
                 return scaleFlow;
-            case "current_mood_score":
+            case "current_mood_score": // 情绪评分
                 return moodScoreFlow;
+            case "mood_recognize_named": // 情绪识别
+                return moodRecognizeNamedFlow;
+            case "auto_mindset_recognize":
+                return autoMindsetRecognize;
             default:
                 throw new RuntimeException("not supported task flow");
         }
@@ -93,24 +103,35 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
     public void createBpmnModel(Long flowDayitemId){
         TreatmentFlowDayitemDO flowDayitemDO = treatmentFlowDayitemMapper.selectById(flowDayitemId);
         switch (flowDayitemDO.getItemType()){
-            case "problem_goal_motive":
+            case "problem_goal_motive":  // 目标与动机
                 GoalAndMotivationFlow goalAndMotivationFlow = new GoalAndMotivationFlow(engine.getEngine());
                 String taskFlowId = goalAndMotivationFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
                 flowDayitemDO.setTaskFlowId(taskFlowId);
                 treatmentFlowDayitemMapper.updateById(flowDayitemDO);
                 break;
-            case "scale":
+            case "scale": // 初步评估
                 ScaleFlow scaleFlow = new ScaleFlow(engine.getEngine());
                 String scaleFlowId = scaleFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
                 flowDayitemDO.setTaskFlowId(scaleFlowId);
                 treatmentFlowDayitemMapper.updateById(flowDayitemDO);
                 break;
-            case "current_mood_score":
+            case "current_mood_score": // 情绪评分
                 MoodScoreFlow moodScoreFlow = new MoodScoreFlow(engine.getEngine());
                 String moodScoreFlowId = moodScoreFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
                 flowDayitemDO.setTaskFlowId(moodScoreFlowId);
                 treatmentFlowDayitemMapper.updateById(flowDayitemDO);
                 break;
+            case "mood_recognize_named": // 情绪识别
+                MoodRecognizeNamedFlow moodRecognizeNamedFlow = new MoodRecognizeNamedFlow(engine.getEngine());
+                String moodRecognizeNamedFlowId = moodRecognizeNamedFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
+                flowDayitemDO.setTaskFlowId(moodRecognizeNamedFlowId);
+                treatmentFlowDayitemMapper.updateById(flowDayitemDO);
+                break;
+            case "auto_mindset_recognize": // 自动化思维识别
+                AutoMindsetRecognize autoMindsetRecognize = new AutoMindsetRecognize(engine.getEngine());
+                String autoMindsetRecognizeId = autoMindsetRecognize.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
+                flowDayitemDO.setTaskFlowId(autoMindsetRecognizeId);
+                treatmentFlowDayitemMapper.updateById(flowDayitemDO);
             default:
                 throw new RuntimeException("not supported task flow");
         }

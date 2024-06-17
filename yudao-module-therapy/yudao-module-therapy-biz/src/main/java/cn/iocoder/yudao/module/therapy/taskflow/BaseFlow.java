@@ -277,7 +277,7 @@ public abstract class BaseFlow {
             // use settings
         } catch (IOException e) {
             // handle exception
-            throw new RuntimeException("Failed to read settings from resources/scale.json");
+            throw new RuntimeException("Failed to read settings from " + settingsResourceFile + e.getMessage());
         }
         BpmnModel bpmnModel = createBPMNModel(id, settings);
         RepositoryService repositoryService = processEngine.getRepositoryService();

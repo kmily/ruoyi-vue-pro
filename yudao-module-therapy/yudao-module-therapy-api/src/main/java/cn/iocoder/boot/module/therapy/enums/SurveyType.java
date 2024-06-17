@@ -27,6 +27,10 @@ public enum SurveyType implements IntArrayValuable {
     MOOD_MARK(8, "情绪评分","mood_mark",null),
     MOOD_DIARY(9, "心情日记","mood_diary",null),
     MOOD_RECOGNITION(10, "情绪识别","mood_recognition",null),
+    COGNITION_RECONSTRUCTION(11, "认知重建", "cognition_reconstruction",null),
+    AUTO_MINDSET_RECOGNIZE(12, "自动化思维和识别","auto_mindset_recognize",null),
+    TWELVE_MIND_DISTORT(13, "12种心理歪曲","twelve_mind_distort",null),
+    HAPPY_ACTIVITY(13, "愉悦活动清单","happy_activity",null)
     ;
 
     /**

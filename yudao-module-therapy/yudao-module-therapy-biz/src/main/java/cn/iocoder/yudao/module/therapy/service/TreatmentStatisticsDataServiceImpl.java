@@ -66,5 +66,14 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
         return map;
     }
 
+    public List<String>  queryUserGoals(Long userId){
+        //TODO fix this;
+        Long
+        ArrayList<String> goals = new ArrayList<>();
+        goals.add("goal1");
+        goals.add("goal2");
+        return goals;
+    }
+
 
 }

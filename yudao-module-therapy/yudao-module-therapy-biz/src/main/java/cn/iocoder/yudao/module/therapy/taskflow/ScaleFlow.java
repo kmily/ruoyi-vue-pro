@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.module.therapy.taskflow.Const.DAYITEM_INSTANCE_ID;
+import static cn.iocoder.yudao.module.therapy.taskflow.Const.SURVEY_INSTANCE_ID;
 
 /**
  * 量表流程  - 初步评估
@@ -94,12 +95,14 @@ public class ScaleFlow extends BaseFlow{
     }
 
     public Map<String, Object> auto_survey_report(Container container,Map data, Task currentTask){
-        data.put("result", "TODO");
+        Map variables = getVariables(container);
+        data.put("instance_id", (Long) variables.get(SURVEY_INSTANCE_ID));
         return data;
     }
 
     public Map<String, Object> auto_review_result(Container container, Map data, Task currentTask){
-        data.put("result", "TODO");
+        Map variables = getVariables(container);
+        data.put("instance_id", (Long) variables.get(SURVEY_INSTANCE_ID));
         return data;
     }
 
