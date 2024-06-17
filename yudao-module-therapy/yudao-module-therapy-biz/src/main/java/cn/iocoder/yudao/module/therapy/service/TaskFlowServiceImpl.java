@@ -55,6 +55,15 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
     private Engine engine;
 
     @Resource
+    TwelveMindDistort twelveMindDistort;
+
+    @Resource
+    CognitionReconstructFlow cognitionReconstructFlow;
+
+    @Resource
+    HappyActiveFlow happyActiveFlow;
+
+    @Resource
     private MoodScoreFlow moodScoreFlow;
 
     private Container getContainer(BaseFlow flow, TreatmentDayitemInstanceDO dayitemInstanceDO, TreatmentFlowDayitemDO flowDayitemDO){
@@ -85,8 +94,14 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
                 return moodScoreFlow;
             case "mood_recognize_named": // 情绪识别
                 return moodRecognizeNamedFlow;
-            case "auto_mindset_recognize":
+            case "auto_mindset_recognize": //自动化思维识别
                 return autoMindsetRecognize;
+            case "twelve_mind_distort": //12中心理歪曲
+                return twelveMindDistort;
+            case "cognize_reestablish": //认知重建
+                return cognitionReconstructFlow;
+            case "happly_exercise_list": //愉悦活动清单
+                return happyActiveFlow;
             default:
                 throw new RuntimeException("not supported task flow");
         }
@@ -132,6 +147,25 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
                 String autoMindsetRecognizeId = autoMindsetRecognize.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
                 flowDayitemDO.setTaskFlowId(autoMindsetRecognizeId);
                 treatmentFlowDayitemMapper.updateById(flowDayitemDO);
+                break;
+            case "twelve_mind_distort":
+                TwelveMindDistort twelveMindDistort = new TwelveMindDistort(engine.getEngine());
+                String twelveMindDistortId = twelveMindDistort.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
+                flowDayitemDO.setTaskFlowId(twelveMindDistortId);
+                treatmentFlowDayitemMapper.updateById(flowDayitemDO);
+                break;
+            case "cognize_reestablish":
+                CognitionReconstructFlow cognitionReconstructFlow = new CognitionReconstructFlow(engine.getEngine());
+                String cognizeReestablishId = cognitionReconstructFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
+                flowDayitemDO.setTaskFlowId(cognizeReestablishId);
+                treatmentFlowDayitemMapper.updateById(flowDayitemDO);
+                break;
+            case  "happly_exercise_list":
+                HappyActiveFlow happyActiveFlow = new HappyActiveFlow(engine.getEngine());
+                String happyActiveFlowId = happyActiveFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
+                flowDayitemDO.setTaskFlowId(happyActiveFlowId);
+                treatmentFlowDayitemMapper.updateById(flowDayitemDO);
+                break;
             default:
                 throw new RuntimeException("not supported task flow");
         }

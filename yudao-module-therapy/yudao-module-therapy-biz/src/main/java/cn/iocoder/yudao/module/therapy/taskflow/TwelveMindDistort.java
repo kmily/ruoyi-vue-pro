@@ -42,7 +42,7 @@ public class TwelveMindDistort extends BaseFlow{
     }
 
     public String deploy(Long id, Map<String, Object> settings) {
-        return super.deploy(id, "/twelve_mind_distort.json");
+        return super.deploy(id, "/twelve_mind_distortion.json");
     }
 
     public Map<String, Object> auto_twelve_problems_qst(Container container, Map data, Task currentTask) {

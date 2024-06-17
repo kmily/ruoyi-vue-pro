@@ -48,7 +48,7 @@ public class HappyActiveFlow extends BaseFlow  {
         return super.deploy(id, "/happy_activity.json");
     }
 
-    public Map<String, Object> auto_category_qst(Container container, Map data, Task currentTask) {
+    public Map<String, Object> auto_categories_qst(Container container, Map data, Task currentTask) {
         RuntimeService runtimeService = processEngine.getRuntimeService();
         Long instance_id = (Long) runtimeService.getVariable(container.getProcessInstanceId(), SURVEY_INSTANCE_ID);
         if(instance_id == null) {
@@ -59,7 +59,7 @@ public class HappyActiveFlow extends BaseFlow  {
         return data;
     }
 
-    public void submit_category_qst(Container container, DayitemStepSubmitReqVO submitReqVO, Task currentTask) {
+    public void submit_categories_qst(Container container, DayitemStepSubmitReqVO submitReqVO, Task currentTask) {
         surveyService.submitSurveyForFlow(submitReqVO.getStep_data().getSurvey());
     }
 }
