@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.therapy.service;
 
+import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemInstanceDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentInstanceDO;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayInstanceMapper;
@@ -28,6 +29,9 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
 
     @Resource
     private TreatmentDayInstanceMapper treatmentDayInstanceMapper;
+
+    @Resource
+    private SurveyService surveyService;
 
 
     @Override
@@ -64,6 +68,16 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
             }
         }
         return map;
+    }
+
+    public List<String>  queryUserGoals(Long userId){
+        //TODO fix this;
+        SubmitSurveyReqVO data =  surveyService.getGoalMotive(userId);
+        ArrayList<String> goals = new ArrayList<>();
+        goals.add("goal1");
+        goals.add("goal2");
+        goals.add("goal3");
+        return goals;
     }
 
 

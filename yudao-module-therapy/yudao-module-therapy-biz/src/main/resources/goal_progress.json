@@ -1,0 +1,20 @@
+{
+  "group_nodes": {
+    "start": [ {"step_type": "START"}],
+    "steps": [
+      {"step_type": "guide_language", "step_data": {"content":  "哇！你已经完成了这一阶段的治疗，真的超级棒！我能看出来你一直在努力变得更好呢，你觉得呢？"}},
+      {"step_type": "guide_language", "step_data": {"content":  "我们一起来回顾一下，刚开始的时候你给自己设定的那些目标，你觉得自己实现了多少呢？现在离这些目标又近了多少？"}},
+      {"step_type": "goal_progress_qst", "step_data": {}},
+      {"step_type": "guide_language", "step_data": {"content":  "唔... 可能我们刚开始治疗时间还不够长，你还没来得及看到明显的变化；也可能我们的目标定得有点高了。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "在这个探索内心的旅程中，我们会越来越了解自己，你可以随时调整你的目标，让它们更符合你真实的想法。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "记住，任何时候我们都不需要着急，你的感受才是最重要的。一步一步来，每一点小小的进步都是你变得更好的证明。"}}
+    ],
+    "end": [
+      {"step_type": "END"}
+    ]
+  },
+  "group_relations": [
+    {"source": "start", "target": "steps"},
+    {"source": "steps", "target": "end"}
+  ]
+}
