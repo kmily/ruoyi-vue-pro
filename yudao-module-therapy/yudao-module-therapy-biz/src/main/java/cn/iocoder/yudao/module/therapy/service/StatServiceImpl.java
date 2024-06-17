@@ -4,8 +4,11 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.json.JSONObject;
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.ScheduleStateRespVO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
+import cn.iocoder.yudao.module.therapy.dal.mysql.survey.SurveyAnswerDetailMapper;
 import cn.iocoder.yudao.module.therapy.dal.mysql.survey.SurveyAnswerMapper;
 import cn.iocoder.yudao.module.therapy.dal.mysql.survey.TreatmentScheduleMapper;
 import org.springframework.stereotype.Service;
@@ -15,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.SURVEY_ANSWER_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -27,6 +31,9 @@ public class StatServiceImpl implements StatService {
     @Resource
     private SurveyAnswerMapper surveyAnswerMapper;
 
+    @Resource
+    private SurveyAnswerDetailMapper surveyAnswerDetailMapper;
+
     @Override
     public List<ScheduleStateRespVO> StatSchedule(Integer dayNum, Long userId) {
         List<ScheduleStateRespVO> rsp = new ArrayList<>();
@@ -36,7 +43,7 @@ public class StatServiceImpl implements StatService {
                 ScheduleStateRespVO vo = new ScheduleStateRespVO();
                 vo.setDay(LocalDate.now().plusDays(i).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
                 vo.setNum((Long) map.getOrDefault("count", 0));
-                if(vo.getNum()<=0){
+                if (vo.getNum() <= 0) {
                     continue;
                 }
                 Integer score = (Integer) map.getOrDefault("score", 0);
@@ -103,13 +110,26 @@ public class StatServiceImpl implements StatService {
     }
 
     @Override
-    public List<SurveyAnswerDO> getAnswerList(Long userId, LocalDate begin, LocalDate end,List<Integer> types) {
-        return surveyAnswerMapper.selectBySurveysAndDate(userId,begin,end,types);
+    public List<SurveyAnswerDO> getAnswerList(Long userId, LocalDate begin, LocalDate end, List<Integer> types) {
+        return surveyAnswerMapper.selectBySurveysAndDate(userId, begin, end, types);
     }
 
     @Override
     public Map<String, List<JSONObject>> getStrategyCard(Long userId) {
-        return null;
+        List<SurveyAnswerDO> answerDOS = surveyAnswerMapper.selectBySurveyTypeAndUserId(userId, Arrays.asList(SurveyType.STRATEGY_CARD.getType()));
+
+        Map<String, List<JSONObject>> res = new HashMap<>();
+        for (SurveyAnswerDO answerDO : answerDOS) {
+            JSONObject jsonObject = new JSONObject(answerDO.getReprot());
+            List<JSONObject> list = res.getOrDefault(jsonObject.getStr("category", "未知"), new ArrayList<>());
+            JSONObject val = new JSONObject();
+            val.set("title", jsonObject.getStr("title", "未命名"));
+            val.set("time", answerDO.getCreateTime());
+            val.set("id", answerDO.getId());
+            list.add(val);
+            res.put(jsonObject.getStr("category", "未知"), list);
+        }
+        return res;
     }
 
     @Override
