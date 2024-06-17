@@ -94,4 +94,8 @@ public interface MemberUserMapper extends BaseMapperX<MemberUserDO> {
         return update(null, lambdaUpdateWrapper);
     }
 
+    default Long count(){
+        return selectCount();
+    }
+
 }

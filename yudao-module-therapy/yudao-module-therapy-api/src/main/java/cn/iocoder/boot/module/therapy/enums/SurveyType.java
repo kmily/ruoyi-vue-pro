@@ -30,6 +30,7 @@ public enum SurveyType implements IntArrayValuable {
     AUTO_THOUGHT_RECOGNITION(11, "自动化思维识别","auto_thought_recognition",null),
     COGNIZE_REBUILD(12, "认知重建","cognize_rebuild",null),
     STRATEGY_GAMES(13, "对策游戏","strategy_games",Arrays.asList(SurveyQuestionType.SPAN)),
+    THOUGHT_TRAP(14, "思维陷阱","thought_trap",null),
     ;
 
     /**

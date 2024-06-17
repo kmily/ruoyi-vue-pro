@@ -276,7 +276,11 @@ public class SurveyServiceImpl implements SurveyService {
 
     @Override
     public SubmitSurveyReqVO getGoalMotive() {
-        List<SurveyAnswerDO> surveyAnswerDOS = surveyAnswerMapper.selectBySurveyTypeAndUserId(getLoginUserId(), Arrays.asList(SurveyType.PROBLEM_GOAL_MOTIVE.getType()));
+        return this.getFirstAnswerInfo(SurveyType.PROBLEM_GOAL_MOTIVE.getType());
+    }
+
+    private SubmitSurveyReqVO getFirstAnswerInfo(Integer type){
+        List<SurveyAnswerDO> surveyAnswerDOS = surveyAnswerMapper.selectBySurveyTypeAndUserId(getLoginUserId(), Arrays.asList(type));
         Optional<SurveyAnswerDO> optional = surveyAnswerDOS.stream().max(Comparator.comparingLong(SurveyAnswerDO::getId));
         if (!optional.isPresent()) {
             return null;
@@ -296,5 +300,11 @@ public class SurveyServiceImpl implements SurveyService {
             vo.getQstList().add(reqVO);
         }
         return vo;
+    }
+
+
+    @Override
+    public SubmitSurveyReqVO getThoughtTrap() {
+        return this.getFirstAnswerInfo(SurveyType.THOUGHT_TRAP.getType());
     }
 }

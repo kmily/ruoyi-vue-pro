@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.therapy.controller.app;
 
+import cn.hutool.json.JSONObject;
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -26,6 +27,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -104,9 +106,10 @@ public class AppSurveyController {
         return success(surveyService.getGoalMotive());
     }
 
-    @GetMapping("/getCommonSnswer")
-    @Operation(summary = "获取通用回答详情")
-    public CommonResult<SubmitSurveyReqVO> getCommonSnswer() {
-        return success(surveyService.getGoalMotive());
+    @GetMapping("/getThoughtTrap")
+    @Operation(summary = "获取思维陷阱详情")
+    public CommonResult<SubmitSurveyReqVO> getThoughtTrap() {
+        return success(surveyService.getThoughtTrap());
+
     }
 }

@@ -107,4 +107,10 @@ public interface SurveyService {
      * @return
      */
     SubmitSurveyReqVO getGoalMotive();
+
+    /**
+     * 获取最新思维陷井
+     * @return
+     */
+    SubmitSurveyReqVO getThoughtTrap();
 }
