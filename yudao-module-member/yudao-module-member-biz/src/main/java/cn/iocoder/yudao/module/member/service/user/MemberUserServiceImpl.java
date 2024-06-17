@@ -127,6 +127,11 @@ public class MemberUserServiceImpl implements MemberUserService {
     }
 
     @Override
+    public Long total() {
+        return memberUserMapper.count();
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public MemberUserDO createUser(String nickname, String avtar, String registerIp, Integer terminal) {
         return createUser(null, nickname, avtar, registerIp, terminal, null);

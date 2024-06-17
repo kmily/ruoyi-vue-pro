@@ -201,4 +201,6 @@ public interface MemberUserService {
     List<MemberUserExtDO> getUserExtInfoList(List<Long> userIds);
     void saveUserExtInfo(MemberUserExtDTO dto);
     void updateMemberExtByUserId(MemberUserExtDTO dto);
+
+    Long total();
 }
