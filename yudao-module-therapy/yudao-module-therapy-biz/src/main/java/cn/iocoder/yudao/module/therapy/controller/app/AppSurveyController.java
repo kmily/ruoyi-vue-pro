@@ -101,7 +101,7 @@ public class AppSurveyController {
     @GetMapping("/getGoalMotive")
     @Operation(summary = "获取目标与动机详情")
     public CommonResult<SubmitSurveyReqVO> getGoalMotive() {
-        return success(surveyService.getGoalMotive());
+        return success(surveyService.getGoalMotive(getLoginUserId()));
     }
 
     @GetMapping("/getThoughtTrap")

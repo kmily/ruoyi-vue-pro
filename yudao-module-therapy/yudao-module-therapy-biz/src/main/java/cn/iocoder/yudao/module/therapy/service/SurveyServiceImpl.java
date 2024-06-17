@@ -275,7 +275,7 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     @Override
-    public SubmitSurveyReqVO getGoalMotive() {
+    public SubmitSurveyReqVO getGoalMotive(Long userId) {
         return this.getFirstAnswerInfo(SurveyType.PROBLEM_GOAL_MOTIVE.getType());
     }
 
@@ -305,6 +305,6 @@ public class SurveyServiceImpl implements SurveyService {
 
     @Override
     public SubmitSurveyReqVO getThoughtTrap() {
-        return this.getFirstAnswerInfo(SurveyType.THOUGHT_TRAP.getType());
+        return this.getFirstAnswerInfo(SurveyType.TWELVE_MIND_DISTORT.getType());
     }
 }
