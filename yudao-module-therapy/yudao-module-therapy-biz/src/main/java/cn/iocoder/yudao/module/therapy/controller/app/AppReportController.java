@@ -147,4 +147,11 @@ public class AppReportController {
         List<SurveyAnswerDO> answerDOS = statService.getAnswerList(getLoginUserId(), null, null, Arrays.asList(SurveyType.MOOD_DIARY.getType()));
         return success(answerDOS);
     }
+
+    @GetMapping("/getStrategyCard")
+    @Operation(summary = "获取对策卡")
+    public CommonResult<Map<String,List<JSONObject>>> getStrategyCard() {
+        return success(statService.getStrategyCard(getLoginUserId()));
+
+    }
 }

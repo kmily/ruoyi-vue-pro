@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.repository.query.Param;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -92,7 +93,7 @@ public class AppSurveyController {
     @GetMapping("/listSchedule")
     @Operation(summary = "获得患者指定日期日程列表")
 //    @PreAuthorize("@ss.hasPermission('hlgyy:treatment-schedule:query')")
-    public CommonResult<List<TreatmentScheduleRespVO>> getTreatmentSchedulePage(@Valid @Param("day") LocalDate day) {
+    public CommonResult<List<TreatmentScheduleRespVO>> getTreatmentSchedulePage(@Valid @Param("day") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate day) {
         List<TreatmentScheduleDO> pageResult = treatmentScheduleService.getScheduleList(day);
         return success(BeanUtils.toBean(pageResult, TreatmentScheduleRespVO.class));
     }

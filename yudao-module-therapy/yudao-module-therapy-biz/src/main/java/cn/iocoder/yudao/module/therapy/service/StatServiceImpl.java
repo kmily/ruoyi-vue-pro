@@ -108,6 +108,11 @@ public class StatServiceImpl implements StatService {
     }
 
     @Override
+    public Map<String, List<JSONObject>> getStrategyCard(Long userId) {
+        return null;
+    }
+
+    @Override
     public List<SurveyAnswerDO> getScaleList(Long userId) {
 
         return surveyAnswerMapper.selectBySurveyTypeAndUserId(userId, Arrays.asList(SurveyType.PHQ9_SCALE.getType()));
