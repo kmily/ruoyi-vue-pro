@@ -106,5 +106,5 @@ public interface SurveyService {
      * 获取患者最新目标与动机
      * @return
      */
-    SubmitSurveyReqVO getGoalMotive();
+    SubmitSurveyReqVO getGoalMotive(Long userId);
 }

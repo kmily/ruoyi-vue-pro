@@ -275,8 +275,8 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     @Override
-    public SubmitSurveyReqVO getGoalMotive() {
-        List<SurveyAnswerDO> surveyAnswerDOS = surveyAnswerMapper.selectBySurveyTypeAndUserId(getLoginUserId(), Arrays.asList(SurveyType.PROBLEM_GOAL_MOTIVE.getType()));
+    public SubmitSurveyReqVO getGoalMotive(Long userId) {
+        List<SurveyAnswerDO> surveyAnswerDOS = surveyAnswerMapper.selectBySurveyTypeAndUserId(userId, Arrays.asList(SurveyType.PROBLEM_GOAL_MOTIVE.getType()));
         Optional<SurveyAnswerDO> optional = surveyAnswerDOS.stream().max(Comparator.comparingLong(SurveyAnswerDO::getId));
         if (!optional.isPresent()) {
             return null;

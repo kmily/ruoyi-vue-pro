@@ -101,12 +101,14 @@ public class AppSurveyController {
     @GetMapping("/getGoalMotive")
     @Operation(summary = "获取目标与动机详情")
     public CommonResult<SubmitSurveyReqVO> getGoalMotive() {
-        return success(surveyService.getGoalMotive());
+        Long userId = getLoginUserId();
+        return success(surveyService.getGoalMotive(userId));
     }
 
     @GetMapping("/getCommonSnswer")
     @Operation(summary = "获取通用回答详情")
     public CommonResult<SubmitSurveyReqVO> getCommonSnswer() {
-        return success(surveyService.getGoalMotive());
+        Long userId = getLoginUserId();
+        return success(surveyService.getGoalMotive(userId));
     }
 }
