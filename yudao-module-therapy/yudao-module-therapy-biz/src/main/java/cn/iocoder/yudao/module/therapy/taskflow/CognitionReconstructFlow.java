@@ -37,7 +37,7 @@ public class CognitionReconstructFlow extends BaseFlow{
 
     @Override
     public String getProcessName(Long id) {
-        return "COGNITION_RECONSTRUCTION-" + id;
+        return "COGNIZE_REBUILD-" + id;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class CognitionReconstructFlow extends BaseFlow{
         RuntimeService runtimeService = processEngine.getRuntimeService();
         Long instance_id = (Long) runtimeService.getVariable(container.getProcessInstanceId(), SURVEY_INSTANCE_ID);
         if(instance_id == null) {
-            instance_id = surveyService.initSurveyAnswer(SurveyType.COGNITION_RECONSTRUCTION.getCode(), SURVEY_SOURCE_TYPE); //TODO
+            instance_id = surveyService.initSurveyAnswer(SurveyType.COGNIZE_REBUILD.getCode(), SURVEY_SOURCE_TYPE); //TODO
             runtimeService.setVariable(container.getProcessInstanceId(), SURVEY_INSTANCE_ID, instance_id);
         }
         data.put("instance_id", instance_id);
@@ -67,7 +67,7 @@ public class CognitionReconstructFlow extends BaseFlow{
 
     public Map<String, Object> auto_reconstruct_qst(Container container,Map data, Task currentTask){
         Map variables = getVariables(container);
-        Long instance_id = surveyService.initSurveyAnswer(SurveyType.COGNITION_RECONSTRUCTION.getCode(), SURVEY_SOURCE_TYPE); //TODO
+        Long instance_id = surveyService.initSurveyAnswer(SurveyType.COGNIZE_REBUILD.getCode(), SURVEY_SOURCE_TYPE); //TODO
         List<AnswerDetailDO> instanceData = surveyService.getAnswerDetailByAnswerId((Long) variables.get(SURVEY_INSTANCE_ID));
         data.put("instance_data", instanceData);
         data.put("instance_id", instance_id);

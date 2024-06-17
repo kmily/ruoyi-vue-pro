@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @Component
 @ConfigurationProperties(prefix = "scale")
-@PropertySource(value ="classpath:custom.yaml",encoding = "UTF-8",ignoreResourceNotFound = false)
+@PropertySource(value ="classpath:custom.yaml",encoding = "UTF-8",ignoreResourceNotFound = false,factory = YAMLPropertySourceFactory.class)
 public class ScaleReportAutoConfiguration {
     private List<Grade> gad7;
     private List<Grade> phq9;

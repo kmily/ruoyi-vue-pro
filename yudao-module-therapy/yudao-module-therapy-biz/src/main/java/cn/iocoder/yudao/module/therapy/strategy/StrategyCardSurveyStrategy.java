@@ -1,9 +1,6 @@
 package cn.iocoder.yudao.module.therapy.strategy;
 
-import cn.iocoder.yudao.module.therapy.config.ScaleReportAutoConfiguration;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * 对策卡问卷策略实现

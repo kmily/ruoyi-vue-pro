@@ -35,7 +35,10 @@ public class StatServiceImpl implements StatService {
             if (Objects.nonNull(map)) {
                 ScheduleStateRespVO vo = new ScheduleStateRespVO();
                 vo.setDay(LocalDate.now().plusDays(i).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-                vo.setNum((Integer) map.getOrDefault("count", 0));
+                vo.setNum((Long) map.getOrDefault("count", 0));
+                if(vo.getNum()<=0){
+                    continue;
+                }
                 Integer score = (Integer) map.getOrDefault("score", 0);
                 vo.setScore(Math.round(score / vo.getNum()));
                 rsp.add(vo);
@@ -100,8 +103,13 @@ public class StatServiceImpl implements StatService {
     }
 
     @Override
-    public List<SurveyAnswerDO> getMoodScoringList(Long userId, LocalDate begin, LocalDate end) {
-        return surveyAnswerMapper.selectBySurveysAndDate(userId,begin,end,Arrays.asList(SurveyType.MOOD_MARK.getType()));
+    public List<SurveyAnswerDO> getAnswerList(Long userId, LocalDate begin, LocalDate end,List<Integer> types) {
+        return surveyAnswerMapper.selectBySurveysAndDate(userId,begin,end,types);
+    }
+
+    @Override
+    public Map<String, List<JSONObject>> getStrategyCard(Long userId) {
+        return null;
     }
 
     @Override

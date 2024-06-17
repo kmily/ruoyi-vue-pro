@@ -4,11 +4,9 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.json.JSONObject;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.therapy.config.ScaleReportAutoConfiguration;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveySaveReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
-import cn.iocoder.yudao.module.therapy.convert.SurveyConvert;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
@@ -19,14 +17,12 @@ import jodd.util.StringUtil;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 /**
  * 抽象问卷策略实现
@@ -35,7 +31,7 @@ public abstract class AbstractStrategy {
     @Resource
     protected SurveyAnswerMapper surveyAnswerMapper;
     @Resource
-    private SurveyAnswerDetailMapper surveyAnswerDetailMapper;
+    protected SurveyAnswerDetailMapper surveyAnswerDetailMapper;
 
     public void validationReqVO(SurveySaveReqVO vo) {
         if (CollUtil.isEmpty(vo.getQuestions())) throw exception(SURVEY_QUESTION_EMPTY);
@@ -70,26 +66,6 @@ public abstract class AbstractStrategy {
         }
     }
 
-//    public Long saveAnswer(SubmitSurveyReqVO reqVO) {
-//        if (reqVO.getId() > 0) {
-//            return reqVO.getId();
-//        }
-//        SurveyAnswerDO answerDO = new SurveyAnswerDO();
-////        answerDO.setSource(reqVO.getSource());
-////        answerDO.setBelongSurveyId(reqVO.getSurveyId());
-//        surveyAnswerMapper.insert(answerDO);
-//        return answerDO.getId();
-//    }
-//
-//    public void saveAnswerDetail(List<QuestionDO> qst, SubmitSurveyReqVO reqVO) {
-//        Map<String, QuestionDO> qstMap = CollectionUtils.convertMap(qst, QuestionDO::getCode);
-//        List<AnswerDetailDO> anAnswerDOS = SurveyConvert.INSTANCE.convert(qstMap, reqVO);
-//        surveyAnswerDetailMapper.insertBatch(anAnswerDOS);
-//    }
-
-//    public void fillQuestion(SurveySaveReqVO vo){
-//
-//    }
     /**
      * 检查题目是否属于问卷
      * @param reqVO
@@ -105,14 +81,19 @@ public abstract class AbstractStrategy {
     }
 
 
-    public void generateReport(Long answerId,List<ScaleReportAutoConfiguration.Grade> grades) {
+    /**
+     * 生成报告
+     * @param answerId
+     * @param grades
+     */
+    protected void generateScaleReport(Long answerId, List<ScaleReportAutoConfiguration.Grade> grades) {
         List<AnswerDetailDO> detailDOS = surveyAnswerDetailMapper.getByAnswerId(answerId);
         if (CollectionUtil.isEmpty(detailDOS)) {
             return;
         }
         Integer score = 0;
         for (AnswerDetailDO item : detailDOS) {
-            if (Objects.isNull(item.getAnswer())) {
+            if (Objects.nonNull(item.getAnswer())) {
                 score += item.getAnswer().getInt("val", 0);
             }
         }
@@ -128,4 +109,19 @@ public abstract class AbstractStrategy {
         answerDO.setReprot(jsonObject.toString());
         surveyAnswerMapper.updateById(answerDO);
     }
+
+    /**
+     * 生成报告
+     * @param answerId
+     */
+    protected void generateReport(Long answerId){
+        List<AnswerDetailDO> detailDOS = surveyAnswerDetailMapper.getByAnswerId(answerId);
+        if (CollectionUtil.isEmpty(detailDOS)) {
+            return;
+        }
+        SurveyAnswerDO answerDO = surveyAnswerMapper.selectById(answerId);
+        answerDO.setReprot(detailDOS.get(0).getAnswer().toString());
+        surveyAnswerMapper.updateById(answerDO);
+    }
+
 }

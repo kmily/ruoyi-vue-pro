@@ -250,6 +250,7 @@ yudao:
       - hlgyy_survey_question
       - hlgyy_answer_detail
       - hlgyy_member_user_ext
+      - hlgyy_treatment_schedule
   sms-code: # 短信验证码相关的配置项
     expire-times: 10m
     send-frequency: 1m

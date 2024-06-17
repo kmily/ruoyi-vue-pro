@@ -13,7 +13,7 @@ public class ISIScaleSurveyStrategy extends AbstractStrategy implements SurveySt
     private ScaleReportAutoConfiguration scaleReportAutoConfiguration;
 
     @Override
-    public void generateReport(Long answerId) {
-        super.generateReport(answerId,scaleReportAutoConfiguration.getIsi());
+    public void generateReport(Long details) {
+        super.generateScaleReport(details,scaleReportAutoConfiguration.getIsi());
     }
 }

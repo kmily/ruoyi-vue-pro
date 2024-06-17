@@ -12,6 +12,7 @@ import lombok.*;
 @TableName(value = "hlgyy_servey_answer", autoResultMap = true)
 @KeySequence("member_user_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @Builder
 @NoArgsConstructor

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.therapy.service;
 
+import cn.hutool.json.JSONObject;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.ScheduleStateRespVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
@@ -43,7 +44,13 @@ public interface StatService {
      * @param userId
      * @return
      */
-    List<SurveyAnswerDO> getMoodScoringList(Long userId, LocalDate begin,LocalDate end);
+    List<SurveyAnswerDO> getAnswerList(Long userId, LocalDate begin, LocalDate end,List<Integer> types);
 
+    /**
+     * 获取对策卡
+     * @param userId
+     * @return
+     */
+    Map<String,List<JSONObject>> getStrategyCard(Long userId);
 
 }

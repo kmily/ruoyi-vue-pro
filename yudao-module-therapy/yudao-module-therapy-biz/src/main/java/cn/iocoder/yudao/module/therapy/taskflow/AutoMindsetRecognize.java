@@ -69,7 +69,7 @@ public class AutoMindsetRecognize extends BaseFlow {
         RuntimeService runtimeService = processEngine.getRuntimeService();
         Long instance_id = (Long) runtimeService.getVariable(container.getProcessInstanceId(), SURVEY_INSTANCE_ID);
         if(instance_id == null) {
-            instance_id = surveyService.initSurveyAnswer(SurveyType.AUTO_MINDSET_RECOGNIZE.getCode(), SURVEY_SOURCE_TYPE);
+            instance_id = surveyService.initSurveyAnswer(SurveyType.AUTO_THOUGHT_RECOGNITION.getCode(), SURVEY_SOURCE_TYPE);
             runtimeService.setVariable(container.getProcessInstanceId(), SURVEY_INSTANCE_ID, instance_id);
         }
         data.put("instance_id", instance_id);
