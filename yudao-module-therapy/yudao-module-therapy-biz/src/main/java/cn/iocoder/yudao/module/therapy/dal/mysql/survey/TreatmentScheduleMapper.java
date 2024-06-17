@@ -37,8 +37,7 @@ public interface TreatmentScheduleMapper extends BaseMapperX<TreatmentScheduleDO
     default List<TreatmentScheduleDO> getScheduleList(LocalDate day) {
         return selectList(Wrappers.lambdaQuery(TreatmentScheduleDO.class)
                 .eq(TreatmentScheduleDO::getUserId, getLoginUserId())
-                .le(TreatmentScheduleDO::getBeginTime, day)
-                .ge(TreatmentScheduleDO::getEndTime, day));
+                .between(TreatmentScheduleDO::getBeginTime, day,day.plusDays(1)));
     }
 
     default Map<String, Object> statSchedule(LocalDate begin, LocalDate end,Long userId) {

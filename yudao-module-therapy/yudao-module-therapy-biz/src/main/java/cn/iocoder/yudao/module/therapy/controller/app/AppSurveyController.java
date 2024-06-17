@@ -104,5 +104,9 @@ public class AppSurveyController {
         return success(surveyService.getGoalMotive());
     }
 
-
+    @GetMapping("/getCommonSnswer")
+    @Operation(summary = "获取通用回答详情")
+    public CommonResult<SubmitSurveyReqVO> getCommonSnswer() {
+        return success(surveyService.getGoalMotive());
+    }
 }

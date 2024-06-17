@@ -18,4 +18,10 @@ public interface SurveyAnswerDetailMapper extends BaseMapperX<AnswerDetailDO> {
         return selectList(queryWrapper);
     }
 
+    default List<AnswerDetailDO> getByAnswerIds(List<Long> ids){
+        LambdaQueryWrapper<AnswerDetailDO> queryWrapper= Wrappers.lambdaQuery(AnswerDetailDO.class)
+                .in(AnswerDetailDO::getAnswerId,ids);
+        return selectList(queryWrapper);
+    }
+
 }
