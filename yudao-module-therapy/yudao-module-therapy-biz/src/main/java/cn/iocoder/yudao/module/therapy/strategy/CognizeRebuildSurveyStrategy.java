@@ -8,40 +8,23 @@ import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
+import cn.iocoder.yudao.module.therapy.dal.mysql.survey.SurveyAnswerDetailMapper;
+import cn.iocoder.yudao.module.therapy.dal.mysql.survey.SurveyAnswerMapper;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
  * 认知重建策略实现
  */
 @Component("cognize_rebuildSurveyStrategy")
-public class CognizeRebuildSurveyStrategy extends AbstractStrategy implements SurveyStrategy {
-    @Override
-    public void validationReqVO(SurveySaveReqVO vo) {
-        SurveyStrategy.super.validationReqVO(vo);
-    }
+public class CognizeRebuildSurveyStrategy  implements SurveyStrategy {
 
-    @Override
-    public void fillSurveyCode(TreatmentSurveyDO surveyDO) {
-        SurveyStrategy.super.fillSurveyCode(surveyDO);
-    }
-
-    @Override
-    public void fillQuestionCode(QuestionDO qst) {
-        SurveyStrategy.super.fillQuestionCode(qst);
-    }
-
-    @Override
-    public void checkLoseQuestion(SubmitSurveyReqVO reqVO, List<QuestionDO> qst) {
-        SurveyStrategy.super.checkLoseQuestion(reqVO, qst);
-    }
-
-    @Override
-    public void checkQuestionExistsSurvey(SubmitSurveyReqVO reqVO, List<QuestionDO> qst) {
-        SurveyStrategy.super.checkQuestionExistsSurvey(reqVO, qst);
-    }
-
+    @Resource
+    private SurveyAnswerDetailMapper surveyAnswerDetailMapper;
+    @Resource
+    private SurveyAnswerMapper surveyAnswerMapper;
     @Override
     public void generateReport(Long answerId) {
         //获取关联自动化思维id

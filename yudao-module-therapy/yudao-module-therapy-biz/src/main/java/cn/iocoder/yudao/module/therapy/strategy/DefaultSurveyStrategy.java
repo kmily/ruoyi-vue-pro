@@ -21,15 +21,15 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
  * 默认问卷策略实现
  */
 @Component
-public class DefaultSurveyStrategy extends AbstractStrategy implements SurveyStrategy {
+public class DefaultSurveyStrategy  implements SurveyStrategy {
 
-    @Override
-    public void validationReqVO(SurveySaveReqVO vo) {
-        SurveyStrategy.super.validationReqVO(vo);
-    }
-
-    @Override
-    public void checkLoseQuestion(SubmitSurveyReqVO reqVO, List<QuestionDO> qst) {
+//    @Override
+//    public void validationReqVO(SurveySaveReqVO vo) {
+//        SurveyStrategy.super.validationReqVO(vo);
+//    }
+//
+//    @Override
+//    public void checkLoseQuestion(SubmitSurveyReqVO reqVO, List<QuestionDO> qst) {
 //        //可以部分提交,但提交的题必须在此问卷当中
 //        Set<Long> qst1Set = reqVO.getQstList().stream().map(p -> p.getId()).collect(Collectors.toSet());
 //        Set<Long> qst2Set = qst.stream().filter(k -> k.isRequired()).map(k -> k.getId()).collect(Collectors.toSet());
@@ -37,7 +37,7 @@ public class DefaultSurveyStrategy extends AbstractStrategy implements SurveyStr
 //        if (qst1Set.size() > 0) {
 //            throw exception(QUESTION_NOT_EXISTS_SURVEY);
 //        }
-    }
+//    }
 
     @Override
     public void fillQuestion(SurveySaveReqVO vo) {
@@ -64,13 +64,13 @@ public class DefaultSurveyStrategy extends AbstractStrategy implements SurveyStr
         vo.getQuestions().add(map3.toString());
     }
 
-    @Override
-    public void generateReport(Long details) {
-        SurveyStrategy.super.generateReport(details);
-    }
-
-    @Override
-    public void checkQuestionExistsSurvey(SubmitSurveyReqVO reqVO, List<QuestionDO> qst){
-        SurveyStrategy.super.checkQuestionExistsSurvey(reqVO,qst);
-    }
+//    @Override
+//    public void generateReport(Long details) {
+//        SurveyStrategy.super.generateReport(details);
+//    }
+//
+//    @Override
+//    public void checkQuestionExistsSurvey(SubmitSurveyReqVO reqVO, List<QuestionDO> qst){
+//        SurveyStrategy.super.checkQuestionExistsSurvey(reqVO,qst);
+//    }
 }

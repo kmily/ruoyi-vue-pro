@@ -307,4 +307,9 @@ public class SurveyServiceImpl implements SurveyService {
     public SubmitSurveyReqVO getThoughtTrap() {
         return this.getFirstAnswerInfo(SurveyType.TWELVE_MIND_DISTORT.getType());
     }
+
+    @Override
+    public SubmitSurveyReqVO getMoodRecognition() {
+        return this.getFirstAnswerInfo(SurveyType.MOOD_RECOGNITION.getType());
+    }
 }

@@ -5,6 +5,7 @@ import cn.hutool.json.JSONObject;
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.AnAnswerReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.ScheduleStateRespVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
@@ -51,6 +52,7 @@ public class AppReportController {
 
     @GetMapping("/scheduleStat")
     @Operation(summary = "行为活动计划统计")
+    @PreAuthenticated
     public CommonResult<List<ScheduleStateRespVO>> scheduleState() {
         return success(statService.StatSchedule(7, getLoginUserId()));
     }
@@ -58,12 +60,14 @@ public class AppReportController {
     @GetMapping(value = "/scaleDetail")
     @Operation(summary = "量表报告")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthenticated
     public CommonResult<Map<String, String>> scaleDetail(@RequestParam("id") Long id) {
         return success(statService.getScaleReport(id, getLoginUserId()));
     }
 
     @GetMapping(value = "/scaleList")
     @Operation(summary = "量表报告列表")
+    @PreAuthenticated
     public CommonResult<List<KeyValue<LocalDateTime, Long>>> scaleList() {
         List<SurveyAnswerDO> answerDOS = statService.getScaleList(getLoginUserId());
         List<KeyValue<LocalDateTime, Long>> res = new ArrayList<>();
@@ -80,6 +84,7 @@ public class AppReportController {
 
     @GetMapping(value = "/scaleChart")
     @Operation(summary = "量表报告拆线图数据")
+    @PreAuthenticated
     public CommonResult<Map<String, List<KeyValue>>> scaleChart() {
         Map<String, List<KeyValue>> res = statService.getScaleChart(getLoginUserId());
 
@@ -90,6 +95,7 @@ public class AppReportController {
     @Operation(summary = "每日心情评分拆线图数据")
     @Parameter(name = "begin", description = "开始日期:yyyy-MM-dd", required = true, example = "2024-06-01")
     @Parameter(name = "end", description = "结束日期:yyyy-MM-dd", required = true, example = "2024-06-01")
+    @PreAuthenticated
     public CommonResult<List<KeyValue>> moodScoring(@RequestParam("begin") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate begin
             , @RequestParam("end")@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
         List<SurveyAnswerDO> answerDOS = statService.getAnswerList(getLoginUserId(), begin, end, Arrays.asList(SurveyType.MOOD_MARK.getType()));
@@ -107,6 +113,7 @@ public class AppReportController {
 
     @GetMapping(value = "/autoThoughtRecognition")
     @Operation(summary = "自动化思维识别列表")
+    @PreAuthenticated
     public CommonResult<List<SurveyAnswerDO>> autoThoughtRecognition() {
         List<SurveyAnswerDO> answerDOS = statService.getAnswerList(getLoginUserId(), null, null, Arrays.asList(SurveyType.AUTO_THOUGHT_RECOGNITION.getType()));
         return success(answerDOS);
@@ -114,6 +121,7 @@ public class AppReportController {
 
     @GetMapping(value = "/getCommonDetail")
     @Operation(summary = "获取通用报告")
+    @PreAuthenticated
     @Parameter(name = "id", description = "报告id", required = true, example = "1024")
     public CommonResult<SubmitSurveyReqVO> getCommonDetail(@RequestParam("id") Long id) {
         SubmitSurveyReqVO res = new SubmitSurveyReqVO();
@@ -136,6 +144,7 @@ public class AppReportController {
 
     @GetMapping(value = "/cognizeRebuild")
     @Operation(summary = "认知重建报告列表")
+    @PreAuthenticated
     public CommonResult<List<SurveyAnswerDO>> cognizeRebuild() {
         List<SurveyAnswerDO> answerDOS = statService.getAnswerList(getLoginUserId(), null, null, Arrays.asList(SurveyType.COGNIZE_REBUILD.getType()));
         return success(answerDOS);
@@ -143,6 +152,7 @@ public class AppReportController {
 
     @GetMapping("/getMoodDiary")
     @Operation(summary = "获取心情日记")
+    @PreAuthenticated
     public CommonResult<List<SurveyAnswerDO>> getMoodDiary() {
         List<SurveyAnswerDO> answerDOS = statService.getAnswerList(getLoginUserId(), null, null, Arrays.asList(SurveyType.MOOD_DIARY.getType()));
         return success(answerDOS);
@@ -150,8 +160,17 @@ public class AppReportController {
 
     @GetMapping("/getStrategyCard")
     @Operation(summary = "获取对策卡")
+    @PreAuthenticated
     public CommonResult<Map<String,List<JSONObject>>> getStrategyCard() {
         return success(statService.getStrategyCard(getLoginUserId()));
 
+    }
+
+    @GetMapping("/getReplyCard")
+    @Operation(summary = "获取应对卡")
+    @PreAuthenticated
+    public CommonResult<List<SurveyAnswerDO>> getReplyCard() {
+        List<SurveyAnswerDO> answerDOS = statService.getAnswerList(getLoginUserId(), null, null, Arrays.asList(SurveyType.REPLY_CARD.getType()));
+        return success(answerDOS);
     }
 }
