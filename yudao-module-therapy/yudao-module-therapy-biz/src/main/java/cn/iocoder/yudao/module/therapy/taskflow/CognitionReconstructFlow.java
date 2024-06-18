@@ -60,7 +60,15 @@ public class CognitionReconstructFlow extends BaseFlow{
         return data;
     }
 
+    public String deploy(Long id, Map<String, Object> settings) {
+        return super.deploy(id, "/cognition_reconstruct.json");
+    }
+
     public void submit_recall_qst(Container container, DayitemStepSubmitReqVO submitReqVO, Task currentTask){
+        surveyService.submitSurveyForFlow(submitReqVO.getStep_data().getSurvey());
+    }
+
+    public void submit_reconstruct_qst(Container container, DayitemStepSubmitReqVO submitReqVO, Task currentTask){
         surveyService.submitSurveyForFlow(submitReqVO.getStep_data().getSurvey());
     }
 
