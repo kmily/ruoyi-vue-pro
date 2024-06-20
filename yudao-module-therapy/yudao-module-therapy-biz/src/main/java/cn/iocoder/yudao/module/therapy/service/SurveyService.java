@@ -117,4 +117,8 @@ public interface SurveyService {
      * @return
      */
     SubmitSurveyReqVO getMoodRecognition();
+
+    SubmitSurveyReqVO getHappyActivity();
+
+    void setSurveyRel(Long id,Long relId);
 }

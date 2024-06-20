@@ -172,9 +172,9 @@ public class SurveyController {
     @PostMapping("/setSurveyRel")
     @Operation(summary = "设置问卷关联性")
     @Parameter(name = "id", description = "问卷id", required = true, example = "1024")
-    @Parameter(name = "relList", description = "关联问卷id", required = true, example = "1024,43,534")
-    public CommonResult<Boolean> setSurveyRel(@RequestParam("id") Long id, @RequestParam("relList") List<Long> relList) {
-//        reqVO.setSource(1);
+    @Parameter(name = "relId", description = "关联问卷id", required = true, example = "534")
+    public CommonResult<Boolean> setSurveyRel(@RequestParam("id") Long id, @RequestParam("relId") Long relId) {
+        surveyService.setSurveyRel(id, relId);
         return success(true);
     }
 

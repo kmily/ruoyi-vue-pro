@@ -120,7 +120,7 @@ public class AppReportController {
     }
 
     @GetMapping(value = "/getCommonDetail")
-    @Operation(summary = "获取通用报告")
+    @Operation(summary = "获取通用详情")
     @PreAuthenticated
     @Parameter(name = "id", description = "报告id", required = true, example = "1024")
     public CommonResult<SubmitSurveyReqVO> getCommonDetail(@RequestParam("id") Long id) {

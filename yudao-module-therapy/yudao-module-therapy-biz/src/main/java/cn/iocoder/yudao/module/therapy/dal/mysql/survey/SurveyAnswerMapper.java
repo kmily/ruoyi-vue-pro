@@ -1,15 +1,20 @@
 package cn.iocoder.yudao.module.therapy.dal.mysql.survey;
 
+import cn.iocoder.boot.module.therapy.enums.SignState;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyAnswerPageReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentScheduleDO;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -41,5 +46,20 @@ public interface SurveyAnswerMapper extends BaseMapperX<SurveyAnswerDO> {
         return selectList(Wrappers.lambdaQuery(SurveyAnswerDO.class)
                 .in(SurveyAnswerDO::getSurveyType, surveyType)
                 .eq(SurveyAnswerDO::getCreator, userId));
+    }
+
+    default Long countByUserId(Long userId){
+        return selectCount(Wrappers.lambdaQuery(SurveyAnswerDO.class)
+                .eq(SurveyAnswerDO::getCreator,userId));
+    }
+
+    default List<Map<String, Object>> useToolsNum( Long userId) {
+        MPJLambdaWrapperX<SurveyAnswerDO> wrapperX = new MPJLambdaWrapperX();
+        wrapperX.selectCount(SurveyAnswerDO::getId, "count")
+                .selectCount(SurveyAnswerDO::getSurveyType)
+                .eqIfPresent(SurveyAnswerDO::getCreator, userId)
+                .groupBy(SurveyAnswerDO::getSurveyType);
+        List<Map<String, Object>> res = selectMaps(wrapperX);
+        return res;
     }
 }

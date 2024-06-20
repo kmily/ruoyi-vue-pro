@@ -53,4 +53,8 @@ public interface StatService {
      */
     Map<String,List<JSONObject>> getStrategyCard(Long userId);
 
+    Long useToolsTotal(Long userId);
+
+    Map<Long,Long> useToolsNum(Long userId);
+
 }

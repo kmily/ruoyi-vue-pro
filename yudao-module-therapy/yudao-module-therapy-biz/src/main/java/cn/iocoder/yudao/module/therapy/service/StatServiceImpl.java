@@ -133,6 +133,26 @@ public class StatServiceImpl implements StatService {
     }
 
     @Override
+    public Long useToolsTotal(Long userId) {
+        Long n1 = surveyAnswerMapper.countByUserId(userId);
+        Long n2 = treatmentScheduleMapper.countByUserId(userId);
+        return n1 + n2;
+    }
+
+    @Override
+    public Map<Long, Long> useToolsNum(Long userId) {
+        List<Map<String, Object>> maps = surveyAnswerMapper.useToolsNum(userId);
+
+        Long n2 = treatmentScheduleMapper.countByUserId(userId);
+        Map<Long, Long> map = new HashMap<>();
+        for (Map<String, Object> item : maps) {
+            map.put((Long) item.get("surveyType"), (Long) item.getOrDefault("count", 0L));
+        }
+        map.put(Long.parseLong(SurveyType.SCHEDULE_LIST.getType()+"") , n2);
+        return map;
+    }
+
+    @Override
     public List<SurveyAnswerDO> getScaleList(Long userId) {
 
         return surveyAnswerMapper.selectBySurveyTypeAndUserId(userId, Arrays.asList(SurveyType.PHQ9_SCALE.getType()));

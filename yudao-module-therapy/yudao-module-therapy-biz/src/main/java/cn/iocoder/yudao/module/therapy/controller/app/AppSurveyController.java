@@ -116,4 +116,11 @@ public class AppSurveyController {
     public CommonResult<SubmitSurveyReqVO> getMoodRecognition() {
         return success(surveyService.getMoodRecognition());
     }
+
+    @GetMapping("/getHappyActivity")
+    @Operation(summary = "获取愉悦活动清单详情")
+    @PreAuthenticated
+    public CommonResult<SubmitSurveyReqVO> getHappyActivity() {
+        return success(surveyService.getHappyActivity());
+    }
 }
