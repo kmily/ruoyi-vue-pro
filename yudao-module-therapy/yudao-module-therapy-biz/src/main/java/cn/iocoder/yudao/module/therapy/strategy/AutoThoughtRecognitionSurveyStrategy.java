@@ -13,10 +13,10 @@ import java.util.List;
  */
 @Component("auto_thought_recognitionSurveyStrategy")
 public class AutoThoughtRecognitionSurveyStrategy extends AbstractStrategy implements SurveyStrategy {
-//    @Override
-//    public void validationReqVO(SurveySaveReqVO vo) {
-//        SurveyStrategy.super.validationReqVO(vo);
-//    }
+    @Override
+    public void validationReqVO(SurveySaveReqVO vo) {
+        SurveyStrategy.super.validationReqVO(vo);
+    }
 //
 //    @Override
 //    public void fillSurveyCode(TreatmentSurveyDO surveyDO) {
@@ -28,14 +28,14 @@ public class AutoThoughtRecognitionSurveyStrategy extends AbstractStrategy imple
 //        SurveyStrategy.super.fillQuestionCode(qst);
 //    }
 //
-//    @Override
-//    public void checkLoseQuestion(SubmitSurveyReqVO reqVO, List<QuestionDO> qst) {
-//        SurveyStrategy.super.checkLoseQuestion(reqVO,qst);
-//    }
-//    @Override
-//    public void checkQuestionExistsSurvey(SubmitSurveyReqVO reqVO, List<QuestionDO> qst){
-//        SurveyStrategy.super.checkQuestionExistsSurvey(reqVO,qst);
-//    }
+    @Override
+    public void checkLoseQuestion(SubmitSurveyReqVO reqVO, List<QuestionDO> qst) {
+        SurveyStrategy.super.checkLoseQuestion(reqVO,qst);
+    }
+    @Override
+    public void checkQuestionExistsSurvey(SubmitSurveyReqVO reqVO, List<QuestionDO> qst){
+        SurveyStrategy.super.checkQuestionExistsSurvey(reqVO,qst);
+    }
 
     @Override
     public void generateReport(Long answerId) {

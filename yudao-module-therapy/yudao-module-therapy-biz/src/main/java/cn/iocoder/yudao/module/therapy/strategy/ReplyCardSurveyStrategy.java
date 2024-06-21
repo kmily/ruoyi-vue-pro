@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.therapy.strategy;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
 import cn.iocoder.yudao.module.therapy.dal.mysql.survey.SurveyAnswerDetailMapper;
 import cn.iocoder.yudao.module.therapy.dal.mysql.survey.SurveyAnswerMapper;
 import org.springframework.stereotype.Component;
@@ -14,11 +16,17 @@ import java.util.List;
  * 应对卡策略实现
  */
 @Component("reply_cardSurveyStrategy")
-public class ReplyCardSurveyStrategy implements SurveyStrategy {
+public class ReplyCardSurveyStrategy  implements SurveyStrategy {
     @Resource
     private SurveyAnswerDetailMapper surveyAnswerDetailMapper;
     @Resource
     private SurveyAnswerMapper surveyAnswerMapper;
+
+    @Override
+    public void fillSurveyCode(TreatmentSurveyDO surveyDO) {
+        surveyDO.setCode(IdUtil.fastSimpleUUID());
+    }
+
     @Override
     public void generateReport(Long answerId) {
         List<AnswerDetailDO> detailDOS = surveyAnswerDetailMapper.getByAnswerId(answerId);
