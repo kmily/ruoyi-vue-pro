@@ -144,31 +144,32 @@ public class SurveyServiceImpl implements SurveyService {
             }
             //检查题目是否属于问卷
             List<QuestionDO> ts = surveyQuestionMapper.selectBySurveyId(tsdo.getId());
-            Set<String> set1 = reqVO.getQstList().stream().map(p -> p.getQstCode()).collect(Collectors.toSet());
-            Set<String> set2 = ts.stream().map(p -> p.getCode()).collect(Collectors.toSet());
-            set1.removeAll(set2);
-            if (set1.size() > 0) {
-                throw exception(QUESTION_NOT_EXISTS_SURVEY);
-            }
+//            Set<String> set1 = reqVO.getQstList().stream().map(p -> p.getQstCode()).collect(Collectors.toSet());
+//            Set<String> set2 = ts.stream().map(p -> p.getCode()).collect(Collectors.toSet());
+//            set1.removeAll(set2);
+//            if (set1.size() > 0) {
+//                throw exception(QUESTION_NOT_EXISTS_SURVEY);
+//            }
+            SurveyStrategy surveyStrategy = surveyStrategyFactory.getSurveyStrategy(SurveyType.getByType(reqVO.getSurveyType()).getCode());
+            surveyStrategy.checkQuestionExistsSurvey(reqVO, ts);
             Long answerId = this.initSurveyAnswer(tsdo.getCode(), 1);
             Map<String, QuestionDO> mapQst = CollectionUtils.convertMap(ts, QuestionDO::getCode);
             List<AnswerDetailDO> newDetails = new ArrayList<>();
             for (AnAnswerReqVO item : reqVO.getQstList()) {
                 AnswerDetailDO detailDO = new AnswerDetailDO();
-                if (!mapQst.containsKey(item.getQstCode())) throw exception(SURVEY_QUESTION_NOT_EXISTS);
-                QuestionDO qst = mapQst.get(item.getQstCode());
+//                if (!mapQst.containsKey(item.getQstCode())) throw exception(SURVEY_QUESTION_NOT_EXISTS);
+                QuestionDO qst = mapQst.getOrDefault(item.getQstCode(), null);
                 detailDO.setAnswerId(answerId);
-                detailDO.setBelongSurveyId(qst.getBelongSurveyId());
+                detailDO.setBelongSurveyId(tsdo.getId());
                 detailDO.setCreator(getLoginUserId().toString());
                 detailDO.setUpdater(getLoginUserId().toString());
-                detailDO.setQstContext(qst.getQstContext());
+                detailDO.setQstContext(Objects.isNull(qst) ? null : qst.getQstContext());
                 detailDO.setAnswer(item.getAnswer());
-                detailDO.setQstId(qst.getId());
-                detailDO.setBelongQstCode(qst.getCode());
+                detailDO.setQstId(Objects.isNull(qst) ? 0L : qst.getId());
+                detailDO.setBelongQstCode(item.getQstCode());
                 newDetails.add(detailDO);
             }
             surveyAnswerDetailMapper.insertBatch(newDetails);
-            SurveyStrategy surveyStrategy = surveyStrategyFactory.getSurveyStrategy(SurveyType.getByType(tsdo.getSurveyType()).getCode());
             surveyStrategy.generateReport(answerId);
             return answerId;
         }
