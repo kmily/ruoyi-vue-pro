@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
+import cn.iocoder.yudao.module.therapy.dal.mysql.survey.SurveyAnswerMapper;
 import cn.iocoder.yudao.module.therapy.dal.mysql.survey.TreatmentSurveyMapper;
 import org.springframework.stereotype.Component;
 
@@ -19,34 +20,12 @@ import java.util.Objects;
  * 对策卡问卷策略实现
  */
 @Component("strategy_cardSurveyStrategy")
-public class StrategyCardSurveyStrategy extends AbstractStrategy implements SurveyStrategy {
+public class StrategyCardSurveyStrategy  implements SurveyStrategy {
     @Resource
     private TreatmentSurveyMapper treatmentSurveyMapper;
 
-    @Override
-    public void validationReqVO(SurveySaveReqVO vo) {
-        SurveyStrategy.super.validationReqVO(vo);
-    }
-
-    @Override
-    public void fillSurveyCode(TreatmentSurveyDO surveyDO) {
-        SurveyStrategy.super.fillSurveyCode(surveyDO);
-    }
-
-    @Override
-    public void fillQuestionCode(QuestionDO qst) {
-        SurveyStrategy.super.fillQuestionCode(qst);
-    }
-
-    @Override
-    public void checkLoseQuestion(SubmitSurveyReqVO reqVO, List<QuestionDO> qst) {
-        SurveyStrategy.super.checkLoseQuestion(reqVO, qst);
-    }
-
-    @Override
-    public void checkQuestionExistsSurvey(SubmitSurveyReqVO reqVO, List<QuestionDO> qst) {
-        SurveyStrategy.super.checkQuestionExistsSurvey(reqVO, qst);
-    }
+    @Resource
+    private SurveyAnswerMapper surveyAnswerMapper;
 
     @Override
     public void generateReport(Long answerId) {

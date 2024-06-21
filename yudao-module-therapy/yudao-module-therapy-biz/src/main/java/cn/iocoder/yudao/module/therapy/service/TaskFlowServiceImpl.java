@@ -53,7 +53,7 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
     private Engine engine;
 
     @Resource
-    TwelveMindDistort twelveMindDistort;
+    TwelveMindDistortFlow twelveMindDistort;
 
     @Resource
     CognitionReconstructFlow cognitionReconstructFlow;
@@ -147,7 +147,7 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
                 treatmentFlowDayitemMapper.updateById(flowDayitemDO);
                 break;
             case "twelve_mind_distort":
-                TwelveMindDistort twelveMindDistort = new TwelveMindDistort(engine.getEngine());
+                TwelveMindDistortFlow twelveMindDistort = new TwelveMindDistortFlow(engine.getEngine());
                 String twelveMindDistortId = twelveMindDistort.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
                 flowDayitemDO.setTaskFlowId(twelveMindDistortId);
                 treatmentFlowDayitemMapper.updateById(flowDayitemDO);

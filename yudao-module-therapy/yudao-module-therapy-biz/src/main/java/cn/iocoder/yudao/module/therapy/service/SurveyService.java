@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.therapy.service;
 
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyAnswerPageReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyPageReqVO;
@@ -113,4 +112,13 @@ public interface SurveyService {
      * @return
      */
     SubmitSurveyReqVO getThoughtTrap();
+    /**
+     * 获取最新情绪识别
+     * @return
+     */
+    SubmitSurveyReqVO getMoodRecognition();
+
+    SubmitSurveyReqVO getHappyActivity();
+
+    void setSurveyRel(Long id,Long relId);
 }

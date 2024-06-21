@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyAnswerPa
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentScheduleDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.github.yulichang.method.mp.SelectCount;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDate;
@@ -50,5 +51,12 @@ public interface TreatmentScheduleMapper extends BaseMapperX<TreatmentScheduleDO
         List<Map<String, Object>> res = selectMaps(wrapperX);
         return Objects.nonNull(res) && res.size() > 0 ? res.get(0) : null;
     }
+
+    default Long countByUserId(Long userId) {
+        return selectCount(Wrappers.lambdaQuery(TreatmentScheduleDO.class)
+                .eq(TreatmentScheduleDO::getCreator,userId));
+    }
+
+
 
 }

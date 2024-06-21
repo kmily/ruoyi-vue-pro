@@ -279,7 +279,7 @@ public class SurveyServiceImpl implements SurveyService {
         return this.getFirstAnswerInfo(SurveyType.PROBLEM_GOAL_MOTIVE.getType());
     }
 
-    private SubmitSurveyReqVO getFirstAnswerInfo(Integer type){
+    private SubmitSurveyReqVO getFirstAnswerInfo(Integer type) {
         List<SurveyAnswerDO> surveyAnswerDOS = surveyAnswerMapper.selectBySurveyTypeAndUserId(getLoginUserId(), Arrays.asList(type));
         Optional<SurveyAnswerDO> optional = surveyAnswerDOS.stream().max(Comparator.comparingLong(SurveyAnswerDO::getId));
         if (!optional.isPresent()) {
@@ -294,7 +294,7 @@ public class SurveyServiceImpl implements SurveyService {
         vo.setSurveyType(optional.get().getSurveyType());
         vo.setQstList(new ArrayList<>());
         for (AnswerDetailDO item : answerDetailDOS) {
-            AnAnswerReqVO reqVO=new AnAnswerReqVO();
+            AnAnswerReqVO reqVO = new AnAnswerReqVO();
             reqVO.setQstCode(item.getBelongQstCode());
             reqVO.setAnswer(item.getAnswer());
             vo.getQstList().add(reqVO);
@@ -306,5 +306,30 @@ public class SurveyServiceImpl implements SurveyService {
     @Override
     public SubmitSurveyReqVO getThoughtTrap() {
         return this.getFirstAnswerInfo(SurveyType.TWELVE_MIND_DISTORT.getType());
+    }
+
+    @Override
+    public SubmitSurveyReqVO getMoodRecognition() {
+        return this.getFirstAnswerInfo(SurveyType.MOOD_RECOGNITION.getType());
+    }
+
+    @Override
+    public SubmitSurveyReqVO getHappyActivity() {
+        return this.getFirstAnswerInfo(SurveyType.HAPPY_ACTIVITY.getType());
+    }
+
+    @Override
+    public void setSurveyRel(Long id, Long relId) {
+        TreatmentSurveyDO surveyDO = treatmentSurveyMapper.selectById(id);
+        if (Objects.isNull(surveyDO)) {
+            throw exception(SURVEY_NOT_EXISTS);
+        }
+        TreatmentSurveyDO surveyDO1 = treatmentSurveyMapper.selectById(relId);
+        if (Objects.isNull(surveyDO1)) {
+            throw exception(SURVEY_NOT_EXISTS);
+        }
+
+        surveyDO.setRelSurveyList(Arrays.asList(relId));
+        treatmentSurveyMapper.updateById(surveyDO);
     }
 }
