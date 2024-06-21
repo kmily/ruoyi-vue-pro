@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.therapy.controller.admin.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Schema(description = "管理后台 - 治疗进度 Response VO")
@@ -16,7 +17,7 @@ public class TreatmentProgressRespVO {
         private Long dayitem_instance_id;
 
         @Schema(description = "子任务类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "goal_and_plan")
-        private Long item_type;
+        private String item_type;
 
         @Schema(description = "子任务名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "初步评估")
         private String item_name;
@@ -25,10 +26,12 @@ public class TreatmentProgressRespVO {
         private String status;
 
         @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "2023-05-23 12:23:34")
-        private String create_time;
+        private LocalDateTime create_time;
 
         @Schema(description = "更新时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "2023-05-23 12:23:34")
-        private String update_time;
+        private LocalDateTime update_time;
+
+
     }
 
     @Schema(description = "管理后台 - 治疗进度每日进度 Request VO")
@@ -38,7 +41,10 @@ public class TreatmentProgressRespVO {
         private Long day_instance_id;
 
         @Schema(description = "是否休息日", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
-        private boolean is_break;
+        private boolean has_break;
+
+        @Schema(description = "名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "第一天")
+        private String name;
 
         @Schema(description = "当天任务完成状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "COMPLETED")
         private String status;
@@ -48,6 +54,10 @@ public class TreatmentProgressRespVO {
 
         @Schema(description = "流程日序号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private int flow_day_index;
+
+        public void addDayItemInstance(DayitemInstanceVO dayitemInstanceVO){
+            dayitem_instances.add(dayitemInstanceVO);
+        }
     }
 
     @Schema(description = "治疗流程ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
@@ -61,4 +71,8 @@ public class TreatmentProgressRespVO {
     @Schema
     private List<DayInstanceVO> day_instances;  // 数据
 
+
+    public void addDayInstance(DayInstanceVO dayInstanceVO){
+        day_instances.add(dayInstanceVO);
+    }
 }

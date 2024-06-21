@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.therapy.service;
 
+import cn.iocoder.yudao.module.therapy.controller.admin.vo.TreatmentProgressRespVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemInstanceDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentInstanceDO;
 
@@ -19,7 +20,15 @@ public interface TreatmentStatisticsDataService {
      */
     Map<Long, List<String>> queryPsycoTroubleCategory(List<Long> treatmentInstanceIds);
 
-    List<TreatmentDayitemInstanceDO> queryTreatmentProgressDetail(Long treatmentInstanceId);
+
+    /**
+     * 查询治疗进度
+     *
+     * @param treatmentInstanceId
+     * @return
+     */
+    TreatmentProgressRespVO getTreatmentProgress(Long treatmentInstanceId);
+
 
     Map<Long,TreatmentInstanceDO> queryLatestTreatmentInstanceId(List<Long> userIds);
 
