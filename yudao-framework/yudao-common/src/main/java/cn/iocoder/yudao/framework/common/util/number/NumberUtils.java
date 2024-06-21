@@ -69,4 +69,105 @@ public class NumberUtils {
         return number.longValue();
     }
 
+    public static Boolean isZero(Object obj) {
+        if (Objects.isNull(obj)) {
+            return true;
+        }
+        if (obj instanceof Number) {
+            Number number = (Number) obj;
+            if (number.longValue() == 0L) {
+                return true;
+            }
+        }
+
+        if (obj instanceof String) {
+            //string to number
+            Number number = toNumber(obj.toString());
+            if (number == null) {
+                return false;
+            }
+            return number.intValue() == 0;
+        }
+
+        return false;
+    }
+
+    public static Number toNumber(String number){
+
+        if (StrUtil.isNotEmpty(number)) {
+            return NumberUtil.parseNumber(number);
+        }
+
+        return null;
+    }
+
+
+    public static String toString(Number num, Number defaultValue) {
+        if (num == null) {
+            return defaultValue.toString();
+        }
+        return num.toString();
+    }
+
+    public static boolean compareToLong(Number one, Number two) {
+        if (Objects.isNull(one)) {
+            return false;
+        }
+        if (Objects.isNull(two)) {
+            return false;
+        }
+        return one.longValue() == two.longValue();
+    }
+
+    public static boolean gtEqZero(Number number) {
+        if (Objects.isNull(number)) {
+            return false;
+        }
+        return number.intValue() >= 0;
+    }
+
+
+    public static boolean gtZero(Number number) {
+        if (Objects.isNull(number)) {
+            return false;
+        }
+        return number.intValue() > 0;
+    }
+
+    public static boolean ltZero(Number number) {
+        if (Objects.isNull(number)) {
+            return false;
+        }
+        return number.intValue() < 0;
+    }
+
+    public static boolean gteZero(Number number) {
+        if (Objects.isNull(number)) {
+            return false;
+        }
+        return number.intValue() >= 0;
+    }
+
+    public static Integer toInt(Number number) {
+        if (Objects.isNull(number)) {
+            return null;
+        }
+        return number.intValue();
+    }
+
+    public static Long toLong(Integer number) {
+        if (Objects.isNull(number)) {
+            return null;
+        }
+        return number.longValue();
+    }
+
+
+    public static Integer toInt(Number number, Integer defaultValue) {
+        if (Objects.isNull(number)) {
+            return defaultValue;
+        }
+        return toInt(number);
+    }
+
 }
