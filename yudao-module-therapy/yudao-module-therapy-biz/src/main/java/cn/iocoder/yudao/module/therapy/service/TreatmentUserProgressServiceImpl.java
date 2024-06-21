@@ -62,6 +62,7 @@ public class TreatmentUserProgressServiceImpl implements  TreatmentUserProgressS
         data.setId(dayitemInstanceDO.getId());
         data.setRequired(flowDayitemDO.isRequired());
         data.setItem_type(flowDayitemDO.getItemType());
+        data.setDayitem_id(dayitemInstanceDO.getDayitemId());
         data.setSettings(flowDayitemDO.getSettingsObj());
         return data;
     }

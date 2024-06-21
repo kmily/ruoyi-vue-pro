@@ -23,7 +23,7 @@
   },
   "group_relations": [
     {"source": "start", "target": "steps"},
-    {"source": "start", "type":  "ExclusiveGate",
+    {"source": "steps", "type":  "ExclusiveGate",
       "next_true": "llm", "next_false": "manual", "variable":  "is_llm"},
     { "source":  "llm", "target":  "end"},
     { "source":  "manual", "target":  "end"}
