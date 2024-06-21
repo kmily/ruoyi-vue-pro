@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.therapy.service;
 
-import cn.iocoder.boot.module.therapy.enums.TaskType;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemInstanceDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDayitemDO;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.awt.event.ContainerAdapter;
 import java.util.Map;
 
 import static cn.iocoder.yudao.module.therapy.taskflow.Const.DAYITEM_INSTANCE_ID;
@@ -46,7 +44,7 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
     MoodRecognizeNamedFlow moodRecognizeNamedFlow;
 
     @Resource
-    AutoMindsetRecognize autoMindsetRecognize;
+    AutoMindsetRecognizeFlow autoMindsetRecognizeFlow;
 
     @Resource
     ScaleFlow scaleFlow;
@@ -55,7 +53,7 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
     private Engine engine;
 
     @Resource
-    TwelveMindDistort twelveMindDistort;
+    TwelveMindDistortFlow twelveMindDistort;
 
     @Resource
     CognitionReconstructFlow cognitionReconstructFlow;
@@ -95,7 +93,7 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
             case "mood_recognize_named": // 情绪识别
                 return moodRecognizeNamedFlow;
             case "auto_mindset_recognize": //自动化思维识别
-                return autoMindsetRecognize;
+                return autoMindsetRecognizeFlow;
             case "twelve_mind_distort": //12中心理歪曲
                 return twelveMindDistort;
             case "cognize_reestablish": //认知重建
@@ -143,13 +141,13 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
                 treatmentFlowDayitemMapper.updateById(flowDayitemDO);
                 break;
             case "auto_mindset_recognize": // 自动化思维识别
-                AutoMindsetRecognize autoMindsetRecognize = new AutoMindsetRecognize(engine.getEngine());
-                String autoMindsetRecognizeId = autoMindsetRecognize.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
+                AutoMindsetRecognizeFlow autoMindsetRecognizeFlow = new AutoMindsetRecognizeFlow(engine.getEngine());
+                String autoMindsetRecognizeId = autoMindsetRecognizeFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
                 flowDayitemDO.setTaskFlowId(autoMindsetRecognizeId);
                 treatmentFlowDayitemMapper.updateById(flowDayitemDO);
                 break;
             case "twelve_mind_distort":
-                TwelveMindDistort twelveMindDistort = new TwelveMindDistort(engine.getEngine());
+                TwelveMindDistortFlow twelveMindDistort = new TwelveMindDistortFlow(engine.getEngine());
                 String twelveMindDistortId = twelveMindDistort.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
                 flowDayitemDO.setTaskFlowId(twelveMindDistortId);
                 treatmentFlowDayitemMapper.updateById(flowDayitemDO);

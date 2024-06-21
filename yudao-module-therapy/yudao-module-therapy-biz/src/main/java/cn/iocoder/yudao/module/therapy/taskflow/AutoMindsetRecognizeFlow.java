@@ -23,7 +23,7 @@ import static cn.iocoder.yudao.module.therapy.taskflow.Const.*;
 import static cn.iocoder.yudao.module.therapy.taskflow.Const.SURVEY_INSTANCE_ID;
 
 @Component
-public class AutoMindsetRecognize extends BaseFlow {
+public class AutoMindsetRecognizeFlow extends BaseFlow {
 
     @Resource
     TreatmentDayitemInstanceMapper treatmentDayitemInstanceMapper;
@@ -31,7 +31,7 @@ public class AutoMindsetRecognize extends BaseFlow {
     @Resource
     SurveyService surveyService;
 
-    public AutoMindsetRecognize(ProcessEngine engine) {
+    public AutoMindsetRecognizeFlow(ProcessEngine engine) {
         super(engine);
     }
 
@@ -48,7 +48,7 @@ public class AutoMindsetRecognize extends BaseFlow {
     }
 
     public String deploy(Long id, Map<String, Object> settings) {
-        return super.deploy(id, "/thoughts_recognize.json");
+        return super.deploy(id, "/auto_mindset_recognize.json");
     }
 
     public Map<String, Object> auto_recognize_methods_qst(Container container, Map data, Task currentTask) {

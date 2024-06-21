@@ -17,10 +17,11 @@ import lombok.NoArgsConstructor;
 public class TreatmentDayInstanceDO extends BaseDO {
 
     public enum StatusEnum {
-        INITIATED(0),
-        IN_PROGRESS(1),
-        COMPLETED(2),
-        CANCELLED(3);
+        NOT_STARTED(0),
+        INITIATED(1),
+        IN_PROGRESS(2),
+        COMPLETED(3),
+        CANCELLED(4);
 
         private final int value;
 

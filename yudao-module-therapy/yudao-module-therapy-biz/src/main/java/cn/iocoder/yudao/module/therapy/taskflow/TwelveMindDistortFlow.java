@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.therapy.taskflow;
 
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
-import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayitemInstanceMapper;
 import cn.iocoder.yudao.module.therapy.service.SurveyService;
 import org.flowable.engine.ProcessEngine;
@@ -12,20 +11,19 @@ import org.springframework.stereotype.Component;
 import org.flowable.task.api.Task;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.module.therapy.taskflow.Const.*;
 
 @Component
-public class TwelveMindDistort extends BaseFlow{
+public class TwelveMindDistortFlow extends BaseFlow{
 
     @Resource
     TreatmentDayitemInstanceMapper treatmentDayitemInstanceMapper;
 
     @Resource
     SurveyService surveyService;
-    public TwelveMindDistort(ProcessEngine engine) {
+    public TwelveMindDistortFlow(ProcessEngine engine) {
         super(engine);
     }
 
@@ -65,7 +63,7 @@ public class TwelveMindDistort extends BaseFlow{
         RuntimeService runtimeService = processEngine.getRuntimeService();
         Long instance_id = (Long) runtimeService.getVariable(container.getProcessInstanceId(), STRATEGY_CARD_SURVEY_ID);
         if(instance_id == null) {
-            instance_id = surveyService.initSurveyAnswer(SurveyType.STRATEGY_CARD.getCode(), SURVEY_SOURCE_TYPE);
+            instance_id = surveyService.initSurveyAnswer(SurveyType.REPLY_CARD.getCode(), SURVEY_SOURCE_TYPE);
             runtimeService.setVariable(container.getProcessInstanceId(), STRATEGY_CARD_SURVEY_ID, instance_id);
         }
         data.put("instance_id", instance_id);

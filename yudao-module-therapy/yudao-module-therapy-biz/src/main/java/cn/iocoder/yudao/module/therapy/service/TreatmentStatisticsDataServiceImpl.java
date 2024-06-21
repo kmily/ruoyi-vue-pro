@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.therapy.service;
 
+import cn.iocoder.boot.module.therapy.enums.TaskType;
+import cn.iocoder.yudao.module.therapy.controller.admin.vo.TreatmentProgressRespVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
-import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemInstanceDO;
-import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentInstanceDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.*;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayInstanceMapper;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayitemInstanceMapper;
+import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentFlowDayitemMapper;
 import com.alibaba.fastjson.JSONObject;
 
 import javax.annotation.Resource;
@@ -33,6 +35,9 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
     @Resource
     private SurveyService surveyService;
 
+    @Resource
+    private TreatmentFlowDayitemMapper treatmentFlowDayitemMapper;
+
 
     @Override
     public Map<Long, List<String>> queryPsycoTroubleCategory(List<Long> treatmentInstanceIds) {
@@ -46,17 +51,51 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
         return res;
     }
 
-//    @Override
-//    public Map<Long, TreatmentInstanceDO.TreatmentStatus> queryTreatmentStatus(List<Long> treatmentInstanceIds) {
-//        return null;
-//    }
-
     @Override
-    public List<TreatmentDayitemInstanceDO> queryTreatmentProgressDetail(Long treatmentInstanceId) {
-//        List<TreatmentDayitemInstanceDO> dayitemInstanceDOS = treatmentDayitemInstanceMapper.selectList(TreatmentDayitemInstanceDO::getFlowInstanceId, treatmentInstanceId);
-//        List<TreatmentDayInstanceDO> dayInstanceDOS = treatmentDayInstanceMapper.selectList(TreatmentDayInstanceDO::getFlowInstanceId, treatmentInstanceId);
-        return null;
+    public TreatmentProgressRespVO getTreatmentProgress(Long treatmentInstanceId) {
+        TreatmentInstanceDO treatmentInstanceDO = treatmentInstanceMapper.selectById(treatmentInstanceId);
+        Long flowId = treatmentInstanceDO.getFlowId();
+        List<TreatmentDayitemDetailDO> detailDOS = treatmentFlowDayitemMapper.getDayitemDetail(treatmentInstanceId, flowId );
+        TreatmentProgressRespVO treatmentProgressRespVO = new TreatmentProgressRespVO();
+        treatmentProgressRespVO.setDay_instances(new ArrayList<>());
 
+        TreatmentProgressRespVO.DayInstanceVO dayInstanceVO = null;
+        for (TreatmentDayitemDetailDO detailDO : detailDOS) {
+            if(dayInstanceVO == null || dayInstanceVO.getFlow_day_index() != detailDO.getFlowDayIndex()){
+                dayInstanceVO = new TreatmentProgressRespVO.DayInstanceVO();
+                dayInstanceVO.setDayitem_instances(new ArrayList<>());
+                treatmentProgressRespVO.addDayInstance(dayInstanceVO);
+            }
+            dayInstanceVO.setDay_instance_id(detailDO.getDayInstanceId());
+            dayInstanceVO.setHas_break(detailDO.getHasBreak());
+            dayInstanceVO.setName(detailDO.getFlowDayName());
+            String dayStatus = TreatmentDayInstanceDO.StatusEnum.fromValue(detailDO.getDayInstanceStatus()).toString();
+            dayInstanceVO.setStatus(dayStatus);
+            dayInstanceVO.setFlow_day_index(detailDO.getFlowDayIndex());
+            if(dayInstanceVO.isHas_break()){
+                continue; // skip break day
+            }
+            TreatmentProgressRespVO.DayitemInstanceVO dayitemInstanceVO = convertToDayItemInstanceVO(detailDO);
+            if(!dayitemInstanceVO.getItem_type().equals(TaskType.GUIDE_LANGUAGE.getCode())){
+                dayInstanceVO.addDayItemInstance(dayitemInstanceVO);
+            }
+        }
+
+        return treatmentProgressRespVO;
+    }
+
+    private TreatmentProgressRespVO.DayitemInstanceVO convertToDayItemInstanceVO(TreatmentDayitemDetailDO detailDO){
+        TreatmentProgressRespVO.DayitemInstanceVO dayitemInstanceVO = new TreatmentProgressRespVO.DayitemInstanceVO();
+        dayitemInstanceVO.setDayitem_instance_id(detailDO.getDayitemInstanceId());
+        String itemType = TaskType.getByType(detailDO.getDayitemType()).getCode();
+        String itemName = TaskType.getByType(detailDO.getDayitemType()).getTitle();
+        dayitemInstanceVO.setItem_type(itemType);
+        dayitemInstanceVO.setItem_name(itemName);
+        String status = TreatmentDayitemInstanceDO.StatusEnum.fromValue(detailDO.getDayitemInstanceStatus()).toString();
+        dayitemInstanceVO.setStatus(status);
+        dayitemInstanceVO.setCreate_time(detailDO.getCreateTime());
+        dayitemInstanceVO.setUpdate_time(detailDO.getUpdateTime());
+        return dayitemInstanceVO;
     }
 
     public Map<Long, TreatmentInstanceDO> queryLatestTreatmentInstanceId(List<Long> userIds) {

@@ -74,7 +74,9 @@ public abstract class BaseFlow {
             Method method = this.getClass().getMethod("auto_" + (String) data.get("step_type"), Container.class, Map.class, Task.class);
             Map stepResult = (Map) method.invoke(this, container, data.get("step_data"), currentTask);
             boolean requireSubmit = (boolean) data.getOrDefault("submit", true);
+            result.put("require_submit", requireSubmit);
             if(!requireSubmit || data.get("step_type").equals("guide_language")){
+                result.put("require_submit", false);
                 TaskService taskService = processEngine.getTaskService();
                 taskService.complete(currentTask.getId());
             }

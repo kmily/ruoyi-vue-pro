@@ -73,7 +73,7 @@ public class DayTaskEngine {
                 initInstance(
                         flowInstanceDO.getUserId(),
                         firstFlowDayDO.getId(),
-                        flowId
+                        flowInstanceDO.getId()
                 );
         TreatmentStepItem stepItem = new TreatmentStepItem();
         stepItem.setStarted(true);

@@ -84,6 +84,8 @@ insert into hlgyy_treatment_flow_dayitem(id, day_id, `type`, settings, dependent
 values (6, 1, 5, '{}', '', 5, 1, 1, 0);
 
 insert into hlgyy_treatment_flow_dayitem(day_id, `type`, settings, dependent_item_ids, `agroup`, group_seq, tenant_id, required)
+values ( 1, 6, '{}', '', 5, 1, 1, 0);
+insert into hlgyy_treatment_flow_dayitem(day_id, `type`, settings, dependent_item_ids, `agroup`, group_seq, tenant_id, required)
 values ( 1, 7, '{}', '', 5, 1, 1, 0);
 insert into hlgyy_treatment_flow_dayitem(day_id, `type`, settings, dependent_item_ids, `agroup`, group_seq, tenant_id, required)
 values ( 1, 8, '{}', '', 5, 1, 1, 0);

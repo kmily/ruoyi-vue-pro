@@ -15,7 +15,10 @@ public class StepItemVO {
     @Schema(description = "子任务实例ID", requiredMode = Schema.RequiredMode.NOT_REQUIRED , example = "1")
     private Long id;
 
-    @Schema(description = "子任务类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "guide")
+    @Schema(description = "子任务类别ID", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1")
+    private Long dayitem_id;
+
+    @Schema(description = "子任务类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "guide_language")
     private String item_type;
 
     @Schema(description = "是否必须完成", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
