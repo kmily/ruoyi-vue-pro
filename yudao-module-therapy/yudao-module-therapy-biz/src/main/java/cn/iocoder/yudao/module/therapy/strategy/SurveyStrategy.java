@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
+import jodd.util.StringUtil;
 
 import java.util.List;
 
@@ -32,7 +33,7 @@ public interface SurveyStrategy {
      * @param qst
      */
     default void fillQuestionCode(QuestionDO qst) {
-//        if (StringUtil.isBlank(qst.getCode())) qst.setCode(IdUtil.fastSimpleUUID());
+        if (StringUtil.isBlank(qst.getCode())) qst.setCode(IdUtil.fastSimpleUUID());
     }
 
     /**

@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -41,5 +42,7 @@ public class UserRespVO {
 
     @Schema(description = "预约时间段,字典:booking_time", example = "1")
     private Integer appointmentTimeRange;
+
+    private LocalDateTime createTime;
 
 }

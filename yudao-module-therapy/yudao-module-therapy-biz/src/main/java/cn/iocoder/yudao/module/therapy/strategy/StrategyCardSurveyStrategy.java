@@ -1,11 +1,6 @@
 package cn.iocoder.yudao.module.therapy.strategy;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.json.JSONObject;
-import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveySaveReqVO;
-import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
-import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
-import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
 import cn.iocoder.yudao.module.therapy.dal.mysql.survey.SurveyAnswerMapper;
@@ -13,7 +8,6 @@ import cn.iocoder.yudao.module.therapy.dal.mysql.survey.TreatmentSurveyMapper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.Objects;
 
 /**

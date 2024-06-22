@@ -1,13 +1,11 @@
 package cn.iocoder.yudao.module.therapy.controller.admin.survey.vo;
 
-import cn.hutool.json.JSONObject;
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 @Schema(description = "管理后台 - 治疗问卷创建/修改 Request VO")
