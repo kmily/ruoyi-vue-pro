@@ -52,11 +52,7 @@ public class MemberUserRespVO extends MemberUserBaseVO {
     @Schema(description = "用户经验值", requiredMode  = Schema.RequiredMode.REQUIRED, example = "200")
     private Integer experience;
 
-//    @Schema(description = "治疗进度", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-//    private Integer progress;
-//
-//    @Schema(description = "第几周", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-//    private Integer weekNum;
+
     // ========== 扩展信息 ==========
     /**
      * 父母教育程序
@@ -83,24 +79,5 @@ public class MemberUserRespVO extends MemberUserBaseVO {
      */
     @Schema(description = "细居住地类型",  example = "3")
     private Integer liveAreaType;
-
-    // ========== 治疗信息信息 ==========
-    /**
-     * 最新治疗流程id
-     */
-    @Schema(description = "最新治疗流程id",  example = "3")
-    private Long treatmentInstanceId;
-
-    @Schema(description = "治疗进度状态",  example = "3")
-    private Integer instanceState;
-
-    @Schema(description = "LLM分类",  example = "3")
-    private List<String> llm;
-
-    @Schema(description = "预约时间",example = "2024-05-23")
-    private Date appointmentDate;
-
-    @Schema(description = "预约时间段,字典:booking_time", example = "1")
-    private Integer appointmentTimeRange;
 
 }

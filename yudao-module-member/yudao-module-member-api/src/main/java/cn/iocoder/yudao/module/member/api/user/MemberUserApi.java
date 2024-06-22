@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.member.api.user;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserExtDTO;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserPageReqDTO;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 
 import java.util.Collection;
@@ -61,9 +63,11 @@ public interface MemberUserApi {
 
     MemberUserExtDTO getUserExtInfo(Long userId);
 
-//    List<MemberUserExtDTO> getUserExtInfoList(List<Long> userIds);
+    List<MemberUserExtDTO> getUserExtInfoList(List<Long> userIds);
 
     void saveUserExtInfo(MemberUserExtDTO dto);
 
     void updateMemberExtByUserId(MemberUserExtDTO dto);
+
+    PageResult<MemberUserRespDTO> getUserPage(MemberUserPageReqDTO pageReqVO);
 }

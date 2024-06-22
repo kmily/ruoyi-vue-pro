@@ -5,14 +5,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
-import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserBaseVO;
-import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserRespVO;
-import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateLevelReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdatePointReqVO;
-import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateReqVO;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.*;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.AppAuthLoginReqVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserResetPasswordReqVO;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
@@ -22,27 +16,16 @@ import cn.iocoder.yudao.module.member.enums.point.MemberPointBizTypeEnum;
 import cn.iocoder.yudao.module.member.service.level.MemberLevelService;
 import cn.iocoder.yudao.module.member.service.point.MemberPointRecordService;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
-import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentInstanceDO;
-import cn.iocoder.yudao.module.therapy.service.TreatmentStatisticsDataService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
@@ -64,8 +47,7 @@ public class MemberUserController {
     @Resource
     private MemberPointRecordService memberPointRecordService;
 
-    @Resource
-    private TreatmentStatisticsDataService treatmentStatisticsDataService;
+
 
     @PutMapping("/update")
     @Operation(summary = "更新会员用户")
@@ -135,29 +117,29 @@ public class MemberUserController {
 //        List<MemberGroupDO> groups = memberGroupService.getGroupList(
 //                convertSet(pageResult.getList(), MemberUserDO::getGroupId));
 //        return success(MemberUserConvert.INSTANCE.convertPage(pageResult, tags, levels, groups));
-        //处理患者最新的治疗流程返显
-        List<Long> userIds = pageResult.getList().stream().map(p -> p.getId()).collect(Collectors.toList());
-        Map<Long, TreatmentInstanceDO> map = treatmentStatisticsDataService.queryLatestTreatmentInstanceId(userIds);
-        Map<Long, List<String>> map1 = treatmentStatisticsDataService.queryPsycoTroubleCategory(userIds);
-        //处理扩展信息
-        List<MemberUserExtDO> extDOS=memberUserService.getUserExtInfoList(userIds);
-        Map<Long,MemberUserExtDO> map2=CollectionUtils.convertMap(extDOS,MemberUserExtDO::getUserId);
-
+//        //处理患者最新的治疗流程返显
+//        List<Long> userIds = pageResult.getList().stream().map(p -> p.getId()).collect(Collectors.toList());
+//        Map<Long, TreatmentInstanceDO> map = treatmentStatisticsDataService.queryLatestTreatmentInstanceId(userIds);
+//        Map<Long, List<String>> map1 = treatmentStatisticsDataService.queryPsycoTroubleCategory(userIds);
+//        //处理扩展信息
+//        List<MemberUserExtDO> extDOS=memberUserService.getUserExtInfoList(userIds);
+//        Map<Long,MemberUserExtDO> map2=CollectionUtils.convertMap(extDOS,MemberUserExtDO::getUserId);
+//
         PageResult<MemberUserRespVO> res = MemberUserConvert.INSTANCE.convertPage(pageResult);
-        for (MemberUserRespVO item : res.getList()) {
-            if (map.containsKey(item.getId())) {
-                TreatmentInstanceDO instanceDO = map.get(item.getId());
-                item.setInstanceState(instanceDO.getStatus());
-                item.setTreatmentInstanceId(instanceDO.getId());
-            }
-            if (map1 != null && map1.containsKey(item.getId())) {
-                item.setLlm(map1.get(item.getId()));
-            }
-            if (map2 != null && map2.containsKey(item.getId())) {
-                item.setAppointmentDate(map2.get(item.getId()).getAppointmentDate());
-                item.setAppointmentTimeRange(map2.get(item.getId()).getAppointmentTimeRange());
-            }
-        }
+//        for (MemberUserRespVO item : res.getList()) {
+//            if (map.containsKey(item.getId())) {
+//                TreatmentInstanceDO instanceDO = map.get(item.getId());
+//                item.setInstanceState(instanceDO.getStatus());
+//                item.setTreatmentInstanceId(instanceDO.getId());
+//            }
+//            if (map1 != null && map1.containsKey(item.getId())) {
+//                item.setLlm(map1.get(item.getId()));
+//            }
+//            if (map2 != null && map2.containsKey(item.getId())) {
+//                item.setAppointmentDate(map2.get(item.getId()).getAppointmentDate());
+//                item.setAppointmentTimeRange(map2.get(item.getId()).getAppointmentTimeRange());
+//            }
+//        }
 
         return success(res);
     }

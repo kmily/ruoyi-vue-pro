@@ -37,9 +37,9 @@ public abstract class AbstractStrategy {
         if (CollUtil.isEmpty(vo.getQuestions())) throw exception(SURVEY_QUESTION_EMPTY);
     }
 
-    public void fillSurveyCode(TreatmentSurveyDO surveyDO) {
-        surveyDO.setCode(IdUtil.fastSimpleUUID());
-    }
+//    public void fillSurveyCode(TreatmentSurveyDO surveyDO) {
+//        surveyDO.setCode(IdUtil.fastSimpleUUID());
+//    }
 
     /**
      * 填充问题code
