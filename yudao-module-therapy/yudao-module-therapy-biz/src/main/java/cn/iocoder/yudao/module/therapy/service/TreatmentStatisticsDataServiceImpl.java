@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.therapy.service;
 
 import cn.iocoder.boot.module.therapy.enums.TaskType;
 import cn.iocoder.yudao.module.therapy.controller.admin.vo.TreatmentProgressRespVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.AnAnswerReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.*;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayInstanceMapper;
@@ -111,11 +112,18 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
 
     public List<String>  queryUserGoals(Long userId){
         //TODO fix this;
+//        {"goals":[{"goal":"目标1","title":"问题1"},{"goal":"目标2","title":"问题2"},{"goal":"目标3","title":"问题3"}]}
         SubmitSurveyReqVO data =  surveyService.getGoalMotive(userId);
-        ArrayList<String> goals = new ArrayList<>();
-        goals.add("goal1");
-        goals.add("goal2");
-        goals.add("goal3");
+        List<AnAnswerReqVO> answers = data.getQstList();
+        List<String> goals = new ArrayList<>();
+        for(AnAnswerReqVO answer : answers){
+            if(answer.getQstCode().equals("set_goal_qst")){
+                List<Map<String, String>> goalAnswerList = (List<Map<String, String>>) answer.getAnswer().get("goals");
+                for(Map<String, String> goalAnswer : goalAnswerList){
+                    goals.add(goalAnswer.get("goal"));
+                }
+            }
+        }
         return goals;
     }
 
