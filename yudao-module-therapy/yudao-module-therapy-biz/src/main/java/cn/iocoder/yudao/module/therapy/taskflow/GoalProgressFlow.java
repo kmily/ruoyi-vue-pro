@@ -50,6 +50,10 @@ public class GoalProgressFlow extends BaseFlow{
         treatmentDayitemInstanceMapper.finishDayItemInstance(dayItemInstanceId);
     }
 
+    public String deploy(Long id, Map<String, Object> settings) {
+        return super.deploy(id, "/goal_progress.json");
+    }
+
     public Map<String, Object> auto_goal_progress_qst(Container container, Map data, Task currentTask) {
         Map variables = getVariables(container);
         Long dayitemInstanceId = (Long) variables.get(DAYITEM_INSTANCE_ID);
