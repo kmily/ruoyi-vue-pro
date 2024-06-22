@@ -46,6 +46,8 @@ public class FileServiceImpl implements FileService {
         String type = FileTypeUtils.getMineType(content, name);
         if (StrUtil.isEmpty(path)) {
             path = FileUtils.generatePath(content, name);
+        } else {
+            path = path + "/" + FileUtils.generatePath(content, name);
         }
         // 如果 name 为空，则使用 path 填充
         if (StrUtil.isEmpty(name)) {
