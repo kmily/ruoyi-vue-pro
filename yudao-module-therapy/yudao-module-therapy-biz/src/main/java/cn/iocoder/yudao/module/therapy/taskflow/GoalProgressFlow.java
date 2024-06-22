@@ -2,7 +2,9 @@ package cn.iocoder.yudao.module.therapy.taskflow;
 
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemInstanceDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayitemInstanceMapper;
 import cn.iocoder.yudao.module.therapy.service.SurveyService;
 import cn.iocoder.yudao.module.therapy.service.TreatmentStatisticsDataService;
@@ -49,20 +51,14 @@ public class GoalProgressFlow extends BaseFlow{
     }
 
     public Map<String, Object> auto_goal_progress_qst(Container container, Map data, Task currentTask) {
-        RuntimeService runtimeService = processEngine.getRuntimeService();
-        Long instance_id = (Long) runtimeService.getVariable(container.getProcessInstanceId(), SURVEY_INSTANCE_ID);
-        if(instance_id == null) {
-            instance_id = surveyService.initSurveyAnswer(SurveyType.MOOD_RECOGNITION.getCode(), SURVEY_SOURCE_TYPE);
-            runtimeService.setVariable(container.getProcessInstanceId(), SURVEY_INSTANCE_ID, instance_id);
-        }
-
         Map variables = getVariables(container);
         Long dayitemInstanceId = (Long) variables.get(DAYITEM_INSTANCE_ID);
         TreatmentDayitemInstanceDO dayitemInstanceDO = treatmentDayitemInstanceMapper.selectById(dayitemInstanceId);
-        List<String> goals = treatmentStatisticsDataService.queryUserGoals(dayitemInstanceDO.getUserId());
-
+        SubmitSurveyReqVO surveyReqVO = surveyService.getGoalMotive(dayitemInstanceDO.getUserId());
+        Long instance_id = surveyReqVO.getId();
+        List<AnswerDetailDO> instanceData = surveyService.getAnswerDetailByAnswerId(instance_id);
         data.put("instance_id", instance_id);
-        data.put("goals", goals);
+        data.put("instance_data", instanceData);
         return data;
     }
 
