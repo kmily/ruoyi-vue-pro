@@ -64,6 +64,9 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
     @Resource
     private MoodScoreFlow moodScoreFlow;
 
+    @Resource
+    private ActionPlanFlow actionPlanFlow;
+
     private Container getContainer(BaseFlow flow, TreatmentDayitemInstanceDO dayitemInstanceDO, TreatmentFlowDayitemDO flowDayitemDO){
         Container container =  new Container();
         if(dayitemInstanceDO.getTaskInstanceId().isEmpty()){
@@ -100,6 +103,8 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
                 return cognitionReconstructFlow;
             case "happly_exercise_list": //愉悦活动清单
                 return happyActiveFlow;
+            case "behaviour_exercise_plan": //行为活动计划
+                return actionPlanFlow;
             default:
                 throw new RuntimeException("not supported task flow");
         }
@@ -162,6 +167,12 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
                 HappyActiveFlow happyActiveFlow = new HappyActiveFlow(engine.getEngine());
                 String happyActiveFlowId = happyActiveFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
                 flowDayitemDO.setTaskFlowId(happyActiveFlowId);
+                treatmentFlowDayitemMapper.updateById(flowDayitemDO);
+                break;
+            case "behaviour_exercise_plan":
+                ActionPlanFlow actionPlanFlow = new ActionPlanFlow(engine.getEngine());
+                String actionPlanFlowId = actionPlanFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
+                flowDayitemDO.setTaskFlowId(actionPlanFlowId);
                 treatmentFlowDayitemMapper.updateById(flowDayitemDO);
                 break;
             default:
