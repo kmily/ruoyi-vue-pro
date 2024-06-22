@@ -8,7 +8,6 @@
       {"step_type": "guide_language", "step_data": {"content":  "现在，让我们来试着扮演自己心灵的小侦探，进行一下复盘，并寻找在这个场景下可能更合适更让你感到没那么糟糕的新想法。"}},
       {"step_type": "guide_language", "step_data": {"content":  "侦探式提问是你在评估任何自动思维或想法时可以提出的问题。这里列出了一些例子。这些问题中的大多数都能很好地应对许多思维陷阱，但你可能需要都试一下，看看哪些问题对你来说最适合。你也可以想出其他没有出现在这个工作表中的侦探式提问。把你的回答写在使用的问题下面。"}},
       {"step_type": "recall_qst", "step_data": {}},
-      {"step_type": "reconstruct_qst", "step_data": {}},
       {"step_type": "report", "step_data": {}, "submit":  false},
       {"step_type": "guide_language", "step_data": {"content":  "TODO"}},
       {"step_type": "guide_language", "step_data": {"content":  "TODO"}}
