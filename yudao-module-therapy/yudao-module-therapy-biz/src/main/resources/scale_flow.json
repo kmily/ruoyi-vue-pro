@@ -6,13 +6,13 @@
       {"step_type": "survey_questions", "step_data": {"code":  "gad7_scale", "header":  "初步评估4-2", "index":  1}}
     ],
     "report": [
-      {"step_type": "survey_report", "step_data": {}, "submit":  false}
+      {"step_type": "survey_report", "step_data": {"code":  "phq9_scale"}, "submit":  false}
     ],
     "finish_guide": [
       {"step_type": "guide_language", "step_data": {"content":  "真棒，你已经完成了一次对自己心理健康状态的全面检查。你可以在“量表评估”-“评估报告”中查看每次的评估结果和自己状态的变化情况"}}
     ],
     "review": [
-      {"step_type": "review_result", "step_data": {}, "submit":  false}
+      {"step_type": "review_result", "step_data": {"code":  "phq9_scale"}, "submit":  false}
     ],
     "end": [
       {"step_type": "END"}

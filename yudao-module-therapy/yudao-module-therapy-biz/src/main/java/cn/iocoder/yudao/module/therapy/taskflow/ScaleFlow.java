@@ -96,13 +96,15 @@ public class ScaleFlow extends BaseFlow{
 
     public Map<String, Object> auto_survey_report(Container container,Map data, Task currentTask){
         Map variables = getVariables(container);
-        data.put("instance_id", (Long) variables.get(SURVEY_INSTANCE_ID));
+        String surveyIdKey = "survey_instance_id+" + data.get("code");
+        data.put("instance_id", (Long) variables.get(surveyIdKey));
         return data;
     }
 
     public Map<String, Object> auto_review_result(Container container, Map data, Task currentTask){
         Map variables = getVariables(container);
-        data.put("instance_id", (Long) variables.get(SURVEY_INSTANCE_ID));
+        String surveyIdKey = "survey_instance_id+" + data.get("code");
+        data.put("instance_id", (Long) variables.get(surveyIdKey));
         return data;
     }
 
