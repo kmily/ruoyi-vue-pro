@@ -80,13 +80,15 @@ public class MoodScoreFlow extends BaseFlow {
     }
 
     public Map auto_mood_diary_qst(Container container,Map data, Task currentTask){
-        Map variables = super.getVariables(container);
-        Long instance_id = (Long) variables.get(SURVEY_INSTANCE_ID);
-        Map result = new HashMap<>();
-        List<AnswerDetailDO> instanceData = surveyService.getAnswerDetailByAnswerId((Long) variables.get(SURVEY_INSTANCE_ID));
-        result.put("instance_data", instanceData);
-        result.put("instance_id", instance_id);
-        return result;
+        String DIARY_SURVEY_INSTANCE_ID = "survey_instance_id";
+        RuntimeService runtimeService = processEngine.getRuntimeService();
+        Long instance_id = (Long) runtimeService.getVariable(container.getProcessInstanceId(), DIARY_SURVEY_INSTANCE_ID);
+        if(instance_id == null) {
+            instance_id = surveyService.initSurveyAnswer(SurveyType.MOOD_DIARY.getCode(), SURVEY_SOURCE_TYPE);
+            runtimeService.setVariable(container.getProcessInstanceId(), DIARY_SURVEY_INSTANCE_ID, instance_id);
+        }
+        data.put("instance_id", instance_id);
+        return data;
     }
 
     public void submit_mood_diary_qst(Container container,DayitemStepSubmitReqVO submitReqVO, Task currentTask){
