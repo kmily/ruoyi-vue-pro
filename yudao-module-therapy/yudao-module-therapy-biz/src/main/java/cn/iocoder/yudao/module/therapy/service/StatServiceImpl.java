@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.therapy.dal.mysql.survey.TreatmentScheduleMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -41,12 +42,12 @@ public class StatServiceImpl implements StatService {
             Map<String, Object> map = treatmentScheduleMapper.statSchedule(LocalDate.now().plusDays(-i), LocalDate.now().plusDays(1 - i), userId);
             if (Objects.nonNull(map)) {
                 ScheduleStateRespVO vo = new ScheduleStateRespVO();
-                vo.setDay(LocalDate.now().plusDays(i).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                vo.setDay(LocalDate.now().plusDays(-i).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
                 vo.setNum((Long) map.getOrDefault("count", 0));
                 if (vo.getNum() <= 0) {
                     continue;
                 }
-                Integer score = (Integer) map.getOrDefault("score", 0);
+                Integer score = ((BigDecimal) map.getOrDefault("score", 0)).intValue();
                 vo.setScore(Math.round(score / vo.getNum()));
                 rsp.add(vo);
             }
