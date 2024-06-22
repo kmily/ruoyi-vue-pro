@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.therapy.taskflow;
 
-import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemInstanceDO;
@@ -9,7 +8,6 @@ import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayitemInst
 import cn.iocoder.yudao.module.therapy.service.SurveyService;
 import cn.iocoder.yudao.module.therapy.service.TreatmentStatisticsDataService;
 import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.task.api.Task;
 import org.springframework.stereotype.Component;
@@ -18,8 +16,9 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.TREATMENT_REQUIRE_GOAL_AND_MOTIVATION;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.therapy.taskflow.Const.*;
-import static cn.iocoder.yudao.module.therapy.taskflow.Const.SURVEY_INSTANCE_ID;
 
 @Component
 public class GoalProgressFlow extends BaseFlow{
@@ -59,6 +58,9 @@ public class GoalProgressFlow extends BaseFlow{
         Long dayitemInstanceId = (Long) variables.get(DAYITEM_INSTANCE_ID);
         TreatmentDayitemInstanceDO dayitemInstanceDO = treatmentDayitemInstanceMapper.selectById(dayitemInstanceId);
         SubmitSurveyReqVO surveyReqVO = surveyService.getGoalMotive(dayitemInstanceDO.getUserId());
+        if(surveyReqVO == null){
+            throw exception(TREATMENT_REQUIRE_GOAL_AND_MOTIVATION);
+        }
         Long instance_id = surveyReqVO.getId();
         List<AnswerDetailDO> instanceData = surveyService.getAnswerDetailByAnswerId(instance_id);
         data.put("instance_id", instance_id);

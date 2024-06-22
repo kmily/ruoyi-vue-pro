@@ -33,6 +33,7 @@ public interface ErrorCodeConstants {
 
     //治疗流程相关
     ErrorCode TREATMENT_DAYITEM_STEP_PARAMS_ERROR = new ErrorCode(1_050_001_001, "治疗子任务步骤参数错误");
+    ErrorCode TREATMENT_REQUIRE_GOAL_AND_MOTIVATION = new ErrorCode(1_050_001_002, "请先完成目标与动机的填写");
 
 
 }
