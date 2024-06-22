@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.therapy.strategy;
 
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.json.JSONObject;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveySaveReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
@@ -22,7 +23,7 @@ public interface SurveyStrategy {
      * 填充题目code
      */
     default void fillSurveyCode(TreatmentSurveyDO surveyDO) {
-
+        surveyDO.setCode(IdUtil.fastSimpleUUID());
     }
 
     /**

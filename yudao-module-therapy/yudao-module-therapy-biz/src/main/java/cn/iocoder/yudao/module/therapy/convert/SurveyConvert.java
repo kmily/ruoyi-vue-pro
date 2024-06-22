@@ -4,8 +4,11 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.boot.module.therapy.enums.SurveyQuestionType;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.*;
+import cn.iocoder.yudao.module.therapy.controller.admin.vo.UserRespVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.AnAnswerReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
@@ -106,5 +109,7 @@ public interface SurveyConvert {
     }
 
     SurveyAnswerRespVO convert(SurveyAnswerDO surveyAnswerDO);
+
+    PageResult<UserRespVO> convertUserDTOPage(PageResult<MemberUserRespDTO> pageResult);
 
 }
