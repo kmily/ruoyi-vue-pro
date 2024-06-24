@@ -48,7 +48,7 @@
             <scope>provided</scope> <!-- 设置为 provided，主要是 GlobalExceptionHandler 使用 -->
         </dependency>
 
-        <!-- 业务组件 -->
+        <!-- 业务组件 TODO 基建模块是不应该反过来依赖具体的业务模块的，应该在基建模块中抽出接口类（如：ApiAccessLogFrameworkService、ApiErrorLogFrameworkService），具体的业务模块去实现 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-infra-api</artifactId> <!-- 需要使用它，进行操作日志的记录 -->
