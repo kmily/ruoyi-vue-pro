@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.therapy.controller.admin.survey;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -83,7 +84,14 @@ public class SurveyController {
                 .map(x -> Long.parseLong(x))
                 .collect(Collectors.toSet());
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
-        return success(new PageResult<>(SurveyConvert.INSTANCE.convertList(pageResult.getList(), userMap), pageResult.getTotal()));
+        Set<Long> surveyIds = pageResult.getList().stream()
+                .map(TreatmentSurveyDO::getRelSurveyList)
+                .filter(CollectionUtil::isNotEmpty)
+                .flatMap(p -> p.stream())
+                .collect(Collectors.toSet());
+        List<TreatmentSurveyDO> surveyDOS = surveyService.getSurveyByIds(surveyIds);
+        Map<Long, TreatmentSurveyDO> surveyDOMap = CollectionUtils.convertMap(surveyDOS, TreatmentSurveyDO::getId);
+        return success(new PageResult<>(SurveyConvert.INSTANCE.convertList(pageResult.getList(), userMap,surveyDOMap), pageResult.getTotal()));
     }
 
     @GetMapping("/get")
@@ -170,7 +178,7 @@ public class SurveyController {
     }
 
 
-    @PostMapping("/setSurveyRel")
+    @GetMapping("/setSurveyRel")
     @Operation(summary = "设置问卷关联性")
     @Parameter(name = "id", description = "问卷id", required = true, example = "1024")
     @Parameter(name = "relId", description = "关联问卷id", required = true, example = "534")
