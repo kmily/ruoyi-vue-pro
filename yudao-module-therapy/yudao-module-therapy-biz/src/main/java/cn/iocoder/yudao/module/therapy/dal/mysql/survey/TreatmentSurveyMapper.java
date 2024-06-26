@@ -10,6 +10,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import jodd.util.StringUtil;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface TreatmentSurveyMapper extends BaseMapperX<TreatmentSurveyDO> {
 
@@ -39,5 +41,13 @@ public interface TreatmentSurveyMapper extends BaseMapperX<TreatmentSurveyDO> {
                 .last("limit 1");
 
         return selectOne(queryWrapper);
+    }
+
+    default List<TreatmentSurveyDO> listByType(Integer type){
+        LambdaQueryWrapper<TreatmentSurveyDO> queryWrapper= Wrappers.lambdaQuery(TreatmentSurveyDO.class)
+                .eq(TreatmentSurveyDO::getSurveyType,type)
+                .orderByDesc(TreatmentSurveyDO::getId);
+
+        return selectList(queryWrapper);
     }
 }

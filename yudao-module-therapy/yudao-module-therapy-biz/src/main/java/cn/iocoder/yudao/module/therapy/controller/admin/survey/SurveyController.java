@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.therapy.controller.admin.survey;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -176,6 +177,21 @@ public class SurveyController {
     public CommonResult<Boolean> setSurveyRel(@RequestParam("id") Long id, @RequestParam("relId") Long relId) {
         surveyService.setSurveyRel(id, relId);
         return success(true);
+    }
+
+    @GetMapping("/listByType")
+    @Operation(summary = "通过类型获取问卷")
+    @Parameter(name = "type", description = "问卷类型", required = true, example = "2")
+    public CommonResult<List<KeyValue<Long, String>>> listByType(@RequestParam("type") Integer type) {
+        List<TreatmentSurveyDO> surveyDOS = surveyService.listByType(type);
+        List<KeyValue<Long, String>> res = new ArrayList<>();
+        for (TreatmentSurveyDO item : surveyDOS) {
+            KeyValue<Long, String> keyValue = new KeyValue<>();
+            keyValue.setValue(item.getTitle());
+            keyValue.setKey(item.getId());
+            res.add(keyValue);
+        }
+        return success(res);
     }
 
 }

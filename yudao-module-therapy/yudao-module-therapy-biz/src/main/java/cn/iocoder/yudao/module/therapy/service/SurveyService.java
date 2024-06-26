@@ -121,4 +121,6 @@ public interface SurveyService {
     SubmitSurveyReqVO getHappyActivity();
 
     void setSurveyRel(Long id,Long relId);
+
+    List<TreatmentSurveyDO> listByType(Integer type);
 }
