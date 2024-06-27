@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.therapy.controller.admin.survey;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -82,7 +84,18 @@ public class SurveyController {
                 .map(x -> Long.parseLong(x))
                 .collect(Collectors.toSet());
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
-        return success(new PageResult<>(SurveyConvert.INSTANCE.convertList(pageResult.getList(), userMap), pageResult.getTotal()));
+        Set<Long> surveyIds = pageResult.getList().stream()
+                .map(TreatmentSurveyDO::getRelSurveyList)
+                .filter(CollectionUtil::isNotEmpty)
+                .flatMap(p -> p.stream())
+                .collect(Collectors.toSet());
+        Map<Long, TreatmentSurveyDO> surveyDOMap=new HashMap<>();
+        if(CollUtil.isNotEmpty(surveyIds)){
+            List<TreatmentSurveyDO> surveyDOS = surveyService.getSurveyByIds(surveyIds);
+            surveyDOMap = CollectionUtils.convertMap(surveyDOS, TreatmentSurveyDO::getId);
+        }
+
+        return success(new PageResult<>(SurveyConvert.INSTANCE.convertList(pageResult.getList(), userMap,surveyDOMap), pageResult.getTotal()));
     }
 
     @GetMapping("/get")
@@ -111,7 +124,7 @@ public class SurveyController {
     @GetMapping("/getSurveyAnswerPage")
     @Operation(summary = "获得患者答题列表")
     public CommonResult<PageResult<SurveyAnswerRespVO>> getSurveyAnswerPage(@Valid SurveyAnswerPageReqVO reqVO) {
-        reqVO.setUserId(getLoginUserId());
+//        reqVO.setUserId(getLoginUserId());
         if (reqVO.getSurveyType().equals(SurveyType.SCHEDULE_LIST)) {
             return success(this.getScheduleList(reqVO));
         }
@@ -169,13 +182,28 @@ public class SurveyController {
     }
 
 
-    @PostMapping("/setSurveyRel")
+    @GetMapping("/setSurveyRel")
     @Operation(summary = "设置问卷关联性")
     @Parameter(name = "id", description = "问卷id", required = true, example = "1024")
     @Parameter(name = "relId", description = "关联问卷id", required = true, example = "534")
     public CommonResult<Boolean> setSurveyRel(@RequestParam("id") Long id, @RequestParam("relId") Long relId) {
         surveyService.setSurveyRel(id, relId);
         return success(true);
+    }
+
+    @GetMapping("/listByType")
+    @Operation(summary = "通过类型获取问卷")
+    @Parameter(name = "type", description = "问卷类型", required = true, example = "2")
+    public CommonResult<List<KeyValue<Long, String>>> listByType(@RequestParam("type") Integer type) {
+        List<TreatmentSurveyDO> surveyDOS = surveyService.listByType(type);
+        List<KeyValue<Long, String>> res = new ArrayList<>();
+        for (TreatmentSurveyDO item : surveyDOS) {
+            KeyValue<Long, String> keyValue = new KeyValue<>();
+            keyValue.setValue(item.getTitle());
+            keyValue.setKey(item.getId());
+            res.add(keyValue);
+        }
+        return success(res);
     }
 
 }

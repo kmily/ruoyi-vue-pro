@@ -161,9 +161,8 @@ public class MemberUserController {
 
     @GetMapping("/total")
     @Operation(summary = "总患者数量", description = "统计目前患者总数")
-    public CommonResult<Boolean> total() {
-        memberUserService.total();
-        return success(true);
+    public CommonResult<Long> total() {
+        return success(memberUserService.total());
     }
 
 }

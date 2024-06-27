@@ -333,4 +333,9 @@ public class SurveyServiceImpl implements SurveyService {
         surveyDO.setRelSurveyList(Arrays.asList(relId));
         treatmentSurveyMapper.updateById(surveyDO);
     }
+
+    @Override
+    public List<TreatmentSurveyDO> listByType(Integer type) {
+        return treatmentSurveyMapper.listByType(type);
+    }
 }
