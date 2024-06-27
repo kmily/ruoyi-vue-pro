@@ -56,4 +56,6 @@ public interface AIChatService {
     Flux<SSEMsgDTO> automaticThinkingRecognition(Long userId, String conversationId, String content);
 
     List<ChatMessageDO> queryChatHistories(Long userId, Integer pageNo, Integer pageSize);
+
+    Long queryChatHistoriesCount(Long userId);
 }
