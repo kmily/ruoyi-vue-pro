@@ -120,7 +120,7 @@ public class SurveyController {
     @GetMapping("/getSurveyAnswerPage")
     @Operation(summary = "获得患者答题列表")
     public CommonResult<PageResult<SurveyAnswerRespVO>> getSurveyAnswerPage(@Valid SurveyAnswerPageReqVO reqVO) {
-        reqVO.setUserId(getLoginUserId());
+//        reqVO.setUserId(getLoginUserId());
         if (reqVO.getSurveyType().equals(SurveyType.SCHEDULE_LIST)) {
             return success(this.getScheduleList(reqVO));
         }
