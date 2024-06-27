@@ -75,7 +75,7 @@ public class StatServiceImpl implements StatService {
 
     @Override
     public Map<String, List<KeyValue>> getScaleChart(Long userId) {
-        List<SurveyAnswerDO> answerDOS = surveyAnswerMapper.selectBySurveyTypeAndUserId(getLoginUserId(), Arrays.asList(SurveyType.GAD7_SCALE.getType(), SurveyType.PHQ9_SCALE.getType()
+        List<SurveyAnswerDO> answerDOS = surveyAnswerMapper.selectBySurveyTypeAndUserId(userId, Arrays.asList(SurveyType.GAD7_SCALE.getType(), SurveyType.PHQ9_SCALE.getType()
                 , SurveyType.MOOD_SCALE.getType(), SurveyType.ISI_SCALE.getType()));
         Map<String, List<KeyValue>> res = new HashMap<>();
         if (CollectionUtil.isNotEmpty(answerDOS)) {

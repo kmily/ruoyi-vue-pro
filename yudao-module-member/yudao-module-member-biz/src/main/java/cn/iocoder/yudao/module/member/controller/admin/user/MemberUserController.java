@@ -165,4 +165,12 @@ public class MemberUserController {
         return success(memberUserService.total());
     }
 
+    @GetMapping("/setTestGroup")
+    @Operation(summary = "设置患者分组", description = "设置患者分组")
+    @Parameter(name = "userId", description = "患者id", required = true, example = "1024")
+    @Parameter(name = "groupId", description = "分组id", required = true, example = "2")
+    public CommonResult<Boolean> setTestGroup() {
+        return success(true);
+    }
+
 }

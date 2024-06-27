@@ -47,7 +47,7 @@ public abstract class AbstractStrategy {
      * @param qst
      */
     public void fillQuestionCode(QuestionDO qst) {
-        if (StringUtil.isBlank(qst.getCode())) qst.setCode(IdUtil.fastSimpleUUID());
+        qst.setCode(IdUtil.fastSimpleUUID());
     }
 
     /**
