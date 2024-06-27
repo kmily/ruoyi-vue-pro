@@ -58,4 +58,17 @@ public class AIController {
             return CommonResult.error(new ServiceException(new ErrorCode(500,e.getMessage())));
         }
     }
+
+    @PostMapping("/chat-count")
+    public CommonResult<Long> getChatHistoriesCount(@Validated @RequestBody ChatHistoryRequest request) {
+
+        try {
+            Long l = aiChatService.queryChatHistoriesCount(request.getUserId());
+
+            return CommonResult.success(l);
+        }catch (Exception e){
+            log.error("getChatHistories error",e);
+            return CommonResult.error(new ServiceException(new ErrorCode(500,e.getMessage())));
+        }
+    }
 }

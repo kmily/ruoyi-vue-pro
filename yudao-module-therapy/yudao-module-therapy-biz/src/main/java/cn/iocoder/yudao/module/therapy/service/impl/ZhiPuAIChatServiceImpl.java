@@ -240,6 +240,16 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
         return chatMessageDOS;
     }
 
+    @Override
+    public Long queryChatHistoriesCount(Long userId) {
+        QueryWrapper<ChatMessageDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("send_user_id",userId);
+        queryWrapper.or();
+        queryWrapper.eq("receive_user_id",userId);
+        Long l = chatMessageMapper.selectCount(queryWrapper);
+        return l;
+    }
+
     private List<ChatMessage> assembleHistoryList(String conversationId,String sysPrompt){
         List<ChatMessage> messages = new ArrayList<>();
         ChatMessage sysMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(),sysPrompt );
