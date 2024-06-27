@@ -2,17 +2,16 @@ package cn.iocoder.yudao.module.therapy.service;
 
 import cn.iocoder.boot.module.therapy.enums.TaskType;
 import cn.iocoder.yudao.module.therapy.controller.admin.vo.TreatmentProgressRespVO;
+import cn.iocoder.yudao.module.therapy.controller.app.TreatmentPlanVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.AnAnswerReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.*;
-import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayInstanceMapper;
-import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayitemInstanceMapper;
-import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentFlowDayitemMapper;
+import cn.iocoder.yudao.module.therapy.dal.mysql.definition.*;
 import com.alibaba.fastjson.JSONObject;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentInstanceMapper;
+
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -34,10 +33,17 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
     private TreatmentDayInstanceMapper treatmentDayInstanceMapper;
 
     @Resource
+    private TreatmentUserProgressMapper treatmentUserProgressMapper;
+
+    @Resource
     private SurveyService surveyService;
 
     @Resource
     private TreatmentFlowDayitemMapper treatmentFlowDayitemMapper;
+
+    @Resource
+    private TreatmentFlowDayMapper treatmentFlowDayMapper;
+
 
 
     @Override
@@ -59,6 +65,7 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
         List<TreatmentDayitemDetailDO> detailDOS = treatmentFlowDayitemMapper.getDayitemDetail(treatmentInstanceId, flowId );
         TreatmentProgressRespVO treatmentProgressRespVO = new TreatmentProgressRespVO();
         treatmentProgressRespVO.setDay_instances(new ArrayList<>());
+        treatmentProgressRespVO.setProgress_percentage(getProgressPercentage(treatmentInstanceId));
 
         TreatmentProgressRespVO.DayInstanceVO dayInstanceVO = null;
         for (TreatmentDayitemDetailDO detailDO : detailDOS) {
@@ -81,7 +88,6 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
                 dayInstanceVO.addDayItemInstance(dayitemInstanceVO);
             }
         }
-
         return treatmentProgressRespVO;
     }
 
@@ -128,4 +134,70 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
     }
 
 
+    @Override
+    public TreatmentPlanVO getTreatmentProgressAndPlan(Long treatmentInstanceId) {
+        TreatmentInstanceDO treatmentInstanceDO = treatmentInstanceMapper.selectById(treatmentInstanceId);
+        Long flowId = treatmentInstanceDO.getFlowId();
+        List<TreatmentDayitemDetailDO> detailDOS = treatmentFlowDayitemMapper.getDayitemDetail(treatmentInstanceId, flowId );
+        TreatmentPlanVO treatmentPlanVO = new TreatmentPlanVO();
+        treatmentPlanVO.setGroups(new ArrayList<>());
+        treatmentPlanVO.setProgress_percentage(getProgressPercentage(treatmentInstanceId));
+        int weekDays = 7;
+        int dayIndex = 0;
+        TreatmentProgressRespVO.DayInstanceVO dayInstanceVO = null;
+        for (TreatmentDayitemDetailDO detailDO : detailDOS) {
+            if(dayInstanceVO == null || dayInstanceVO.getFlow_day_index() != detailDO.getFlowDayIndex()){
+                TreatmentPlanVO.GroupData groupData;
+                if(dayIndex % weekDays == 0){
+                    groupData = new TreatmentPlanVO.GroupData();
+                    groupData.setIndex(dayIndex / weekDays);
+                    groupData.setDay_instances(new ArrayList<>());
+                    treatmentPlanVO.getGroups().add(groupData);
+                }else{
+                    groupData = treatmentPlanVO.getGroups().get(treatmentPlanVO.getGroups().size() - 1);
+                }
+                dayInstanceVO = new TreatmentProgressRespVO.DayInstanceVO();
+                dayInstanceVO.setDayitem_instances(new ArrayList<>());
+                groupData.addDayInstance(dayInstanceVO);
+                dayIndex += 1;
+            }
+            dayInstanceVO.setDay_instance_id(detailDO.getDayInstanceId());
+            dayInstanceVO.setHas_break(detailDO.getHasBreak());
+            dayInstanceVO.setName(detailDO.getFlowDayName());
+            String dayStatus = TreatmentDayInstanceDO.StatusEnum.fromValue(detailDO.getDayInstanceStatus()).toString();
+            dayInstanceVO.setStatus(dayStatus);
+            dayInstanceVO.setFlow_day_index(detailDO.getFlowDayIndex());
+            if(dayInstanceVO.isHas_break()){
+                continue; // skip break day
+            }
+            TreatmentProgressRespVO.DayitemInstanceVO dayitemInstanceVO = convertToDayItemInstanceVO(detailDO);
+            if(!dayitemInstanceVO.getItem_type().equals(TaskType.GUIDE_LANGUAGE.getCode())){
+                dayInstanceVO.addDayItemInstance(dayitemInstanceVO);
+            }
+        }
+        return treatmentPlanVO;
+    }
+
+
+    @Override
+    public int getProgressPercentage(Long treatmentInstanceId){
+        TreatmentUserProgressDO treatmentUserProgressDO =  treatmentUserProgressMapper.selectOne(TreatmentUserProgressDO::getTreatmentInstanceId, treatmentInstanceId);
+        if (Objects.isNull(treatmentUserProgressDO)) {
+            return 0;
+        }
+        TreatmentDayInstanceDO treatmentDayInstanceDO = treatmentDayInstanceMapper.selectById(treatmentUserProgressDO.getDayInstanceId());
+        int addition = 0; // if completed, add 1
+        if (treatmentDayInstanceDO.getStatus() == TreatmentDayInstanceDO.StatusEnum.COMPLETED.getValue()) {
+            addition = 1;
+        }
+
+        TreatmentFlowDayDO treatmentFlowDayDO = treatmentFlowDayMapper.selectById(treatmentDayInstanceDO.getDayId());
+        int totalDays = treatmentFlowDayMapper.getDaysCount(treatmentFlowDayDO.getFlowId());
+        if(totalDays == 0){
+            return 0;
+        }
+        int count = treatmentFlowDayDO.getSequence() + addition;
+        return (int) ( count / (float) totalDays  * 100);
+
+    }
 }

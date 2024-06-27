@@ -65,7 +65,7 @@ public class TreatmentProgressRespVO {
 
 
     @Schema(description = "治疗流程总体百分比", requiredMode = Schema.RequiredMode.REQUIRED, example = "75")
-    private Long progress_percentage;
+    private int progress_percentage;
 
 
     @Schema

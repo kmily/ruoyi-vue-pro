@@ -80,7 +80,7 @@ public class MoodScoreFlow extends BaseFlow {
     }
 
     public Map auto_mood_diary_qst(Container container,Map data, Task currentTask){
-        String DIARY_SURVEY_INSTANCE_ID = "survey_instance_id";
+        String DIARY_SURVEY_INSTANCE_ID = "survey_diary_instance_id";
         RuntimeService runtimeService = processEngine.getRuntimeService();
         Long instance_id = (Long) runtimeService.getVariable(container.getProcessInstanceId(), DIARY_SURVEY_INSTANCE_ID);
         if(instance_id == null) {

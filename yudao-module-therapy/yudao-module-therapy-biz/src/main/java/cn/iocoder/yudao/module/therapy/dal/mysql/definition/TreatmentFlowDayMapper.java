@@ -33,4 +33,10 @@ public interface TreatmentFlowDayMapper extends BaseMapperX<TreatmentFlowDayDO> 
                 .orderByAsc(TreatmentFlowDayDO::getSequence);
         return selectList(wrapper);
     }
+
+    default int getDaysCount(Long flowId) {
+        LambdaQueryWrapper<TreatmentFlowDayDO> wrapper = Wrappers.lambdaQuery(TreatmentFlowDayDO.class)
+                .eq(TreatmentFlowDayDO::getFlowId, flowId);
+        return Math.toIntExact(selectCount(wrapper));
+    }
 }
