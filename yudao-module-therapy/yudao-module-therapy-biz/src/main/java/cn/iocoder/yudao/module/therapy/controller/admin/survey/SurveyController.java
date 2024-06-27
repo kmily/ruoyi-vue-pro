@@ -89,8 +89,12 @@ public class SurveyController {
                 .filter(CollectionUtil::isNotEmpty)
                 .flatMap(p -> p.stream())
                 .collect(Collectors.toSet());
-        List<TreatmentSurveyDO> surveyDOS = surveyService.getSurveyByIds(surveyIds);
-        Map<Long, TreatmentSurveyDO> surveyDOMap = CollectionUtils.convertMap(surveyDOS, TreatmentSurveyDO::getId);
+        Map<Long, TreatmentSurveyDO> surveyDOMap=new HashMap<>();
+        if(CollUtil.isNotEmpty(surveyIds)){
+            List<TreatmentSurveyDO> surveyDOS = surveyService.getSurveyByIds(surveyIds);
+            surveyDOMap = CollectionUtils.convertMap(surveyDOS, TreatmentSurveyDO::getId);
+        }
+
         return success(new PageResult<>(SurveyConvert.INSTANCE.convertList(pageResult.getList(), userMap,surveyDOMap), pageResult.getTotal()));
     }
 
