@@ -19,6 +19,8 @@ import reactor.core.publisher.Flux;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -39,8 +41,8 @@ public class AppAIController {
     @PostMapping("/problem-classification")
     @Operation(summary = "分析问题分类")
     public CommonResult<String> teenProblemClassification(@Valid @RequestBody ProblemClassificationRequest req) {
-       String answer = aiChatService.teenProblemClassification(req.getQuestion());
-       return success(answer);
+        List<String> strings = aiChatService.teenProblemClassificationV2(req.getQuestion());
+        return success(String.join("| ", strings));
     }
 
     @PostMapping(value = "/automated-thinking", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
