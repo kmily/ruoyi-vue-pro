@@ -18,5 +18,4 @@ public interface TreatmentFlowMapper extends BaseMapperX<TreatmentFlowDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<TreatmentFlowDO>()
                 .orderByDesc(TreatmentFlowDO::getId));
     }
-
 }
