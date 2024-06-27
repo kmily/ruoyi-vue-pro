@@ -123,4 +123,6 @@ public interface SurveyService {
     void setSurveyRel(Long id,Long relId);
 
     List<TreatmentSurveyDO> listByType(Integer type);
+
+    List<TreatmentSurveyDO> listByTag(String tag);
 }

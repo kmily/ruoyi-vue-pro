@@ -23,6 +23,7 @@ import cn.iocoder.yudao.module.therapy.dal.mysql.survey.TreatmentSurveyMapper;
 import cn.iocoder.yudao.module.therapy.strategy.SurveyStrategy;
 import cn.iocoder.yudao.module.therapy.strategy.SurveyStrategyFactory;
 import lombok.var;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -277,11 +278,11 @@ public class SurveyServiceImpl implements SurveyService {
 
     @Override
     public SubmitSurveyReqVO getGoalMotive(Long userId) {
-        return this.getFirstAnswerInfo(SurveyType.PROBLEM_GOAL_MOTIVE.getType());
+        return this.getFirstAnswerInfo(SurveyType.PROBLEM_GOAL_MOTIVE.getType(),userId);
     }
 
-    private SubmitSurveyReqVO getFirstAnswerInfo(Integer type) {
-        List<SurveyAnswerDO> surveyAnswerDOS = surveyAnswerMapper.selectBySurveyTypeAndUserId(getLoginUserId(), Arrays.asList(type));
+    private SubmitSurveyReqVO getFirstAnswerInfo(Integer type,Long userId) {
+        List<SurveyAnswerDO> surveyAnswerDOS = surveyAnswerMapper.selectBySurveyTypeAndUserId(userId, Arrays.asList(type));
         Optional<SurveyAnswerDO> optional = surveyAnswerDOS.stream().max(Comparator.comparingLong(SurveyAnswerDO::getId));
         if (!optional.isPresent()) {
             return null;
@@ -306,17 +307,17 @@ public class SurveyServiceImpl implements SurveyService {
 
     @Override
     public SubmitSurveyReqVO getThoughtTrap() {
-        return this.getFirstAnswerInfo(SurveyType.TWELVE_MIND_DISTORT.getType());
+        return this.getFirstAnswerInfo(SurveyType.TWELVE_MIND_DISTORT.getType(),getLoginUserId());
     }
 
     @Override
     public SubmitSurveyReqVO getMoodRecognition() {
-        return this.getFirstAnswerInfo(SurveyType.MOOD_RECOGNITION.getType());
+        return this.getFirstAnswerInfo(SurveyType.MOOD_RECOGNITION.getType(),getLoginUserId());
     }
 
     @Override
     public SubmitSurveyReqVO getHappyActivity() {
-        return this.getFirstAnswerInfo(SurveyType.HAPPY_ACTIVITY.getType());
+        return this.getFirstAnswerInfo(SurveyType.HAPPY_ACTIVITY.getType(),getLoginUserId());
     }
 
     @Override
@@ -337,5 +338,13 @@ public class SurveyServiceImpl implements SurveyService {
     @Override
     public List<TreatmentSurveyDO> listByType(Integer type) {
         return treatmentSurveyMapper.listByType(type);
+    }
+
+    @Override
+    public List<TreatmentSurveyDO> listByTag(String tag) {
+        if(StringUtils.isBlank(tag)){
+            throw exception(BAD_REQUEST);
+        }
+        return treatmentSurveyMapper.listByTag(tag);
     }
 }
