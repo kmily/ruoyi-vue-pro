@@ -169,7 +169,8 @@ public class MemberUserController {
     @Operation(summary = "设置患者分组", description = "设置患者分组")
     @Parameter(name = "userId", description = "患者id", required = true, example = "1024")
     @Parameter(name = "groupId", description = "分组id", required = true, example = "2")
-    public CommonResult<Boolean> setTestGroup() {
+    public CommonResult<Boolean> setTestGroup(@RequestParam("userId") Long userId,@RequestParam("groupId") Integer groupId) {
+        memberUserService.setTestGroup(userId,groupId);
         return success(true);
     }
 

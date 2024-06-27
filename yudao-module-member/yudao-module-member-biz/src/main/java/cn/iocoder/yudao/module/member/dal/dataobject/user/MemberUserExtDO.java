@@ -75,4 +75,10 @@ public class MemberUserExtDO implements Serializable, TransPojo {
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
+
+    /**
+     * ab测试组
+     * 字典类型:user_test_group
+     */
+    private Integer testGroup;
 }

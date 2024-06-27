@@ -35,7 +35,7 @@ public class MoodMarkSurveyStrategy  implements SurveyStrategy {
         }
         Integer score = 0;
         for (int i = 0; i < detailDOS.size(); i++) {
-            if (Objects.isNull(detailDOS.get(i).getAnswer())) {
+            if (Objects.nonNull(detailDOS.get(i).getAnswer())) {
                 score += detailDOS.get(i).getAnswer().getInt("val", 0);
 
             }

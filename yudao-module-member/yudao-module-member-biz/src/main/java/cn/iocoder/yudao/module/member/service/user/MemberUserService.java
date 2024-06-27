@@ -203,4 +203,6 @@ public interface MemberUserService {
     void updateMemberExtByUserId(MemberUserExtDTO dto);
 
     Long total();
+
+    void setTestGroup(Long userId,Integer groupId);
 }
