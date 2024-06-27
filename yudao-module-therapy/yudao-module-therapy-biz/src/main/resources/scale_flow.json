@@ -4,6 +4,8 @@
     "survey_qsts": [
       {"step_type": "survey_questions", "step_data": {"code":  "phq9_scale", "header":  "初步评估4-1", "index":  0}},
       {"step_type": "survey_questions", "step_data": {"code":  "gad7_scale", "header":  "初步评估4-2", "index":  1}}
+      {"step_type": "survey_questions", "step_data": {"code":  "isi_scale", "header":  "初步评估4-3", "index":  2}}
+      {"step_type": "survey_questions", "step_data": {"code":  "mood_scale", "header":  "初步评估4-4", "index":  3}}
     ],
     "report": [
       {"step_type": "survey_report", "step_data": {"code":  "phq9_scale"}, "submit":  false}
