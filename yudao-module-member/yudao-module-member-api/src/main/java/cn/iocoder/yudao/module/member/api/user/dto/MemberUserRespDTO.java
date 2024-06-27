@@ -17,6 +17,13 @@ public class MemberUserRespDTO {
      * 用户ID
      */
     private Long id;
+
+    /**
+     * 用户名称
+     */
+    private String name;
+
+    private Byte sex;
     /**
      * 用户昵称
      */

@@ -20,6 +20,7 @@ public enum SurveyQuestionType implements IntArrayValuable {
     TREE(3,"tree", "树"),
     SPAN(4,"span", "文本框"),
     SPACES(5,"spaces", "占位题"),
+    DIALOG(6,"from", "对话框"),
     ;
 
     /**

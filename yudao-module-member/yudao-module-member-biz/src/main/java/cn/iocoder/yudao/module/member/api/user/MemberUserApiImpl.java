@@ -1,7 +1,11 @@
 package cn.iocoder.yudao.module.member.api.user;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserExtDTO;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserPageReqDTO;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
+import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserPageReqVO;
 import cn.iocoder.yudao.module.member.convert.user.MemberUserConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
@@ -54,10 +58,10 @@ public class MemberUserApiImpl implements MemberUserApi {
         return MemberUserConvert.INSTANCE.convert(userService.getUserExtInfo(userId));
     }
 
-//    @Override
-//    public List<MemberUserExtDTO> getUserExtInfoList(List<Long> userIds) {
-//        return MemberUserConvert.INSTANCE.convertExtList(userService.getUserExtInfoList(userIds));
-//    }
+    @Override
+    public List<MemberUserExtDTO> getUserExtInfoList(List<Long> userIds) {
+        return MemberUserConvert.INSTANCE.convertExtList(userService.getUserExtInfoList(userIds));
+    }
 
     @Override
     public void saveUserExtInfo(MemberUserExtDTO dto) {
@@ -70,6 +74,13 @@ public class MemberUserApiImpl implements MemberUserApi {
             throw exception(USER_NOT_EXISTS);
         }
         userService.updateMemberExtByUserId(dto);
+    }
+
+    @Override
+    public PageResult<MemberUserRespDTO> getUserPage(MemberUserPageReqDTO pageReqVO) {
+        PageResult<MemberUserDO> res=userService.getUserPage(BeanUtils.toBean(pageReqVO,MemberUserPageReqVO.class));
+        return MemberUserConvert.INSTANCE.convertDTOPage(res);
+
     }
 
 }

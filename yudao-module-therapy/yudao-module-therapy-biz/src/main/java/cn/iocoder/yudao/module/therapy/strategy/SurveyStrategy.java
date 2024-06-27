@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.therapy.strategy;
 
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.json.JSONObject;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveySaveReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
+import jodd.util.StringUtil;
 
 import java.util.List;
 
@@ -22,7 +24,7 @@ public interface SurveyStrategy {
      * 填充题目code
      */
     default void fillSurveyCode(TreatmentSurveyDO surveyDO) {
-
+        surveyDO.setCode(IdUtil.fastSimpleUUID());
     }
 
     /**
@@ -31,7 +33,7 @@ public interface SurveyStrategy {
      * @param qst
      */
     default void fillQuestionCode(QuestionDO qst) {
-//        if (StringUtil.isBlank(qst.getCode())) qst.setCode(IdUtil.fastSimpleUUID());
+        if (StringUtil.isBlank(qst.getCode())) qst.setCode(IdUtil.fastSimpleUUID());
     }
 
     /**

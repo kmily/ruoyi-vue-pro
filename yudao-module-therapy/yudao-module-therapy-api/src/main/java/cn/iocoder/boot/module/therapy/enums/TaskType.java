@@ -24,7 +24,8 @@ public enum TaskType implements IntArrayValuable {
     TWELVE_MIND_DISTORT(7,"12种心理歪曲","twelve_mind_distort"),
     COGNIZE_REESTABLISH(8,"认知重建","cognize_reestablish"),
     HAPPLY_EXERCISE_LIST(9,"愉悦活动清单","happly_exercise_list"),
-    BEHAVIOUR_EXERCISE_PLAN(10,"行为活动计划","behaviour_exercise_plan")
+    BEHAVIOUR_EXERCISE_PLAN(10,"行为活动计划","behaviour_exercise_plan"),
+    GOAL_PROGRESS(11,"目标完成情况","goal_progress"),
     ;
 
     /**

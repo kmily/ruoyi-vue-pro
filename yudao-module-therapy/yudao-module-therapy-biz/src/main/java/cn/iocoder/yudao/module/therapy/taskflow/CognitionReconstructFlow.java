@@ -83,6 +83,8 @@ public class CognitionReconstructFlow extends BaseFlow{
     }
 
     public Map<String, Object> auto_report(Container container,Map data, Task currentTask){
+        Long instance_id = surveyService.initSurveyAnswer(SurveyType.COGNIZE_REBUILD.getCode(), SURVEY_SOURCE_TYPE); //TODO
+        data.put("instance_id", instance_id);
         return data;
     }
 

@@ -50,4 +50,13 @@ public class SurveyRespVO {
      */
     @Schema(description = "创建人", requiredMode = Schema.RequiredMode.REQUIRED, example = "张三")
     private String creator;
+
+    @Schema(description = "关联问卷名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "对策卡焦虑")
+    private String relSurveyTitle;
+
+    /**
+     * 关联问卷Id
+     */
+    @Schema(description = "关联问卷Id", requiredMode = Schema.RequiredMode.REQUIRED, example = "33L")
+    private Long relSurveyId;
 }

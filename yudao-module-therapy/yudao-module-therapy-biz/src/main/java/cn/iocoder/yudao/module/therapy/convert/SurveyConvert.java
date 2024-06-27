@@ -4,8 +4,13 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.boot.module.therapy.enums.SurveyQuestionType;
+import cn.iocoder.boot.module.therapy.enums.SurveyType;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.*;
+import cn.iocoder.yudao.module.therapy.controller.admin.vo.UserRespVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.AnAnswerReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
@@ -15,9 +20,7 @@ import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.SURVEY_QUESTION_NOT_EXISTS;
 import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.SURVEY_QUESTION_TYPE_CHANGE;
@@ -43,12 +46,21 @@ public interface SurveyConvert {
         return qst;
     }
 
-    default List<SurveyRespVO> convertList(List<TreatmentSurveyDO> tsDO, Map<Long, AdminUserRespDTO> userMap) {
+    default List<SurveyRespVO> convertList(List<TreatmentSurveyDO> tsDO, Map<Long, AdminUserRespDTO> userMap, Map<Long, TreatmentSurveyDO> surveyDOMap) {
         List<SurveyRespVO> list = this.convertList(tsDO);
         for (SurveyRespVO item : list) {
+            if (item.getSurveyType().equals(SurveyType.STRATEGY_GAMES.getType())) {
+                Optional<TreatmentSurveyDO> optional = tsDO.stream().filter(p -> p.getId().equals(item.getId())).findFirst();
+                if (optional.isPresent() && CollUtil.isNotEmpty(optional.get().getRelSurveyList())) {
+                    item.setRelSurveyId(NumberUtils.toLong(optional.get().getRelSurveyList().get(0),0L));
+                }
+            }
             Long userId = Long.parseLong(item.getCreator());
             if (CollUtil.isEmpty(userMap) && userMap.containsKey(userId)) {
                 item.setCreator(userMap.get(userId).getNickname());
+            }
+            if (Objects.nonNull(item.getRelSurveyId()) && item.getRelSurveyId() > 0 && surveyDOMap.containsKey(item.getRelSurveyId())) {
+                item.setRelSurveyTitle(surveyDOMap.get(item.getRelSurveyId()).getTitle());
             }
         }
 
@@ -106,5 +118,7 @@ public interface SurveyConvert {
     }
 
     SurveyAnswerRespVO convert(SurveyAnswerDO surveyAnswerDO);
+
+    PageResult<UserRespVO> convertUserDTOPage(PageResult<MemberUserRespDTO> pageResult);
 
 }
