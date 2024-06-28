@@ -54,7 +54,7 @@ public class AppReportController {
     @Operation(summary = "行为活动计划统计")
     @PreAuthenticated
     public CommonResult<List<ScheduleStateRespVO>> scheduleState() {
-        return success(statService.StatSchedule(30, getLoginUserId()));
+        return success(statService.StatSchedule(7, getLoginUserId()));
     }
 
     @GetMapping(value = "/scaleDetail")
