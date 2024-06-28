@@ -46,6 +46,13 @@ public interface AIChatService {
     String teenProblemClassification (String problems);
 
     /**
+     * 青少年问题分类
+     * @param problems 问题
+     * @return 结果
+     */
+     List<String> teenProblemClassificationV2 (String problems);
+
+    /**
      * 自动思维识别
      *
      * @param userId         用户编号

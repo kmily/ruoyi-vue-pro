@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.google.common.collect.Lists;
 import com.zhipu.oapi.ClientV4;
 import com.zhipu.oapi.Constants;
 import com.zhipu.oapi.service.v4.model.ChatCompletionRequest;
@@ -27,6 +28,7 @@ import com.zhipu.oapi.service.v4.model.ModelData;
 import io.reactivex.Flowable;
 import liquibase.util.BooleanUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -145,18 +147,8 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
      */
     @Override
     public String teenProblemClassification(String problems) {
-        DictDataDO dictDataDO = dictDataService.parseDictData("ai_system_prompt", "juvenile_problems_classification");
-        if (dictDataDO == null) {
-            log.error("dictDataDO is null, dictType:{} label:{}", "ai_system_prompt", "juvenile_problems_classification");
-            return "系统提示未配置";
-        }
-
-        List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage sysMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), dictDataDO.getValue());
-        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), problems);
-        messages.add(sysMessage);
-        messages.add(chatMessage);
-        ModelApiResponse chat = chat(messages, false);
+        ModelApiResponse chat = problemClassification(problems);
+        if (chat == null) return "系统提示未配置";
 
         if (!chat.isSuccess()) {
             log.error("chat problem:{} error:{}", problems, JSON.toJSONString(chat));
@@ -170,6 +162,51 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
             return "解析失败，choices为空";
         }
         return String.valueOf(choices.get(0).getMessage().getContent());
+    }
+
+    private ModelApiResponse problemClassification(String problems) {
+        DictDataDO dictDataDO = dictDataService.parseDictData("ai_system_prompt", "juvenile_problems_classification");
+        if (dictDataDO == null) {
+            log.error("dictDataDO is null, dictType:{} label:{}", "ai_system_prompt", "juvenile_problems_classification");
+            return null;
+        }
+
+        List<ChatMessage> messages = new ArrayList<>();
+        ChatMessage sysMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), dictDataDO.getValue());
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), problems);
+        messages.add(sysMessage);
+        messages.add(chatMessage);
+        ModelApiResponse chat = chat(messages, false);
+        return chat;
+    }
+
+    @Override
+    public List<String> teenProblemClassificationV2(String problems) {
+        ModelApiResponse modelApiResponse = problemClassification(problems);
+
+        if (modelApiResponse == null) {
+            log.error("chat problem:{} error:{}", problems, "系统返回为NULL");
+            return Collections.emptyList();
+        }
+
+        if (!modelApiResponse.isSuccess()) {
+            log.error("chat problem:{} error:{}", problems, JSON.toJSONString(modelApiResponse));
+            return Collections.emptyList();
+        }
+
+        ModelData data = modelApiResponse.getData();
+        List<Choice> choices = data.getChoices();
+        if (choices == null || choices.isEmpty()) {
+            log.error("chat problem:{} error:{}", problems, "choices为空");
+            return Collections.emptyList();
+        }
+
+        String s = String.valueOf(choices.get(0).getMessage().getContent());
+        if (JsonUtils.isJson(s)) {
+            List<String> list = JsonUtils.parseArray(s, String.class);
+            return list;
+        }
+        return Collections.emptyList();
     }
 
     /**
