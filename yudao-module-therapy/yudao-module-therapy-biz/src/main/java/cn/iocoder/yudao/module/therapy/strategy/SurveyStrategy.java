@@ -33,7 +33,7 @@ public interface SurveyStrategy {
      * @param qst
      */
     default void fillQuestionCode(QuestionDO qst) {
-        if (StringUtil.isBlank(qst.getCode())) qst.setCode(IdUtil.fastSimpleUUID());
+        qst.setCode(IdUtil.fastSimpleUUID());
     }
 
     /**
