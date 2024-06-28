@@ -70,6 +70,9 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
     @Resource
     private GoalProgressFlow goalProgressFlow;
 
+    @Resource
+    private StrategyPracticeFlow strategyPracticeFlow;
+
     private Container getContainer(BaseFlow flow, TreatmentDayitemInstanceDO dayitemInstanceDO, TreatmentFlowDayitemDO flowDayitemDO){
         Container container =  new Container();
         if(dayitemInstanceDO.getTaskInstanceId().isEmpty()){
@@ -110,6 +113,8 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
                 return actionPlanFlow;
             case "goal_progress": // 目标进展
                 return goalProgressFlow;
+            case "strategy_practice": //对策游戏
+                return strategyPracticeFlow;
             default:
                 throw new RuntimeException("not supported task flow");
         }
@@ -184,6 +189,12 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
                 GoalProgressFlow goalProgressFlow = new GoalProgressFlow(engine.getEngine());
                 String goalProgressFlowId = goalProgressFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
                 flowDayitemDO.setTaskFlowId(goalProgressFlowId);
+                treatmentFlowDayitemMapper.updateById(flowDayitemDO);
+                break;
+            case "strategy_practice": //对策游戏
+                StrategyPracticeFlow strategyPracticeFlow = new StrategyPracticeFlow(engine.getEngine());
+                String strategyPracticeFlowId = strategyPracticeFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
+                flowDayitemDO.setTaskFlowId(strategyPracticeFlowId);
                 treatmentFlowDayitemMapper.updateById(flowDayitemDO);
                 break;
             default:

@@ -62,8 +62,7 @@ public class AICheckUserTroublesCategory implements org.flowable.engine.delegate
             return;
         }
         System.out.println("User troubles: " + userTroubles);
-        String result = aiChatService.teenProblemClassification(String.join(",", userTroubles));
-        List<String> troublesCategory = llmResultToPsycoCategories(result);
+        List<String> troublesCategory  = aiChatService.teenProblemClassificationV2(String.join(",", userTroubles));
         if(troublesCategory.size() > 0 ){
             execution.setVariable("primary_troubles_is_set", true);
             Long dayitemInstanceId = (Long) execution.getVariable(DAYITEM_INSTANCE_ID);

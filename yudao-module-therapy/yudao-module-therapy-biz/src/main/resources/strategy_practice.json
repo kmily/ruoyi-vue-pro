@@ -1,0 +1,16 @@
+{
+  "group_nodes": {
+    "start": [ {"step_type": "START"}],
+    "steps": [
+      {"step_type": "strategy_practice_survey", "step_data": {}, "submit":  false},
+      {"step_type": "strategy_card", "step_data": {}}
+    ],
+    "end": [
+      {"step_type": "END"}
+    ]
+  },
+  "group_relations": [
+    {"source": "start", "target": "steps"},
+    {"source": "steps", "target": "end"}
+  ]
+}
