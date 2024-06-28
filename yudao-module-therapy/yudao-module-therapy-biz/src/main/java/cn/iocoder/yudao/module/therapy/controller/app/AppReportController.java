@@ -98,6 +98,7 @@ public class AppReportController {
     @PreAuthenticated
     public CommonResult<List<KeyValue>> moodScoring(@RequestParam("begin") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate begin
             , @RequestParam("end")@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
+        end=end.plusDays(1);
         List<SurveyAnswerDO> answerDOS = statService.getAnswerList(getLoginUserId(), begin, end, Arrays.asList(SurveyType.MOOD_MARK.getType()));
         List<KeyValue> res = new ArrayList<>();
         if (CollectionUtil.isNotEmpty(answerDOS)) {
