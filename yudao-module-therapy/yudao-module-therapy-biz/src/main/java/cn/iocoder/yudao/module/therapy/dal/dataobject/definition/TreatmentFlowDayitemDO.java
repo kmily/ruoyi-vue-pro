@@ -37,10 +37,10 @@ public class TreatmentFlowDayitemDO extends BaseDO implements JsonFieldAccessibl
 
     private String remark;
 
-//    /**
-//     * 废弃
-//     */
-//    private String itemType;
+    /**
+     * 名称
+     */
+    private String name;
 
     /**
      * 任务类型
