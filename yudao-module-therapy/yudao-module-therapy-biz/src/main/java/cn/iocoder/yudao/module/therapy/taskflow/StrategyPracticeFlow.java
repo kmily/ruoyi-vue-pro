@@ -84,6 +84,7 @@ public class StrategyPracticeFlow extends BaseFlow {
         List<QuestionDO> questionDOS = surveyService.getQuestionBySurveyId(surveyDO.getId());
         data.put("survey_id", surveyDO.getId());
         data.put("questions", questionDOS);
+        data.put("description", surveyDO.getDescription());
         data.put("trouble_tag", tag);
 
         return data;
