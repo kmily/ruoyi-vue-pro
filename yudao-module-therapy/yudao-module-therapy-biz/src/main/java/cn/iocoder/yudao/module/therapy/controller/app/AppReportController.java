@@ -54,7 +54,7 @@ public class AppReportController {
     @Operation(summary = "行为活动计划统计")
     @PreAuthenticated
     public CommonResult<List<ScheduleStateRespVO>> scheduleState() {
-        return success(statService.StatSchedule(30, getLoginUserId()));
+        return success(statService.StatSchedule(7, getLoginUserId()));
     }
 
     @GetMapping(value = "/scaleDetail")
@@ -98,6 +98,7 @@ public class AppReportController {
     @PreAuthenticated
     public CommonResult<List<KeyValue>> moodScoring(@RequestParam("begin") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate begin
             , @RequestParam("end")@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
+        end=end.plusDays(1);
         List<SurveyAnswerDO> answerDOS = statService.getAnswerList(getLoginUserId(), begin, end, Arrays.asList(SurveyType.MOOD_MARK.getType()));
         List<KeyValue> res = new ArrayList<>();
         if (CollectionUtil.isNotEmpty(answerDOS)) {

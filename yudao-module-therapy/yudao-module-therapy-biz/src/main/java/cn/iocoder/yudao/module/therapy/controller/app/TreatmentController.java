@@ -1,18 +1,20 @@
 package cn.iocoder.yudao.module.therapy.controller.app;
 
-import cn.hutool.json.ObjectMapper;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
+import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserExtDTO;
+import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
+import cn.iocoder.yudao.module.system.api.dict.dto.DictDataRespDTO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.*;
 import cn.iocoder.yudao.module.therapy.controller.vo.TreatmentInstanceVO;
 import cn.iocoder.yudao.module.therapy.convert.DayitemNextStepConvert;
 import cn.iocoder.yudao.module.therapy.convert.TreatmentChatHistoryConvert;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentChatHistoryDO;
-import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemInstanceDO;
-import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDayitemDO;
 import cn.iocoder.yudao.module.therapy.service.TaskFlowService;
 import cn.iocoder.yudao.module.therapy.service.TreatmentChatHistoryService;
 import cn.iocoder.yudao.module.therapy.service.TreatmentService;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.therapy.service.TreatmentUserProgressService;
 import cn.iocoder.yudao.module.therapy.service.common.TreatmentStepItem;
 import cn.iocoder.yudao.module.therapy.taskflow.BaseFlow;
@@ -22,7 +24,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +46,10 @@ public class TreatmentController {
 
     @Resource
     private TreatmentChatHistoryService treatmentChatHistoryService;
+    @Resource
+    private MemberUserApi memberUserApi;
+    @Resource
+    private DictDataApi dictDataApi;
 
     @PostMapping("/{code}")
     @Operation(summary = "初始化治疗流程")
@@ -185,5 +190,12 @@ public class TreatmentController {
 //        truncate table hlgyy_treatment_instance;
     }
 
-
+    @GetMapping("/getFlow")
+    @Operation(summary = "获取患者使用的治疗方案")
+    @PreAuthenticated
+    public CommonResult<String> getFlow() {
+        Long userId = getLoginUserId();
+        MemberUserExtDTO extDTO= memberUserApi.getUserExtInfo(userId);
+        return success(dictDataApi.getDictDataLabel("flow_rule",extDTO.getTestGroup()));
+    }
 }

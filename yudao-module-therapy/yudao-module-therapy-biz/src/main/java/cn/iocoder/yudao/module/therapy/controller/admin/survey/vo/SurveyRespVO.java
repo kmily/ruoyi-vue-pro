@@ -17,6 +17,12 @@ public class SurveyRespVO {
     private Long id;
 
     /**
+     * 问卷编码
+     */
+    @Schema(description = "问卷编码", requiredMode = Schema.RequiredMode.REQUIRED, example = "1adbcd")
+    private String code;
+
+    /**
      * 调查标题
      */
     @Schema(description = "名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "PHQ9量表")

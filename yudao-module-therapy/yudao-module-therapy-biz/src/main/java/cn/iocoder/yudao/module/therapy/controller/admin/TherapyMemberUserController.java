@@ -86,6 +86,7 @@ public class TherapyMemberUserController {
             if (map2 != null && map2.containsKey(item.getId())) {
                 item.setAppointmentDate(map2.get(item.getId()).getAppointmentDate());
                 item.setAppointmentTimeRange(map2.get(item.getId()).getAppointmentTimeRange());
+                item.setTestGroup(map2.get(item.getId()).getTestGroup());
             }
         }
 

@@ -145,12 +145,6 @@ public class SurveyServiceImpl implements SurveyService {
             }
             //检查题目是否属于问卷
             List<QuestionDO> ts = surveyQuestionMapper.selectBySurveyId(tsdo.getId());
-//            Set<String> set1 = reqVO.getQstList().stream().map(p -> p.getQstCode()).collect(Collectors.toSet());
-//            Set<String> set2 = ts.stream().map(p -> p.getCode()).collect(Collectors.toSet());
-//            set1.removeAll(set2);
-//            if (set1.size() > 0) {
-//                throw exception(QUESTION_NOT_EXISTS_SURVEY);
-//            }
             SurveyStrategy surveyStrategy = surveyStrategyFactory.getSurveyStrategy(SurveyType.getByType(reqVO.getSurveyType()).getCode());
             surveyStrategy.checkQuestionExistsSurvey(reqVO, ts);
             Long answerId = this.initSurveyAnswer(tsdo.getCode(), 1);
@@ -158,7 +152,6 @@ public class SurveyServiceImpl implements SurveyService {
             List<AnswerDetailDO> newDetails = new ArrayList<>();
             for (AnAnswerReqVO item : reqVO.getQstList()) {
                 AnswerDetailDO detailDO = new AnswerDetailDO();
-//                if (!mapQst.containsKey(item.getQstCode())) throw exception(SURVEY_QUESTION_NOT_EXISTS);
                 QuestionDO qst = mapQst.getOrDefault(item.getQstCode(), null);
                 detailDO.setAnswerId(answerId);
                 detailDO.setBelongSurveyId(tsdo.getId());
@@ -201,10 +194,7 @@ public class SurveyServiceImpl implements SurveyService {
                 oldDetails.add(temp);
             } else {
                 AnswerDetailDO detailDO = new AnswerDetailDO();
-                QuestionDO qst = null;
-                if (!mapQst.containsKey(item.getQstCode())) {
-                    qst = mapQst.get(item.getQstCode());
-                }
+                QuestionDO qst = mapQst.getOrDefault(item.getQstCode(), null);;
                 detailDO.setAnswerId(reqVO.getId());
                 detailDO.setBelongSurveyId(answerDO.getBelongSurveyId());
                 detailDO.setQstContext(Objects.isNull(qst) ? null : qst.getQstContext());

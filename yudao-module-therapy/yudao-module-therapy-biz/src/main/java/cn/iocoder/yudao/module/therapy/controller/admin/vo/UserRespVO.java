@@ -45,4 +45,10 @@ public class UserRespVO {
 
     private LocalDateTime createTime;
 
+    /**
+     * ab测试组
+     * 字典类型:user_test_group
+     */
+    private Integer testGroup;
+
 }

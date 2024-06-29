@@ -95,7 +95,8 @@ public class TreatmentChatHistoryServiceImpl implements TreatmentChatHistoryServ
         try {
             jsonString = objectMapper.writeValueAsString(stepRespVO);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+            jsonString = "";
         }
         TreatmentChatHistoryDO treatmentChatHistoryDO = new TreatmentChatHistoryDO();
         treatmentChatHistoryDO.setUserId(userId);

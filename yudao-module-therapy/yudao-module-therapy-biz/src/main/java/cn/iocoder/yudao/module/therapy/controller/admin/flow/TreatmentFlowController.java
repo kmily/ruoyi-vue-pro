@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.therapy.controller.admin.flow;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -28,6 +29,8 @@ import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.TREATMENT_FLOW_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "管理后台 - 治疗方案")
@@ -167,10 +170,17 @@ public class TreatmentFlowController {
     @Operation(summary = "获取计划任务")
     @Parameter(name = "id", description = "任务id", required = true, example = "1024")
     public CommonResult<FlowTaskVO> getTask(@RequestParam("id") Long id) {
-        TreatmentFlowDayitemDO dayitemDO=treatmentService.getTask(id);
-        FlowTaskVO vo=BeanUtils.toBean(dayitemDO,FlowTaskVO.class);
+        TreatmentFlowDayitemDO dayitemDO = treatmentService.getTask(id);
+        FlowTaskVO vo = BeanUtils.toBean(dayitemDO, FlowTaskVO.class);
         return success(vo);
     }
 
+    @GetMapping("/publish")
+    @Operation(summary = "发布方案")
+    @Parameter(name = "id", description = "方案id", required = true, example = "1024")
+    public CommonResult<Boolean> publish(@RequestParam("id") Long id) {
+        treatmentService.publish(id, CommonStatusEnum.ENABLE.getStatus());
+        return success(true);
+    }
 
 }

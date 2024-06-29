@@ -111,7 +111,7 @@ public interface SurveyConvert {
             res.setSurveyId(item.getBelongSurveyId());
             TreatmentSurveyDO temp = treatmentSurveyDOMap.get(item.getBelongSurveyId());
             res.setTitle(temp.getTitle());
-            res.setSurveyType(temp.getSurveyType());
+            res.setSurveyType(item.getSurveyType());
             respVOS.add(res);
         }
         return respVOS;
