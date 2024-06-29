@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.therapy.controller.app.vo.AutomatedThinkingReques
 import cn.iocoder.yudao.module.therapy.controller.app.vo.ProblemClassificationRequest;
 import cn.iocoder.yudao.module.therapy.service.AIChatService;
 import cn.iocoder.yudao.module.therapy.service.dto.SSEMsgDTO;
+import cn.iocoder.yudao.module.therapy.service.enums.RequestSourceEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
@@ -50,7 +51,8 @@ public class AppAIController {
 
         Long loginUserId = getLoginUserId();
         loginUserId = NumberUtils.toLong(loginUserId,Long.valueOf(req.getConversationId().hashCode()));
-        return aiChatService.automaticThinkingRecognition(loginUserId, req.getConversationId(), req.getContent());
+        return aiChatService.automaticThinkingRecognition(loginUserId, req.getConversationId(), req.getContent(),
+                RequestSourceEnum.fromValue(req.getSource()),req.getDayItemInstanceId(),req.getStepId());
     }
 
 }
