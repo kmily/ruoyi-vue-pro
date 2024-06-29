@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 
 @Schema(description = "管理后台 - 治疗方案子任务 Request VO")
 @Data
@@ -17,12 +18,12 @@ public class FlowTaskVO {
 //    @Min(value = 1,message = "前一个任务id不对")
     private Long beforeId;
 
-//    @Schema(description = "治疗方案子任务code", example = "gfg2nbc",requiredMode = Schema.RequiredMode.REQUIRED)
-//    @NotBlank(message = "治疗方案子任务code不能为空")
-//    private String code;
+    @Schema(description = "任务名称", example = "gfg2nbc",requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "任务名称不能为空")
+    private String name;
 
-    @Schema(description = "治疗y计划id", example = "2",requiredMode = Schema.RequiredMode.REQUIRED)
-    @Min(value = 1,message = "治疗y计划id不对")
+    @Schema(description = "治疗计划id", example = "2",requiredMode = Schema.RequiredMode.REQUIRED)
+    @Min(value = 1,message = "dayId不对")
     private Long dayId;
 
     @Schema(description = "子任务类型:[引导语,量表引入...]", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
@@ -38,8 +39,6 @@ public class FlowTaskVO {
     @Schema(description = "备注",  example = "随便")
     private String remark;
 
-//    @Schema(description = "顺序组",  example = "2",requiredMode = Schema.RequiredMode.REQUIRED)
-//    private Integer agroup;
 
     @Schema(description = "设置josn格式",  example = "{.....}")
     private String settings;

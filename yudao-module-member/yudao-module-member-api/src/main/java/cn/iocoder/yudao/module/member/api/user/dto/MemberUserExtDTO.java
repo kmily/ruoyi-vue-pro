@@ -9,4 +9,9 @@ public class MemberUserExtDTO {
     private Date appointmentDate;
     private Integer appointmentTimeRange;
     private Long userId;
+    /**
+     * ab测试组
+     * 字典类型:user_test_group
+     */
+    private Integer testGroup;
 }
