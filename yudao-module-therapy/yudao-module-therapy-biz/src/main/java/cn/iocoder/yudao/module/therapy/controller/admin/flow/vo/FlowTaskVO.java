@@ -18,8 +18,7 @@ public class FlowTaskVO {
 //    @Min(value = 1,message = "前一个任务id不对")
     private Long beforeId;
 
-    @Schema(description = "任务名称", example = "gfg2nbc",requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "任务名称不能为空")
+    @Schema(description = "任务名称", example = "gfg2nbc")
     private String name;
 
     @Schema(description = "治疗计划id", example = "2",requiredMode = Schema.RequiredMode.REQUIRED)
