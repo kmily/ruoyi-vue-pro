@@ -112,4 +112,6 @@ public interface TreatmentService {
     List<TreatmentFlowDayitemDO> getTaskListByDayId(Long id);
 
     TreatmentFlowDayitemDO getTask(Long id);
+
+    void publish(Long id,Integer state);
 }
