@@ -196,7 +196,6 @@ public class TreatmentController {
     public CommonResult<String> getFlow() {
         Long userId = getLoginUserId();
         MemberUserExtDTO extDTO= memberUserApi.getUserExtInfo(userId);
-        DictDataRespDTO dto=dictDataApi.getDictData("flow_rule",extDTO.getTestGroup()+"");
-        return success(dto.getValue());
+        return success(dictDataApi.getDictDataLabel("flow_rule",extDTO.getTestGroup()));
     }
 }
