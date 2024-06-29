@@ -67,32 +67,49 @@ public class StrategyPracticeFlow extends BaseFlow {
         }
         Map variables = getVariables(container);
         Long survey_id = (Long) variables.get("survey_id");
+
+        TreatmentSurveyDO surveyDO;
         if(survey_id == null){
             Random random = new Random();
             int rInt = random.nextInt();
             int index = rInt % surveyDOS.size();
-            TreatmentSurveyDO surveyDO = surveyDOS.get(index);
-            data.put("survey_id", surveyDO.getId());
-            data.put("survey_questions_data", surveyDO);
+            surveyDO = surveyDOS.get(index);
             RuntimeService runtimeService = processEngine.getRuntimeService();
-            runtimeService.setVariable(container.getProcessInstanceId(), SURVEY_INSTANCE_ID, surveyDO.getId());
+            runtimeService.setVariable(container.getProcessInstanceId(), "survey_id", surveyDO.getId());
+
         }else{
-            TreatmentSurveyDO surveyDO = treatmentSurveyMapper.selectById(survey_id);
-            data.put("survey_questions_data", surveyDO);
-            data.put("survey_id", surveyDO.getId());
+            surveyDO = treatmentSurveyMapper.selectById(survey_id);
         }
+
+        List<QuestionDO> questionDOS = surveyService.getQuestionBySurveyId(surveyDO.getId());
+        data.put("survey_id", surveyDO.getId());
+        data.put("questions", questionDOS);
+        data.put("trouble_tag", tag);
 
         return data;
     }
 
     public Map<String, Object> auto_strategy_card(Container container, Map data, Task currentTask) {
         Map variables = getVariables(container);
-        Long instance_id = (Long) variables.get(SURVEY_INSTANCE_ID);
+        Long survey_id = (Long) variables.get("survey_id");
+        TreatmentSurveyDO surveyDO = treatmentSurveyMapper.selectById(survey_id);
+        TreatmentSurveyDO cardSurvey = treatmentSurveyMapper.selectById(surveyDO.getRelSurveyList().get(0));
+        int SOURCE_MAIN = 2;
+        Long instance_id = -1L;
+        if(variables.get(SURVEY_INSTANCE_ID) != null) {
+            instance_id = (Long) variables.get(SURVEY_INSTANCE_ID);
+        }
+        if( instance_id < 0){
+            instance_id = surveyService.initSurveyAnswer(cardSurvey.getCode(), SOURCE_MAIN);
+            variables.put(SURVEY_INSTANCE_ID, instance_id);
+        }
         List<AnswerDetailDO> instanceData =  surveyService.getAnswerDetailByAnswerId(instance_id);
+        List<QuestionDO> questionDOS = surveyService.getQuestionBySurveyId(cardSurvey.getId());
+
         data.put("instance_id", instance_id);
         data.put("instance_data", instanceData);
+        data.put("questions", questionDOS);
         return data;
-
     }
 
     public void submit_strategy_card(Container container, DayitemStepSubmitReqVO submitReqVO, Task currentTask) {
