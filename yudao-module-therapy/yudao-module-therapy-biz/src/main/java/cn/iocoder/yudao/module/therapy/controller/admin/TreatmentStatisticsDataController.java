@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.Map;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -49,4 +50,15 @@ public class TreatmentStatisticsDataController {
         return success(statService.useToolsNum(userId));
     }
 
+
+    @GetMapping("/userInTreatment")
+    @Operation(summary = "治疗中的用户数量")
+    @Parameter(name = "startDate", description = "起始日期（包含）", required = true, example = "2015-03-02")
+    public CommonResult<Map<String, Integer>> userInUse(@RequestParam("startDate") String startDate) {
+        Map<String, Integer> result = new HashMap<>();
+        result.put("finishedEvaluationCount", 1); //完成初步评估的用户人次
+        result.put("inTreatmentCount", 2); // 正在治疗的用户人次
+        result.put("finishedTreatmentCount", 3); // 已经完成的用户人次
+        return success(result);
+    }
 }
