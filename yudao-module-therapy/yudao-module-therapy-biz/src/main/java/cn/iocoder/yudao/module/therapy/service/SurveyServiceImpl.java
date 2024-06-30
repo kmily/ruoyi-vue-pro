@@ -7,6 +7,7 @@ import cn.iocoder.boot.module.therapy.enums.SurveyQuestionType;
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyAnswerPageReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyPageReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveySaveReqVO;
@@ -124,7 +125,7 @@ public class SurveyServiceImpl implements SurveyService {
         return surveyQuestionMapper.selectBySurveyId(id);
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    //@Transactional(rollbackFor = Exception.class)
     @Override
     public Long submitSurveyForTools(SubmitSurveyReqVO reqVO) {
         if (CollectionUtil.isEmpty(reqVO.getQstList())) {
@@ -156,8 +157,8 @@ public class SurveyServiceImpl implements SurveyService {
                 QuestionDO qst = mapQst.getOrDefault(item.getQstCode(), null);
                 detailDO.setAnswerId(answerId);
                 detailDO.setBelongSurveyId(tsdo.getId());
-                detailDO.setCreator(getLoginUserId().toString());
-                detailDO.setUpdater(getLoginUserId().toString());
+                detailDO.setCreator(StringUtils.isBlank(getLoginUserId().toString())? "system":getLoginUserId().toString());
+                detailDO.setUpdater(StringUtils.isBlank(getLoginUserId().toString())? "system":getLoginUserId().toString());
                 detailDO.setQstContext(Objects.isNull(qst) ? null : qst.getQstContext());
                 detailDO.setAnswer(item.getAnswer());
                 detailDO.setQstId(Objects.isNull(qst) ? 0L : qst.getId());
@@ -218,7 +219,7 @@ public class SurveyServiceImpl implements SurveyService {
         surveyAnswerMapper.updateReprotState(answerDO.getId(),ReprotState.DONE.getType());
     }
 
-    @Transactional(rollbackFor = Exception.class)
+   // @Transactional(rollbackFor = Exception.class)
     @Override
     public Long submitSurveyForFlow(SubmitSurveyReqVO reqVO) {
         if (CollectionUtil.isEmpty(reqVO.getQstList())) {
