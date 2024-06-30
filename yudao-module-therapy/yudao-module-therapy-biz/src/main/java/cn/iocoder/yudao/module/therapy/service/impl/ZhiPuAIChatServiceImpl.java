@@ -341,7 +341,7 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
         ChatMessageDO info = ChatMessageDO.builder().sendUserId(sendUserId).sendUserType(userType.name()).conversationId(conversationId).content(message).receiveUserId(receiveUserId).build();
         if (userType == UserTypeEnum.ROBOT) {
             long answerId = saveAutomatedThoughtsConclusion(message, sourceEnum);
-            if (NumberUtils.gtZero(answerId)) {
+            if (NumberUtils.gtZero(answerId) && RequestSourceEnum.MAIN_PROCESS.equals(sourceEnum)) {
                 BaseFlow taskFlow = taskFlowService.getTaskFlow(receiveUserId, dayItemInstanceId);
                 DayitemStepSubmitReqVO dayitemStepSubmitReqVO = new DayitemStepSubmitReqVO();
                 dayitemStepSubmitReqVO.setStep_id(stepId);
@@ -362,22 +362,26 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
      */
     private Long saveAutomatedThoughtsConclusion(String message, RequestSourceEnum sourceEnum) {
 
-        //ChatMessageDO info = ChatMessageDO.builder().sendUserId(sendUserId).
-        //        sendUserType(userType.name()).conversationId(conversationId).content(message)
-        //        .receiveUserId(receiveUserId)
-        //        .build();
-        // chatMessageMapper.insert(info);
+        // [日期/时间：XXX。 情境：XXXX。 想法：自动化思维内容。情绪与身体感觉：情绪及评分，身体感觉及评分。行为及后果：XXX。]
+        //Pattern pattern = Pattern.compile("\\[日期/时间：(.*?)。情境：(.*?)。自动化思维：“(.*?)”，“(.*?)”。情绪与身体感觉：(.*?)。行为及后果：(.*?)。\\]");
 
-        Pattern pattern = Pattern.compile("\\[日期/时间：(.*?)。情境：(.*?)。自动化思维：“(.*?)”，“(.*?)”。情绪与身体感觉：(.*?)。行为及后果：(.*?)。\\]");
+        Pattern isResult = Pattern.compile("\\[(.*?)\\]",Pattern.DOTALL);
+        Matcher matcher1 = isResult.matcher(message);
+        if (!matcher1.find()){
+            log.info("不是自动化思维识别结论, 消息源： {}  ", message);
+            return 0L;
+        }
+
+        Pattern pattern = Pattern.compile(
+                "\\[日期/时间：(.*?)。\\s*情境：(.*?)。\\s*想法：(.*?)（自动化思维）。\\s*情绪与身体感觉：(.*?)。\\s*行为及后果：(.*?)。\\]");
         Matcher matcher = pattern.matcher(message);
 
         if (matcher.find()) {
             String dateTime = matcher.group(1);
             String situation = matcher.group(2);
             String automaticThought1 = matcher.group(3);
-            String automaticThought2 = matcher.group(4);
-            String emotionsAndBodyFeelings = matcher.group(5);
-            String behaviorAndConsequences = matcher.group(6);
+            String emotionsAndBodyFeelings = matcher.group(4);
+            String behaviorAndConsequences = matcher.group(5);
 
             //{
             //    "time": "5月24日下午",
@@ -393,7 +397,7 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
             JSONObject jobj = new JSONObject();
             jobj.put("time", dateTime);
             jobj.put("scene", situation);
-            jobj.put("autoThought", automaticThought1 + "，" + automaticThought2);
+            jobj.put("autoThought", automaticThought1);
             jobj.put("response", emotionsAndBodyFeelings);
             jobj.put("result", behaviorAndConsequences);
 
@@ -408,10 +412,76 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
                 return surveyService.submitSurveyForFlow(submitSurveyReqVO);
             }
         } else {
-            log.info("不是自动化思维识别结论: 消息源： {}  ", message);
-            return 0L;
+            String s = checkIsAutomaticResult(message);
+            if("no".equalsIgnoreCase(s)){
+                log.info("大模型识别不是自动化思维结论：{}",message);
+                return 0L;
+            }
+
+            if (!jsonUtils.isJson(s)) {
+
+                String regex = "\\{[^}]+\\}";
+                // 编译正则表达式
+                pattern = Pattern.compile(regex);
+                // 在输入文本中查找匹配项
+                matcher = pattern.matcher(s);
+                if (matcher.find()) {
+                    s = matcher.group(); // 提取匹配到的JSON部分
+                } else {
+                    log.error("大模型识别返回不是JSON。 {}",s);
+                    return 0L;
+                }
+            }
+
+            JSONObject jsonObject = new  JSONObject(s);
+            SubmitSurveyReqVO submitSurveyReqVO = new SubmitSurveyReqVO();
+            submitSurveyReqVO.setSurveyType(11);
+            AnAnswerReqVO anAnswerReqVO = new AnAnswerReqVO();
+            anAnswerReqVO.setQstCode(UUID.randomUUID().toString());
+            anAnswerReqVO.setAnswer(jsonObject);
+            submitSurveyReqVO.setQstList(Collections.singletonList(anAnswerReqVO));
+
+            if (RequestSourceEnum.TOOLBOX.equals(sourceEnum)) {
+                return surveyService.submitSurveyForTools(submitSurveyReqVO);
+            } else {
+                return surveyService.submitSurveyForFlow(submitSurveyReqVO);
+            }
         }
     }
+
+
+    private String checkIsAutomaticResult(String message) {
+
+        DictDataDO dictDataDO = dictDataService.parseDictData("ai_system_prompt", "check_is_automatic_result");
+        if (dictDataDO == null) {
+            log.error("dictDataDO is null, dictType:{} label:{}", "ai_system_prompt", "juvenile_problems_classification");
+            return null;
+        }
+
+        List<ChatMessage> messages = new ArrayList<>();
+        ChatMessage sysMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), dictDataDO.getValue());
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), message);
+        messages.add(sysMessage);
+        messages.add(chatMessage);
+        ModelApiResponse chat = chat(messages, false);
+
+        if (chat == null)
+            return "系统提示未配置";
+
+        if (!chat.isSuccess()) {
+            log.error("chat problem:{} error:{}", messages, JSON.toJSONString(chat));
+            return "解析失败：" + chat.getMsg();
+        }
+
+        ModelData data = chat.getData();
+        List<Choice> choices = data.getChoices();
+        if (choices == null || choices.isEmpty()) {
+            log.error("chat problem:{} error:{}", messages, "choices为空");
+            return "解析失败，choices为空";
+        }
+        return String.valueOf(choices.get(0).getMessage().getContent());
+    }
+
 
     private SSEMsgDTO convertModelDataToString(ModelData modelData) {
         // Implement conversion logic

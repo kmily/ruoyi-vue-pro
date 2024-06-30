@@ -113,7 +113,10 @@
                     },
                     payload: JSON.stringify({
                         conversationId: conversationId,
-                        content: this_.message
+                        content: this_.message,
+                        source:1,
+                        dayItemInstanceId:1,
+                        stepId:"stepId"
                     }),
                 })
                 this.generating = true
