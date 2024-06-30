@@ -1,21 +1,28 @@
 package cn.iocoder.yudao.module.therapy.service.impl;
 
+import cn.hutool.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 import cn.iocoder.yudao.module.system.service.dict.DictDataService;
-import cn.iocoder.yudao.module.therapy.controller.admin.VO.AutomaticThinkingRecognitionChatHistoriesVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.AnAnswerReqVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.chat.ChatMessageDO;
 import cn.iocoder.yudao.module.therapy.dal.mysql.chat.ChatMessageMapper;
 import cn.iocoder.yudao.module.therapy.service.AIChatService;
+import cn.iocoder.yudao.module.therapy.service.SurveyService;
+import cn.iocoder.yudao.module.therapy.service.TaskFlowService;
 import cn.iocoder.yudao.module.therapy.service.dto.SSEMsgDTO;
+import cn.iocoder.yudao.module.therapy.service.enums.RequestSourceEnum;
 import cn.iocoder.yudao.module.therapy.service.enums.UserTypeEnum;
+import cn.iocoder.yudao.module.therapy.taskflow.BaseFlow;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.google.common.collect.Lists;
 import com.zhipu.oapi.ClientV4;
 import com.zhipu.oapi.Constants;
 import com.zhipu.oapi.service.v4.model.ChatCompletionRequest;
@@ -28,7 +35,6 @@ import com.zhipu.oapi.service.v4.model.ModelData;
 import io.reactivex.Flowable;
 import liquibase.util.BooleanUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -39,6 +45,9 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Author:lidongw_1
@@ -55,6 +64,12 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
 
     @Resource
     ChatMessageMapper chatMessageMapper;
+
+    @Resource
+    SurveyService surveyService;
+
+    @Resource
+    TaskFlowService taskFlowService;
 
     //@Value("${zhipu.api.key:this-is-a-test-key}")
     String API_KEY = "7820338e5c0e1d9228f8c2a5e2bf2e0d.EIWUgIkQCoStAnBU";
@@ -218,10 +233,13 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
      * @return
      */
     @Override
-    public Flux<SSEMsgDTO> automaticThinkingRecognition(Long userId, String conversationId, String content) {
-
+    public Flux<SSEMsgDTO> automaticThinkingRecognition(Long userId, String conversationId, String content,
+                                                        RequestSourceEnum sourceEnum,
+                                                        Long dayItemInstanceId,
+                                                        String stepId) {
         //保存用户消息
-        saveUserChatMessage(conversationId, userId,0L, UserTypeEnum.USER, content);
+        saveUserChatMessage(conversationId, userId, 0L, UserTypeEnum.USER, content, sourceEnum, dayItemInstanceId, stepId);
+
         DictDataDO dictDataDO = dictDataService.parseDictData("ai_system_prompt", "automatic_thinking_recognition_prompt");
         if (dictDataDO == null) {
             SSEMsgDTO sseMsgDTO = new SSEMsgDTO();
@@ -232,13 +250,11 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
             log.warn("dictDataDO is null, dictType:{} label:{}", "ai_system_prompt", "juvenile_problems_classification");
             return Flux.just(sseMsgDTO);
         }
-        List<ChatMessage> chatMessages = assembleHistoryList(conversationId,dictDataDO.getValue());
-;
-
+        List<ChatMessage> chatMessages = assembleHistoryList(conversationId, dictDataDO.getValue());
 
         ModelApiResponse sseModelApiResp = chat(chatMessages, true);
         if (sseModelApiResp.isSuccess()) {
-            StringBuffer sb =new StringBuffer();
+            StringBuffer sb = new StringBuffer();
             Flowable<SSEMsgDTO> flowable = sseModelApiResp.getFlowable().map(modelData -> {
                 // Convert ModelData to JSON string or desired string format
                 SSEMsgDTO jsonString = convertModelDataToString(modelData);
@@ -248,13 +264,13 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
                 sb.append(jsonString.getContent());
                 return jsonString;
             });
-            return Flux.create(emitter -> flowable.subscribe(emitter::next, emitter::error,()->{
+            return Flux.create(emitter -> flowable.subscribe(emitter::next, emitter::error, () -> {
                 SSEMsgDTO sseMsgDTO = new SSEMsgDTO();
                 sseMsgDTO.setContent("----END----");
                 sseMsgDTO.setFinished(true);
                 sseMsgDTO.setCode(200);
                 emitter.next(sseMsgDTO);
-                saveUserChatMessage(conversationId, 0L,userId, UserTypeEnum.ROBOT, sb.toString());
+                saveUserChatMessage(conversationId, 0L, userId, UserTypeEnum.ROBOT, sb.toString(), sourceEnum, dayItemInstanceId, stepId);
                 emitter.complete();
             })).publishOn(Schedulers.boundedElastic()).cast(SSEMsgDTO.class);
         } else {
@@ -266,9 +282,9 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
     public List<ChatMessageDO> queryChatHistories(Long userId, Integer pageNo, Integer pageSize) {
 
         QueryWrapper<ChatMessageDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("send_user_id",userId);
+        queryWrapper.eq("send_user_id", userId);
         queryWrapper.or();
-        queryWrapper.eq("receive_user_id",userId);
+        queryWrapper.eq("receive_user_id", userId);
         queryWrapper.orderByDesc("id");
         //分页
         queryWrapper.last("limit " + (pageNo - 1) * pageSize + "," + pageSize);
@@ -280,24 +296,24 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
     @Override
     public Long queryChatHistoriesCount(Long userId) {
         QueryWrapper<ChatMessageDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("send_user_id",userId);
+        queryWrapper.eq("send_user_id", userId);
         queryWrapper.or();
-        queryWrapper.eq("receive_user_id",userId);
+        queryWrapper.eq("receive_user_id", userId);
         Long l = chatMessageMapper.selectCount(queryWrapper);
         return l;
     }
 
-    private List<ChatMessage> assembleHistoryList(String conversationId,String sysPrompt){
+    private List<ChatMessage> assembleHistoryList(String conversationId, String sysPrompt) {
         List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage sysMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(),sysPrompt );
+        ChatMessage sysMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), sysPrompt);
         messages.add(sysMessage);
 
         QueryWrapper<ChatMessageDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("conversation_id",conversationId);
+        queryWrapper.eq("conversation_id", conversationId);
         List<ChatMessageDO> chatMessageDOS = chatMessageMapper.selectList(queryWrapper);
         for (ChatMessageDO chatMessageDO : chatMessageDOS) {
             ChatMessage chatMessage = new ChatMessage();
-            if (UserTypeEnum.USER.name().compareToIgnoreCase(chatMessageDO.getSendUserType())==0) {
+            if (UserTypeEnum.USER.name().compareToIgnoreCase(chatMessageDO.getSendUserType()) == 0) {
                 chatMessage.setRole(ChatMessageRole.USER.value());
             } else {
                 chatMessage.setRole(ChatMessageRole.ASSISTANT.value());
@@ -318,13 +334,83 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
      * @param userType       用户类型
      * @param message        消息内容
      */
-    private void saveUserChatMessage(String conversationId, long sendUserId,long receiveUserId, UserTypeEnum userType,String message){
+    private void saveUserChatMessage(String conversationId, long sendUserId, long receiveUserId, UserTypeEnum userType,
+                                     String message, RequestSourceEnum sourceEnum,
+                                     Long dayItemInstanceId, String stepId) {
 
-        ChatMessageDO info = ChatMessageDO.builder().sendUserId(sendUserId).
-                sendUserType(userType.name()).conversationId(conversationId).content(message)
-                .receiveUserId(receiveUserId)
-                .build();
+        ChatMessageDO info = ChatMessageDO.builder().sendUserId(sendUserId).sendUserType(userType.name()).conversationId(conversationId).content(message).receiveUserId(receiveUserId).build();
+        if (userType == UserTypeEnum.ROBOT) {
+            long answerId = saveAutomatedThoughtsConclusion(message, sourceEnum);
+            if (NumberUtils.gtZero(answerId)) {
+                BaseFlow taskFlow = taskFlowService.getTaskFlow(receiveUserId, dayItemInstanceId);
+                DayitemStepSubmitReqVO dayitemStepSubmitReqVO = new DayitemStepSubmitReqVO();
+                dayitemStepSubmitReqVO.setStep_id(stepId);
+                taskFlowService.userSubmit(taskFlow, dayItemInstanceId, stepId, dayitemStepSubmitReqVO);
+            }
+        }
+
         chatMessageMapper.insert(info);
+    }
+
+
+    /**
+     * 保存自动化思维识别结论
+     *
+     * @param message
+     * @param sourceEnum
+     * @return
+     */
+    private Long saveAutomatedThoughtsConclusion(String message, RequestSourceEnum sourceEnum) {
+
+        //ChatMessageDO info = ChatMessageDO.builder().sendUserId(sendUserId).
+        //        sendUserType(userType.name()).conversationId(conversationId).content(message)
+        //        .receiveUserId(receiveUserId)
+        //        .build();
+        // chatMessageMapper.insert(info);
+
+        Pattern pattern = Pattern.compile("\\[日期/时间：(.*?)。情境：(.*?)。自动化思维：“(.*?)”，“(.*?)”。情绪与身体感觉：(.*?)。行为及后果：(.*?)。\\]");
+        Matcher matcher = pattern.matcher(message);
+
+        if (matcher.find()) {
+            String dateTime = matcher.group(1);
+            String situation = matcher.group(2);
+            String automaticThought1 = matcher.group(3);
+            String automaticThought2 = matcher.group(4);
+            String emotionsAndBodyFeelings = matcher.group(5);
+            String behaviorAndConsequences = matcher.group(6);
+
+            //{
+            //    "time": "5月24日下午",
+            //        "scene": "准备上台演讲的前5分钟",
+            //        "autoThought": "我一点不会想起来该说什么",
+            //        "response": "紧张的不行",
+            //        "result": "闭目深呼吸"
+            //}
+
+            SubmitSurveyReqVO submitSurveyReqVO = new SubmitSurveyReqVO();
+            submitSurveyReqVO.setSurveyType(11);
+
+            JSONObject jobj = new JSONObject();
+            jobj.put("time", dateTime);
+            jobj.put("scene", situation);
+            jobj.put("autoThought", automaticThought1 + "，" + automaticThought2);
+            jobj.put("response", emotionsAndBodyFeelings);
+            jobj.put("result", behaviorAndConsequences);
+
+            AnAnswerReqVO anAnswerReqVO = new AnAnswerReqVO();
+            anAnswerReqVO.setQstCode(UUID.randomUUID().toString());
+            anAnswerReqVO.setAnswer(jobj);
+            submitSurveyReqVO.setQstList(Collections.singletonList(anAnswerReqVO));
+
+            if (RequestSourceEnum.TOOLBOX.equals(sourceEnum)) {
+                return surveyService.submitSurveyForTools(submitSurveyReqVO);
+            } else {
+                return surveyService.submitSurveyForFlow(submitSurveyReqVO);
+            }
+        } else {
+            log.info("不是自动化思维识别结论: 消息源： {}  ", message);
+            return 0L;
+        }
     }
 
     private SSEMsgDTO convertModelDataToString(ModelData modelData) {
@@ -336,7 +422,7 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
             sseMsgDTO.setId(modelData.getId());
             sseMsgDTO.setFinished(BooleanUtil.parseBoolean(choice.getFinishReason()));
             sseMsgDTO.setCode(200);
-            return  sseMsgDTO;
+            return sseMsgDTO;
         } catch (Exception e) {
             sseMsgDTO.setCode(500);
             sseMsgDTO.setContent("数据解析失败");
@@ -357,14 +443,8 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
         System.out.println("chat input: " + JSON.toJSONString(messages));
         String requestIdTemplate = "chat-%s";
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
-        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-                .model(Constants.ModelChatGLM4)
-                .stream(isStream)
-                .invokeMethod(Constants.invokeMethod)
-                .temperature(0.67f)
-                .messages(messages)
-                .requestId(requestId)
-                .build();
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder().model(Constants.ModelChatGLM4).stream(isStream).invokeMethod(Constants.invokeMethod).temperature(0.67f).messages(messages).requestId(requestId).build();
+
         ModelApiResponse modelApiResponse = client.invokeModelApi(chatCompletionRequest);
 
         log.info("chat response:{}", JSON.toJSONString(modelApiResponse));

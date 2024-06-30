@@ -99,7 +99,7 @@ public class TreatmentServiceImpl implements TreatmentService {
         // 插入
         TreatmentFlowDO treatmentFlow = BeanUtils.toBean(createReqVO, TreatmentFlowDO.class);
         treatmentFlow.setCode(IdUtil.fastSimpleUUID());
-        treatmentFlow.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        treatmentFlow.setStatus(CommonStatusEnum.DISABLE.getStatus());
         treatmentFlowMapper.insert(treatmentFlow);
         // 返回
         return treatmentFlow.getId();
@@ -238,5 +238,15 @@ public class TreatmentServiceImpl implements TreatmentService {
     @Override
     public TreatmentFlowDayitemDO getTask(Long id) {
         return treatmentFlowDayitemMapper.selectById(id);
+    }
+
+    @Override
+    public void publish(Long id,Integer state) {
+        TreatmentFlowDO dayitemDO=treatmentFlowMapper.selectById(id);
+        if(Objects.isNull(dayitemDO)){
+            throw exception(TREATMENT_FLOW_NOT_EXISTS);
+        }
+        dayitemDO.setStatus(state);
+        treatmentFlowMapper.updateById(dayitemDO);
     }
 }
