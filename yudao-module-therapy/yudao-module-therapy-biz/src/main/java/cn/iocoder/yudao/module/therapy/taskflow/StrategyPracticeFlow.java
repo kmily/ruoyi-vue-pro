@@ -111,6 +111,8 @@ public class StrategyPracticeFlow extends BaseFlow {
         data.put("instance_data", instanceData);
         data.put("description", cardSurvey.getDescription());
         data.put("questions", questionDOS);
+        String tag = "不开心";
+        data.put("trouble_tag", tag);
         return data;
     }
 
