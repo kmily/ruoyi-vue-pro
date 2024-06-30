@@ -133,6 +133,10 @@ public class MemberUserServiceImpl implements MemberUserService {
 
     @Override
     public void setTestGroup(Long userId, Integer groupId) {
+        MemberUserExtDO extDO= memberUserExtMapper.selectById(userId);
+        if(Objects.isNull(extDO)){
+            throw exception(USER_EXT_INO_NOT_EXISTS);
+        }
         memberUserExtMapper.setTestGroup(userId,groupId);
     }
 

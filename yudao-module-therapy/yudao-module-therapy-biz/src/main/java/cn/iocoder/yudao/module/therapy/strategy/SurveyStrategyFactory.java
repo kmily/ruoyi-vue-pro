@@ -19,12 +19,6 @@ public class SurveyStrategyFactory {
         }else {
             return applicationContext.getBean(DefaultSurveyStrategy.class);
         }
-//        SurveyStrategy surveyStrategy = applicationContext.getBean(this.getName(type), SurveyStrategy.class);
-//        if (surveyStrategy != null) {
-//            return surveyStrategy;
-//        }
-
-
     }
 
     private String getName(String type) {

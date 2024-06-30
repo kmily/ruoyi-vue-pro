@@ -45,4 +45,6 @@ public class SurveyAnswerDO extends BaseDO {
      */
     private Integer source;
 
+    private Integer reprotState;
+
 }

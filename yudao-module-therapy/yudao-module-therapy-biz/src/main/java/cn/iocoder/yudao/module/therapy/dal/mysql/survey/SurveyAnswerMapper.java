@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.therapy.dal.mysql.survey;
 
+import cn.hutool.core.lang.Assert;
+import cn.iocoder.boot.module.therapy.enums.ReprotState;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyAnswerPageReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -21,6 +24,7 @@ public interface SurveyAnswerMapper extends BaseMapperX<SurveyAnswerDO> {
         // 分页查询
         return selectPage(reqVO, new LambdaQueryWrapperX<SurveyAnswerDO>()
                 .eq(SurveyAnswerDO::getCreator, reqVO.getUserId().toString())
+                .eq(SurveyAnswerDO::getReprotState, ReprotState.DONE.getType())
                 .eqIfPresent(SurveyAnswerDO::getSurveyType, reqVO.getSurveyType())
                 .orderByDesc(SurveyAnswerDO::getId));
     }
@@ -34,6 +38,7 @@ public interface SurveyAnswerMapper extends BaseMapperX<SurveyAnswerDO> {
     default List<SurveyAnswerDO> selectBySurveysAndDate(Long userId, LocalDate begin, LocalDate end, List<Integer> types) {
         return selectList(new LambdaQueryWrapperX<SurveyAnswerDO>()
                 .eq(SurveyAnswerDO::getCreator, userId)
+                .eq(SurveyAnswerDO::getReprotState, ReprotState.DONE.getType())
                 .betweenIfPresent(SurveyAnswerDO::getCreateTime, begin, end)
                 .in(SurveyAnswerDO::getSurveyType, types));
 
@@ -42,11 +47,13 @@ public interface SurveyAnswerMapper extends BaseMapperX<SurveyAnswerDO> {
     default List<SurveyAnswerDO> selectBySurveyTypeAndUserId(Long userId, List<Integer> surveyType) {
         return selectList(Wrappers.lambdaQuery(SurveyAnswerDO.class)
                 .in(SurveyAnswerDO::getSurveyType, surveyType)
+                .eq(SurveyAnswerDO::getReprotState, ReprotState.DONE.getType())
                 .eq(SurveyAnswerDO::getCreator, userId));
     }
 
     default Long countByUserId(Long userId){
         return selectCount(Wrappers.lambdaQuery(SurveyAnswerDO.class)
+                .eq(SurveyAnswerDO::getReprotState, ReprotState.DONE.getType())
                 .eq(SurveyAnswerDO::getCreator,userId));
     }
 
@@ -54,9 +61,17 @@ public interface SurveyAnswerMapper extends BaseMapperX<SurveyAnswerDO> {
         MPJLambdaWrapperX<SurveyAnswerDO> wrapperX = new MPJLambdaWrapperX();
         wrapperX.selectCount(SurveyAnswerDO::getId, "count")
                 .selectCount(SurveyAnswerDO::getSurveyType)
+                .eq(SurveyAnswerDO::getReprotState, ReprotState.DONE.getType())
                 .eqIfPresent(SurveyAnswerDO::getCreator, userId)
                 .groupBy(SurveyAnswerDO::getSurveyType);
         List<Map<String, Object>> res = selectMaps(wrapperX);
         return res;
+    }
+
+    default void updateReprotState(Long id,Integer state){
+        LambdaUpdateWrapper<SurveyAnswerDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<SurveyAnswerDO>()
+                .setSql(" reprot_state = "+ state)
+                .eq(SurveyAnswerDO::getId, id);
+        update(null, lambdaUpdateWrapper);
     }
 }

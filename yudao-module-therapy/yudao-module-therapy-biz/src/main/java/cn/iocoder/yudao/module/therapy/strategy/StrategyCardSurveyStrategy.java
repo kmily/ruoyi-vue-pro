@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.therapy.strategy;
 
 import cn.hutool.json.JSONObject;
+import cn.iocoder.boot.module.therapy.enums.ReprotState;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
 import cn.iocoder.yudao.module.therapy.dal.mysql.survey.SurveyAnswerMapper;
