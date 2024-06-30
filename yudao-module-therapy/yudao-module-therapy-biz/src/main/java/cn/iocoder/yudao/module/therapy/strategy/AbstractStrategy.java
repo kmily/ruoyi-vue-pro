@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.json.JSONObject;
+import cn.iocoder.boot.module.therapy.enums.ReprotState;
 import cn.iocoder.yudao.module.therapy.config.ScaleReportAutoConfiguration;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveySaveReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
@@ -107,6 +108,7 @@ public abstract class AbstractStrategy {
         jsonObject.set("begin",grade.getBegin());
         jsonObject.set("end",grade.getEnd());
         answerDO.setReprot(jsonObject.toString());
+        answerDO.setReprotState(ReprotState.DONE.getType());
         surveyAnswerMapper.updateById(answerDO);
     }
 
@@ -121,6 +123,7 @@ public abstract class AbstractStrategy {
         }
         SurveyAnswerDO answerDO = surveyAnswerMapper.selectById(answerId);
         answerDO.setReprot(detailDOS.get(0).getAnswer().toString());
+        answerDO.setReprotState(ReprotState.DONE.getType());
         surveyAnswerMapper.updateById(answerDO);
     }
 

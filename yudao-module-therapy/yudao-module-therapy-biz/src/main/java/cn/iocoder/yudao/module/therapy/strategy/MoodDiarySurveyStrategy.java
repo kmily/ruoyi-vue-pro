@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.therapy.strategy;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.json.JSONObject;
+import cn.iocoder.boot.module.therapy.enums.ReprotState;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
 import cn.iocoder.yudao.module.therapy.dal.mysql.survey.SurveyAnswerDetailMapper;
@@ -29,6 +30,7 @@ public class MoodDiarySurveyStrategy  implements SurveyStrategy {
         }
         SurveyAnswerDO answerDO = surveyAnswerMapper.selectById(answerId);
         answerDO.setReprot(detailDOS.get(0).getAnswer().toString());//按照约定将答案做为报告,以便后续出列表使用
+        answerDO.setReprotState(ReprotState.DONE.getType());
         surveyAnswerMapper.updateById(answerDO);
     }
 }

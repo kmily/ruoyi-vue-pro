@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.therapy.strategy;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.json.JSONObject;
+import cn.iocoder.boot.module.therapy.enums.ReprotState;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveySaveReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
@@ -44,6 +45,7 @@ public class CognizeRebuildSurveyStrategy  implements SurveyStrategy {
 
         SurveyAnswerDO answerDO2 = surveyAnswerMapper.selectById(answerId);
         answerDO2.setReprot(jsonObject.toString());
+        answerDO2.setReprotState(ReprotState.DONE.getType());
         surveyAnswerMapper.updateById(answerDO2);
     }
 }
