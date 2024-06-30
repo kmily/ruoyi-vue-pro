@@ -4,6 +4,7 @@ package cn.iocoder.yudao.module.therapy.controller.admin;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.therapy.controller.admin.vo.TreatmentProgressRespVO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDayitemDO;
 import cn.iocoder.yudao.module.therapy.service.TreatmentStatisticsDataService;
 import cn.iocoder.yudao.module.therapy.service.StatService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,10 +56,6 @@ public class TreatmentStatisticsDataController {
     @Operation(summary = "治疗中的用户数量")
     @Parameter(name = "startDate", description = "起始日期（包含）", required = true, example = "2015-03-02")
     public CommonResult<Map<String, Integer>> userInUse(@RequestParam("startDate") String startDate) {
-        Map<String, Integer> result = new HashMap<>();
-        result.put("finishedEvaluationCount", 1); //完成初步评估的用户人次
-        result.put("inTreatmentCount", 2); // 正在治疗的用户人次
-        result.put("finishedTreatmentCount", 3); // 已经完成的用户人次
-        return success(result);
+        return success(treatmentStatisticsDataService.getTreatmentUserCount(startDate));
     }
 }

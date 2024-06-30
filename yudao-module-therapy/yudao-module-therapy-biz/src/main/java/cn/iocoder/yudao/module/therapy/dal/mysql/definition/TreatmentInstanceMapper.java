@@ -42,5 +42,21 @@ public interface TreatmentInstanceMapper extends BaseMapperX<TreatmentInstanceDO
         return selectOne(queryWrapper);
     }
 
+    default int countInTreatment(Long flowId){
+        LambdaQueryWrapper<TreatmentInstanceDO> queryWrapper = Wrappers.lambdaQuery(TreatmentInstanceDO.class)
+                .eq(TreatmentInstanceDO::getFlowId, flowId)
+                .in(TreatmentInstanceDO::getStatus,
+                        TreatmentInstanceDO.TreatmentStatus.INITIATED.getValue(),
+                        TreatmentInstanceDO.TreatmentStatus.IN_PROGRESS.getValue());
+        return selectCount(queryWrapper).intValue();
+    }
+
+    default int countFinishedTreatment(Long flowId){
+        LambdaQueryWrapper<TreatmentInstanceDO> queryWrapper = Wrappers.lambdaQuery(TreatmentInstanceDO.class)
+                .eq(TreatmentInstanceDO::getFlowId, flowId)
+                .eq(TreatmentInstanceDO::getStatus, TreatmentInstanceDO.TreatmentStatus.COMPLETED.getValue());
+        return selectCount(queryWrapper).intValue();
+    }
+
 
 }

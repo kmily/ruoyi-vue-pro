@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSONObject;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 
+import liquibase.pro.packaged.I;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -43,6 +44,9 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
 
     @Resource
     private TreatmentFlowDayMapper treatmentFlowDayMapper;
+
+    @Resource
+    private TreatmentFlowMapper treatmentFlowMapper;
 
 
 
@@ -200,4 +204,22 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
         return (int) ( count / (float) totalDays  * 100);
 
     }
+
+    @Override
+    public Map<String, Integer> getTreatmentUserCount(String startDate){
+        Map<String, Integer> result = new HashMap<>();
+        String flowCode = "main";
+        //初步评估数据
+        TreatmentFlowDO flowDO = treatmentFlowMapper.selectOne(TreatmentFlowDO::getCode, flowCode);
+        TreatmentFlowDayitemDO flowDayitemDO = treatmentFlowDayitemMapper.getPriorEvaluation(flowDO.getId(), TaskType.SCALE.getType());
+        assert flowDayitemDO != null;
+        int finishedEvaluationCount = treatmentDayitemInstanceMapper.countByFinishedDayitemId(flowDayitemDO.getId());
+        result.put("finishedEvaluationCount", finishedEvaluationCount); //完成初步评估的用户人次
+        int inTreatmentCount = treatmentInstanceMapper.countInTreatment(flowDO.getId());
+        result.put("inTreatmentCount", inTreatmentCount); // 正在治疗的用户人次
+        int finishedTreatmentCount = treatmentInstanceMapper.countFinishedTreatment(flowDO.getId());
+        result.put("finishedTreatmentCount", finishedTreatmentCount); // 已经完成的用户人次
+        return result;
+    }
+
 }

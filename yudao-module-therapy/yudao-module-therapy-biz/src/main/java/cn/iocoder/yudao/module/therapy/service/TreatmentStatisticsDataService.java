@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.therapy.controller.admin.vo.TreatmentProgressResp
 import cn.iocoder.yudao.module.therapy.controller.app.TreatmentPlanVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemInstanceDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentInstanceDO;
+import scala.Int;
 
 import java.util.List;
 import java.util.Map;
@@ -38,5 +39,18 @@ public interface TreatmentStatisticsDataService {
 
     List<String> queryUserGoals(Long userId);
 
+    /**
+     * 查询用户的治疗进度百分比
+     *
+     * @param treatmentInstanceId
+     * @return
+     */
     int getProgressPercentage(Long treatmentInstanceId);
+
+
+    /**
+     * 获取治疗中\治疗完成、完成初步评估的人数统计数据
+     */
+
+    Map<String, Integer> getTreatmentUserCount(String startDate);
 }

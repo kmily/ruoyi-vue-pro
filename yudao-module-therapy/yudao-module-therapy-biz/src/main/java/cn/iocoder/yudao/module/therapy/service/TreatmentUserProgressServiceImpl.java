@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.therapy.service;
 
+import cn.iocoder.boot.module.therapy.enums.TaskType;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.StepItemVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.*;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.*;
@@ -64,6 +65,9 @@ public class TreatmentUserProgressServiceImpl implements  TreatmentUserProgressS
         data.setItem_type(flowDayitemDO.getItemType());
         data.setDayitem_id(dayitemInstanceDO.getDayitemId());
         data.setSettings(flowDayitemDO.getSettingsObj());
+        if(flowDayitemDO.getItemType().equals(TaskType.GUIDE_LANGUAGE.getCode())){
+            data.getSettings().put("content", flowDayitemDO.getSettingsObj().getOrDefault("text", ""));
+        }
         return data;
     }
 

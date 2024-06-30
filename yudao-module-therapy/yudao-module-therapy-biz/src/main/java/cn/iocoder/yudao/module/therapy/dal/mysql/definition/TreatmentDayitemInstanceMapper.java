@@ -55,4 +55,11 @@ public interface TreatmentDayitemInstanceMapper extends BaseMapperX<TreatmentDay
         updateById(instanceDO);
     }
 
+    default int countByFinishedDayitemId(Long dayItemId){
+        LambdaQueryWrapper<TreatmentDayitemInstanceDO> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(TreatmentDayitemInstanceDO::getDayitemId, dayItemId);
+        queryWrapper.eq(TreatmentDayitemInstanceDO::getStatus, TreatmentDayitemInstanceDO.StatusEnum.COMPLETED.getValue());
+        return selectCount(queryWrapper).intValue();
+    }
+
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.therapy.dal.mysql.definition;
 
+import cn.iocoder.boot.module.therapy.enums.TaskType;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDayitemDO;
@@ -89,4 +90,8 @@ public interface TreatmentFlowDayitemMapper extends BaseMapperX<TreatmentFlowDay
             " on ins.flow_instance_id = #{treatmentInstanceId} and ins.dayitem_id = di.id " +
             " where d.flow_id = #{treatmentFlowId} order by d.sequence, di.agroup")
     List<TreatmentDayitemDetailDO> getDayitemDetail(@Param("treatmentInstanceId") Long treatmentInstanceId, @Param("treatmentFlowId") Long treatmentFlowId);
+
+
+    @Select("select * from hlgyy_treatment_flow_dayitem where flow_id = #{flowId} and `type` = #{type} order by group_seq desc limit 1")
+    TreatmentFlowDayitemDO getPriorEvaluation(@Param("flowId") Long flowId, @Param("type") Integer type);
 }
