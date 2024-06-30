@@ -39,7 +39,7 @@ public interface SurveyAnswerMapper extends BaseMapperX<SurveyAnswerDO> {
         return selectList(new LambdaQueryWrapperX<SurveyAnswerDO>()
                 .eq(SurveyAnswerDO::getCreator, userId)
                 .eq(SurveyAnswerDO::getReprotState, ReprotState.DONE.getType())
-                .betweenIfPresent(SurveyAnswerDO::getCreateTime, begin, end)
+                .betweenIfPresent(SurveyAnswerDO::getCreateTime, begin, end.plusDays(1))
                 .in(SurveyAnswerDO::getSurveyType, types));
 
     }
