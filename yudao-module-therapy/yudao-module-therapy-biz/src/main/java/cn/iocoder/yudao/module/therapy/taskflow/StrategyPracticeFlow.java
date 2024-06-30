@@ -109,6 +109,7 @@ public class StrategyPracticeFlow extends BaseFlow {
 
         data.put("instance_id", instance_id);
         data.put("instance_data", instanceData);
+        data.put("description", surveyDO.getDescription());
         data.put("questions", questionDOS);
         return data;
     }
