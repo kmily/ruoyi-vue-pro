@@ -108,7 +108,6 @@ public abstract class AbstractStrategy {
         jsonObject.set("begin",grade.getBegin());
         jsonObject.set("end",grade.getEnd());
         answerDO.setReprot(jsonObject.toString());
-        answerDO.setReprotState(ReprotState.DONE.getType());
         surveyAnswerMapper.updateById(answerDO);
     }
 
@@ -123,7 +122,6 @@ public abstract class AbstractStrategy {
         }
         SurveyAnswerDO answerDO = surveyAnswerMapper.selectById(answerId);
         answerDO.setReprot(detailDOS.get(0).getAnswer().toString());
-        answerDO.setReprotState(ReprotState.DONE.getType());
         surveyAnswerMapper.updateById(answerDO);
     }
 

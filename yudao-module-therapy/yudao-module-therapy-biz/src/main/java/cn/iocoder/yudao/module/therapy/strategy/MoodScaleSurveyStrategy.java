@@ -57,7 +57,6 @@ public class MoodScaleSurveyStrategy extends AbstractStrategy implements SurveyS
         jsonObject.set("positiveScore", positiveScore);
         jsonObject.set("passiveScore", passiveScore);
         answerDO.setReprot(jsonObject.toString());
-        answerDO.setReprotState(ReprotState.DONE.getType());
         surveyAnswerMapper.updateById(answerDO);
     }
 }

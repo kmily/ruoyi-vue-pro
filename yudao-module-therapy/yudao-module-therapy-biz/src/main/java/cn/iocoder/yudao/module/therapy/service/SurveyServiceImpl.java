@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.therapy.service;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.json.JSONObject;
+import cn.iocoder.boot.module.therapy.enums.ReprotState;
 import cn.iocoder.boot.module.therapy.enums.SurveyQuestionType;
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -165,6 +166,7 @@ public class SurveyServiceImpl implements SurveyService {
             }
             surveyAnswerDetailMapper.insertBatch(newDetails);
             surveyStrategy.generateReport(answerId);
+            surveyAnswerMapper.updateReprotState(answerId,ReprotState.DONE.getType());
             return answerId;
         }
     }
@@ -213,6 +215,7 @@ public class SurveyServiceImpl implements SurveyService {
         }
 
         surveyStrategy.generateReport(answerDO.getId());
+        surveyAnswerMapper.updateReprotState(answerDO.getId(),ReprotState.DONE.getType());
     }
 
     @Transactional(rollbackFor = Exception.class)

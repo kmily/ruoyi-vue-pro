@@ -45,7 +45,6 @@ public class CognizeRebuildSurveyStrategy  implements SurveyStrategy {
 
         SurveyAnswerDO answerDO2 = surveyAnswerMapper.selectById(answerId);
         answerDO2.setReprot(jsonObject.toString());
-        answerDO2.setReprotState(ReprotState.DONE.getType());
         surveyAnswerMapper.updateById(answerDO2);
     }
 }

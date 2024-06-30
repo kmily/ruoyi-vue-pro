@@ -46,7 +46,6 @@ public class MoodMarkSurveyStrategy  implements SurveyStrategy {
         JSONObject jsonObject = new JSONObject();
         jsonObject.set("score", score);
         answerDO.setReprot(jsonObject.toString());
-        answerDO.setReprotState(ReprotState.DONE.getType());
         surveyAnswerMapper.updateById(answerDO);
     }
 }

@@ -37,7 +37,6 @@ public class StrategyCardSurveyStrategy  implements SurveyStrategy {
         jsonObject.set("category", surveyDO.getTags().get(0));//对策卡问卷按约定只录入一个tag
         jsonObject.set("title", surveyDO.getTitle());
         answerDO.setReprot(jsonObject.toString());
-        answerDO.setReprotState(ReprotState.DONE.getType());
         surveyAnswerMapper.updateById(answerDO);
     }
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.therapy.dal.mysql.survey;
 
+import cn.hutool.core.lang.Assert;
 import cn.iocoder.boot.module.therapy.enums.ReprotState;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
@@ -7,6 +8,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.therapy.controller.admin.survey.vo.SurveyAnswerPageReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.SurveyAnswerDO;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -64,5 +66,12 @@ public interface SurveyAnswerMapper extends BaseMapperX<SurveyAnswerDO> {
                 .groupBy(SurveyAnswerDO::getSurveyType);
         List<Map<String, Object>> res = selectMaps(wrapperX);
         return res;
+    }
+
+    default void updateReprotState(Long id,Integer state){
+        LambdaUpdateWrapper<SurveyAnswerDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<SurveyAnswerDO>()
+                .setSql(" reprot_state = "+ state)
+                .eq(SurveyAnswerDO::getId, id);
+        update(null, lambdaUpdateWrapper);
     }
 }

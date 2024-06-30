@@ -30,7 +30,6 @@ public class MoodDiarySurveyStrategy  implements SurveyStrategy {
         }
         SurveyAnswerDO answerDO = surveyAnswerMapper.selectById(answerId);
         answerDO.setReprot(detailDOS.get(0).getAnswer().toString());//按照约定将答案做为报告,以便后续出列表使用
-        answerDO.setReprotState(ReprotState.DONE.getType());
         surveyAnswerMapper.updateById(answerDO);
     }
 }
