@@ -12,6 +12,8 @@ public class TreatmentStepItem {
         CURRENT_DAY_NO_MORE_STEP, // 当前疗程日没有更多步骤
         LAST_DAY_NOT_COMPLETE, // 上一天存在治疗任务没有完成
         CURRENT_STEP_REQUIRES_COMPLETE, // 当前步骤需要完成,请先完成当前步骤
+        TREATMENT_FINISHED, // 疗程已经结束
+        TODAY_IS_BREAK_DAY, // 今天是休息日
     }
 
 

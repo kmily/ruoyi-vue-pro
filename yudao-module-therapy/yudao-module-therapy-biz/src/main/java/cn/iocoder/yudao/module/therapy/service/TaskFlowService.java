@@ -16,4 +16,6 @@ public interface TaskFlowService {
     public BaseFlow getTaskFlow(TreatmentFlowDayitemDO flowDayitemDO);
 
     public BaseFlow getTaskFlow(Long userId,  Long dayItemInstanceId);
+
+    public void updateFlowFromDayitem(TreatmentFlowDayitemDO flowDayitemDO, String type);
 }

@@ -49,6 +49,12 @@ public class TreatmentServiceImpl implements TreatmentService {
     @Resource
     private TreatmentFlowDayitemMapper treatmentFlowDayitemMapper;
 
+    @Resource
+    private TaskFlowService taskFlowService;
+
+    @Resource
+    private TreatmentDayInstanceMapper treatmentDayInstanceMapper;
+
     @Override
     public Long initTreatmentInstance(Long userId, String treatmentCode) {
         TreatmentFlowDO treatmentFlow = treatmentFlowMapper.selectByCode(treatmentCode);
@@ -71,7 +77,6 @@ public class TreatmentServiceImpl implements TreatmentService {
     public TreatmentStepItem getNext(TreatmentStepItem userCurrentStep) {
         dayTaskEngine.initWithCurrentStep(userCurrentStep);
         TreatmentStepItem nextStepItem = dayTaskEngine.getNextStepItem();
-
         return nextStepItem;
     }
 
@@ -197,6 +202,8 @@ public class TreatmentServiceImpl implements TreatmentService {
                 }
             }
             treatmentFlowDayitemMapper.insert(dayitemDO);
+            // TODO create workflow
+            taskFlowService.updateFlowFromDayitem(dayitemDO, "create");
             return dayitemDO.getId();
         }
 
@@ -214,6 +221,8 @@ public class TreatmentServiceImpl implements TreatmentService {
         }
         TreatmentFlowDayitemDO dayitemDO = BeanUtils.toBean(vo, TreatmentFlowDayitemDO.class);
         treatmentFlowDayitemMapper.updateById(dayitemDO);
+        // TODO update workflow
+        taskFlowService.updateFlowFromDayitem(dayitemDO, "update");
     }
 
     @Override
@@ -249,4 +258,84 @@ public class TreatmentServiceImpl implements TreatmentService {
         dayitemDO.setStatus(state);
         treatmentFlowMapper.updateById(dayitemDO);
     }
+
+
+
+    /**
+     * 如果当天为休息日，则完成
+     * 如果当天所有必做任务都已经完成，则完成
+     * @param dayInstanceDO 疗程日实例
+     */
+    private boolean isCompletedDayInstance(TreatmentDayInstanceDO dayInstanceDO){
+        TreatmentFlowDayDO flowDayDO = treatmentFlowDayMapper.selectById(dayInstanceDO.getDayId());
+        if(flowDayDO.isHasBreak()){
+            dayInstanceDO.setStatus(TreatmentDayInstanceDO.StatusEnum.COMPLETED.getValue());
+            treatmentDayInstanceMapper.updateById(dayInstanceDO);
+        }
+        List<TreatmentFlowDayitemDO> flowDayitemDOS = treatmentFlowDayitemMapper.filterByDay(flowDayDO.getId());
+        List<TreatmentDayitemInstanceDO> treatmentDayitemInstanceDOS = treatmentDayitemInstanceMapper.getUserDayitemInstances(
+                dayInstanceDO.getUserId(),
+                dayInstanceDO.getFlowInstanceId(),
+                flowDayitemDOS
+        );
+        boolean completed = true;
+        for(TreatmentDayitemInstanceDO dayitemInstanceDO : treatmentDayitemInstanceDOS){
+            if(dayitemInstanceDO.isRequired()){
+                if(dayitemInstanceDO.getStatus() != TreatmentDayitemInstanceDO.StatusEnum.COMPLETED.getValue()){
+                    completed = false;
+                }
+            }
+        }
+        return completed;
+    }
+
+
+    /**
+     * 更新疗程日的状态
+     * 如果当天为休息日，则完成
+     * 如果当天所有必做任务都已经完成，则完成
+     * @param dayInstanceDO 疗程日实例
+     */
+    @Override
+    public void updateDayInstanceStatus(TreatmentDayInstanceDO dayInstanceDO){
+        boolean completed = isCompletedDayInstance(dayInstanceDO);
+        if(completed){
+            dayInstanceDO.setStatus(TreatmentDayInstanceDO.StatusEnum.COMPLETED.getValue());
+            treatmentDayInstanceMapper.updateById(dayInstanceDO);
+        }
+    }
+
+
+    /**
+     * 更新疗程实例的状态
+     * @param dayInstanceDO
+     */
+    private void updateTreatmentInstanceStatus(TreatmentDayInstanceDO dayInstanceDO){
+        TreatmentFlowDayDO flowDayDO = treatmentFlowDayMapper.selectById(dayInstanceDO.getDayId());
+        if(!treatmentFlowDayMapper.isLastFlowDay(flowDayDO)){
+            return;
+        }
+        if(isCompletedDayInstance(dayInstanceDO)){
+            TreatmentInstanceDO instanceDO = treatmentInstanceMapper.selectById(dayInstanceDO.getFlowInstanceId());
+            instanceDO.setStatus(TreatmentInstanceDO.TreatmentStatus.COMPLETED.getValue());
+            treatmentInstanceMapper.updateById(instanceDO);
+        }
+    }
+
+    @Override
+    public void finishDayItemInstance(Long dayItemInstanceId){
+        treatmentDayitemInstanceMapper.finishDayItemInstanceDO(dayItemInstanceId);
+        TreatmentDayitemInstanceDO dayitemInstanceDO = treatmentDayitemInstanceMapper.selectById(dayItemInstanceId);
+        TreatmentDayInstanceDO dayInstanceDO = treatmentDayInstanceMapper.selectById(dayitemInstanceDO.getDayInstanceId());
+        updateDayInstanceStatus(dayInstanceDO);
+        updateTreatmentInstanceStatus(dayInstanceDO);
+    }
+
+    @Override
+    public void cancelTreatmentInstance(Long flowInstanceId){
+        TreatmentInstanceDO instanceDO = treatmentInstanceMapper.selectById(flowInstanceId);
+        instanceDO.setStatus(TreatmentInstanceDO.TreatmentStatus.CANCELLED.getValue());
+        treatmentInstanceMapper.updateById(instanceDO);
+    }
+
 }

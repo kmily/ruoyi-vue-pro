@@ -121,7 +121,6 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
     }
 
     public List<String>  queryUserGoals(Long userId){
-        //TODO fix this;
 //        {"goals":[{"goal":"目标1","title":"问题1"},{"goal":"目标2","title":"问题2"},{"goal":"目标3","title":"问题3"}]}
         SubmitSurveyReqVO data =  surveyService.getGoalMotive(userId);
         List<AnAnswerReqVO> answers = data.getQstList();
@@ -135,6 +134,19 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
             }
         }
         return goals;
+    }
+
+    public List<String>  queryUserTroubles(Long userId){
+
+        TreatmentDayitemInstanceDO treatmentDayitemInstanceDO =
+                treatmentDayitemInstanceMapper.queryUserGoalAndMotiveInstance(
+                        userId,
+                        TaskType.PROBLEM_GOAL_MOTIVE.getType()
+                );
+        if (treatmentDayitemInstanceDO == null) {
+            return new ArrayList<>();
+        }
+        return (List<String>) treatmentDayitemInstanceDO.getExtAttrObj().getOrDefault("trouble_categories", new ArrayList<>());
     }
 
 

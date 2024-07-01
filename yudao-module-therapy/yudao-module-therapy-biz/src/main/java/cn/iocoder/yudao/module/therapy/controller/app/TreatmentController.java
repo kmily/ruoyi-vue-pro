@@ -181,6 +181,7 @@ public class TreatmentController {
     @Operation(summary = "清空用户流程数据-临时测试用")
     @PreAuthenticated
     public CommonResult<Long> clearUserProgress() {
+        // TODO REMOVE THIS FUNCTION
         Long userId = getLoginUserId();
         treatmentUserProgressService.clearUserProgress(userId);
         return success(1L);

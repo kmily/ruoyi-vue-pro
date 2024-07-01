@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayitemInstanceMapper;
 import cn.iocoder.yudao.module.therapy.service.SurveyService;
+import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.task.api.Task;
 import org.flowable.engine.ProcessEngine;
@@ -32,9 +33,11 @@ public class ScaleFlow extends BaseFlow{
     @Resource
     SurveyService surveyService;
 
+    @Resource
+    private TreatmentService treatmentService;
 
     public String deploy(Long id, Map<String, Object> settings) {
-        return super.deploy(id, "/scale_flow.json");
+        return super.deploy(id, "/scale_flow.json", settings);
     }
 
 
@@ -51,7 +54,7 @@ public class ScaleFlow extends BaseFlow{
     public void onFlowEnd(DelegateExecution execution) {
         Map variables = execution.getVariables();
         Long dayItemInstanceId = (Long) variables.get(DAYITEM_INSTANCE_ID);
-        treatmentDayitemInstanceMapper.finishDayItemInstance(dayItemInstanceId);
+        treatmentService.finishDayItemInstance(dayItemInstanceId);
     }
 
     public Map<String, Object> auto_survey_questions(Container container, Map data, Task currentTask){
