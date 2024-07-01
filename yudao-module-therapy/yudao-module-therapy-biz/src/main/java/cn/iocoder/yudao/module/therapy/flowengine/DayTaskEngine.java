@@ -92,6 +92,8 @@ public class DayTaskEngine {
             );
             stepItem.setDay_items(dayitemInstancesDO);
             stepItem.setAgroup(dayitemsDO.get(0).getAgroup());
+        }else{
+            stepItem.setProcessStatus(TreatmentStepItem.ProcessStatus.TODAY_IS_BREAK_DAY);
         }
         return stepItem;
     }
@@ -133,7 +135,10 @@ public class DayTaskEngine {
         }
         if(userCurrentStep.getFlowDayDO().isHasBreak()){
             //用户当前步骤是休息日
-            return getBreakDayNextStepItem();
+            TreatmentStepItem stepItem =  TreatmentStepItem.clone(userCurrentStep);
+            stepItem.setProcessStatus(TreatmentStepItem.ProcessStatus.TODAY_IS_BREAK_DAY);
+            return stepItem;
+//            return getBreakDayNextStepItem();
         }else{
             //用户当前步骤不是休息日
             TreatmentDayInstanceDO dayInstanceDO = userCurrentStep.getDay();

@@ -53,9 +53,11 @@ public class TreatmentUserProgressServiceImpl implements  TreatmentUserProgressS
             stepItem.setDay(dayInstanceDO);
 
             List<TreatmentFlowDayitemDO> flowDayitemDOS = treatmentFlowDayitemMapper.selectGroupItems(dayInstanceDO.getDayId(), progressDO.getDayAgroup());
-            List<TreatmentDayitemInstanceDO> dayitemInstanceDOS = treatmentDayitemInstanceMapper.selectCurrentItems(flowDayitemDOS);
-            stepItem.setAgroup(progressDO.getDayAgroup());
-            stepItem.setDay_items(dayitemInstanceDOS);
+            if(flowDayitemDOS.size() > 0){
+                List<TreatmentDayitemInstanceDO> dayitemInstanceDOS = treatmentDayitemInstanceMapper.selectCurrentItems(flowDayitemDOS);
+                stepItem.setAgroup(progressDO.getDayAgroup());
+                stepItem.setDay_items(dayitemInstanceDOS);
+            }
         }else{
             stepItem.setStarted(false);
         }
@@ -88,6 +90,10 @@ public class TreatmentUserProgressServiceImpl implements  TreatmentUserProgressS
                 settings.put("content", "请先完成之前的必做任务哦~");
             case CURRENT_STEP_REQUIRES_COMPLETE:
                 settings.put("content", "请先完成当前任务才能继续哦~");
+            case TREATMENT_FINISHED:
+                settings.put("content", "恭喜你完成了所有任务,治疗流程已经结束~");
+            case TODAY_IS_BREAK_DAY:
+                settings.put("content", "今天是休息日哦~");
         }
         sysInfo.setSettings(settings);
         return sysInfo;
