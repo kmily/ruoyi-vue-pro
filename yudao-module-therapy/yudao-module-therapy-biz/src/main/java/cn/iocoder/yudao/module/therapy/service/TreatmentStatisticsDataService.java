@@ -53,4 +53,7 @@ public interface TreatmentStatisticsDataService {
      */
 
     Map<String, Integer> getTreatmentUserCount(String startDate);
-}
+
+    List<String>  queryUserTroubles(Long userId);
+
+    }

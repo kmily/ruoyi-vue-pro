@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.therapy.service;
 
+import cn.iocoder.boot.module.therapy.enums.TaskType;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemInstanceDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDayitemDO;
@@ -126,6 +127,15 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
         TreatmentFlowDayitemDO flowDayitemDO = treatmentFlowDayitemMapper.selectById(dayitemInstanceDO.getDayitemId());
         return getTaskFlow(flowDayitemDO);
     }
+
+    @Override
+    public void updateFlowFromDayitem(TreatmentFlowDayitemDO flowDayitemDO, String type){
+        if(flowDayitemDO.getItemType().equals(TaskType.GUIDE_LANGUAGE.getCode())){
+            return;
+        }
+        createBpmnModel(flowDayitemDO.getId()); // 更新工作流
+    }
+
 
     @Override
     public void createBpmnModel(Long flowDayitemId){

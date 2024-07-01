@@ -42,6 +42,11 @@ public class TreatmentUserProgressServiceImpl implements  TreatmentUserProgressS
         TreatmentStepItem stepItem = new TreatmentStepItem();
         TreatmentInstanceDO instance = treatmentInstanceMapper.selectById(treatmentInstanceId);
         TreatmentUserProgressDO progressDO =  treatmentUserProgressMapper.getUserCurrentProgress(userId, treatmentInstanceId);
+        if(instance.getStatus() == TreatmentInstanceDO.TreatmentStatus.CANCELLED.getValue() ||
+                instance.getStatus() == TreatmentInstanceDO.TreatmentStatus.COMPLETED.getValue()){
+            stepItem.setEnd(true);
+            return stepItem;
+        }
         stepItem.setFlowInstance(instance);
         if(progressDO != null){
             TreatmentDayInstanceDO dayInstanceDO = treatmentDayInstanceMapper.selectById(progressDO.getDayInstanceId());

@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayite
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayitemInstanceMapper;
 import cn.iocoder.yudao.module.therapy.service.SurveyService;
+import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import cn.iocoder.yudao.module.therapy.service.TreatmentStatisticsDataService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -31,6 +32,8 @@ public class GoalProgressFlow extends BaseFlow{
 
     @Resource
     TreatmentStatisticsDataService treatmentStatisticsDataService;
+    @Resource
+    private TreatmentService treatmentService;
 
 
     public GoalProgressFlow(ProcessEngine engine) {
@@ -46,11 +49,11 @@ public class GoalProgressFlow extends BaseFlow{
     public void onFlowEnd(DelegateExecution execution) {
         Map variables = execution.getVariables();
         Long dayItemInstanceId = (Long) variables.get(DAYITEM_INSTANCE_ID);
-        treatmentDayitemInstanceMapper.finishDayItemInstance(dayItemInstanceId);
+        treatmentService.finishDayItemInstance(dayItemInstanceId);
     }
 
     public String deploy(Long id, Map<String, Object> settings) {
-        return super.deploy(id, "/goal_progress.json");
+        return super.deploy(id, "/goal_progress.json", settings);
     }
 
     public Map<String, Object> auto_goal_progress_qst(Container container, Map data, Task currentTask) {

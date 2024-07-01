@@ -6,15 +6,15 @@ import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayitemInstanceMapper;
 import cn.iocoder.yudao.module.therapy.service.SurveyService;
+import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import org.flowable.task.api.Task;
 
 import static cn.iocoder.yudao.module.therapy.taskflow.Const.*;
@@ -28,6 +28,8 @@ public class MoodScoreFlow extends BaseFlow {
 
     @Resource
     SurveyService surveyService;
+    @Resource
+    private TreatmentService treatmentService;
 
     public MoodScoreFlow(ProcessEngine engine) {
         super(engine);
@@ -35,7 +37,7 @@ public class MoodScoreFlow extends BaseFlow {
 
 
     public String deploy(Long id, Map<String, Object> settings) {
-        return super.deploy(id, "/mood_score.json");
+        return super.deploy(id, "/mood_score.json", settings);
     }
 
 
@@ -49,7 +51,7 @@ public class MoodScoreFlow extends BaseFlow {
     public void onFlowEnd(DelegateExecution execution) {
         Map variables = execution.getVariables();
         Long dayItemInstanceId = (Long) variables.get(DAYITEM_INSTANCE_ID);
-        treatmentDayitemInstanceMapper.finishDayItemInstance(dayItemInstanceId);
+        treatmentService.finishDayItemInstance(dayItemInstanceId);
     }
 
     public Map<String, Object> auto_mood_ruler_qst(Container container,Map data, Task currentTask){
@@ -75,7 +77,10 @@ public class MoodScoreFlow extends BaseFlow {
         Map variables = super.getVariables(container);
         int moodScore = (int) variables.get("moodScore");
         Map result = new HashMap<>();
-        result.put("content", data.get(String.valueOf(moodScore)));
+        List<String> replies = (List<String>) data.get(String.valueOf(moodScore));
+        Random rand = new Random();
+        String randReply = replies.get(rand.nextInt(replies.size()));
+        result.put("content", randReply);
         return result;
     }
 

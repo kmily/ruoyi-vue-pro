@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.therapy.taskflow;
 
+import cn.hutool.core.lang.hash.Hash;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -271,7 +272,7 @@ public abstract class BaseFlow {
     }
 
 
-    public String deploy(Long id, String settingsResourceFile) {
+    public String deploy(Long id, String settingsResourceFile, Map extraSettings) {
         Map settings;
         ObjectMapper objectMapper = new ObjectMapper();
         try (InputStream inputStream = getClass().getResourceAsStream(settingsResourceFile)) {
@@ -281,13 +282,51 @@ public abstract class BaseFlow {
             // handle exception
             throw new RuntimeException("Failed to read settings from " + settingsResourceFile + e.getMessage());
         }
+        List<Map> extraGuidesSettings = (List<Map>) extraSettings.getOrDefault("guides", new ArrayList());
+        settings = mergeExtraGuidesSettings(settings, extraGuidesSettings);
         BpmnModel bpmnModel = createBPMNModel(id, settings);
         RepositoryService repositoryService = processEngine.getRepositoryService();
         repositoryService.createDeployment()
-                .addBpmnModel("GoalAndMotivationFlow-" + String.valueOf(id) + ".bpmn", bpmnModel)
+                .addBpmnModel(getProcessName(id) + ".bpmn", bpmnModel)
                 .deploy();
         System.out.println(new String(new BpmnXMLConverter().convertToXML(bpmnModel), StandardCharsets.UTF_8));
         return getProcessName(id);
+    }
+
+    private Map mergeExtraGuidesSettings(Map settings, List<Map> extraGuidesSettings){
+        if(extraGuidesSettings.size() == 0){
+            return settings;
+        }
+        ArrayList<Map> adminGuides = new ArrayList<>();
+        for(Map guide: extraGuidesSettings){
+            Map newGuide = new HashMap();
+            newGuide.put("step_type", "guide_language");
+            Map stepData = new HashMap<String, String>();
+            stepData.put("content", guide.get("text"));
+            newGuide.put("step_data",  stepData);
+            adminGuides.add(newGuide);
+        }
+
+        Map groupNodes = (Map) settings.get("group_nodes");
+        groupNodes.put("ADMIN_GUIDES", adminGuides);
+        ArrayList groupRelations = (ArrayList) settings.get("group_relations");
+        HashMap firstRel = new HashMap<>();
+        firstRel.put("source", "start");
+        firstRel.put("target", "ADMIN_GUIDES");
+
+        for (int i = 0; i < groupRelations.size(); i++) {
+            Map rel = (Map) groupRelations.get(i);
+            if(rel.get("source").equals("start")){
+                rel.put("source", "ADMIN_GUIDES");
+            }
+        }
+        groupRelations.add(0, firstRel);
+
+        // set
+        settings.put("group_relations", groupRelations);
+        settings.put("group_nodes", groupNodes);
+        System.out.println("merged work flow settings, you can comment this if in production: \n" + settings);
+        return settings;
     }
 
 

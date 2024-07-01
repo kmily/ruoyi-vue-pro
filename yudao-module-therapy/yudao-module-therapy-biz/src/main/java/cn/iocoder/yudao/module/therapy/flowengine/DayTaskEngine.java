@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.therapy.flowengine;
 
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.*;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.*;
+import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import cn.iocoder.yudao.module.therapy.service.common.TreatmentStepItem;
 import org.springframework.stereotype.Component;
 
@@ -30,6 +31,8 @@ public class DayTaskEngine {
 
 
     private TreatmentStepItem userCurrentStep;
+
+    private TreatmentService treatmentService;
 
     /**
      * 构造函数
@@ -106,57 +109,12 @@ public class DayTaskEngine {
                 return stepItem;
             }
             stepItem = getNextStepItemOfNextDay(userCurrentStep);
-            // Obsolete, Please remove
-//            TreatmentDayInstanceDO nextDayInstanceDO = treatmentDayInstanceMapper.initInstance(
-//                    userCurrentStep.getFlowInstance().getUserId(),
-//                    nextDayDO.getId(),
-//                    userCurrentStep.getFlowInstance().getId()
-//            );
-//            List<TreatmentFlowDayitemDO> dayitemsDO = treatmentFlowDayitemMapper.getFirstFlowDayitems(nextDayDO.getId());;
-//            List<TreatmentDayitemInstanceDO> dayitemInstancesDO = treatmentDayitemInstanceMapper.initInstances(
-//                    userCurrentStep.getFlowInstance().getUserId(),
-//                    nextDayInstanceDO,
-//                    dayitemsDO
-//            );
-//            stepItem.setDay_items(dayitemInstancesDO);
         }else{
             // same day
             dayInstanceDO.setStatus(TreatmentDayInstanceDO.StatusEnum.IN_PROGRESS.getValue());
             treatmentDayInstanceMapper.updateById(dayInstanceDO);
         }
         return stepItem;
-    }
-
-    /**
-     * 更新疗程日的状态
-     * 如果当天为休息日，则完成
-     * 如果当天所有必做任务都已经完成，则完成
-     * @param dayInstanceDO 疗程日实例
-     */
-    public void updateDayInstanceStatus(TreatmentDayInstanceDO dayInstanceDO){
-        TreatmentFlowDayDO flowDayDO = treatmentFlowDayMapper.selectById(dayInstanceDO.getDayId());
-        if(flowDayDO.isHasBreak()){
-            dayInstanceDO.setStatus(TreatmentDayInstanceDO.StatusEnum.COMPLETED.getValue());
-            treatmentDayInstanceMapper.updateById(dayInstanceDO);
-        }
-        List<TreatmentFlowDayitemDO> flowDayitemDOS = treatmentFlowDayitemMapper.filterByDay(flowDayDO.getId());
-        List<TreatmentDayitemInstanceDO> treatmentDayitemInstanceDOS = treatmentDayitemInstanceMapper.getUserDayitemInstances(
-                dayInstanceDO.getUserId(),
-                dayInstanceDO.getFlowInstanceId(),
-                flowDayitemDOS
-        );
-        boolean completed = true;
-        for(TreatmentDayitemInstanceDO dayitemInstanceDO : treatmentDayitemInstanceDOS){
-            if(dayitemInstanceDO.isRequired()){
-                if(dayitemInstanceDO.getStatus() != TreatmentDayitemInstanceDO.StatusEnum.COMPLETED.getValue()){
-                    completed = false;
-                }
-            }
-        }
-        if(completed){
-            dayInstanceDO.setStatus(TreatmentDayInstanceDO.StatusEnum.COMPLETED.getValue());
-            treatmentDayInstanceMapper.updateById(dayInstanceDO);
-        }
     }
 
     /**
@@ -168,6 +126,11 @@ public class DayTaskEngine {
             //用户还没有开始
             return initAndGetFirstStep();
         }
+        if(userCurrentStep.isEnd()){
+            TreatmentStepItem stepItem =  TreatmentStepItem.clone(userCurrentStep);
+            stepItem.setProcessStatus(TreatmentStepItem.ProcessStatus.TREATMENT_FINISHED);
+            return stepItem;
+        }
         if(userCurrentStep.getFlowDayDO().isHasBreak()){
             //用户当前步骤是休息日
             return getBreakDayNextStepItem();
@@ -178,7 +141,7 @@ public class DayTaskEngine {
             if(!isSameDay) {
                 // next day
                 // Update Yesterday Status
-                updateDayInstanceStatus(userCurrentStep.getDay()); //更新昨天的状态，TODO 在完成某个任务时更新
+                treatmentService.updateDayInstanceStatus(userCurrentStep.getDay()); //更新昨天的状态
 
                 if(treatmentFlowDayitemMapper.hasNextGroup(userCurrentStep.getFlowDayDO().getId(), userCurrentStep.getAgroup())){
                     return getNextStepItemOfCurrentStepItemInSameDay(userCurrentStep);

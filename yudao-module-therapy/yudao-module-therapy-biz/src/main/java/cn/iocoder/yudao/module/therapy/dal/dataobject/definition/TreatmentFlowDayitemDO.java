@@ -13,8 +13,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.alibaba.druid.sql.ast.SQLPartitionValue.Operator.List;
 
 @TableName("hlgyy_treatment_flow_dayitem")
 @Data
@@ -67,6 +70,12 @@ public class TreatmentFlowDayitemDO extends BaseDO implements JsonFieldAccessibl
             return new HashMap();
         try {
             JsonNode jsonNode =  objectMapper.readTree(settings);
+            if(settings.startsWith("[")){
+                 ArrayList guides = objectMapper.convertValue(jsonNode, ArrayList.class);
+                 Map<String, Object> map = new HashMap<>();
+                 map.put("guides", guides);
+                 return map;
+            }
             return objectMapper.convertValue(jsonNode, Map.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

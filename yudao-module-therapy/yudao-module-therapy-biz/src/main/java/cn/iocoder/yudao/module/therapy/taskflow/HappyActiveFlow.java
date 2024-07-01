@@ -5,6 +5,7 @@ import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayitemInstanceMapper;
 import cn.iocoder.yudao.module.therapy.service.SurveyService;
+import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -25,6 +26,8 @@ public class HappyActiveFlow extends BaseFlow  {
 
     @Resource
     SurveyService surveyService;
+    @Resource
+    private TreatmentService treatmentService;
 
 
     public HappyActiveFlow(ProcessEngine engine) {
@@ -40,12 +43,12 @@ public class HappyActiveFlow extends BaseFlow  {
     public void onFlowEnd(DelegateExecution execution) {
         Map variables = execution.getVariables();
         Long dayItemInstanceId = (Long) variables.get(DAYITEM_INSTANCE_ID);
-        treatmentDayitemInstanceMapper.finishDayItemInstance(dayItemInstanceId);
+        treatmentService.finishDayItemInstance(dayItemInstanceId);
     }
 
 
     public String deploy(Long id, Map<String, Object> settings) {
-        return super.deploy(id, "/happy_activity.json");
+        return super.deploy(id, "/happy_activity.json", settings);
     }
 
     public Map<String, Object> auto_categories_qst(Container container, Map data, Task currentTask) {
