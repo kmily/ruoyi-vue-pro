@@ -20,9 +20,9 @@ public class AutomatedThinkingRequestVO {
         @Schema(description = "来源",requiredMode = Schema.RequiredMode.REQUIRED, defaultValue = "1", example = "1：主流程 2：工具箱")
         private int source;
 
-        @Schema(description = "实例ID",requiredMode = Schema.RequiredMode.REQUIRED, defaultValue = "1", example = "l")
+        @Schema(description = "实例ID", defaultValue = "0", example = "l")
         Long dayItemInstanceId;
 
-        @Schema(description = "步骤",requiredMode = Schema.RequiredMode.REQUIRED, defaultValue = "code", example = "code")
+        @Schema(description = "步骤", defaultValue = "", example = "code")
         String stepId;
 }
