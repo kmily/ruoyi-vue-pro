@@ -195,6 +195,14 @@ public class DayTaskEngine {
     private TreatmentStepItem getNextStepItemOfNextDay(TreatmentStepItem userCurrentStep){
         TreatmentFlowDayDO nextDayDO = treatmentFlowDayMapper.getNextFlowDay(userCurrentStep.getFlowDayDO());
         TreatmentStepItem stepItem = TreatmentStepItem.clone(userCurrentStep);
+        if(nextDayDO == null){
+            stepItem.setEnd(true);
+            return stepItem;
+        }
+        if(nextDayDO.isHasBreak()){
+            stepItem.setProcessStatus(TreatmentStepItem.ProcessStatus.TODAY_IS_BREAK_DAY);
+            return stepItem;
+        }
         List<TreatmentFlowDayitemDO> dayitemDOS = treatmentFlowDayitemMapper.getFirstGroupFlowDayitems(nextDayDO.getId());;
         TreatmentDayInstanceDO nextDayInstanceDO = treatmentDayInstanceMapper.initInstance(
                 userCurrentStep.getFlowInstance().getUserId(),
