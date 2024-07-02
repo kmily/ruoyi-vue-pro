@@ -4,6 +4,8 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +51,7 @@ public interface TreatmentDayitemInstanceMapper extends BaseMapperX<TreatmentDay
     }
 
 
-    default void finishDayItemInstance(Long dayItemInstanceId){
+    default void finishDayItemInstanceDO(Long dayItemInstanceId){
         TreatmentDayitemInstanceDO instanceDO = selectById(dayItemInstanceId);
         instanceDO.setStatus(TreatmentDayitemInstanceDO.StatusEnum.COMPLETED.getValue());
         updateById(instanceDO);
@@ -61,5 +63,14 @@ public interface TreatmentDayitemInstanceMapper extends BaseMapperX<TreatmentDay
         queryWrapper.eq(TreatmentDayitemInstanceDO::getStatus, TreatmentDayitemInstanceDO.StatusEnum.COMPLETED.getValue());
         return selectCount(queryWrapper).intValue();
     }
+
+    @Select("select i.* from hlgyy_treatment_dayitem_instance i where user_id = #{userId}" +
+            " inner join " +
+            " hlgyy_treatment_dayitem d on i.dayitem_id = d.id " +
+            " inner join hlgyy_treatment_flow f on f.id = d.flow_id" +
+            " where d.type = #{taskType} and f.code = 'main' " +
+            " order by i.create_time desc limit 1")
+    TreatmentDayitemInstanceDO queryUserGoalAndMotiveInstance(@Param("flowId") Long userId,
+                                                              @Param("taskType") Integer taskType);
 
 }

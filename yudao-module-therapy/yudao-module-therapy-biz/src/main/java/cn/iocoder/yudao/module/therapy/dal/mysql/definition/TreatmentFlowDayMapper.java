@@ -27,6 +27,13 @@ public interface TreatmentFlowDayMapper extends BaseMapperX<TreatmentFlowDayDO> 
         return selectOne(queryWrapper);
     }
 
+    default boolean isLastFlowDay(TreatmentFlowDayDO currentDay) {
+        QueryWrapper<TreatmentFlowDayDO> queryWrapper = new QueryWrapper();
+        queryWrapper = queryWrapper.eq("flow_id", currentDay.getFlowId())
+                .gt("sequence", currentDay.getSequence());
+        return selectCount(queryWrapper) == 0;
+    }
+
     default List<TreatmentFlowDayDO> getPlanListByFlowId(Long id){
         LambdaQueryWrapper<TreatmentFlowDayDO> wrapper= Wrappers.lambdaQuery(TreatmentFlowDayDO.class)
                 .eq(TreatmentFlowDayDO::getFlowId,id)

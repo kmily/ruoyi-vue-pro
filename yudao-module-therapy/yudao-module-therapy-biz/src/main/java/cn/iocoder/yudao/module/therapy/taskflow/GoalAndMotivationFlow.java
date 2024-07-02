@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.therapy.taskflow;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -9,16 +7,14 @@ import java.util.Map;
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemInstanceDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.AnswerDetailDO;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayitemInstanceMapper;
 import cn.iocoder.yudao.module.therapy.service.DayitemInstanceService;
 import cn.iocoder.yudao.module.therapy.service.SurveyService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.flowable.bpmn.converter.BpmnXMLConverter;
-import org.flowable.bpmn.model.*;
+import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import org.flowable.engine.*;
 
-import java.nio.charset.StandardCharsets;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.task.api.Task;
@@ -44,27 +40,31 @@ public class GoalAndMotivationFlow extends BaseFlow{
     @Resource
     DayitemInstanceService dayitemInstanceService;
 
+    @Resource
+    private TreatmentService treatmentService;
+
     public GoalAndMotivationFlow(ProcessEngine engine) {
         super(engine);
     }
 
     public String deploy(Long id, Map<String, Object> settings) {
-        // read settings from resources/goal_and_motivation_settings.json
-        ObjectMapper objectMapper = new ObjectMapper();
-        try (InputStream inputStream = getClass().getResourceAsStream("/goal_and_motivation_flow.json")) {
-            settings = objectMapper.readValue(inputStream, Map.class);
-            // use settings
-        } catch (IOException e) {
-            // handle exception
-            throw new RuntimeException("Failed to read settings from resources/goal_and_motivation_settings.json");
-        }
-        BpmnModel bpmnModel = createBPMNModel(id, settings);
-        RepositoryService repositoryService = processEngine.getRepositoryService();
-        repositoryService.createDeployment()
-                .addBpmnModel("GoalAndMotivationFlow-" + String.valueOf(id) + ".bpmn", bpmnModel)
-                .deploy();
-        System.out.println(new String(new BpmnXMLConverter().convertToXML(bpmnModel), StandardCharsets.UTF_8));
-        return getProcessName(id);
+        return super.deploy(id, "/goal_and_motivation_flow.json", settings);
+//        // read settings from resources/goal_and_motivation_settings.json
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        try (InputStream inputStream = getClass().getResourceAsStream("/goal_and_motivation_flow.json")) {
+//            settings = objectMapper.readValue(inputStream, Map.class);
+//            // use settings
+//        } catch (IOException e) {
+//            // handle exception
+//            throw new RuntimeException("Failed to read settings from resources/goal_and_motivation_settings.json");
+//        }
+//        BpmnModel bpmnModel = createBPMNModel(id, settings);
+//        RepositoryService repositoryService = processEngine.getRepositoryService();
+//        repositoryService.createDeployment()
+//                .addBpmnModel("GoalAndMotivationFlow-" + String.valueOf(id) + ".bpmn", bpmnModel)
+//                .deploy();
+//        System.out.println(new String(new BpmnXMLConverter().convertToXML(bpmnModel), StandardCharsets.UTF_8));
+//        return getProcessName(id);
     }
 
 
@@ -77,8 +77,13 @@ public class GoalAndMotivationFlow extends BaseFlow{
     public void onFlowEnd(DelegateExecution execution) {
         Map variables = execution.getVariables();
         Long dayItemInstanceId = (Long) variables.get(DAYITEM_INSTANCE_ID);
-
-        treatmentDayitemInstanceMapper.finishDayItemInstance(dayItemInstanceId);
+        // TODO if user don't agree should cancel all the treatment
+        treatmentService.finishDayItemInstance(dayItemInstanceId);
+        if (!(boolean) variables.get("try_treatment_confirm_result")){
+            // cancel all the treatment
+            TreatmentDayitemInstanceDO dayitemInstanceDO = treatmentDayitemInstanceMapper.selectById(dayItemInstanceId);
+            treatmentService.cancelTreatmentInstance(dayitemInstanceDO.getFlowInstanceId());
+        }
     }
 
     /**

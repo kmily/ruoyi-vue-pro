@@ -15,6 +15,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -39,7 +40,7 @@ public interface SurveyAnswerMapper extends BaseMapperX<SurveyAnswerDO> {
         return selectList(new LambdaQueryWrapperX<SurveyAnswerDO>()
                 .eq(SurveyAnswerDO::getCreator, userId)
                 .eq(SurveyAnswerDO::getReprotState, ReprotState.DONE.getType())
-                .betweenIfPresent(SurveyAnswerDO::getCreateTime, begin, end.plusDays(1))
+                .betweenIfPresent(SurveyAnswerDO::getCreateTime, begin, Objects.isNull(end)?end: end.plusDays(1))
                 .in(SurveyAnswerDO::getSurveyType, types));
 
     }

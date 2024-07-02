@@ -5,17 +5,12 @@ import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserExtDTO;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
-import cn.iocoder.yudao.module.system.api.dict.dto.DictDataRespDTO;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.*;
 import cn.iocoder.yudao.module.therapy.controller.vo.TreatmentInstanceVO;
 import cn.iocoder.yudao.module.therapy.convert.DayitemNextStepConvert;
 import cn.iocoder.yudao.module.therapy.convert.TreatmentChatHistoryConvert;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentChatHistoryDO;
-import cn.iocoder.yudao.module.therapy.service.TaskFlowService;
-import cn.iocoder.yudao.module.therapy.service.TreatmentChatHistoryService;
-import cn.iocoder.yudao.module.therapy.service.TreatmentService;
-import cn.iocoder.yudao.module.therapy.service.TreatmentUserProgressService;
+import cn.iocoder.yudao.module.therapy.service.*;
 import cn.iocoder.yudao.module.therapy.service.common.TreatmentStepItem;
 import cn.iocoder.yudao.module.therapy.taskflow.BaseFlow;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,6 +46,10 @@ public class TreatmentController {
     @Resource
     private DictDataApi dictDataApi;
 
+    @Resource
+    private DayTaskEngineService dayTaskEngine;
+
+
     @PostMapping("/{code}")
     @Operation(summary = "初始化治疗流程")
 //    @Parameter(name="code", description = "治疗流程Code", required = true, example = "main")
@@ -85,7 +84,7 @@ public class TreatmentController {
     public CommonResult<TreatmentNextVO> getNext(@PathVariable("code") String code, @PathVariable("id") Long treatmentInstanceId) {
         Long userId = getLoginUserId();
         TreatmentStepItem userCurrentStep = treatmentUserProgressService.getTreatmentUserProgress(userId, treatmentInstanceId);
-        TreatmentStepItem stepItem = treatmentService.getNext(userCurrentStep);
+        TreatmentStepItem stepItem = dayTaskEngine.getNext(userCurrentStep);
         TreatmentNextVO data = treatmentUserProgressService.convertStepItemToRespFormat(stepItem);
         treatmentUserProgressService.updateUserProgress(stepItem);
         treatmentChatHistoryService.addChatHistory(userId, treatmentInstanceId, data, true);
@@ -181,6 +180,7 @@ public class TreatmentController {
     @Operation(summary = "清空用户流程数据-临时测试用")
     @PreAuthenticated
     public CommonResult<Long> clearUserProgress() {
+        // TODO REMOVE THIS FUNCTION
         Long userId = getLoginUserId();
         treatmentUserProgressService.clearUserProgress(userId);
         return success(1L);

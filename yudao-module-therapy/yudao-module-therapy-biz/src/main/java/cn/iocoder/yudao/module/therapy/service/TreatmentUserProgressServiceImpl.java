@@ -42,15 +42,22 @@ public class TreatmentUserProgressServiceImpl implements  TreatmentUserProgressS
         TreatmentStepItem stepItem = new TreatmentStepItem();
         TreatmentInstanceDO instance = treatmentInstanceMapper.selectById(treatmentInstanceId);
         TreatmentUserProgressDO progressDO =  treatmentUserProgressMapper.getUserCurrentProgress(userId, treatmentInstanceId);
+        if(instance.getStatus() == TreatmentInstanceDO.TreatmentStatus.CANCELLED.getValue() ||
+                instance.getStatus() == TreatmentInstanceDO.TreatmentStatus.COMPLETED.getValue()){
+            stepItem.setEnd(true);
+            return stepItem;
+        }
         stepItem.setFlowInstance(instance);
         if(progressDO != null){
             TreatmentDayInstanceDO dayInstanceDO = treatmentDayInstanceMapper.selectById(progressDO.getDayInstanceId());
             stepItem.setDay(dayInstanceDO);
 
             List<TreatmentFlowDayitemDO> flowDayitemDOS = treatmentFlowDayitemMapper.selectGroupItems(dayInstanceDO.getDayId(), progressDO.getDayAgroup());
-            List<TreatmentDayitemInstanceDO> dayitemInstanceDOS = treatmentDayitemInstanceMapper.selectCurrentItems(flowDayitemDOS);
-            stepItem.setAgroup(progressDO.getDayAgroup());
-            stepItem.setDay_items(dayitemInstanceDOS);
+            if(flowDayitemDOS.size() > 0){
+                List<TreatmentDayitemInstanceDO> dayitemInstanceDOS = treatmentDayitemInstanceMapper.selectCurrentItems(flowDayitemDOS);
+                stepItem.setAgroup(progressDO.getDayAgroup());
+                stepItem.setDay_items(dayitemInstanceDOS);
+            }
         }else{
             stepItem.setStarted(false);
         }
@@ -79,10 +86,19 @@ public class TreatmentUserProgressServiceImpl implements  TreatmentUserProgressS
         switch (stepItem.getProcessStatus()){
             case CURRENT_DAY_NO_MORE_STEP:
                 settings.put("content", "今天已经没有更多任务了哦~");
+                break;
             case LAST_DAY_NOT_COMPLETE:
                 settings.put("content", "请先完成之前的必做任务哦~");
+                break;
             case CURRENT_STEP_REQUIRES_COMPLETE:
                 settings.put("content", "请先完成当前任务才能继续哦~");
+                break;
+            case TREATMENT_FINISHED:
+                settings.put("content", "恭喜你完成了所有任务,治疗流程已经结束~");
+                break;
+            case TODAY_IS_BREAK_DAY:
+                settings.put("content", "今天是休息日哦~");
+                break;
         }
         sysInfo.setSettings(settings);
         return sysInfo;

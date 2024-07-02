@@ -6,9 +6,7 @@ import cn.iocoder.yudao.module.therapy.controller.vo.SetAppointmentTimeReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.FlowPlanReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.FlowTaskVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.SaveFlowReqVO;
-import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDO;
-import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDayDO;
-import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDayitemDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.*;
 import cn.iocoder.yudao.module.therapy.service.common.TreatmentStepItem;
 
 import javax.validation.Valid;
@@ -114,4 +112,13 @@ public interface TreatmentService {
     TreatmentFlowDayitemDO getTask(Long id);
 
     void publish(Long id,Integer state);
+
+    void updateDayInstanceStatus(TreatmentDayInstanceDO dayInstanceDO);
+
+    void finishDayItemInstance(Long dayItemInstanceId);
+
+
+    void cancelTreatmentInstance(Long flowInstanceId);
+
+    void completeDayInstance(TreatmentDayInstanceDO dayInstanceDO);
 }
