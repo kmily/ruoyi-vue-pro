@@ -119,4 +119,6 @@ public interface TreatmentService {
 
 
     void cancelTreatmentInstance(Long flowInstanceId);
+
+    void completeDayInstance(TreatmentDayInstanceDO dayInstanceDO);
 }

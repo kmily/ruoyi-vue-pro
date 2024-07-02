@@ -13,7 +13,6 @@ import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.FlowTaskVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.SaveFlowReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.*;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.*;
-import cn.iocoder.yudao.module.therapy.flowengine.DayTaskEngine;
 import cn.iocoder.yudao.module.therapy.service.common.TreatmentStepItem;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +38,7 @@ public class TreatmentServiceImpl implements TreatmentService {
     private TreatmentDayitemInstanceMapper treatmentDayitemInstanceMapper;
 
     @Resource
-    private DayTaskEngine dayTaskEngine;
+    private DayTaskEngineService dayTaskEngine;
 
     @Resource
     private MemberUserApi memberUserApi;
@@ -302,6 +301,7 @@ public class TreatmentServiceImpl implements TreatmentService {
         if(completed){
             dayInstanceDO.setStatus(TreatmentDayInstanceDO.StatusEnum.COMPLETED.getValue());
             treatmentDayInstanceMapper.updateById(dayInstanceDO);
+            updateTreatmentInstanceStatus(dayInstanceDO);
         }
     }
 
@@ -336,6 +336,13 @@ public class TreatmentServiceImpl implements TreatmentService {
         TreatmentInstanceDO instanceDO = treatmentInstanceMapper.selectById(flowInstanceId);
         instanceDO.setStatus(TreatmentInstanceDO.TreatmentStatus.CANCELLED.getValue());
         treatmentInstanceMapper.updateById(instanceDO);
+    }
+
+    @Override
+    public void completeDayInstance(TreatmentDayInstanceDO dayInstanceDO){
+        dayInstanceDO.setStatus(TreatmentDayInstanceDO.StatusEnum.COMPLETED.getValue());
+        treatmentDayInstanceMapper.updateById(dayInstanceDO);
+        updateTreatmentInstanceStatus(dayInstanceDO);
     }
 
 }
