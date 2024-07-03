@@ -125,7 +125,7 @@ public class SurveyServiceImpl implements SurveyService {
         return surveyQuestionMapper.selectBySurveyId(id);
     }
 
-    //@Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Long submitSurveyForTools(SubmitSurveyReqVO reqVO) {
         if (CollectionUtil.isEmpty(reqVO.getQstList())) {
@@ -157,8 +157,8 @@ public class SurveyServiceImpl implements SurveyService {
                 QuestionDO qst = mapQst.getOrDefault(item.getQstCode(), null);
                 detailDO.setAnswerId(answerId);
                 detailDO.setBelongSurveyId(tsdo.getId());
-                detailDO.setCreator(StringUtils.isBlank(getLoginUserId().toString())? "system":getLoginUserId().toString());
-                detailDO.setUpdater(StringUtils.isBlank(getLoginUserId().toString())? "system":getLoginUserId().toString());
+                detailDO.setCreator(Objects.isNull(getLoginUserId())? "0":getLoginUserId().toString());
+                detailDO.setUpdater(Objects.isNull(getLoginUserId())? "0":getLoginUserId().toString());
                 detailDO.setQstContext(Objects.isNull(qst) ? null : qst.getQstContext());
                 detailDO.setAnswer(item.getAnswer());
                 detailDO.setQstId(Objects.isNull(qst) ? 0L : qst.getId());
@@ -251,6 +251,8 @@ public class SurveyServiceImpl implements SurveyService {
         answerDO.setSurveyType(ts.getSurveyType());
         answerDO.setSource(source);
         answerDO.setBelongSurveyId(ts.getId());
+        answerDO.setCreator(Objects.isNull(getLoginUserId())?"system":getLoginUserId().toString());
+        answerDO.setUpdater(Objects.isNull(getLoginUserId())?"system":getLoginUserId().toString());
         surveyAnswerMapper.insert(answerDO);
         return answerDO.getId();
     }

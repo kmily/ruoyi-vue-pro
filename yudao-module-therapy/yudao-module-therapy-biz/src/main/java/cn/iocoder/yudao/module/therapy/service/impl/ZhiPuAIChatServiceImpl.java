@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.therapy.service.impl;
 
 import cn.hutool.json.JSONObject;
+import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
@@ -35,6 +36,7 @@ import com.zhipu.oapi.service.v4.model.ModelData;
 import io.reactivex.Flowable;
 import liquibase.util.BooleanUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -48,6 +50,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static cn.iocoder.yudao.module.therapy.taskflow.Const.SURVEY_SOURCE_TYPE;
 
 /**
  * Author:lidongw_1
@@ -233,10 +237,7 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
      * @return
      */
     @Override
-    public Flux<SSEMsgDTO> automaticThinkingRecognition(Long userId, String conversationId, String content,
-                                                        RequestSourceEnum sourceEnum,
-                                                        Long dayItemInstanceId,
-                                                        String stepId) {
+    public Flux<SSEMsgDTO> automaticThinkingRecognition(Long userId, String conversationId, String content, RequestSourceEnum sourceEnum, Long dayItemInstanceId, String stepId) {
         //保存用户消息
         saveUserChatMessage(conversationId, userId, 0L, UserTypeEnum.USER, content, sourceEnum, dayItemInstanceId, stepId);
 
@@ -334,21 +335,24 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
      * @param userType       用户类型
      * @param message        消息内容
      */
-    private void saveUserChatMessage(String conversationId, long sendUserId, long receiveUserId, UserTypeEnum userType,
-                                     String message, RequestSourceEnum sourceEnum,
-                                     Long dayItemInstanceId, String stepId) {
+    private void saveUserChatMessage(String conversationId, long sendUserId, long receiveUserId, UserTypeEnum userType, String message, RequestSourceEnum sourceEnum, Long dayItemInstanceId, String stepId) {
 
         ChatMessageDO info = ChatMessageDO.builder().sendUserId(sendUserId).sendUserType(userType.name()).conversationId(conversationId).content(message).receiveUserId(receiveUserId).build();
+
         if (userType == UserTypeEnum.ROBOT) {
-            long answerId = saveAutomatedThoughtsConclusion(message, sourceEnum);
-            if (NumberUtils.gtZero(answerId) && RequestSourceEnum.MAIN_PROCESS.equals(sourceEnum)) {
-                BaseFlow taskFlow = taskFlowService.getTaskFlow(receiveUserId, dayItemInstanceId);
-                DayitemStepSubmitReqVO dayitemStepSubmitReqVO = new DayitemStepSubmitReqVO();
-                dayitemStepSubmitReqVO.setStep_id(stepId);
-                taskFlowService.userSubmit(taskFlow, dayItemInstanceId, stepId, dayitemStepSubmitReqVO);
+            try {
+                long answerId = saveAutomatedThoughtsConclusion(message, sourceEnum);
+                if (NumberUtils.gtZero(answerId) && RequestSourceEnum.MAIN_PROCESS.equals(sourceEnum)) {
+                    BaseFlow taskFlow = taskFlowService.getTaskFlow(receiveUserId, dayItemInstanceId);
+                    DayitemStepSubmitReqVO dayitemStepSubmitReqVO = new DayitemStepSubmitReqVO();
+                    dayitemStepSubmitReqVO.setStep_id(stepId);
+                    taskFlowService.userSubmit(taskFlow, dayItemInstanceId, stepId, dayitemStepSubmitReqVO);
+                    log.info("设置结束任务成功，会话ID: {}  dayItemInstanceId:{} stepId:{}",info.getConversationId(),dayItemInstanceId,stepId);
+                }
+            } catch (Exception e) {
+                log.error("创建问券报错。{}",info.getConversationId(),e);
             }
         }
-
         chatMessageMapper.insert(info);
     }
 
@@ -365,15 +369,14 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
         // [日期/时间：XXX。 情境：XXXX。 想法：自动化思维内容。情绪与身体感觉：情绪及评分，身体感觉及评分。行为及后果：XXX。]
         //Pattern pattern = Pattern.compile("\\[日期/时间：(.*?)。情境：(.*?)。自动化思维：“(.*?)”，“(.*?)”。情绪与身体感觉：(.*?)。行为及后果：(.*?)。\\]");
 
-        Pattern isResult = Pattern.compile("\\[(.*?)\\]",Pattern.DOTALL);
+        Pattern isResult = Pattern.compile("\\[(.*?)\\]", Pattern.DOTALL);
         Matcher matcher1 = isResult.matcher(message);
-        if (!matcher1.find()){
+        if (!matcher1.find()) {
             log.info("不是自动化思维识别结论, 消息源： {}  ", message);
             return 0L;
         }
 
-        Pattern pattern = Pattern.compile(
-                "\\[日期/时间：(.*?)。\\s*情境：(.*?)。\\s*想法：(.*?)（自动化思维）。\\s*情绪与身体感觉：(.*?)。\\s*行为及后果：(.*?)。\\]");
+        Pattern pattern = Pattern.compile("\\[日期/时间：(.*?)。\\s*情境：(.*?)。\\s*想法：(.*?)（自动化思维）。\\s*情绪与身体感觉：(.*?)。\\s*行为及后果：(.*?)。\\]");
         Matcher matcher = pattern.matcher(message);
 
         if (matcher.find()) {
@@ -413,13 +416,17 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
             }
         } else {
             String s = checkIsAutomaticResult(message);
-            if("no".equalsIgnoreCase(s)){
-                log.info("大模型识别不是自动化思维结论：{}",message);
-                return 0L;
+            if ("no".equalsIgnoreCase(s)) {
+                log.info("大模型识别不是自动化思维结论：{}", message);
+                String s1 = twoParseResult(message);
+                s = checkIsAutomaticResult(s1);
+                if ("no".equalsIgnoreCase(s)) {
+                    log.warn("二次解析也失败了,{}", s1);
+                    return 0L;
+                }
             }
 
             if (!jsonUtils.isJson(s)) {
-
                 String regex = "\\{[^}]+\\}";
                 // 编译正则表达式
                 pattern = Pattern.compile(regex);
@@ -428,12 +435,12 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
                 if (matcher.find()) {
                     s = matcher.group(); // 提取匹配到的JSON部分
                 } else {
-                    log.error("大模型识别返回不是JSON。 {}",s);
+                    log.error("大模型识别返回不是JSON。 {}", s);
                     return 0L;
                 }
             }
 
-            JSONObject jsonObject = new  JSONObject(s);
+            JSONObject jsonObject = new JSONObject(s);
             SubmitSurveyReqVO submitSurveyReqVO = new SubmitSurveyReqVO();
             submitSurveyReqVO.setSurveyType(11);
             AnAnswerReqVO anAnswerReqVO = new AnAnswerReqVO();
@@ -444,9 +451,29 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
             if (RequestSourceEnum.TOOLBOX.equals(sourceEnum)) {
                 return surveyService.submitSurveyForTools(submitSurveyReqVO);
             } else {
+                Long id = surveyService.initSurveyAnswer(SurveyType.AUTO_THOUGHT_RECOGNITION.getCode(), SURVEY_SOURCE_TYPE);
+                if (NumberUtils.isZero(id)) {
+                    log.error("创建自动化思维问卷实例失败。{}", JsonUtils.toJsonString(submitSurveyReqVO));
+                    return 0L;
+                }
+                submitSurveyReqVO.setId(id);
                 return surveyService.submitSurveyForFlow(submitSurveyReqVO);
             }
         }
+    }
+
+    private String twoParseResult(String msg) {
+        // 编译正则表达式
+        Pattern pattern = Pattern.compile("\\[(.*?)\\]", Pattern.DOTALL);
+        // 在输入文本中查找匹配项
+        Matcher matcher = pattern.matcher(msg);
+        if (matcher.find()) {
+            return matcher.group(); // 提取匹配到的JSON部分
+        } else {
+            log.error("二次识别也失败了。 {}", msg);
+            return StringUtils.EMPTY;
+        }
+
     }
 
 
@@ -465,8 +492,7 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
         messages.add(chatMessage);
         ModelApiResponse chat = chat(messages, false);
 
-        if (chat == null)
-            return "系统提示未配置";
+        if (chat == null) return "系统提示未配置";
 
         if (!chat.isSuccess()) {
             log.error("chat problem:{} error:{}", messages, JSON.toJSONString(chat));
