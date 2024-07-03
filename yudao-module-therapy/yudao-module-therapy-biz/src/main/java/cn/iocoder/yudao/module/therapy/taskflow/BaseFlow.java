@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.therapy.taskflow;
 
 import cn.hutool.core.lang.hash.Hash;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,6 +47,42 @@ public abstract class BaseFlow {
     }
 
     /**
+     * 前置条件是否满足
+     * @param container
+     * @return
+     */
+    public boolean prerequisiteReady(Container container){
+        return true;
+    }
+
+    /**
+     * 前置条件不满足
+     * @param container
+     * @return
+     */
+    public Map prerequisiteFailed(Container container){
+        HashMap result = new HashMap();
+        result.put("__step_id", "SYS_INFO" );
+        result.put("__step_name", "SYS_INFO");
+        result.put("step_type", "SYS_INFO");
+        Map stepData = new HashMap();
+        stepData.put("content", "您未符合相应的条件，暂时不能进行此任务");
+        result.put("step_data", stepData);
+        return result;
+    }
+
+    private Map exceptionResult(ServiceException e){
+        HashMap result = new HashMap();
+        result.put("__step_id", "SYS_INFO" );
+        result.put("__step_name", "SYS_INFO");
+        result.put("step_type", "SYS_INFO");
+        Map stepData = new HashMap();
+        stepData.put("content", e.getMessage());
+        result.put("step_data", stepData);
+        return result;
+    }
+
+    /**
      * 运行流程, 返回下一步的信息
      * @return
      */
@@ -76,12 +113,14 @@ public abstract class BaseFlow {
             Map stepResult = (Map) method.invoke(this, container, data.get("step_data"), currentTask);
             boolean requireSubmit = (boolean) data.getOrDefault("submit", true);
             result.put("require_submit", requireSubmit);
-            if(!requireSubmit || data.get("step_type").equals("guide_language")){
+            if (!requireSubmit || data.get("step_type").equals("guide_language")) {
                 result.put("require_submit", false);
                 TaskService taskService = processEngine.getTaskService();
                 taskService.complete(currentTask.getId());
             }
             result.put("step_data", stepResult);
+        } catch (ServiceException e){
+            return exceptionResult(e);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         } catch (NoSuchMethodException e) {

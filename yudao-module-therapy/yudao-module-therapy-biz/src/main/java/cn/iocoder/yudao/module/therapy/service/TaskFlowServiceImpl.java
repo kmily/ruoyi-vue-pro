@@ -222,7 +222,11 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
             dayitemInstanceDO.setTaskInstanceId(container.getProcessInstanceId());
             treatmentDayitemInstanceMapper.updateById(dayitemInstanceDO);
         }
-        return taskFlow.run(container);
+        if(taskFlow.prerequisiteReady(container)){
+            return taskFlow.run(container);
+        }else{
+            return taskFlow.prerequisiteFailed(container);
+        }
     }
 
     @Override

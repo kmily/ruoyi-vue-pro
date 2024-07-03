@@ -19,6 +19,7 @@ import org.flowable.task.api.Task;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -69,20 +70,48 @@ public class StrategyPracticeFlow extends BaseFlow {
         treatmentService.finishDayItemInstance(dayItemInstanceId);
     }
 
-    public Map<String, Object> auto_strategy_practice_survey(Container container, Map data, Task currentTask){
-        // # TODO Bug
+
+    /**
+     * 前置条件是否满足
+     * @param container
+     * @return
+     */
+    public boolean prerequisiteReady(Container container){
         Long dayItemInstanceId =(Long) getVariables(container).get(DAYITEM_INSTANCE_ID);;
         TreatmentDayitemInstanceDO dayitemInstanceDO = treatmentDayitemInstanceMapper.selectById(dayItemInstanceId);
         List<String> troubleTags = treatmentStatisticsDataService.queryUserTroubles(dayitemInstanceDO.getUserId());
         if(troubleTags.size() == 0){
-            throw exception(TREATMENT_REQUIRE_GOAL_AND_MOTIVATION);
+            return false;
         }
+        return true;
+    }
+
+    /**
+     * 前置条件不满足
+     * @param container
+     * @return
+     */
+    public Map prerequisiteFailed(Container container){
+        HashMap result = new HashMap();
+        result.put("__step_id", "SYS_INFO" );
+        result.put("__step_name", "SYS_INFO");
+        result.put("step_type", "SYS_INFO");
+        Map stepData = new HashMap();
+        stepData.put("content", "您还没有完成目标与动机中的问题类别设定，请完成后继续！");
+        result.put("step_data", stepData);
+        return result;
+    }
+
+    public Map<String, Object> auto_strategy_practice_survey(Container container, Map data, Task currentTask){
+        Long dayItemInstanceId =(Long) getVariables(container).get(DAYITEM_INSTANCE_ID);;
+        TreatmentDayitemInstanceDO dayitemInstanceDO = treatmentDayitemInstanceMapper.selectById(dayItemInstanceId);
+        List<String> troubleTags = treatmentStatisticsDataService.queryUserTroubles(dayitemInstanceDO.getUserId());
         int randIndex = new Random().nextInt(troubleTags.size());
         String tag = troubleTags.get(randIndex);
         List<TreatmentSurveyDO> surveyDOS = surveyService.listByTag(tag);
         if(surveyDOS.isEmpty()){
-//            throw exception(TREATMENT_NO_STRATEGY_GAME_FOUND);
-            throw new RuntimeException("No survey found for tag: " + tag);
+            System.out.println("[ERROR] no strategy game found for tag: " + tag);
+            throw exception(TREATMENT_NO_STRATEGY_GAME_FOUND);
         }
         Map variables = getVariables(container);
         Long survey_id = (Long) variables.get("survey_id");

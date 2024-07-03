@@ -92,6 +92,24 @@ public interface TreatmentFlowDayitemMapper extends BaseMapperX<TreatmentFlowDay
     List<TreatmentDayitemDetailDO> getDayitemDetail(@Param("treatmentInstanceId") Long treatmentInstanceId, @Param("treatmentFlowId") Long treatmentFlowId);
 
 
+
+    @Select("select d.id as day_id, d.has_break, d.sequence as flow_day_index, d.name as flow_day_name, " +
+            " dins.id as day_instance_id, dins.status as day_instance_status, " +
+            " di.type as dayitem_type, ins.id as dayitem_instance_id, " +
+            " ins.create_time, ins.update_time, ins.status as dayitem_instance_status " +
+            " from hlgyy_treatment_flow_days   d " +
+            " left join hlgyy_treatment_flow_dayitem di " +
+            " on di.day_id = d.id  " +
+            " left join hlgyy_treatment_day_instance dins " +
+            " on dins.day_id = d.id and dins.flow_instance_id = #{treatmentInstanceId}" +
+            " left join hlgyy_treatment_dayitem_instance ins" +
+            " on ins.flow_instance_id = #{treatmentInstanceId} and ins.dayitem_id = di.id " +
+            " where d.flow_id = #{treatmentFlowId} order by d.sequence, di.agroup and d.id = #{dayId}")
+    List<TreatmentDayitemDetailDO> getDayitemDetailOfDay(@Param("treatmentInstanceId") Long treatmentInstanceId,
+                                                         @Param("treatmentFlowId") Long treatmentFlowId,
+                                                         @Param("dayId") Long dayId);
+
+
     @Select("select * from hlgyy_treatment_flow_dayitem where flow_id = #{flowId} and `type` = #{type} order by group_seq desc limit 1")
     TreatmentFlowDayitemDO getPriorEvaluation(@Param("flowId") Long flowId, @Param("type") Integer type);
 }
