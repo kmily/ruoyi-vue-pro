@@ -43,7 +43,7 @@ public class MoodScaleSurveyStrategy extends AbstractStrategy implements SurveyS
         Integer passiveScore = 0;//消极
         List<Integer> indexs = Arrays.asList(0, 4, 5, 8, 9, 11, 15, 16, 18, 19);
         for (int i = 0; i < detailDOS.size(); i++) {
-            if (Objects.isNull(detailDOS.get(i).getAnswer())) {
+            if (Objects.nonNull(detailDOS.get(i).getAnswer())) {
                 if (indexs.contains(i)) {
                     positiveScore += detailDOS.get(i).getAnswer().getInt("val", 0);
                 } else {
