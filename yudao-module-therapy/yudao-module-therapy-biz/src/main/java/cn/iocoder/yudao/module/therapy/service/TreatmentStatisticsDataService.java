@@ -49,6 +49,15 @@ public interface TreatmentStatisticsDataService {
 
 
     /**
+     * 查询用户的当天治疗进度百分比
+     *
+     * @param treatmentInstanceId
+     * @return
+     */
+    int getDayProgressPercentage(Long treatmentInstanceId);
+
+
+    /**
      * 获取治疗中\治疗完成、完成初步评估的人数统计数据
      */
 

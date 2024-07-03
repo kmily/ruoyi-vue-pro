@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -46,4 +48,9 @@ public interface TreatmentFlowDayMapper extends BaseMapperX<TreatmentFlowDayDO> 
                 .eq(TreatmentFlowDayDO::getFlowId, flowId);
         return Math.toIntExact(selectCount(wrapper));
     }
+
+    @Select(" select * from hlgyy_treatment_flow_day d inner join " +
+            " hlgyy_treatment_day_instance i on d.id = i.day_id " +
+            " where i.id = #{instanceId}")
+    TreatmentFlowDayDO selectByDayInstanceId(@Param("instanceId") Long instanceId);
 }

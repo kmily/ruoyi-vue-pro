@@ -64,13 +64,13 @@ public interface TreatmentDayitemInstanceMapper extends BaseMapperX<TreatmentDay
         return selectCount(queryWrapper).intValue();
     }
 
-    @Select("select i.* from hlgyy_treatment_dayitem_instance i where user_id = #{userId}" +
+    @Select("select i.* from hlgyy_treatment_dayitem_instance i " +
             " inner join " +
-            " hlgyy_treatment_dayitem d on i.dayitem_id = d.id " +
+            " hlgyy_treatment_flow_dayitem d on i.dayitem_id = d.id " +
             " inner join hlgyy_treatment_flow f on f.id = d.flow_id" +
-            " where d.type = #{taskType} and f.code = 'main' " +
+            " where d.type = #{taskType} and f.code = 'main' and user_id = #{userId} " +
             " order by i.create_time desc limit 1")
-    TreatmentDayitemInstanceDO queryUserGoalAndMotiveInstance(@Param("flowId") Long userId,
+    TreatmentDayitemInstanceDO queryUserGoalAndMotiveInstance(@Param("userId") Long userId,
                                                               @Param("taskType") Integer taskType);
 
 }

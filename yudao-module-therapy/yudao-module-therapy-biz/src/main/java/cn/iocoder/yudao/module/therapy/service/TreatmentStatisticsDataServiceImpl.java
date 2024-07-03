@@ -146,6 +146,9 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
         if (treatmentDayitemInstanceDO == null) {
             return new ArrayList<>();
         }
+        if(treatmentDayitemInstanceDO.getExtAttrObj() == null){
+            return new ArrayList<>();
+        }
         return (List<String>) treatmentDayitemInstanceDO.getExtAttrObj().getOrDefault("trouble_categories", new ArrayList<>());
     }
 
@@ -214,7 +217,33 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
         }
         int count = treatmentFlowDayDO.getSequence() + addition;
         return (int) ( count / (float) totalDays  * 100);
+    }
 
+    @Override
+    public int getDayProgressPercentage(Long treatmentInstanceId){
+        TreatmentInstanceDO treatmentInstanceDO = treatmentInstanceMapper.selectById(treatmentInstanceId);
+        TreatmentUserProgressDO treatmentUserProgressDO =  treatmentUserProgressMapper.getUserCurrentProgress(
+                treatmentInstanceDO.getUserId(),
+                treatmentInstanceDO.getId());
+        TreatmentFlowDayDO treatmentFlowDayDO = treatmentFlowDayMapper.selectByDayInstanceId(treatmentUserProgressDO.getDayInstanceId());
+        List<TreatmentDayitemDetailDO> detailDOS =  treatmentFlowDayitemMapper.getDayitemDetailOfDay(treatmentInstanceDO.getUserId(),
+                treatmentInstanceId,
+                treatmentFlowDayDO.getId());
+        int totalCount = 0;
+        int completeCount = 0;
+        for(TreatmentDayitemDetailDO detailDO: detailDOS){
+            if(detailDO.getDayitemType() == TaskType.GUIDE_LANGUAGE.getType()){
+                continue;
+            }
+            totalCount += 1;
+            if(detailDO.getDayitemInstanceStatus() == TreatmentDayitemInstanceDO.StatusEnum.COMPLETED.getValue()){
+                completeCount += 1;
+            }
+        }
+        if(totalCount == 0){
+            return 0;
+        }
+        return (int)(( completeCount / (float) totalCount) * 100);
     }
 
     @Override
