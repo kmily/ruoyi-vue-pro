@@ -21,7 +21,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.MEMBER_GROUP_NOT_SETTINGS;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -201,6 +204,9 @@ public class TreatmentController {
     public CommonResult<String> getFlow() {
         Long userId = getLoginUserId();
         MemberUserExtDTO extDTO= memberUserApi.getUserExtInfo(userId);
+        if(Objects.isNull(extDTO) || Objects.isNull(extDTO.getTestGroup())){
+            throw exception(MEMBER_GROUP_NOT_SETTINGS);
+        }
         return success(dictDataApi.getDictDataLabel("flow_rule",extDTO.getTestGroup()));
     }
 }

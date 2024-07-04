@@ -25,6 +25,8 @@ public interface ErrorCodeConstants {
     ErrorCode TREATMENT_PLAN_TASK_NOT_EXISTS = new ErrorCode(1_004_003_002, "治疗计划的任务不存在");
     ErrorCode TREATMENT_PLAN_SEQ_EXISTS = new ErrorCode(1_004_003_003, "已经存在当天的治疗计划");
 
+    ErrorCode MEMBER_GROUP_NOT_SETTINGS = new ErrorCode(1_004_003_004, "请联系医生设置您的分组");
+
 
     // ========== 活动计划相关 ==========
     ErrorCode TREATMENT_SCHEDULE_NOT_EXISTS = new ErrorCode(1_004_004_000, "患者日程不存在");
