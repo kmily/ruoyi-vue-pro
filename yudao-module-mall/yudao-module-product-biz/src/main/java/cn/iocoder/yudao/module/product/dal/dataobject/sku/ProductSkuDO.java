@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
 import lombok.*;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -134,13 +135,21 @@ public class ProductSkuDO extends BaseDO {
     // TODO @芋艿：可以找一些新的思路
     public static class PropertyTypeHandler extends AbstractJsonTypeHandler<Object> {
 
+        public PropertyTypeHandler(Class<?> type) {
+            super(type);
+        }
+
+        public PropertyTypeHandler(Class<?> type, Field field) {
+            super(type, field);
+        }
+
         @Override
-        protected Object parse(String json) {
+        public Object parse(String json) {
             return JsonUtils.parseArray(json, Property.class);
         }
 
         @Override
-        protected String toJson(Object obj) {
+        public String toJson(Object obj) {
             return JsonUtils.toJsonString(obj);
         }
 

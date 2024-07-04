@@ -13,6 +13,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -213,13 +214,21 @@ public class TradeOrderItemDO extends BaseDO {
     // TODO @芋艿：可以找一些新的思路
     public static class PropertyTypeHandler extends AbstractJsonTypeHandler<List<Property>> {
 
+        public PropertyTypeHandler(Class<?> type) {
+            super(type);
+        }
+
+        public PropertyTypeHandler(Class<?> type, Field field) {
+            super(type, field);
+        }
+
         @Override
-        protected List<Property> parse(String json) {
+        public List<Property> parse(String json) {
             return JsonUtils.parseArray(json, Property.class);
         }
 
         @Override
-        protected String toJson(List<Property> obj) {
+        public String toJson(List<Property> obj) {
             return JsonUtils.toJsonString(obj);
         }
 

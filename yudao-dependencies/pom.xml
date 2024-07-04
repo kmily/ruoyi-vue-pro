@@ -24,8 +24,8 @@
         <servlet.versoin>2.5</servlet.versoin>
         <!-- DB 相关 -->
         <druid.version>1.2.21</druid.version>
-        <mybatis-plus.version>3.5.5</mybatis-plus.version>
-        <mybatis-plus-generator.version>3.5.5</mybatis-plus-generator.version>
+        <mybatis-plus.version>3.5.7</mybatis-plus.version>
+        <mybatis-plus-generator.version>3.5.7</mybatis-plus-generator.version>
         <dynamic-datasource.version>4.3.0</dynamic-datasource.version>
         <mybatis-plus-join.version>1.4.10</mybatis-plus-join.version>
         <easy-trans.version>2.2.11</easy-trans.version>
@@ -48,7 +48,7 @@
         <!-- 工具类相关 -->
         <captcha-plus.version>1.0.10</captcha-plus.version>
         <jsoup.version>1.17.2</jsoup.version>
-        <lombok.version>1.18.30</lombok.version>
+        <lombok.version>1.18.32</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <hutool.version>5.8.25</hutool.version>
         <easyexcel.verion>3.3.3</easyexcel.verion>

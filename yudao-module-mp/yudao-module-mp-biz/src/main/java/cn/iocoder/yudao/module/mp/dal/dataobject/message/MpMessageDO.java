@@ -16,6 +16,7 @@ import me.chanjar.weixin.mp.builder.kefu.NewsBuilder;
 
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -241,13 +242,21 @@ public class MpMessageDO extends BaseDO {
     // TODO @芋艿：可以找一些新的思路
     public static class ArticleTypeHandler extends AbstractJsonTypeHandler<List<Article>> {
 
+        public ArticleTypeHandler(Class<?> type) {
+            super(type);
+        }
+
+        public ArticleTypeHandler(Class<?> type, Field field) {
+            super(type, field);
+        }
+
         @Override
-        protected List<Article> parse(String json) {
+        public List<Article> parse(String json) {
             return JsonUtils.parseArray(json, Article.class);
         }
 
         @Override
-        protected String toJson(List<Article> obj) {
+        public String toJson(List<Article> obj) {
             return JsonUtils.toJsonString(obj);
         }
 
