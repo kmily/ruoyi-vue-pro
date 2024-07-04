@@ -30,6 +30,20 @@ public interface TreatmentFlowDayitemMapper extends BaseMapperX<TreatmentFlowDay
         return selectList(queryWrapper);
     }
 
+    default List<TreatmentFlowDayitemDO> queryTasks(Long dayId){
+        QueryWrapper<TreatmentFlowDayitemDO> queryWrapper = new QueryWrapper();
+        queryWrapper = queryWrapper.eq("day_id", dayId);
+        queryWrapper = queryWrapper.ne("type", TaskType.GUIDE_LANGUAGE.getType());
+        return selectList(queryWrapper);
+    }
+
+    default List<TreatmentFlowDayitemDO> queryRequiredTasks(Long dayId){
+        QueryWrapper<TreatmentFlowDayitemDO> queryWrapper = new QueryWrapper();
+        queryWrapper = queryWrapper.eq("day_id", dayId).eq("required", true);
+        queryWrapper = queryWrapper.ne("type", TaskType.GUIDE_LANGUAGE.getType());
+        return selectList(queryWrapper);
+    }
+
     default boolean hasNextGroup(Long dayId, Long agroup) {
         QueryWrapper<TreatmentFlowDayitemDO> queryWrapper = new QueryWrapper();
         queryWrapper = queryWrapper.eq("day_id", dayId).gt("agroup", agroup)
@@ -45,10 +59,14 @@ public interface TreatmentFlowDayitemMapper extends BaseMapperX<TreatmentFlowDay
      */
     default List<TreatmentFlowDayitemDO> getNextGroup(Long dayId, Long agroup) {
         QueryWrapper<TreatmentFlowDayitemDO> queryWrapper = new QueryWrapper();
-        Integer nextAgroup = selectOne(new QueryWrapper<TreatmentFlowDayitemDO>()
+        TreatmentFlowDayitemDO obj = selectOne(new QueryWrapper<TreatmentFlowDayitemDO>()
                 .eq("day_id", dayId)
                 .gt("agroup", agroup)
-                .orderByAsc("agroup").last("limit 1")).getAgroup();
+                .orderByAsc("agroup").last("limit 1"));
+        if(obj == null){
+            return null;
+        }
+        Integer nextAgroup = obj.getAgroup();
         queryWrapper = queryWrapper.eq("day_id", dayId).eq("agroup", nextAgroup)
                 .orderByAsc("group_seq");
         return selectList(queryWrapper);

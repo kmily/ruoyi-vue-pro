@@ -72,12 +72,12 @@ public class TreatmentServiceImpl implements TreatmentService {
         }
     }
 
-    @Override
-    public TreatmentStepItem getNext(TreatmentStepItem userCurrentStep) {
-        dayTaskEngine.initWithCurrentStep(userCurrentStep);
-        TreatmentStepItem nextStepItem = dayTaskEngine.getNextStepItem();
-        return nextStepItem;
-    }
+//    @Override
+//    public TreatmentStepItem getNext(TreatmentStepItem userCurrentStep) {
+//        dayTaskEngine.initWithCurrentStep(userCurrentStep);
+//        TreatmentStepItem nextStepItem = dayTaskEngine.getNextStepItem();
+//        return nextStepItem;
+//    }
 
     @Override
     public void completeDayitemInstance(Long userId,
@@ -265,24 +265,34 @@ public class TreatmentServiceImpl implements TreatmentService {
      * 如果当天所有必做任务都已经完成，则完成
      * @param dayInstanceDO 疗程日实例
      */
-    private boolean isCompletedDayInstance(TreatmentDayInstanceDO dayInstanceDO){
+    private boolean isCompletedDayInstance(TreatmentDayInstanceDO dayInstanceDO, boolean isSameDay){
         TreatmentFlowDayDO flowDayDO = treatmentFlowDayMapper.selectById(dayInstanceDO.getDayId());
         if(flowDayDO.isHasBreak()){
             dayInstanceDO.setStatus(TreatmentDayInstanceDO.StatusEnum.COMPLETED.getValue());
             treatmentDayInstanceMapper.updateById(dayInstanceDO);
+            return true;
         }
-        List<TreatmentFlowDayitemDO> flowDayitemDOS = treatmentFlowDayitemMapper.filterByDay(flowDayDO.getId());
+        List<TreatmentFlowDayitemDO> flowDayitemDOS;
+        if(isSameDay){
+            flowDayitemDOS = treatmentFlowDayitemMapper.queryTasks(flowDayDO.getId());
+        }else{
+            flowDayitemDOS = treatmentFlowDayitemMapper.queryRequiredTasks(flowDayDO.getId());
+        }
+        if(flowDayitemDOS.size() == 0){
+            return true;
+        }
         List<TreatmentDayitemInstanceDO> treatmentDayitemInstanceDOS = treatmentDayitemInstanceMapper.getUserDayitemInstances(
                 dayInstanceDO.getUserId(),
                 dayInstanceDO.getFlowInstanceId(),
                 flowDayitemDOS
         );
+        if(treatmentDayitemInstanceDOS.size() < flowDayitemDOS.size()){
+            return false;
+        }
         boolean completed = true;
         for(TreatmentDayitemInstanceDO dayitemInstanceDO : treatmentDayitemInstanceDOS){
-            if(dayitemInstanceDO.isRequired()){
-                if(dayitemInstanceDO.getStatus() != TreatmentDayitemInstanceDO.StatusEnum.COMPLETED.getValue()){
-                    completed = false;
-                }
+            if(dayitemInstanceDO.getStatus() != TreatmentDayitemInstanceDO.StatusEnum.COMPLETED.getValue()){
+                completed = false;
             }
         }
         return completed;
@@ -296,12 +306,12 @@ public class TreatmentServiceImpl implements TreatmentService {
      * @param dayInstanceDO 疗程日实例
      */
     @Override
-    public void updateDayInstanceStatus(TreatmentDayInstanceDO dayInstanceDO){
-        boolean completed = isCompletedDayInstance(dayInstanceDO);
+    public void updateDayInstanceStatus(TreatmentDayInstanceDO dayInstanceDO, boolean isSameDay){
+        boolean completed = isCompletedDayInstance(dayInstanceDO, isSameDay);
         if(completed){
             dayInstanceDO.setStatus(TreatmentDayInstanceDO.StatusEnum.COMPLETED.getValue());
             treatmentDayInstanceMapper.updateById(dayInstanceDO);
-            updateTreatmentInstanceStatus(dayInstanceDO);
+            updateTreatmentInstanceStatus(dayInstanceDO, isSameDay);
         }
     }
 
@@ -310,12 +320,12 @@ public class TreatmentServiceImpl implements TreatmentService {
      * 更新疗程实例的状态
      * @param dayInstanceDO
      */
-    private void updateTreatmentInstanceStatus(TreatmentDayInstanceDO dayInstanceDO){
+    private void updateTreatmentInstanceStatus(TreatmentDayInstanceDO dayInstanceDO, boolean isSameDay){
         TreatmentFlowDayDO flowDayDO = treatmentFlowDayMapper.selectById(dayInstanceDO.getDayId());
         if(!treatmentFlowDayMapper.isLastFlowDay(flowDayDO)){
             return;
         }
-        if(isCompletedDayInstance(dayInstanceDO)){
+        if(isCompletedDayInstance(dayInstanceDO, isSameDay)){
             TreatmentInstanceDO instanceDO = treatmentInstanceMapper.selectById(dayInstanceDO.getFlowInstanceId());
             instanceDO.setStatus(TreatmentInstanceDO.TreatmentStatus.COMPLETED.getValue());
             treatmentInstanceMapper.updateById(instanceDO);
@@ -327,8 +337,8 @@ public class TreatmentServiceImpl implements TreatmentService {
         treatmentDayitemInstanceMapper.finishDayItemInstanceDO(dayItemInstanceId);
         TreatmentDayitemInstanceDO dayitemInstanceDO = treatmentDayitemInstanceMapper.selectById(dayItemInstanceId);
         TreatmentDayInstanceDO dayInstanceDO = treatmentDayInstanceMapper.selectById(dayitemInstanceDO.getDayInstanceId());
-        updateDayInstanceStatus(dayInstanceDO);
-        updateTreatmentInstanceStatus(dayInstanceDO);
+        updateDayInstanceStatus(dayInstanceDO, true);
+        updateTreatmentInstanceStatus(dayInstanceDO, true);
     }
 
     @Override
@@ -338,11 +348,11 @@ public class TreatmentServiceImpl implements TreatmentService {
         treatmentInstanceMapper.updateById(instanceDO);
     }
 
-    @Override
-    public void completeDayInstance(TreatmentDayInstanceDO dayInstanceDO){
-        dayInstanceDO.setStatus(TreatmentDayInstanceDO.StatusEnum.COMPLETED.getValue());
-        treatmentDayInstanceMapper.updateById(dayInstanceDO);
-        updateTreatmentInstanceStatus(dayInstanceDO);
-    }
+//    @Override
+//    public void completeDayInstance(TreatmentDayInstanceDO dayInstanceDO){
+//        dayInstanceDO.setStatus(TreatmentDayInstanceDO.StatusEnum.COMPLETED.getValue());
+//        treatmentDayInstanceMapper.updateById(dayInstanceDO);
+//        updateTreatmentInstanceStatus(dayInstanceDO);
+//    }
 
 }

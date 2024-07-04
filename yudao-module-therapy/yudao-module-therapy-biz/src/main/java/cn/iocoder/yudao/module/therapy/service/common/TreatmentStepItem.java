@@ -33,8 +33,13 @@ public class TreatmentStepItem {
     public static TreatmentStepItem clone(TreatmentStepItem item){
         TreatmentStepItem newItem = new TreatmentStepItem();
         newItem.setDay_items(item.getDay_items());
+        newItem.setFlowDayDO(item.getFlowDayDO());
         newItem.setDay(item.getDay());
         newItem.setFlowInstance(item.getFlowInstance());
+        newItem.setTreatmentFlowDO(item.getTreatmentFlowDO());
+        newItem.setProcessStatus(item.getProcessStatus());
+        newItem.setFlowDayitemDOs(item.getFlowDayitemDOs());
+        newItem.setEnd(item.isEnd());
         newItem.setStarted(item.isStarted());
         newItem.setAgroup(item.getAgroup());
         return newItem;

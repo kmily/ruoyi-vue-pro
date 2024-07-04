@@ -133,6 +133,9 @@ public class TreatmentUserProgressServiceImpl implements  TreatmentUserProgressS
     @Override
     public void updateUserProgress(TreatmentStepItem stepItem){
         TreatmentUserProgressDO progressDO = treatmentUserProgressMapper.getUserCurrentProgress(stepItem.getFlowInstance().getUserId(), stepItem.getFlowInstance().getId());
+        if(stepItem.getProcessStatus() == TreatmentStepItem.ProcessStatus.TREATMENT_FINISHED) {
+            return;
+        }
         if(progressDO == null){
             progressDO = new TreatmentUserProgressDO();
             progressDO.setUserId(stepItem.getFlowInstance().getUserId());

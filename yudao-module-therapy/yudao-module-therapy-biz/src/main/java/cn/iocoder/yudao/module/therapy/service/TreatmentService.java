@@ -18,7 +18,7 @@ public interface TreatmentService {
 
     Long getCurrentTreatmentInstance(Long userId, String treatmentCode);
 
-    TreatmentStepItem getNext(TreatmentStepItem userCurrentStep);
+//    TreatmentStepItem getNext(TreatmentStepItem userCurrentStep);
 
     void completeDayitemInstance(Long userId, Long dayItemInstanceId);
 
@@ -113,12 +113,12 @@ public interface TreatmentService {
 
     void publish(Long id,Integer state);
 
-    void updateDayInstanceStatus(TreatmentDayInstanceDO dayInstanceDO);
+    void updateDayInstanceStatus(TreatmentDayInstanceDO dayInstanceDO, boolean isSameDay);
 
     void finishDayItemInstance(Long dayItemInstanceId);
 
 
     void cancelTreatmentInstance(Long flowInstanceId);
 
-    void completeDayInstance(TreatmentDayInstanceDO dayInstanceDO);
+//    void completeDayInstance(TreatmentDayInstanceDO dayInstanceDO);
 }
