@@ -184,6 +184,18 @@ public class TreatmentController {
         return success(resp);
     }
 
+    @PostMapping("/dayitem/{dayitem_instance_id}/fireevent/{event_name}")
+    @Operation(summary = "子任务step提交数据")
+    @PreAuthenticated
+    public CommonResult<DayitemNextStepRespVO> stepSubmit(@PathVariable("dayitem_instance_id") Long dayitem_instance_id,
+                                                            @PathVariable("event_name") String eventName) {
+        Long userId = getLoginUserId();
+        BaseFlow flow = taskFlowService.getTaskFlow(userId, dayitem_instance_id);
+        Map data = flow.fireEvent(dayitem_instance_id, eventName);
+        DayitemNextStepRespVO result = DayitemNextStepConvert.convert(data);
+        return success(result);
+    }
+
     @PostMapping("/clear_user_progress")
     @Operation(summary = "清空用户流程数据-临时测试用")
     @PreAuthenticated

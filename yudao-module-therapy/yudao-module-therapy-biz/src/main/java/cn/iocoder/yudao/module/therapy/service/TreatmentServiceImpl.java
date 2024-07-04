@@ -201,7 +201,7 @@ public class TreatmentServiceImpl implements TreatmentService {
                 }
             }
             treatmentFlowDayitemMapper.insert(dayitemDO);
-            // TODO create workflow
+            // create workflow
             taskFlowService.updateFlowFromDayitem(dayitemDO, "create");
             return dayitemDO.getId();
         }
@@ -220,7 +220,7 @@ public class TreatmentServiceImpl implements TreatmentService {
         }
         TreatmentFlowDayitemDO dayitemDO = BeanUtils.toBean(vo, TreatmentFlowDayitemDO.class);
         treatmentFlowDayitemMapper.updateById(dayitemDO);
-        // TODO update workflow
+        // update workflow
         taskFlowService.updateFlowFromDayitem(dayitemDO, "update");
     }
 

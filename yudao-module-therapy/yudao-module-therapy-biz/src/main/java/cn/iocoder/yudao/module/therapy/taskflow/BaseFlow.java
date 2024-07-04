@@ -46,6 +46,18 @@ public abstract class BaseFlow {
         return runtimeService.getVariables(container.getProcessInstanceId());
     }
 
+
+     public Map fireEvent(Long dayitemInstanceId, String eventName){
+         HashMap result = new HashMap();
+         result.put("__step_id", "guide_language" );
+         result.put("__step_name", "guide_language");
+         result.put("step_type", "guide_language");
+         Map stepData = new HashMap();
+         stepData.put("content", "DEFAULT RESPONSE");
+         result.put("step_data", stepData);
+         return result;
+     }
+
     /**
      * 前置条件是否满足
      * @param container
@@ -328,7 +340,7 @@ public abstract class BaseFlow {
         repositoryService.createDeployment()
                 .addBpmnModel(getProcessName(id) + ".bpmn", bpmnModel)
                 .deploy();
-        System.out.println(new String(new BpmnXMLConverter().convertToXML(bpmnModel), StandardCharsets.UTF_8));
+//        System.out.println(new String(new BpmnXMLConverter().convertToXML(bpmnModel), StandardCharsets.UTF_8));
         return getProcessName(id);
     }
 

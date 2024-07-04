@@ -40,7 +40,11 @@ public class MoodScoreFlow extends BaseFlow {
         return super.deploy(id, "/mood_score.json", settings);
     }
 
-
+//
+//    {"step_type": "guide_language", "step_data": {"content":  "为什么要使用情绪尺子？"}},
+//    {"step_type": "guide_language", "step_data": {"content":  "评估你的情绪有很多好处。首先，它可以帮助你发现情绪变化的模式。你可能会开始注意到，某些活动、人或情况会让你的情绪分数上升或下降。这些洞察可以引导你做出改变，比如避开使你情绪低落的因素，或者寻找更多使你感觉好转的活动。"}},
+//    {"step_type": "guide_language", "step_data": {"content":  "其次，通过跟踪情绪，你可以开始理解哪些策略对于提高你的情绪有效，哪些不是。这有助于你更好地管理情绪，学习如何自我调节，从而在面对挑战时更加有力。"}},
+//    {"step_type": "guide_language", "step_data": {"content":  "最后，这还可以帮助你和治疗师或支持你的人更有效地交流。有了具体的情绪评分，你可以更清晰地表达自己的感受，让他们更好地理解你的需求。）"}}
 
     @Override
     public String getProcessName(Long id) {
@@ -53,6 +57,26 @@ public class MoodScoreFlow extends BaseFlow {
         Long dayItemInstanceId = (Long) variables.get(DAYITEM_INSTANCE_ID);
         treatmentService.finishDayItemInstance(dayItemInstanceId);
     }
+
+
+
+    @Override
+    public Map fireEvent(Long dayitemInstanceId, String eventName){
+        if(eventName == "why_user_mood_ruler"){}
+        HashMap result = new HashMap();
+        result.put("__step_id", "multi_guide_languages" );
+        result.put("__step_name", "multi_guide_languages");
+        result.put("step_type", "multi_guide_languages");
+        Map stepData = new HashMap();
+        stepData.put("content", Arrays.asList(
+                "评估你的情绪有很多好处。首先，它可以帮助你发现情绪变化的模式。你可能会开始注意到，某些活动、人或情况会让你的情绪分数上升或下降。这些洞察可以引导你做出改变，比如避开使你情绪低落的因素，或者寻找更多使你感觉好转的活动。",
+                "其次，通过跟踪情绪，你可以开始理解哪些策略对于提高你的情绪有效，哪些不是。这有助于你更好地管理情绪，学习如何自我调节，从而在面对挑战时更加有力。",
+                "最后，这还可以帮助你和治疗师或支持你的人更有效地交流。有了具体的情绪评分，你可以更清晰地表达自己的感受，让他们更好地理解你的需求。"
+        ));
+        result.put("step_data", stepData);
+        return result;
+    }
+
 
     public Map<String, Object> auto_mood_ruler_qst(Container container,Map data, Task currentTask){
         RuntimeService runtimeService = processEngine.getRuntimeService();
