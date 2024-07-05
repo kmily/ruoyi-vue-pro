@@ -208,5 +208,24 @@ CREATE TABLE `hlgyy_treatment_chat_history`  (
 PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '治疗流程历史消息表';
 
+DROP TABLE IF EXISTS `hlgyy_tt_main_inserted_steps`;
+CREATE TABLE `hlgyy_tt_main_inserted_steps`  (
+ `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID',
+ `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '消息',
+ `user_id` bigint NOT NULL COMMENT '用户id',
+ `treatment_instance_id` bigint NOT NULL COMMENT '治疗流程实例id',
+ `status` int not null DEFAULT 0,
+ `sequence` int not null DEFAULT 0,
+
+ `tenant_id` bigint NOT NULL COMMENT '租户id',
+ `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '创建者',
+ `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+ `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+ `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+ `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+ PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '治疗流程主聊天插入消息';
+
+
 
 

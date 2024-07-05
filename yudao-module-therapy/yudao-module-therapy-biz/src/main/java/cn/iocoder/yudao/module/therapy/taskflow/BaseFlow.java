@@ -322,8 +322,7 @@ public abstract class BaseFlow {
         return bpmnModel;
     }
 
-
-    public String deploy(Long id, String settingsResourceFile, Map extraSettings) {
+    protected Map loadSettings( String settingsResourceFile){
         Map settings;
         ObjectMapper objectMapper = new ObjectMapper();
         try (InputStream inputStream = getClass().getResourceAsStream(settingsResourceFile)) {
@@ -333,8 +332,18 @@ public abstract class BaseFlow {
             // handle exception
             throw new RuntimeException("Failed to read settings from " + settingsResourceFile + e.getMessage());
         }
+        return settings;
+    }
+
+
+    public String deploy(Long id, String settingsResourceFile, Map extraSettings) {
+        Map settings = loadSettings(settingsResourceFile);
         List<Map> extraGuidesSettings = (List<Map>) extraSettings.getOrDefault("guides", new ArrayList());
         settings = mergeExtraGuidesSettings(settings, extraGuidesSettings);
+        return deploy(settings, id);
+    }
+
+    protected String deploy(Map settings, Long id){
         BpmnModel bpmnModel = createBPMNModel(id, settings);
         RepositoryService repositoryService = processEngine.getRepositoryService();
         repositoryService.createDeployment()

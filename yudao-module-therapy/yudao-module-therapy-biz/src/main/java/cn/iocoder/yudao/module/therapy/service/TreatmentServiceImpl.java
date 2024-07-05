@@ -1,26 +1,29 @@
 package cn.iocoder.yudao.module.therapy.service;
 
 import cn.hutool.core.util.IdUtil;
+import cn.iocoder.boot.module.therapy.enums.TaskType;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserExtDTO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.StepItemVO;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.TreatmentNextVO;
 import cn.iocoder.yudao.module.therapy.controller.vo.SetAppointmentTimeReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.FlowPlanReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.FlowTaskVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.SaveFlowReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.*;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.*;
-import cn.iocoder.yudao.module.therapy.service.common.TreatmentStepItem;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.*;
@@ -38,9 +41,6 @@ public class TreatmentServiceImpl implements TreatmentService {
     private TreatmentDayitemInstanceMapper treatmentDayitemInstanceMapper;
 
     @Resource
-    private DayTaskEngineService dayTaskEngine;
-
-    @Resource
     private MemberUserApi memberUserApi;
 
     @Resource
@@ -53,6 +53,9 @@ public class TreatmentServiceImpl implements TreatmentService {
 
     @Resource
     private TreatmentDayInstanceMapper treatmentDayInstanceMapper;
+
+    @Resource
+    private TTMainInsertedStepMapper tTMainInsertedStepMapper;
 
     @Override
     public Long initTreatmentInstance(Long userId, String treatmentCode) {
@@ -354,5 +357,48 @@ public class TreatmentServiceImpl implements TreatmentService {
 //        treatmentDayInstanceMapper.updateById(dayInstanceDO);
 //        updateTreatmentInstanceStatus(dayInstanceDO);
 //    }
+    @Override
+    public TreatmentNextVO getInsertedNextVO(Long userId, Long treatmentInstanceId){
+        List<TTMainInsertedStepDO> data = tTMainInsertedStepMapper.getInsertedNextVO(userId, treatmentInstanceId);
+        if(data.size() == 0){
+            return null;
+        }else{
+            TTMainInsertedStepDO stepDO = data.get(0);
+            Map<String, Object> stepData = stepDO.getMessageObj();
+            TreatmentNextVO vo = new TreatmentNextVO();
+            StepItemVO stepItemVO = new StepItemVO();
+            stepItemVO.setItem_type(stepData.get("item_type").toString());
+            stepItemVO.setRequired(false);
+            stepItemVO.setSettings((Map) stepData.get("settings"));
+            vo.setStep_item(stepItemVO);
+            stepDO.setStatus(TTMainInsertedStepDO.StatusEnum.USED.getValue());
+            tTMainInsertedStepMapper.updateById(stepDO);
+            return vo;
+        }
+    }
 
+
+    public void addGuideLanguageStep(Long userId, Long treatmentInstanceId, String content){
+        Long maxSeq = tTMainInsertedStepMapper.selectCount(new LambdaQueryWrapper<TTMainInsertedStepDO>()
+                .eq(TTMainInsertedStepDO::getUserId, userId)
+                .eq(TTMainInsertedStepDO::getTreatmentInstanceId, treatmentInstanceId)
+        );
+        com.fasterxml.jackson.databind.ObjectMapper objectMapper = new ObjectMapper();
+        TTMainInsertedStepDO insertedStepDO = new TTMainInsertedStepDO();
+        insertedStepDO.setUserId(userId);
+        insertedStepDO.setTreatmentInstanceId(treatmentInstanceId);
+        insertedStepDO.setSequence(maxSeq.intValue() + 1);
+        insertedStepDO.setStatus(TTMainInsertedStepDO.StatusEnum.DEFAULT.getValue());
+        HashMap<String, Object> message = new HashMap<String, Object>();
+        HashMap<String, Object> settingsMap = new HashMap<>();
+        settingsMap.put("text", content);
+        message.put("item_type", TaskType.GUIDE_LANGUAGE.getCode());
+        message.put("settings", settingsMap);
+        try {
+            insertedStepDO.setMessage(objectMapper.writeValueAsString(message));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        tTMainInsertedStepMapper.insert(insertedStepDO);
+    }
 }

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.therapy.service;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.therapy.controller.app.vo.TreatmentNextVO;
 import cn.iocoder.yudao.module.therapy.controller.vo.SetAppointmentTimeReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.FlowPlanReqVO;
 import cn.iocoder.yudao.module.therapy.controller.admin.flow.vo.FlowTaskVO;
@@ -58,24 +59,28 @@ public interface TreatmentService {
 
     /**
      * 添加计划
+     *
      * @param reqVO
      */
     Long addPlan(FlowPlanReqVO reqVO);
 
     /**
      * 更新计划
+     *
      * @param reqVO
      */
     void updatePlan(FlowPlanReqVO reqVO);
 
     /**
      * 删除计划
+     *
      * @param id
      */
     void delPlan(Long id);
 
     /**
      * 创建计划子任务
+     *
      * @param vo
      * @return
      */
@@ -83,6 +88,7 @@ public interface TreatmentService {
 
     /**
      * 更新计划子任务
+     *
      * @param vo
      * @return
      */
@@ -90,6 +96,7 @@ public interface TreatmentService {
 
     /**
      * 删除计划子任务
+     *
      * @param id
      * @return
      */
@@ -97,13 +104,13 @@ public interface TreatmentService {
 
     /**
      * 通过
+     *
      * @param id
      * @return
      */
     List<TreatmentFlowDayDO> getPlanListByFlowId(Long id);
 
     /**
-     *
      * @param id
      * @return
      */
@@ -111,7 +118,7 @@ public interface TreatmentService {
 
     TreatmentFlowDayitemDO getTask(Long id);
 
-    void publish(Long id,Integer state);
+    void publish(Long id, Integer state);
 
     void updateDayInstanceStatus(TreatmentDayInstanceDO dayInstanceDO, boolean isSameDay);
 
@@ -120,5 +127,9 @@ public interface TreatmentService {
 
     void cancelTreatmentInstance(Long flowInstanceId);
 
-//    void completeDayInstance(TreatmentDayInstanceDO dayInstanceDO);
+    //    void completeDayInstance(TreatmentDayInstanceDO dayInstanceDO);
+    TreatmentNextVO getInsertedNextVO(Long userId, Long treatmentInstanceId);
+
+    void addGuideLanguageStep(Long userId, Long treatmentInstanceId, String content);
+
 }

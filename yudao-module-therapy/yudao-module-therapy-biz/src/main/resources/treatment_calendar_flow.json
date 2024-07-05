@@ -1,0 +1,11 @@
+{
+  "group_nodes": {
+    "start": [ {"step_type": "START"}],
+    "end": [
+      {"step_type": "END"}
+    ]
+  },
+  "group_relations": [
+    {"source": "start", "target": "end"}
+  ]
+}

@@ -86,17 +86,24 @@ public class TreatmentController {
     @PreAuthenticated
     public CommonResult<TreatmentNextVO> getNext(@PathVariable("code") String code, @PathVariable("id") Long treatmentInstanceId) {
         Long userId = getLoginUserId();
-        TreatmentStepItem userCurrentStep = dayTaskEngine.getCurrentStep(treatmentInstanceId);
-        TreatmentStepItem stepItem;
-        if(code.equals("freestyle")){
-            stepItem = dayTaskEngine.getNextStepItemResult(userCurrentStep, true);
+        TreatmentNextVO insertedNextVO = treatmentService.getInsertedNextVO(userId, treatmentInstanceId);
+        if(insertedNextVO == null){
+            TreatmentStepItem userCurrentStep = dayTaskEngine.getCurrentStep(treatmentInstanceId);
+            TreatmentStepItem stepItem;
+            if(code.equals("freestyle")){
+                stepItem = dayTaskEngine.getNextStepItemResult(userCurrentStep, true);
+            }else{
+                stepItem = dayTaskEngine.getNextStepItemResult(userCurrentStep, false);
+            }
+            TreatmentNextVO data = treatmentUserProgressService.convertStepItemToRespFormat(stepItem);
+            treatmentUserProgressService.updateUserProgress(stepItem);
+            treatmentChatHistoryService.addChatHistory(userId, treatmentInstanceId, data, true);
+            return success(data);
         }else{
-            stepItem = dayTaskEngine.getNextStepItemResult(userCurrentStep, false);
+            treatmentChatHistoryService.addChatHistory(userId, treatmentInstanceId, insertedNextVO, true);
+            return success(insertedNextVO);
         }
-        TreatmentNextVO data = treatmentUserProgressService.convertStepItemToRespFormat(stepItem);
-        treatmentUserProgressService.updateUserProgress(stepItem);
-        treatmentChatHistoryService.addChatHistory(userId, treatmentInstanceId, data, true);
-        return success(data);
+
     }
 
     @GetMapping("/{code}/{id}/chat-history")

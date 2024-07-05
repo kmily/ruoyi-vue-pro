@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Map;
 
+import static cn.iocoder.boot.module.therapy.enums.TaskType.*;
 import static cn.iocoder.yudao.module.therapy.taskflow.Const.DAYITEM_INSTANCE_ID;
 
 @Service
@@ -74,6 +75,18 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
     @Resource
     private StrategyPracticeFlow strategyPracticeFlow;
 
+    @Resource
+    private CaseStudyFlow caseStudyFlow;
+
+    @Resource
+    private ScheduleChartFlow scheduleChartFlow;
+
+    @Resource
+    private TreatmentCalendarFlow treatmentCalendarFlow;
+
+    @Resource
+    VideoTreatmentFlow videoTreatmentFlow;
+
     private Container getContainer(BaseFlow flow, TreatmentDayitemInstanceDO dayitemInstanceDO, TreatmentFlowDayitemDO flowDayitemDO){
         Container container =  new Container();
         if(dayitemInstanceDO.getTaskInstanceId().isEmpty()){
@@ -93,32 +106,42 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
 
     @Override
     public BaseFlow getTaskFlow(TreatmentFlowDayitemDO flowDayitemDO){
-        switch (flowDayitemDO.getItemType()){
-            case "problem_goal_motive": // 目标与动机
-                return goalAndMotivationFlow;
-            case "scale": // 初步评估
-                return scaleFlow;
-            case "current_mood_score": // 情绪评分
-                return moodScoreFlow;
-            case "mood_recognize_named": // 情绪识别
-                return moodRecognizeNamedFlow;
-            case "auto_mindset_recognize": //自动化思维识别
-                return autoMindsetRecognizeFlow;
-            case "twelve_mind_distort": //12中心理歪曲
-                return twelveMindDistort;
-            case "cognize_reestablish": //认知重建
-                return cognitionReconstructFlow;
-            case "happly_exercise_list": //愉悦活动清单
-                return happyActiveFlow;
-            case "behaviour_exercise_plan": //行为活动计划
-                return actionPlanFlow;
-            case "goal_progress": // 目标进展
-                return goalProgressFlow;
-            case "strategy_practice": //对策游戏
-                return strategyPracticeFlow;
-            default:
-                throw new RuntimeException("not supported task flow");
+        String itemType = flowDayitemDO.getItemType();
+        if (PROBLEM_GOAL_MOTIVE.getCode().equals(itemType)) { // 目标与动机
+            return goalAndMotivationFlow;
+        } else if (SCALE.getCode().equals(itemType)) { // 初步评估
+            return scaleFlow;
+        } else if (CURRENT_MOOD_SCORE.getCode().equals(itemType)) { // 情绪评分
+            return moodScoreFlow;
+        } else if (MOOD_RECOGNIZE_NAMED.getCode().equals(itemType)) { // 情绪识别
+            return moodRecognizeNamedFlow;
+        } else if (AUTO_MINDSET_RECOGNIZE.getCode().equals(itemType)) { //自动化思维识别
+            return autoMindsetRecognizeFlow;
+        } else if (TWELVE_MIND_DISTORT.getCode().equals(itemType)) { //12中心理歪曲
+            return twelveMindDistort;
+        } else if (COGNIZE_REESTABLISH.getCode().equals(itemType)) { //认知重建
+            return cognitionReconstructFlow;
+        } else if (HAPPLY_EXERCISE_LIST.getCode().equals(itemType)) { //愉悦活动清单
+            return happyActiveFlow;
+        } else if (BEHAVIOUR_EXERCISE_PLAN.getCode().equals(itemType)) { //行为活动计划
+            return actionPlanFlow;
+        } else if (GOAL_PROGRESS.getCode().equals(itemType)) { // 目标进展
+            return goalProgressFlow;
+        } else if (STRATEGY_PRACTICE.getCode().equals(itemType)) { //对策游戏
+            return strategyPracticeFlow;
+        } else if (CASE_STUDY.getCode().equals(itemType)) {
+            return caseStudyFlow;
+        } else if (VIDEO.getCode().equals(itemType)) {
+            return videoTreatmentFlow;
+        } else if (SCHEDULE.getCode().equals(itemType)) {
+            return scheduleChartFlow;
+        } else if (THERAPY_CALENDAR.getCode().equals(itemType)) {
+            return treatmentCalendarFlow;
         }
+        else {
+            throw new RuntimeException("not supported task flow");
+        }
+
     }
 
     @Override
@@ -140,7 +163,34 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
     @Override
     public void createBpmnModel(Long flowDayitemId){
         TreatmentFlowDayitemDO flowDayitemDO = treatmentFlowDayitemMapper.selectById(flowDayitemId);
-        switch (flowDayitemDO.getItemType()){
+        String itemType = flowDayitemDO.getItemType();
+        if (VIDEO.getCode().equals(itemType)) {
+            VideoTreatmentFlow videoTreatmentFlow = new VideoTreatmentFlow(engine.getEngine());
+            String taskFlowId = videoTreatmentFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
+            flowDayitemDO.setTaskFlowId(taskFlowId);
+            treatmentFlowDayitemMapper.updateById(flowDayitemDO);
+            return;
+        }else if(CASE_STUDY.getCode().equals(itemType)){
+            CaseStudyFlow caseStudyFlow = new CaseStudyFlow(engine.getEngine());
+            String taskFlowId = caseStudyFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
+            flowDayitemDO.setTaskFlowId(taskFlowId);
+            treatmentFlowDayitemMapper.updateById(flowDayitemDO);
+            return;
+        }else if(SCHEDULE.getCode().equals(itemType)) {
+            ScheduleChartFlow scheduleChartFlow = new ScheduleChartFlow(engine.getEngine());
+            String taskFlowId = scheduleChartFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
+            flowDayitemDO.setTaskFlowId(taskFlowId);
+            treatmentFlowDayitemMapper.updateById(flowDayitemDO);
+            return;
+        }else if(THERAPY_CALENDAR.getCode().equals(itemType)) {
+            TreatmentCalendarFlow treatmentCalendarFlow = new TreatmentCalendarFlow(engine.getEngine());
+            String taskFlowId = treatmentCalendarFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
+            flowDayitemDO.setTaskFlowId(taskFlowId);
+            treatmentFlowDayitemMapper.updateById(flowDayitemDO);
+            return;
+        }
+
+            switch (flowDayitemDO.getItemType()){
             case "problem_goal_motive":  // 目标与动机
                 GoalAndMotivationFlow goalAndMotivationFlow = new GoalAndMotivationFlow(engine.getEngine());
                 String taskFlowId = goalAndMotivationFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
