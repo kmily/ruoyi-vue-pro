@@ -337,10 +337,10 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     @Override
-    public List<TreatmentSurveyDO> listByTag(String tag) {
+    public List<TreatmentSurveyDO> listByTag(String tag,Integer type) {
         if(StringUtils.isBlank(tag)){
             throw exception(BAD_REQUEST);
         }
-        return treatmentSurveyMapper.listByTag(tag);
+        return treatmentSurveyMapper.listByTag(tag,type);
     }
 }

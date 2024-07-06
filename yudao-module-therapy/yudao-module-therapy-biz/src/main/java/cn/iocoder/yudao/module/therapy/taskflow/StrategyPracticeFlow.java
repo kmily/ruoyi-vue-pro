@@ -108,7 +108,7 @@ public class StrategyPracticeFlow extends BaseFlow {
         List<String> troubleTags = treatmentStatisticsDataService.queryUserTroubles(dayitemInstanceDO.getUserId());
         int randIndex = new Random().nextInt(troubleTags.size());
         String tag = troubleTags.get(randIndex);
-        List<TreatmentSurveyDO> surveyDOS = surveyService.listByTag(tag);
+        List<TreatmentSurveyDO> surveyDOS = surveyService.listByTag(tag,SurveyType.STRATEGY_GAMES.getType());
         if(surveyDOS.isEmpty()){
             System.out.println("[ERROR] no strategy game found for tag: " + tag);
             throw exception(TREATMENT_NO_STRATEGY_GAME_FOUND);

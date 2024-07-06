@@ -124,5 +124,5 @@ public interface SurveyService {
 
     List<TreatmentSurveyDO> listByType(Integer type);
 
-    List<TreatmentSurveyDO> listByTag(String tag);
+    List<TreatmentSurveyDO> listByTag(String tag,Integer type);
 }

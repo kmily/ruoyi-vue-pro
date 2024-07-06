@@ -51,8 +51,9 @@ public interface TreatmentSurveyMapper extends BaseMapperX<TreatmentSurveyDO> {
         return selectList(queryWrapper);
     }
 
-    default List<TreatmentSurveyDO> listByTag(String tag){
+    default List<TreatmentSurveyDO> listByTag(String tag,Integer type){
         LambdaQueryWrapper<TreatmentSurveyDO> queryWrapper= Wrappers.lambdaQuery(TreatmentSurveyDO.class)
+                .eq(TreatmentSurveyDO::getSurveyType,type)
                 .apply(String.format("JSON_CONTAINS(tags, '[\"%s\"]')", tag));
 
         return selectList(queryWrapper);
