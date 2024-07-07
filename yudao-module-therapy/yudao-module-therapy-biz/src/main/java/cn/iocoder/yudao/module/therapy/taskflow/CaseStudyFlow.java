@@ -119,6 +119,7 @@ public class CaseStudyFlow extends BaseFlow{
 
     public Map auto_survey_qst(Container container,Map data, Task currentTask){
         String tag = queryTag(container);
+        tag = "焦虑";
         List<TreatmentSurveyDO> surveyDOS = querySurveys(container, tag);
         Map variables = getVariables(container);
         Long survey_id = (Long) variables.get("survey_id");
@@ -135,11 +136,12 @@ public class CaseStudyFlow extends BaseFlow{
         }
         Long instance_id = (Long) runtimeService.getVariable(container.getProcessInstanceId(), SURVEY_INSTANCE_ID);
         if(instance_id == null) {
-            instance_id = surveyService.initSurveyAnswer(SurveyType.CASE_STUDY.getCode(), SURVEY_SOURCE_TYPE);
+            instance_id = surveyService.initSurveyAnswer(surveyDO.getCode(), SURVEY_SOURCE_TYPE);
             runtimeService.setVariable(container.getProcessInstanceId(), SURVEY_INSTANCE_ID, instance_id);
         }
         List<QuestionDO> questionDOS = surveyService.getQuestionBySurveyId(surveyDO.getId());
         data.put("survey_id", surveyDO.getId());
+        data.put("instance_id", instance_id);
         data.put("questions", questionDOS);
         data.put("description", surveyDO.getDescription());
         data.put("trouble_tag", tag);
