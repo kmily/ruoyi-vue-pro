@@ -400,7 +400,7 @@ public class TreatmentServiceImpl implements TreatmentService {
         insertedStepDO.setStatus(TTMainInsertedStepDO.StatusEnum.DEFAULT.getValue());
         HashMap<String, Object> message = new HashMap<String, Object>();
         HashMap<String, Object> settingsMap = new HashMap<>();
-        settingsMap.put("text", content);
+        settingsMap.put("content", content);
         message.put("item_type", TaskType.GUIDE_LANGUAGE.getCode());
         message.put("settings", settingsMap);
         try {
