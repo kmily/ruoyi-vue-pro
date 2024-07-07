@@ -39,30 +39,30 @@ public class DefaultSurveyStrategy  implements SurveyStrategy {
 //        }
 //    }
 
-    @Override
-    public void fillQuestion(SurveySaveReqVO vo) {
-        vo.setQuestions(new ArrayList<>());
-        JSONObject map1 = new JSONObject();
-        map1.set("title", "特殊题标题");
-        map1.set("type", SurveyQuestionType.SPACES.getCode());
-        map1.set("field", IdUtil.fastSimpleUUID());
-        map1.set("$required", false);
-        vo.getQuestions().add(map1.toString());
-
-        JSONObject map2 = new JSONObject();
-        map2.set("title", "特殊题标题");
-        map2.set("type", SurveyQuestionType.SPACES.getCode());
-        map2.set("field", IdUtil.fastSimpleUUID());
-        map2.set("$required", false);
-        vo.getQuestions().add(map2.toString());
-
-        JSONObject map3 = new JSONObject();
-        map3.set("title", "特殊题标题");
-        map3.set("type", SurveyQuestionType.SPACES.getCode());
-        map3.set("field", IdUtil.fastSimpleUUID());
-        map3.set("$required", false);
-        vo.getQuestions().add(map3.toString());
-    }
+//    @Override
+//    public void fillQuestion(SurveySaveReqVO vo) {
+//        vo.setQuestions(new ArrayList<>());
+//        JSONObject map1 = new JSONObject();
+//        map1.set("title", "特殊题标题");
+//        map1.set("type", SurveyQuestionType.SPACES.getCode());
+//        map1.set("field", IdUtil.fastSimpleUUID());
+//        map1.set("$required", false);
+//        vo.getQuestions().add(map1.toString());
+//
+//        JSONObject map2 = new JSONObject();
+//        map2.set("title", "特殊题标题");
+//        map2.set("type", SurveyQuestionType.SPACES.getCode());
+//        map2.set("field", IdUtil.fastSimpleUUID());
+//        map2.set("$required", false);
+//        vo.getQuestions().add(map2.toString());
+//
+//        JSONObject map3 = new JSONObject();
+//        map3.set("title", "特殊题标题");
+//        map3.set("type", SurveyQuestionType.SPACES.getCode());
+//        map3.set("field", IdUtil.fastSimpleUUID());
+//        map3.set("$required", false);
+//        vo.getQuestions().add(map3.toString());
+//    }
 
 //    @Override
 //    public void generateReport(Long details) {
