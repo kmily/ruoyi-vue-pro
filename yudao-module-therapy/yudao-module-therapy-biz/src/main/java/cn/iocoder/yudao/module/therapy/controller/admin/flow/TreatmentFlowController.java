@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDO
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDayDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDayitemDO;
 import cn.iocoder.yudao.module.therapy.service.TreatmentService;
+import cn.iocoder.yudao.module.therapy.service.TreatmentUserProgressService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -44,6 +45,9 @@ public class TreatmentFlowController {
 
     @Resource
     private AdminUserApi adminUserApi;
+
+    @Resource
+    private TreatmentUserProgressService treatmentUserProgressService;
 
     @PostMapping("/createFlow")
     @Operation(summary = "创建方案")
@@ -181,6 +185,26 @@ public class TreatmentFlowController {
     public CommonResult<Boolean> publish(@RequestParam("id") Long id) {
         treatmentService.publish(id, CommonStatusEnum.ENABLE.getStatus());
         return success(true);
+    }
+
+    @PostMapping("/endTreament/{userid}")
+    @Operation(summary = "强制结束病人治疗流程")
+    public CommonResult<Boolean> endTreatment(
+            @PathVariable("userid") Long userid
+            ){
+        treatmentUserProgressService.endTreatment(userid);
+        return success(true);
+
+    }
+
+    @PostMapping("/publishFlow/{flowId}")
+    @Operation(summary = "发布治疗方案子任务的工作流流程-千万不要频繁多次调用")
+    public CommonResult<Boolean> publishFlow(
+            @PathVariable("flowId") Long flowId
+    ){
+        treatmentService.publishFlow(flowId);
+        return success(true);
+
     }
 
 }

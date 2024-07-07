@@ -3,7 +3,10 @@ package cn.iocoder.yudao.module.therapy.taskflow;
 import cn.iocoder.boot.module.therapy.enums.SurveyType;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemInstanceDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.QuestionDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.survey.TreatmentSurveyDO;
 import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayitemInstanceMapper;
+import cn.iocoder.yudao.module.therapy.dal.mysql.survey.TreatmentSurveyMapper;
 import cn.iocoder.yudao.module.therapy.service.SurveyService;
 import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import cn.iocoder.yudao.module.therapy.service.TreatmentStatisticsDataService;
@@ -17,7 +20,10 @@ import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
+import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.TREATMENT_NO_CASE_STUDY_FOUND;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.therapy.taskflow.Const.*;
 
 @Component
@@ -33,6 +39,9 @@ public class CaseStudyFlow extends BaseFlow{
     SurveyService surveyService;
     @Resource
     private TreatmentService treatmentService;
+
+    @Resource
+    private TreatmentSurveyMapper treatmentSurveyMapper;
 
 
     public CaseStudyFlow(ProcessEngine engine) {
@@ -89,24 +98,55 @@ public class CaseStudyFlow extends BaseFlow{
     }
 
 
+    private List<TreatmentSurveyDO> querySurveys(Container container, String tag){
+        List<TreatmentSurveyDO> surveyDOS = surveyService.listByTag(tag,SurveyType.CASE_STUDY.getType());
+        if(surveyDOS.isEmpty()){
+            System.out.println("[ERROR] no Case Study found for tag: " + tag);
+            throw exception(TREATMENT_NO_CASE_STUDY_FOUND);
+        }
+        return surveyDOS;
+    }
 
-    public Map auto_mood_diary_qst(Container container,Map data, Task currentTask){
-//        Long dayItemInstanceId =(Long) getVariables(container).get(DAYITEM_INSTANCE_ID);;
-//        TreatmentDayitemInstanceDO dayitemInstanceDO = treatmentDayitemInstanceMapper.selectById(dayItemInstanceId);
-//        List<String> troubleTags = treatmentStatisticsDataService.queryUserTroubles(dayitemInstanceDO.getUserId());
+    private String queryTag(Container container){
+        Long dayItemInstanceId =(Long) getVariables(container).get(DAYITEM_INSTANCE_ID);;
+        TreatmentDayitemInstanceDO dayitemInstanceDO = treatmentDayitemInstanceMapper.selectById(dayItemInstanceId);
+        List<String> troubleTags = treatmentStatisticsDataService.queryUserTroubles(dayitemInstanceDO.getUserId());
+        int randIndex = new Random().nextInt(troubleTags.size());
+        String tag = troubleTags.get(randIndex);
+        return tag;
+    }
+
+
+    public Map auto_survey_qst(Container container,Map data, Task currentTask){
+        String tag = queryTag(container);
+        List<TreatmentSurveyDO> surveyDOS = querySurveys(container, tag);
+        Map variables = getVariables(container);
+        Long survey_id = (Long) variables.get("survey_id");
+        TreatmentSurveyDO surveyDO;
         RuntimeService runtimeService = processEngine.getRuntimeService();
+        if(survey_id == null || survey_id == 0L){
+            Random random = new Random();
+            int rInt = random.nextInt();
+            int index = rInt % surveyDOS.size();
+            surveyDO = surveyDOS.get(index);
+            runtimeService.setVariable(container.getProcessInstanceId(), "survey_id", surveyDO.getId());
+        }else{
+            surveyDO = treatmentSurveyMapper.selectById(survey_id);
+        }
         Long instance_id = (Long) runtimeService.getVariable(container.getProcessInstanceId(), SURVEY_INSTANCE_ID);
         if(instance_id == null) {
             instance_id = surveyService.initSurveyAnswer(SurveyType.CASE_STUDY.getCode(), SURVEY_SOURCE_TYPE);
             runtimeService.setVariable(container.getProcessInstanceId(), SURVEY_INSTANCE_ID, instance_id);
         }
-        data.put("instance_id", instance_id);
+        List<QuestionDO> questionDOS = surveyService.getQuestionBySurveyId(surveyDO.getId());
+        data.put("survey_id", surveyDO.getId());
+        data.put("questions", questionDOS);
+        data.put("description", surveyDO.getDescription());
+        data.put("trouble_tag", tag);
         return data;
     }
 
-
-
-    public void submit_mood_diary_qst(Container container, DayitemStepSubmitReqVO submitReqVO, Task currentTask) {
+    public void submit_survey_qst(Container container, DayitemStepSubmitReqVO submitReqVO, Task currentTask) {
         surveyService.submitSurveyForFlow(submitReqVO.getStep_data().getSurvey());
     }
 }

@@ -357,7 +357,7 @@ public class DayTaskEngineService {
         if(userCurrentStep.isStarted()){ // 已经完成过初始化
             maxSpanDays = LocalDateTime.now().getDayOfYear() -  dayInstanceDO.getCreateTime().getDayOfYear() + 1;
         }
-        if(isFreeStyle){//自由模式,不限制每日完成任务数量
+        if(!isFreeStyle){//TODO BUG
             maxWholeDays = 1000;
             maxSpanDays = 1000;
         }

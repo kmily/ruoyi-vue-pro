@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.therapy.dal.mysql.definition;
 
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -73,4 +74,11 @@ public interface TreatmentDayitemInstanceMapper extends BaseMapperX<TreatmentDay
     TreatmentDayitemInstanceDO queryUserGoalAndMotiveInstance(@Param("userId") Long userId,
                                                               @Param("taskType") Integer taskType);
 
+
+    default TreatmentDayitemInstanceDO queryInstance(Long userId, Long dayItemInstanceId){
+        LambdaQueryWrapper<TreatmentDayitemInstanceDO> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(TreatmentDayitemInstanceDO::getUserId, userId);
+        queryWrapper.eq(TreatmentDayitemInstanceDO::getId, dayItemInstanceId);
+        return selectOne(queryWrapper);
+    }
 }

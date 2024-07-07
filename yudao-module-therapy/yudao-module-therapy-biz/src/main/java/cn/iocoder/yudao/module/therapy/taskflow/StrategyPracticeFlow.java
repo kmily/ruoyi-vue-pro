@@ -118,7 +118,7 @@ public class StrategyPracticeFlow extends BaseFlow {
 
         RuntimeService runtimeService = processEngine.getRuntimeService();
         TreatmentSurveyDO surveyDO;
-        if(survey_id == null){
+        if(survey_id == null || survey_id == 0L){
             Random random = new Random();
             int rInt = random.nextInt();
             int index = rInt % surveyDOS.size();

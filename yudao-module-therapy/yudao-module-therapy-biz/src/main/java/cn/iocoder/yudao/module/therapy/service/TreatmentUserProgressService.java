@@ -15,4 +15,6 @@ public interface TreatmentUserProgressService {
     void updateUserProgress(TreatmentStepItem stepItem);
 
     void clearUserProgress(Long userId);
+
+    void endTreatment(Long userId);
 }

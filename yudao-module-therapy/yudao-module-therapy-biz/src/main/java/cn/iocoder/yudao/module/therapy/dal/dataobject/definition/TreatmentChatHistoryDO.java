@@ -2,12 +2,15 @@ package cn.iocoder.yudao.module.therapy.dal.dataobject.definition;
 
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Map;
 
 @TableName("hlgyy_treatment_chat_history")
 @Data
@@ -36,4 +39,8 @@ public class TreatmentChatHistoryDO extends BaseDO {
     private Long treatmentDayitemInstanceId;
 
     private String source; // system, user, user_sumbit
+
+    public Map getMessageObj() {
+        return JSON.parseObject(message, Map.class);
+    }
 }

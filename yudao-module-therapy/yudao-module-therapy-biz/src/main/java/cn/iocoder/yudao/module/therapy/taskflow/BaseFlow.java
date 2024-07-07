@@ -128,7 +128,11 @@ public abstract class BaseFlow {
             if (!requireSubmit || data.get("step_type").equals("guide_language")) {
                 result.put("require_submit", false);
                 TaskService taskService = processEngine.getTaskService();
-                taskService.complete(currentTask.getId());
+                try {
+                    taskService.complete(currentTask.getId());
+                }catch (org.flowable.common.engine.api.FlowableObjectNotFoundException e){
+//                    throw new RuntimeException(e);
+                }
             }
             result.put("step_data", stepResult);
         } catch (ServiceException e){
@@ -385,7 +389,7 @@ public abstract class BaseFlow {
         // set
         settings.put("group_relations", groupRelations);
         settings.put("group_nodes", groupNodes);
-        System.out.println("merged work flow settings, you can comment this if in production: \n" + settings);
+//        System.out.println("merged work flow settings, you can comment this if in production: \n" + settings);
         return settings;
     }
 

@@ -21,7 +21,7 @@ public interface TreatmentService {
 
 //    TreatmentStepItem getNext(TreatmentStepItem userCurrentStep);
 
-    void completeDayitemInstance(Long userId, Long dayItemInstanceId);
+//    void completeDayitemInstance(Long userId, Long dayItemInstanceId);
 
     boolean setAppointmentTime(Long userId, SetAppointmentTimeReqVO reqVO);
 
@@ -119,6 +119,8 @@ public interface TreatmentService {
     TreatmentFlowDayitemDO getTask(Long id);
 
     void publish(Long id, Integer state);
+
+    void publishFlow(Long flowId);
 
     void updateDayInstanceStatus(TreatmentDayInstanceDO dayInstanceDO, boolean isSameDay);
 

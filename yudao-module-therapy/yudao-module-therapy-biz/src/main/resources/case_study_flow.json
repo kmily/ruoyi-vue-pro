@@ -2,8 +2,7 @@
   "group_nodes": {
     "start": [ {"step_type": "START"}],
     "steps": [
-        {"step_type": "case_study_qst", "step_data":  {}},
-
+        {"step_type": "survey_qst", "step_data":  {}}
     ],
     "end": [
       {"step_type": "END"}

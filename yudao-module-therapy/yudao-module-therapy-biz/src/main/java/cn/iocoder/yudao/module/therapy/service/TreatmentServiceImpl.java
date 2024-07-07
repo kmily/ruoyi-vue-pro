@@ -82,13 +82,13 @@ public class TreatmentServiceImpl implements TreatmentService {
 //        return nextStepItem;
 //    }
 
-    @Override
-    public void completeDayitemInstance(Long userId,
-                                        Long dayItemInstanceId) {
-        TreatmentDayitemInstanceDO treatmentDayitemInstanceDO = treatmentDayitemInstanceMapper.selectByUserIdAndId(userId, dayItemInstanceId);
-        treatmentDayitemInstanceDO.setStatus(TreatmentDayitemInstanceDO.StatusEnum.COMPLETED.getValue());
-        treatmentDayitemInstanceMapper.updateById(treatmentDayitemInstanceDO);
-    }
+//    @Override
+//    public void completeDayitemInstance(Long userId,
+//                                        Long dayItemInstanceId) {
+//        TreatmentDayitemInstanceDO treatmentDayitemInstanceDO = treatmentDayitemInstanceMapper.selectByUserIdAndId(userId, dayItemInstanceId);
+//        treatmentDayitemInstanceDO.setStatus(TreatmentDayitemInstanceDO.StatusEnum.COMPLETED.getValue());
+//        treatmentDayitemInstanceMapper.updateById(treatmentDayitemInstanceDO);
+//    }
 
     public boolean setAppointmentTime(Long userId, SetAppointmentTimeReqVO reqVO) {
         MemberUserExtDTO dto=new MemberUserExtDTO();
@@ -261,6 +261,15 @@ public class TreatmentServiceImpl implements TreatmentService {
         treatmentFlowMapper.updateById(dayitemDO);
     }
 
+    @Override
+    public void publishFlow(Long flowId){
+        List<TreatmentFlowDayitemDO> list = treatmentFlowDayitemMapper.getListByFlowId(flowId);
+        for (TreatmentFlowDayitemDO flowDayitemDO: list){
+            taskFlowService.updateFlowFromDayitem(flowDayitemDO, "publish");
+        }
+    }
+
+
 
 
     /**
@@ -391,7 +400,7 @@ public class TreatmentServiceImpl implements TreatmentService {
         insertedStepDO.setStatus(TTMainInsertedStepDO.StatusEnum.DEFAULT.getValue());
         HashMap<String, Object> message = new HashMap<String, Object>();
         HashMap<String, Object> settingsMap = new HashMap<>();
-        settingsMap.put("text", content);
+        settingsMap.put("content", content);
         message.put("item_type", TaskType.GUIDE_LANGUAGE.getCode());
         message.put("settings", settingsMap);
         try {

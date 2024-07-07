@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.therapy.controller.app;
 
+import cn.iocoder.boot.module.therapy.enums.TaskType;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
@@ -10,6 +11,8 @@ import cn.iocoder.yudao.module.therapy.controller.vo.TreatmentInstanceVO;
 import cn.iocoder.yudao.module.therapy.convert.DayitemNextStepConvert;
 import cn.iocoder.yudao.module.therapy.convert.TreatmentChatHistoryConvert;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentChatHistoryDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemInstanceDO;
+import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayitemInstanceMapper;
 import cn.iocoder.yudao.module.therapy.service.*;
 import cn.iocoder.yudao.module.therapy.service.common.TreatmentStepItem;
 import cn.iocoder.yudao.module.therapy.taskflow.BaseFlow;
@@ -51,6 +54,9 @@ public class TreatmentController {
 
     @Resource
     private DayTaskEngineService dayTaskEngine;
+
+    @Resource
+    private TreatmentDayitemInstanceMapper treatmentDayitemInstanceMapper;
 
 
     @PostMapping("/{code}")
@@ -112,7 +118,8 @@ public class TreatmentController {
     public CommonResult<List<TreatmentHistoryChatMessageVO>> getChatHistory(@PathVariable("code") String code, @PathVariable("id") Long treatmentInstanceId) {
         Long userId = getLoginUserId();
         List<TreatmentChatHistoryDO> messages =  treatmentChatHistoryService.queryChatHistory(userId, treatmentInstanceId);
-        return success(TreatmentChatHistoryConvert.convert(messages));
+        treatmentChatHistoryService.convert(messages);
+        return success(treatmentChatHistoryService.convert(messages));
     }
 
     @PostMapping("/{code}/{id}/chat-history")
@@ -125,14 +132,14 @@ public class TreatmentController {
         return success(1L);
     }
 
-    @PostMapping("/dayitem/{dayitem_instance_id}/complete")
-    @Operation(summary = "完成子任务")
-    @PreAuthenticated
-    public CommonResult<Long> getNext(@PathVariable("dayitem_instance_id") Long dayitem_instance_id) {
-        Long userId = getLoginUserId();
-        treatmentService.completeDayitemInstance(userId, dayitem_instance_id);
-        return success(1L);
-    }
+//    @PostMapping("/dayitem/{dayitem_instance_id}/complete")
+//    @Operation(summary = "完成子任务")
+//    @PreAuthenticated
+//    public CommonResult<Long> getNext(@PathVariable("dayitem_instance_id") Long dayitem_instance_id) {
+//        Long userId = getLoginUserId();
+//        treatmentService.completeDayitemInstance(userId, dayitem_instance_id);
+//        return success(1L);
+//    }
 
     @PostMapping("/dayitem/{dayitem_instance_id}/next")
     @Operation(summary = "获取子任务下一项内容")
@@ -189,6 +196,20 @@ public class TreatmentController {
         resp.setStep_resp(stepRespVO);
         treatmentChatHistoryService.addTaskUserSubmitMessage(userId, 0L, dayitem_instance_id, submitReqVO);
         return success(resp);
+    }
+
+
+    @PostMapping("/dayitem/{dayitem_instance_id}/complete")
+    @Operation(summary = "完成子任务")
+    @PreAuthenticated
+    public CommonResult<Long> completeSubDayitemTask(@PathVariable("dayitem_instance_id") Long dayitem_instance_id) {
+        Long userId = getLoginUserId();
+        TreatmentDayitemInstanceDO instanceDO = treatmentDayitemInstanceMapper.queryInstance(userId, dayitem_instance_id);
+        if(instanceDO == null){
+            throw new RuntimeException("instance not found");
+        }
+        treatmentService.finishDayItemInstance(dayitem_instance_id);
+        return success(1L);
     }
 
     @PostMapping("/dayitem/{dayitem_instance_id}/fireevent/{event_name}")

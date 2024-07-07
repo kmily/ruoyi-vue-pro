@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.therapy.dal.mysql.definition;
 
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentFlowDayDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentInstanceDO;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -30,6 +32,7 @@ public interface TreatmentInstanceMapper extends BaseMapperX<TreatmentInstanceDO
                 .eq(TreatmentInstanceDO::getUserId, userId)
                 .eq(TreatmentInstanceDO::getFlowId, treatmentId)
                 .in(TreatmentInstanceDO::getStatus,
+                        TreatmentInstanceDO.TreatmentStatus.NOT_STARTED.getValue(),
                         TreatmentInstanceDO.TreatmentStatus.INITIATED.getValue(),
                         TreatmentInstanceDO.TreatmentStatus.IN_PROGRESS.getValue()));
     }
@@ -56,6 +59,21 @@ public interface TreatmentInstanceMapper extends BaseMapperX<TreatmentInstanceDO
                 .eq(TreatmentInstanceDO::getFlowId, flowId)
                 .eq(TreatmentInstanceDO::getStatus, TreatmentInstanceDO.TreatmentStatus.COMPLETED.getValue());
         return selectCount(queryWrapper).intValue();
+    }
+
+    default void endTreatment(Long userId){
+        List<TreatmentInstanceDO> instanceDOS = selectList(
+                new LambdaQueryWrapper<TreatmentInstanceDO>()
+                        .eq(TreatmentInstanceDO::getUserId, userId)
+                        .in(TreatmentInstanceDO::getStatus,
+                                TreatmentInstanceDO.TreatmentStatus.INITIATED.getValue(),
+                                TreatmentInstanceDO.TreatmentStatus.NOT_STARTED.getValue(),
+                                TreatmentInstanceDO.TreatmentStatus.IN_PROGRESS.getValue())
+        );
+        for(TreatmentInstanceDO instanceDO: instanceDOS){
+            instanceDO.setStatus(TreatmentInstanceDO.TreatmentStatus.COMPLETED.getValue());
+            updateById(instanceDO);
+        }
     }
 
 
