@@ -120,6 +120,8 @@ public interface TreatmentService {
 
     void publish(Long id, Integer state);
 
+    void publishFlow(Long flowId);
+
     void updateDayInstanceStatus(TreatmentDayInstanceDO dayInstanceDO, boolean isSameDay);
 
     void finishDayItemInstance(Long dayItemInstanceId);

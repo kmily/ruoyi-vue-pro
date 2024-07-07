@@ -188,11 +188,21 @@ public class TreatmentFlowController {
     }
 
     @PostMapping("/endTreament/{userid}")
-    @Operation(summary = "强制结束病人治疗流程")
+    @Operation(summary = "发布治疗方案子任务的工作流流程-千万不要频繁多次调用")
     public CommonResult<Boolean> endTreatment(
             @PathVariable("userid") Long userid
             ){
         treatmentUserProgressService.endTreatment(userid);
+        return success(true);
+
+    }
+
+    @PostMapping("/publishFlow/{flowId}")
+    @Operation(summary = "强制结束病人治疗流程")
+    public CommonResult<Boolean> publishFlow(
+            @PathVariable("flowId") Long flowId
+    ){
+        treatmentService.publishFlow(flowId);
         return success(true);
 
     }

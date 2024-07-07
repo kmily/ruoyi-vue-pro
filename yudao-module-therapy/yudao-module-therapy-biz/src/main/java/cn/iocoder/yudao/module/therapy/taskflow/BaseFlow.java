@@ -385,7 +385,7 @@ public abstract class BaseFlow {
         // set
         settings.put("group_relations", groupRelations);
         settings.put("group_nodes", groupNodes);
-        System.out.println("merged work flow settings, you can comment this if in production: \n" + settings);
+//        System.out.println("merged work flow settings, you can comment this if in production: \n" + settings);
         return settings;
     }
 

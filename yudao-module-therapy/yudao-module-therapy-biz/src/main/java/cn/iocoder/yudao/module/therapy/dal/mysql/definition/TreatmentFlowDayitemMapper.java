@@ -130,4 +130,10 @@ public interface TreatmentFlowDayitemMapper extends BaseMapperX<TreatmentFlowDay
 
     @Select("select * from hlgyy_treatment_flow_dayitem where flow_id = #{flowId} and `type` = #{type} order by group_seq desc limit 1")
     TreatmentFlowDayitemDO getPriorEvaluation(@Param("flowId") Long flowId, @Param("type") Integer type);
+
+    default List<TreatmentFlowDayitemDO> getListByFlowId(Long flowId){
+        LambdaQueryWrapper<TreatmentFlowDayitemDO> queryWrapper=Wrappers.lambdaQuery(TreatmentFlowDayitemDO.class)
+                .eq(TreatmentFlowDayitemDO::getFlowId,flowId);
+        return selectList(queryWrapper);
+    }
 }

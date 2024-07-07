@@ -261,6 +261,15 @@ public class TreatmentServiceImpl implements TreatmentService {
         treatmentFlowMapper.updateById(dayitemDO);
     }
 
+    @Override
+    public void publishFlow(Long flowId){
+        List<TreatmentFlowDayitemDO> list = treatmentFlowDayitemMapper.getListByFlowId(flowId);
+        for (TreatmentFlowDayitemDO flowDayitemDO: list){
+            taskFlowService.updateFlowFromDayitem(flowDayitemDO, "publish");
+        }
+    }
+
+
 
 
     /**
