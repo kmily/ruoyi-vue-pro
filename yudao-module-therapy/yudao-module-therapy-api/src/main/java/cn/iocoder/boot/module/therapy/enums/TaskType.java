@@ -6,7 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 治疗问卷类型
@@ -58,5 +60,11 @@ public enum TaskType implements IntArrayValuable {
 
     public String getCode(){
         return this.code;
+    }
+
+    public static List<String> allDayItemTypes() {
+        return Arrays.stream(values())
+                .map(TaskType::getCode)
+                .collect(Collectors.toList());
     }
 }

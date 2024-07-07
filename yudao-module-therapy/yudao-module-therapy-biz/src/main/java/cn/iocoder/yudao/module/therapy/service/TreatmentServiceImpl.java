@@ -82,13 +82,13 @@ public class TreatmentServiceImpl implements TreatmentService {
 //        return nextStepItem;
 //    }
 
-    @Override
-    public void completeDayitemInstance(Long userId,
-                                        Long dayItemInstanceId) {
-        TreatmentDayitemInstanceDO treatmentDayitemInstanceDO = treatmentDayitemInstanceMapper.selectByUserIdAndId(userId, dayItemInstanceId);
-        treatmentDayitemInstanceDO.setStatus(TreatmentDayitemInstanceDO.StatusEnum.COMPLETED.getValue());
-        treatmentDayitemInstanceMapper.updateById(treatmentDayitemInstanceDO);
-    }
+//    @Override
+//    public void completeDayitemInstance(Long userId,
+//                                        Long dayItemInstanceId) {
+//        TreatmentDayitemInstanceDO treatmentDayitemInstanceDO = treatmentDayitemInstanceMapper.selectByUserIdAndId(userId, dayItemInstanceId);
+//        treatmentDayitemInstanceDO.setStatus(TreatmentDayitemInstanceDO.StatusEnum.COMPLETED.getValue());
+//        treatmentDayitemInstanceMapper.updateById(treatmentDayitemInstanceDO);
+//    }
 
     public boolean setAppointmentTime(Long userId, SetAppointmentTimeReqVO reqVO) {
         MemberUserExtDTO dto=new MemberUserExtDTO();
