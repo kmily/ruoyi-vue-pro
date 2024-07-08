@@ -79,11 +79,11 @@ public class GoalAndMotivationFlow extends BaseFlow{
         Long dayItemInstanceId = (Long) variables.get(DAYITEM_INSTANCE_ID);
         // TODO if user don't agree should cancel all the treatment
         treatmentService.finishDayItemInstance(dayItemInstanceId);
-        if (!(boolean) variables.get("try_treatment_confirm_result")){
-            // cancel all the treatment
-            TreatmentDayitemInstanceDO dayitemInstanceDO = treatmentDayitemInstanceMapper.selectById(dayItemInstanceId);
-            treatmentService.cancelTreatmentInstance(dayitemInstanceDO.getFlowInstanceId());
-        }
+//        if (!(boolean) variables.get("try_treatment_confirm_result")){
+//            // cancel all the treatment
+//            TreatmentDayitemInstanceDO dayitemInstanceDO = treatmentDayitemInstanceMapper.selectById(dayItemInstanceId);
+//            treatmentService.cancelTreatmentInstance(dayitemInstanceDO.getFlowInstanceId());
+//        }
     }
 
     /**

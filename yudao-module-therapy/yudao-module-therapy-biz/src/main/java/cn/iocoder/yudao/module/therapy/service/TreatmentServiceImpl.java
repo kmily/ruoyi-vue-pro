@@ -188,6 +188,7 @@ public class TreatmentServiceImpl implements TreatmentService {
         if (Objects.isNull(vo.getBeforeId()) || vo.getBeforeId() <= 0L) {
             dayitemDO.setAgroup(1);
             treatmentFlowDayitemMapper.insert(dayitemDO);
+            taskFlowService.updateFlowFromDayitem(dayitemDO, "create");
             return dayitemDO.getId();
         } else {
             List<TreatmentFlowDayitemDO> items = getTaskListByDayId(vo.getDayId()).stream()
