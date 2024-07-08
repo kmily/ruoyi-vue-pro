@@ -32,7 +32,8 @@ public enum TaskType implements IntArrayValuable {
     VIDEO(13,"视频","video"),
     CASE_STUDY(14,"案例练习","case_study"),
     SCHEDULE(15, "行为活动记录表","schedule"),
-    THERAPY_CALENDAR(16,"治疗日历","therapy_calendar")
+    THERAPY_CALENDAR(16,"治疗日历","therapy_calendar"),
+    RELAX_EXERCISE(17,"放松练习","relax_exercise")
     ;
 
     /**
