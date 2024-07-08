@@ -85,6 +85,9 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
     private TreatmentCalendarFlow treatmentCalendarFlow;
 
     @Resource
+    private RelaxExerciseFlow relaxExerciseFlow;
+
+    @Resource
     VideoTreatmentFlow videoTreatmentFlow;
 
     private Container getContainer(BaseFlow flow, TreatmentDayitemInstanceDO dayitemInstanceDO, TreatmentFlowDayitemDO flowDayitemDO){
@@ -137,6 +140,8 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
             return scheduleChartFlow;
         } else if (THERAPY_CALENDAR.getCode().equals(itemType)) {
             return treatmentCalendarFlow;
+        } else if (RELAX_EXERCISE.getCode().equals(itemType)){
+            return relaxExerciseFlow;
         }
         else {
             throw new RuntimeException("not supported task flow");
@@ -185,6 +190,12 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
         }else if(THERAPY_CALENDAR.getCode().equals(itemType)) {
             TreatmentCalendarFlow treatmentCalendarFlow = new TreatmentCalendarFlow(engine.getEngine());
             String taskFlowId = treatmentCalendarFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
+            flowDayitemDO.setTaskFlowId(taskFlowId);
+            treatmentFlowDayitemMapper.updateById(flowDayitemDO);
+            return;
+        }else if (RELAX_EXERCISE.getCode().equals(itemType)) {
+            RelaxExerciseFlow relaxExerciseFlow = new RelaxExerciseFlow(engine.getEngine());
+            String taskFlowId = relaxExerciseFlow.deploy(flowDayitemDO.getId(), flowDayitemDO.getSettingsObj());
             flowDayitemDO.setTaskFlowId(taskFlowId);
             treatmentFlowDayitemMapper.updateById(flowDayitemDO);
             return;
