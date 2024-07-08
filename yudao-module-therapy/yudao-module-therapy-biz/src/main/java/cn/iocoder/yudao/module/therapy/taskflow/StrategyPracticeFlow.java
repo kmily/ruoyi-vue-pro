@@ -79,7 +79,7 @@ public class StrategyPracticeFlow extends BaseFlow {
     public boolean prerequisiteReady(Container container){
         Long dayItemInstanceId =(Long) getVariables(container).get(DAYITEM_INSTANCE_ID);;
         TreatmentDayitemInstanceDO dayitemInstanceDO = treatmentDayitemInstanceMapper.selectById(dayItemInstanceId);
-        List<String> troubleTags = treatmentStatisticsDataService.queryUserTroubles(dayitemInstanceDO.getUserId());
+        List<String> troubleTags = treatmentStatisticsDataService.queryUserTroubles(dayitemInstanceDO);
         if(troubleTags.size() == 0){
             return false;
         }
@@ -105,7 +105,7 @@ public class StrategyPracticeFlow extends BaseFlow {
     public Map<String, Object> auto_strategy_practice_survey(Container container, Map data, Task currentTask){
         Long dayItemInstanceId =(Long) getVariables(container).get(DAYITEM_INSTANCE_ID);;
         TreatmentDayitemInstanceDO dayitemInstanceDO = treatmentDayitemInstanceMapper.selectById(dayItemInstanceId);
-        List<String> troubleTags = treatmentStatisticsDataService.queryUserTroubles(dayitemInstanceDO.getUserId());
+        List<String> troubleTags = treatmentStatisticsDataService.queryUserTroubles(dayitemInstanceDO);
         int randIndex = new Random().nextInt(troubleTags.size());
         String tag = troubleTags.get(randIndex);
         List<TreatmentSurveyDO> surveyDOS = surveyService.listByTag(tag,SurveyType.STRATEGY_GAMES.getType());

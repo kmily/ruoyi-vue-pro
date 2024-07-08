@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.therapy.service;
 
 import cn.iocoder.yudao.module.therapy.controller.admin.vo.TreatmentProgressRespVO;
 import cn.iocoder.yudao.module.therapy.controller.app.TreatmentPlanVO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayInstanceDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemInstanceDO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentInstanceDO;
 import scala.Int;
@@ -63,6 +64,6 @@ public interface TreatmentStatisticsDataService {
 
     Map<String, Integer> getTreatmentUserCount(String startDate);
 
-    List<String>  queryUserTroubles(Long userId);
+    List<String>  queryUserTroubles(TreatmentDayitemInstanceDO dayitemInstanceDO);
 
     }

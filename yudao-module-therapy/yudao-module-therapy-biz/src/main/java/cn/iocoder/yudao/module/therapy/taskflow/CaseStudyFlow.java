@@ -74,7 +74,7 @@ public class CaseStudyFlow extends BaseFlow{
     public boolean prerequisiteReady(Container container){
         Long dayItemInstanceId =(Long) getVariables(container).get(DAYITEM_INSTANCE_ID);;
         TreatmentDayitemInstanceDO dayitemInstanceDO = treatmentDayitemInstanceMapper.selectById(dayItemInstanceId);
-        List<String> troubleTags = treatmentStatisticsDataService.queryUserTroubles(dayitemInstanceDO.getUserId());
+        List<String> troubleTags = treatmentStatisticsDataService.queryUserTroubles(dayitemInstanceDO);
         if(troubleTags.size() == 0){
             return false;
         }
@@ -110,7 +110,7 @@ public class CaseStudyFlow extends BaseFlow{
     private String queryTag(Container container){
         Long dayItemInstanceId =(Long) getVariables(container).get(DAYITEM_INSTANCE_ID);;
         TreatmentDayitemInstanceDO dayitemInstanceDO = treatmentDayitemInstanceMapper.selectById(dayItemInstanceId);
-        List<String> troubleTags = treatmentStatisticsDataService.queryUserTroubles(dayitemInstanceDO.getUserId());
+        List<String> troubleTags = treatmentStatisticsDataService.queryUserTroubles(dayitemInstanceDO);
         int randIndex = new Random().nextInt(troubleTags.size());
         String tag = troubleTags.get(randIndex);
         return tag;

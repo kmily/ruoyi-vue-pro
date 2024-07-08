@@ -69,10 +69,11 @@ public interface TreatmentDayitemInstanceMapper extends BaseMapperX<TreatmentDay
             " inner join " +
             " hlgyy_treatment_flow_dayitem d on i.dayitem_id = d.id " +
             " inner join hlgyy_treatment_flow f on f.id = d.flow_id" +
-            " where d.type = #{taskType} and f.code = 'main' and user_id = #{userId} " +
+            " where user_id = #{userId} and  d.type = #{taskType} and f.code = #{flowCode}   " +
             " order by i.create_time desc limit 1")
     TreatmentDayitemInstanceDO queryUserGoalAndMotiveInstance(@Param("userId") Long userId,
-                                                              @Param("taskType") Integer taskType);
+                                                              @Param("taskType") Integer taskType,
+                                                              @Param("flowCode") String flowCode);
 
 
     default TreatmentDayitemInstanceDO queryInstance(Long userId, Long dayItemInstanceId){

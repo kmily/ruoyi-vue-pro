@@ -12,7 +12,6 @@ import com.alibaba.fastjson.JSONObject;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 
-import liquibase.pro.packaged.I;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -136,12 +135,14 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
         return goals;
     }
 
-    public List<String>  queryUserTroubles(Long userId){
-
+    public List<String>  queryUserTroubles(TreatmentDayitemInstanceDO dayitemInstanceDO){
+        Long userId = dayitemInstanceDO.getUserId();
+        String flowCode = treatmentFlowMapper.getFlowCodeByDayitemInstanceId(dayitemInstanceDO.getId());
         TreatmentDayitemInstanceDO treatmentDayitemInstanceDO =
                 treatmentDayitemInstanceMapper.queryUserGoalAndMotiveInstance(
                         userId,
-                        TaskType.PROBLEM_GOAL_MOTIVE.getType()
+                        TaskType.PROBLEM_GOAL_MOTIVE.getType(),
+                        flowCode
                 );
         if (treatmentDayitemInstanceDO == null) {
             return new ArrayList<>();
