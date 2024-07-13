@@ -127,18 +127,18 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
 
     // ========== 和 TenantLineInnerInterceptor 一致的逻辑 ==========
 
-    protected void processSelectBody(SelectBody selectBody) {
+    protected void processSelectBody(Select selectBody) {
         if (selectBody == null) {
             return;
         }
         if (selectBody instanceof PlainSelect) {
             processPlainSelect((PlainSelect) selectBody);
-        } else if (selectBody instanceof WithItem) {
-            WithItem withItem = (WithItem) selectBody;
-            processSelectBody(withItem.getSubSelect().getSelectBody());
-        } else {
+        } else if (selectBody instanceof ParenthesedSelect) {
+            ParenthesedSelect parenthesedSelect = (ParenthesedSelect) selectBody;
+            processSelectBody(parenthesedSelect.getSelect().getSelectBody());
+        } else if (selectBody instanceof SetOperationList) {
             SetOperationList operationList = (SetOperationList) selectBody;
-            List<SelectBody> selectBodyList = operationList.getSelects();
+            List<Select> selectBodyList = operationList.getSelects();
             if (CollectionUtils.isNotEmpty(selectBodyList)) {
                 selectBodyList.forEach(this::processSelectBody);
             }
@@ -150,7 +150,7 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
      */
     protected void processPlainSelect(PlainSelect plainSelect) {
         //#3087 github
-        List<SelectItem> selectItems = plainSelect.getSelectItems();
+        List<SelectItem<?>> selectItems = plainSelect.getSelectItems();
         if (CollectionUtils.isNotEmpty(selectItems)) {
             selectItems.forEach(this::processSelectItem);
         }
@@ -177,19 +177,14 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
     }
 
     private List<Table> processFromItem(FromItem fromItem) {
-        // 处理括号括起来的表达式
-        while (fromItem instanceof ParenthesisFromItem) {
-            fromItem = ((ParenthesisFromItem) fromItem).getFromItem();
-        }
-
         List<Table> mainTables = new ArrayList<>();
         // 无 join 时的处理逻辑
         if (fromItem instanceof Table) {
             Table fromTable = (Table) fromItem;
             mainTables.add(fromTable);
-        } else if (fromItem instanceof SubJoin) {
+        } else if (fromItem instanceof ParenthesedFromItem) {
             // SubJoin 类型则还需要添加上 where 条件
-            List<Table> tables = processSubJoin((SubJoin) fromItem);
+            List<Table> tables = processSubJoin((ParenthesedFromItem) fromItem);
             mainTables.addAll(tables);
         } else {
             // 处理下 fromItem
@@ -237,8 +232,8 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
                 // in
                 InExpression expression = (InExpression) where;
                 Expression inExpression = expression.getRightExpression();
-                if (inExpression instanceof SubSelect) {
-                    processSelectBody(((SubSelect) inExpression).getSelectBody());
+                if (inExpression instanceof Select) {
+                    processSelectBody(((Select) inExpression).getSelectBody());
                 }
             } else if (where instanceof ExistsExpression) {
                 // exists
@@ -256,13 +251,14 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
     }
 
     protected void processSelectItem(SelectItem selectItem) {
-        if (selectItem instanceof SelectExpressionItem) {
-            SelectExpressionItem selectExpressionItem = (SelectExpressionItem) selectItem;
-            if (selectExpressionItem.getExpression() instanceof SubSelect) {
-                processSelectBody(((SubSelect) selectExpressionItem.getExpression()).getSelectBody());
-            } else if (selectExpressionItem.getExpression() instanceof Function) {
-                processFunction((Function) selectExpressionItem.getExpression());
-            }
+        Expression expression = selectItem.getExpression();
+        if (expression instanceof Select) {
+            this.processSelectBody((Select)expression);
+        } else if (expression instanceof Function) {
+            this.processFunction((Function)expression);
+        } else if (expression instanceof ExistsExpression) {
+            ExistsExpression existsExpression = (ExistsExpression)expression;
+            this.processSelectBody((Select)existsExpression.getRightExpression());
         }
     }
 
@@ -277,8 +273,8 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
         ExpressionList parameters = function.getParameters();
         if (parameters != null) {
             parameters.getExpressions().forEach(expression -> {
-                if (expression instanceof SubSelect) {
-                    processSelectBody(((SubSelect) expression).getSelectBody());
+                if (expression instanceof Select) {
+                    processSelectBody(((Select) expression).getSelectBody());
                 } else if (expression instanceof Function) {
                     processFunction((Function) expression);
                 }
@@ -290,26 +286,11 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
      * 处理子查询等
      */
     protected void processOtherFromItem(FromItem fromItem) {
-        // 去除括号
-        while (fromItem instanceof ParenthesisFromItem) {
-            fromItem = ((ParenthesisFromItem) fromItem).getFromItem();
-        }
-
-        if (fromItem instanceof SubSelect) {
-            SubSelect subSelect = (SubSelect) fromItem;
-            if (subSelect.getSelectBody() != null) {
-                processSelectBody(subSelect.getSelectBody());
-            }
-        } else if (fromItem instanceof ValuesList) {
-            logger.debug("Perform a subQuery, if you do not give us feedback");
-        } else if (fromItem instanceof LateralSubSelect) {
-            LateralSubSelect lateralSubSelect = (LateralSubSelect) fromItem;
-            if (lateralSubSelect.getSubSelect() != null) {
-                SubSelect subSelect = lateralSubSelect.getSubSelect();
-                if (subSelect.getSelectBody() != null) {
-                    processSelectBody(subSelect.getSelectBody());
-                }
-            }
+        if (fromItem instanceof ParenthesedSelect) {
+            Select subSelect = (Select)fromItem;
+            this.processSelectBody(subSelect);
+        } else if (fromItem instanceof ParenthesedFromItem) {
+            this.logger.debug("Perform a subQuery, if you do not give us feedback");
         }
     }
 
@@ -319,13 +300,17 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
      * @param subJoin subJoin
      * @return Table subJoin 中的主表
      */
-    private List<Table> processSubJoin(SubJoin subJoin) {
-        List<Table> mainTables = new ArrayList<>();
-        if (subJoin.getJoinList() != null) {
-            List<Table> list = processFromItem(subJoin.getLeft());
-            mainTables.addAll(list);
-            mainTables = processJoins(mainTables, subJoin.getJoinList());
+    private List<Table> processSubJoin(ParenthesedFromItem subJoin) {
+        ArrayList mainTables;
+        for(mainTables = new ArrayList(); subJoin.getJoins() == null && subJoin.getFromItem() instanceof ParenthesedFromItem; subJoin = (ParenthesedFromItem)subJoin.getFromItem()) {
         }
+
+        if (subJoin.getJoins() != null) {
+            List<Table> list = this.processFromItem(subJoin.getFromItem());
+            mainTables.addAll(list);
+            this.processJoins(mainTables, subJoin.getJoins());
+        }
+
         return mainTables;
     }
 
@@ -360,8 +345,8 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
             if (joinItem instanceof Table) {
                 joinTables = new ArrayList<>();
                 joinTables.add((Table) joinItem);
-            } else if (joinItem instanceof SubJoin) {
-                joinTables = processSubJoin((SubJoin) joinItem);
+            } else if (joinItem instanceof ParenthesedFromItem) {
+                joinTables = processSubJoin((ParenthesedFromItem) joinItem);
             }
 
             if (joinTables != null) {

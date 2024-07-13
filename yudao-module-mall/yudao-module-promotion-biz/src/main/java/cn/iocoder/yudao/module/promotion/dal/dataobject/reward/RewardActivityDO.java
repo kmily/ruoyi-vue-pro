@@ -15,6 +15,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -118,13 +119,21 @@ public class RewardActivityDO extends BaseDO {
     // TODO @芋艿：可以找一些新的思路
     public static class RuleTypeHandler extends AbstractJsonTypeHandler<List<Rule>> {
 
+        public RuleTypeHandler(Class<?> type) {
+            super(type);
+        }
+
+        public RuleTypeHandler(Class<?> type, Field field) {
+            super(type, field);
+        }
+
         @Override
-        protected List<Rule> parse(String json) {
+        public List<Rule> parse(String json) {
             return JsonUtils.parseArray(json, Rule.class);
         }
 
         @Override
-        protected String toJson(List<Rule> obj) {
+        public String toJson(List<Rule> obj) {
             return JsonUtils.toJsonString(obj);
         }
 
