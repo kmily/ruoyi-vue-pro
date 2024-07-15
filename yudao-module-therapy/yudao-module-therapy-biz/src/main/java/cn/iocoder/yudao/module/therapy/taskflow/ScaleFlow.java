@@ -116,18 +116,4 @@ public class ScaleFlow extends BaseFlow{
         runtimeService.setVariable(container.getProcessInstanceId(), SURVEY_INSTANCE_ID, instance_id);
         return data;
     }
-
-    @Override
-    protected Map endResult(Container container){
-
-        HistoricProcessInstance hProcess = container.getHistoricProcessInstance();
-
-        HistoricVariableInstance d = processEngine.getHistoryService().
-                createHistoricVariableInstanceQuery().
-                processInstanceId(hProcess.getId()).
-                variableName("survey_instance_id+" + "phq9_scale").
-                singleResult();
-        List<AnswerDetailDO> ans = surveyService.getAnswerDetailByAnswerId((Long) d.getValue());
-        return new HashMap<>();
-    }
 }
