@@ -9,13 +9,16 @@ import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayitemInst
 import cn.iocoder.yudao.module.therapy.service.SurveyService;
 import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.task.api.Task;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -107,8 +110,24 @@ public class ScaleFlow extends BaseFlow{
     public Map<String, Object> auto_review_result(Container container, Map data, Task currentTask){
         Map variables = getVariables(container);
         String surveyIdKey = "survey_instance_id+" + data.get("code");
+        Long instance_id =  (Long) variables.get(surveyIdKey);
         data.put("instance_id", (Long) variables.get(surveyIdKey));
+        RuntimeService runtimeService = processEngine.getRuntimeService();
+        runtimeService.setVariable(container.getProcessInstanceId(), SURVEY_INSTANCE_ID, instance_id);
         return data;
     }
 
+    @Override
+    protected Map endResult(Container container){
+
+        HistoricProcessInstance hProcess = container.getHistoricProcessInstance();
+
+        HistoricVariableInstance d = processEngine.getHistoryService().
+                createHistoricVariableInstanceQuery().
+                processInstanceId(hProcess.getId()).
+                variableName("survey_instance_id+" + "phq9_scale").
+                singleResult();
+        List<AnswerDetailDO> ans = surveyService.getAnswerDetailByAnswerId((Long) d.getValue());
+        return new HashMap<>();
+    }
 }

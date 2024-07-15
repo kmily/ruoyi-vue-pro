@@ -1,11 +1,9 @@
 package cn.iocoder.yudao.module.therapy.taskflow;
 
-import cn.hutool.core.lang.hash.Hash;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.*;
 import org.flowable.bpmn.model.Process;
 import org.flowable.engine.*;
@@ -13,19 +11,18 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 
 
-import javax.annotation.PreDestroy;
-import java.awt.event.ContainerAdapter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.module.therapy.taskflow.Const.DAYITEM_INSTANCE_ID;
+import static cn.iocoder.yudao.module.therapy.taskflow.Const.SURVEY_INSTANCE_ID;
 
 
 public abstract class BaseFlow {
@@ -94,6 +91,26 @@ public abstract class BaseFlow {
         return result;
     }
 
+    protected Map endResult(Container container){
+        HashMap result = new HashMap();
+        HistoricProcessInstance hProcess = container.getHistoricProcessInstance();
+        Map<String, Object> pVariables = new HashMap<>();
+        result.put("step_type", "END");
+        Map stepData = new HashMap();
+        stepData.put("content", "流程已经结束了");
+        HistoricVariableInstance instanceVariable = processEngine.getHistoryService().
+                createHistoricVariableInstanceQuery().
+                processInstanceId(hProcess.getId()).
+                variableName(SURVEY_INSTANCE_ID).
+                singleResult();
+        if(instanceVariable != null){
+            pVariables.put("instance_id", (Long) instanceVariable.getValue());
+        }
+        stepData.put("p_variables", pVariables);
+        result.put("step_data", stepData);
+        return result;
+    }
+
     /**
      * 运行流程, 返回下一步的信息
      * @return
@@ -101,11 +118,7 @@ public abstract class BaseFlow {
     public Map run(Container container){
         HashMap result = new HashMap();
         if(container.getHistoricProcessInstance() != null){
-            result.put("step_type", "END");
-            Map stepData = new HashMap();
-            stepData.put("content", "流程已经结束了");
-            result.put("step_data", stepData);
-            return result;
+            return endResult(container);
         }
         Task currentTask = getCurrentTask(container);
         result.put("__step_id", currentTask.getId());
@@ -538,6 +551,4 @@ public abstract class BaseFlow {
         bindContentToServiceTask(serviceTask, step);
         return serviceTask;
     }
-
-
 }

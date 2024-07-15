@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
