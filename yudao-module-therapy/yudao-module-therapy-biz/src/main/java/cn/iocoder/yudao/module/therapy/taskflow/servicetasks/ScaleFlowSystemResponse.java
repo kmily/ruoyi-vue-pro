@@ -68,10 +68,15 @@ public class ScaleFlowSystemResponse implements org.flowable.engine.delegate.Jav
         String content;
         if (scorePh9 >= 5 || scoreGad7 >= 5 || scoreIsi >= 7){
             content = "经过评估，你目前可能遭遇了一定的心理困扰，让XXX（智能治疗师名称）来和你一起寻找改善的方法吧~";
+            treatmentService.addGuideLanguageStep(dayitemInstanceDO.getUserId(), dayitemInstanceDO.getFlowInstanceId(),
+                    content);
+            String userContent = "好哒";
+            treatmentService.addGuideLanguageStepTypeUser(dayitemInstanceDO.getUserId(), dayitemInstanceDO.getFlowInstanceId(),
+                    userContent);
         }else{
             content = "经过评估，目前没有发现你存在情绪和睡眠方面的问题，暂时不需要心理健康治疗，请继续保持呀！如果你感觉自己的状态变差，或者想要对自己的心理健康进行监测，可以随时使用哦~";
+            treatmentService.addGuideLanguageStep(dayitemInstanceDO.getUserId(), dayitemInstanceDO.getFlowInstanceId(),
+                    content);
         }
-        treatmentService.addGuideLanguageStep(dayitemInstanceDO.getUserId(), dayitemInstanceDO.getFlowInstanceId(),
-                content);
     }
 }

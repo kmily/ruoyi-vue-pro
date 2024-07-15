@@ -389,6 +389,14 @@ public class TreatmentServiceImpl implements TreatmentService {
 
 
     public void addGuideLanguageStep(Long userId, Long treatmentInstanceId, String content){
+        addGuideLanguageStep(userId, treatmentInstanceId, content, false);
+    }
+
+    public void addGuideLanguageStepTypeUser(Long userId, Long treatmentInstanceId, String content){
+        addGuideLanguageStep(userId, treatmentInstanceId, content, true);
+    }
+
+    public void addGuideLanguageStep(Long userId, Long treatmentInstanceId, String content, boolean isUser){
         Long maxSeq = tTMainInsertedStepMapper.selectCount(new LambdaQueryWrapper<TTMainInsertedStepDO>()
                 .eq(TTMainInsertedStepDO::getUserId, userId)
                 .eq(TTMainInsertedStepDO::getTreatmentInstanceId, treatmentInstanceId)
@@ -401,6 +409,9 @@ public class TreatmentServiceImpl implements TreatmentService {
         insertedStepDO.setStatus(TTMainInsertedStepDO.StatusEnum.DEFAULT.getValue());
         HashMap<String, Object> message = new HashMap<String, Object>();
         HashMap<String, Object> settingsMap = new HashMap<>();
+        if(isUser){
+            settingsMap.put("is_user", true);
+        }
         settingsMap.put("content", content);
         message.put("item_type", TaskType.GUIDE_LANGUAGE.getCode());
         message.put("settings", settingsMap);

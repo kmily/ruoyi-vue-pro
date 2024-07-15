@@ -133,5 +133,6 @@ public interface TreatmentService {
     TreatmentNextVO getInsertedNextVO(Long userId, Long treatmentInstanceId);
 
     void addGuideLanguageStep(Long userId, Long treatmentInstanceId, String content);
+    void addGuideLanguageStepTypeUser(Long userId, Long treatmentInstanceId, String content);
 
 }
