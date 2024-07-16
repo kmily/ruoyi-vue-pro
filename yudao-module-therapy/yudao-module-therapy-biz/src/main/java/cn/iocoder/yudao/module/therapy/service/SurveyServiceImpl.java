@@ -206,6 +206,7 @@ public class SurveyServiceImpl implements SurveyService {
                 detailDO.setBelongQstCode(item.getQstCode());
                 detailDO.setQstType(Objects.isNull(qst) ? SurveyQuestionType.SPACES.getType() : qst.getQstType());
                 detailDO.setCreator((Objects.isNull(getLoginUserId())?"system":getLoginUserId().toString()));
+
                 newDetails.add(detailDO);
             }
         }
