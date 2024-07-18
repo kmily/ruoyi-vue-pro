@@ -10,10 +10,13 @@ import cn.iocoder.yudao.module.therapy.controller.app.vo.AnAnswerReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.DayitemStepSubmitReqVO;
 import cn.iocoder.yudao.module.therapy.controller.app.vo.SubmitSurveyReqVO;
 import cn.iocoder.yudao.module.therapy.dal.dataobject.chat.ChatMessageDO;
+import cn.iocoder.yudao.module.therapy.dal.dataobject.definition.TreatmentDayitemInstanceDO;
 import cn.iocoder.yudao.module.therapy.dal.mysql.chat.ChatMessageMapper;
+import cn.iocoder.yudao.module.therapy.dal.mysql.definition.TreatmentDayitemInstanceMapper;
 import cn.iocoder.yudao.module.therapy.service.AIChatService;
 import cn.iocoder.yudao.module.therapy.service.SurveyService;
 import cn.iocoder.yudao.module.therapy.service.TaskFlowService;
+import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import cn.iocoder.yudao.module.therapy.service.dto.SSEMsgDTO;
 import cn.iocoder.yudao.module.therapy.service.enums.RequestSourceEnum;
 import cn.iocoder.yudao.module.therapy.service.enums.UserTypeEnum;
@@ -51,6 +54,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.therapy.taskflow.Const.SURVEY_SOURCE_TYPE;
 
 /**
@@ -74,6 +78,12 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
 
     @Resource
     TaskFlowService taskFlowService;
+
+    @Resource
+    TreatmentDayitemInstanceMapper treatmentDayitemInstanceMapper;
+
+    @Resource
+    TreatmentService treatmentService;
 
     //@Value("${zhipu.api.key:this-is-a-test-key}")
     String API_KEY = "7820338e5c0e1d9228f8c2a5e2bf2e0d.EIWUgIkQCoStAnBU";
@@ -344,14 +354,15 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
                 long answerId = saveAutomatedThoughtsConclusion(message, sourceEnum);
                 if (NumberUtils.gtZero(answerId) && RequestSourceEnum.MAIN_PROCESS.equals(sourceEnum)) {
                     try {
-                        BaseFlow taskFlow = taskFlowService.getTaskFlow(receiveUserId, dayItemInstanceId);
-                        DayitemStepSubmitReqVO dayitemStepSubmitReqVO = new DayitemStepSubmitReqVO();
-                        dayitemStepSubmitReqVO.setStep_id(stepId);
-                        taskFlowService.userSubmit(taskFlow, dayItemInstanceId, stepId, dayitemStepSubmitReqVO);
+                        Long userId = getLoginUserId();
+                        TreatmentDayitemInstanceDO instanceDO = treatmentDayitemInstanceMapper.queryInstance(userId, dayItemInstanceId);
+                        if(instanceDO == null){
+                            throw new RuntimeException("instance not found, userId:" + userId + " dayItemInstanceId:" + dayItemInstanceId);
+                        }
+                        treatmentService.finishDayItemInstance(dayItemInstanceId);
                         log.info("设置结束任务成功，会话ID: {}  dayItemInstanceId:{} stepId:{}", info.getConversationId(), dayItemInstanceId, stepId);
                     }catch (Exception e){
-                        log.error("设置任务失败。receiveUserId：{} dayItemInstanceId:{} stepId:{}",receiveUserId,dayItemInstanceId,stepId );
-                        throw new RuntimeException(e);
+                        log.error("设置任务失败。receiveUserId：{} dayItemInstanceId:{} stepId:{}",receiveUserId,dayItemInstanceId,stepId,e);
                     }
                 }
             } catch (Exception e) {
@@ -403,11 +414,11 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
             submitSurveyReqVO.setSurveyType(11);
 
             JSONObject jobj = new JSONObject();
-            jobj.put("time", dateTime);
-            jobj.put("scene", situation);
-            jobj.put("autoThought", automaticThought1);
-            jobj.put("response", emotionsAndBodyFeelings);
-            jobj.put("result", behaviorAndConsequences);
+            jobj.set("time", dateTime);
+            jobj.set("scene", situation);
+            jobj.set("autoThought", automaticThought1);
+            jobj.set("response", emotionsAndBodyFeelings);
+            jobj.set("result", behaviorAndConsequences);
 
             AnAnswerReqVO anAnswerReqVO = new AnAnswerReqVO();
             anAnswerReqVO.setQstCode(UUID.randomUUID().toString());
