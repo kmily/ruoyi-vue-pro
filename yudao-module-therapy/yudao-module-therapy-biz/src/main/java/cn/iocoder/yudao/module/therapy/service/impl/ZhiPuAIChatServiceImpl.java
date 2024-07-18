@@ -351,6 +351,7 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
                         log.info("设置结束任务成功，会话ID: {}  dayItemInstanceId:{} stepId:{}", info.getConversationId(), dayItemInstanceId, stepId);
                     }catch (Exception e){
                         log.error("设置任务失败。receiveUserId：{} dayItemInstanceId:{} stepId:{}",receiveUserId,dayItemInstanceId,stepId );
+                        throw new RuntimeException(e);
                     }
                 }
             } catch (Exception e) {
