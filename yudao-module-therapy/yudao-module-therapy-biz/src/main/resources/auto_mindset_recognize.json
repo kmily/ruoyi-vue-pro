@@ -7,7 +7,7 @@
       {"step_type": "recognize_methods_qst", "step_data": {}}
     ],
     "llm": [
-      {"step_type": "llm_report", "step_data": {}, "submit":  false}
+      {"step_type": "llm_report", "step_data": {}}
     ],
     "manual": [
       {"step_type": "guide_language", "step_data": {"content":  "回忆在过去一周里，你经历的一次强烈的情绪体验，试着识别当时情绪的诱发情境（即你是在什么样的情境下体验到这个情绪的）和情绪体验中的三个成分。你可以选择每个模块下的任意一个或多个问题进行回答。"}},
