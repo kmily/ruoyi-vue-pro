@@ -355,7 +355,7 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
                     }
                 }
             } catch (Exception e) {
-                log.error("创建问券报错。{}",info.getConversationId(),e);
+                log.error("创建问券报错。{} receiveUserId：{} dayItemInstanceId:{} stepId:{} ",info.getConversationId(),receiveUserId,dayItemInstanceId,stepId,e);
             }
         }
         chatMessageMapper.insert(info);
