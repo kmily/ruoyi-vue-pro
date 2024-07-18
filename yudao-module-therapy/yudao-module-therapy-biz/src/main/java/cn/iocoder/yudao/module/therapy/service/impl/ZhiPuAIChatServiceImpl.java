@@ -343,14 +343,19 @@ public class ZhiPuAIChatServiceImpl implements AIChatService {
             try {
                 long answerId = saveAutomatedThoughtsConclusion(message, sourceEnum);
                 if (NumberUtils.gtZero(answerId) && RequestSourceEnum.MAIN_PROCESS.equals(sourceEnum)) {
-                    BaseFlow taskFlow = taskFlowService.getTaskFlow(receiveUserId, dayItemInstanceId);
-                    DayitemStepSubmitReqVO dayitemStepSubmitReqVO = new DayitemStepSubmitReqVO();
-                    dayitemStepSubmitReqVO.setStep_id(stepId);
-                    taskFlowService.userSubmit(taskFlow, dayItemInstanceId, stepId, dayitemStepSubmitReqVO);
-                    log.info("设置结束任务成功，会话ID: {}  dayItemInstanceId:{} stepId:{}",info.getConversationId(),dayItemInstanceId,stepId);
+                    try {
+                        BaseFlow taskFlow = taskFlowService.getTaskFlow(receiveUserId, dayItemInstanceId);
+                        DayitemStepSubmitReqVO dayitemStepSubmitReqVO = new DayitemStepSubmitReqVO();
+                        dayitemStepSubmitReqVO.setStep_id(stepId);
+                        taskFlowService.userSubmit(taskFlow, dayItemInstanceId, stepId, dayitemStepSubmitReqVO);
+                        log.info("设置结束任务成功，会话ID: {}  dayItemInstanceId:{} stepId:{}", info.getConversationId(), dayItemInstanceId, stepId);
+                    }catch (Exception e){
+                        log.error("设置任务失败。receiveUserId：{} dayItemInstanceId:{} stepId:{}",receiveUserId,dayItemInstanceId,stepId );
+                        throw new RuntimeException(e);
+                    }
                 }
             } catch (Exception e) {
-                log.error("创建问券报错。{}",info.getConversationId(),e);
+                log.error("创建问券报错。{} receiveUserId：{} dayItemInstanceId:{} stepId:{} ",info.getConversationId(),receiveUserId,dayItemInstanceId,stepId,e);
             }
         }
         chatMessageMapper.insert(info);
