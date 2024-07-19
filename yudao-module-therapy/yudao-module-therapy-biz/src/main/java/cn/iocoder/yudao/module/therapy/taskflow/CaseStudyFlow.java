@@ -104,7 +104,7 @@ public class CaseStudyFlow extends BaseFlow{
         List<TreatmentSurveyDO> surveyDOS = surveyService.listByTag(tag,SurveyType.CASE_STUDY.getType());
         if(surveyDOS.isEmpty()){
             log.error("[ERROR] no Case Study found for tag: " + tag);
-            throw exception(TREATMENT_NO_CASE_STUDY_FOUND);
+            throw exception(TREATMENT_NO_CASE_STUDY_FOUND, tag);
         }
         return surveyDOS;
     }
@@ -121,7 +121,7 @@ public class CaseStudyFlow extends BaseFlow{
 
     public Map auto_survey_qst(Container container,Map data, Task currentTask){
         String tag = queryTag(container);
-        tag = "焦虑";
+//        tag = "焦虑";
         List<TreatmentSurveyDO> surveyDOS = querySurveys(container, tag);
         Map variables = getVariables(container);
         Long survey_id = (Long) variables.get("survey_id");

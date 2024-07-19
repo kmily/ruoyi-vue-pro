@@ -37,8 +37,8 @@ public interface ErrorCodeConstants {
     ErrorCode TREATMENT_DAYITEM_STEP_PARAMS_ERROR = new ErrorCode(1_050_001_001, "治疗子任务步骤参数错误");
     ErrorCode TREATMENT_REQUIRE_GOAL_AND_MOTIVATION = new ErrorCode(1_050_001_002, "请先完成目标与动机的填写");
 
-    ErrorCode TREATMENT_NO_STRATEGY_GAME_FOUND = new ErrorCode(1_050_001_003, "没有找到对应的策略游戏");
-    ErrorCode TREATMENT_NO_CASE_STUDY_FOUND = new ErrorCode(1_050_001_003, "没有找到对应的案例练习");
+    ErrorCode TREATMENT_NO_STRATEGY_GAME_FOUND = new ErrorCode(1_050_001_003, "没有找到对应的策略游戏, TAG={}");
+    ErrorCode TREATMENT_NO_CASE_STUDY_FOUND = new ErrorCode(1_050_001_003, "没有找到对应的案例练习, TAG={}");
 
     ErrorCode TREATMENT_NO_STRATEGY_CARD_FOUND = new ErrorCode(1_050_001_004, "没有找到策略卡");
 

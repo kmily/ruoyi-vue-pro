@@ -114,7 +114,7 @@ public class StrategyPracticeFlow extends BaseFlow {
         List<TreatmentSurveyDO> surveyDOS = surveyService.listByTag(tag,SurveyType.STRATEGY_GAMES.getType());
         if(surveyDOS.isEmpty()){
             log.error("[ERROR] no strategy game found for tag: " + tag);
-            throw exception(TREATMENT_NO_STRATEGY_GAME_FOUND);
+            throw exception(TREATMENT_NO_STRATEGY_GAME_FOUND, tag);
         }
         Map variables = getVariables(container);
         Long survey_id = (Long) variables.get("survey_id");

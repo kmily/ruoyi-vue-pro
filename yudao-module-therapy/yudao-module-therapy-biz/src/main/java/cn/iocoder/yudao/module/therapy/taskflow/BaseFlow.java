@@ -148,13 +148,14 @@ public abstract class BaseFlow {
                 }
             }
             result.put("step_data", stepResult);
-        } catch (ServiceException e){
-            return exceptionResult(e);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
+            if(e.getTargetException() instanceof ServiceException){
+                return exceptionResult((ServiceException) e.getTargetException());
+            }
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
