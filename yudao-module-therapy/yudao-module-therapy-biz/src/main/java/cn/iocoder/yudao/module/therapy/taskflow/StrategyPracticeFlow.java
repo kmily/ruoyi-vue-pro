@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.therapy.dal.mysql.survey.TreatmentSurveyMapper;
 import cn.iocoder.yudao.module.therapy.service.SurveyService;
 import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import cn.iocoder.yudao.module.therapy.service.TreatmentStatisticsDataService;
+import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Logger;
 
 import org.flowable.task.api.Task;
 
@@ -33,6 +35,7 @@ import static cn.iocoder.yudao.module.therapy.taskflow.Const.DAYITEM_INSTANCE_ID
 import static cn.iocoder.yudao.module.therapy.taskflow.Const.SURVEY_INSTANCE_ID;
 
 @Component
+@Slf4j
 public class StrategyPracticeFlow extends BaseFlow {
 
     @Resource
@@ -110,7 +113,7 @@ public class StrategyPracticeFlow extends BaseFlow {
         String tag = troubleTags.get(randIndex);
         List<TreatmentSurveyDO> surveyDOS = surveyService.listByTag(tag,SurveyType.STRATEGY_GAMES.getType());
         if(surveyDOS.isEmpty()){
-            System.out.println("[ERROR] no strategy game found for tag: " + tag);
+            log.error("[ERROR] no strategy game found for tag: " + tag);
             throw exception(TREATMENT_NO_STRATEGY_GAME_FOUND);
         }
         Map variables = getVariables(container);

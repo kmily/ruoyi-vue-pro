@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.therapy.dal.mysql.survey.TreatmentSurveyMapper;
 import cn.iocoder.yudao.module.therapy.service.SurveyService;
 import cn.iocoder.yudao.module.therapy.service.TreatmentService;
 import cn.iocoder.yudao.module.therapy.service.TreatmentStatisticsDataService;
+import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -27,6 +28,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.therapy.taskflow.Const.*;
 
 @Component
+@Slf4j
 public class CaseStudyFlow extends BaseFlow{
 
     @Resource
@@ -101,7 +103,7 @@ public class CaseStudyFlow extends BaseFlow{
     private List<TreatmentSurveyDO> querySurveys(Container container, String tag){
         List<TreatmentSurveyDO> surveyDOS = surveyService.listByTag(tag,SurveyType.CASE_STUDY.getType());
         if(surveyDOS.isEmpty()){
-            System.out.println("[ERROR] no Case Study found for tag: " + tag);
+            log.error("[ERROR] no Case Study found for tag: " + tag);
             throw exception(TREATMENT_NO_CASE_STUDY_FOUND);
         }
         return surveyDOS;
