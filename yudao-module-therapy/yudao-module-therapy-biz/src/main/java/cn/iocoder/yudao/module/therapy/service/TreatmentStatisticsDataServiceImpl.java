@@ -51,12 +51,18 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
 
     @Override
     public Map<Long, List<String>> queryPsycoTroubleCategory(List<Long> treatmentInstanceIds) {
-        List<TreatmentDayitemInstanceDO> dayitemInstanceDOS =  treatmentDayitemInstanceMapper.selectList(TreatmentDayitemInstanceDO::getId, treatmentInstanceIds);
+        List<TreatmentDayitemInstanceDO> dayitemInstanceDOS =  treatmentDayitemInstanceMapper.findGoalAndMotiveItems(treatmentInstanceIds);
+        if (dayitemInstanceDOS == null){
+            return new HashMap<>();
+        }
         Map<Long, List<String>> res = new HashMap();
         for(TreatmentDayitemInstanceDO dayitemInstanceDO : dayitemInstanceDOS){
             JSONObject extAttr = dayitemInstanceDO.getExtAttrObj();
+            if (extAttr == null) {
+                continue;
+            }
             List<String> troubles = (List<String>) extAttr.getOrDefault(USER_TROUBLE_CATEGORIES, new ArrayList<String>());
-            res.put(dayitemInstanceDO.getId(), troubles);
+            res.put(dayitemInstanceDO.getFlowInstanceId(), troubles);
         }
         return res;
     }

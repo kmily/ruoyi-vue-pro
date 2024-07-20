@@ -22,6 +22,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -57,6 +58,9 @@ public class TreatmentController {
 
     @Resource
     private TreatmentDayitemInstanceMapper treatmentDayitemInstanceMapper;
+
+    @Resource
+    private TreatmentStatisticsDataService treatmentStatisticsDataService;
 
 
     @PostMapping("/{code}")
@@ -248,5 +252,16 @@ public class TreatmentController {
             throw exception(MEMBER_GROUP_NOT_SETTINGS);
         }
         return success(dictDataApi.getDictDataLabel("flow_rule",extDTO.getTestGroup()));
+    }
+
+    @GetMapping("/demoTest")
+    @Operation(summary = "demoTest")
+    public CommonResult<Map> demoTest() {
+        List<Long> ids = new ArrayList<>();
+        ids.add(120L);
+        ids.add(121L);
+        ids.add(131L);
+        Map result = treatmentStatisticsDataService.queryPsycoTroubleCategory(ids);
+        return success(result);
     }
 }
