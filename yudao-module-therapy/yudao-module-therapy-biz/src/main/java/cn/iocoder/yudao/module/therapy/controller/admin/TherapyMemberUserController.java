@@ -52,7 +52,7 @@ public class TherapyMemberUserController {
     @PostMapping("/set-appointment-time")
     @Operation(summary = "设置预约时间")
     public CommonResult<Boolean> setAppointmentTime(@RequestBody @Valid AdminSetAppointmentTimeVO reqVO) {
-        treatmentService.setAppointmentTime(reqVO.getUserId(),reqVO);
+        treatmentService.setAppointmentTime(reqVO.getUserId(), reqVO);
         return success(true);
     }
 
@@ -68,10 +68,16 @@ public class TherapyMemberUserController {
         //处理患者最新的治疗流程返显
         List<Long> userIds = pageResult.getList().stream().map(p -> p.getId()).collect(Collectors.toList());
         Map<Long, TreatmentInstanceDO> map = treatmentStatisticsDataService.queryLatestTreatmentInstanceId(userIds);
-        Map<Long, List<String>> map1 = treatmentStatisticsDataService.queryPsycoTroubleCategory(userIds);
+
+        Map<Long, List<String>> map1 = null;
+        if (map.size() > 0) {
+            List<Long> instanceIds = map.values().stream().map(p -> p.getId()).collect(Collectors.toList());
+            map1 = treatmentStatisticsDataService.queryPsycoTroubleCategory(instanceIds);
+        }
+
         //处理扩展信息
-        List<MemberUserExtDTO> extDOS=memberUserApi.getUserExtInfoList(userIds);
-        Map<Long,MemberUserExtDTO> map2= CollectionUtils.convertMap(extDOS,MemberUserExtDTO::getUserId);
+        List<MemberUserExtDTO> extDOS = memberUserApi.getUserExtInfoList(userIds);
+        Map<Long, MemberUserExtDTO> map2 = CollectionUtils.convertMap(extDOS, MemberUserExtDTO::getUserId);
 
         PageResult<UserRespVO> res = SurveyConvert.INSTANCE.convertUserDTOPage(pageResult);
         for (UserRespVO item : res.getList()) {
@@ -79,10 +85,11 @@ public class TherapyMemberUserController {
                 TreatmentInstanceDO instanceDO = map.get(item.getId());
                 item.setInstanceState(instanceDO.getStatus());
                 item.setTreatmentInstanceId(instanceDO.getId());
+                if (map1 != null && map1.containsKey(instanceDO.getId())) {
+                    item.setLlm(map1.get(instanceDO.getId()));
+                }
             }
-            if (map1 != null && map1.containsKey(item.getId())) {
-                item.setLlm(map1.get(item.getId()));
-            }
+
             if (map2 != null && map2.containsKey(item.getId())) {
                 item.setAppointmentDate(map2.get(item.getId()).getAppointmentDate());
                 item.setAppointmentTimeRange(map2.get(item.getId()).getAppointmentTimeRange());
