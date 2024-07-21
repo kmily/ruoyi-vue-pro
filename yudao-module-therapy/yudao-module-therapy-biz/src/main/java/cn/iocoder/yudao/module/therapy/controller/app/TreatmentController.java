@@ -153,7 +153,9 @@ public class TreatmentController {
         Long treatmentInstanceId = 0L;
         Map data = taskFlowService.getNext(userId, treatmentInstanceId, dayitem_instance_id);
         DayitemNextStepRespVO result = DayitemNextStepConvert.convert(data);
-        treatmentChatHistoryService.addTaskChatHistory(userId, treatmentInstanceId, dayitem_instance_id, result, true);
+        if(!result.getStep_type().equals("SYS_INFO")){
+            treatmentChatHistoryService.addTaskChatHistory(userId, treatmentInstanceId, dayitem_instance_id, result, true);
+        }
         return success(result);
     }
 
