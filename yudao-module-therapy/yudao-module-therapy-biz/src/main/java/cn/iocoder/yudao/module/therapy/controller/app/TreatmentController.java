@@ -90,12 +90,20 @@ public class TreatmentController {
         return success(resp);
     }
 
+    private String getUserName(Long userId){
+        String userName = memberUserApi.getUser(userId).getNickname();
+        if(userName == null || userName.isEmpty()){
+            userName =  memberUserApi.getUser(userId).getName();
+        }
+        return userName;
+    }
 
     @PostMapping("/{code}/{id}/next")
     @Operation(summary = "获取用户治疗下一项内容")
     @PreAuthenticated
     public CommonResult<TreatmentNextVO> getNext(@PathVariable("code") String code, @PathVariable("id") Long treatmentInstanceId) {
         Long userId = getLoginUserId();
+        String userName = getUserName(userId);
         TreatmentNextVO insertedNextVO = treatmentService.getInsertedNextVO(userId, treatmentInstanceId);
         if(insertedNextVO == null){
             TreatmentStepItem userCurrentStep = dayTaskEngine.getCurrentStep(treatmentInstanceId);
@@ -105,7 +113,7 @@ public class TreatmentController {
             }else{
                 stepItem = dayTaskEngine.getNextStepItemResult(userCurrentStep, false);
             }
-            TreatmentNextVO data = treatmentUserProgressService.convertStepItemToRespFormat(stepItem);
+            TreatmentNextVO data = treatmentUserProgressService.convertStepItemToRespFormat(stepItem, userName);
             treatmentUserProgressService.updateUserProgress(stepItem);
             treatmentChatHistoryService.addChatHistory(userId, treatmentInstanceId, data, true);
             return success(data);
@@ -150,9 +158,10 @@ public class TreatmentController {
     @PreAuthenticated
     public CommonResult<DayitemNextStepRespVO> subTaskGetNext(@PathVariable("dayitem_instance_id") Long dayitem_instance_id) {
         Long userId = getLoginUserId();
+        String userName = getUserName(userId);
         Long treatmentInstanceId = 0L;
         Map data = taskFlowService.getNext(userId, treatmentInstanceId, dayitem_instance_id);
-        DayitemNextStepRespVO result = DayitemNextStepConvert.convert(data);
+        DayitemNextStepRespVO result = DayitemNextStepConvert.convert(data, userName);
         if(!result.getStep_type().equals("SYS_INFO")){
             treatmentChatHistoryService.addTaskChatHistory(userId, treatmentInstanceId, dayitem_instance_id, result, true);
         }
@@ -226,7 +235,7 @@ public class TreatmentController {
         Long userId = getLoginUserId();
         BaseFlow flow = taskFlowService.getTaskFlow(userId, dayitem_instance_id);
         Map data = flow.fireEvent(dayitem_instance_id, eventName);
-        DayitemNextStepRespVO result = DayitemNextStepConvert.convert(data);
+        DayitemNextStepRespVO result = DayitemNextStepConvert.convert(data, getUserName(userId));
         return success(result);
     }
 

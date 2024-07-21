@@ -8,9 +8,9 @@ import cn.iocoder.yudao.module.therapy.service.common.TreatmentStepItem;
 public interface TreatmentUserProgressService {
     TreatmentStepItem getTreatmentUserProgress(Long userId, Long treatmentInstanceId);
 
-    TreatmentNextVO convertStepItemToRespFormat(TreatmentStepItem stepItem);
+    TreatmentNextVO convertStepItemToRespFormat(TreatmentStepItem stepItem, String userName);
 
-    StepItemVO convertDayitemInstanceToMap(TreatmentDayitemInstanceDO dayitemInstanceDO);
+    StepItemVO convertDayitemInstanceToMap(TreatmentDayitemInstanceDO dayitemInstanceDO, String userName);
 
     void updateUserProgress(TreatmentStepItem stepItem);
 

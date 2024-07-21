@@ -64,7 +64,7 @@ public class TreatmentUserProgressServiceImpl implements  TreatmentUserProgressS
         return stepItem;
     }
 
-    public StepItemVO convertDayitemInstanceToMap(TreatmentDayitemInstanceDO dayitemInstanceDO) {
+    public StepItemVO convertDayitemInstanceToMap(TreatmentDayitemInstanceDO dayitemInstanceDO, String userName) {
         StepItemVO data = new StepItemVO();
         TreatmentFlowDayitemDO flowDayitemDO = treatmentFlowDayitemMapper.selectById(dayitemInstanceDO.getDayitemId());
         data.setId(dayitemInstanceDO.getId());
@@ -73,7 +73,8 @@ public class TreatmentUserProgressServiceImpl implements  TreatmentUserProgressS
         data.setDayitem_id(dayitemInstanceDO.getDayitemId());
         data.setSettings(flowDayitemDO.getSettingsObj());
         if(flowDayitemDO.getItemType().equals(TaskType.GUIDE_LANGUAGE.getCode())){
-            data.getSettings().put("content", flowDayitemDO.getSettingsObj().getOrDefault("text", ""));
+            String content = ((String) flowDayitemDO.getSettingsObj().getOrDefault("text", "")).replace("用户昵称", userName);
+            data.getSettings().put("content", content);
         }
         return data;
     }
@@ -105,7 +106,7 @@ public class TreatmentUserProgressServiceImpl implements  TreatmentUserProgressS
     }
 
     @Override
-    public TreatmentNextVO convertStepItemToRespFormat(TreatmentStepItem stepItem) {
+    public TreatmentNextVO convertStepItemToRespFormat(TreatmentStepItem stepItem, String userName) {
         TreatmentNextVO data = new TreatmentNextVO();
         data.setProcess_status(stepItem.getProcessStatus().toString());
         if(!stepItem.getProcessStatus().equals(TreatmentStepItem.ProcessStatus.IS_NEXT)){
@@ -117,13 +118,13 @@ public class TreatmentUserProgressServiceImpl implements  TreatmentUserProgressS
                 data.setStep_item_type("LIST");
                 List<StepItemVO> stepItemVOS = new ArrayList<>();
                 for(TreatmentDayitemInstanceDO dayitemInstanceDO : stepItem.getDay_items()){
-                    StepItemVO respItem = convertDayitemInstanceToMap(dayitemInstanceDO);
+                    StepItemVO respItem = convertDayitemInstanceToMap(dayitemInstanceDO, userName);
                     stepItemVOS.add(respItem);
                 }
                 data.setStep_items(stepItemVOS);
             }else{
                 data.setStep_item_type("SINGLE");
-                StepItemVO stepItemVO = convertDayitemInstanceToMap(stepItem.getDay_items().get(0));
+                StepItemVO stepItemVO = convertDayitemInstanceToMap(stepItem.getDay_items().get(0), userName);
                 data.setStep_item(stepItemVO);
             }
         }
