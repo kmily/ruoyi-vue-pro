@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.Map;
 
 import static cn.iocoder.boot.module.therapy.enums.TaskType.*;
@@ -282,6 +283,9 @@ public class TaskFlowServiceImpl implements TaskFlowService, ExecutionListener {
         if(dayitemInstanceDO.getTaskInstanceId().isEmpty()){
             dayitemInstanceDO.setTaskInstanceId(container.getProcessInstanceId());
             treatmentDayitemInstanceMapper.updateById(dayitemInstanceDO);
+        }
+        if(container.getHistoricProcessInstance() != null){
+            return taskFlow.endResult(container);
         }
         if(taskFlow.prerequisiteReady(container)){
             return taskFlow.run(container);
