@@ -91,7 +91,7 @@ public abstract class BaseFlow {
         return result;
     }
 
-    public Map qendResult(Container container){
+    public Map endResult(Container container){
         HashMap result = new HashMap();
         HistoricProcessInstance hProcess = container.getHistoricProcessInstance();
         Map<String, Object> pVariables = new HashMap<>();
