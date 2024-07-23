@@ -124,6 +124,16 @@ public class TreatmentController {
 
     }
 
+    @PostMapping("/{code}/{id}/complete")
+    @Operation(summary = "强制完成当前治疗流程")
+    @PreAuthenticated
+    public CommonResult<String> completeTreatment(@PathVariable("code") String code, @PathVariable("id") Long treatmentInstanceId) {
+        Long userId = getLoginUserId();
+//        String userName = getUserName(userId);
+        treatmentService.completeTreatmentInstance(userId, treatmentInstanceId);
+        return success("SUCCESS");
+    }
+
     @GetMapping("/{code}/{id}/chat-history")
     @Operation(summary = "获取用户治疗的聊天记录-主聊天页面")
     @PreAuthenticated

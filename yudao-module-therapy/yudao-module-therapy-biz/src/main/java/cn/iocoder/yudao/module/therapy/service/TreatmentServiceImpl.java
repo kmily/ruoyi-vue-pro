@@ -357,7 +357,7 @@ public class TreatmentServiceImpl implements TreatmentService {
     @Override
     public void cancelTreatmentInstance(Long flowInstanceId){
         TreatmentInstanceDO instanceDO = treatmentInstanceMapper.selectById(flowInstanceId);
-        instanceDO.setStatus(TreatmentInstanceDO.TreatmentStatus.CANCELLED.getValue());
+        instanceDO.setStatus(TreatmentInstanceDO.TreatmentStatus.COMPLETED.getValue());
         treatmentInstanceMapper.updateById(instanceDO);
     }
 
@@ -422,4 +422,11 @@ public class TreatmentServiceImpl implements TreatmentService {
         }
         tTMainInsertedStepMapper.insert(insertedStepDO);
     }
+
+    public void completeTreatmentInstance(Long userId, Long treatmentInstanceId){
+        TreatmentInstanceDO instanceDO = treatmentInstanceMapper.selectById(treatmentInstanceId);
+        instanceDO.setStatus(TreatmentInstanceDO.TreatmentStatus.COMPLETED.getValue());
+        treatmentInstanceMapper.updateById(instanceDO);
+    }
+
 }

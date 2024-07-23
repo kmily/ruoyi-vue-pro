@@ -28,7 +28,7 @@
       {"step_type": "do_you_agree", "step_data": {"content":  "也许你现在还很难明确自己的问题，你希望先尝试治疗，跟随我们的治疗进程渐渐发现自己想要改变或解决的问题吗？", "confirm":  "愿意", "cancel":  "不愿意", "variable": "try_treatment_confirm_result"}}
     ],
     "dont_try": [
-      {"step_type": "guide_language", "step_data": {"content":  "选择不愿意则输出：□：或许你现在还没有做好接受治疗的准备，没有关系，我们可以慢慢来，在你希望得到改变的时候，我会一直在这里等你。"}}
+      {"step_type": "guide_language", "step_data": {"content":  "或许你现在还没有做好接受治疗的准备，没有关系，我们可以慢慢来，在你希望得到改变的时候，我会一直在这里等你。"}}
     ],
     "set_goals":[
       {"step_type": "guide_language", "step_data": {"content":  "在识别出首要问题后，我们的下一步是设定与首要问题相关的治疗目标。如果某个问题是你生活中不顺利的事情，就可以把它对应的目标设置为能帮助你解决这个问题的内容。确定问题和目标是很重要的，因为目标能帮助我们找到解决或改变问题的方法，并激励我们采取行动！"}},
@@ -67,7 +67,10 @@
     {"source": "primary_troubles", "type":  "ExclusiveGate",
       "next_true": "set_goals",
       "next_false": "choose_trouble_category", "variable":  "primary_troubles_is_set"},
-    {"source": "choose_trouble_category", "target": "try_treatment_confirm"},
+    {"source": "choose_trouble_category",  "type":  "ExclusiveGate",
+      "next_false": "try_treatment_confirm",
+      "next_true": "set_goals",
+      "variable":  "is_select_no_troubles"},
     {"source": "try_treatment_confirm", "type":  "ExclusiveGate",
       "next_true": "set_goals",
       "next_false": "dont_try", "variable":  "try_treatment_confirm_result"},

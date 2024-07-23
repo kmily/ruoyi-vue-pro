@@ -135,4 +135,6 @@ public interface TreatmentService {
     void addGuideLanguageStep(Long userId, Long treatmentInstanceId, String content);
     void addGuideLanguageStepTypeUser(Long userId, Long treatmentInstanceId, String content);
 
+    void completeTreatmentInstance(Long userId, Long treatmentInstanceId);
+
 }
