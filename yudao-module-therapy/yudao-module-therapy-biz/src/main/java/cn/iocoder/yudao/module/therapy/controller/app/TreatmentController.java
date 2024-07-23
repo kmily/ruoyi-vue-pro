@@ -285,4 +285,16 @@ public class TreatmentController {
         Map result = treatmentStatisticsDataService.queryPsycoTroubleCategory(ids);
         return success(result);
     }
+
+    @GetMapping("/dayitem/{dayitem_instance_id}/backtoinit")
+    @Operation(summary = "demoTest")
+    public CommonResult<Long> backToInit(@PathVariable("dayitem_instance_id") Long dayitem_instance_id) {
+        Long userId = getLoginUserId();
+        TreatmentDayitemInstanceDO instanceDO = treatmentDayitemInstanceMapper.queryInstance(userId, dayitem_instance_id);
+        instanceDO.setStatus(TreatmentDayitemInstanceDO.StatusEnum.INITIATED.getValue());
+        instanceDO.setTaskInstanceId(null);
+        treatmentChatHistoryService.deleteByDayItemInstanceId(dayitem_instance_id);
+        treatmentDayitemInstanceMapper.updateById(instanceDO);
+        return success(0L);
+    }
 }

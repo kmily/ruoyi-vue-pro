@@ -21,7 +21,7 @@
       }
     ],
     "choose_trouble_category": [
-      {"step_type": "guide_language", "step_data": {"content":  "可能你一时间还想不到自己面临的具体问题是什么，试着看看你是否存在下面这几类问题呢？你可以选择最多10个自己可能存在的问题类型。（以下内容各项以选项形式展示，可分页，每页展示10个，在末页增加“不存在上述问题”选项）"}},
+      {"step_type": "guide_language", "step_data": {"content":  "可能你一时间还想不到自己面临的具体问题是什么，试着看看你是否存在下面这几类问题呢？你可以选择最多10个自己可能存在的问题类型。"}},
       {"step_type": "trouble_category_qst", "step_data": {}}
     ],
     "try_treatment_confirm": [
@@ -68,8 +68,8 @@
       "next_true": "set_goals",
       "next_false": "choose_trouble_category", "variable":  "primary_troubles_is_set"},
     {"source": "choose_trouble_category",  "type":  "ExclusiveGate",
-      "next_false": "try_treatment_confirm",
-      "next_true": "set_goals",
+      "next_false": "set_goals",
+      "next_true": "try_treatment_confirm",
       "variable":  "is_select_no_troubles"},
     {"source": "try_treatment_confirm", "type":  "ExclusiveGate",
       "next_true": "set_goals",
