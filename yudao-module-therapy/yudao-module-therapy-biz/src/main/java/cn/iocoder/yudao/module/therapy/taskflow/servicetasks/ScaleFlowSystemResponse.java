@@ -67,7 +67,7 @@ public class ScaleFlowSystemResponse implements org.flowable.engine.delegate.Jav
         int scoreIsi = getScoreByCode(execution, "isi_scale");
         String content;
         if (scorePh9 >= 5 || scoreGad7 >= 5 || scoreIsi >= 7){
-            content = "经过评估，你目前可能遭遇了一定的心理困扰，让XXX（智能治疗师名称）来和你一起寻找改善的方法吧~";
+            content = "经过评估，你目前可能遭遇了一定的心理困扰，让diudiu来和你一起寻找改善的方法吧~";
             treatmentService.addGuideLanguageStep(dayitemInstanceDO.getUserId(), dayitemInstanceDO.getFlowInstanceId(),
                     content);
             String userContent = "好哒";
