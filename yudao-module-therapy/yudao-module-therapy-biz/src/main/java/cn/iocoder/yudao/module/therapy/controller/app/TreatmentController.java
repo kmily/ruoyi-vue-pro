@@ -22,6 +22,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -58,6 +59,9 @@ public class TreatmentController {
     @Resource
     private TreatmentDayitemInstanceMapper treatmentDayitemInstanceMapper;
 
+    @Resource
+    private TreatmentStatisticsDataService treatmentStatisticsDataService;
+
 
     @PostMapping("/{code}")
     @Operation(summary = "初始化治疗流程")
@@ -86,12 +90,20 @@ public class TreatmentController {
         return success(resp);
     }
 
+    private String getUserName(Long userId){
+        String userName = memberUserApi.getUser(userId).getNickname();
+        if(userName == null || userName.isEmpty()){
+            userName =  memberUserApi.getUser(userId).getName();
+        }
+        return userName;
+    }
 
     @PostMapping("/{code}/{id}/next")
     @Operation(summary = "获取用户治疗下一项内容")
     @PreAuthenticated
     public CommonResult<TreatmentNextVO> getNext(@PathVariable("code") String code, @PathVariable("id") Long treatmentInstanceId) {
         Long userId = getLoginUserId();
+        String userName = getUserName(userId);
         TreatmentNextVO insertedNextVO = treatmentService.getInsertedNextVO(userId, treatmentInstanceId);
         if(insertedNextVO == null){
             TreatmentStepItem userCurrentStep = dayTaskEngine.getCurrentStep(treatmentInstanceId);
@@ -101,7 +113,7 @@ public class TreatmentController {
             }else{
                 stepItem = dayTaskEngine.getNextStepItemResult(userCurrentStep, false);
             }
-            TreatmentNextVO data = treatmentUserProgressService.convertStepItemToRespFormat(stepItem);
+            TreatmentNextVO data = treatmentUserProgressService.convertStepItemToRespFormat(stepItem, userName);
             treatmentUserProgressService.updateUserProgress(stepItem);
             treatmentChatHistoryService.addChatHistory(userId, treatmentInstanceId, data, true);
             return success(data);
@@ -110,6 +122,16 @@ public class TreatmentController {
             return success(insertedNextVO);
         }
 
+    }
+
+    @PostMapping("/{code}/{id}/complete")
+    @Operation(summary = "强制完成当前治疗流程")
+    @PreAuthenticated
+    public CommonResult<String> completeTreatment(@PathVariable("code") String code, @PathVariable("id") Long treatmentInstanceId) {
+        Long userId = getLoginUserId();
+//        String userName = getUserName(userId);
+        treatmentService.completeTreatmentInstance(userId, treatmentInstanceId);
+        return success("SUCCESS");
     }
 
     @GetMapping("/{code}/{id}/chat-history")
@@ -146,10 +168,13 @@ public class TreatmentController {
     @PreAuthenticated
     public CommonResult<DayitemNextStepRespVO> subTaskGetNext(@PathVariable("dayitem_instance_id") Long dayitem_instance_id) {
         Long userId = getLoginUserId();
+        String userName = getUserName(userId);
         Long treatmentInstanceId = 0L;
         Map data = taskFlowService.getNext(userId, treatmentInstanceId, dayitem_instance_id);
-        DayitemNextStepRespVO result = DayitemNextStepConvert.convert(data);
-        treatmentChatHistoryService.addTaskChatHistory(userId, treatmentInstanceId, dayitem_instance_id, result, true);
+        DayitemNextStepRespVO result = DayitemNextStepConvert.convert(data, userName);
+        if(!result.getStep_type().equals("SYS_INFO")){
+            treatmentChatHistoryService.addTaskChatHistory(userId, treatmentInstanceId, dayitem_instance_id, result, true);
+        }
         return success(result);
     }
 
@@ -220,7 +245,7 @@ public class TreatmentController {
         Long userId = getLoginUserId();
         BaseFlow flow = taskFlowService.getTaskFlow(userId, dayitem_instance_id);
         Map data = flow.fireEvent(dayitem_instance_id, eventName);
-        DayitemNextStepRespVO result = DayitemNextStepConvert.convert(data);
+        DayitemNextStepRespVO result = DayitemNextStepConvert.convert(data, getUserName(userId));
         return success(result);
     }
 
@@ -248,5 +273,28 @@ public class TreatmentController {
             throw exception(MEMBER_GROUP_NOT_SETTINGS);
         }
         return success(dictDataApi.getDictDataLabel("flow_rule",extDTO.getTestGroup()));
+    }
+
+    @GetMapping("/demoTest")
+    @Operation(summary = "demoTest")
+    public CommonResult<Map> demoTest() {
+        List<Long> ids = new ArrayList<>();
+        ids.add(120L);
+        ids.add(121L);
+        ids.add(131L);
+        Map result = treatmentStatisticsDataService.queryPsycoTroubleCategory(ids);
+        return success(result);
+    }
+
+    @GetMapping("/dayitem/{dayitem_instance_id}/backtoinit")
+    @Operation(summary = "demoTest")
+    public CommonResult<Long> backToInit(@PathVariable("dayitem_instance_id") Long dayitem_instance_id) {
+        Long userId = getLoginUserId();
+        TreatmentDayitemInstanceDO instanceDO = treatmentDayitemInstanceMapper.queryInstance(userId, dayitem_instance_id);
+        instanceDO.setStatus(TreatmentDayitemInstanceDO.StatusEnum.INITIATED.getValue());
+        instanceDO.setTaskInstanceId(null);
+        treatmentChatHistoryService.deleteByDayItemInstanceId(dayitem_instance_id);
+        treatmentDayitemInstanceMapper.updateById(instanceDO);
+        return success(0L);
     }
 }

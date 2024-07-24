@@ -92,6 +92,11 @@ public class TreatmentChatHistoryServiceImpl implements TreatmentChatHistoryServ
     }
 
     @Override
+    public void deleteByDayItemInstanceId(Long dayItemInstanceId) {
+        treatmentChatHistoryMapper.delete(new LambdaQueryWrapperX<TreatmentChatHistoryDO>().eq(TreatmentChatHistoryDO::getTreatmentDayitemInstanceId, dayItemInstanceId));
+    }
+
+    @Override
     public List<TreatmentChatHistoryDO> queryChatHistory(Long userId, Long treatmentInstanceId) {
         return treatmentChatHistoryMapper.queryChatHistory(userId, treatmentInstanceId);
     }

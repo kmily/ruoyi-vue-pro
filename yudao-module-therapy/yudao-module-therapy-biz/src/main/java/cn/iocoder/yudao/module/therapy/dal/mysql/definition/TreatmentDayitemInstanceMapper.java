@@ -75,6 +75,18 @@ public interface TreatmentDayitemInstanceMapper extends BaseMapperX<TreatmentDay
                                                               @Param("taskType") Integer taskType,
                                                               @Param("flowCode") String flowCode);
 
+    @Select({
+            "<script>",
+            "select i.* from hlgyy_treatment_dayitem_instance i",
+            "inner join hlgyy_treatment_flow_dayitem d on i.dayitem_id = d.id",
+            "where i.flow_instance_id in",
+            "<foreach item='item' index='index' collection='flowInstanceIds' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach>",
+            "and d.type = 3", // TaskType.PROBLEM_GOAL_MOTIVE
+            "</script>"
+    })
+    List<TreatmentDayitemInstanceDO> findGoalAndMotiveItems(@Param("flowInstanceIds") List<Long> flowInstanceIds);
 
     default TreatmentDayitemInstanceDO queryInstance(Long userId, Long dayItemInstanceId){
         LambdaQueryWrapper<TreatmentDayitemInstanceDO> queryWrapper = new LambdaQueryWrapper<>();

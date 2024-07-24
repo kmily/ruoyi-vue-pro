@@ -79,11 +79,11 @@ public class GoalAndMotivationFlow extends BaseFlow{
         Long dayItemInstanceId = (Long) variables.get(DAYITEM_INSTANCE_ID);
         // TODO if user don't agree should cancel all the treatment
         treatmentService.finishDayItemInstance(dayItemInstanceId);
-//        if (!(boolean) variables.get("try_treatment_confirm_result")){
-//            // cancel all the treatment
-//            TreatmentDayitemInstanceDO dayitemInstanceDO = treatmentDayitemInstanceMapper.selectById(dayItemInstanceId);
-//            treatmentService.cancelTreatmentInstance(dayitemInstanceDO.getFlowInstanceId());
-//        }
+        if (!(boolean) variables.getOrDefault("try_treatment_confirm_result", true)){
+            // cancel all the treatment
+            TreatmentDayitemInstanceDO dayitemInstanceDO = treatmentDayitemInstanceMapper.selectById(dayItemInstanceId);
+            treatmentService.cancelTreatmentInstance(dayitemInstanceDO.getFlowInstanceId());
+        }
     }
 
     /**
@@ -201,6 +201,12 @@ public class GoalAndMotivationFlow extends BaseFlow{
         if(troublesCategory == null || troublesCategory.size() == 0 ){
             throw exception(TREATMENT_DAYITEM_STEP_PARAMS_ERROR);
         }
+        boolean is_select_no_troubles = false;
+        if(troublesCategory.size() == 1 && troublesCategory.get(0).equals("没有上述问题")){
+            is_select_no_troubles = true;
+        }
+        RuntimeService runtimeService = processEngine.getRuntimeService();
+        runtimeService.setVariable(container.getProcessInstanceId(), "is_select_no_troubles", is_select_no_troubles);
         dayitemInstanceService.updateDayitemInstanceExtAttr(dayitemInstanceId, USER_TROUBLE_CATEGORIES, troublesCategory);
         surveyService.submitSurveyForFlow(submitReqVO.getStep_data().getSurvey());
     }

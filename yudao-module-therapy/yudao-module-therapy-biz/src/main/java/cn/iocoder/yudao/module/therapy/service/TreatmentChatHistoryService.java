@@ -22,6 +22,8 @@ public interface TreatmentChatHistoryService {
 
     void addTaskUserChatMessage(Long userId, Long treatmentInstanceId, Long treatmentDayitemInstanceId, Object msgObj);
 
+    void deleteByDayItemInstanceId(Long dayItemInstanceId);
+
     List<TreatmentChatHistoryDO> queryTaskChatHistory(Long userId, Long treatmentInstanceId);
 
     List<TreatmentHistoryChatMessageVO> convert(List<TreatmentChatHistoryDO> list);
