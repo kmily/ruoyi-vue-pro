@@ -57,7 +57,7 @@ public class AppAIController {
             dto.setFinished(true);
             dto.setMsg("请输入内容");
 
-            return Flux.just(dto);
+            return Flux.empty();
         }
 
 
