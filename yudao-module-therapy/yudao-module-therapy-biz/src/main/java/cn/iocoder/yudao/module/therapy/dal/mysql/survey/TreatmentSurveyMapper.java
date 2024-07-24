@@ -19,7 +19,7 @@ public interface TreatmentSurveyMapper extends BaseMapperX<TreatmentSurveyDO> {
 
         // 分页查询
         return selectPage(reqVO, new LambdaQueryWrapperX<TreatmentSurveyDO>()
-                .likeIfPresent(TreatmentSurveyDO::getTitle, reqVO.getTitle())
+                .likeIfPresent(TreatmentSurveyDO::getTitle, reqVO.getName())
                 .betweenIfPresent(TreatmentSurveyDO::getCreateTime, reqVO.getCreateTime())
                 .betweenIfPresent(TreatmentSurveyDO::getCreateTime, reqVO.getCreateTime())
                 .eqIfPresent(TreatmentSurveyDO::getSurveyType, reqVO.getSurveyType())
