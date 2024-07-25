@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.therapy.service.common.TreatmentStepItem;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 
 public interface TreatmentService {
@@ -132,8 +133,8 @@ public interface TreatmentService {
     //    void completeDayInstance(TreatmentDayInstanceDO dayInstanceDO);
     TreatmentNextVO getInsertedNextVO(Long userId, Long treatmentInstanceId);
 
-    void addGuideLanguageStep(Long userId, Long treatmentInstanceId, String content);
-    void addGuideLanguageStepTypeUser(Long userId, Long treatmentInstanceId, String content);
+    void addGuideLanguageStep(Long userId, Long treatmentInstanceId, Map guideLanguageSettings);
+    void addGuideLanguageStepTypeUser(Long userId, Long treatmentInstanceId, Map guideLanguageSettings);
 
     void completeTreatmentInstance(Long userId, Long treatmentInstanceId);
 

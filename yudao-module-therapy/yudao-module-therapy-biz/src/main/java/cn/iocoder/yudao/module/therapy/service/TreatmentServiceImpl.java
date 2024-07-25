@@ -259,6 +259,7 @@ public class TreatmentServiceImpl implements TreatmentService {
             throw exception(TREATMENT_FLOW_NOT_EXISTS);
         }
         dayitemDO.setStatus(state);
+        publishFlow(id); // 更新所有子任务的流程图
         treatmentFlowMapper.updateById(dayitemDO);
     }
 
@@ -388,15 +389,15 @@ public class TreatmentServiceImpl implements TreatmentService {
     }
 
 
-    public void addGuideLanguageStep(Long userId, Long treatmentInstanceId, String content){
-        addGuideLanguageStep(userId, treatmentInstanceId, content, false);
+    public void addGuideLanguageStep(Long userId, Long treatmentInstanceId, Map guideLanguageSettings){
+        addGuideLanguageStep(userId, treatmentInstanceId, guideLanguageSettings, false);
     }
 
-    public void addGuideLanguageStepTypeUser(Long userId, Long treatmentInstanceId, String content){
-        addGuideLanguageStep(userId, treatmentInstanceId, content, true);
+    public void addGuideLanguageStepTypeUser(Long userId, Long treatmentInstanceId, Map guideLanguageSettings){
+        addGuideLanguageStep(userId, treatmentInstanceId, guideLanguageSettings, true);
     }
 
-    public void addGuideLanguageStep(Long userId, Long treatmentInstanceId, String content, boolean isUser){
+    public void addGuideLanguageStep(Long userId, Long treatmentInstanceId, Map guideLanguageSettings, boolean isUser){
         Long maxSeq = tTMainInsertedStepMapper.selectCount(new LambdaQueryWrapper<TTMainInsertedStepDO>()
                 .eq(TTMainInsertedStepDO::getUserId, userId)
                 .eq(TTMainInsertedStepDO::getTreatmentInstanceId, treatmentInstanceId)
@@ -408,13 +409,11 @@ public class TreatmentServiceImpl implements TreatmentService {
         insertedStepDO.setSequence(maxSeq.intValue() + 1);
         insertedStepDO.setStatus(TTMainInsertedStepDO.StatusEnum.DEFAULT.getValue());
         HashMap<String, Object> message = new HashMap<String, Object>();
-        HashMap<String, Object> settingsMap = new HashMap<>();
         if(isUser){
-            settingsMap.put("is_user", true);
+            guideLanguageSettings.put("is_user", true);
         }
-        settingsMap.put("content", content);
         message.put("item_type", TaskType.GUIDE_LANGUAGE.getCode());
-        message.put("settings", settingsMap);
+        message.put("settings", guideLanguageSettings);
         try {
             insertedStepDO.setMessage(objectMapper.writeValueAsString(message));
         } catch (JsonProcessingException e) {

@@ -19,6 +19,8 @@ public class TreatmentDayitemDetailDO {
 
     private Long dayInstanceId;
 
+    private Long dayitemId;
+
     private int dayInstanceStatus;
 
     // day item info

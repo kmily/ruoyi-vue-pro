@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -66,17 +67,23 @@ public class ScaleFlowSystemResponse implements org.flowable.engine.delegate.Jav
         int scoreGad7 = getScoreByCode(execution, "gad7_scale");
         int scoreIsi = getScoreByCode(execution, "isi_scale");
         String content;
+        HashMap guideLanguageSettings =  new HashMap<>();
         if (scorePh9 >= 5 || scoreGad7 >= 5 || scoreIsi >= 7){
             content = "经过评估，你目前可能遭遇了一定的心理困扰，让diudiu来和你一起寻找改善的方法吧~";
+            guideLanguageSettings.put("content", content);
+            guideLanguageSettings.put("textChange", true);
+            guideLanguageSettings.put("textSuccess", "好哒");
             treatmentService.addGuideLanguageStep(dayitemInstanceDO.getUserId(), dayitemInstanceDO.getFlowInstanceId(),
-                    content);
-            String userContent = "好哒";
-            treatmentService.addGuideLanguageStepTypeUser(dayitemInstanceDO.getUserId(), dayitemInstanceDO.getFlowInstanceId(),
-                    userContent);
+                    guideLanguageSettings);
+//            {"text":"<p>当你准备好开始时，请告诉我，我们可以一步一步来。如果你在任何时候感到不舒服，也可以随时告诉我?。</p>","textChange":true,"textSuccess":"我准备好啦"}
+//            String userContent = "好哒";
+//            treatmentService.addGuideLanguageStepTypeUser(dayitemInstanceDO.getUserId(), dayitemInstanceDO.getFlowInstanceId(),
+//                    userContent);
         }else{
             content = "经过评估，目前没有发现你存在情绪和睡眠方面的问题，暂时不需要心理健康治疗，请继续保持呀！如果你感觉自己的状态变差，或者想要对自己的心理健康进行监测，可以随时使用哦~";
+            guideLanguageSettings.put("content", content);
             treatmentService.addGuideLanguageStep(dayitemInstanceDO.getUserId(), dayitemInstanceDO.getFlowInstanceId(),
-                    content);
+                    guideLanguageSettings);
         }
     }
 }

@@ -97,16 +97,17 @@ public interface TreatmentFlowDayitemMapper extends BaseMapperX<TreatmentFlowDay
 //    di.id, di.day_id, d.flow_id, d.name, d.sequence, ins.status
     @Select("select d.id as day_id, d.has_break, d.sequence as flow_day_index, d.name as flow_day_name, " +
             " dins.id as day_instance_id, dins.status as day_instance_status, " +
-            " di.type as dayitem_type, ins.id as dayitem_instance_id, " +
+            " di.type as dayitem_type, ins.id as dayitem_instance_id, di.id as dayitem_id, " +
             " ins.create_time, ins.update_time, ins.status as dayitem_instance_status " +
             " from hlgyy_treatment_flow_days   d " +
             " left join hlgyy_treatment_flow_dayitem di " +
-            " on di.day_id = d.id  " +
+            " on di.day_id = d.id and  di.deleted != 1 " +
             " left join hlgyy_treatment_day_instance dins " +
             " on dins.day_id = d.id and dins.flow_instance_id = #{treatmentInstanceId}" +
             " left join hlgyy_treatment_dayitem_instance ins" +
             " on ins.flow_instance_id = #{treatmentInstanceId} and ins.dayitem_id = di.id " +
-            " where d.flow_id = #{treatmentFlowId} order by d.sequence, di.agroup")
+            " where d.flow_id = #{treatmentFlowId} and d.deleted != 1" +
+            " order by d.sequence, di.agroup")
     List<TreatmentDayitemDetailDO> getDayitemDetail(@Param("treatmentInstanceId") Long treatmentInstanceId, @Param("treatmentFlowId") Long treatmentFlowId);
 
 

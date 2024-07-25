@@ -278,3 +278,6 @@ debug: true
 jeecg:
   jmreport:
     saas-mode: tenant
+hlgyy:
+  treatment:
+    main-flowcode: cyr-experimental

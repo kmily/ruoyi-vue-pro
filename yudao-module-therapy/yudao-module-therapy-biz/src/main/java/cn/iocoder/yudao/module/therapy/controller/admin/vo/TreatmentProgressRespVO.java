@@ -13,8 +13,11 @@ public class TreatmentProgressRespVO {
     @Schema(description = "管理后台 - 治疗进度每日进度 Request VO")
     @Data
     public static class DayitemInstanceVO {
-        @Schema(description = "流程子任务ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+        @Schema(description = "流程子任务实例ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Long dayitem_instance_id;
+
+        @Schema(description = "流程子任务ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+        private Long dayitem_id;
 
         @Schema(description = "子任务类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "goal_and_plan")
         private String item_type;

@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSONObject;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -46,6 +47,9 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
 
     @Resource
     private TreatmentFlowMapper treatmentFlowMapper;
+
+    @Value("${hlgyy.treatment.main-flowcode}")
+    private String flowCode;
 
 
 
@@ -111,6 +115,7 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
         dayitemInstanceVO.setStatus(status);
         dayitemInstanceVO.setCreate_time(detailDO.getCreateTime());
         dayitemInstanceVO.setUpdate_time(detailDO.getUpdateTime());
+        dayitemInstanceVO.setDayitem_id(detailDO.getDayitemId());
         return dayitemInstanceVO;
     }
 
@@ -256,7 +261,6 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
     @Override
     public Map<String, Integer> getTreatmentUserCount(String startDate){
         Map<String, Integer> result = new HashMap<>();
-        String flowCode = "main";
         //初步评估数据
         TreatmentFlowDO flowDO = treatmentFlowMapper.selectOne(TreatmentFlowDO::getCode, flowCode);
         TreatmentFlowDayitemDO flowDayitemDO = treatmentFlowDayitemMapper.getPriorEvaluation(flowDO.getId(), TaskType.SCALE.getType());
