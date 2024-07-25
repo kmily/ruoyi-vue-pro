@@ -28,8 +28,7 @@ import java.util.logging.Logger;
 
 import org.flowable.task.api.Task;
 
-import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.TREATMENT_NO_STRATEGY_GAME_FOUND;
-import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.TREATMENT_REQUIRE_GOAL_AND_MOTIVATION;
+import static cn.iocoder.boot.module.therapy.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.therapy.taskflow.Const.DAYITEM_INSTANCE_ID;
 import static cn.iocoder.yudao.module.therapy.taskflow.Const.SURVEY_INSTANCE_ID;
@@ -144,6 +143,9 @@ public class StrategyPracticeFlow extends BaseFlow {
         Map variables = getVariables(container);
         Long survey_id = (Long) variables.get("survey_id");
         TreatmentSurveyDO surveyDO = treatmentSurveyMapper.selectById(survey_id);
+        if(surveyDO.getRelSurveyList() == null || surveyDO.getRelSurveyList().isEmpty()){
+            throw exception(TREATMENT_NO_STRATEGY_SURVEY_FOUND, String.valueOf(survey_id ));
+        }
         TreatmentSurveyDO cardSurvey = treatmentSurveyMapper.selectById(surveyDO.getRelSurveyList().get(0));
         int SOURCE_MAIN = 2;
         Long instance_id = -1L;

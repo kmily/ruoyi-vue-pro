@@ -38,8 +38,8 @@ public interface ErrorCodeConstants {
     ErrorCode TREATMENT_REQUIRE_GOAL_AND_MOTIVATION = new ErrorCode(1_050_001_002, "请先完成目标与动机的填写");
 
     ErrorCode TREATMENT_NO_STRATEGY_GAME_FOUND = new ErrorCode(1_050_001_003, "没有找到对应的策略游戏, TAG={}");
-    ErrorCode TREATMENT_NO_CASE_STUDY_FOUND = new ErrorCode(1_050_001_003, "没有找到对应的案例练习, TAG={}");
-
+    ErrorCode TREATMENT_NO_CASE_STUDY_FOUND = new ErrorCode(1_050_001_004, "没有找到对应的案例练习, TAG={}");
+    ErrorCode TREATMENT_NO_STRATEGY_SURVEY_FOUND = new ErrorCode(1_050_001_005, "没有找到对应的策略问卷, survey_id={}");
     ErrorCode TREATMENT_NO_STRATEGY_CARD_FOUND = new ErrorCode(1_050_001_004, "没有找到策略卡");
 
 }
