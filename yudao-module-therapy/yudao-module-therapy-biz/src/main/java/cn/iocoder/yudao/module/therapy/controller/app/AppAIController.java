@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.therapy.service.dto.SSEMsgDTO;
 import cn.iocoder.yudao.module.therapy.service.enums.RequestSourceEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,6 +49,17 @@ public class AppAIController {
 
     @PostMapping(value = "/automated-thinking", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<SSEMsgDTO> chat(@Valid @RequestBody AutomatedThinkingRequestVO req) {
+
+        if(StringUtils.isBlank(req.getContent())){
+
+            SSEMsgDTO dto = new SSEMsgDTO();
+            dto.setCode(400);
+            dto.setFinished(true);
+            dto.setMsg("请输入内容");
+
+            return Flux.empty();
+        }
+
 
         Long loginUserId = getLoginUserId();
         loginUserId = NumberUtils.toLong(loginUserId,Long.valueOf(req.getConversationId().hashCode()));

@@ -21,7 +21,7 @@ public class SurveyPageReqVO extends PageParam {
      * 调查标题
      */
     @Schema(description = "标题", example = "PHQ9量表")
-    private String title;
+    private String name;
 
     /**
      * 标签,逗号分割
