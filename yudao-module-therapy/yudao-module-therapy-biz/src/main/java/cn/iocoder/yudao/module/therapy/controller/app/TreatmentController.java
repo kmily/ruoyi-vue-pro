@@ -292,7 +292,7 @@ public class TreatmentController {
         Long userId = getLoginUserId();
         TreatmentDayitemInstanceDO instanceDO = treatmentDayitemInstanceMapper.queryInstance(userId, dayitem_instance_id);
         instanceDO.setStatus(TreatmentDayitemInstanceDO.StatusEnum.INITIATED.getValue());
-        instanceDO.setTaskInstanceId(null);
+        instanceDO.setTaskInstanceId("");
         treatmentChatHistoryService.deleteByDayItemInstanceId(dayitem_instance_id);
         treatmentDayitemInstanceMapper.updateById(instanceDO);
         return success(0L);
