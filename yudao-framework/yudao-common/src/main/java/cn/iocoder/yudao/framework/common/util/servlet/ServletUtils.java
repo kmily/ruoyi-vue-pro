@@ -48,10 +48,10 @@ public class ServletUtils {
      */
     public static HttpServletRequest getRequest() {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        if (!(requestAttributes instanceof ServletRequestAttributes)) {
+        if (!(requestAttributes instanceof ServletRequestAttributes reqAttributes)) {
             return null;
         }
-        return ((ServletRequestAttributes) requestAttributes).getRequest();
+        return reqAttributes.getRequest();
     }
 
     public static String getUserAgent() {

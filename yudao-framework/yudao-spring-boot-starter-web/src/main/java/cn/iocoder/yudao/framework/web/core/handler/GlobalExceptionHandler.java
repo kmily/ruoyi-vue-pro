@@ -69,38 +69,38 @@ public class GlobalExceptionHandler {
      * @return 通用返回
      */
     public CommonResult<?> allExceptionHandler(HttpServletRequest request, Throwable ex) {
-        if (ex instanceof MissingServletRequestParameterException) {
-            return missingServletRequestParameterExceptionHandler((MissingServletRequestParameterException) ex);
+        if (ex instanceof MissingServletRequestParameterException exception) {
+            return missingServletRequestParameterExceptionHandler(exception);
         }
-        if (ex instanceof MethodArgumentTypeMismatchException) {
-            return methodArgumentTypeMismatchExceptionHandler((MethodArgumentTypeMismatchException) ex);
+        if (ex instanceof MethodArgumentTypeMismatchException exception) {
+            return methodArgumentTypeMismatchExceptionHandler(exception);
         }
-        if (ex instanceof MethodArgumentNotValidException) {
-            return methodArgumentNotValidExceptionExceptionHandler((MethodArgumentNotValidException) ex);
+        if (ex instanceof MethodArgumentNotValidException exception) {
+            return methodArgumentNotValidExceptionExceptionHandler(exception);
         }
-        if (ex instanceof BindException) {
-            return bindExceptionHandler((BindException) ex);
+        if (ex instanceof BindException exception) {
+            return bindExceptionHandler(exception);
         }
-        if (ex instanceof ConstraintViolationException) {
-            return constraintViolationExceptionHandler((ConstraintViolationException) ex);
+        if (ex instanceof ConstraintViolationException exception) {
+            return constraintViolationExceptionHandler(exception);
         }
-        if (ex instanceof ValidationException) {
-            return validationException((ValidationException) ex);
+        if (ex instanceof ValidationException exception) {
+            return validationException(exception);
         }
-        if (ex instanceof NoHandlerFoundException) {
-            return noHandlerFoundExceptionHandler(request, (NoHandlerFoundException) ex);
+        if (ex instanceof NoHandlerFoundException exception) {
+            return noHandlerFoundExceptionHandler(request, exception);
         }
-        if (ex instanceof NoResourceFoundException) {
-            return noResourceFoundExceptionHandler(request, (NoResourceFoundException) ex);
+        if (ex instanceof NoResourceFoundException exception) {
+            return noResourceFoundExceptionHandler(request, exception);
         }
-        if (ex instanceof HttpRequestMethodNotSupportedException) {
-            return httpRequestMethodNotSupportedExceptionHandler((HttpRequestMethodNotSupportedException) ex);
+        if (ex instanceof HttpRequestMethodNotSupportedException exception) {
+            return httpRequestMethodNotSupportedExceptionHandler(exception);
         }
-        if (ex instanceof ServiceException) {
-            return serviceExceptionHandler((ServiceException) ex);
+        if (ex instanceof ServiceException exception) {
+            return serviceExceptionHandler(exception);
         }
-        if (ex instanceof AccessDeniedException) {
-            return accessDeniedExceptionHandler(request, (AccessDeniedException) ex);
+        if (ex instanceof AccessDeniedException exception) {
+            return accessDeniedExceptionHandler(request, exception);
         }
         return defaultExceptionHandler(request, ex);
     }
