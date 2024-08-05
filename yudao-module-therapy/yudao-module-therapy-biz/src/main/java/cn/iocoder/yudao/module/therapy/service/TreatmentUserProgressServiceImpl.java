@@ -100,6 +100,9 @@ public class TreatmentUserProgressServiceImpl implements  TreatmentUserProgressS
             case TODAY_IS_BREAK_DAY:
                 settings.put("content", "今天是休息日哦~");
                 break;
+            case INVALID:
+                settings.put("content", "无效的任务状态");
+                break;
         }
         sysInfo.setSettings(settings);
         return sysInfo;
@@ -137,6 +140,7 @@ public class TreatmentUserProgressServiceImpl implements  TreatmentUserProgressS
         if(stepItem.getProcessStatus() == TreatmentStepItem.ProcessStatus.TREATMENT_FINISHED) {
             return;
         }
+        //TODO Maybe BUG, add update dayitemInstanceId
         if(progressDO == null){
             progressDO = new TreatmentUserProgressDO();
             progressDO.setUserId(stepItem.getFlowInstance().getUserId());

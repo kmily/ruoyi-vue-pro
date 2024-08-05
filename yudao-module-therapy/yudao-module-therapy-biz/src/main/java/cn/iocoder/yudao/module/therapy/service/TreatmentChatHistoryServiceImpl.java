@@ -127,8 +127,8 @@ public class TreatmentChatHistoryServiceImpl implements TreatmentChatHistoryServ
     }
 
     private boolean isDayItemTask(Map stepItem) {
-        return TaskType.allDayItemTypes().contains(stepItem.get("item_type")) &&
-                !stepItem.get("item_type").equals(TaskType.GUIDE_LANGUAGE.getCode());
+        return TaskType.allDayItemTypes().contains(stepItem.get("item_type"));
+//                && !stepItem.get("item_type").equals(TaskType.GUIDE_LANGUAGE.getCode());
     }
 
 

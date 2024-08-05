@@ -14,6 +14,7 @@ public class TreatmentStepItem {
         CURRENT_STEP_REQUIRES_COMPLETE, // 当前步骤需要完成,请先完成当前步骤
         TREATMENT_FINISHED, // 疗程已经结束
         TODAY_IS_BREAK_DAY, // 今天是休息日
+        INVALID, // 无效
     }
 
 
@@ -24,10 +25,12 @@ public class TreatmentStepItem {
     private boolean isEnd = false;  // 用户是否已经结束整体的流程
     private long Agroup = -1; // 当前组的序号
     private ProcessStatus processStatus = ProcessStatus.IS_NEXT;
+    private TreatmentDayitemInstanceDO lastReturnedDayitemInstanceDO;
 
     // For DayTaskEngine usage only
     private TreatmentFlowDayDO flowDayDO;
     private List<TreatmentFlowDayitemDO> flowDayitemDOs;
+    private List<TreatmentDayitemInstanceDO> flowDayitemInstanceDOs;
     private TreatmentFlowDO treatmentFlowDO;
 
     public static TreatmentStepItem clone(TreatmentStepItem item){

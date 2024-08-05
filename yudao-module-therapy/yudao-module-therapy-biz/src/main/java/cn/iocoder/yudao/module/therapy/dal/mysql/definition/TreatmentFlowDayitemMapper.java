@@ -68,13 +68,27 @@ public interface TreatmentFlowDayitemMapper extends BaseMapperX<TreatmentFlowDay
         }
         Integer nextAgroup = obj.getAgroup();
         queryWrapper = queryWrapper.eq("day_id", dayId).eq("agroup", nextAgroup)
-                .orderByAsc("group_seq");
+                .orderByAsc("id"); // should be ordered by group_seq
+        return selectList(queryWrapper);
+    }
+
+    /**
+     * 获取当天下一组的所有任务
+     * @param dayId
+     * @param agroup
+     * @return
+     */
+    default List<TreatmentFlowDayitemDO> getCurrentGroup(Long dayId, Long agroup) {
+        QueryWrapper<TreatmentFlowDayitemDO> queryWrapper = new QueryWrapper();
+        queryWrapper = queryWrapper.eq("day_id", dayId).eq("agroup", agroup)
+                .orderByAsc("id"); // should be ordered by group_seq
         return selectList(queryWrapper);
     }
 
     default List<TreatmentFlowDayitemDO> selectGroupItems(Long dayId, Long agroup) {
         QueryWrapper<TreatmentFlowDayitemDO> queryWrapper = new QueryWrapper();
-        queryWrapper = queryWrapper.eq("day_id", dayId).eq("agroup", agroup).orderByAsc("group_seq");
+        queryWrapper = queryWrapper.eq("day_id", dayId).eq("agroup", agroup)
+                .orderByAsc("id"); // should be ordered by group_seq
         return selectList(queryWrapper);
     }
 

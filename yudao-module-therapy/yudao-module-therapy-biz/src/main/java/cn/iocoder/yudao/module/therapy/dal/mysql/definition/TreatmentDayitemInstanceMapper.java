@@ -31,7 +31,7 @@ public interface TreatmentDayitemInstanceMapper extends BaseMapperX<TreatmentDay
 
     default List<TreatmentDayitemInstanceDO> selectCurrentItems( List<TreatmentFlowDayitemDO> flowDayitemDOS){
         LambdaQueryWrapper<TreatmentDayitemInstanceDO> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.in(TreatmentDayitemInstanceDO::getId , flowDayitemDOS.stream().map(TreatmentFlowDayitemDO::getId).toArray());
+        queryWrapper.in(TreatmentDayitemInstanceDO::getDayitemId , flowDayitemDOS.stream().map(TreatmentFlowDayitemDO::getId).toArray());
         return selectList(queryWrapper);
     }
 
@@ -93,5 +93,20 @@ public interface TreatmentDayitemInstanceMapper extends BaseMapperX<TreatmentDay
         queryWrapper.eq(TreatmentDayitemInstanceDO::getUserId, userId);
         queryWrapper.eq(TreatmentDayitemInstanceDO::getId, dayItemInstanceId);
         return selectOne(queryWrapper);
+    }
+
+//    default List<TreatmentDayitemInstanceDO> queryInstances( List<Long> dayItemIds){
+//        LambdaQueryWrapper<TreatmentDayitemInstanceDO> queryWrapper = new LambdaQueryWrapper<>();
+//        // TODO whether order matters?
+//        queryWrapper.in(TreatmentDayitemInstanceDO::getDayitemId, dayItemIds);
+//        return selectList(queryWrapper);
+//    }
+
+    default List<TreatmentDayitemInstanceDO> queryInstances(Long treatmentInstanceId, List<Long> dayItemIds){
+        LambdaQueryWrapper<TreatmentDayitemInstanceDO> queryWrapper = new LambdaQueryWrapper<>();
+        // TODO whether order matters?
+        queryWrapper.in(TreatmentDayitemInstanceDO::getDayitemId, dayItemIds);
+        queryWrapper.eq(TreatmentDayitemInstanceDO::getFlowInstanceId, treatmentInstanceId);
+        return selectList(queryWrapper);
     }
 }

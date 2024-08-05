@@ -51,4 +51,6 @@ public class TreatmentUserProgressDO extends BaseDO {
     private Long dayAgroup;
 
     private Long treatmentInstanceId;
+
+//    private Long dayitemInstanceId;
 }

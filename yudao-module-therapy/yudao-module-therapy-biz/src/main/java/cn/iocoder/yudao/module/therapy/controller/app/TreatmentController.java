@@ -145,12 +145,27 @@ public class TreatmentController {
     }
 
     @PostMapping("/{code}/{id}/chat-history")
-    @Operation(summary = "获取用户治疗的聊天记录-主聊天页面")
+    @Operation(summary = "插入用户治疗的聊天记录-主聊天页面")
     @PreAuthenticated
     public CommonResult<Long> addChatHistory(@PathVariable("code") String code,
                                              @PathVariable("id") Long treatmentInstanceId,
                                              @RequestBody Map map) {
-        treatmentChatHistoryService.addUserChatMessage(getLoginUserId(), treatmentInstanceId, map);
+        Long treatmentDayitemInstanceId = Long.valueOf((int) map.getOrDefault("id", 0));
+        if(treatmentDayitemInstanceId !=0 ){
+            TreatmentDayitemInstanceDO treatmentDayitemInstanceDO = treatmentDayitemInstanceMapper.queryInstance(getLoginUserId(), treatmentDayitemInstanceId);
+            treatmentDayitemInstanceDO.setStatus(TreatmentDayitemInstanceDO.StatusEnum.COMPLETED.getValue());
+            treatmentDayitemInstanceMapper.updateById(treatmentDayitemInstanceDO);
+            // insert to chat history
+            TreatmentNextVO insertedNextVO = new TreatmentNextVO();
+            StepItemVO stepItem = new StepItemVO();
+            stepItem.setItem_type("user_input");
+            map.put("content", map.getOrDefault("text", ""));
+            stepItem.setSettings(map);
+            insertedNextVO.setStep_item_type("SINGLE");
+            insertedNextVO.setProcess_status("IS_NEXT");
+            insertedNextVO.setStep_item(stepItem);
+            treatmentChatHistoryService.addUserChatMessage(getLoginUserId(), treatmentInstanceId, insertedNextVO);
+        }
         return success(1L);
     }
 
