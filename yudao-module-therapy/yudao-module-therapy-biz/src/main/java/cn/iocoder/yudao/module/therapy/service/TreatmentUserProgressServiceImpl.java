@@ -100,8 +100,8 @@ public class TreatmentUserProgressServiceImpl implements  TreatmentUserProgressS
             case TODAY_IS_BREAK_DAY:
                 settings.put("content", "今天是休息日哦~");
                 break;
-            case INVALID:
-                settings.put("content", "无效的任务状态");
+            case NOT_NEXT:
+                settings.put("content", "请点击上面的文字按钮继续哦~");
                 break;
         }
         sysInfo.setSettings(settings);

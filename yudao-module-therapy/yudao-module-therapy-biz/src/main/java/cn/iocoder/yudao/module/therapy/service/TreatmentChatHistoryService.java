@@ -27,4 +27,6 @@ public interface TreatmentChatHistoryService {
     List<TreatmentChatHistoryDO> queryTaskChatHistory(Long userId, Long treatmentInstanceId);
 
     List<TreatmentHistoryChatMessageVO> convert(List<TreatmentChatHistoryDO> list);
+
+    void updateRecentConfirmMessageStatus(Long userId, Long treatmentInstanceId);
 }

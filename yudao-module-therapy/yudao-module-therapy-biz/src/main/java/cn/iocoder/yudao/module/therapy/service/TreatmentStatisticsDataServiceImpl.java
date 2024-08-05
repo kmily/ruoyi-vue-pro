@@ -201,7 +201,13 @@ public class TreatmentStatisticsDataServiceImpl implements TreatmentStatisticsDa
             if(dayInstanceVO.isHas_break()){
                 continue; // skip break day
             }
-            TreatmentProgressRespVO.DayitemInstanceVO dayitemInstanceVO = convertToDayItemInstanceVO(detailDO);
+            TreatmentProgressRespVO.DayitemInstanceVO dayitemInstanceVO;
+            try{
+                dayitemInstanceVO = convertToDayItemInstanceVO(detailDO);
+            } catch (Exception e){
+                throw new RuntimeException("detailDO: " + detailDO.toString() + " error: " + e.getMessage()
+                        + "\n 如果是治疗日必须有任务");
+            }
             if(!dayitemInstanceVO.getItem_type().equals(TaskType.GUIDE_LANGUAGE.getCode())){
                 dayInstanceVO.addDayItemInstance(dayitemInstanceVO);
             }

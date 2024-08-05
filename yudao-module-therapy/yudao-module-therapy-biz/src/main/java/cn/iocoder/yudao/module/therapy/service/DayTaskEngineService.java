@@ -111,8 +111,10 @@ public class DayTaskEngineService {
             if(userCurrentStepConfirmed(userCurrentStep)){
                 dayitemDOs = getNextStepItemFromRemainsOfCurrentGroup(userCurrentStep);
             }else{
-                dayitemDOs = treatmentFlowDayitemMapper.getCurrentGroup(dayDO.getId(), userCurrentStep.getAgroup());
-                dayitemDOs =  keepUntilFirstInteractiveTask(userCurrentStep, dayitemDOs);
+//                dayitemDOs = treatmentFlowDayitemMapper.getCurrentGroup(dayDO.getId(), userCurrentStep.getAgroup());
+//                dayitemDOs =  keepUntilFirstInteractiveTask(userCurrentStep, dayitemDOs);
+                userCurrentStep.setProcessStatus(TreatmentStepItem.ProcessStatus.NOT_NEXT);
+                return userCurrentStep;
             }
         }
 

@@ -71,8 +71,8 @@ public class ScaleFlowSystemResponse implements org.flowable.engine.delegate.Jav
         if (scorePh9 >= 5 || scoreGad7 >= 5 || scoreIsi >= 7){
             content = "经过评估，你目前可能遭遇了一定的心理困扰，让diudiu来和你一起寻找改善的方法吧~";
             guideLanguageSettings.put("content", content);
-            guideLanguageSettings.put("textChange", true);
-            guideLanguageSettings.put("textSuccess", "好哒");
+//            guideLanguageSettings.put("textChange", true);
+//            guideLanguageSettings.put("textSuccess", "好哒");
             treatmentService.addGuideLanguageStep(dayitemInstanceDO.getUserId(), dayitemInstanceDO.getFlowInstanceId(),
                     guideLanguageSettings);
 //            {"text":"<p>当你准备好开始时，请告诉我，我们可以一步一步来。如果你在任何时候感到不舒服，也可以随时告诉我?。</p>","textChange":true,"textSuccess":"我准备好啦"}

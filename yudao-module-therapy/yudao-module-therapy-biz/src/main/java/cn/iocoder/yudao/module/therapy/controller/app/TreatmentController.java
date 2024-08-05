@@ -150,8 +150,12 @@ public class TreatmentController {
     public CommonResult<Long> addChatHistory(@PathVariable("code") String code,
                                              @PathVariable("id") Long treatmentInstanceId,
                                              @RequestBody Map map) {
-        Long treatmentDayitemInstanceId = Long.valueOf((int) map.getOrDefault("id", 0));
-        if(treatmentDayitemInstanceId !=0 ){
+        Long treatmentDayitemInstanceId = null;
+        if(map.get("id") != null){
+            treatmentDayitemInstanceId = Long.valueOf((int) map.getOrDefault("id", 0));
+        }
+
+        if(treatmentDayitemInstanceId !=null && treatmentDayitemInstanceId !=0 ){
             TreatmentDayitemInstanceDO treatmentDayitemInstanceDO = treatmentDayitemInstanceMapper.queryInstance(getLoginUserId(), treatmentDayitemInstanceId);
             treatmentDayitemInstanceDO.setStatus(TreatmentDayitemInstanceDO.StatusEnum.COMPLETED.getValue());
             treatmentDayitemInstanceMapper.updateById(treatmentDayitemInstanceDO);
@@ -165,6 +169,8 @@ public class TreatmentController {
             insertedNextVO.setProcess_status("IS_NEXT");
             insertedNextVO.setStep_item(stepItem);
             treatmentChatHistoryService.addUserChatMessage(getLoginUserId(), treatmentInstanceId, insertedNextVO);
+        }else{
+//            treatmentChatHistoryService.updateRecentConfirmMessageStatus(getLoginUserId(), treatmentInstanceId);
         }
         return success(1L);
     }

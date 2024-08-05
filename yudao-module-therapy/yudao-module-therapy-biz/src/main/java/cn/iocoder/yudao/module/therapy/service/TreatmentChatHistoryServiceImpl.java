@@ -127,6 +127,11 @@ public class TreatmentChatHistoryServiceImpl implements TreatmentChatHistoryServ
     }
 
     private boolean isDayItemTask(Map stepItem) {
+        if(stepItem.get("item_type").equals(TaskType.GUIDE_LANGUAGE.getCode())){
+            if(stepItem.get("id") == null){
+                return false;
+            }
+        }
         return TaskType.allDayItemTypes().contains(stepItem.get("item_type"));
 //                && !stepItem.get("item_type").equals(TaskType.GUIDE_LANGUAGE.getCode());
     }
@@ -148,6 +153,9 @@ public class TreatmentChatHistoryServiceImpl implements TreatmentChatHistoryServ
             if(msgObj != null) {
                 if(msgObj.get("step_item_type").equals("SINGLE")){
                     Map stepItem = (Map) msgObj.get("step_item");
+                    if(stepItem.get("id") == null){
+                        return msgObj;
+                    }
                     stepItem.put("status",
                             instancesStatus.getOrDefault(
                                     Long.valueOf(stepItem.getOrDefault("id", "0").toString()),
@@ -158,6 +166,9 @@ public class TreatmentChatHistoryServiceImpl implements TreatmentChatHistoryServ
                     //List
                     List<Map> stepItems = (List<Map>) msgObj.get("step_items");
                     for(Map stepItem : stepItems){
+                        if(stepItem.get("id") == null){
+                            continue;
+                        }
                         stepItem.put("status",
                                 instancesStatus.getOrDefault(
                                         Long.valueOf(stepItem.getOrDefault("id", "0").toString()),
@@ -221,5 +232,29 @@ public class TreatmentChatHistoryServiceImpl implements TreatmentChatHistoryServ
                             fromValue(dayitemInstanceDO.getStatus()));
         }
         return result;
+    }
+
+    public void updateRecentConfirmMessageStatus(Long userId, Long treatmentInstanceId){
+        TreatmentChatHistoryDO historyDO = treatmentChatHistoryMapper.selectOne(
+                lambda(TreatmentChatHistoryDO.class)
+                        .eq(TreatmentChatHistoryDO::getUserId, userId)
+                        .eq(TreatmentChatHistoryDO::getTreatmentInstanceId, treatmentInstanceId)
+                        .eq(TreatmentChatHistoryDO::getTreatmentDayitemInstanceId, MAIN_TREATMENT_DAYITEM_INSTANCE_ID)
+                        .orderByDesc(TreatmentChatHistoryDO::getId).last("limit 1")
+        );
+        Map msg = historyDO.getMessageObj();
+        Map stepItem = (Map) msg.get("step_item");
+        if(msg.get("step_item_type").equals("SINGLE")){
+            String itemType = stepItem.get("item_type").toString();
+            if(itemType.equals(TaskType.GUIDE_LANGUAGE.getCode())){
+                Map settings = (Map) stepItem.get("settings");
+                if((boolean) settings.getOrDefault("textChange", false)){
+                    stepItem.put("status", TreatmentDayitemInstanceDO.StatusEnum.COMPLETED.getValue());
+                }
+            }
+        }
+        msg.put("step_item", stepItem);
+        historyDO.setMessage(objToString(msg));
+        treatmentChatHistoryMapper.updateById(historyDO);
     }
 }

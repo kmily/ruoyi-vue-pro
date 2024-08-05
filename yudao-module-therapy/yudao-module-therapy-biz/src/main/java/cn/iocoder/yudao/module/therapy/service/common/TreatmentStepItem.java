@@ -14,7 +14,7 @@ public class TreatmentStepItem {
         CURRENT_STEP_REQUIRES_COMPLETE, // 当前步骤需要完成,请先完成当前步骤
         TREATMENT_FINISHED, // 疗程已经结束
         TODAY_IS_BREAK_DAY, // 今天是休息日
-        INVALID, // 无效
+        NOT_NEXT, // 无效
     }
 
 
