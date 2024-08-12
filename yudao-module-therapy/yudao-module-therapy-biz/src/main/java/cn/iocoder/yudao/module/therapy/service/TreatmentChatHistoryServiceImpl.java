@@ -34,6 +34,21 @@ public class TreatmentChatHistoryServiceImpl implements TreatmentChatHistoryServ
     @Resource
     private TreatmentDayitemInstanceMapper treatmentDayitemInstanceMapper;
 
+
+    public boolean chatHistoryAlreadyExists(TreatmentChatHistoryDO treatmentChatHistoryDO){
+        List<TreatmentChatHistoryDO> ins = treatmentChatHistoryMapper.selectList(new LambdaQueryWrapper<TreatmentChatHistoryDO>()
+                .eq(TreatmentChatHistoryDO::getUserId, treatmentChatHistoryDO.getUserId())
+                .eq(TreatmentChatHistoryDO::getTreatmentInstanceId, treatmentChatHistoryDO.getTreatmentInstanceId())
+                .eq(TreatmentChatHistoryDO::getTreatmentDayitemInstanceId, treatmentChatHistoryDO.getTreatmentDayitemInstanceId())
+                .eq(TreatmentChatHistoryDO::getMessage, treatmentChatHistoryDO.getMessage())
+                .orderByAsc(TreatmentChatHistoryDO::getId)
+        );
+        if(ins.size() == 0){
+            return false;
+        }
+        return ins.get(ins.size() - 1).getMessage().equals(treatmentChatHistoryDO.getMessage());
+    }
+
     @Override
     public void addChatHistory(Long userId, Long treatmentInstanceId, TreatmentNextVO nextVO, boolean isSystem) {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -118,7 +133,9 @@ public class TreatmentChatHistoryServiceImpl implements TreatmentChatHistoryServ
         treatmentChatHistoryDO.setMessage(jsonString);
         treatmentChatHistoryDO.setSystem(isSystem);
         treatmentChatHistoryDO.setTreatmentDayitemInstanceId(treatmentDayitemInstanceId);
-        treatmentChatHistoryMapper.insert(treatmentChatHistoryDO);
+        if(!chatHistoryAlreadyExists(treatmentChatHistoryDO)){
+            treatmentChatHistoryMapper.insert(treatmentChatHistoryDO);
+        }
     }
 
     @Override
