@@ -9,8 +9,8 @@ import lombok.*;
 @ToString(callSuper = true)
 public class PayAppCreateReqVO extends PayAppBaseVO {
 
-    @Schema(description = "应用编码", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")
-    @NotNull(message = "应用编码不能为空")
+    @Schema(description = "应用标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")
+    @NotNull(message = "应用标识不能为空")
     private String appKey;
 
 }

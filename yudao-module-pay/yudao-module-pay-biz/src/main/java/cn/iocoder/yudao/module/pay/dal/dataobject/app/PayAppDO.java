@@ -32,7 +32,7 @@ public class PayAppDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 应用编码
+     * 应用标识
      */
     private String appKey;
     /**

@@ -19,9 +19,9 @@ import java.time.Duration;
 public class TradeOrderProperties {
 
     /**
-     * 应用编码
+     * 应用标识
      */
-    @NotNull(message = "应用编码不能为空")
+    @NotNull(message = "应用标识不能为空")
     private String appKey;
 
     /**
