@@ -107,7 +107,7 @@ public interface PayAppService {
      * <p>
      * 如果不合法，抛出 {@link ServiceException} 业务异常
      *
-     * @param appKey 应用编号
+     * @param appKey 应用标识
      * @return 应用
      */
     PayAppDO validPayApp(String appKey);
