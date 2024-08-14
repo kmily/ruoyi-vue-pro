@@ -19,10 +19,10 @@ import java.time.Duration;
 public class TradeOrderProperties {
 
     /**
-     * 应用编号
+     * 应用编码
      */
-    @NotNull(message = "应用编号不能为空")
-    private Long appId;
+    @NotNull(message = "应用编码不能为空")
+    private String appKey;
 
     /**
      * 支付超时时间

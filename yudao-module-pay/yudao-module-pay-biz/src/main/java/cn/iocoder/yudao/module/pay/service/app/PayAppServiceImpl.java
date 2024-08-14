@@ -11,11 +11,11 @@ import cn.iocoder.yudao.module.pay.dal.mysql.app.PayAppMapper;
 import cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 
@@ -43,6 +43,10 @@ public class PayAppServiceImpl implements PayAppService {
 
     @Override
     public Long createApp(PayAppCreateReqVO createReqVO) {
+        // 验证appKey是否重复
+        if (appMapper.selectCount(PayAppDO::getAppKey, createReqVO.getAppKey()) > 0) {
+            throw exception(APP_KEY_EXISTS);
+        }
         // 插入
         PayAppDO app = PayAppConvert.INSTANCE.convert(createReqVO);
         appMapper.insert(app);
@@ -56,6 +60,8 @@ public class PayAppServiceImpl implements PayAppService {
         validateAppExists(updateReqVO.getId());
         // 更新
         PayAppDO updateObj = PayAppConvert.INSTANCE.convert(updateReqVO);
+        // 不能更新appKey属性
+        updateObj.setAppKey(null);
         appMapper.updateById(updateObj);
     }
 
@@ -101,7 +107,7 @@ public class PayAppServiceImpl implements PayAppService {
 
     @Override
     public List<PayAppDO> getAppList() {
-         return appMapper.selectList();
+        return appMapper.selectList();
     }
 
     @Override
@@ -110,8 +116,20 @@ public class PayAppServiceImpl implements PayAppService {
     }
 
     @Override
-    public PayAppDO validPayApp(Long id) {
-        PayAppDO app = appMapper.selectById(id);
+    public PayAppDO validPayApp(Long appId) {
+        PayAppDO app = appMapper.selectById(appId);
+        // 校验支付应用数据是否存在以及可用
+        return validatePayAppDO(app);
+    }
+
+    @Override
+    public PayAppDO validPayApp(String appKey) {
+        PayAppDO app = appMapper.selectByAppKey(appKey);
+        // 校验支付应用数据是否存在以及可用
+        return validatePayAppDO(app);
+    }
+
+    private static PayAppDO validatePayAppDO(PayAppDO app) {
         // 校验是否存在
         if (app == null) {
             throw exception(ErrorCodeConstants.APP_NOT_FOUND);
