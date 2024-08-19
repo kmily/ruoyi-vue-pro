@@ -3,7 +3,7 @@
     "start": [ {"step_type": "START"}],
     "steps": [
       {"step_type": "guide_language", "step_data": {"content":  "现在我们已经了解到，想法是让我们在某些情境下产生情绪的关键环节。让我们来试试看，是什么样的想法影响了你的情绪吧！"}},
-      {"step_type": "guide_language", "step_data": {"content":  "你可以选择使用工作表来自主填写，或者由我们的小助理（大语言模型接口）来帮助你一起寻找。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "你可以选择使用工作表来自主填写，或者由我们的小助理biubiu来帮助你一起寻找。"}},
       {"step_type": "recognize_methods_qst", "step_data": {}}
     ],
     "llm": [

@@ -2,18 +2,24 @@
   "group_nodes": {
     "start": [ {"step_type": "START"}],
     "steps": [
-      {"step_type": "guide_language", "step_data": {"content":  "在寻找改善情绪的方法前，知道我们正在经历的到底是什么样的情绪是重要的。"}},
-      {"step_type": "guide_language", "step_data": {"content":  "生活中有许多描述情绪的词语：开心、伤心、愤怒等等，你是否停下来仔细思考过他们的含义呢？在体验到这种情绪的时候，你的感受是什么样的呢？"}},
-      {"step_type": "guide_language", "step_data": {"content":  "“平静”、“快乐”、“坚定”、“愤怒”、“悲伤”、“恐惧”是我们常见的六种基本情绪，但有时，我们的情感体验是更细腻和复杂的，只用这些词语来形容我们的情绪是远远不足的。"}},
-      {"step_type": "guide_language", "step_data": {"content":  "下面的“情绪轮盘”或许是一个能够帮助你命名自己当下情绪体验的工具，想想这些情绪你是否都经历过呢？在经历它们的时候你有什么样的体会？你还经历过什么样的情绪呢？"}},
+      {"step_type": "guide_language", "step_data": {"content":  "在寻找改善情绪的方法前，首先要知道我们到底在经历什么样的情绪\uD83D\uDCAD。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "生活中有很多描述情绪的词：开心、伤心、愤怒等等。你有没有停下来仔细想过它们的含义？当你体验到这些情绪时，你的感受是什么样的呢？\uD83E\uDD14"}},
+      {"step_type": "guide_language", "step_data": {"content":  "“平静”、“快乐”、“坚定”、“愤怒”、“悲伤”、“恐惧”是最常见的六种基本情绪。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "但有时候，我们的情感体验更细腻、复杂，光用这些词来形容我们的情绪可能还不够\uD83C\uDFA8。"}},
+      {"step_type": "guide_language", "step_data": {"content":"下面的“情绪轮盘”是一个可以帮助你命名当下情绪的工具。"}},
+      {"step_type": "guide_language", "step_data": {"content":"想想这些情绪你都经历过吗？在经历它们时你有什么样的体会？你还体验过哪些其他的情绪呢？\uD83D\uDD0D"}},
       {"step_type": "mood_categories", "step_data": {}, "submit":  false},
-      {"step_type": "guide_language", "step_data": {"content":"想象一下，如果你从未体验到情绪，你的生活会是什么样的?如果你从未感受到高兴、伤心、生气、害怕或担忧，你的生活会更容易或更艰难一些吗?你觉得会有什么不同?"}},
-      {"step_type": "guide_language", "step_data": {"content":"也许你会认为，如果能更少感到生气、害怕或者担忧，将是一件不错的事。"}},
-      {"step_type": "guide_language", "step_data": {"content":"然而，尽管这些情绪以及其他一些情绪时常让人感到不愉快，但情绪的出现是正常的、自然的，也是生存所必需的。情绪会给我们一个信号，告诉我们在身处的环境中有些事情正在发生需要引起我们的注意了。"}},
-      {"step_type": "guide_language", "step_data": {"content":"情绪不想被忽视，因为它想告诉我们需要采取重要的行动。"}},
-      {"step_type": "guide_language", "step_data": {"content":"比如，当你在马路上行走，突然有一辆车在向你冲来，你可能会感到惊吓和害怕，然后你会尽可能快地离开危险区域。这时候，能够感到恐惧极其重要，让你知道危险的事情正在发生，并帮助你弄明白危险或者威胁来自何处，然后努力避开它。\n许多时候，我们的情绪会自动地指导我们的行为，于是我们不必花时间考虑要怎么做。"}},
-      {"step_type": "guide_language", "step_data": {"content":"在下图中选择你在过去一周里经历过的最主要的几种的情绪，为它们排个序，使用一些问题来帮助你思考。"}},
+
+
+      {"step_type": "guide_language", "step_data": {"content":"想象一下，如果你从没体验过情绪，你的生活会是什么样的？没有高兴、伤心、生气、害怕或担忧，生活会变得更轻松还是更复杂？你觉得会有什么不同呢？\uD83E\uDD14"}},
+      {"step_type": "guide_language", "step_data": {"content":"或许你会觉得，少点生气、害怕或担忧，生活会更好一些\uD83C\uDF24\uFE0F。"}},
+      {"step_type": "guide_language", "step_data": {"content":"但其实，虽然这些情绪有时让人抓狂，它们是自然的，也是必需的。情绪就像一种信号，提醒你周围发生了什么，告诉你该注意些什么\uD83D\uDEA8。"}},
+      {"step_type": "guide_language", "step_data": {"content":"比如，当你走在马路上，突然一辆车冲过来，你会感到惊吓和害怕，然后立马躲开。这时，恐惧超重要！它让你知道有危险，并帮你避开它\uD83D\uDE97\uD83D\uDCA8。"}},
+      {"step_type": "guide_language", "step_data": {"content":"很多时候，情绪会自动帮你做决定，所以你不用浪费时间去想下一步该怎么做⏱\uFE0F。"}},
+      {"step_type": "guide_language", "step_data": {"content":"现在，在下图中找出你过去一周里最常体验的几种情绪，给它们排个序，用几个问题来帮你理清思路吧\uD83E\uDDE9。"}},
       {"step_type": "mood_categories_qst", "step_data": {}},
+      {"step_type": "guide_language", "step_data": {"content":"真棒，现在你对你体验到的情绪有了一些更深刻的思考和理解！✨"}},
+      {"step_type": "guide_language", "step_data": {"content":"在经历其他情绪时，你的感受又是什么样的呢。你可以在“工具箱”-“情绪识别”工具中，进行查看、修改和填写，你也可以随时根据情况来修改或新建自己对这种情绪的理解。"}},
       {"step_type": "mood_describe_qst", "step_data": {}}
     ],
     "end": [

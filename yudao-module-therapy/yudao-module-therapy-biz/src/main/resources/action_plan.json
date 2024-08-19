@@ -2,9 +2,13 @@
   "group_nodes": {
     "start": [ {"step_type": "START"}],
     "steps": [
-      {"step_type": "guide_language", "step_data": {"content":  "现在，我们获得了一个你的专属愉悦活动银行。"}},
-      {"step_type": "guide_language", "step_data": {"content":  "进行适度的活动能够改善我们的情绪，也让我们维持和世界的沟通。"}},
-      {"step_type": "guide_language", "step_data": {"content":  "现在，让我们来设计一下你后续这周的活动计划吧，想想你希望在哪些时间段尝试或者进行什么活动，你有多大的信心去完成它们。记得在你的愉悦活动银行里也选择一些活动来让自己放松哦！让我们试试看进行这些活动会如何影响你的情绪体验。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "现在，你有了一个专属的“愉悦活动清单”\uD83C\uDF89！"}},
+      {"step_type": "guide_language", "step_data": {"content":  "适度的活动不仅能改善情绪，还能让你保持与世界的联系\uD83E\uDDD8\u200D♂\uFE0F。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "接下来，咱们来设计一下你这周的活动计划吧\uD83D\uDCC5！"}},
+      {"step_type": "guide_language", "step_data": {"content":  "想想你希望在哪些时间段进行什么活动，看看自己有多大信心完成它们。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "别忘了尝试一些“相反的行为”哦！\uD83C\uDF00"}},
+      {"step_type": "guide_language", "step_data": {"content":  "你也可以从“愉悦活动清单”里挑选一些放松的活动来帮助自己思考。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "试试看这些活动会如何影响你的情绪吧\uD83D\uDCAB。"}},
       {"step_type": "action_plan_qst", "step_data": {}}
     ],
     "end": [

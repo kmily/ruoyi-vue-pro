@@ -2,11 +2,12 @@
   "group_nodes": {
     "start": [ {"step_type": "START"}],
     "steps": [
-      {"step_type": "guide_language", "step_data": {"content":  "由于既往的经验和成长经历等等，我们可能会在某些情境下陷入思维陷阱中，从而让我们体验到不良情绪。怎么从思维陷阱中逃脱出来，使用更合适的想法来代替它，是帮助我们缓解情绪问题的关键。"}},
-      {"step_type": "guide_language", "step_data": {"content":  "在学习了“思维陷阱”部分的知识后，你可能会意识到，此前自己的一些想法也许是思维陷阱下的产物，它们是有失偏颇的，让我们错误地看待了自己的处境，也让我们感到更加的难过、紧张或焦虑。"}},
-      {"step_type": "guide_language", "step_data": {"content":  "你可以选择此前在“自动化思维识别”中描述的某一个困扰你的情境和想法，或想想最近有没有困扰自己的新情绪和想法，来对它进行一次深入的检验。"}},
-      {"step_type": "guide_language", "step_data": {"content":  "现在，让我们来试着扮演自己心灵的小侦探，进行一下复盘，并寻找在这个场景下可能更合适更让你感到没那么糟糕的新想法。"}},
-      {"step_type": "guide_language", "step_data": {"content":  "侦探式提问是你在评估任何自动思维或想法时可以提出的问题。这里列出了一些例子。这些问题中的大多数都能很好地应对许多思维陷阱，但你可能需要都试一下，看看哪些问题对你来说最适合。你也可以想出其他没有出现在这个工作表中的侦探式提问。把你的回答写在使用的问题下面。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "由于过去的经验和成长环境，我们有时会在某些情境下陷入思维陷阱，从而体验到不良情绪\uD83C\uDF27\uFE0F。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "要摆脱这些陷阱，用更合适的想法替代它们，这是缓解情绪问题的关键！\uD83D\uDD11"}},
+      {"step_type": "guide_language", "step_data": {"content":  "学习了“思维陷阱”的知识后，你可能会发现，之前的一些想法其实就是“思维陷阱”的产物，它们让你误解了自己的处境，结果让你更难过、紧张或焦虑\uD83D\uDE14。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "现在，你可以回顾一下之前在“自动化思维识别”中描述的某个让你困扰的情境和想法，或者想想最近有没有新的情绪和想法在困扰你，然后深入分析一下。\n"}},
+      {"step_type": "guide_language", "step_data": {"content":  "让我们试着扮演自己心灵的小侦探\uD83D\uDD75\uFE0F\u200D♂\uFE0F，复盘一下这些情境，并寻找更合适的新想法，帮助你感觉没那么糟糕\uD83C\uDF08。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "这里有一些“侦探式提问”，可以帮你评估任何自动化思维或想法。大多数问题都能对付很多思维陷阱，但你可以试试看哪些对你最有用。你也可以想出其他没有列在这里的问题。把你的答案写在对应的问题下面吧！✍\uFE0F"}},
       {"step_type": "recall_qst", "step_data": {}},
       {"step_type": "report", "step_data": {}, "submit":  false}
     ],
