@@ -51,7 +51,7 @@
     "review": [
       {"step_type": "guide_language", "step_data": {"content":  "现在，回顾一下你写下的内容。综合所有因素，做出改变值得吗？你愿意试一试吗？希望你能勇敢迈出第一步！\uD83D\uDEB6\u200D♂\uFE0F\uD83D\uDEB6\u200D♀\uFE0F"}},
       {"step_type": "guide_language", "step_data": {"content":  "对于其他目标，你会怎么权衡改变的利弊呢？你可以在“工具箱”-“问题、目标与动机”中进行查看、修改和填写，随时根据情况来调整自己的问题和目标。\uD83D\uDCCB"}},
-      {"step_type": "guide_language", "step_data": {"content":  "在治疗旅程中，可能会有坚持不下去的时候⛰\uFE0F。记得回顾你想实现的目标，想象一下未来的美好生活，提醒自己为什么想要做出改变\uD83C\uDF1F。"}}
+      {"step_type": "guide_language", "step_data": {"content":  "在治疗旅程中，可能会有坚持不下去的时候⛰\uFE0F。记得回顾你想实现的目标，想象一下未来的美好生活，提醒自己为什么想要做出改变\uD83C\uDF1F。"}},
       {"step_type": "guide_language", "step_data": {"content":  "相信自己，你会越来越好的！\uD83D\uDCAA"}}
     ],
     "end": [
