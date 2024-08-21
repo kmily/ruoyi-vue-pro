@@ -105,7 +105,7 @@ public interface TreatmentFlowDayitemMapper extends BaseMapperX<TreatmentFlowDay
     default List<TreatmentFlowDayitemDO> getListByDayId(Long id){
         LambdaQueryWrapper<TreatmentFlowDayitemDO> queryWrapper=Wrappers.lambdaQuery(TreatmentFlowDayitemDO.class)
                 .eq(TreatmentFlowDayitemDO::getDayId,id)
-                .orderByAsc(TreatmentFlowDayitemDO::getAgroup);
+                .orderByAsc(TreatmentFlowDayitemDO::getId);
         return selectList(queryWrapper);
     }
 //    di.id, di.day_id, d.flow_id, d.name, d.sequence, ins.status
