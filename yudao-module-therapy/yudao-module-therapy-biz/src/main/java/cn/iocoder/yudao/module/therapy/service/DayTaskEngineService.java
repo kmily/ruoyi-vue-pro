@@ -63,8 +63,10 @@ public class DayTaskEngineService {
         List<Long> dayitemIds = dayitemDOS.stream().map((TreatmentFlowDayitemDO t) -> t.getId()).collect(Collectors.toList());
         List<TreatmentDayitemInstanceDO> dayitemInstanceDOS =
                 treatmentDayitemInstanceMapper.queryInstances(userCurrentStep.getFlowInstance().getId(),dayitemIds);
-        for(int i = dayitemInstanceDOS.size() ; i < userCurrentStep.getFlowDayitemDOs().size(); i++){
-            TreatmentFlowDayitemDO dayitemDO = userCurrentStep.getFlowDayitemDOs().get(i);
+        List<TreatmentFlowDayitemDO> dayitemDOs = treatmentFlowDayitemMapper.selectGroupItems(
+                userCurrentStep.getDay().getDayId(), userCurrentStep.getAgroup());
+        for(int i = dayitemInstanceDOS.size() ; i < dayitemDOs.size(); i++){
+            TreatmentFlowDayitemDO dayitemDO = dayitemDOs.get(i);
             if(dayitemDO.getItemType().equals(TaskType.GUIDE_LANGUAGE.getCode())){
                 boolean textChange = (boolean) dayitemDO.getSettingsObj().getOrDefault("textChange", false);
                 if(textChange){
@@ -251,7 +253,7 @@ public class DayTaskEngineService {
             maxSpanDays = LocalDateTime.now().getDayOfYear() -  dayInstanceDO.getCreateTime().getDayOfYear() + 1;
         }
         // 如果非自由模式，不限制天数
-        if(!isFreeStyle){//TODO BUG
+        if(isFreeStyle){//TODO BUG
             maxWholeDays = 1000;
             maxSpanDays = 1000;
         }
