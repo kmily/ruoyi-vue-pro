@@ -48,10 +48,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             try {
                 // 1.1 基于 token 构建登录用户
                 LoginUser loginUser = buildLoginUserByToken(token, userType);
-                // 1.2 模拟 Login 功能，方便日常开发调试
-                if (loginUser == null) {
-                    loginUser = mockLoginUser(request, token, userType);
-                }
+//                // 1.2 模拟 Login 功能，方便日常开发调试
+//                if (loginUser == null) {
+//                    loginUser = mockLoginUser(request, token, userType);
+//                }
 
                 // 2. 设置当前用户
                 if (loginUser != null) {
