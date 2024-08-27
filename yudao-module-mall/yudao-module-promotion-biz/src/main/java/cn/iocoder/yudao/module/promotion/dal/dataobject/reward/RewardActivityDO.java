@@ -71,7 +71,7 @@ public class RewardActivityDO extends BaseDO {
      * 商品 SPU 编号的数组
      */
     @TableField(typeHandler = LongListTypeHandler.class)
-    private List<Long> productSpuIds;
+    private List<Long> productScopeValues;
     /**
      * 优惠规则的数组
      */
@@ -99,10 +99,20 @@ public class RewardActivityDO extends BaseDO {
          * 是否包邮
          */
         private Boolean freeDelivery;
+        // TODO @puhui999：是不是大于零，就认为赠送积分哈；简洁一点；
+        /**
+         * 是否赠送积分
+         */
+        private Boolean givePoint;
         /**
          * 赠送的积分
          */
         private Integer point;
+        // TODO @puhui999：非空，就认为赠送优惠劵
+        /**
+         * 是否赠送优惠券
+         */
+        private Boolean giveCoupon;
         /**
          * 赠送的优惠劵编号的数组
          */

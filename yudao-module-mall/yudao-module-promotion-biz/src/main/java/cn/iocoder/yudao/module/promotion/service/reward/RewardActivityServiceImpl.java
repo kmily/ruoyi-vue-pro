@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.promotion.service.reward;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.api.category.ProductCategoryApi;
+import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityPageReqVO;
@@ -11,6 +13,7 @@ import cn.iocoder.yudao.module.promotion.convert.reward.RewardActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.reward.RewardActivityMapper;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
 import cn.iocoder.yudao.module.promotion.util.PromotionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -20,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -38,12 +42,19 @@ public class RewardActivityServiceImpl implements RewardActivityService {
     @Resource
     private RewardActivityMapper rewardActivityMapper;
 
+    @Resource
+    private ProductCategoryApi productCategoryApi;
+    @Resource
+    private ProductSpuApi productSpuApi;
+
     @Override
     public Long createRewardActivity(RewardActivityCreateReqVO createReqVO) {
-        // 校验商品是否冲突
-        validateRewardActivitySpuConflicts(null, createReqVO.getProductSpuIds());
+        // 1.1 校验商品范围
+        validateProductScope(createReqVO.getProductScope(), createReqVO.getProductScopeValues());
+        // 1.2 校验商品是否冲突
+        //validateRewardActivitySpuConflicts(null, createReqVO.getProductSpuIds());
 
-        // 插入
+        // 2. 插入
         RewardActivityDO rewardActivity = RewardActivityConvert.INSTANCE.convert(createReqVO)
                 .setStatus(
                         PromotionUtils.calculateActivityStatus(createReqVO.getEndTime()).equals(CommonStatusEnum.DISABLE.getStatus())?
@@ -57,15 +68,17 @@ public class RewardActivityServiceImpl implements RewardActivityService {
 
     @Override
     public void updateRewardActivity(RewardActivityUpdateReqVO updateReqVO) {
-        // 校验存在
+        // 1.1 校验存在
         RewardActivityDO dbRewardActivity = validateRewardActivityExists(updateReqVO.getId());
         if (dbRewardActivity.getStatus().equals(PromotionActivityStatusEnum.CLOSE.getStatus())) { // 已关闭的活动，不能修改噢
             throw exception(REWARD_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED);
         }
-        // 校验商品是否冲突
-        validateRewardActivitySpuConflicts(updateReqVO.getId(), updateReqVO.getProductSpuIds());
+        // 1.2 校验商品范围
+        validateProductScope(updateReqVO.getProductScope(), updateReqVO.getProductScopeValues());
+        // 1.3 校验商品是否冲突
+        //validateRewardActivitySpuConflicts(updateReqVO.getId(), updateReqVO.getProductSpuIds());
 
-        // 更新
+        // 2. 更新
         RewardActivityDO updateObj = RewardActivityConvert.INSTANCE.convert(updateReqVO)
                 .setStatus(PromotionUtils.calculateActivityStatus(updateReqVO.getEndTime()));
         rewardActivityMapper.updateById(updateObj);
@@ -74,6 +87,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
     @Override
     public void closeRewardActivity(Long id) {
         // 校验存在
+        // TODO @puhui999：去掉 PromotionActivityStatusEnum，使用 CommonStatus 作为状态哈。开启，关闭
         RewardActivityDO dbRewardActivity = validateRewardActivityExists(id);
         if (dbRewardActivity.getStatus().equals(PromotionActivityStatusEnum.CLOSE.getStatus())) { // 已关闭的活动，不能关闭噢
             throw exception(REWARD_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED);
@@ -108,7 +122,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
     }
 
     // TODO @芋艿：逻辑有问题，需要优化；要分成全场、和指定来校验；
-
+    // TODO @puhui999: 下次提交 fix
     /**
      * 校验商品参加的活动是否冲突
      *
@@ -131,6 +145,14 @@ public class RewardActivityServiceImpl implements RewardActivityService {
         }
     }
 
+    private void validateProductScope(Integer productScope, List<Long> productScopeValues) {
+        if (Objects.equals(PromotionProductScopeEnum.SPU.getScope(), productScope)) {
+            productSpuApi.validateSpuList(productScopeValues);
+        } else if (Objects.equals(PromotionProductScopeEnum.CATEGORY.getScope(), productScope)) {
+            productCategoryApi.validateCategoryList(productScopeValues);
+        }
+    }
+
     /**
      * 获得商品参加的满减送活动的数组
      *
@@ -140,8 +162,10 @@ public class RewardActivityServiceImpl implements RewardActivityService {
      */
     private List<RewardActivityDO> getRewardActivityListBySpuIds(Collection<Long> spuIds,
                                                                  Collection<Integer> statuses) {
-        List<RewardActivityDO> list = rewardActivityMapper.selectListByStatus(statuses);
-        return CollUtil.filter(list, activity -> CollUtil.containsAny(activity.getProductSpuIds(), spuIds));
+        // TODO @puhui999: 下次 fix
+        //List<RewardActivityDO> list = rewardActivityMapper.selectListByStatus(statuses);
+        //return CollUtil.filter(list, activity -> CollUtil.containsAny(activity.getProductSpuIds(), spuIds));
+        return List.of();
     }
 
     @Override
