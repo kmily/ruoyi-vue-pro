@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
+import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
@@ -31,8 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.Resource;
-import jakarta.validation.Validator;
+import javax.annotation.Resource;
+import javax.validation.Validator;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -80,6 +81,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             createLoginLog(null, username, logTypeEnum, LoginResultEnum.BAD_CREDENTIALS);
             throw exception(AUTH_LOGIN_BAD_CREDENTIALS);
         }
+        TenantContextHolder.setTenantId(user.getTenantId());
         if (!userService.isPasswordMatch(password, user.getPassword())) {
             createLoginLog(user.getId(), username, logTypeEnum, LoginResultEnum.BAD_CREDENTIALS);
             throw exception(AUTH_LOGIN_BAD_CREDENTIALS);

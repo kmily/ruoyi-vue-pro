@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.promotion.service.reward;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityCreateReqVO;
@@ -11,10 +12,10 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.reward.RewardActivityMapper;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
 import cn.iocoder.yudao.module.promotion.util.PromotionUtils;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,7 +45,11 @@ public class RewardActivityServiceImpl implements RewardActivityService {
 
         // 插入
         RewardActivityDO rewardActivity = RewardActivityConvert.INSTANCE.convert(createReqVO)
-                .setStatus(PromotionUtils.calculateActivityStatus(createReqVO.getEndTime()));
+                .setStatus(
+                        PromotionUtils.calculateActivityStatus(createReqVO.getEndTime()).equals(CommonStatusEnum.DISABLE.getStatus())?
+                                PromotionActivityStatusEnum.WAIT.getStatus():
+                                PromotionActivityStatusEnum.RUN.getStatus()
+                );
         rewardActivityMapper.insert(rewardActivity);
         // 返回
         return rewardActivity.getId();

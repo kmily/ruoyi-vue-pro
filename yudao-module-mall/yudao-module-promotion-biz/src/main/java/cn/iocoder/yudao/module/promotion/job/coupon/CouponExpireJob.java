@@ -6,9 +6,8 @@ import cn.iocoder.yudao.framework.tenant.core.job.TenantJob;
 import cn.iocoder.yudao.module.promotion.service.coupon.CouponService;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 
-// TODO 芋艿：配置一个 Job
 /**
  * 优惠券过期 Job
  *

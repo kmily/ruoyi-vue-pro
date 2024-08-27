@@ -12,11 +12,11 @@ import cn.iocoder.yudao.module.system.api.social.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -63,16 +63,16 @@ public class AppSocialUserController {
 
     @PostMapping("/wxa-qrcode")
     @Operation(summary = "获得微信小程序码(base64 image)")
-    public CommonResult<String> getWxaQrcode(@RequestBody @Valid AppSocialWxQrcodeReqVO reqVO) {
+    public CommonResult<String> getWxaQrcode(@RequestBody @Valid AppSocialWxaQrcodeReqVO reqVO) {
         byte[] wxQrcode = socialClientApi.getWxaQrcode(BeanUtils.toBean(reqVO, SocialWxQrcodeReqDTO.class));
         return success(Base64.encode(wxQrcode));
     }
 
     @GetMapping("/get-subscribe-template-list")
     @Operation(summary = "获得微信小程订阅模板列表")
-    public CommonResult<List<AppSocialWxSubscribeTemplateRespVO>> getSubscribeTemplateList() {
+    public CommonResult<List<AppSocialWxaSubscribeTemplateRespVO>> getSubscribeTemplateList() {
         List<SocialWxaSubscribeTemplateRespDTO> template = socialClientApi.getWxaSubscribeTemplateList(UserTypeEnum.MEMBER.getValue());
-        return success(BeanUtils.toBean(template, AppSocialWxSubscribeTemplateRespVO.class));
+        return success(BeanUtils.toBean(template, AppSocialWxaSubscribeTemplateRespVO.class));
     }
 
 }

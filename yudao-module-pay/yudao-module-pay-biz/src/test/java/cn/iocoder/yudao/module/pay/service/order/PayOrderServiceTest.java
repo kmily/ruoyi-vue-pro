@@ -26,13 +26,13 @@ import cn.iocoder.yudao.module.pay.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
+import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -218,11 +218,11 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
     public void testCreateOrder_success() {
         // mock 参数
         PayOrderCreateReqDTO reqDTO = randomPojo(PayOrderCreateReqDTO.class,
-                o -> o.setAppId(1L).setMerchantOrderId("10")
+                o -> o.setAppKey("demo").setMerchantOrderId("10")
                         .setSubject(randomString()).setBody(randomString()));
         // mock 方法
         PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L).setOrderNotifyUrl("http://127.0.0.1"));
-        when(appService.validPayApp(eq(reqDTO.getAppId()))).thenReturn(app);
+        when(appService.validPayApp(eq(reqDTO.getAppKey()))).thenReturn(app);
 
         // 调用
         Long orderId = orderService.createOrder(reqDTO);
@@ -239,10 +239,13 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
     public void testCreateOrder_exists() {
         // mock 参数
         PayOrderCreateReqDTO reqDTO = randomPojo(PayOrderCreateReqDTO.class,
-                o -> o.setAppId(1L).setMerchantOrderId("10"));
+                o -> o.setAppKey("demo").setMerchantOrderId("10"));
         // mock 数据
         PayOrderDO dbOrder = randomPojo(PayOrderDO.class,  o -> o.setAppId(1L).setMerchantOrderId("10"));
         orderMapper.insert(dbOrder);
+        // mock 方法
+        PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L).setOrderNotifyUrl("http://127.0.0.1"));
+        when(appService.validPayApp(eq(reqDTO.getAppKey()))).thenReturn(app);
 
         // 调用
         Long orderId = orderService.createOrder(reqDTO);

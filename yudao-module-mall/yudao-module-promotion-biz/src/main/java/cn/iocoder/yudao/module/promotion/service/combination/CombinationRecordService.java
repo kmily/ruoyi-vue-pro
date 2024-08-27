@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationA
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationProductDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
 
-import jakarta.annotation.Nullable;
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -138,24 +138,6 @@ public interface CombinationRecordService {
     Map<Long, Integer> getCombinationRecordCountMapByActivity(Collection<Long> activityIds,
                                                               @Nullable Integer status,
                                                               @Nullable Long headId);
-
-    /**
-     * 获取拼团记录
-     *
-     * @param userId 用户编号
-     * @param id     拼团记录编号
-     * @return 拼团记录
-     */
-    CombinationRecordDO getCombinationRecordByIdAndUser(Long userId, Long id);
-
-    /**
-     * 取消拼团
-     *
-     * @param userId 用户编号
-     * @param id     拼团记录编号
-     * @param headId 团长编号
-     */
-    void cancelCombinationRecord(Long userId, Long id, Long headId);
 
     /**
      * 处理过期拼团

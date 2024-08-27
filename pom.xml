@@ -15,12 +15,12 @@
         <!-- 各种 module 拓展 -->
         <module>yudao-module-system</module>
         <module>yudao-module-infra</module>
-<!--        <module>yudao-module-member</module>-->
+        <module>yudao-module-member</module>
 <!--        <module>yudao-module-bpm</module>-->
 <!--        <module>yudao-module-report</module>-->
 <!--        <module>yudao-module-mp</module>-->
-<!--        <module>yudao-module-pay</module>-->
-<!--        <module>yudao-module-mall</module>-->
+        <module>yudao-module-pay</module>
+        <module>yudao-module-mall</module>
 <!--        <module>yudao-module-crm</module>-->
 <!--        <module>yudao-module-erp</module>-->
 <!--        <module>yudao-module-ai</module>-->
@@ -31,17 +31,17 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>2.1.0-snapshot</revision>
+        <revision>2.2.0-jdk8-snapshot</revision>
         <!-- Maven 相关 -->
-        <java.version>17</java.version>
+        <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <maven-surefire-plugin.version>3.2.2</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
         <!-- 看看咋放到 bom 里 -->
         <lombok.version>1.18.34</lombok.version>
-        <spring.boot.version>3.3.1</spring.boot.version>
+        <spring.boot.version>2.7.18</spring.boot.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -67,6 +67,9 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire-plugin.version}</version>
+                    <configuration>
+                        <skip>true</skip>
+                    </configuration>
                 </plugin>
                 <!-- maven-compiler-plugin 插件，解决 spring-boot-configuration-processor + Lombok + MapStruct 组合 -->
                 <!-- https://stackoverflow.com/questions/33483697/re-run-spring-boot-configuration-annotation-processor-to-update-generated-metada -->
@@ -75,6 +78,7 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven-compiler-plugin.version}</version>
                     <configuration>
+                        <skip>true</skip>
                         <annotationProcessorPaths>
                             <path>
                                 <groupId>org.springframework.boot</groupId>
@@ -92,11 +96,6 @@
                                 <version>${mapstruct.version}</version>
                             </path>
                         </annotationProcessorPaths>
-                        <!-- 编译参数写在 arg 内，解决 Spring Boot 3.2 的 Parameter Name Discovery 问题 -->
-                        <debug>false</debug>
-                        <compilerArgs>
-                            <arg>-parameters</arg>
-                        </compilerArgs>
                     </configuration>
                 </plugin>
                 <plugin>

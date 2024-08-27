@@ -7,6 +7,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
@@ -52,13 +53,13 @@ import cn.iocoder.yudao.module.trade.service.price.TradePriceService;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculatorHelper;
-import jakarta.annotation.Resource;
-import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +72,7 @@ import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.min
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getTerminal;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.trade.enums.MessageTemplateConstants.DELIVERY_ORDER;
+import static cn.iocoder.yudao.module.trade.enums.MessageTemplateConstants.WXA_ORDER_DELIVERY;
 
 /**
  * 交易订单【写】Service 实现类
@@ -368,14 +369,13 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
         // 3. 记录订单日志
         TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.DELIVERED.getStatus(),
-                MapUtil.<String, Object>builder().put("expressName", express != null ? express.getName() : "")
-                        .put("logisticsNo", express != null ? deliveryReqVO.getLogisticsNo() : "").build());
+                MapUtil.<String, Object>builder().put("expressName", express != null ? express.getName() : "无")
+                        .put("logisticsNo", express != null ? deliveryReqVO.getLogisticsNo() : "无").build());
 
-        // TODO @puhui999：可以改成 4.1 4.2。因为都算通知哈；
-        // 4. 发送站内信
+        // 4.1 发送站内信
         tradeMessageService.sendMessageWhenDeliveryOrder(new TradeOrderMessageWhenDeliveryOrderReqBO()
                 .setOrderId(order.getId()).setUserId(order.getUserId()).setMessage(null));
-        // 5. 发送订阅消息
+        // 4.2 发送订阅消息
         getSelf().sendDeliveryOrderMessage(order, deliveryReqVO);
     }
 
@@ -385,12 +385,12 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         Long orderId = order.getId();
         socialClientApi.sendWxaSubscribeMessage(new SocialWxaSubscribeMessageSendReqDTO()
                 .setUserId(order.getUserId()).setUserType(UserTypeEnum.MEMBER.getValue())
-                .setTemplateTitle(DELIVERY_ORDER)
+                .setTemplateTitle(WXA_ORDER_DELIVERY)
                 .setPage("pages/order/detail?id=" + orderId) // 订单详情页
                 .addMessage("character_string3", String.valueOf(orderId)) // 订单编号
                 .addMessage("phrase6", TradeOrderStatusEnum.DELIVERED.getName()) // 订单状态
                 .addMessage("date4", LocalDateTimeUtil.formatNormal(LocalDateTime.now()))// 发货时间
-                .addMessage("character_string5", deliveryReqVO.getLogisticsNo()) // 快递单号
+                .addMessage("character_string5", StrUtil.blankToDefault(deliveryReqVO.getLogisticsNo(), "-")) // 快递单号
                 .addMessage("thing9", order.getReceiverDetailAddress())); // 收货地址
     }
 
@@ -855,12 +855,14 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void cancelPaidOrder(Long userId, Long orderId) {
-        // TODO 芋艿：这里实现要优化下；
+        // TODO @puhui999：需要校验状态；已支付的情况下，才可以。
         TradeOrderDO order = tradeOrderMapper.selectOrderByIdAndUserId(orderId, userId);
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
         }
         cancelOrder0(order, TradeOrderCancelTypeEnum.MEMBER_CANCEL);
+
+        // TODO @puhui999：需要退款
     }
 
     /**

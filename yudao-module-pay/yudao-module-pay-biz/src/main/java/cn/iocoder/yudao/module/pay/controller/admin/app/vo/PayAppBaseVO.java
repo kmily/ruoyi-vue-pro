@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.hibernate.validator.constraints.URL;
 
-import jakarta.validation.constraints.*;
+import javax.validation.constraints.*;
 
 /**
 * 支付应用信息 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -13,6 +13,10 @@ import jakarta.validation.constraints.*;
 */
 @Data
 public class PayAppBaseVO {
+
+    @Schema(description = "应用标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")
+    @NotEmpty(message = "应用标识不能为空")
+    private String appKey;
 
     @Schema(description = "应用名", requiredMode = Schema.RequiredMode.REQUIRED, example = "小豆")
     @NotNull(message = "应用名不能为空")

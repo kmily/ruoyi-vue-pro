@@ -15,13 +15,12 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountActivit
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProductDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.discount.DiscountActivityMapper;
 import cn.iocoder.yudao.module.promotion.dal.mysql.discount.DiscountProductMapper;
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionActivityStatusEnum;
 import cn.iocoder.yudao.module.promotion.util.PromotionUtils;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
@@ -149,7 +148,7 @@ public class DiscountActivityServiceImpl implements DiscountActivityService {
         }
 
         // 更新
-        DiscountActivityDO updateObj = new DiscountActivityDO().setId(id).setStatus(PromotionActivityStatusEnum.CLOSE.getStatus());
+        DiscountActivityDO updateObj = new DiscountActivityDO().setId(id).setStatus(CommonStatusEnum.DISABLE.getStatus());
         discountActivityMapper.updateById(updateObj);
     }
 
