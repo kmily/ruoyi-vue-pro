@@ -10,10 +10,10 @@ import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
+import jakarta.annotation.Resource;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -52,7 +52,7 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
     private void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result,
                            RewardActivityMatchRespDTO rewardActivity) {
         // 1.1 获得满减送的订单项（商品）列表
-        List<TradePriceCalculateRespBO.OrderItem> orderItems = filterMatchCouponOrderItems(result, rewardActivity);
+        List<TradePriceCalculateRespBO.OrderItem> orderItems = filterMatchActivityOrderItems(result, rewardActivity);
         if (CollUtil.isEmpty(orderItems)) {
             return;
         }
@@ -93,10 +93,11 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
      * @param rewardActivity 满减送活动
      * @return 订单项（商品）列表
      */
-    private List<TradePriceCalculateRespBO.OrderItem> filterMatchCouponOrderItems(TradePriceCalculateRespBO result,
-                                                                                  RewardActivityMatchRespDTO rewardActivity) {
+    private List<TradePriceCalculateRespBO.OrderItem> filterMatchActivityOrderItems(TradePriceCalculateRespBO result,
+                                                                                    RewardActivityMatchRespDTO rewardActivity) {
+        // TODO @puhui999：是不是得根据类型过滤哈
         return filterList(result.getItems(),
-                orderItem -> CollUtil.contains(rewardActivity.getSpuIds(), orderItem.getSpuId()));
+                orderItem -> CollUtil.contains(rewardActivity.getProductScopeValues(), orderItem.getSpuId()));
     }
 
     /**

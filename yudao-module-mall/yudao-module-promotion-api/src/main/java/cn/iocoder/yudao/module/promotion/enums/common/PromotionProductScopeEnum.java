@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * 营销的商品范围枚举
@@ -33,6 +34,18 @@ public enum PromotionProductScopeEnum implements IntArrayValuable {
     @Override
     public int[] array() {
         return ARRAYS;
+    }
+
+    public static boolean isAll(Integer scope) {
+        return Objects.equals(scope, ALL.scope);
+    }
+
+    public static boolean isSpu(Integer scope) {
+        return Objects.equals(scope, SPU.scope);
+    }
+
+    public static boolean isCategory(Integer scope) {
+        return Objects.equals(scope, CATEGORY.scope);
     }
 
 }
