@@ -143,14 +143,16 @@ public class MenuServiceImpl implements MenuService {
         // 1. 遍历到 parentId 为根节点，则无需判断
         Long parentId = node.getParentId();
         if (ObjUtil.equal(parentId, ID_ROOT)) {
-            if (CommonStatusEnum.isDisable(node.getStatus())) {
-                disabledMenuCache.add(node.getId());
-                return true;
-            }
             return false;
         }
 
-        // 2. 继续遍历 parent 节点
+        // 2. 判断自身是否禁用
+        if (CommonStatusEnum.isDisable(node.getStatus())) {
+            disabledMenuCache.add(node.getId());
+            return true;
+        }
+
+        // 3. 继续遍历 parent 节点
         MenuDO parent = menuMap.get(parentId);
         if (parent == null || isMenuDisabled(parent, menuMap, disabledMenuCache)) {
             disabledMenuCache.add(node.getId());
