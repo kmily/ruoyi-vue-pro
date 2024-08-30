@@ -3,9 +3,11 @@ package cn.iocoder.yudao.module.trade.service.price.calculator;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.promotion.api.reward.RewardActivityApi;
 import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionConditionTypeEnum;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
@@ -14,10 +16,13 @@ import javax.annotation.Resource;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
+import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.REWARD_ACTIVITY_TYPE_NOT_EXISTS;
 import static cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculatorHelper.formatPrice;
 
 /**
@@ -39,14 +44,15 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
             return;
         }
         // 获得 SKU 对应的满减送活动
-        List<RewardActivityMatchRespDTO> rewardActivities = rewardActivityApi.getMatchRewardActivityList(
-                convertSet(result.getItems(), TradePriceCalculateRespBO.OrderItem::getSpuId));
+        List<RewardActivityMatchRespDTO> rewardActivities = rewardActivityApi.getRewardActivityBySpuIdsAndStatusAndDateTimeLt(
+                convertSet(result.getItems(), TradePriceCalculateRespBO.OrderItem::getSpuId), CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now());
         if (CollUtil.isEmpty(rewardActivities)) {
             return;
         }
-
-        // 处理每个满减送活动
-        rewardActivities.forEach(rewardActivity -> calculate(param, result, rewardActivity));
+        // 处理最新的满减送活动
+        if(!rewardActivities.isEmpty()){
+            calculate(param, result, rewardActivities.get(0));
+        }
     }
 
     private void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result,
@@ -95,9 +101,18 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
      */
     private List<TradePriceCalculateRespBO.OrderItem> filterMatchActivityOrderItems(TradePriceCalculateRespBO result,
                                                                                     RewardActivityMatchRespDTO rewardActivity) {
-        // TODO @puhui999：是不是得根据类型过滤哈
-        return filterList(result.getItems(),
-                orderItem -> CollUtil.contains(rewardActivity.getProductScopeValues(), orderItem.getSpuId()));
+        Integer productScope = rewardActivity.getProductScope();
+        if(PromotionProductScopeEnum.isAll(productScope)){
+            return result.getItems();
+        }else if (PromotionProductScopeEnum.isSpu(productScope)) {
+            return filterList(result.getItems(),
+                    orderItem -> CollUtil.contains(rewardActivity.getProductScopeValues(), orderItem.getSpuId()));
+        }else if (PromotionProductScopeEnum.isCategory(productScope)) {
+            return filterList(result.getItems(),
+                    orderItem -> CollUtil.contains(rewardActivity.getProductScopeValues(), orderItem.getCategoryId()));
+        }else{
+            throw exception(REWARD_ACTIVITY_TYPE_NOT_EXISTS);
+        }
     }
 
     /**

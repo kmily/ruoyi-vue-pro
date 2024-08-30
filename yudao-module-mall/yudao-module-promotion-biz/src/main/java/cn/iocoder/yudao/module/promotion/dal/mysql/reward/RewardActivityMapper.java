@@ -45,14 +45,7 @@ public interface RewardActivityMapper extends BaseMapperX<RewardActivityDO> {
                 .apply(productScopeValuesFindInSetFunc.apply(spuIds)));
     }
 
-    /**
-     * 获取指定活动编号的活动列表且
-     * 开始时间和结束时间小于给定时间 dateTime 的活动列表
-     *
-     * @param status   状态
-     * @param dateTime 指定日期
-     * @return 活动列表
-     */
+
     default List<RewardActivityDO> selectListByStatusAndDateTimeLt(Integer status, LocalDateTime dateTime) {
         return selectList(new LambdaQueryWrapperX<RewardActivityDO>()
                 .eq(RewardActivityDO::getStatus, status)
@@ -62,6 +55,14 @@ public interface RewardActivityMapper extends BaseMapperX<RewardActivityDO> {
         );
     }
 
+    /**
+     * 获取指定活动编号的活动列表且
+     * 开始时间和结束时间小于给定时间 dateTime 的活动列表
+     *
+     * @param status   状态
+     * @param dateTime 指定日期
+     * @return 活动列表
+     */
     default List<RewardActivityDO> getRewardActivityByStatusAndDateTimeLt(Collection<Long> spuIds,Collection<Long> categoryIds, Integer status, LocalDateTime dateTime) {
         //拼接通用券查询语句
         Function<Collection<Long>, String> productScopeValuesFindInSetFunc = ids -> ids.stream()
@@ -75,7 +76,6 @@ public interface RewardActivityMapper extends BaseMapperX<RewardActivityDO> {
                 .or(i -> i.eq(RewardActivityDO::getProductScope, 1))
                 .or(i -> i. eq(RewardActivityDO::getProductScope, 3).and(i1 -> i1.apply(productScopeValuesFindInSetFunc.apply(categoryIds))))
                 .orderByDesc(RewardActivityDO::getId)
-                .last("limit 1")
         );
     }
 }
