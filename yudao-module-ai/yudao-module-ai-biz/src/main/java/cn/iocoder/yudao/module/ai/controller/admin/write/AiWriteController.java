@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.annotation.Resource;
-import jakarta.annotation.security.PermitAll;
+import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;

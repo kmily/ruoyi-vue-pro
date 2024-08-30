@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.trade.convert.order.TradeOrderConvert;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderCancelTypeEnum;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 

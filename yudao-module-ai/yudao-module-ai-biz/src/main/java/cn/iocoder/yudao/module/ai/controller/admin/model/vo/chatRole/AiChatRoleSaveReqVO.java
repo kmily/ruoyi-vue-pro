@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import jakarta.validation.constraints.*;
+import javax.validation.constraints.*;
 import org.hibernate.validator.constraints.URL;
 
 @Schema(description = "管理后台 - AI 聊天角色新增/修改 Request VO")
