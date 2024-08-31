@@ -296,7 +296,7 @@ public class AppTradeOrderController {
                     build();
             Integer discountType = discountProductRespDTO.getDiscountType();
             if(Objects.equals(PromotionDiscountTypeEnum.PRICE.getType(), discountType)){
-                sku.setPrice(price - discountProductRespDTO.getDiscountPrice() * 100);
+                sku.setPrice(price - discountProductRespDTO.getDiscountPrice());
             }else if(Objects.equals(PromotionDiscountTypeEnum.PERCENT.getType(), discountType)){
                 Integer newPrice = price * discountProductRespDTO.getDiscountPercent() / 100;
                 sku.setPrice(price - newPrice);
