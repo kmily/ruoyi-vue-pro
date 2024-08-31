@@ -29,6 +29,7 @@ import javax.annotation.Resource;
 import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
@@ -184,6 +185,13 @@ public class CodegenServiceImpl implements CodegenService {
                         && !primaryKeyPredicate.test(tableField, codegenColumnDOMap.get(tableField.getColumnName())))
                 .map(TableField::getColumnName)
                 .collect(Collectors.toSet());
+        IntStream.range(0, tableFields.size()).mapToObj(index -> {
+            String name = tableFields.get(index).getName();
+            if (codegenColumnDOMap.containsKey(name) && codegenColumnDOMap.get(name).getOrdinalPosition() != index) {
+                return name;
+            }
+            return null;
+        }).filter(Objects::nonNull).forEach(modifyFieldNames::add);
         // 3.2 计算需要【删除】的字段
         Set<String> tableFieldNames = convertSet(tableFields, TableField::getName);
         Set<Long> deleteColumnIds = codegenColumns.stream()
