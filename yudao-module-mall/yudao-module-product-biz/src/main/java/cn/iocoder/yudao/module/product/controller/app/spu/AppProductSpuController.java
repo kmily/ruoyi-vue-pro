@@ -20,17 +20,15 @@ import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -69,8 +67,8 @@ public class AppProductSpuController {
         list.forEach(spu -> spu.setSalesCount(spu.getSalesCount() + spu.getVirtualSalesCount()));
         List<AppProductSpuRespVO> voList = BeanUtils.toBean(list, AppProductSpuRespVO.class);
         // 处理 vip 价格
-        MemberLevelRespDTO memberLevel = getMemberLevel();
-        voList.forEach(vo -> vo.setVipPrice(calculateVipPrice(vo.getPrice(), memberLevel)));
+//        MemberLevelRespDTO memberLevel = getMemberLevel();
+//        voList.forEach(vo -> vo.setVipPrice(calculateVipPrice(vo.getPrice(), memberLevel)));
         return success(voList);
     }
 
@@ -85,9 +83,9 @@ public class AppProductSpuController {
         // 拼接返回
         pageResult.getList().forEach(spu -> spu.setSalesCount(spu.getSalesCount() + spu.getVirtualSalesCount()));
         PageResult<AppProductSpuRespVO> voPageResult = BeanUtils.toBean(pageResult, AppProductSpuRespVO.class);
-        // 处理 vip 价格
-        MemberLevelRespDTO memberLevel = getMemberLevel();
-        voPageResult.getList().forEach(vo -> vo.setVipPrice(calculateVipPrice(vo.getPrice(), memberLevel)));
+//        // 处理 vip 价格
+//        MemberLevelRespDTO memberLevel = getMemberLevel();
+//        voPageResult.getList().forEach(vo -> vo.setVipPrice(calculateVipPrice(vo.getPrice(), memberLevel)));
         return success(voPageResult);
     }
 
@@ -142,7 +140,7 @@ public class AppProductSpuController {
      */
     public Integer calculateVipPrice(Integer price, MemberLevelRespDTO memberLevel) {
         if (memberLevel == null || memberLevel.getDiscountPercent() == null) {
-            return 0;
+            return null;
         }
         Integer newPrice = price * memberLevel.getDiscountPercent() / 100;
         return price - newPrice;

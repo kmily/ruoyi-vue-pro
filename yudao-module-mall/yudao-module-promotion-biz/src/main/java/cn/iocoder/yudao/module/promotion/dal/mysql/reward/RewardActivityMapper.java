@@ -38,11 +38,21 @@ public interface RewardActivityMapper extends BaseMapperX<RewardActivityDO> {
 
     default List<RewardActivityDO> selectListBySpuIdsAndStatus(Collection<Long> spuIds, Integer status) {
         Function<Collection<Long>, String> productScopeValuesFindInSetFunc = ids -> ids.stream()
-                .map(id -> StrUtil.format("FIND_IN_SET({}, product_spu_ids) ", id))
+                .map(id -> StrUtil.format("FIND_IN_SET({}, product_scope_values) ", id))
                 .collect(Collectors.joining(" OR "));
         return selectList(new QueryWrapper<RewardActivityDO>()
                 .eq("status", status)
                 .apply(productScopeValuesFindInSetFunc.apply(spuIds)));
+    }
+
+
+    default List<RewardActivityDO> selectListByStatusAndDateTimeLt(Integer status, LocalDateTime dateTime) {
+        return selectList(new LambdaQueryWrapperX<RewardActivityDO>()
+                .eq(RewardActivityDO::getStatus, status)
+                .lt(RewardActivityDO::getStartTime, dateTime)
+                .gt(RewardActivityDO::getEndTime, dateTime)// 开始时间 < 指定时间 < 结束时间，也就是说获取指定时间段的活动
+                .orderByAsc(RewardActivityDO::getStartTime)
+        );
     }
 
     /**
@@ -53,13 +63,19 @@ public interface RewardActivityMapper extends BaseMapperX<RewardActivityDO> {
      * @param dateTime 指定日期
      * @return 活动列表
      */
-    default List<RewardActivityDO> selectListByStatusAndDateTimeLt(Integer status, LocalDateTime dateTime) {
+    default List<RewardActivityDO> getRewardActivityByStatusAndDateTimeLt(Collection<Long> spuIds,Collection<Long> categoryIds, Integer status, LocalDateTime dateTime) {
+        //拼接通用券查询语句
+        Function<Collection<Long>, String> productScopeValuesFindInSetFunc = ids -> ids.stream()
+                .map(id -> StrUtil.format("FIND_IN_SET({}, product_scope_values) ", id))
+                .collect(Collectors.joining(" OR "));
         return selectList(new LambdaQueryWrapperX<RewardActivityDO>()
-                .eq(RewardActivityDO::getStatus, status)
+                .eq(RewardActivityDO::getStatus,status)
                 .lt(RewardActivityDO::getStartTime, dateTime)
-                .gt(RewardActivityDO::getEndTime, dateTime)// 开始时间 < 指定时间 < 结束时间，也就是说获取指定时间段的活动
-                .orderByAsc(RewardActivityDO::getStartTime)
+                .gt(RewardActivityDO::getEndTime, dateTime)
+                .and(i -> i. eq(RewardActivityDO::getProductScope, 2).and(i1 -> i1.apply(productScopeValuesFindInSetFunc.apply(spuIds))))
+                .or(i -> i.eq(RewardActivityDO::getProductScope, 1))
+                .or(i -> i. eq(RewardActivityDO::getProductScope, 3).and(i1 -> i1.apply(productScopeValuesFindInSetFunc.apply(categoryIds))))
+                .orderByDesc(RewardActivityDO::getId)
         );
     }
-
 }

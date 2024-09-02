@@ -3,29 +3,23 @@ package cn.iocoder.yudao.module.trade.service.price.calculator;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.module.promotion.api.reward.RewardActivityApi;
 import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionConditionTypeEnum;
-import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculatorHelper.formatPrice;
-
-// TODO @puhui999：相关的单测，建议改一改
 
 /**
  * 满减送活动的 {@link TradePriceCalculator} 实现类
@@ -46,14 +40,15 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
             return;
         }
         // 获得 SKU 对应的满减送活动
-        List<RewardActivityMatchRespDTO> rewardActivities = rewardActivityApi.getMatchRewardActivityList(
-                convertSet(result.getItems(), TradePriceCalculateRespBO.OrderItem::getSpuId));
+        List<RewardActivityMatchRespDTO> rewardActivities = rewardActivityApi.getRewardActivityBySpuIdsAndStatusAndDateTimeLt(
+                convertSet(result.getItems(), TradePriceCalculateRespBO.OrderItem::getSpuId), CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now());
         if (CollUtil.isEmpty(rewardActivities)) {
             return;
         }
-
-        // 处理每个满减送活动
-        rewardActivities.forEach(rewardActivity -> calculate(param, result, rewardActivity));
+        // 处理最新的满减送活动
+        if(!rewardActivities.isEmpty()){
+            calculate(param, result, rewardActivities.get(0));
+        }
     }
 
     private void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result,
@@ -128,21 +123,18 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
      */
     private List<TradePriceCalculateRespBO.OrderItem> filterMatchActivityOrderItems(TradePriceCalculateRespBO result,
                                                                                     RewardActivityMatchRespDTO rewardActivity) {
-        // 情况一：全部商品都可以参与
-        if (PromotionProductScopeEnum.isAll(rewardActivity.getProductScope())) {
+        Integer productScope = rewardActivity.getProductScope();
+        if(PromotionProductScopeEnum.isAll(productScope)){
             return result.getItems();
-        }
-        // 情况二：指定商品参与
-        if (PromotionProductScopeEnum.isSpu(rewardActivity.getProductScope())) {
+        }else if (PromotionProductScopeEnum.isSpu(productScope)) {
             return filterList(result.getItems(),
                     orderItem -> CollUtil.contains(rewardActivity.getProductScopeValues(), orderItem.getSpuId()));
-        }
-        // 情况三：指定商品类型参与
-        if (PromotionProductScopeEnum.isCategory(rewardActivity.getProductScope())) {
+        }else if (PromotionProductScopeEnum.isCategory(productScope)) {
             return filterList(result.getItems(),
                     orderItem -> CollUtil.contains(rewardActivity.getProductScopeValues(), orderItem.getCategoryId()));
+        }else{
+            throw exception(REWARD_ACTIVITY_TYPE_NOT_EXISTS);
         }
-        return List.of();
     }
 
     /**
