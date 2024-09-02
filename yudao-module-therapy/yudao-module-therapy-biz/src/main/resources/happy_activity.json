@@ -3,7 +3,7 @@
     "start": [ {"step_type": "START"}],
     "steps": [
       {"step_type": "guide_language", "step_data": {"content":  "做一些自己喜欢的活动可以让心情变好！\uD83C\uDFA8 想想有哪些活动会让你开心起来呢？"}},
-      {"step_type": "guide_language", "step_data": {"content":  "以下是一些常见的愉悦活动分类，也许能帮你找到灵感✨：\n * <b>服务类活动</b>：做些能帮助别人或者改善别人生活的事\uD83E\uDD1D； \n * <b>趣味类活动</b>：做些让你觉得有趣或兴奋的事\uD83C\uDF89； \n * <b>社交类活动</b>：和别人一起做点有趣的事\uD83D\uDC6F\u200D♂\uFE0F； \n * <b>成长类活动</b>：学习一项新技能，并努力掌握它\uD83D\uDCDA；\n * <b>体育类活动</b>：动起来，做些运动或玩游戏\uD83C\uDFC3\u200D♂\uFE0F。"}},
+      {"step_type": "guide_language", "step_data": {"content":  "以下是一些常见的愉悦活动分类，也许能帮你找到灵感✨：<br/> * <b>服务类活动</b>：做些能帮助别人或者改善别人生活的事\uD83E\uDD1D； <br/> * <b>趣味类活动</b>：做些让你觉得有趣或兴奋的事\uD83C\uDF89； <br/> * <b>社交类活动</b>：和别人一起做点有趣的事\uD83D\uDC6F\u200D♂\uFE0F； <br/> * <b>成长类活动</b>：学习一项新技能，并努力掌握它\uD83D\uDCDA；<br/> * <b>体育类活动</b>：动起来，做些运动或玩游戏\uD83C\uDFC3\u200D♂\uFE0F。"}},
       {"step_type": "guide_language", "step_data": {"content":  "这里有个活动清单，包括一些可以做的事、去的地方、学的东西等，试着选一些你喜欢的，或者自己设计有趣的活动，建立你的“愉悦活动清单”\uD83D\uDCDD！"}},
       {"step_type": "guide_language", "step_data": {"content":  "在情绪低落时，它能帮你找到摆脱坏情绪的方法，放松一下，转移注意力，然后以更好的状态面对问题\uD83D\uDCAA。"}},
       {"step_type": "guide_language", "step_data": {"content":  "如果一时想不起有趣的活动，不妨想象一下：如果你有一天完全自由，没有任何安排，你会做些什么来让自己开心呢？考虑一下你想到的事情是不是现实的，是否可以有规律地发生，是不是积极的选择。"}},
