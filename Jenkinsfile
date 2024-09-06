@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        NAME = "jh-web"
+        NAME = "specialty"
         VERSION = "0.0.1"
         ENVTYPE = "DEV"
         DEVIMGURL = "192.168.10.205:8888"
