@@ -5,7 +5,7 @@ pipeline {
         NAME = "specialty"
         VERSION = "0.0.1"
         ENVTYPE = "DEV"
-        DEVIMGURL = "192.168.10.205:8888"
+        DEVIMGURL = "192.168.10.206:8888"
     }
 
     stages {
@@ -29,6 +29,12 @@ pipeline {
                     sh "echo ${password} | docker login  -u ${username}   --password-stdin http://${DEVIMGURL}"
                     sh "docker push ${DEVIMGURL}/library/${NAME}:${VERSION}"
                 }
+            }
+        }
+
+        stage('启动项目') {
+            steps {
+                sshCommand remote: saas, command: 'echo Hello, Jenkins!' // 执行SSH命令
             }
         }
     }
