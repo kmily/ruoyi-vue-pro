@@ -320,7 +320,7 @@ public class CouponServiceImpl implements CouponService {
             throw exception(COUPON_TEMPLATE_NOT_EXISTS);
         }
         // 校验剩余数量
-        if (couponTemplate.getTakeCount() + userIds.size() > couponTemplate.getTotalCount()) {
+        if (couponTemplate.getTotalCount() != null && couponTemplate.getTakeCount() + userIds.size() > couponTemplate.getTotalCount()) {
             throw exception(COUPON_TEMPLATE_NOT_ENOUGH);
         }
         // 校验"固定日期"的有效期类型是否过期
@@ -342,7 +342,7 @@ public class CouponServiceImpl implements CouponService {
      * @param couponTemplate 优惠劵模版
      */
     private void removeTakeLimitUser(Set<Long> userIds, CouponTemplateDO couponTemplate) {
-        if (couponTemplate.getTakeLimitCount() <= 0) {
+        if (couponTemplate.getTakeLimitCount() == null || couponTemplate.getTakeLimitCount() <= 0) {
             return;
         }
         // 查询已领过券的用户
