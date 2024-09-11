@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.promotion.dal.mysql.coupon.CouponTemplateMapper;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTakeTypeEnum;
 import org.springframework.stereotype.Service;
+import javax.validation.Validator;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -41,8 +42,13 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
     @Resource
     private ProductSpuApi productSpuApi;
 
+    @Resource
+    private Validator validator;
+
     @Override
     public Long createCouponTemplate(CouponTemplateCreateReqVO createReqVO) {
+        // 校验参数
+        createReqVO.validate(validator);
         // 校验商品范围
         validateProductScope(createReqVO.getProductScope(), createReqVO.getProductScopeValues());
         // 插入
