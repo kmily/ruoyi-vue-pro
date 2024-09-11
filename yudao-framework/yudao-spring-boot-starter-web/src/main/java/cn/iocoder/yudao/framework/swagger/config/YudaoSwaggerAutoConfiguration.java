@@ -15,6 +15,7 @@ import org.springdoc.core.*;
 import org.springdoc.core.customizers.OpenApiBuilderCustomizer;
 import org.springdoc.core.customizers.ServerBaseUrlCustomizer;
 import org.springdoc.core.providers.JavadocProvider;
+import org.springdoc.core.providers.ObjectMapperProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -105,8 +106,8 @@ public class YudaoSwaggerAutoConfiguration {
      * 修复swagger文档A属性引用B属性时 A属性中定义B字段上的 @Schema 注解不生效问题
      */
     @Bean
-    public SchemaPropertyFixModelConverter schemaPropertyFixModelConverter(){
-        return new SchemaPropertyFixModelConverter();
+    public SchemaPropertyFixModelConverter schemaPropertyFixModelConverter(ObjectMapperProvider springDocObjectMapper){
+        return new SchemaPropertyFixModelConverter(springDocObjectMapper);
     }
 
     // ========== 分组 OpenAPI 配置 ==========
