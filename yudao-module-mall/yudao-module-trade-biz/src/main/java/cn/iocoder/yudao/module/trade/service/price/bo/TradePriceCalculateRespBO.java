@@ -68,6 +68,11 @@ public class TradePriceCalculateRespBO {
     private Long bargainActivityId;
 
     /**
+     * 是否满送包邮
+     */
+    private Boolean freeDelivery;
+
+    /**
      * 订单价格
      */
     @Data

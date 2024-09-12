@@ -75,6 +75,8 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
         Integer newDiscountPrice = rule.getDiscountPrice();
         // 2.2 计算分摊的优惠金额
         List<Integer> divideDiscountPrices = TradePriceCalculatorHelper.dividePrice(orderItems, newDiscountPrice);
+        //计算是否包邮
+        result.setFreeDelivery(rule.getFreeDelivery());
 
         // 3.1 记录使用的优惠劵
         result.setCouponId(param.getCouponId());
@@ -152,7 +154,7 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
      */
     private String getRewardActivityNotMeetTip(RewardActivityMatchRespDTO rewardActivity) {
         // TODO 芋艿：后面再想想；应该找第一个规则，算下还差多少即可。
-        return "TODO";
+        return "";
     }
 
 }
