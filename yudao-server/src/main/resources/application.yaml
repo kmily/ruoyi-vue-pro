@@ -3,7 +3,7 @@ spring:
     name: yudao-server
 
   profiles:
-    active: local
+    active: test
 
   main:
     allow-circular-references: true # 允许循环依赖，因为项目是三层架构，无法避免这个情况。
@@ -294,6 +294,7 @@ yudao:
       - rep_demo_jianpiao
       - tmp_report_data_1
       - tmp_report_data_income
+      - system_users
     ignore-caches:
       - permission_menu_ids
       - oauth_client
@@ -315,8 +316,8 @@ yudao:
     express:
       client: kd_niao
       kd-niao:
-        api-key: cb022f1e-48f1-4c4a-a723-9001ac9676b8
-        business-id: 1809751
+        api-key: c33833cf-68c2-4f7e-a2cf-387eb5bce53b
+        business-id: 1865609
       kd100:
         key: pLXUGAwK5305
         customer: E77DF18BE109F454A5CD319E44BF5177

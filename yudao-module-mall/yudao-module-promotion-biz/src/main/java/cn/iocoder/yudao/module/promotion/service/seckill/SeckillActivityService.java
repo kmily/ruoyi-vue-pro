@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppS
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillProductDO;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -110,7 +110,7 @@ public interface SeckillActivityService {
     List<SeckillActivityDO> getSeckillActivityListByConfigIdAndStatus(Long configId, Integer status);
 
     /**
-     * 通过活动时段获取秒杀活动
+     * 通过活动时段获取开始的秒杀活动
      *
      * @param pageReqVO 请求
      * @return 秒杀活动列表
