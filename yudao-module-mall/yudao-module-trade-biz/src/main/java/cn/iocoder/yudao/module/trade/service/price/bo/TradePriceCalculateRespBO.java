@@ -70,7 +70,7 @@ public class TradePriceCalculateRespBO {
     /**
      * 是否满送包邮
      */
-    private Boolean freeDelivery;
+    private Boolean freeDelivery = false;
 
     /**
      * 订单价格
