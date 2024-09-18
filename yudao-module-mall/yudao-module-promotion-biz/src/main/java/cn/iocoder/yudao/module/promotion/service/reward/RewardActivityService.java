@@ -10,11 +10,14 @@ import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivi
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionConditionTypeEnum;
+import cn.iocoder.yudao.module.promotion.service.coupon.CouponService;
+import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
 
@@ -78,28 +81,14 @@ public interface RewardActivityService {
      */
     List<RewardActivityMatchRespDTO> getMatchRewardActivityListBySpuIds(Collection<Long> spuIds);
 
-    default String getRewardActivityRuleDescription(Integer conditionType, RewardActivityDO.Rule rule) {
-        String description = "";
-        if (PromotionConditionTypeEnum.PRICE.getType().equals(conditionType)) {
-            description += StrUtil.format("满 {} 元", MoneyUtils.fenToYuanStr(rule.getLimit()));
-        } else {
-            description += StrUtil.format("满 {} 件", rule.getLimit());
-        }
-        List<String> tips = new ArrayList<>(10);
-        if (rule.getDiscountPrice() != null) {
-            tips.add(StrUtil.format("减 {}", MoneyUtils.fenToYuanStr(rule.getDiscountPrice())));
-        }
-        if (Boolean.TRUE.equals(rule.getFreeDelivery())) {
-            tips.add("包邮");
-        }
-        if (rule.getPoint() != null && rule.getPoint() > 0) {
-            tips.add(StrUtil.format("送 {} 积分", rule.getPoint()));
-        }
-        if (CollUtil.isNotEmpty(rule.getGiveCouponTemplateCounts())) {
-            tips.add(StrUtil.format("送 {} 张优惠券",
-                    getSumValue(rule.getGiveCouponTemplateCounts().values(), count -> count, Integer::sum)));
-        }
-        return description + StrUtil.join("、", tips);
-    }
+    /**
+     * 获得 spuId 商品匹配的的满减送活动列表
+     *
+     * @param conditionType   条件类型
+     * @param rule   优惠规则
+     * @return key 类型 RewardTypeEnum
+     *       value 优惠描述
+     */
+    Map<Integer, String> getRewardActivityRuleDescription(Integer conditionType, RewardActivityDO.Rule rule);
 
 }

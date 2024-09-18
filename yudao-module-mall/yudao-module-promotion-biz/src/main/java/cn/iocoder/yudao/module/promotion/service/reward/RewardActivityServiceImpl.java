@@ -2,8 +2,10 @@ package cn.iocoder.yudao.module.promotion.service.reward;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.product.api.category.ProductCategoryApi;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
@@ -13,9 +15,14 @@ import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivi
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityCreateReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityUpdateReqVO;
+import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.reward.RewardActivityMapper;
+import cn.iocoder.yudao.module.promotion.enums.common.PromotionConditionTypeEnum;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
+import cn.iocoder.yudao.module.promotion.enums.reward.RewardTypeEnum;
+import cn.iocoder.yudao.module.promotion.service.coupon.CouponService;
+import cn.iocoder.yudao.module.promotion.service.coupon.CouponTemplateService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -43,6 +50,9 @@ public class RewardActivityServiceImpl implements RewardActivityService {
     private ProductCategoryApi productCategoryApi;
     @Resource
     private ProductSpuApi productSpuApi;
+
+    @Resource
+    private CouponTemplateService couponTemplateService;
 
     @Override
     public Long createRewardActivity(RewardActivityCreateReqVO createReqVO) {
@@ -234,6 +244,51 @@ public class RewardActivityServiceImpl implements RewardActivityService {
                             .setDescription(getRewardActivityRuleDescription(activityDTO.getConditionType(), rule))));
             return activityDTO;
         });
+    }
+
+    @Override
+    public Map<Integer, String> getRewardActivityRuleDescription(Integer conditionType, RewardActivityDO.Rule rule) {
+        Map<Integer, String> rewardActivityRuleDescription = new HashMap<>();
+        String description = "";
+        if (PromotionConditionTypeEnum.PRICE.getType().equals(conditionType)) {
+            description += StrUtil.format("满{}元", MoneyUtils.fenToYuanStr(rule.getLimit()));
+        } else {
+            description += StrUtil.format("满{}件", rule.getLimit());
+        }
+        //满减
+        List<String> fullMinusTips = new ArrayList<>(10);
+        if (rule.getDiscountPrice() != null) {
+            fullMinusTips.add(StrUtil.format("减{}元", MoneyUtils.fenToYuanStr(rule.getDiscountPrice())));
+        }
+        rewardActivityRuleDescription.put(RewardTypeEnum.FULLMINUS.getType(),description + StrUtil.join("、", fullMinusTips));
+        //满送
+        List<String> fullDeliverTips = new ArrayList<>(10);
+        List<String> fullDeliverSumTips = new ArrayList<>(10);
+        Map<Long, Integer> giveCouponTemplateCounts = rule.getGiveCouponTemplateCounts();
+        if (CollUtil.isNotEmpty(giveCouponTemplateCounts)) {
+            giveCouponTemplateCounts.keySet().forEach(key -> {
+                //查询电子券
+                CouponTemplateDO couponTemplate = couponTemplateService.getCouponTemplate(key);
+                Integer num = giveCouponTemplateCounts.get(key);
+                fullDeliverTips.add(StrUtil.format("送{}张{}元{}",
+                        num, MoneyUtils.fenToYuanStr(couponTemplate.getDiscountPrice()), couponTemplate.getName()));
+            });
+            fullDeliverSumTips.add(StrUtil.format("送{}张优惠券",
+                    getSumValue(rule.getGiveCouponTemplateCounts().values(), count -> count, Integer::sum)));
+        }
+        if (rule.getPoint() != null && rule.getPoint() > 0) {
+            fullDeliverTips.add(StrUtil.format("送{}积分", rule.getPoint()));
+        }
+        rewardActivityRuleDescription.put(RewardTypeEnum.FULLDELIVER.getType(),description + StrUtil.join("、", fullDeliverTips));
+        rewardActivityRuleDescription.put(RewardTypeEnum.FULLDELIVERSUM.getType(),description + StrUtil.join("、", fullDeliverSumTips));
+        //包邮
+        List<String> freeDeliveryTips = new ArrayList<>(10);
+        if (Boolean.TRUE.equals(rule.getFreeDelivery())) {
+            freeDeliveryTips.add("包邮");
+        }
+        rewardActivityRuleDescription.put(RewardTypeEnum.FREEDELIVERY.getType(),description + StrUtil.join("、", freeDeliveryTips));
+        //优惠券
+        return rewardActivityRuleDescription;
     }
 
 }

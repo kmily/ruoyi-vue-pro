@@ -6,6 +6,7 @@ import lombok.Data;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Schema(description = "用户 App - 商品结算信息 Response VO")
 @Data
@@ -28,7 +29,7 @@ public class AppTradeProductSettlementRespVO {
         private Long id;
 
         @Schema(description = "优惠规则描述", requiredMode = Schema.RequiredMode.REQUIRED, example = "满 0.5 元减 0.3")
-        private List<String> ruleDescriptions;
+        private List<Map<Integer, String>> ruleDescriptions;
 
     }
 
