@@ -44,7 +44,12 @@ public interface ErrorCodeConstants {
     ErrorCode REWARD_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_006_004, "满减送活动已关闭，不能重复关闭");
     ErrorCode REWARD_ACTIVITY_SCOPE_EXISTS = new ErrorCode(1_013_006_005, "与该时间段满减送活动【{}】商品范围冲突，原因：{}");
 
-    // ========== TODO 空着 1-013-007-000 ============
+    // ========== 积分商城活动 1-013-007-000 ==========
+    ErrorCode POINT_ACTIVITY_NOT_EXISTS = new ErrorCode(1_013_007_000, "积分商城活动不存在");
+    ErrorCode POINT_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1_013_007_001, "存在商品参加了其它积分商城活动");
+    ErrorCode POINT_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_007_002, "积分商城活动已关闭，不能修改");
+    ErrorCode POINT_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1_013_007_003, "积分商城活动未关闭或未结束，不能删除");
+    ErrorCode POINT_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_007_004, "积分商城活动已关闭，不能重复关闭");
 
     // ========== 秒杀活动 1-013-008-000 ==========
     ErrorCode SECKILL_ACTIVITY_NOT_EXISTS = new ErrorCode(1_013_008_000, "秒杀活动不存在");
