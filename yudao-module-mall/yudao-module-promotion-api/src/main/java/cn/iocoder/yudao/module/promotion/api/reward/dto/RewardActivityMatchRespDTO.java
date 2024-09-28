@@ -110,7 +110,7 @@ public class RewardActivityMatchRespDTO {
          *
          * 通过 {@link #limit}、{@link #discountPrice} 等字段进行拼接
          */
-        private String description;
+        private Map<Integer, String> description;
 
     }
 

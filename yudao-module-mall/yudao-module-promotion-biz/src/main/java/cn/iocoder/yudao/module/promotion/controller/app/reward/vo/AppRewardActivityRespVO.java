@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Schema(description = "用户 App - 满减送活动 Response VO")
 @Data
@@ -43,7 +44,7 @@ public class AppRewardActivityRespVO {
     public static class Rule extends RewardActivityBaseVO.Rule {
 
         @Schema(description = "规则描述")
-        private String description; // 通过 {@link #limit}、{@link #discountPrice} 等字段进行拼接
+        private Map<Integer, String> description; // 通过 {@link #limit}、{@link #discountPrice} 等字段进行拼接
 
     }
 

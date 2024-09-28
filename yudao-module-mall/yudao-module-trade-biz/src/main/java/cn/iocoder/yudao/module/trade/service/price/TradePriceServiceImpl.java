@@ -131,7 +131,7 @@ public class TradePriceServiceImpl implements TradePriceService {
                 // 计算 VIP 优惠金额
                 Integer vipPrice = discountActivityPriceCalculator.calculateVipPrice(level, orderItem);
                 if (discountPrice <= 0 && vipPrice <= 0) {
-                    return skuVO;
+                    return null;
                 }
                 // 选择一个大的优惠
                 if (discountPrice > vipPrice) {
