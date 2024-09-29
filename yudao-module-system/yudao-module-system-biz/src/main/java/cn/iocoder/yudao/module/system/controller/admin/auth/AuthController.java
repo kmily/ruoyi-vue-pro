@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -154,4 +155,21 @@ public class AuthController {
         return success(authService.socialLogin(reqVO));
     }
 
+    @PostMapping("/login/impersonate")
+    @PreAuthorize("@ss.hasPermission('system:login:impersonate')")
+    @Operation(summary = "模拟身份登录")
+    @Parameters({
+            @Parameter(name = "tenantId", description = "租户编号", required = true),
+            @Parameter(name = "userId", description = "用户编号", required = true)
+    })
+    public CommonResult<AuthLoginRespVO> impersonate(@RequestBody @Valid AuthImpersonateLoginReqVO reqVO) {
+        return success(authService.impersonate(reqVO));
+    }
+
+    @PostMapping("/stop-impersonation")
+    @PermitAll
+    @Operation(summary = "退出身份模拟")
+    public CommonResult<AuthLoginRespVO> stopImpersonation() {
+        return success(authService.stopImpersonation());
+    }
 }

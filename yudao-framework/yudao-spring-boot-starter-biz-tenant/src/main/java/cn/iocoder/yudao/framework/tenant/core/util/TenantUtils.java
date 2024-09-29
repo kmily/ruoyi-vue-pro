@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.tenant.core.util;
 
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 
 import java.util.Map;
@@ -54,7 +55,11 @@ public class TenantUtils {
             TenantContextHolder.setIgnore(false);
             // 执行逻辑
             return callable.call();
+        } catch (ServiceException e){
+            // 业务逻辑异常直接抛出，交给全局异常处理器，返回具体的异常信息
+            throw e;
         } catch (Exception e) {
+            // 系统异常
             throw new RuntimeException(e);
         } finally {
             TenantContextHolder.setTenantId(oldTenantId);

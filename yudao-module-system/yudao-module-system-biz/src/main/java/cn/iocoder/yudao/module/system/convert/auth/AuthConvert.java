@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.system.convert.auth;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeSendReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
@@ -30,7 +31,10 @@ public interface AuthConvert {
 
     default AuthPermissionInfoRespVO convert(AdminUserDO user, List<RoleDO> roleList, List<MenuDO> menuList) {
         return AuthPermissionInfoRespVO.builder()
-                .user(BeanUtils.toBean(user, AuthPermissionInfoRespVO.UserVO.class))
+                .user(BeanUtils.toBean(user, AuthPermissionInfoRespVO.UserVO.class)
+                        // 是否模拟身份登录
+                        .setImpersonated(SecurityFrameworkUtils.isImpersonate())
+                )
                 .roles(convertSet(roleList, RoleDO::getCode))
                 // 权限标识信息
                 .permissions(convertSet(menuList, MenuDO::getPermission))

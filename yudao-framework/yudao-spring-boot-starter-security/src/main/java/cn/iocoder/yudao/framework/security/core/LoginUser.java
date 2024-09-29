@@ -20,6 +20,14 @@ public class LoginUser {
 
     public static final String INFO_KEY_NICKNAME = "nickname";
     public static final String INFO_KEY_DEPT_ID = "deptId";
+    /**
+     * 切换用户登录后的原用户编号
+     */
+    public static final String INFO_KEY_SOURCE_USER_ID = "sourceUserId";
+    /**
+     * 切换用户登录后的原用户租户编号
+     */
+    public static final String INFO_KEY_SOURCE_TENANT_ID = "sourceTenantId";
 
     /**
      * 用户编号

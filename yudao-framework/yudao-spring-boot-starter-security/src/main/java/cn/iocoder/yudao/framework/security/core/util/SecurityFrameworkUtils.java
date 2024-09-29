@@ -113,6 +113,17 @@ public class SecurityFrameworkUtils {
     }
 
     /**
+     * 获得当前用户是否为模拟身份登录，从上下文中
+     *
+     * @return 是否为模拟身份登录
+     */
+    @Nullable
+    public static boolean isImpersonate() {
+        LoginUser loginUser = getLoginUser();
+        return loginUser != null && loginUser.getInfo().containsKey(LoginUser.INFO_KEY_SOURCE_USER_ID);
+    }
+
+    /**
      * 设置当前用户
      *
      * @param loginUser 登录用户

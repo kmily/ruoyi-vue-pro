@@ -1,11 +1,17 @@
 package cn.iocoder.yudao.module.system.service.auth;
 
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
@@ -13,15 +19,19 @@ import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.*;
 import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import cn.iocoder.yudao.module.system.enums.oauth2.OAuth2ClientConstants;
+import cn.iocoder.yudao.module.system.enums.permission.RoleCodeEnum;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
 import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
 import cn.iocoder.yudao.module.system.service.member.MemberService;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2TokenService;
+import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.social.SocialUserService;
+import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.google.common.annotations.VisibleForTesting;
 import com.xingyuv.captcha.model.common.ResponseModel;
@@ -35,7 +45,10 @@ import javax.annotation.Resource;
 import javax.validation.Validator;
 import java.util.Objects;
 
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.FORBIDDEN;
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.UNAUTHORIZED;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
@@ -64,6 +77,10 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     private CaptchaService captchaService;
     @Resource
     private SmsCodeApi smsCodeApi;
+    @Resource
+    private TenantService tenantService;
+    @Resource
+    private PermissionService permissionService;
 
     /**
      * 验证码的开关，默认为 true
@@ -205,6 +222,55 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     public AuthLoginRespVO refreshToken(String refreshToken) {
         OAuth2AccessTokenDO accessTokenDO = oauth2TokenService.refreshAccessToken(refreshToken, OAuth2ClientConstants.CLIENT_ID_DEFAULT);
         return AuthConvert.INSTANCE.convert(accessTokenDO);
+    }
+
+    @Override
+    public AuthLoginRespVO impersonate(AuthImpersonateLoginReqVO reqVO) {
+        if(SecurityFrameworkUtils.isImpersonate()) {
+            throw exception0(FORBIDDEN.getCode(), "暂不支持重复模拟登录");
+        }
+
+        TenantDO tenant = tenantService.getTenant(reqVO.getTenantId());
+        if (tenant == null) {
+            throw exception(TENANT_NOT_EXISTS);
+        }
+
+        if (DateUtils.isExpired(tenant.getExpireTime())) {
+            throw exception(TENANT_EXPIRE, tenant.getName());
+        }
+
+        return TenantUtils.execute(reqVO.getTenantId(), () -> {
+            TenantContextHolder.setIgnore(true);
+            // 超管才忽略租户过滤
+            boolean isSuperAdmin = permissionService.hasAnyRoles(SecurityFrameworkUtils.getLoginUserId(), RoleCodeEnum.SUPER_ADMIN.getCode());
+            TenantContextHolder.setIgnore(isSuperAdmin);
+
+            AdminUserDO adminUserDO = userService.getUser(reqVO.getUserId());
+            if (adminUserDO == null) {
+                throw exception(FORBIDDEN);
+            }
+            return createTokenAfterLoginSuccess(adminUserDO.getId(), adminUserDO.getUsername(), LoginLogTypeEnum.LOGIN_IMPERSONATE);
+        });
+    }
+
+    @Override
+    public AuthLoginRespVO stopImpersonation() {
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        if(loginUser == null) {
+            throw exception(UNAUTHORIZED);
+        }
+        if(!SecurityFrameworkUtils.isImpersonate()) {
+            throw exception(FORBIDDEN);
+        }
+        Long tenantId = MapUtil.getLong(loginUser.getInfo(), LoginUser.INFO_KEY_SOURCE_TENANT_ID);
+        return TenantUtils.execute(tenantId, () -> {
+            TenantContextHolder.setIgnore(true);
+            AdminUserDO adminUserDO = userService.getUser(MapUtil.getLong(loginUser.getInfo(), LoginUser.INFO_KEY_SOURCE_USER_ID));
+            if (adminUserDO == null) {
+                throw exception(USER_NOT_EXISTS);
+            }
+            return createTokenAfterLoginSuccess(adminUserDO.getId(), adminUserDO.getUsername(), LoginLogTypeEnum.STOP_IMPERSONATE);
+        });
     }
 
     @Override

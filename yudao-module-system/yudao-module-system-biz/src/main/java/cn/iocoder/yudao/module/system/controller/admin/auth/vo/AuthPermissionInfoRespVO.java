@@ -47,6 +47,9 @@ public class AuthPermissionInfoRespVO {
         @Schema(description = "部门编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
         private Long deptId;
 
+        @Schema(description = "是否模拟身份", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
+        private boolean impersonated;
+
     }
 
     @Schema(description = "管理后台 - 登录用户的菜单信息 Response VO")

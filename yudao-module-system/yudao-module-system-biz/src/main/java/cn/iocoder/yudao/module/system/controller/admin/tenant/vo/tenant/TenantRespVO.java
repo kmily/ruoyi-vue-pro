@@ -52,4 +52,7 @@ public class TenantRespVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
+    @Schema(description = "租户管理员编号", example = "1024")
+    private Long contactUserId;
+
 }
