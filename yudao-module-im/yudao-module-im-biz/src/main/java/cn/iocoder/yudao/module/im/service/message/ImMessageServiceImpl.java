@@ -16,10 +16,10 @@ import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.hutool.core.date.TimeUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -87,7 +87,7 @@ public class ImMessageServiceImpl implements ImMessageService {
                 .setConversationNo(ImConversationTypeEnum.generateConversationNo(fromUserId, message.getReceiverId(), message.getConversationType()))
                 .setSendFrom(ImMessageSourceEnum.USER_SEND.getSource())
                 .setMessageStatus(ImMessageStatusEnum.SENDING.getStatus())
-                .setSendTime(TimeUtil.now());
+                .setSendTime(LocalDateTime.now());
         imMessageMapper.insert(imMessageDO);
         return imMessageDO;
     }

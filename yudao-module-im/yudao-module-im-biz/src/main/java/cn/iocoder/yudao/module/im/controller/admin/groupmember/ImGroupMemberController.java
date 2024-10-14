@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.ImGroupMemberPageReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.ImGroupMemberRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.ImGroupMemberSaveReqVO;
@@ -25,7 +24,6 @@ import java.io.IOException;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 // TODO @芋艿：得看看 create、update、delete、get、page 这几个接口，要保留哪些
 @Tag(name = "管理后台 - 群成员")
@@ -81,7 +79,6 @@ public class ImGroupMemberController {
     @GetMapping("/export-excel")
     @Operation(summary = "导出群成员 Excel")
     @PreAuthorize("@ss.hasPermission('im:group-member:export')")
-    @OperateLog(type = EXPORT)
     public void exportGroupMemberExcel(@Valid ImGroupMemberPageReqVO pageReqVO,
                                        HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
