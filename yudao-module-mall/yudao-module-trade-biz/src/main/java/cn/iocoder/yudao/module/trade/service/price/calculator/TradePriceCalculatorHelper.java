@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.price.calculator;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
@@ -10,6 +11,7 @@ import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,8 +32,7 @@ public class TradePriceCalculatorHelper {
                                                                List<ProductSpuRespDTO> spuList, List<ProductSkuRespDTO> skuList) {
         // 创建 PriceCalculateRespDTO 对象
         TradePriceCalculateRespBO result = new TradePriceCalculateRespBO();
-        result.setType(getOrderType(param));
-        result.setPromotions(new ArrayList<>());
+        result.setType(getOrderType(param)).setPromotions(new ArrayList<>()).setGiveCouponTemplateCounts(new LinkedHashMap<>());
 
         // 创建它的 OrderItem 属性
         result.setItems(new ArrayList<>(param.getItems().size()));
@@ -59,9 +60,9 @@ public class TradePriceCalculatorHelper {
                     .setWeight(sku.getWeight()).setVolume(sku.getVolume());
             // spu 信息
             orderItem.setSpuName(spu.getName()).setCategoryId(spu.getCategoryId())
-                    .setDeliveryTemplateId(spu.getDeliveryTemplateId())
+                    .setDeliveryTypes(spu.getDeliveryTypes()).setDeliveryTemplateId(spu.getDeliveryTemplateId())
                     .setGivePoint(spu.getGiveIntegral()).setUsePoint(0);
-            if (orderItem.getPicUrl() == null) {
+            if (StrUtil.isBlank(orderItem.getPicUrl())) {
                 orderItem.setPicUrl(spu.getPicUrl());
             }
         });
@@ -88,6 +89,9 @@ public class TradePriceCalculatorHelper {
         }
         if (param.getBargainRecordId() != null) {
             return TradeOrderTypeEnum.BARGAIN.getType();
+        }
+        if (param.getPointActivityId() != null) {
+            return TradeOrderTypeEnum.POINT.getType();
         }
         return TradeOrderTypeEnum.NORMAL.getType();
     }
@@ -240,12 +244,12 @@ public class TradePriceCalculatorHelper {
      *
      * 和 {@link #dividePrice(List, Integer)} 逻辑一致，只是传入的是 TradeOrderItemDO 对象
      *
-     * @param items         订单项
+     * @param items 订单项
      * @param price 订单支付金额
      * @return 分摊金额数组，和传入的 orderItems 一一对应
      */
     public static List<Integer> dividePrice2(List<TradeOrderItemDO> items, Integer price) {
-        Integer total = getSumValue(items, TradeOrderItemDO::getPrice, Integer::sum);
+        Integer total = getSumValue(items, TradeOrderItemDO::getPayPrice, Integer::sum);
         assert total != null;
         // 遍历每一个，进行分摊
         List<Integer> prices = new ArrayList<>(items.size());
@@ -254,12 +258,11 @@ public class TradePriceCalculatorHelper {
             TradeOrderItemDO orderItem = items.get(i);
             int partPrice;
             if (i < items.size() - 1) { // 减一的原因，是因为拆分时，如果按照比例，可能会出现.所以最后一个，使用反减
-                partPrice = (int) (price * (1.0D * orderItem.getPayPrice() / total));
+                partPrice = (int) (price * (1.0D * orderItem.getPrice() / total));
                 remainPrice -= partPrice;
             } else {
                 partPrice = remainPrice;
             }
-            Assert.isTrue(partPrice >= 0, "分摊金额必须大于等于 0");
             prices.add(partPrice);
         }
         return prices;

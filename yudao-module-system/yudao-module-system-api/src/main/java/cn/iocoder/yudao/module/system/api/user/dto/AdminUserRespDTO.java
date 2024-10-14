@@ -40,6 +40,10 @@ public class AdminUserRespDTO {
      * 手机号码
      */
     private String mobile;
+    /**
+     * 用户头像
+     */
+    private String avatar;
 
     // TODO @hao：这种字段的添加，最好和 do 保持一致的顺序哈；
     /**

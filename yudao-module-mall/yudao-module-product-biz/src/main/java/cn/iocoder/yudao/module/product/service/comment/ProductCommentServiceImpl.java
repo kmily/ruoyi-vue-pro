@@ -67,7 +67,7 @@ public class ProductCommentServiceImpl implements ProductCommentService {
         // 校验 SPU
         ProductSpuDO spu = validateSpu(sku.getSpuId());
         // 校验评论
-        validateCommentExists(createReqDTO.getUserId(), createReqDTO.getOrderId());
+        validateCommentExists(createReqDTO.getUserId(), createReqDTO.getOrderItemId());
         // 获取用户详细信息
         MemberUserRespDTO user = memberUserApi.getUser(createReqDTO.getUserId());
 
@@ -113,7 +113,7 @@ public class ProductCommentServiceImpl implements ProductCommentService {
 
         // 更新可见状态
         productCommentMapper.updateById(new ProductCommentDO().setId(updateReqVO.getId())
-                .setVisible(true));
+                .setVisible(updateReqVO.getVisible()));
     }
 
     @Override
