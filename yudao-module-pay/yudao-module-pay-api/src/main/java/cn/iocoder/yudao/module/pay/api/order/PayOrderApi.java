@@ -30,6 +30,14 @@ public interface PayOrderApi {
     PayOrderRespDTO getOrder(Long id);
 
     /**
+     * 获得支付单
+     *
+     * @param channelOrderNo 渠道订单编号
+     * @return 支付单
+     */
+    PayOrderRespDTO getOrder( String channelOrderNo);
+
+    /**
      * 更新支付订单价格
      *
      * @param id 支付单编号

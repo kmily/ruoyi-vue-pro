@@ -34,6 +34,13 @@ public interface PayOrderService {
     /**
      * 获得支付订单
      *
+     * @param channalOrderNo 渠道订单号
+     * @return 支付订单
+     */
+    PayOrderDO getOrder(String channalOrderNo);
+    /**
+     * 获得支付订单
+     *
      * @param appId           应用编号
      * @param merchantOrderId 商户订单编号
      * @return 支付订单

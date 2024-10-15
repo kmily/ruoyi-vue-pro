@@ -2,7 +2,10 @@ package cn.iocoder.yudao.module.trade.controller.app.order;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
+import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
+import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.*;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemCommentCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.item.AppTradeOrderItemRespVO;
@@ -11,6 +14,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
+import cn.iocoder.yudao.module.trade.framework.delivery.wx.WxMaOrderShippingProperties;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.service.aftersale.AfterSaleService;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
@@ -53,6 +57,12 @@ public class AppTradeOrderController {
     private AfterSaleService afterSaleService;
     @Resource
     private TradePriceService priceService;
+
+    @Resource
+    private PayOrderApi payOrderApi;
+
+    @Resource
+    private WxMaOrderShippingProperties wxMaOrderShippingProperties;
 
     @Resource
     private TradeOrderProperties tradeOrderProperties;
@@ -113,8 +123,13 @@ public class AppTradeOrderController {
         // 2.2 查询物流公司
         DeliveryExpressDO express = order.getLogisticsId() != null && order.getLogisticsId() > 0 ?
                 deliveryExpressService.getDeliveryExpress(order.getLogisticsId()) : null;
+        //小程序订单查询渠道项
+        PayOrderRespDTO payOrder = PayChannelEnum.WX_LITE.getCode().equals(order.getPayChannelCode())?
+                payOrderApi.getOrder(order.getPayOrderId()) : null;
         // 2.3 最终组合
-        return success(TradeOrderConvert.INSTANCE.convert02(order, orderItems, tradeOrderProperties, express));
+        return success(TradeOrderConvert.INSTANCE.convert02(order, orderItems, tradeOrderProperties, express, payOrder,
+                wxMaOrderShippingProperties.getIsMaTradeManaged()));
+
     }
 
     @GetMapping("/get-express-track-list")
@@ -165,6 +180,14 @@ public class AppTradeOrderController {
     @Parameter(name = "id", description = "交易订单编号")
     public CommonResult<Boolean> receiveOrder(@RequestParam("id") Long id) {
         tradeOrderUpdateService.receiveOrderByMember(getLoginUserId(), id);
+        return success(true);
+    }
+
+    @PutMapping("/wx-receive")
+    @Operation(summary = "微信小程序确认交易订单收货")
+    public CommonResult<Boolean> receiveWxOrder(@RequestParam("channelOrderNo") String channelOrderNo) {
+        PayOrderRespDTO payOrder = payOrderApi.getOrder(channelOrderNo);
+        tradeOrderUpdateService.receiveOrderByMember(getLoginUserId(), Long.valueOf(payOrder.getMerchantOrderId()));
         return success(true);
     }
 

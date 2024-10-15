@@ -211,6 +211,10 @@ public class TradeOrderDO extends BaseDO {
      */
     private String logisticsNo;
     /**
+     * 微信物流查询id
+     */
+    private String waybillToken;
+    /**
      * 发货时间
      */
     private LocalDateTime deliveryTime;

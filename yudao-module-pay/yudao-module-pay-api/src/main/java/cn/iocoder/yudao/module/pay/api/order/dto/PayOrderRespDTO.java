@@ -30,6 +30,14 @@ public class PayOrderRespDTO {
      * 例如说，内部系统 A 的订单号。需要保证每个 PayMerchantDO 唯一
      */
     private String merchantOrderId;
+    /**
+     * 商品标题
+     */
+    private String subject;
+    /**
+     * 商品描述信息
+     */
+    private String body;
 
     // ========== 订单相关字段 ==========
     /**
@@ -49,5 +57,14 @@ public class PayOrderRespDTO {
     private LocalDateTime successTime;
 
     // ========== 渠道相关字段 ==========
+    /**
+     * 渠道用户编号
+     * 例如说，微信 openid、支付宝账号
+     */
+    private String channelUserId;
+    /**
+     * 渠道订单号
+     */
+    private String channelOrderNo;
 
 }

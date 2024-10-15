@@ -59,8 +59,15 @@ public class AppTradeOrderDetailRespVO {
 
     @Schema(description = "支付渠道", example = "wx_lite_pay")
     private String payChannelCode;
+
     @Schema(description = "支付渠道名", example = "微信小程序支付")
     private String payChannelName;
+
+    @Schema(description = "支付渠道订单号", example = "4200008888197001018888888888")
+    private String channelOrderNo;
+
+    @Schema(description = "是否开启微信小程序发货信息管理")
+    private Boolean isMaTradeManaged;
 
     @Schema(description = "商品原价（总）", requiredMode = Schema.RequiredMode.REQUIRED, example = "1000")
     private Integer totalPrice;
@@ -90,6 +97,9 @@ public class AppTradeOrderDetailRespVO {
 
     @Schema(description = "发货物流单号", example = "1024")
     private String logisticsNo;
+
+    @Schema(description = "微信物流查询id")
+    private String waybillToken;
 
     @Schema(description = "发货时间")
     private LocalDateTime deliveryTime;

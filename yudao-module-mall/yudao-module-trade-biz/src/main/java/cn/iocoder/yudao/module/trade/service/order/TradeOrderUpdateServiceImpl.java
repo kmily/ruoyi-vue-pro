@@ -1,5 +1,9 @@
 package cn.iocoder.yudao.module.trade.service.order;
 
+import cn.binarywang.wx.miniapp.api.WxMaService;
+import cn.binarywang.wx.miniapp.bean.delivery.TraceWaybillRequest;
+import cn.binarywang.wx.miniapp.bean.delivery.WaybillGoodsInfo;
+import cn.binarywang.wx.miniapp.bean.shop.request.shipping.*;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
@@ -12,6 +16,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
+import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.module.member.api.address.MemberAddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.MemberAddressRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
@@ -42,6 +47,10 @@ import cn.iocoder.yudao.module.trade.dal.mysql.order.TradeOrderMapper;
 import cn.iocoder.yudao.module.trade.dal.redis.no.TradeNoRedisDAO;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.*;
+import cn.iocoder.yudao.module.trade.framework.delivery.wx.WxMaOrderShippingProperties;
+import cn.iocoder.yudao.module.trade.framework.delivery.wx.enums.WxLogisticsTypeEnum;
+import cn.iocoder.yudao.module.trade.framework.delivery.wx.enums.WxMaDeliveryModeEnum;
+import cn.iocoder.yudao.module.trade.framework.delivery.wx.enums.WxOrderNumberType;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.framework.order.core.annotations.TradeOrderLog;
 import cn.iocoder.yudao.module.trade.framework.order.core.utils.TradeOrderLogUtils;
@@ -57,15 +66,20 @@ import cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculat
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import me.chanjar.weixin.common.error.WxErrorException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -103,6 +117,12 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private DeliveryExpressService deliveryExpressService;
     @Resource
     private TradeMessageService tradeMessageService;
+
+    @Resource
+    private WxMaService wxMaService;
+
+    @Resource
+    private WxMaOrderShippingProperties wxMaOrderShippingProperties;
 
     @Resource
     private PayOrderApi payOrderApi;
@@ -368,6 +388,13 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             throw exception(ORDER_DELIVERY_FAIL_DELIVERY_TYPE_NOT_EXPRESS);
         }
 
+        PayOrderRespDTO payOrder = null;
+        //小程序发货时获取支付单
+        if(PayChannelEnum.WX_LITE.getCode().equals(order.getPayChannelCode())
+                && (wxMaOrderShippingProperties.getIsMaTradeManaged() || wxMaOrderShippingProperties.getUseMaLogisticsPlugin())) {
+            payOrder = payOrderApi.getOrder(order.getPayOrderId());
+        }
+
         // 2. 更新订单为已发货
         TradeOrderDO updateOrderObj = new TradeOrderDO();
         // 2.1 快递发货
@@ -375,12 +402,23 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         if (ObjectUtil.notEqual(deliveryReqVO.getLogisticsId(), TradeOrderDO.LOGISTICS_ID_NULL)) {
             express = deliveryExpressService.validateDeliveryExpress(deliveryReqVO.getLogisticsId());
             updateOrderObj.setLogisticsId(deliveryReqVO.getLogisticsId()).setLogisticsNo(deliveryReqVO.getLogisticsNo());
+            //使用微信小程序物流查询插件
+            if(payOrder!=null && wxMaOrderShippingProperties.getUseMaLogisticsPlugin()){
+                try {
+                    String waybillToken = getWxTraceWaybillToken(order.getId(), deliveryReqVO.getLogisticsNo(), express, order.getReceiverMobile(), payOrder);
+                    updateOrderObj.setWaybillToken(waybillToken);
+                }catch (WxErrorException e) {
+                    log.error("[WxMaLogisticsPlugin][微信小程序物流插件查询id获取发生异常,异常信息({})]",e.getMessage());
+                    throw new RuntimeException(e);
+                }
+            }
         } else {
             // 2.2 无需发货
             updateOrderObj.setLogisticsId(0L).setLogisticsNo("");
         }
+        LocalDateTime deliveryTime = LocalDateTime.now();
         // 执行更新
-        updateOrderObj.setStatus(TradeOrderStatusEnum.DELIVERED.getStatus()).setDeliveryTime(LocalDateTime.now());
+        updateOrderObj.setStatus(TradeOrderStatusEnum.DELIVERED.getStatus()).setDeliveryTime(deliveryTime);
         int updateCount = tradeOrderMapper.updateByIdAndStatus(order.getId(), order.getStatus(), updateOrderObj);
         if (updateCount == 0) {
             throw exception(ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED);
@@ -396,6 +434,113 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                 .setOrderId(order.getId()).setUserId(order.getUserId()).setMessage(null));
         // 4.2 发送订阅消息
         getSelf().sendDeliveryOrderMessage(order, deliveryReqVO);
+
+        //小程序发货信息录入,放最后确保数据库事务完成
+        if(payOrder!= null && wxMaOrderShippingProperties.getIsMaTradeManaged())
+            wxMaOrderUpload(order.getId(), updateOrderObj, express, order.getReceiverMobile(), payOrder, deliveryTime);
+    }
+
+    /**
+     * 微信小程序交易发货信息录入
+     *
+     * @param orderId 交易订单id
+     * @param updateOrderObj 更新交易订单对象
+     * @param express 发货请求
+     * @param receiverMobile 收件人手机号码
+     * @param payOrder 交易订单
+     * @param deliveryTime 发货时间
+     */
+    private void wxMaOrderUpload(Long orderId, TradeOrderDO updateOrderObj, DeliveryExpressDO express,
+                                 String receiverMobile, PayOrderRespDTO payOrder, LocalDateTime deliveryTime) {
+        //构建订单信息
+        OrderKeyBean orderKey = new OrderKeyBean(WxOrderNumberType.TRANSACTION.getCode(),payOrder.getChannelOrderNo(),null,null);
+
+        //默认为快递发货
+        int logistics_type = WxLogisticsTypeEnum.EXPRESS.getCode();
+
+        if(ObjectUtil.equal(updateOrderObj.getLogisticsId(), TradeOrderDO.LOGISTICS_ID_NULL)){
+            //无需发货的场景
+            //TODO: 无需发货只设置为虚拟发货
+            logistics_type = WxLogisticsTypeEnum.VIRTUAL.getCode();
+        }
+
+
+        //构建物流信息列表,合并发货所以只有一条记录
+        List<ShippingListBean> shippingList = new ArrayList<ShippingListBean>(){{
+            add(
+                    ShippingListBean.builder()
+                    .trackingNo(updateOrderObj.getLogisticsNo())
+                    .expressCompany(express!=null?express.getCode():null)
+                    .itemDesc(payOrder.getBody())
+                    .contact(new ContactBean(null,receiverMobile))
+                    .build()
+            );
+        }};
+
+        //根据接口要求生成时间字符串,同步平台生成的时间
+        ZonedDateTime dateTime = ZonedDateTime.of(deliveryTime, ZoneId.of("Asia/Shanghai"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        String upload_time = dateTime.format(formatter);
+
+        //构建请求
+        WxMaOrderShippingInfoUploadRequest request = WxMaOrderShippingInfoUploadRequest.builder()
+                .orderKey(orderKey)
+                .deliveryMode(WxMaDeliveryModeEnum.UNIFIED_DELIVERY.getCode())//仅考虑合并发货情况
+                .logisticsType(logistics_type)
+                .isAllDelivered(true)
+                .shippingList(shippingList)
+                .uploadTime(upload_time)
+                .payer(new PayerBean(payOrder.getChannelUserId()))
+                .build();
+        try{
+            //上传发货信息
+            wxMaService.getWxMaOrderShippingService().upload(request);
+            //设置订单详情路径
+            wxMaService.getWxMaOrderShippingService().setMsgJumpPath(wxMaOrderShippingProperties.getOrderDetailPath()+"?id="+orderId);
+        } catch (WxErrorException e) {
+            log.error("[WxMaOrderShipping][微信小程序发货信息录入发生异常，异常信息({})]",e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 获取微信小程序物流查询插件的查询id(waybillToken)
+     *
+     * @param orderId 订单id
+     * @param logisticsNo 元旦号
+     * @param express 快递公司
+     * @param receiverMobile 收件人手机号
+     * @param payOrder 交易订单
+     * @return 物流查询id
+     */
+    private String getWxTraceWaybillToken(Long orderId, String logisticsNo, DeliveryExpressDO express,
+                                          String receiverMobile, PayOrderRespDTO payOrder) throws WxErrorException {
+
+        List<TradeOrderItemDO> orderItems = tradeOrderItemMapper.selectListByOrderId(orderId);
+        List<WaybillGoodsInfo.GoodsItem> goodsItems = orderItems
+                .stream()
+                .map(item->{
+                            WaybillGoodsInfo.GoodsItem goodsItem = new WaybillGoodsInfo.GoodsItem();
+                            goodsItem.setGoodsName(item.getSpuName());
+                            goodsItem.setGoodsImgUrl(item.getPicUrl());
+                            return goodsItem;
+                })
+                .collect(Collectors.toList());
+
+        //构建请求
+        //TODO: WxJava 4.6.0暂时不支持设置快递公司代码, 之后最好加上
+        TraceWaybillRequest request = TraceWaybillRequest.builder()
+                .openid(payOrder.getChannelUserId())
+                .senderPhone("")
+                .receiverPhone(receiverMobile)
+                //.deliveryId(express.getCode())
+                .waybillId(logisticsNo)
+                .goodsInfo(new WaybillGoodsInfo(goodsItems))
+                .transId(payOrder.getChannelOrderNo())
+                .orderDetailPath(wxMaOrderShippingProperties.getOrderDetailPath() + "?id=" + orderId)
+                .build();
+
+        return wxMaService.getWxMaImmediateDeliveryService().traceWaybill(request).getWaybillToken();
     }
 
     @Async
