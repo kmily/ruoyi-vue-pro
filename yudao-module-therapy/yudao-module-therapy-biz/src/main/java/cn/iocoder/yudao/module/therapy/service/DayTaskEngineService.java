@@ -176,7 +176,7 @@ public class DayTaskEngineService {
 
         TreatmentFlowDO flowDO = treatmentFlowMapper.selectById(stepItem.getFlowInstance().getFlowId());
         TreatmentFlowDayDO flowDayDO = treatmentFlowDayMapper.selectById(stepItem.getDay().getDayId());
-        if(!flowDayDO.isHasBreak()) {
+        if(!flowDayDO.isHasBreak() && stepItem.getDay_items() != null) {
             List<TreatmentDayitemInstanceDO> dayitemInstanceDOs = stepItem.getDay_items();
             List<Long> ids = dayitemInstanceDOs.stream().map(TreatmentDayitemInstanceDO::getDayitemId).collect(Collectors.toList());
             if(ids.size() > 0){
