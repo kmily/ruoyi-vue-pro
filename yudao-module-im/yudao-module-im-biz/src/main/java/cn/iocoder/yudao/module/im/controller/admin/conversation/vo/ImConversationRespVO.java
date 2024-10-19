@@ -18,7 +18,7 @@ public class ImConversationRespVO {
     private Long userId;
 
     @Schema(description = "会话类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    private Integer conversationType;
+    private Integer type;
 
     @Schema(description = "聊天对象编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private Long targetId;
