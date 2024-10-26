@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.service.message;
 
+import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageListByNoReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageListReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
@@ -16,11 +17,19 @@ public interface ImMessageService {
     /**
      * 获得历史消息
      *
-     * @param loginUserId 登录用户编号
      * @param listReqVO   分页查询
      * @return 消息分页
      */
-    List<ImMessageDO> getMessageList(Long loginUserId, ImMessageListReqVO listReqVO);
+    List<ImMessageDO> getMessageList(ImMessageListReqVO listReqVO);
+
+
+    /**
+     * 获得历史消息
+     *
+     * @param listReqVO   分页查询
+     * @return 消息分页
+     */
+    List<ImMessageDO> getMessageListByConversationNo(ImMessageListByNoReqVO listReqVO);
 
     /**
      * 拉取消息-大于 seq 的消息

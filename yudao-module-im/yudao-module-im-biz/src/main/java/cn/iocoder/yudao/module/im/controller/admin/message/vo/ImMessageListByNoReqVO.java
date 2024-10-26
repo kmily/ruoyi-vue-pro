@@ -15,20 +15,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Schema(description = "管理后台 - 消息列表 Request VO")
 @Data
 @ToString(callSuper = true)
-public class ImMessageListReqVO {
-
-    @Schema(description = "接收人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "32494")
-    @NotNull(message = "接收人编号不能为空")
-    private Long receiverId;
-
-    @Schema(description = "发送人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "32494")
-    @NotNull(message = "发送人编号不能为空")
-    private Long senderId;
-
-    @Schema(description = "会话类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @InEnum(value = ImConversationTypeEnum.class,message = "会话类型必须是 {value}")
-    @NotNull(message = "会话类型不能为空")
-    private Integer conversationType;
+public class ImMessageListByNoReqVO {
 
     @Schema(description = "发送时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "2024-03-27 12:00:00")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY)

@@ -18,7 +18,7 @@ public interface ImConversationService {
      *
      * @return 会话列表
      */
-    List<ImConversationDO> getConversationList();
+    List<ImConversationDO> getConversationList(Long loginUserId);
 
     /**
      * 置顶会话

@@ -2,10 +2,7 @@ package cn.iocoder.yudao.module.im.controller.admin.message;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageListReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageRespVO;
-import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageSendReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageSendRespVO;
+import cn.iocoder.yudao.module.im.controller.admin.message.vo.*;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
 import cn.iocoder.yudao.module.im.service.message.ImMessageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,7 +47,14 @@ public class ImMessageController {
     @GetMapping("/list")
     @Operation(summary = "消息列表-根据接收人和发送时间进行分页查询")
     public CommonResult<List<ImMessageRespVO>> getMessageList(@Valid ImMessageListReqVO listReqVO) {
-        List<ImMessageDO> messagePage = imMessageService.getMessageList(getLoginUserId(), listReqVO);
+        List<ImMessageDO> messagePage = imMessageService.getMessageList(listReqVO);
+        return success(BeanUtils.toBean(messagePage, ImMessageRespVO.class));
+    }
+
+    @GetMapping("/listByNo")
+    @Operation(summary = "消息列表-根据接收人和发送时间进行分页查询")
+    public CommonResult<List<ImMessageRespVO>> getMessageListByNo(@Valid ImMessageListByNoReqVO listReqVO) {
+        List<ImMessageDO> messagePage = imMessageService.getMessageListByConversationNo(listReqVO);
         return success(BeanUtils.toBean(messagePage, ImMessageRespVO.class));
     }
 

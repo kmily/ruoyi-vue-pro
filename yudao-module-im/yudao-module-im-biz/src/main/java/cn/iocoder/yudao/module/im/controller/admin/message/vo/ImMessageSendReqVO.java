@@ -24,6 +24,10 @@ public class ImMessageSendReqVO {
     @NotNull(message = "会话类型不能为空")
     private Integer conversationType;
 
+    @Schema(description = "会话编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @NotNull(message = "会话编号不能为空")
+    private String conversationNo;
+
     @Schema(description = "消息类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @InEnum(ImMessageContentTypeEnum.class)
     @NotNull(message = "消息类型不能为空")

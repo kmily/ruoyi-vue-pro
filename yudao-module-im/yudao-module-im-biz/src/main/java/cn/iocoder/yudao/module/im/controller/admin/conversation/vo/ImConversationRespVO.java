@@ -35,4 +35,16 @@ public class ImConversationRespVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
+    @Schema(description = "会话接受者头像", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String avatar;
+
+    @Schema(description = "会话接受者昵称", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String nickname;
+
+    @Schema(description = "最后一条消息的描述", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String lastMessageDescription;
+
+    @Schema(description = "未读消息条数", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String unreadMessagesCount;
+
 }

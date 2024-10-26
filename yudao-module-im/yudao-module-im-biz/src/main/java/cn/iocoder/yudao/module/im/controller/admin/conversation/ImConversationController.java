@@ -5,8 +5,14 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationUpdateLastReadTimeReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationUpdatePinnedReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageListByNoReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageContentTypeEnum;
 import cn.iocoder.yudao.module.im.service.conversation.ImConversationService;
+import cn.iocoder.yudao.module.im.service.message.ImMessageService;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -15,6 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -28,11 +35,50 @@ public class ImConversationController {
     @Resource
     private ImConversationService imConversationService;
 
+    @Resource
+    private ImMessageService imMessageService;
+
+    @Resource
+    AdminUserApi adminUserApi;
+
     @GetMapping("/list")
     @Operation(summary = "获得用户的会话列表")
     public CommonResult<List<ImConversationRespVO>> getConversationList() {
-        List<ImConversationDO> conversationList = imConversationService.getConversationList();
-        return success(BeanUtils.toBean(conversationList, ImConversationRespVO.class));
+        List<ImConversationDO> conversationList = imConversationService.getConversationList(getLoginUserId());
+        List<ImConversationRespVO> imConversationRespVOList = BeanUtils.toBean(conversationList, ImConversationRespVO.class);
+        imConversationRespVOList.forEach(item -> {
+            // 处理个人图像和昵称
+            Long receiverId = item.getTargetId();
+            AdminUserRespDTO receiverUser = adminUserApi.getUser(receiverId);
+            if (receiverUser != null) {
+                item.setAvatar(receiverUser.getAvatar());
+                item.setNickname(receiverUser.getNickname());
+            }
+
+            // 处理未读消息条数【TODO：】
+
+
+            // 处理最后一条消息描述
+            ImMessageListByNoReqVO imMessageListByNoReqVO = new ImMessageListByNoReqVO();
+            imMessageListByNoReqVO.setConversationNo(item.getNo());
+            List<ImMessageDO> listMessage = imMessageService.getMessageListByConversationNo(imMessageListByNoReqVO);
+
+            if (!listMessage.isEmpty()) {
+                ImMessageDO lastMessage = listMessage.get(listMessage.size() - 1);
+                if (lastMessage != null) {
+                    if (Objects.equals(lastMessage.getContentType(), ImMessageContentTypeEnum.TEXT.getType())) {
+                        item.setLastMessageDescription(lastMessage.getContent());
+                    } else if (Objects.equals(lastMessage.getContentType(), ImMessageContentTypeEnum.PICTURE.getType())) {
+                        item.setLastMessageDescription("[图片]");
+                    } else {
+                        item.setLastMessageDescription("[未知类型]");
+                    }
+                }
+            }
+
+
+        });
+        return success(imConversationRespVOList);
     }
 
     @PostMapping("/update-pinned")

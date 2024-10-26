@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.im.service.message;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageListByNoReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageListReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
@@ -46,15 +47,26 @@ public class ImMessageServiceImpl implements ImMessageService {
     private ImGroupMemberService imGroupMemberService;
 
     @Override
-    public List<ImMessageDO> getMessageList(Long loginUserId, ImMessageListReqVO listReqVO) {
+    public List<ImMessageDO> getMessageList(ImMessageListReqVO listReqVO) {
         // 1. 获得会话编号
-        String no = ImConversationTypeEnum.generateConversationNo(loginUserId, listReqVO.getReceiverId(), listReqVO.getConversationType());
+        String no = ImConversationTypeEnum.generateConversationNo(listReqVO.getSenderId(), listReqVO.getReceiverId(), listReqVO.getConversationType());
         // 2. 查询历史消息
         ImMessageDO message = new ImMessageDO()
                 .setSendTime(listReqVO.getSendTime())
                 .setConversationNo(no);
         return imMessageMapper.selectMessageList(message);
     }
+
+    @Override
+    public List<ImMessageDO> getMessageListByConversationNo(ImMessageListByNoReqVO listReqVO) {
+
+        // 1. 查询历史消息
+        ImMessageDO message = new ImMessageDO()
+                .setSendTime(listReqVO.getSendTime())
+                .setConversationNo(listReqVO.getConversationNo());
+        return imMessageMapper.selectMessageList(message);
+    }
+
 
     @Override
     public List<ImMessageDO> pullMessageList(Long userId, Long sequence, Integer size) {
@@ -84,7 +96,7 @@ public class ImMessageServiceImpl implements ImMessageService {
         ImMessageDO imMessageDO = BeanUtil.copyProperties(message, ImMessageDO.class)
                 .setSenderNickname(fromUser.getNickname()).setSenderAvatar(fromUser.getAvatar())
                 .setSenderId(fromUserId)
-                .setConversationNo(ImConversationTypeEnum.generateConversationNo(fromUserId, message.getReceiverId(), message.getConversationType()))
+                .setConversationNo(message.getConversationNo())
                 .setSendFrom(ImMessageSourceEnum.USER_SEND.getSource())
                 .setMessageStatus(ImMessageStatusEnum.SENDING.getStatus())
                 .setSendTime(LocalDateTime.now());

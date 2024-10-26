@@ -5,6 +5,8 @@ import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversatio
 import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationDO;
 import cn.iocoder.yudao.module.im.dal.mysql.conversation.ImConversationMapper;
 import cn.iocoder.yudao.module.im.enums.conversation.ImConversationTypeEnum;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -24,8 +26,20 @@ public class ImConversationServiceImpl implements ImConversationService {
     private ImConversationMapper imConversationMapper;
 
     @Override
-    public List<ImConversationDO> getConversationList() {
-        return imConversationMapper.selectList();
+    public List<ImConversationDO> getConversationList(Long loginUserId) {
+        // 根据loginUserId判断targetId， 自己不能做targetId
+        // 如何loginUserId和targetId相同，则需要调换userId和targetId
+        List<ImConversationDO> conversationList = imConversationMapper.selectList();
+        // 遍历判断loginUserId和targetId相同，相同则将userId设置为targetId， targetId设置为userId
+        conversationList.forEach(item -> {
+            if (item.getTargetId().equals(loginUserId)) {
+                Long targetId = item.getTargetId();
+                Long userId = item.getUserId();
+                item.setTargetId(userId);
+                item.setUserId(targetId);
+            }
+        });
+        return conversationList;
     }
 
     @Override
