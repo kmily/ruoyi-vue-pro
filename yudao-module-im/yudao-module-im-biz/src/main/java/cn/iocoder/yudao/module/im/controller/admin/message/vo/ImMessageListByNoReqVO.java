@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.im.controller.admin.message.vo;
 
-import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.im.enums.conversation.ImConversationTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -12,6 +10,7 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY;
 
+// TODO @dylan：看看，是不是融合到 ImMessageListReqVO 里
 @Schema(description = "管理后台 - 消息列表 Request VO")
 @Data
 @ToString(callSuper = true)

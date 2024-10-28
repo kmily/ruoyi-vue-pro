@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.im.controller.admin.conversation.vo;
 
-import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
-import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -34,6 +32,10 @@ public class ImConversationRespVO {
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
+
+    // TODO @dylan：这块，交给前端聚合哈。im 这块，我们重前端，后端更多解决消息的通信和存储。
+    // 1. 基础信息：根据会话类型，查询会话接受者的头像、昵称
+    // 2. 未读信息：前端自己增量拉取，基于本地 db 查看
 
     @Schema(description = "会话接受者头像", requiredMode = Schema.RequiredMode.REQUIRED)
     private String avatar;

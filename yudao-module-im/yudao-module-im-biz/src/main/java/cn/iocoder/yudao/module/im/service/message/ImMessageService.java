@@ -22,7 +22,6 @@ public interface ImMessageService {
      */
     List<ImMessageDO> getMessageList(ImMessageListReqVO listReqVO);
 
-
     /**
      * 获得历史消息
      *

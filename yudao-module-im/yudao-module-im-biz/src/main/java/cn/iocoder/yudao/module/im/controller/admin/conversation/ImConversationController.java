@@ -46,6 +46,7 @@ public class ImConversationController {
     public CommonResult<List<ImConversationRespVO>> getConversationList() {
         List<ImConversationDO> conversationList = imConversationService.getConversationList(getLoginUserId());
         List<ImConversationRespVO> imConversationRespVOList = BeanUtils.toBean(conversationList, ImConversationRespVO.class);
+        // TODO @dylan：这块，交给前端聚合哈。im 这块，我们重前端，后端更多解决消息的通信和存储。
         imConversationRespVOList.forEach(item -> {
             // 处理个人图像和昵称
             Long receiverId = item.getTargetId();

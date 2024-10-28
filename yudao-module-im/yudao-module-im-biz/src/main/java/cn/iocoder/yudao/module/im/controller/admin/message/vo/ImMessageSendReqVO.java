@@ -24,6 +24,7 @@ public class ImMessageSendReqVO {
     @NotNull(message = "会话类型不能为空")
     private Integer conversationType;
 
+    // TODO @dylan：这个 conversationNo，直接计算哈。不用传递
     @Schema(description = "会话编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @NotNull(message = "会话编号不能为空")
     private String conversationNo;
