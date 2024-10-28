@@ -23,9 +23,12 @@ import org.springframework.validation.annotation.Validated;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.MESSAGE_RECEIVER_NOT_EXISTS;
+import static cn.iocoder.yudao.module.im.enums.conversation.ImConversationTypeEnum.generateConversationNo;
 
 /**
  * 消息 Service 实现类
@@ -48,8 +51,16 @@ public class ImMessageServiceImpl implements ImMessageService {
 
     @Override
     public List<ImMessageDO> getMessageList(ImMessageListReqVO listReqVO) {
+
         // 1. 获得会话编号
-        String no = ImConversationTypeEnum.generateConversationNo(listReqVO.getSenderId(), listReqVO.getReceiverId(), listReqVO.getConversationType());
+        String no = "";
+        Long loginUserId = getLoginUserId();
+        if (Objects.equals(loginUserId, listReqVO.getUserId())) {
+            no = generateConversationNo(loginUserId, listReqVO.getReceiverId(), listReqVO.getConversationType());
+        } else {
+            no = generateConversationNo(listReqVO.getReceiverId(),loginUserId , listReqVO.getConversationType());
+        }
+
         // 2. 查询历史消息
         ImMessageDO message = new ImMessageDO()
                 .setSendTime(listReqVO.getSendTime())
@@ -92,11 +103,20 @@ public class ImMessageServiceImpl implements ImMessageService {
         validateReceiverIdExists(message);
         // 2. 查询发送人信息
         AdminUserRespDTO fromUser = adminUserApi.getUser(fromUserId);
-        // 3. 保存消息
+
+        // 3. 生成conversationNo
+        String conversationNo = "";
+        if (fromUserId == message.getConversationUserId()) {
+            conversationNo = generateConversationNo(fromUserId, message.getReceiverId(), message.getConversationType());
+        } else {
+            conversationNo = generateConversationNo(message.getReceiverId(), fromUserId, message.getConversationType());
+        }
+
+        // 4. 保存消息
         ImMessageDO imMessageDO = BeanUtil.copyProperties(message, ImMessageDO.class)
                 .setSenderNickname(fromUser.getNickname()).setSenderAvatar(fromUser.getAvatar())
                 .setSenderId(fromUserId)
-                .setConversationNo(message.getConversationNo())
+                .setConversationNo(conversationNo)
                 .setSendFrom(ImMessageSourceEnum.USER_SEND.getSource())
                 .setMessageStatus(ImMessageStatusEnum.SENDING.getStatus())
                 .setSendTime(LocalDateTime.now());

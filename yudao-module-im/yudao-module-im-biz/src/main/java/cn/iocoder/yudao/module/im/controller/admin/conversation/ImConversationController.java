@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversatio
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationUpdatePinnedReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageListByNoReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageListReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageContentTypeEnum;
@@ -55,28 +56,6 @@ public class ImConversationController {
                 item.setAvatar(receiverUser.getAvatar());
                 item.setNickname(receiverUser.getNickname());
             }
-
-            // 处理未读消息条数【TODO：】
-
-
-            // 处理最后一条消息描述
-            ImMessageListByNoReqVO imMessageListByNoReqVO = new ImMessageListByNoReqVO();
-            imMessageListByNoReqVO.setConversationNo(item.getNo());
-            List<ImMessageDO> listMessage = imMessageService.getMessageListByConversationNo(imMessageListByNoReqVO);
-
-            if (!listMessage.isEmpty()) {
-                ImMessageDO lastMessage = listMessage.get(listMessage.size() - 1);
-                if (lastMessage != null) {
-                    if (Objects.equals(lastMessage.getContentType(), ImMessageContentTypeEnum.TEXT.getType())) {
-                        item.setLastMessageDescription(lastMessage.getContent());
-                    } else if (Objects.equals(lastMessage.getContentType(), ImMessageContentTypeEnum.PICTURE.getType())) {
-                        item.setLastMessageDescription("[图片]");
-                    } else {
-                        item.setLastMessageDescription("[未知类型]");
-                    }
-                }
-            }
-
 
         });
         return success(imConversationRespVOList);

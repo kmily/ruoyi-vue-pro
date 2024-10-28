@@ -51,11 +51,4 @@ public class ImMessageController {
         return success(BeanUtils.toBean(messagePage, ImMessageRespVO.class));
     }
 
-    @GetMapping("/listByNo")
-    @Operation(summary = "消息列表-根据接收人和发送时间进行分页查询")
-    public CommonResult<List<ImMessageRespVO>> getMessageListByNo(@Valid ImMessageListByNoReqVO listReqVO) {
-        List<ImMessageDO> messagePage = imMessageService.getMessageListByConversationNo(listReqVO);
-        return success(BeanUtils.toBean(messagePage, ImMessageRespVO.class));
-    }
-
 }
