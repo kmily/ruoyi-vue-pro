@@ -23,7 +23,9 @@ public interface ProductBrowseHistoryMapper extends BaseMapperX<ProductBrowseHis
     default ProductBrowseHistoryDO selectByUserIdAndSpuId(Long userId, Long spuId) {
         return selectOne(new LambdaQueryWrapperX<ProductBrowseHistoryDO>()
                 .eq(ProductBrowseHistoryDO::getUserId, userId)
-                .eq(ProductBrowseHistoryDO::getSpuId, spuId));
+                .eq(ProductBrowseHistoryDO::getSpuId, spuId)
+                .last(" limit 1 ")
+                );
     }
 
     default PageResult<ProductBrowseHistoryDO> selectPage(ProductBrowseHistoryPageReqVO reqVO) {
