@@ -65,7 +65,9 @@ public class BpmFlowableConfiguration {
             // 设置 ActivityBehaviorFactory 实现类，用于流程任务的审核人的自定义
             configuration.setActivityBehaviorFactory(bpmActivityBehaviorFactory);
             // 设置自定义的函数
-            configuration.setCustomFlowableFunctionDelegates(ListUtil.toList(customFlowableFunctionDelegates.stream().iterator()));
+            ArrayList<FlowableFunctionDelegate> flowableFunctionDelegates = ListUtil.toList(customFlowableFunctionDelegates.stream().iterator());
+            flowableFunctionDelegates.add(new VariableConvertByTypeExpressionFunction());
+            configuration.setCustomFlowableFunctionDelegates(flowableFunctionDelegates);
         };
     }
 
