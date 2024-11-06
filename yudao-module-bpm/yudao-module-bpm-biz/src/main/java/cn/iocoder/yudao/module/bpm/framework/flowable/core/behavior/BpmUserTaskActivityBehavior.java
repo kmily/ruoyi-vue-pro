@@ -52,7 +52,7 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
         // 情况一，如果是多实例的任务，例如说会签、或签等情况，则从 Variable 中获取。
         // 顺序审批可见 BpmSequentialMultiInstanceBehavior，并发审批可见 BpmSequentialMultiInstanceBehavior
         if (super.multiInstanceActivityBehavior != null) {
-            return execution.getVariable(super.multiInstanceActivityBehavior.getCollectionElementVariable(), Long.class);
+            return execution.getVariable(super.multiInstanceActivityBehavior.getCollectionElementVariable(), Integer.class).longValue();
         }
 
         // 情况二，如果非多实例的任务，则计算任务处理人

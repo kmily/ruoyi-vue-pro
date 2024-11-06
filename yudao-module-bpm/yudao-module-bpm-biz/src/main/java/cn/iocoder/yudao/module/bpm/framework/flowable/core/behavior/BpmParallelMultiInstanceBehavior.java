@@ -51,7 +51,7 @@ public class BpmParallelMultiInstanceBehavior extends ParallelMultiInstanceBehav
 
         // 第二步，获取任务的所有处理人
         @SuppressWarnings("unchecked")
-        Set<Long> assigneeUserIds = (Set<Long>) execution.getVariable(super.collectionVariable, Set.class);
+        Set<Long> assigneeUserIds = new HashSet<Long>(execution.getVariable(super.collectionVariable, ArrayList.class)) ;
         if (assigneeUserIds == null) {
             assigneeUserIds = taskCandidateInvoker.calculateUsers(execution);
             execution.setVariable(super.collectionVariable, assigneeUserIds);
