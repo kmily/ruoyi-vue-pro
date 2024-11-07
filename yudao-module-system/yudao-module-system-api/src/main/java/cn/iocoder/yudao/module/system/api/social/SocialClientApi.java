@@ -16,8 +16,8 @@ public interface SocialClientApi {
     /**
      * 获得社交平台的授权 URL
      *
-     * @param socialType  社交平台的类型 {@link SocialTypeEnum}
-     * @param userType    用户类型
+     * @param socialType 社交平台的类型 {@link SocialTypeEnum}
+     * @param userType 用户类型
      * @param redirectUri 重定向 URL
      * @return 社交平台的授权 URL
      */
@@ -27,7 +27,7 @@ public interface SocialClientApi {
      * 创建微信公众号 JS SDK 初始化所需的签名
      *
      * @param userType 用户类型
-     * @param url      访问的 URL 地址
+     * @param url 访问的 URL 地址
      * @return 签名
      */
     SocialWxJsapiSignatureRespDTO createWxMpJsapiSignature(Integer userType, String url);
@@ -37,7 +37,7 @@ public interface SocialClientApi {
     /**
      * 获得微信小程序的手机信息
      *
-     * @param userType  用户类型
+     * @param userType 用户类型
      * @param phoneCode 手机授权码
      * @return 手机信息
      */
@@ -64,5 +64,12 @@ public interface SocialClientApi {
      * @param reqDTO 请求
      */
     void sendWxaSubscribeMessage(SocialWxaSubscribeMessageSendReqDTO reqDTO);
+
+    /**
+     * 上传订单发货到微信小程序
+     *
+     * @param reqDTO 请求
+     */
+    void uploadWxaOrderShippingInfo(Integer userType, SocialWxaUploadOrderShippingInfoDTO reqDTO);
 
 }
