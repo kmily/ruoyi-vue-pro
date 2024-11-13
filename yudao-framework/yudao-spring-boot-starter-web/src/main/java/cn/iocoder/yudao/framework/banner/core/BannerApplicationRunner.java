@@ -9,6 +9,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.util.ClassUtils;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +21,8 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class BannerApplicationRunner implements ApplicationRunner {
-    private static final Map<String,String> MODULE_MAP = MapBuilder.create(new TreeMap<String,String>())
+
+    private static final Map<String, String> MODULE_MAP = MapBuilder.create(new LinkedHashMap<String, String>())
             // 数据报表
             .put("cn.iocoder.yudao.module.report.framework.security.config.SecurityConfiguration",
                     "[报表模块 yudao-module-report - 已禁用][参考 https://doc.iocoder.cn/report/ 开启]")
@@ -64,11 +66,10 @@ public class BannerApplicationRunner implements ApplicationRunner {
                     "https://doc.iocoder.cn",
                     "https://t.zsxq.com/02Yf6M7Qn");
 
-            for (Map.Entry<String, String> entry : MODULE_MAP.entrySet()) {
-                if (isNotPresent(entry.getKey())){
-                    System.out.println(entry.getValue());
-                }
-            }
+            MODULE_MAP.entrySet()
+                    .stream()
+                    .filter(t -> isNotPresent(t.getKey()))
+                    .forEach(entry -> System.out.println(entry.getValue()));
         });
     }
 
