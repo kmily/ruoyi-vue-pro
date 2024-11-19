@@ -10,16 +10,30 @@ import java.math.BigDecimal;
 #break
 #end
 #end
+##只引入一次DateTimeFormat
+#foreach ($column in $columns)
+#if (${column.listOperation} && (${column.javaType} == "LocalDateTime" || ${column.javaType} == "LocalDate"))
+import org.springframework.format.annotation.DateTimeFormat;
+#break
+#end
+#end
 ## 处理 LocalDateTime 字段的引入
 #foreach ($column in $columns)
 #if (${column.listOperation} && ${column.javaType} == "LocalDateTime")
 import java.time.LocalDateTime;
-import org.springframework.format.annotation.DateTimeFormat;
-
 import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 #break
 #end
 #end
+## 处理 LocalDate 字段的引入
+#foreach ($column in $columns)
+#if (${column.listOperation} && ${column.javaType} == "LocalDate")
+import java.time.LocalDate;
+import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY;
+#break
+#end
+#end
+
 ## 字段模板
 #macro(columnTpl $prefix $prefixStr)
     @Schema(description = "${prefixStr}${column.columnComment}"#if ("$!column.example" != ""), example = "${column.example}"#end)
@@ -33,9 +47,15 @@ public class ${sceneEnum.prefixClass}${table.className}ListReqVO {
 #foreach ($column in $columns)
 #if (${column.listOperation})##查询操作
 #if (${column.listOperationCondition} == "BETWEEN")## 情况一，Between 的时候
+    #if (${column.listOperation} && ${column.javaType} == "LocalDate")
+    @Schema(description = "${column.columnComment}"#if ("$!column.example" != ""), example = "${column.example}"#end)
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY)
+    private ${column.javaType}[] ${column.javaField};
+    #else## 如果不满足上述任何条件，做其他处理
     @Schema(description = "${column.columnComment}"#if ("$!column.example" != ""), example = "${column.example}"#end)
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private ${column.javaType}[] ${column.javaField};
+    #end
 #else##情况二，非 Between 的时间
     #columnTpl('', '')
 #end
