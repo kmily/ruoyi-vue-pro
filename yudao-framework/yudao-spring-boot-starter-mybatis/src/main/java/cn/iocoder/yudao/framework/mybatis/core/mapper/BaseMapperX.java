@@ -5,6 +5,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.SortablePageParam;
 import cn.iocoder.yudao.framework.common.pojo.SortingField;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import com.baomidou.mybatisplus.annotation.DbType;
@@ -75,25 +77,25 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
     }
 
     default T selectOne(String field, Object value) {
-        return selectOne(new QueryWrapper<T>().eq(field, value));
+        return selectOne(new QueryWrapperX<T>().eq(field, value).limitN(1));
     }
 
     default T selectOne(SFunction<T, ?> field, Object value) {
-        return selectOne(new LambdaQueryWrapper<T>().eq(field, value));
+        return selectOne(new LambdaQueryWrapperX<T>().eq(field, value).limitN(1));
     }
 
     default T selectOne(String field1, Object value1, String field2, Object value2) {
-        return selectOne(new QueryWrapper<T>().eq(field1, value1).eq(field2, value2));
+        return selectOne(new QueryWrapperX<T>().eq(field1, value1).eq(field2, value2).limitN(1));
     }
 
     default T selectOne(SFunction<T, ?> field1, Object value1, SFunction<T, ?> field2, Object value2) {
-        return selectOne(new LambdaQueryWrapper<T>().eq(field1, value1).eq(field2, value2));
+        return selectOne(new LambdaQueryWrapperX<T>().eq(field1, value1).eq(field2, value2).limitN(1));
     }
 
     default T selectOne(SFunction<T, ?> field1, Object value1, SFunction<T, ?> field2, Object value2,
                         SFunction<T, ?> field3, Object value3) {
-        return selectOne(new LambdaQueryWrapper<T>().eq(field1, value1).eq(field2, value2)
-                .eq(field3, value3));
+        return selectOne(new LambdaQueryWrapperX<T>().eq(field1, value1).eq(field2, value2)
+                .eq(field3, value3).limitN(1));
     }
 
     default Long selectCount() {

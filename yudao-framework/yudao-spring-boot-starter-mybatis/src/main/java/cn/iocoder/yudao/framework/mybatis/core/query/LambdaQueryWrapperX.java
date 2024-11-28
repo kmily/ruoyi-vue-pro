@@ -3,6 +3,8 @@ package cn.iocoder.yudao.framework.mybatis.core.query;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
+import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
+import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import org.springframework.util.StringUtils;
@@ -129,6 +131,26 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
     @Override
     public LambdaQueryWrapperX<T> in(SFunction<T, ?> column, Collection<?> coll) {
         super.in(column, coll);
+        return this;
+    }
+
+    /**
+     * FIXME 设置只返回最后 N 条
+     *
+     * @return this
+     */
+    public LambdaQueryWrapperX<T> limitN(int n) {
+        DbType dbType = JdbcUtils.getDbType();
+        switch (dbType) {
+            case ORACLE:
+            case ORACLE_12C:
+                throw new UnsupportedOperationException("Oracle 是通过 ROWNUM <= %d 实现限制 %d 条，待实现".formatted(n, n));
+            case SQL_SERVER:
+            case SQL_SERVER2005:
+                throw new UnsupportedOperationException("SQL Server 是通过 SELECT TOP %d 实现限制 %d 条，待实现".formatted(n, n));
+            default: // MySQL、PostgreSQL、DM 达梦、KingbaseES 大金都是采用 LIMIT 实现
+                super.last("LIMIT " + n);
+        }
         return this;
     }
 
