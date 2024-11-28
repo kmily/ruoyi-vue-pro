@@ -144,10 +144,10 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
         switch (dbType) {
             case ORACLE:
             case ORACLE_12C:
-                throw new UnsupportedOperationException("Oracle 是通过 ROWNUM <= %d 实现限制 %d 条，待实现".formatted(n, n));
+                throw new UnsupportedOperationException("Oracle 是通过 ROWNUM <= " + n + " 实现限制 " + n + " 条，待实现");
             case SQL_SERVER:
             case SQL_SERVER2005:
-                throw new UnsupportedOperationException("SQL Server 是通过 SELECT TOP %d 实现限制 %d 条，待实现".formatted(n, n));
+                throw new UnsupportedOperationException("SQL Server 是通过 SELECT TOP " + n + " 实现限制 " + n + " 条，待实现");
             default: // MySQL、PostgreSQL、DM 达梦、KingbaseES 大金都是采用 LIMIT 实现
                 super.last("LIMIT " + n);
         }
