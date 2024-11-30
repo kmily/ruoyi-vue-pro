@@ -43,6 +43,15 @@ public class SwaggerUtils {
     }
 
     /**
+     * 按“{group}/**”规则匹配进行分组，包含 admin-api 和 app-api
+     *
+     * @param group 分组名称，如：member
+     */
+    public static GroupedOpenApi buildGroupedAdminAndAppApi(String group) {
+        return buildGroupedAdminAndAppApi(group, group + "/**");
+    }
+
+    /**
      * 按“{pathPattern}”规则匹配进行分组，包含 admin-api 和 app-api
      *
      * @param group 分组名称，如：member

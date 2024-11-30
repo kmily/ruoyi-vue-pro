@@ -107,7 +107,8 @@ public class YudaoSwaggerAutoConfiguration {
      */
     @Bean
     public GroupedOpenApi allGroupedOpenApi() {
-        return SwaggerUtils.buildGroupedAdminAndAppApi("all", "");
+        //return SwaggerUtils.buildGroupedAdminAndAppApi("all", "**");
+        return SwaggerUtils.buildGroupedOpenApi("all", "/**");
     }
 
     /**
