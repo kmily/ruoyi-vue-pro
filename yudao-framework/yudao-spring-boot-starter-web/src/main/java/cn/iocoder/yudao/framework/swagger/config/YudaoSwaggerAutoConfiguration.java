@@ -107,23 +107,23 @@ public class YudaoSwaggerAutoConfiguration {
      */
     @Bean
     public GroupedOpenApi allGroupedOpenApi() {
-        return SwaggerUtils.buildGroupedOpenApi("all", "");
+        return SwaggerUtils.buildGroupedAdminAndAppApi("all", "");
     }
 
     /**
-     * @deprecated 使用 {@link SwaggerUtils#buildGroupedOpenApi(String)} 代替
+     * @deprecated 使用 {@link SwaggerUtils#buildGroupedAdminAndAppApi(String)} 代替
      */
     @Deprecated
     public static GroupedOpenApi buildGroupedOpenApi(String group) {
-        return SwaggerUtils.buildGroupedOpenApi(group, group);
+        return SwaggerUtils.buildGroupedAdminAndAppApi(group, group + "/**");
     }
 
     /**
-     * @deprecated 使用 {@link SwaggerUtils#buildGroupedOpenApi(String, String)} 代替
+     * @deprecated 使用 {@link SwaggerUtils#buildGroupedAdminAndAppApi(String, String)} 代替
      */
     @Deprecated
     public static GroupedOpenApi buildGroupedOpenApi(String group, String path) {
-        return SwaggerUtils.buildGroupedOpenApi(group, path);
+        return SwaggerUtils.buildGroupedAdminAndAppApi(group, path + "/**");
     }
 }
 

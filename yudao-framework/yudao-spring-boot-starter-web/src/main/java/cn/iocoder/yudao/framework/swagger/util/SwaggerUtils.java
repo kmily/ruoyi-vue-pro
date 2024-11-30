@@ -39,17 +39,17 @@ public class SwaggerUtils {
      * @param group 分组名称，如：member
      */
     public static GroupedOpenApi buildGroupedOpenApi(String group) {
-        return buildGroupedOpenApi(group, group);
+        return buildGroupedOpenApi(group, group + "/**");
     }
 
     /**
-     * 按“{path}/**”规则匹配进行分组，包含 admin-api 和 app-api
+     * 按“{pathPattern}”规则匹配进行分组，包含 admin-api 和 app-api
      *
      * @param group 分组名称，如：member
-     * @param path 路径，如：member
+     * @param pathPattern 路径，如：member/**
      */
-    public static GroupedOpenApi buildGroupedOpenApi(String group, String path) {
-        return buildGroupedOpenApi(group, "/admin-api/" + path + "/**", "/app-api/" + path + "/**");
+    public static GroupedOpenApi buildGroupedAdminAndAppApi(String group, String pathPattern) {
+        return buildGroupedOpenApi(group, "/admin-api/" + pathPattern, "/app-api/" + pathPattern);
     }
 
     /**
