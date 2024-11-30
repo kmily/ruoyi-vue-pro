@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.swagger.config;
 
-import cn.iocoder.yudao.framework.universal.util.SwaggerUtils;
+import cn.iocoder.yudao.framework.swagger.util.SwaggerUtils;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
