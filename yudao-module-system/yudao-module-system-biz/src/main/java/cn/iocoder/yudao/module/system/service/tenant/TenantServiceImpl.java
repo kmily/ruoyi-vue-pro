@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.datapermission.core.util.DataPermissionUtils;
 import cn.iocoder.yudao.framework.tenant.config.TenantProperties;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
@@ -107,14 +108,17 @@ public class TenantServiceImpl implements TenantService {
         // 创建租户
         TenantDO tenant = BeanUtils.toBean(createReqVO, TenantDO.class);
         tenantMapper.insert(tenant);
-        // 创建租户的管理员
-        TenantUtils.execute(tenant.getId(), () -> {
-            // 创建角色
-            Long roleId = createRole(tenantPackage);
-            // 创建用户，并分配角色
-            Long userId = createUser(roleId, createReqVO);
-            // 修改租户的管理员
-            tenantMapper.updateById(new TenantDO().setId(tenant.getId()).setContactUserId(userId));
+        // 关闭数据权限，避免因为没有数据权限，查询不到数据
+        DataPermissionUtils.executeIgnore(() -> {
+            // 创建租户的管理员
+            TenantUtils.execute(tenant.getId(), () -> {
+                // 创建角色
+                Long roleId = createRole(tenantPackage);
+                // 创建用户，并分配角色
+                Long userId = createUser(roleId, createReqVO);
+                // 修改租户的管理员
+                tenantMapper.updateById(new TenantDO().setId(tenant.getId()).setContactUserId(userId));
+            });
         });
         return tenant.getId();
     }
