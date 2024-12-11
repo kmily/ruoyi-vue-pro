@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.common.pojo;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.util.Assert;
@@ -53,6 +54,14 @@ public class CommonResult<T> implements Serializable {
         CommonResult<T> result = new CommonResult<>();
         result.code = code;
         result.msg = message;
+        return result;
+    }
+
+    public static <T> CommonResult<T> error(ErrorCode errorCode, Object... params) {
+        Assert.isTrue(!GlobalErrorCodeConstants.SUCCESS.getCode().equals(errorCode.getCode()), "code 必须是错误的！");
+        CommonResult<T> result = new CommonResult<>();
+        result.code = errorCode.getCode();
+        result.msg = ServiceExceptionUtil.doFormat(errorCode.getCode(), errorCode.getMsg(), params);
         return result;
     }
 
