@@ -17,7 +17,7 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivableDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.receivable.CrmReceivablePlanDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.receivable.CrmReceivableMapper;
-import cn.iocoder.yudao.module.crm.dal.redis.no.CrmNoRedisDAO;
+import cn.iocoder.yudao.module.crm.enums.CrmCodingRulesConstants;
 import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
@@ -25,6 +25,7 @@ import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPerm
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
+import cn.iocoder.yudao.module.system.api.codingrules.CodingRulesApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
@@ -63,7 +64,7 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     private CrmReceivableMapper receivableMapper;
 
     @Resource
-    private CrmNoRedisDAO noRedisDAO;
+    private CodingRulesApi codingRulesApi;
 
     @Resource
     private CrmContractService contractService;
@@ -87,8 +88,8 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
         validateReceivablePriceExceedsLimit(createReqVO);
         // 1.2 校验关联数据存在
         validateRelationDataExists(createReqVO);
-        // 1.3 生成回款编号
-        String no = noRedisDAO.generate(CrmNoRedisDAO.RECEIVABLE_PREFIX);
+        // 1.3 生成回款编号，根据编号为【CRM_RECEIVABLE】的编码规则生成
+        String no = codingRulesApi.genCodingRules(CrmCodingRulesConstants.RECEIVABLE,false);
         if (receivableMapper.selectByNo(no) != null) {
             throw exception(RECEIVABLE_NO_EXISTS);
         }

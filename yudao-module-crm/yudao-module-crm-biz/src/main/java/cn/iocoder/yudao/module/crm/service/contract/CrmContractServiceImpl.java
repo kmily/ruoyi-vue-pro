@@ -18,7 +18,7 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractProductDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractMapper;
 import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractProductMapper;
-import cn.iocoder.yudao.module.crm.dal.redis.no.CrmNoRedisDAO;
+import cn.iocoder.yudao.module.crm.enums.CrmCodingRulesConstants;
 import cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
@@ -31,6 +31,7 @@ import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqB
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
 import cn.iocoder.yudao.module.crm.service.receivable.CrmReceivableService;
+import cn.iocoder.yudao.module.system.api.codingrules.CodingRulesApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
@@ -43,8 +44,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -74,7 +77,7 @@ public class CrmContractServiceImpl implements CrmContractService {
     private CrmContractProductMapper contractProductMapper;
 
     @Resource
-    private CrmNoRedisDAO noRedisDAO;
+    private CodingRulesApi codingRulesApi;
 
     @Resource
     private CrmPermissionService crmPermissionService;
@@ -105,8 +108,8 @@ public class CrmContractServiceImpl implements CrmContractService {
         List<CrmContractProductDO> contractProducts = validateContractProducts(createReqVO.getProducts());
         // 1.2 校验关联字段
         validateRelationDataExists(createReqVO);
-        // 1.3 生成序号
-        String no = noRedisDAO.generate(CrmNoRedisDAO.CONTRACT_NO_PREFIX);
+        // 1.3 生成序号，根据编号为【CRM_CONTRACT_NO_RULES】的编码规则生成序号
+        String no = codingRulesApi.genCodingRules(CrmCodingRulesConstants.CONTRACT_NO_RULES,false);
         if (contractMapper.selectByNo(no) != null) {
             throw exception(CONTRACT_NO_EXISTS);
         }
