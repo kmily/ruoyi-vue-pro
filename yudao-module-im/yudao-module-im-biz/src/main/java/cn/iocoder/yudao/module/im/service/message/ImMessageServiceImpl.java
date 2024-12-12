@@ -53,19 +53,24 @@ public class ImMessageServiceImpl implements ImMessageService {
     public List<ImMessageDO> getMessageList(ImMessageListReqVO listReqVO) {
 
         // 1. 获得会话编号
-        String no = "";
         Long loginUserId = getLoginUserId();
-        if (Objects.equals(loginUserId, listReqVO.getUserId())) {
-            no = generateConversationNo(loginUserId, listReqVO.getReceiverId(), listReqVO.getConversationType());
-        } else {
-            no = generateConversationNo(listReqVO.getReceiverId(),loginUserId , listReqVO.getConversationType());
-        }
+        String no1 = generateConversationNo(loginUserId, listReqVO.getReceiverId(), listReqVO.getConversationType());
+        String no2 = generateConversationNo(listReqVO.getReceiverId(),loginUserId, listReqVO.getConversationType());
 
         // 2. 查询历史消息
         ImMessageDO message = new ImMessageDO()
                 .setSendTime(listReqVO.getSendTime())
-                .setConversationNo(no);
-        return imMessageMapper.selectMessageList(message);
+                .setConversationNo(no1);
+        List<ImMessageDO>  list = imMessageMapper.selectMessageList(message);
+
+        if (!list.isEmpty()) {
+            return list;
+        }
+
+        message.setConversationNo(no2);
+        list = imMessageMapper.selectMessageList(message);
+
+        return list;
     }
 
     @Override

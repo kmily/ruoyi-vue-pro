@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.im.controller.admin.conversation;
 
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
+import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationCreateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationUpdateLastReadTimeReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationUpdatePinnedReqVO;
@@ -73,6 +76,13 @@ public class ImConversationController {
     public CommonResult<Boolean> updateLastReadTime(@Valid @RequestBody ImConversationUpdateLastReadTimeReqVO updateReqVO) {
         imConversationService.updateLastReadTime(getLoginUserId(),updateReqVO);
         return success(true);
+    }
+
+    @PostMapping("/create")
+    @Operation(summary = "创建会话")
+    public CommonResult<ImConversationDO> createConversation(@Valid @RequestBody ImConversationCreateReqVO createReqVO) {
+        ImConversationDO conversation = imConversationService.createConversation(getLoginUserId(), createReqVO);
+        return success(conversation);
     }
 
 }

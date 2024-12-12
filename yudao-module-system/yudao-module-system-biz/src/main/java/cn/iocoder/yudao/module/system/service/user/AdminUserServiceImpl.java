@@ -308,6 +308,11 @@ public class AdminUserServiceImpl implements AdminUserService {
         return userMapper.selectBatchIds(ids);
     }
 
+    public List<AdminUserDO> getUserListAll() {
+        return userMapper.selectList();
+    }
+
+
     @Override
     public void validateUserList(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
@@ -507,6 +512,11 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Override
     public List<AdminUserDO> getUserListByStatus(Integer status) {
         return userMapper.selectListByStatus(status);
+    }
+
+    @Override
+    public List<AdminUserDO> getDeptUsers(Collection<Long> deptIds) {
+        return userMapper.selectListByDeptIds(deptIds);
     }
 
     @Override

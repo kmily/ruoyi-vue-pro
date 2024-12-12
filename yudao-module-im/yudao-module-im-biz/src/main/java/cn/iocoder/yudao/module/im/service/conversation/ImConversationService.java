@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.service.conversation;
 
+import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationCreateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationUpdateLastReadTimeReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationUpdatePinnedReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationDO;
@@ -35,5 +36,7 @@ public interface ImConversationService {
      * @param updateReqVO 更新信息
      */
     void updateLastReadTime(Long loginUserId, ImConversationUpdateLastReadTimeReqVO updateReqVO);
+
+    ImConversationDO createConversation(Long loginUserId, ImConversationCreateReqVO createReqVO);
 
 }

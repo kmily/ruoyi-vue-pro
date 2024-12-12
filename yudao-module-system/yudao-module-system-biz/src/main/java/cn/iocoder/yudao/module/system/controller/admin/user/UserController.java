@@ -27,9 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -101,6 +99,37 @@ public class UserController {
                 convertList(pageResult.getList(), AdminUserDO::getDeptId));
         return success(new PageResult<>(UserConvert.INSTANCE.convertList(pageResult.getList(), deptMap),
                 pageResult.getTotal()));
+    }
+
+    @GetMapping("/all")
+    @Operation(summary = "获得所有用户列表")
+    @PreAuthorize("@ss.hasPermission('system:user:list')")
+    public CommonResult<List<UserRespVO>> getUserAll() {
+        List<AdminUserDO> result = userService.getUserListAll();
+        if (CollUtil.isEmpty(result)) {
+            return success(null);
+        }
+        // 拼接数据
+        Map<Long, DeptDO> deptMap = deptService.getDeptMap(
+                convertList(result, AdminUserDO::getDeptId));
+        return success(UserConvert.INSTANCE.convertList(result, deptMap));
+    }
+
+    @GetMapping("/listByDept")
+    @Operation(summary = "获得部门用户列表")
+    @PreAuthorize("@ss.hasPermission('system:user:list')")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    public CommonResult<List<UserRespVO>> getDeptUsers(@RequestParam("id") Long id) {
+        List<Long> ids = new ArrayList<>();
+        ids.add(id);
+        List<AdminUserDO> result = userService.getDeptUsers(ids);
+        if (CollUtil.isEmpty(result)) {
+            return success(null);
+        }
+        // 拼接数据
+        Map<Long, DeptDO> deptMap = deptService.getDeptMap(
+                convertList(result, AdminUserDO::getDeptId));
+        return success(UserConvert.INSTANCE.convertList(result, deptMap));
     }
 
     @GetMapping({"/list-all-simple", "/simple-list"})
