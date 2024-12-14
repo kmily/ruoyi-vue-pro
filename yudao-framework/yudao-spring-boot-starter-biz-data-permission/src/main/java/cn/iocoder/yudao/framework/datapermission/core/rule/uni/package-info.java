@@ -36,7 +36,7 @@
  *                     return new HashSet<>();
  *                 }
  *                 String shopIdsStr = MapUtil.get(loginUser.getInfo(), LOGIN_USER_CONTEXT_KEY_SHOP_IDS, String.class);
- *                 StringHashSet shopIds = JsonUtils.parseObject(shopIdsStr, StringHashSet.class);
+ *                 Set<String> shopIds = JsonUtils.parseObject(shopIdsStr, StringHashSet.class);
  *                 if (CollUtil.isEmpty(shopIds)) {
  *                     return new HashSet<>();
  *                 }

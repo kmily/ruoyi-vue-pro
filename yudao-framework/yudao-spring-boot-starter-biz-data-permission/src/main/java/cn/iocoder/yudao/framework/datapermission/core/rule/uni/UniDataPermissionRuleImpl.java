@@ -213,7 +213,7 @@ public class UniDataPermissionRuleImpl implements UniDataPermissionRule {
         }
         // 拼接条件
         if (dataIds.size() == 1) {
-            return new EqualsTo(MyBatisUtils.buildColumn(tableName, tableAlias, columnName), new LongValue(dataIdList.getFirst()));
+            return new EqualsTo(MyBatisUtils.buildColumn(tableName, tableAlias, columnName), new LongValue(dataIdList.get(0)));
         }
         return new InExpression(MyBatisUtils.buildColumn(tableName, tableAlias, columnName),
                 // Parenthesis 的目的，是提供 (1,2,3) 的 () 左右括号
