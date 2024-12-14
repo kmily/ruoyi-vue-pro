@@ -53,8 +53,8 @@ spring:
           #          url: jdbc:dm://127.0.0.1:5236?schema=RUOYI_VUE_PRO # DM 连接的示例
           #          url: jdbc:kingbase8://127.0.0.1:54321/test  # 人大金仓 KingbaseES 连接的示例
           #          url: jdbc:postgresql://127.0.0.1:5432/postgres # OpenGauss 连接的示例
-          username: haoka
-          password: nr1Eo&PyTq3a1%
+          username: root
+          password: UDMUSJv5iRq4R%
           #          username: sa # SQL Server 连接的示例
           #          password: Yudao@2024 # SQL Server 连接的示例
           #          username: SYSDBA # DM 连接的示例
@@ -64,8 +64,8 @@ spring:
         slave: # 模拟从库，可根据自己需要修改
           lazy: true # 开启懒加载，保证启动速度
           url: jdbc:mysql://120.46.194.67:3306/haoka?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true&nullCatalogMeansCurrent=true
-          username: haoka
-          password: nr1Eo&PyTq3a1%
+          username: root
+          password: UDMUSJv5iRq4R%
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   data:

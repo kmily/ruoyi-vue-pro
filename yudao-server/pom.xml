@@ -115,6 +115,18 @@
         <!--            <version>${revision}</version>-->
         <!--        </dependency>-->
 
+
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>11.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
+            <version>11.1.0</version>
+        </dependency>
+
         <!--    好卡模块-->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
