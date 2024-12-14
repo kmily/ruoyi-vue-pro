@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.haoka.dal.dataobject.demo;
 
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+import java.util.*;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+import com.baomidou.mybatisplus.annotation.*;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
  * 好卡案例 DO
@@ -19,7 +20,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DemoDO extends BaseDO {
+public class HaokaDemoDO extends BaseDO {
 
     /**
      * 编号
@@ -36,6 +37,8 @@ public class DemoDO extends BaseDO {
     private Integer age;
     /**
      * 性别
+     *
+     * 枚举 {@link TODO system_user_sex 对应的类}
      */
     private Integer agent;
 

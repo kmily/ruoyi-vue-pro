@@ -14,7 +14,6 @@
     <description>
         haoka biz 模块，主要实现haoka 等功能。
     </description>
-
     <dependencies>  <!-- 5. 新增依赖，这里引入的都是比较常用的业务组件、技术组件 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>

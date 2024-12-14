@@ -1,17 +1,21 @@
 package cn.iocoder.yudao.module.haoka.service.demo;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.haoka.controller.admin.demo.vo.DemoPageReqVO;
-import cn.iocoder.yudao.module.haoka.controller.admin.demo.vo.DemoSaveReqVO;
-import cn.iocoder.yudao.module.haoka.dal.dataobject.demo.DemoDO;
-import cn.iocoder.yudao.module.haoka.dal.mysql.demo.DemoMapper;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+import cn.iocoder.yudao.module.haoka.controller.admin.demo.vo.*;
+import cn.iocoder.yudao.module.haoka.dal.dataobject.demo.HaokaDemoDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+
+import cn.iocoder.yudao.module.haoka.dal.mysql.demo.HaokaDemoMapper;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.haoka.enums.ErrorCodeConstants.DEMO_NOT_EXISTS;
+import static cn.iocoder.yudao.module.haoka.enums.ErrorCodeConstants.*;
 
 /**
  * 好卡案例 Service 实现类
@@ -20,26 +24,26 @@ import static cn.iocoder.yudao.module.haoka.enums.ErrorCodeConstants.DEMO_NOT_EX
  */
 @Service
 @Validated
-public class DemoServiceImpl implements DemoService {
+public class HaokaDemoServiceImpl implements HaokaDemoService {
 
     @Resource
-    private DemoMapper demoMapper;
+    private HaokaDemoMapper demoMapper;
 
     @Override
-    public Long createDemo(DemoSaveReqVO createReqVO) {
+    public Long createDemo(HaokaDemoSaveReqVO createReqVO) {
         // 插入
-        DemoDO demo = BeanUtils.toBean(createReqVO, DemoDO.class);
+        HaokaDemoDO demo = BeanUtils.toBean(createReqVO, HaokaDemoDO.class);
         demoMapper.insert(demo);
         // 返回
         return demo.getId();
     }
 
     @Override
-    public void updateDemo(DemoSaveReqVO updateReqVO) {
+    public void updateDemo(HaokaDemoSaveReqVO updateReqVO) {
         // 校验存在
         validateDemoExists(updateReqVO.getId());
         // 更新
-        DemoDO updateObj = BeanUtils.toBean(updateReqVO, DemoDO.class);
+        HaokaDemoDO updateObj = BeanUtils.toBean(updateReqVO, HaokaDemoDO.class);
         demoMapper.updateById(updateObj);
     }
 
@@ -58,12 +62,12 @@ public class DemoServiceImpl implements DemoService {
     }
 
     @Override
-    public DemoDO getDemo(Long id) {
+    public HaokaDemoDO getDemo(Long id) {
         return demoMapper.selectById(id);
     }
 
     @Override
-    public PageResult<DemoDO> getDemoPage(DemoPageReqVO pageReqVO) {
+    public PageResult<HaokaDemoDO> getDemoPage(HaokaDemoPageReqVO pageReqVO) {
         return demoMapper.selectPage(pageReqVO);
     }
 

@@ -1,12 +1,10 @@
 package cn.iocoder.yudao.module.haoka.controller.admin.demo.vo;
 
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import lombok.*;
+import java.util.*;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import org.springframework.format.annotation.DateTimeFormat;
-
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -15,9 +13,9 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class DemoPageReqVO extends PageParam {
+public class HaokaDemoPageReqVO extends PageParam {
 
-    @Schema(description = "名字", example = "芋艿")
+    @Schema(description = "名字", example = "李四")
     private String name;
 
     @Schema(description = "年龄")

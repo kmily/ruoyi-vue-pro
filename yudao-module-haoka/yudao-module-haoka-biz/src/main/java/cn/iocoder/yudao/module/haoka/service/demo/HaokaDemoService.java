@@ -1,17 +1,18 @@
 package cn.iocoder.yudao.module.haoka.service.demo;
 
+import java.util.*;
+import jakarta.validation.*;
+import cn.iocoder.yudao.module.haoka.controller.admin.demo.vo.*;
+import cn.iocoder.yudao.module.haoka.dal.dataobject.demo.HaokaDemoDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.haoka.controller.admin.demo.vo.DemoPageReqVO;
-import cn.iocoder.yudao.module.haoka.controller.admin.demo.vo.DemoSaveReqVO;
-import cn.iocoder.yudao.module.haoka.dal.dataobject.demo.DemoDO;
-import jakarta.validation.Valid;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 
 /**
  * 好卡案例 Service 接口
  *
  * @author 芋道源码
  */
-public interface DemoService {
+public interface HaokaDemoService {
 
     /**
      * 创建好卡案例
@@ -19,14 +20,14 @@ public interface DemoService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createDemo(@Valid DemoSaveReqVO createReqVO);
+    Long createDemo(@Valid HaokaDemoSaveReqVO createReqVO);
 
     /**
      * 更新好卡案例
      *
      * @param updateReqVO 更新信息
      */
-    void updateDemo(@Valid DemoSaveReqVO updateReqVO);
+    void updateDemo(@Valid HaokaDemoSaveReqVO updateReqVO);
 
     /**
      * 删除好卡案例
@@ -41,7 +42,7 @@ public interface DemoService {
      * @param id 编号
      * @return 好卡案例
      */
-    DemoDO getDemo(Long id);
+    HaokaDemoDO getDemo(Long id);
 
     /**
      * 获得好卡案例分页
@@ -49,6 +50,6 @@ public interface DemoService {
      * @param pageReqVO 分页查询
      * @return 好卡案例分页
      */
-    PageResult<DemoDO> getDemoPage(DemoPageReqVO pageReqVO);
+    PageResult<HaokaDemoDO> getDemoPage(HaokaDemoPageReqVO pageReqVO);
 
 }
