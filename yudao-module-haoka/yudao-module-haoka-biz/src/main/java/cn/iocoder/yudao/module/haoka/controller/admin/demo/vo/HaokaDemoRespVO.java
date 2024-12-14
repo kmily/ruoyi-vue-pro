@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.haoka.controller.admin.demo.vo;
 
+import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
@@ -28,7 +29,7 @@ public class HaokaDemoRespVO {
 
     @Schema(description = "性别", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty(value = "性别", converter = DictConvert.class)
-    @DictFormat("system_user_sex") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
+    @DictFormat(DictTypeConstants.USER_SEX) // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
     private Integer agent;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
