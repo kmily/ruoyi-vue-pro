@@ -45,6 +45,9 @@ public class AppTradeOrderPageItemRespVO {
     @Schema(description = "配送方式", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer deliveryType;
 
+    @Schema(description = "微信物流查询id")
+    private String waybillToken;
+
     /**
      * 订单项数组
      */

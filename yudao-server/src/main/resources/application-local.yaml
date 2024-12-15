@@ -207,6 +207,13 @@ wx:
       type: RedisTemplate # 采用 RedisTemplate 操作 Redis，会自动从 Spring 中获取
       key-prefix: wa # Redis Key 的前缀
       http-client-type: HttpClient # 采用 HttpClient 请求微信公众号平台
+    token:  # 微信小程序消息推送服务Token
+    aes-key:  # 微信小程序消息推送服务AES kEY
+    msg-data-format: JSON # 微信小程序消息推送服务推送信息格式,只适配了JSON
+    plugin:
+      logistics: true
+      order-detail-path: /pages/order/detail
+
 
 --- #################### 芋道相关配置 ####################
 

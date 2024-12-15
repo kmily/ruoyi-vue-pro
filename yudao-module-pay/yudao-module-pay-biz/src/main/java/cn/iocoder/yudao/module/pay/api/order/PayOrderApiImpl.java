@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.pay.convert.order.PayOrderConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import org.springframework.stereotype.Service;
+import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 
 import jakarta.annotation.Resource;
 
@@ -28,6 +29,13 @@ public class PayOrderApiImpl implements PayOrderApi {
     @Override
     public PayOrderRespDTO getOrder(Long id) {
         PayOrderDO order = payOrderService.getOrder(id);
+        return PayOrderConvert.INSTANCE.convert2(order);
+    }
+
+    @Override
+    @TenantIgnore
+    public PayOrderRespDTO getOrder(String channelOrderNo) {
+        PayOrderDO order = payOrderService.getOrder(channelOrderNo);
         return PayOrderConvert.INSTANCE.convert2(order);
     }
 

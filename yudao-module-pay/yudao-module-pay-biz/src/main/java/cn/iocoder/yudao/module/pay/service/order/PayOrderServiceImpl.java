@@ -81,6 +81,11 @@ public class PayOrderServiceImpl implements PayOrderService {
     }
 
     @Override
+    public PayOrderDO getOrder(String channelOrderNo) {
+        return orderMapper.selectOne(PayOrderDO::getChannelOrderNo, channelOrderNo);
+    }
+
+    @Override
     public PayOrderDO getOrder(Long appId, String merchantOrderId) {
         return orderMapper.selectByAppIdAndMerchantOrderId(appId, merchantOrderId);
     }

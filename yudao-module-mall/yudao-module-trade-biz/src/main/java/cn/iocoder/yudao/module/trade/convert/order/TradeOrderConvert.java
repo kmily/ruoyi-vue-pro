@@ -10,6 +10,7 @@ import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.member.api.address.dto.MemberAddressRespDTO;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
+import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
@@ -174,7 +175,9 @@ public interface TradeOrderConvert {
 
     default AppTradeOrderDetailRespVO convert02(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
                                                 TradeOrderProperties tradeOrderProperties,
-                                                DeliveryExpressDO express) {
+                                                DeliveryExpressDO express,
+                                                PayOrderRespDTO payOrder,
+                                                Boolean isMaTradeManaged) {
         AppTradeOrderDetailRespVO orderVO = convert3(order, orderItems);
         orderVO.setPayExpireTime(order.getCreateTime().plus(tradeOrderProperties.getPayExpireTime()));
         if (StrUtil.isNotEmpty(order.getPayChannelCode())) {
@@ -185,6 +188,10 @@ public interface TradeOrderConvert {
         if (express != null) {
             orderVO.setLogisticsId(express.getId()).setLogisticsName(express.getName());
         }
+        //处理支付渠道订单号
+        if(payOrder != null)
+            orderVO.setChannelOrderNo(payOrder.getChannelOrderNo());
+        orderVO.setIsMaTradeManaged(isMaTradeManaged);
         return orderVO;
     }
 
