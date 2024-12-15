@@ -14,16 +14,16 @@ import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 @ExcelIgnoreUnannotated
 public class SuperiorProductConfigRespVO {
 
-    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "21785")
+    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "28128")
     @ExcelProperty("ID")
     private Long id;
 
-    @Schema(description = "上游接口ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "7050")
+    @Schema(description = "上游接口ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "31755")
     @ExcelProperty("上游接口ID")
     private Long haokaSuperiorApiId;
 
-    @Schema(description = "产品", requiredMode = Schema.RequiredMode.REQUIRED, example = "26555")
-    @ExcelProperty("产品")
+    @Schema(description = "产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "320")
+    @ExcelProperty("产品ID")
     private Long haokaProductId;
 
     @Schema(description = "是否已配置", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -35,12 +35,7 @@ public class SuperiorProductConfigRespVO {
     @ExcelProperty("值")
     private String config;
 
-    @Schema(description = "是否必填")
-    @ExcelProperty(value = "是否必填", converter = DictConvert.class)
-    @DictFormat("infra_boolean_string") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
-    private Boolean required;
-
-    @Schema(description = "说明", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "说明")
     @ExcelProperty("说明")
     private String remarks;
 

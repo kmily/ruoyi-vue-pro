@@ -32,7 +32,7 @@ public class SuperiorProductConfigDO extends BaseDO {
      */
     private Long haokaSuperiorApiId;
     /**
-     * 产品
+     * 产品ID
      */
     private Long haokaProductId;
     /**
@@ -45,12 +45,6 @@ public class SuperiorProductConfigDO extends BaseDO {
      * 值
      */
     private String config;
-    /**
-     * 是否必填
-     *
-     * 枚举 {@link TODO infra_boolean_string 对应的类}
-     */
-    private Boolean required;
     /**
      * 说明
      */

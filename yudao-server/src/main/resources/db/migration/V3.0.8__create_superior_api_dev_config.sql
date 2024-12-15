@@ -6,7 +6,6 @@ CREATE TABLE `haoka_superior_api_dev_config`
     `code`                  varchar(512)  NOT NULL DEFAULT '' COMMENT '标识',
     `name`                  varchar(512)  NOT NULL DEFAULT '' COMMENT '名字',
     `value`                 varchar(1024) NOT NULL DEFAULT '' COMMENT '值',
-    `required`              bit(1)        NOT NULL DEFAULT b'0' COMMENT '是否必填',
     `remarks`               text COMMENT '说明',
     `input_type`            int(11) NOT NULL DEFAULT 1 COMMENT '输入类型', -- 枚举：haoka_superior_api_input_type：输入，单选，多选
     `input_select_values`   varchar(1024) NOT NULL DEFAULT '' COMMENT '选项(逗号,分割)',

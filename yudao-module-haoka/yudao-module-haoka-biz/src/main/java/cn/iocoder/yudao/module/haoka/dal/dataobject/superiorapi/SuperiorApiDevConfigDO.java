@@ -44,19 +44,11 @@ public class SuperiorApiDevConfigDO extends BaseDO {
      */
     private String value;
     /**
-     * 是否必填
-     *
-     * 枚举 {@link TODO infra_boolean_string 对应的类}
-     */
-    private Boolean required;
-    /**
      * 说明
      */
     private String remarks;
     /**
      * 输入类型
-     *
-     * 枚举 {@link TODO haoka_superior_api_input_type 对应的类}
      */
     private Integer inputType;
     /**

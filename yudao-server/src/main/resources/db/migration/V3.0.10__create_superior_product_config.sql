@@ -2,13 +2,12 @@ DROP TABLE IF EXISTS `haoka_superior_product_config`;
 CREATE TABLE `haoka_superior_product_config`
 (
     `id`                    bigint(20) NOT NULL PRIMARY KEY COMMENT 'ID',
-    `haoka_superior_api_id` bigint(20) NOT NULL COMMENT 'ID',
-    `haoka_product_id`      bigint(20) NOT NULL COMMENT 'ID',
+    `haoka_superior_api_id` bigint(20) NOT NULL COMMENT '上游接口ID',
+    `haoka_product_id`      bigint(20) NOT NULL COMMENT '产品ID',
 
     `is_confined`           bit(1)      NOT NULL DEFAULT b'0' COMMENT '是否已配置',
     `config`                text        NOT NULL COMMENT '值',
-    `required`              bit(1)      NOT NULL DEFAULT b'0' COMMENT '是否必填',
-    `remarks`               text        NOT NULL COMMENT '说明',
+    `remarks`               text        COMMENT '说明',
 
     `dept_id`               bigint(20) COMMENT '部门ID',
     `creator`               varchar(64) NOT NULL DEFAULT '' COMMENT '创建者',

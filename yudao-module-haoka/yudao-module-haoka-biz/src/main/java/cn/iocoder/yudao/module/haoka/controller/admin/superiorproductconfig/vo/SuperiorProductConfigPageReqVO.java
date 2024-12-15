@@ -15,10 +15,10 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class SuperiorProductConfigPageReqVO extends PageParam {
 
-    @Schema(description = "上游接口ID", example = "7050")
+    @Schema(description = "上游接口ID", example = "31755")
     private Long haokaSuperiorApiId;
 
-    @Schema(description = "产品", example = "26555")
+    @Schema(description = "产品ID", example = "320")
     private Long haokaProductId;
 
     @Schema(description = "是否已配置")
@@ -26,9 +26,6 @@ public class SuperiorProductConfigPageReqVO extends PageParam {
 
     @Schema(description = "值")
     private String config;
-
-    @Schema(description = "是否必填")
-    private Boolean required;
 
     @Schema(description = "说明")
     private String remarks;

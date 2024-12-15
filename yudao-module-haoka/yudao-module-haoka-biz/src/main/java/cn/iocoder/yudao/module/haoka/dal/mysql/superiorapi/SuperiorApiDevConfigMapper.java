@@ -21,9 +21,12 @@ public interface SuperiorApiDevConfigMapper extends BaseMapperX<SuperiorApiDevCo
     default PageResult<SuperiorApiDevConfigDO> selectPage(SuperiorApiDevConfigPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<SuperiorApiDevConfigDO>()
                 .eqIfPresent(SuperiorApiDevConfigDO::getHaokaSuperiorApiId, reqVO.getHaokaSuperiorApiId())
-                .likeIfPresent(SuperiorApiDevConfigDO::getCode, reqVO.getCode())
+                .eqIfPresent(SuperiorApiDevConfigDO::getCode, reqVO.getCode())
                 .likeIfPresent(SuperiorApiDevConfigDO::getName, reqVO.getName())
                 .eqIfPresent(SuperiorApiDevConfigDO::getValue, reqVO.getValue())
+                .eqIfPresent(SuperiorApiDevConfigDO::getRemarks, reqVO.getRemarks())
+                .eqIfPresent(SuperiorApiDevConfigDO::getInputType, reqVO.getInputType())
+                .eqIfPresent(SuperiorApiDevConfigDO::getInputSelectValues, reqVO.getInputSelectValues())
                 .betweenIfPresent(SuperiorApiDevConfigDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(SuperiorApiDevConfigDO::getId));
     }

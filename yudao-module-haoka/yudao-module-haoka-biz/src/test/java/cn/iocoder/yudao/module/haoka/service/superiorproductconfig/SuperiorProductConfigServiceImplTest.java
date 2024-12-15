@@ -114,7 +114,6 @@ public class SuperiorProductConfigServiceImplTest extends BaseDbUnitTest {
            o.setHaokaProductId(null);
            o.setIsConfined(null);
            o.setConfig(null);
-           o.setRequired(null);
            o.setRemarks(null);
            o.setCreateTime(null);
        });
@@ -127,8 +126,6 @@ public class SuperiorProductConfigServiceImplTest extends BaseDbUnitTest {
        superiorProductConfigMapper.insert(cloneIgnoreId(dbSuperiorProductConfig, o -> o.setIsConfined(null)));
        // 测试 config 不匹配
        superiorProductConfigMapper.insert(cloneIgnoreId(dbSuperiorProductConfig, o -> o.setConfig(null)));
-       // 测试 required 不匹配
-       superiorProductConfigMapper.insert(cloneIgnoreId(dbSuperiorProductConfig, o -> o.setRequired(null)));
        // 测试 remarks 不匹配
        superiorProductConfigMapper.insert(cloneIgnoreId(dbSuperiorProductConfig, o -> o.setRemarks(null)));
        // 测试 createTime 不匹配
@@ -139,7 +136,6 @@ public class SuperiorProductConfigServiceImplTest extends BaseDbUnitTest {
        reqVO.setHaokaProductId(null);
        reqVO.setIsConfined(null);
        reqVO.setConfig(null);
-       reqVO.setRequired(null);
        reqVO.setRemarks(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 

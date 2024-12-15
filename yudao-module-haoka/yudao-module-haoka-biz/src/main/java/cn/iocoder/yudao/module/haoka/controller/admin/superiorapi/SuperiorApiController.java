@@ -185,7 +185,7 @@ public class SuperiorApiController {
 
     @GetMapping("/superior-product-config/page")
     @Operation(summary = "获得产品对接上游配置分页")
-    @Parameter(name = "haokaSuperiorApiId", description = "上游接口ID")
+    @Parameter(name = "haokaSuperiorApiId", description = "ID")
     @PreAuthorize("@ss.hasPermission('haoka:superior-api:query')")
     public CommonResult<PageResult<SuperiorProductConfigDO>> getSuperiorProductConfigPage(PageParam pageReqVO,
                                                                                         @RequestParam("haokaSuperiorApiId") Long haokaSuperiorApiId) {

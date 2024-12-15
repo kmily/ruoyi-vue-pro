@@ -6,19 +6,17 @@ import java.util.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import com.alibaba.excel.annotation.*;
-import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
-import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 
 @Schema(description = "管理后台 - 上游API接口开发配置 Response VO")
 @Data
 @ExcelIgnoreUnannotated
 public class SuperiorApiDevConfigRespVO {
 
-    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "10380")
+    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "4692")
     @ExcelProperty("ID")
     private Long id;
 
-    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "2733")
+    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "627")
     @ExcelProperty("ID")
     private Long haokaSuperiorApiId;
 
@@ -26,7 +24,7 @@ public class SuperiorApiDevConfigRespVO {
     @ExcelProperty("标识")
     private String code;
 
-    @Schema(description = "名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "赵六")
+    @Schema(description = "名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "王五")
     @ExcelProperty("名字")
     private String name;
 
@@ -34,18 +32,12 @@ public class SuperiorApiDevConfigRespVO {
     @ExcelProperty("值")
     private String value;
 
-    @Schema(description = "是否必填", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty(value = "是否必填", converter = DictConvert.class)
-    @DictFormat("infra_boolean_string") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
-    private Boolean required;
-
     @Schema(description = "说明")
     @ExcelProperty("说明")
     private String remarks;
 
-    @Schema(description = "输入类型")
-    @ExcelProperty(value = "输入类型", converter = DictConvert.class)
-    @DictFormat("haoka_superior_api_input_type") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
+    @Schema(description = "输入类型", example = "2")
+    @ExcelProperty("输入类型")
     private Integer inputType;
 
     @Schema(description = "选项(逗号,分割)")

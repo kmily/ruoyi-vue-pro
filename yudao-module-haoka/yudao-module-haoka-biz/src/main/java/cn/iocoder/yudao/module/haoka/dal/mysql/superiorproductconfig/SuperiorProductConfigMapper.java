@@ -24,7 +24,6 @@ public interface SuperiorProductConfigMapper extends BaseMapperX<SuperiorProduct
                 .eqIfPresent(SuperiorProductConfigDO::getHaokaProductId, reqVO.getHaokaProductId())
                 .eqIfPresent(SuperiorProductConfigDO::getIsConfined, reqVO.getIsConfined())
                 .eqIfPresent(SuperiorProductConfigDO::getConfig, reqVO.getConfig())
-                .eqIfPresent(SuperiorProductConfigDO::getRequired, reqVO.getRequired())
                 .eqIfPresent(SuperiorProductConfigDO::getRemarks, reqVO.getRemarks())
                 .betweenIfPresent(SuperiorProductConfigDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(SuperiorProductConfigDO::getId));

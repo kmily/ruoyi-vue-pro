@@ -9,26 +9,26 @@ import jakarta.validation.constraints.*;
 @Data
 public class SuperiorProductConfigSaveReqVO {
 
-    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "21785")
+    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "28128")
     private Long id;
 
-    @Schema(description = "上游接口ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "7050")
+    @Schema(description = "上游接口ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "31755")
     @NotNull(message = "上游接口ID不能为空")
     private Long haokaSuperiorApiId;
 
-    @Schema(description = "产品", requiredMode = Schema.RequiredMode.REQUIRED, example = "26555")
-    @NotNull(message = "产品不能为空")
+    @Schema(description = "产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "320")
+    @NotNull(message = "产品ID不能为空")
     private Long haokaProductId;
+
+    @Schema(description = "是否已配置", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "是否已配置不能为空")
+    private Boolean isConfined;
 
     @Schema(description = "值", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "值不能为空")
     private String config;
 
-    @Schema(description = "是否必填")
-    private Boolean required;
-
-    @Schema(description = "说明", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "说明不能为空")
+    @Schema(description = "说明")
     private String remarks;
 
 }

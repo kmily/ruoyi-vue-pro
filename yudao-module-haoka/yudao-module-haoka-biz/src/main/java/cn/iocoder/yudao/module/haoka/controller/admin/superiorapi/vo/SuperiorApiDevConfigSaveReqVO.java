@@ -9,10 +9,10 @@ import jakarta.validation.constraints.*;
 @Data
 public class SuperiorApiDevConfigSaveReqVO {
 
-    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "10380")
+    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "4692")
     private Long id;
 
-    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "2733")
+    @Schema(description = "ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "627")
     @NotNull(message = "ID不能为空")
     private Long haokaSuperiorApiId;
 
@@ -20,7 +20,7 @@ public class SuperiorApiDevConfigSaveReqVO {
     @NotEmpty(message = "标识不能为空")
     private String code;
 
-    @Schema(description = "名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "赵六")
+    @Schema(description = "名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "王五")
     @NotEmpty(message = "名字不能为空")
     private String name;
 
@@ -28,14 +28,10 @@ public class SuperiorApiDevConfigSaveReqVO {
     @NotEmpty(message = "值不能为空")
     private String value;
 
-    @Schema(description = "是否必填", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "是否必填不能为空")
-    private Boolean required;
-
     @Schema(description = "说明")
     private String remarks;
 
-    @Schema(description = "输入类型")
+    @Schema(description = "输入类型", example = "2")
     private Integer inputType;
 
     @Schema(description = "选项(逗号,分割)")
