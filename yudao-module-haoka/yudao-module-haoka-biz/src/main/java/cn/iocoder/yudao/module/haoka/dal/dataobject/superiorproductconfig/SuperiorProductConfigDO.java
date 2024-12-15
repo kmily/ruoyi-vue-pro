@@ -25,14 +25,14 @@ public class SuperiorProductConfigDO extends BaseDO {
     /**
      * ID
      */
-    @TableId
+    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
     /**
-     * ID
+     * 上游接口ID
      */
     private Long haokaSuperiorApiId;
     /**
-     * ID
+     * 产品
      */
     private Long haokaProductId;
     /**

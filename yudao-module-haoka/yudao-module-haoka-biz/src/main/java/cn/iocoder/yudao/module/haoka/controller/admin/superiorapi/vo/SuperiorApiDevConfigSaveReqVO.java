@@ -35,15 +35,10 @@ public class SuperiorApiDevConfigSaveReqVO {
     @Schema(description = "说明")
     private String remarks;
 
-    @Schema(description = "输入类型", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "输入类型不能为空")
+    @Schema(description = "输入类型")
     private Integer inputType;
 
-    @Schema(description = "选项(逗号,分割)", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "选项(逗号,分割)不能为空")
+    @Schema(description = "选项(逗号,分割)")
     private String inputSelectValues;
-
-    @Schema(description = "部门ID", example = "6005")
-    private Long deptId;
 
 }

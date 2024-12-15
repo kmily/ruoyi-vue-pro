@@ -39,15 +39,10 @@ public class SuperiorApiSaveReqVO {
     @Schema(description = "API文档")
     private String apiDoc;
 
-    @Schema(description = "是否已配置开发", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "是否已配置开发不能为空")
+    @Schema(description = "是否已配置开发")
     private Boolean isDevConfined;
 
-    @Schema(description = "是否已配置产品", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "是否已配置产品不能为空")
+    @Schema(description = "是否已配置产品")
     private Boolean isSkuConfined;
-
-    @Schema(description = "部门ID", example = "12247")
-    private Long deptId;
 
 }

@@ -15,10 +15,10 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class SuperiorProductConfigPageReqVO extends PageParam {
 
-    @Schema(description = "ID", example = "7050")
+    @Schema(description = "上游接口ID", example = "7050")
     private Long haokaSuperiorApiId;
 
-    @Schema(description = "ID", example = "26555")
+    @Schema(description = "产品", example = "26555")
     private Long haokaProductId;
 
     @Schema(description = "是否已配置")
@@ -32,9 +32,6 @@ public class SuperiorProductConfigPageReqVO extends PageParam {
 
     @Schema(description = "说明")
     private String remarks;
-
-    @Schema(description = "部门ID", example = "30274")
-    private Long deptId;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

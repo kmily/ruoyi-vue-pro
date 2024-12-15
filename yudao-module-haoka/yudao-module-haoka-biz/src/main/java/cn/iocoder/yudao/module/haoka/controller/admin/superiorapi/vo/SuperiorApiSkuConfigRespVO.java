@@ -35,22 +35,18 @@ public class SuperiorApiSkuConfigRespVO {
     @DictFormat("infra_boolean_string") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
     private Boolean required;
 
-    @Schema(description = "说明", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "说明")
     @ExcelProperty("说明")
     private String remarks;
 
-    @Schema(description = "输入类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "输入类型", example = "1")
     @ExcelProperty(value = "输入类型", converter = DictConvert.class)
     @DictFormat("haoka_superior_api_input_type") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
     private Integer inputType;
 
-    @Schema(description = "选项(逗号,分割)", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "选项(逗号,分割)")
     @ExcelProperty("选项(逗号,分割)")
     private String inputSelectValues;
-
-    @Schema(description = "部门ID", example = "3735")
-    @ExcelProperty("部门ID")
-    private Long deptId;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")

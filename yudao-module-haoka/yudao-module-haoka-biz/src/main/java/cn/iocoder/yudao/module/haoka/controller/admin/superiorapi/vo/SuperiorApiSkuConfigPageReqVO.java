@@ -27,18 +27,6 @@ public class SuperiorApiSkuConfigPageReqVO extends PageParam {
     @Schema(description = "是否必填")
     private Boolean required;
 
-    @Schema(description = "说明")
-    private String remarks;
-
-    @Schema(description = "输入类型", example = "1")
-    private Integer inputType;
-
-    @Schema(description = "选项(逗号,分割)")
-    private String inputSelectValues;
-
-    @Schema(description = "部门ID", example = "3735")
-    private Long deptId;
-
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;

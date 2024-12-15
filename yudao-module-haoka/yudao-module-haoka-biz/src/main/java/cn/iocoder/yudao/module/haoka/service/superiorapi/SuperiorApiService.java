@@ -143,7 +143,7 @@ public interface SuperiorApiService {
      * 获得产品对接上游配置分页
      *
      * @param pageReqVO 分页查询
-     * @param haokaSuperiorApiId ID
+     * @param haokaSuperiorApiId 上游接口ID
      * @return 产品对接上游配置分页
      */
     PageResult<SuperiorProductConfigDO> getSuperiorProductConfigPage(PageParam pageReqVO, Long haokaSuperiorApiId);

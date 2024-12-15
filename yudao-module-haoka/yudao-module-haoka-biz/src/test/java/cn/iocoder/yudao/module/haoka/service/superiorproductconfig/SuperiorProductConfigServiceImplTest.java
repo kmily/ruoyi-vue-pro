@@ -116,7 +116,6 @@ public class SuperiorProductConfigServiceImplTest extends BaseDbUnitTest {
            o.setConfig(null);
            o.setRequired(null);
            o.setRemarks(null);
-           o.setDeptId(null);
            o.setCreateTime(null);
        });
        superiorProductConfigMapper.insert(dbSuperiorProductConfig);
@@ -132,8 +131,6 @@ public class SuperiorProductConfigServiceImplTest extends BaseDbUnitTest {
        superiorProductConfigMapper.insert(cloneIgnoreId(dbSuperiorProductConfig, o -> o.setRequired(null)));
        // 测试 remarks 不匹配
        superiorProductConfigMapper.insert(cloneIgnoreId(dbSuperiorProductConfig, o -> o.setRemarks(null)));
-       // 测试 deptId 不匹配
-       superiorProductConfigMapper.insert(cloneIgnoreId(dbSuperiorProductConfig, o -> o.setDeptId(null)));
        // 测试 createTime 不匹配
        superiorProductConfigMapper.insert(cloneIgnoreId(dbSuperiorProductConfig, o -> o.setCreateTime(null)));
        // 准备参数
@@ -144,7 +141,6 @@ public class SuperiorProductConfigServiceImplTest extends BaseDbUnitTest {
        reqVO.setConfig(null);
        reqVO.setRequired(null);
        reqVO.setRemarks(null);
-       reqVO.setDeptId(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
        // 调用

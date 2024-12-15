@@ -45,19 +45,15 @@ public class SuperiorApiRespVO {
     @ExcelProperty("API文档")
     private String apiDoc;
 
-    @Schema(description = "是否已配置开发", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "是否已配置开发")
     @ExcelProperty(value = "是否已配置开发", converter = DictConvert.class)
     @DictFormat("infra_boolean_string") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
     private Boolean isDevConfined;
 
-    @Schema(description = "是否已配置产品", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "是否已配置产品")
     @ExcelProperty(value = "是否已配置产品", converter = DictConvert.class)
     @DictFormat("infra_boolean_string") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
     private Boolean isSkuConfined;
-
-    @Schema(description = "部门ID", example = "12247")
-    @ExcelProperty("部门ID")
-    private Long deptId;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")

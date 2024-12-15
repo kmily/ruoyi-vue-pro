@@ -26,7 +26,6 @@ public interface SuperiorApiMapper extends BaseMapperX<SuperiorApiDO> {
                 .betweenIfPresent(SuperiorApiDO::getPublishTime, reqVO.getPublishTime())
                 .eqIfPresent(SuperiorApiDO::getIsDevConfined, reqVO.getIsDevConfined())
                 .eqIfPresent(SuperiorApiDO::getIsSkuConfined, reqVO.getIsSkuConfined())
-                .eqIfPresent(SuperiorApiDO::getDeptId, reqVO.getDeptId())
                 .betweenIfPresent(SuperiorApiDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(SuperiorApiDO::getId));
     }

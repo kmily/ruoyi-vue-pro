@@ -117,7 +117,6 @@ public class SuperiorApiServiceImplTest extends BaseDbUnitTest {
            o.setPublishTime(null);
            o.setIsDevConfined(null);
            o.setIsSkuConfined(null);
-           o.setDeptId(null);
            o.setCreateTime(null);
        });
        superiorApiMapper.insert(dbSuperiorApi);
@@ -135,8 +134,6 @@ public class SuperiorApiServiceImplTest extends BaseDbUnitTest {
        superiorApiMapper.insert(cloneIgnoreId(dbSuperiorApi, o -> o.setIsDevConfined(null)));
        // 测试 isSkuConfined 不匹配
        superiorApiMapper.insert(cloneIgnoreId(dbSuperiorApi, o -> o.setIsSkuConfined(null)));
-       // 测试 deptId 不匹配
-       superiorApiMapper.insert(cloneIgnoreId(dbSuperiorApi, o -> o.setDeptId(null)));
        // 测试 createTime 不匹配
        superiorApiMapper.insert(cloneIgnoreId(dbSuperiorApi, o -> o.setCreateTime(null)));
        // 准备参数
@@ -148,7 +145,6 @@ public class SuperiorApiServiceImplTest extends BaseDbUnitTest {
        reqVO.setPublishTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
        reqVO.setIsDevConfined(null);
        reqVO.setIsSkuConfined(null);
-       reqVO.setDeptId(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
        // 调用

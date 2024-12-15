@@ -28,19 +28,13 @@ public class SuperiorApiSkuConfigSaveReqVO {
     @NotNull(message = "是否必填不能为空")
     private Boolean required;
 
-    @Schema(description = "说明", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "说明不能为空")
+    @Schema(description = "说明")
     private String remarks;
 
-    @Schema(description = "输入类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @NotNull(message = "输入类型不能为空")
+    @Schema(description = "输入类型", example = "1")
     private Integer inputType;
 
-    @Schema(description = "选项(逗号,分割)", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "选项(逗号,分割)不能为空")
+    @Schema(description = "选项(逗号,分割)")
     private String inputSelectValues;
-
-    @Schema(description = "部门ID", example = "3735")
-    private Long deptId;
 
 }

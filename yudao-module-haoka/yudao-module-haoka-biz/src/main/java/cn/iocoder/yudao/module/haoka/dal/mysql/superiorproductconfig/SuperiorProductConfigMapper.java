@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.haoka.dal.mysql.superiorproductconfig;
 
+import java.util.*;
+
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -24,7 +26,6 @@ public interface SuperiorProductConfigMapper extends BaseMapperX<SuperiorProduct
                 .eqIfPresent(SuperiorProductConfigDO::getConfig, reqVO.getConfig())
                 .eqIfPresent(SuperiorProductConfigDO::getRequired, reqVO.getRequired())
                 .eqIfPresent(SuperiorProductConfigDO::getRemarks, reqVO.getRemarks())
-                .eqIfPresent(SuperiorProductConfigDO::getDeptId, reqVO.getDeptId())
                 .betweenIfPresent(SuperiorProductConfigDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(SuperiorProductConfigDO::getId));
     }

@@ -114,10 +114,6 @@ public class SuperiorApiSkuConfigServiceImplTest extends BaseDbUnitTest {
            o.setCode(null);
            o.setName(null);
            o.setRequired(null);
-           o.setRemarks(null);
-           o.setInputType(null);
-           o.setInputSelectValues(null);
-           o.setDeptId(null);
            o.setCreateTime(null);
        });
        superiorApiSkuConfigMapper.insert(dbSuperiorApiSkuConfig);
@@ -129,14 +125,6 @@ public class SuperiorApiSkuConfigServiceImplTest extends BaseDbUnitTest {
        superiorApiSkuConfigMapper.insert(cloneIgnoreId(dbSuperiorApiSkuConfig, o -> o.setName(null)));
        // 测试 required 不匹配
        superiorApiSkuConfigMapper.insert(cloneIgnoreId(dbSuperiorApiSkuConfig, o -> o.setRequired(null)));
-       // 测试 remarks 不匹配
-       superiorApiSkuConfigMapper.insert(cloneIgnoreId(dbSuperiorApiSkuConfig, o -> o.setRemarks(null)));
-       // 测试 inputType 不匹配
-       superiorApiSkuConfigMapper.insert(cloneIgnoreId(dbSuperiorApiSkuConfig, o -> o.setInputType(null)));
-       // 测试 inputSelectValues 不匹配
-       superiorApiSkuConfigMapper.insert(cloneIgnoreId(dbSuperiorApiSkuConfig, o -> o.setInputSelectValues(null)));
-       // 测试 deptId 不匹配
-       superiorApiSkuConfigMapper.insert(cloneIgnoreId(dbSuperiorApiSkuConfig, o -> o.setDeptId(null)));
        // 测试 createTime 不匹配
        superiorApiSkuConfigMapper.insert(cloneIgnoreId(dbSuperiorApiSkuConfig, o -> o.setCreateTime(null)));
        // 准备参数
@@ -145,10 +133,6 @@ public class SuperiorApiSkuConfigServiceImplTest extends BaseDbUnitTest {
        reqVO.setCode(null);
        reqVO.setName(null);
        reqVO.setRequired(null);
-       reqVO.setRemarks(null);
-       reqVO.setInputType(null);
-       reqVO.setInputSelectValues(null);
-       reqVO.setDeptId(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
        // 调用

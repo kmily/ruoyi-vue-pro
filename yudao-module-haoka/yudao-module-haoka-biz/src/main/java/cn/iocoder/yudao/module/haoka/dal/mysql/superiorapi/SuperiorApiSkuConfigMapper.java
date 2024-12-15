@@ -24,10 +24,6 @@ public interface SuperiorApiSkuConfigMapper extends BaseMapperX<SuperiorApiSkuCo
                 .likeIfPresent(SuperiorApiSkuConfigDO::getCode, reqVO.getCode())
                 .likeIfPresent(SuperiorApiSkuConfigDO::getName, reqVO.getName())
                 .eqIfPresent(SuperiorApiSkuConfigDO::getRequired, reqVO.getRequired())
-                .eqIfPresent(SuperiorApiSkuConfigDO::getRemarks, reqVO.getRemarks())
-                .eqIfPresent(SuperiorApiSkuConfigDO::getInputType, reqVO.getInputType())
-                .eqIfPresent(SuperiorApiSkuConfigDO::getInputSelectValues, reqVO.getInputSelectValues())
-                .eqIfPresent(SuperiorApiSkuConfigDO::getDeptId, reqVO.getDeptId())
                 .betweenIfPresent(SuperiorApiSkuConfigDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(SuperiorApiSkuConfigDO::getId));
     }

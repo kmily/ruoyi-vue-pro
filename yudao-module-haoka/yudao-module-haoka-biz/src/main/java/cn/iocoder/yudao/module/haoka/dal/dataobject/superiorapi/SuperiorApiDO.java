@@ -26,7 +26,7 @@ public class SuperiorApiDO extends BaseDO {
     /**
      * ID
      */
-    @TableId
+    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
     /**
      * 名字

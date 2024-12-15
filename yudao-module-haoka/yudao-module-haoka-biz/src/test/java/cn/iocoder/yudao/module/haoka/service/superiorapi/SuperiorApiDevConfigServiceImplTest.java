@@ -114,11 +114,6 @@ public class SuperiorApiDevConfigServiceImplTest extends BaseDbUnitTest {
            o.setCode(null);
            o.setName(null);
            o.setValue(null);
-           o.setRequired(null);
-           o.setRemarks(null);
-           o.setInputType(null);
-           o.setInputSelectValues(null);
-           o.setDeptId(null);
            o.setCreateTime(null);
        });
        superiorApiDevConfigMapper.insert(dbSuperiorApiDevConfig);
@@ -130,16 +125,6 @@ public class SuperiorApiDevConfigServiceImplTest extends BaseDbUnitTest {
        superiorApiDevConfigMapper.insert(cloneIgnoreId(dbSuperiorApiDevConfig, o -> o.setName(null)));
        // 测试 value 不匹配
        superiorApiDevConfigMapper.insert(cloneIgnoreId(dbSuperiorApiDevConfig, o -> o.setValue(null)));
-       // 测试 required 不匹配
-       superiorApiDevConfigMapper.insert(cloneIgnoreId(dbSuperiorApiDevConfig, o -> o.setRequired(null)));
-       // 测试 remarks 不匹配
-       superiorApiDevConfigMapper.insert(cloneIgnoreId(dbSuperiorApiDevConfig, o -> o.setRemarks(null)));
-       // 测试 inputType 不匹配
-       superiorApiDevConfigMapper.insert(cloneIgnoreId(dbSuperiorApiDevConfig, o -> o.setInputType(null)));
-       // 测试 inputSelectValues 不匹配
-       superiorApiDevConfigMapper.insert(cloneIgnoreId(dbSuperiorApiDevConfig, o -> o.setInputSelectValues(null)));
-       // 测试 deptId 不匹配
-       superiorApiDevConfigMapper.insert(cloneIgnoreId(dbSuperiorApiDevConfig, o -> o.setDeptId(null)));
        // 测试 createTime 不匹配
        superiorApiDevConfigMapper.insert(cloneIgnoreId(dbSuperiorApiDevConfig, o -> o.setCreateTime(null)));
        // 准备参数
@@ -148,11 +133,6 @@ public class SuperiorApiDevConfigServiceImplTest extends BaseDbUnitTest {
        reqVO.setCode(null);
        reqVO.setName(null);
        reqVO.setValue(null);
-       reqVO.setRequired(null);
-       reqVO.setRemarks(null);
-       reqVO.setInputType(null);
-       reqVO.setInputSelectValues(null);
-       reqVO.setDeptId(null);
        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
        // 调用
