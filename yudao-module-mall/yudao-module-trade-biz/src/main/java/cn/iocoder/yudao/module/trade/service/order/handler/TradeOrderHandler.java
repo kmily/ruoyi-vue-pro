@@ -62,6 +62,13 @@ public interface TradeOrderHandler {
      */
     default void beforeDeliveryOrder(TradeOrderDO order) {}
 
+    /**
+     * 订单发货后
+     *
+     * @param order 订单
+     */
+    default void afterDeliveryOrder(TradeOrderDO order) {}
+
     // ========== 公用方法 ==========
 
     /**

@@ -5,12 +5,19 @@ import cn.binarywang.wx.miniapp.api.WxMaSubscribeService;
 import cn.binarywang.wx.miniapp.api.impl.WxMaServiceImpl;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.binarywang.wx.miniapp.bean.WxMaSubscribeMessage;
+import cn.binarywang.wx.miniapp.bean.shop.request.shipping.ContactBean;
+import cn.binarywang.wx.miniapp.bean.shop.request.shipping.OrderKeyBean;
+import cn.binarywang.wx.miniapp.bean.shop.request.shipping.PayerBean;
+import cn.binarywang.wx.miniapp.bean.shop.request.shipping.ShippingListBean;
+import cn.binarywang.wx.miniapp.bean.shop.request.shipping.WxMaOrderShippingInfoUploadRequest;
+import cn.binarywang.wx.miniapp.bean.shop.response.WxMaOrderShippingInfoBaseResponse;
 import cn.binarywang.wx.miniapp.config.impl.WxMaRedisBetterConfigImpl;
 import cn.binarywang.wx.miniapp.constant.WxMaConstants;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
@@ -20,6 +27,7 @@ import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxQrcodeReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxaSubscribeMessageSendReqDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxaUploadOrderShippingInfoDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
@@ -54,9 +62,15 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
@@ -172,7 +186,7 @@ public class SocialClientServiceImpl implements SocialClientService {
      * 构建 AuthRequest 对象，支持多租户配置
      *
      * @param socialType 社交类型
-     * @param userType   用户类型
+     * @param userType 用户类型
      * @return AuthRequest 对象
      */
     @VisibleForTesting
@@ -229,7 +243,7 @@ public class SocialClientServiceImpl implements SocialClientService {
     /**
      * 创建 clientId + clientSecret 对应的 WxMpService 对象
      *
-     * @param clientId     微信公众号 appId
+     * @param clientId 微信公众号 appId
      * @param clientSecret 微信公众号 secret
      * @return WxMpService 对象
      */
@@ -308,9 +322,9 @@ public class SocialClientServiceImpl implements SocialClientService {
     /**
      * 构建发送消息请求参数
      *
-     * @param reqDTO     请求
+     * @param reqDTO 请求
      * @param templateId 模版编号
-     * @param openId     会员 openId
+     * @param openId 会员 openId
      * @return 微信小程序订阅消息请求参数
      */
     private WxMaSubscribeMessage buildMessageSendReqDTO(SocialWxaSubscribeMessageSendReqDTO reqDTO,
@@ -325,6 +339,85 @@ public class SocialClientServiceImpl implements SocialClientService {
                     subscribeMessage.addData(new WxMaSubscribeMessage.MsgData(key, value))));
         }
         return subscribeMessage;
+    }
+
+    /**
+     * 上传订单发货到微信小程序
+     *
+     * @param reqDTO 请求
+     * @link <a href="https://developers.weixin.qq.com/miniprogram/dev/platform-capabilities/business-capabilities/order-shipping/order-shipping.html">发货信息录入接口</a>
+     */
+    @Override
+    public void uploadWxaOrderShippingInfo(Integer userType, SocialWxaUploadOrderShippingInfoDTO reqDTO) {
+        WxMaService service = getWxMaService(userType);
+        int EXPRESS = 1;
+        List<ShippingListBean> shippingList;
+        if (Objects.equals(EXPRESS, reqDTO.getLogisticsType())) {
+            // 物流配送
+            shippingList = Collections.singletonList(
+                    ShippingListBean.builder()
+                            .trackingNo(reqDTO.getLogisticsNo())
+                            .expressCompany(reqDTO.getExpressCompany())
+                            .itemDesc(reqDTO.getItemDesc())
+                            .contact(ContactBean.builder()
+                                    .receiverContact(maskPhoneNumberWithRegex(reqDTO.getReceiverContact()))
+                                    .build())
+                            .build());
+        } else {
+            shippingList = Collections.singletonList(
+                    ShippingListBean.builder().itemDesc(reqDTO.getItemDesc()).build());
+        }
+        WxMaOrderShippingInfoUploadRequest request = WxMaOrderShippingInfoUploadRequest.builder()
+                .orderKey(OrderKeyBean.builder()
+                        // 使用原支付交易对应的微信订单号，即渠道单号
+                        .orderNumberType(2)
+                        .transactionId(reqDTO.getChannelOrderNo())
+                        .build())
+                //1、实体物流配送采用快递公司进行实体物流配送形式 2、同城配送 3、虚拟商品，虚拟商品，例如话费充值，点卡等，无实体配送形式 4、用户自提
+                .logisticsType(reqDTO.getLogisticsType())
+                //1、UNIFIED_DELIVERY（统一发货）2、SPLIT_DELIVERY（分拆发货）
+                .deliveryMode(1)
+                .shippingList(shippingList)
+                .payer(PayerBean.builder().openid(reqDTO.getChannelUserId()).build())
+                .uploadTime(getUploadTimeString())
+                .build();
+        try {
+            WxMaOrderShippingInfoBaseResponse response = service.getWxMaOrderShippingService().upload(request);
+            if (response.getErrCode() == 0) {
+                log.debug("上传微信小程序发货信息 渠道订单号【{}】 成功", reqDTO.getChannelOrderNo());
+            } else {
+                log.error("上传微信小程序发货信息 渠道订单号【{}】 失败：{}", reqDTO.getChannelOrderNo(), response);
+                throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_UPLOAD_SHIPPING_INFO_ERROR, response.getErrMsg());
+            }
+        } catch (WxErrorException e) {
+            log.error("上传微信小程序发货信息 渠道订单号【{}】 失败", reqDTO.getChannelOrderNo(), e);
+            throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_UPLOAD_SHIPPING_INFO_ERROR, e.getError().getErrorMsg());
+        }
+    }
+
+    private String getUploadTimeString() {
+        ZoneId zoneId = ZoneId.systemDefault();
+        ZonedDateTime now = ZonedDateTime.now(zoneId);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+                .withZone(zoneId);
+        return now.format(formatter);
+    }
+
+    /**
+     * 给手机少号中间4为打星
+     *
+     * @param phoneNumber 手机号
+     */
+    private String maskPhoneNumberWithRegex(String phoneNumber) {
+        if (phoneNumber == null || phoneNumber.length() < 7) {
+            return phoneNumber;
+        }
+        Pattern pattern = Pattern.compile("^(\\d{3})\\d{4}(\\d{4})$");
+        Matcher matcher = pattern.matcher(phoneNumber);
+        if (matcher.find()) {
+            return matcher.group(1) + "****" + matcher.group(2);
+        }
+        return phoneNumber;
     }
 
     /**
@@ -348,7 +441,7 @@ public class SocialClientServiceImpl implements SocialClientService {
     /**
      * 创建 clientId + clientSecret 对应的 WxMaService 对象
      *
-     * @param clientId     微信小程序 appId
+     * @param clientId 微信小程序 appId
      * @param clientSecret 微信小程序 secret
      * @return WxMaService 对象
      */
@@ -410,8 +503,8 @@ public class SocialClientServiceImpl implements SocialClientService {
      *
      * 原因是，不同端（userType）选择某个社交登录（socialType）时，需要通过 {@link #buildAuthRequest(Integer, Integer)} 构建对应的请求
      *
-     * @param id         编号
-     * @param userType   用户类型
+     * @param id 编号
+     * @param userType 用户类型
      * @param socialType 社交类型
      */
     private void validateSocialClientUnique(Long id, Integer userType, Integer socialType) {
@@ -421,7 +514,7 @@ public class SocialClientServiceImpl implements SocialClientService {
             return;
         }
         if (id == null // 新增时，说明重复
-                || ObjUtil.notEqual(id, client.getId())) { // 更新时，如果 id 不一致，说明重复
+            || ObjUtil.notEqual(id, client.getId())) { // 更新时，如果 id 不一致，说明重复
             throw exception(SOCIAL_CLIENT_UNIQUE);
         }
     }

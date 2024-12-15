@@ -143,7 +143,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     /**
      * 获得用户地址
      *
-     * @param userId    用户编号
+     * @param userId 用户编号
      * @param addressId 地址编号
      * @return 地址
      */
@@ -157,7 +157,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     /**
      * 计算订单价格
      *
-     * @param userId          用户编号
+     * @param userId 用户编号
      * @param settlementReqVO 结算信息
      * @return 订单价格
      */
@@ -234,8 +234,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
      * <p>
      * 例如说：优惠劵的扣减、积分的扣减、支付单的创建等等
      *
-     * @param order       订单
-     * @param orderItems  订单项
+     * @param order 订单
+     * @param orderItems 订单项
      * @param createReqVO 创建订单请求
      */
     private void afterCreateTradeOrder(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
@@ -401,6 +401,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                 .setOrderId(order.getId()).setUserId(order.getUserId()).setMessage(null));
         // 4.2 发送订阅消息
         getSelf().sendDeliveryOrderMessage(order, deliveryReqVO);
+        // 5 处理订单发货后逻辑
+        tradeOrderHandlers.forEach(handler -> handler.afterDeliveryOrder(order));
     }
 
     @Async
@@ -516,7 +518,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
      * 1. 交易订单待收货
      *
      * @param userId 用户编号
-     * @param id     交易订单编号
+     * @param id 交易订单编号
      * @return 交易订单
      */
     private TradeOrderDO validateOrderReceivable(Long userId, Long id) {
@@ -587,7 +589,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     /**
      * 取消订单的核心实现
      *
-     * @param order      订单
+     * @param order 订单
      * @param cancelType 取消类型
      */
     private void cancelOrder0(TradeOrderDO order, TradeOrderCancelTypeEnum cancelType) {
@@ -611,7 +613,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
      * 如果金额全部被退款，则取消订单
      * 如果还有未被退款的金额，则无需取消订单
      *
-     * @param order       订单
+     * @param order 订单
      * @param refundPrice 退款金额
      */
     @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.ADMIN_CANCEL_AFTER_SALE)
@@ -965,7 +967,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     /**
      * 创建订单项的评论的核心实现
      *
-     * @param orderItem   订单项
+     * @param orderItem 订单项
      * @param createReqVO 评论内容
      * @return 评论编号
      */
