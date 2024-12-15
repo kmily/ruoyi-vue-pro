@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.framework.tenant.core.mq.rocketmq;
 
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
-import org.apache.rocketmq.client.impl.consumer.DefaultMQPushConsumerImpl;
 import org.apache.rocketmq.client.impl.producer.DefaultMQProducerImpl;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
@@ -20,7 +19,7 @@ public class TenantRocketMQInitializer implements BeanPostProcessor {
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         if (bean instanceof DefaultRocketMQListenerContainer) {
             DefaultRocketMQListenerContainer container = (DefaultRocketMQListenerContainer) bean;
-            initTenantConsumer(container.getConsumer());
+            initTenantConsumer(container);
         } else if (bean instanceof RocketMQTemplate) {
             RocketMQTemplate template = (RocketMQTemplate) bean;
             initTenantProducer(template.getProducer());
@@ -39,15 +38,22 @@ public class TenantRocketMQInitializer implements BeanPostProcessor {
         producerImpl.registerSendMessageHook(new TenantRocketMQSendMessageHook());
     }
 
-    private void initTenantConsumer(DefaultMQPushConsumer consumer) {
+    private void initTenantConsumer(DefaultRocketMQListenerContainer container) {
+        DefaultMQPushConsumer consumer = container.getConsumer();
         if (consumer == null) {
             return;
         }
-        DefaultMQPushConsumerImpl consumerImpl = consumer.getDefaultMQPushConsumerImpl();
-        if (consumerImpl == null) {
-            return;
+
+        switch (container.getConsumeMode()) {
+            case ORDERLY:
+                consumer.setMessageListener(new TenantRocketMQListenerOrderly(container));
+                break;
+            case CONCURRENTLY:
+                consumer.setMessageListener(new TenantRocketMQListenerConcurrently(container));
+                break;
+            default:
+                throw new IllegalArgumentException("Property 'consumeMode' was wrong.");
         }
-        consumerImpl.registerConsumeMessageHook(new TenantRocketMQConsumeMessageHook());
     }
 
 }
