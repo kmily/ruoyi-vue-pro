@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.ratelimiter.core.keyresolver.impl;
 
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.system.SystemUtil;
 import cn.iocoder.yudao.framework.ratelimiter.core.annotation.RateLimiter;
@@ -19,9 +18,8 @@ public class ServerNodeRateLimiterKeyResolver implements RateLimiterKeyResolver 
     @Override
     public String resolver(JoinPoint joinPoint, RateLimiter rateLimiter) {
         String methodName = joinPoint.getSignature().toString();
-        String argsStr = StrUtil.join(",", joinPoint.getArgs());
         String serverNode = String.format("%s@%d", SystemUtil.getHostInfo().getAddress(), SystemUtil.getCurrentPID());
-        return SecureUtil.md5(methodName + argsStr + serverNode);
+        return SecureUtil.md5(methodName + serverNode);
     }
 
 }
