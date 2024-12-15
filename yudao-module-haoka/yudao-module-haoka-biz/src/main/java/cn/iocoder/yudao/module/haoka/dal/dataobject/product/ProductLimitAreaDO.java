@@ -25,7 +25,7 @@ public class ProductLimitAreaDO extends BaseDO {
     /**
      * ID
      */
-    @TableId
+    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
     /**
      * 产品限制ID

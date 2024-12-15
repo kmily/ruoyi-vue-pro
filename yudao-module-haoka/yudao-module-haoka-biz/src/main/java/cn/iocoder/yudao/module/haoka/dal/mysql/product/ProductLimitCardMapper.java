@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.haoka.dal.mysql.product;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.haoka.controller.admin.product.vo.ProductLimitCardPageReqVO;
-import cn.iocoder.yudao.module.haoka.dal.dataobject.product.ProductLimitAreaDO;
 import cn.iocoder.yudao.module.haoka.dal.dataobject.product.ProductLimitCardDO;
 import org.apache.ibatis.annotations.Mapper;
 

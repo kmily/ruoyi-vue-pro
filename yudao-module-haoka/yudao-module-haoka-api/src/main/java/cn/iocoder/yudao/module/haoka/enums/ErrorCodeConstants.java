@@ -23,4 +23,7 @@ public interface ErrorCodeConstants {
     ErrorCode PRODUCT_LIMIT_NOT_EXISTS = new ErrorCode(1_801_001_005, "产品限制条件不存在");
     ErrorCode PRODUCT_LIMIT_AREA_NOT_EXISTS = new ErrorCode(1_801_001_005, "产品区域配置不存在");
     ErrorCode PRODUCT_TYPE_NOT_EXISTS = new ErrorCode(1_801_001_005, "产品类型不存在");
+
+
+    ErrorCode HAO_KA_PRODUCT_NOT_EXISTS = new ErrorCode(1_801_001_005, "产品/渠道不存在");
 }

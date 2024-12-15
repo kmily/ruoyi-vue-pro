@@ -15,8 +15,8 @@ CREATE TABLE `haoka_product`
     `need_blacklist_filter`    bit(1)       NOT NULL DEFAULT b'1' COMMENT '黑名单过滤',
 
     `enable_stock_limit`       bit(1) COMMENT '是否启用库存限制',
-    `stock_num`                int(11) NOT NULL COMMENT '库存数量',
-    `stock_warn_num`           int(11) NOT NULL COMMENT '库存报警数量',
+    `stock_num`                int(11) COMMENT '库存数量',
+    `stock_warn_num`           int(11) COMMENT '库存报警数量',
     `produce_remarks`          text COMMENT '生产备注',
     `settlement_rules`         text COMMENT '结算规则',
     `estimated_revenue`        text COMMENT '预估收益',
