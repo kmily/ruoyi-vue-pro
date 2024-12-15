@@ -183,7 +183,7 @@ public class SuperiorApiServiceImpl implements SuperiorApiService {
 
     @Override
     public PageResult<SuperiorProductConfigDO> getSuperiorProductConfigPage(PageParam pageReqVO, Long haokaSuperiorApiId) {
-        return superiorProductConfigMapper.selectPage(pageReqVO, haokaSuperiorApiId);
+        return superiorProductConfigMapper.selectPageByHaokaSuperiorApiId(pageReqVO, haokaSuperiorApiId);
     }
 
     @Override

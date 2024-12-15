@@ -17,5 +17,10 @@ public interface ErrorCodeConstants {
     ErrorCode SUPERIOR_API_DEV_CONFIG_NOT_EXISTS = new ErrorCode(1_801_001_002, "上游API接口开发配置不存在");
     ErrorCode SUPERIOR_API_SKU_CONFIG_NOT_EXISTS = new ErrorCode(1_801_001_003, "上游API接口SKU要求配置不存在");
     ErrorCode SUPERIOR_PRODUCT_CONFIG_NOT_EXISTS = new ErrorCode(1_801_001_004, "产品对接上游配置不存在");
-
+    ErrorCode PRODUCT_NOT_EXISTS = new ErrorCode(1_801_001_005, "产品/渠道不存在");
+    ErrorCode PRODUCT_CHANNEL_NOT_EXISTS = new ErrorCode(1_801_001_005, "产品的渠道不存在");
+    ErrorCode PRODUCT_LIMIT_CARD_NOT_EXISTS = new ErrorCode(1_801_001_005, "产品身份证限制不存在");
+    ErrorCode PRODUCT_LIMIT_NOT_EXISTS = new ErrorCode(1_801_001_005, "产品限制条件不存在");
+    ErrorCode PRODUCT_LIMIT_AREA_NOT_EXISTS = new ErrorCode(1_801_001_005, "产品区域配置不存在");
+    ErrorCode PRODUCT_TYPE_NOT_EXISTS = new ErrorCode(1_801_001_005, "产品类型不存在");
 }

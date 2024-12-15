@@ -29,7 +29,7 @@ public interface SuperiorProductConfigMapper extends BaseMapperX<SuperiorProduct
                 .orderByDesc(SuperiorProductConfigDO::getId));
     }
 
-    default PageResult<SuperiorProductConfigDO> selectPage(PageParam reqVO, Long haokaSuperiorApiId) {
+    default PageResult<SuperiorProductConfigDO> selectPageByHaokaSuperiorApiId(PageParam reqVO, Long haokaSuperiorApiId) {
         return selectPage(reqVO, new LambdaQueryWrapperX<SuperiorProductConfigDO>()
                 .eq(SuperiorProductConfigDO::getHaokaSuperiorApiId, haokaSuperiorApiId)
                 .orderByDesc(SuperiorProductConfigDO::getId));
@@ -39,4 +39,14 @@ public interface SuperiorProductConfigMapper extends BaseMapperX<SuperiorProduct
         delete(SuperiorProductConfigDO::getHaokaSuperiorApiId, haokaSuperiorApiId);
     }
 
+
+    default PageResult<SuperiorProductConfigDO> selectPageByHaokaProductId(PageParam reqVO, Long haokaProductId) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<SuperiorProductConfigDO>()
+                .eq(SuperiorProductConfigDO::getHaokaProductId, haokaProductId)
+                .orderByDesc(SuperiorProductConfigDO::getId));
+    }
+
+    default int deleteByHaokaProductId(Long haokaProductId) {
+        return delete(SuperiorProductConfigDO::getHaokaProductId, haokaProductId);
+    }
 }
