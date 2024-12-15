@@ -101,6 +101,7 @@ public class UserController {
                 pageResult.getTotal()));
     }
 
+    // TODO @dylan：可以服用 getSimpleUserList 呀。
     @GetMapping("/all")
     @Operation(summary = "获得所有用户列表")
     @PreAuthorize("@ss.hasPermission('system:user:list')")
@@ -115,6 +116,7 @@ public class UserController {
         return success(UserConvert.INSTANCE.convertList(result, deptMap));
     }
 
+    // TODO @dylan：融合到 getSimpleUserList 接口，允许传递 deptId 筛选
     @GetMapping("/listByDept")
     @Operation(summary = "获得部门用户列表")
     @PreAuthorize("@ss.hasPermission('system:user:list')")

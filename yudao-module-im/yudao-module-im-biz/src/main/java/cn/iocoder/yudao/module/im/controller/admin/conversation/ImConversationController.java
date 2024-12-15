@@ -1,18 +1,12 @@
 package cn.iocoder.yudao.module.im.controller.admin.conversation;
 
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationCreateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationUpdateLastReadTimeReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationUpdatePinnedReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageListByNoReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImMessageListReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationDO;
-import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageContentTypeEnum;
 import cn.iocoder.yudao.module.im.service.conversation.ImConversationService;
 import cn.iocoder.yudao.module.im.service.message.ImMessageService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -25,7 +19,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;

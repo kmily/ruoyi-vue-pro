@@ -24,6 +24,7 @@ public class ImMessageSendReqVO {
     @NotNull(message = "会话类型不能为空")
     private Integer conversationType;
 
+    // TODO @dylan：这个是不是不用传递呀。因为 http 连接，有当前的 userid 呀
     @Schema(description = "会话所属用户id", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @NotNull(message = "会话所属用户id")
     private Long conversationUserId;

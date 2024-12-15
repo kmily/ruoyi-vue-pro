@@ -23,7 +23,6 @@ import org.springframework.validation.annotation.Validated;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -51,9 +50,10 @@ public class ImMessageServiceImpl implements ImMessageService {
 
     @Override
     public List<ImMessageDO> getMessageList(ImMessageListReqVO listReqVO) {
-
+        // TODO @dylan：userId 从 controller 传递，service 保持无状态
         // 1. 获得会话编号
         Long loginUserId = getLoginUserId();
+        // TODO @dylan：修复下 generateConversationNo 方法，fromUserId、receiverId 需要小的放前面，大的放后面。这样，可以保证一定只生成唯一的。
         String no1 = generateConversationNo(loginUserId, listReqVO.getReceiverId(), listReqVO.getConversationType());
         String no2 = generateConversationNo(listReqVO.getReceiverId(),loginUserId, listReqVO.getConversationType());
 

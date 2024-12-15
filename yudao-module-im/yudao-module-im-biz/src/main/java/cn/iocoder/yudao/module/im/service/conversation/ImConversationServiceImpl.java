@@ -8,8 +8,6 @@ import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversatio
 import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationDO;
 import cn.iocoder.yudao.module.im.dal.mysql.conversation.ImConversationMapper;
 import cn.iocoder.yudao.module.im.enums.conversation.ImConversationTypeEnum;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -26,6 +24,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 @Service
 @Validated
 public class ImConversationServiceImpl implements ImConversationService {
+
     private final String IM_CONVERSATION_ADD = "im-conversation-add";
 
     @Resource
@@ -108,6 +107,7 @@ public class ImConversationServiceImpl implements ImConversationService {
             conversation = insertConversation(no, loginUserId, createReqVO.getTargetId(), createReqVO.getType());
         }
 
+        // TODO @dylan：这个是不是不用 push 呀。对于发送端，它自己肯定知道；对于接收端，貌似收到 message 的时候，再创建更合理一点。
         // 发送打开会话的通知，并推送会话实体
         // 给自己发送创建会话成功的通知
         webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), getLoginUserId(),
@@ -116,9 +116,7 @@ public class ImConversationServiceImpl implements ImConversationService {
         // 给接受者发送创建会话的通知
         webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), createReqVO.getTargetId(),
                 IM_CONVERSATION_ADD, conversation);
-
         return conversation;
     }
-
 
 }

@@ -19,6 +19,7 @@ public class ImMessageListReqVO {
     @NotNull(message = "接收人编号不能为空")
     private Long receiverId;
 
+    // TODO @dylan：这个是不是不用传递呀。因为 http 连接，有当前的 userid 呀
     @Schema(description = "会话所属人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "32494")
     @NotNull(message = "会话所属人编号不能为空")
     private Long userId;
