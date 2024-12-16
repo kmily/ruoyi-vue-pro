@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.haoka.dal.mysql.product;
 
+import java.util.*;
+
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.haoka.controller.admin.product.vo.ProductLimitCardPageReqVO;
+import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.haoka.dal.dataobject.product.ProductLimitCardDO;
 import org.apache.ibatis.annotations.Mapper;
+import cn.iocoder.yudao.module.haoka.controller.admin.product.vo.*;
 
 /**
  * 产品身份证限制 Mapper
@@ -34,5 +36,8 @@ public interface ProductLimitCardMapper extends BaseMapperX<ProductLimitCardDO> 
         delete(ProductLimitCardDO::getHaokaProductLimitId, haokaProductLimitId);
     }
 
-
+    default List<ProductLimitCardDO> selectListByHaokaProductLimitId(Long haokaProductLimitId) {
+        return selectList(new LambdaQueryWrapperX<ProductLimitCardDO>()
+                .eqIfPresent(ProductLimitCardDO::getHaokaProductLimitId, haokaProductLimitId));
+    }
 }

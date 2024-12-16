@@ -27,6 +27,7 @@ import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.*;
 
 import cn.iocoder.yudao.module.haoka.controller.admin.product.vo.*;
 import cn.iocoder.yudao.module.haoka.dal.dataobject.product.ProductLimitDO;
+import cn.iocoder.yudao.module.haoka.dal.dataobject.product.ProductLimitAreaDO;
 import cn.iocoder.yudao.module.haoka.dal.dataobject.product.ProductLimitCardDO;
 import cn.iocoder.yudao.module.haoka.service.product.ProductLimitService;
 
@@ -93,47 +94,24 @@ public class ProductLimitController {
                         BeanUtils.toBean(list, ProductLimitRespVO.class));
     }
 
-    // ==================== 子表（产品身份证限制） ====================
+    // ==================== 子表（产品区域配置） ====================
 
-    @GetMapping("/product-limit-card/page")
-    @Operation(summary = "获得产品身份证限制分页")
+    @GetMapping("/product-limit-area/list-by-haoka-product-limit-id")
+    @Operation(summary = "获得产品区域配置列表")
     @Parameter(name = "haokaProductLimitId", description = "产品限制ID")
     @PreAuthorize("@ss.hasPermission('haoka:product-limit:query')")
-    public CommonResult<PageResult<ProductLimitCardDO>> getProductLimitCardPage(PageParam pageReqVO,
-                                                                                        @RequestParam("haokaProductLimitId") Long haokaProductLimitId) {
-        return success(productLimitService.getProductLimitCardPage(pageReqVO, haokaProductLimitId));
+    public CommonResult<List<ProductLimitAreaDO>> getProductLimitAreaListByHaokaProductLimitId(@RequestParam("haokaProductLimitId") Long haokaProductLimitId) {
+        return success(productLimitService.getProductLimitAreaListByHaokaProductLimitId(haokaProductLimitId));
     }
 
-    @PostMapping("/product-limit-card/create")
-    @Operation(summary = "创建产品身份证限制")
-    @PreAuthorize("@ss.hasPermission('haoka:product-limit:create')")
-    public CommonResult<Long> createProductLimitCard(@Valid @RequestBody ProductLimitCardDO productLimitCard) {
-        return success(productLimitService.createProductLimitCard(productLimitCard));
-    }
+    // ==================== 子表（产品身份证限制） ====================
 
-    @PutMapping("/product-limit-card/update")
-    @Operation(summary = "更新产品身份证限制")
-    @PreAuthorize("@ss.hasPermission('haoka:product-limit:update')")
-    public CommonResult<Boolean> updateProductLimitCard(@Valid @RequestBody ProductLimitCardDO productLimitCard) {
-        productLimitService.updateProductLimitCard(productLimitCard);
-        return success(true);
-    }
-
-    @DeleteMapping("/product-limit-card/delete")
-    @Parameter(name = "id", description = "编号", required = true)
-    @Operation(summary = "删除产品身份证限制")
-    @PreAuthorize("@ss.hasPermission('haoka:product-limit:delete')")
-    public CommonResult<Boolean> deleteProductLimitCard(@RequestParam("id") Long id) {
-        productLimitService.deleteProductLimitCard(id);
-        return success(true);
-    }
-
-	@GetMapping("/product-limit-card/get")
-	@Operation(summary = "获得产品身份证限制")
-	@Parameter(name = "id", description = "编号", required = true)
+    @GetMapping("/product-limit-card/list-by-haoka-product-limit-id")
+    @Operation(summary = "获得产品身份证限制列表")
+    @Parameter(name = "haokaProductLimitId", description = "产品限制ID")
     @PreAuthorize("@ss.hasPermission('haoka:product-limit:query')")
-	public CommonResult<ProductLimitCardDO> getProductLimitCard(@RequestParam("id") Long id) {
-	    return success(productLimitService.getProductLimitCard(id));
-	}
+    public CommonResult<List<ProductLimitCardDO>> getProductLimitCardListByHaokaProductLimitId(@RequestParam("haokaProductLimitId") Long haokaProductLimitId) {
+        return success(productLimitService.getProductLimitCardListByHaokaProductLimitId(haokaProductLimitId));
+    }
 
 }

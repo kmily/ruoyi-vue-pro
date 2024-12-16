@@ -15,7 +15,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class ProductLimitPageReqVO extends PageParam {
 
-    @Schema(description = "产品类型名称", example = "王五")
+    @Schema(description = "产品类型名称")
     private String name;
 
     @Schema(description = "是否使用只发货地址")

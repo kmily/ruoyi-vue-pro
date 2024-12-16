@@ -33,14 +33,20 @@ public class ProductLimitDO extends BaseDO {
     private String name;
     /**
      * 是否使用只发货地址
+     *
+     * 枚举 {@link TODO infra_boolean_string 对应的类}
      */
     private Boolean useOnlySendArea;
     /**
      * 是否使用不发货地址
+     *
+     * 枚举 {@link TODO infra_boolean_string 对应的类}
      */
     private Boolean useNotSendArea;
     /**
      * 是否使用身份证限制
+     *
+     * 枚举 {@link TODO infra_boolean_string 对应的类}
      */
     private Boolean useCardLimit;
     /**

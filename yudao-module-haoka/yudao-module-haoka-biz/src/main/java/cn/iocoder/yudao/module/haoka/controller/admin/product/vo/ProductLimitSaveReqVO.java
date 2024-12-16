@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
 import jakarta.validation.constraints.*;
+import cn.iocoder.yudao.module.haoka.dal.dataobject.product.ProductLimitAreaDO;
 import cn.iocoder.yudao.module.haoka.dal.dataobject.product.ProductLimitCardDO;
 
 @Schema(description = "管理后台 - 产品限制条件新增/修改 Request VO")
@@ -13,7 +14,7 @@ public class ProductLimitSaveReqVO {
     @Schema(description = "产品类型ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "24464")
     private Long id;
 
-    @Schema(description = "产品类型名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "王五")
+    @Schema(description = "产品类型名称", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "产品类型名称不能为空")
     private String name;
 
@@ -40,5 +41,11 @@ public class ProductLimitSaveReqVO {
 
     @Schema(description = "检测周期(月)")
     private Integer detectionCycle;
+
+    @Schema(description = "产品区域配置列表")
+    private List<ProductLimitAreaDO> productLimitAreas;
+
+    @Schema(description = "产品身份证限制列表")
+    private List<ProductLimitCardDO> productLimitCards;
 
 }

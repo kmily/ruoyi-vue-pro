@@ -41,6 +41,8 @@ public class ProductLimitAreaDO extends BaseDO {
     private String addressName;
     /**
      * 是否允许
+     *
+     * 枚举 {@link TODO infra_boolean_string 对应的类}
      */
     private Boolean allowed;
     /**

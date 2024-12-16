@@ -27,4 +27,12 @@ public interface ProductLimitAreaMapper extends BaseMapperX<ProductLimitAreaDO> 
                 .orderByDesc(ProductLimitAreaDO::getId));
     }
 
+    default List<ProductLimitAreaDO> selectListByHaokaProductLimitId(Long haokaProductLimitId) {
+        return selectList(new LambdaQueryWrapperX<ProductLimitAreaDO>()
+                .eqIfPresent(ProductLimitAreaDO::getHaokaProductLimitId, haokaProductLimitId));
+    }
+
+    default void deleteByHaokaProductLimitId(Long haokaProductLimitId) {
+        delete(ProductLimitAreaDO::getHaokaProductLimitId, haokaProductLimitId);
+    }
 }

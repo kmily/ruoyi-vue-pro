@@ -6,6 +6,8 @@ import java.util.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import com.alibaba.excel.annotation.*;
+import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
+import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 
 @Schema(description = "管理后台 - 产品限制条件 Response VO")
 @Data
@@ -16,20 +18,23 @@ public class ProductLimitRespVO {
     @ExcelProperty("产品类型ID")
     private Long id;
 
-    @Schema(description = "产品类型名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "王五")
+    @Schema(description = "产品类型名称", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("产品类型名称")
     private String name;
 
     @Schema(description = "是否使用只发货地址", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("是否使用只发货地址")
+    @ExcelProperty(value = "是否使用只发货地址", converter = DictConvert.class)
+    @DictFormat("infra_boolean_string") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
     private Boolean useOnlySendArea;
 
     @Schema(description = "是否使用不发货地址", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("是否使用不发货地址")
+    @ExcelProperty(value = "是否使用不发货地址", converter = DictConvert.class)
+    @DictFormat("infra_boolean_string") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
     private Boolean useNotSendArea;
 
     @Schema(description = "是否使用身份证限制", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("是否使用身份证限制")
+    @ExcelProperty(value = "是否使用身份证限制", converter = DictConvert.class)
+    @DictFormat("infra_boolean_string") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
     private Boolean useCardLimit;
 
     @Schema(description = "最大年龄限制")
