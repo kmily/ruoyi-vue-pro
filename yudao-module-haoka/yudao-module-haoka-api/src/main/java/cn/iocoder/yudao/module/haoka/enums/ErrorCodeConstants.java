@@ -26,4 +26,6 @@ public interface ErrorCodeConstants {
 
 
     ErrorCode HAO_KA_PRODUCT_NOT_EXISTS = new ErrorCode(1_801_001_005, "产品/渠道不存在");
+
+    ErrorCode  ON_SALE_PRODUCT_NOT_EXISTS = new ErrorCode(1_801_001_021, "在售产品不存在");
 }

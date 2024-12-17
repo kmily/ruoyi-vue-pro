@@ -22,6 +22,10 @@ public class SuperiorProductConfigRespVO {
     @ExcelProperty("上游接口ID")
     private Long haokaSuperiorApiId;
 
+    @Schema(description = "对应上游编码", requiredMode = Schema.RequiredMode.REQUIRED, example = "31755")
+    @ExcelProperty("对应上游编码")
+    private String superiorCode;
+
     @Schema(description = "产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "320")
     @ExcelProperty("产品ID")
     private Long haokaProductId;

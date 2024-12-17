@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.haoka.controller.admin.superiorproductconfig.vo;
 
+import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.*;
 import java.util.*;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,6 +18,9 @@ public class SuperiorProductConfigPageReqVO extends PageParam {
 
     @Schema(description = "上游接口ID", example = "31755")
     private Long haokaSuperiorApiId;
+
+    @Schema(description = "对应上游编码", example = "31755")
+    private String superiorCode;
 
     @Schema(description = "产品ID", example = "320")
     private Long haokaProductId;

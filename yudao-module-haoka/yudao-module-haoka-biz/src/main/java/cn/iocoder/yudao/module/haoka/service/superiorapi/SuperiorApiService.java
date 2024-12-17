@@ -178,4 +178,5 @@ public interface SuperiorApiService {
 	 */
     SuperiorProductConfigDO getSuperiorProductConfig(Long id);
 
+    List<SuperiorApiSkuConfigDO> getAllSuperiorApiSkuConfig(Long superiorApiId);
 }

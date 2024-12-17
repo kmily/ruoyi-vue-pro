@@ -52,4 +52,5 @@ public interface SuperiorApiSkuConfigService {
      */
     PageResult<SuperiorApiSkuConfigDO> getSuperiorApiSkuConfigPage(SuperiorApiSkuConfigPageReqVO pageReqVO);
 
+    List<SuperiorApiSkuConfigDO> getAllSuperiorApiSkuConfig(Long superiorApiId);
 }

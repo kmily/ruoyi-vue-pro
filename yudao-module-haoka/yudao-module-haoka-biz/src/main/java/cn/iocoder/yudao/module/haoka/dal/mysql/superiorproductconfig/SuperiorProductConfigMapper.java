@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.haoka.dal.mysql.superiorproductconfig;
 
-import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -22,6 +20,7 @@ public interface SuperiorProductConfigMapper extends BaseMapperX<SuperiorProduct
         return selectPage(reqVO, new LambdaQueryWrapperX<SuperiorProductConfigDO>()
                 .eqIfPresent(SuperiorProductConfigDO::getHaokaSuperiorApiId, reqVO.getHaokaSuperiorApiId())
                 .eqIfPresent(SuperiorProductConfigDO::getHaokaProductId, reqVO.getHaokaProductId())
+                .likeIfPresent(SuperiorProductConfigDO::getSuperiorCode, reqVO.getSuperiorCode())
                 .eqIfPresent(SuperiorProductConfigDO::getIsConfined, reqVO.getIsConfined())
                 .eqIfPresent(SuperiorProductConfigDO::getConfig, reqVO.getConfig())
                 .eqIfPresent(SuperiorProductConfigDO::getRemarks, reqVO.getRemarks())
@@ -46,7 +45,7 @@ public interface SuperiorProductConfigMapper extends BaseMapperX<SuperiorProduct
                 .orderByDesc(SuperiorProductConfigDO::getId));
     }
 
-    default int deleteByHaokaProductId(Long haokaProductId) {
-        return delete(SuperiorProductConfigDO::getHaokaProductId, haokaProductId);
+    default void deleteByHaokaProductId(Long haokaProductId) {
+        delete(SuperiorProductConfigDO::getHaokaProductId, haokaProductId);
     }
 }

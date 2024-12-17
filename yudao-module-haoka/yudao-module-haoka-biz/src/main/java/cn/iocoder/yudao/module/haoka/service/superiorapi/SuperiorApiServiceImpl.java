@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.haoka.service.superiorapi;
 
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -212,6 +213,12 @@ public class SuperiorApiServiceImpl implements SuperiorApiService {
     @Override
     public SuperiorProductConfigDO getSuperiorProductConfig(Long id) {
         return superiorProductConfigMapper.selectById(id);
+    }
+
+    @Override
+    public List<SuperiorApiSkuConfigDO> getAllSuperiorApiSkuConfig(Long superiorApiId) {
+        return superiorApiSkuConfigMapper.selectList(new LambdaQueryWrapperX<SuperiorApiSkuConfigDO>()
+                .eqIfPresent(SuperiorApiSkuConfigDO::getHaokaSuperiorApiId, superiorApiId));
     }
 
     private void validateSuperiorProductConfigExists(Long id) {

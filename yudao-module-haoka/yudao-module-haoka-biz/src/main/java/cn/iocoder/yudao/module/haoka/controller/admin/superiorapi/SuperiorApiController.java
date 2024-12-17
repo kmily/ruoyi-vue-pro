@@ -181,6 +181,16 @@ public class SuperiorApiController {
 	    return success(superiorApiService.getSuperiorApiSkuConfig(id));
 	}
 
+
+    @GetMapping("/superior-api-sku-config/getAll")
+    @Operation(summary = "获得上游API接口SKU要求配置")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('haoka:superior-api-sku-config:query')")
+    public CommonResult<List<SuperiorApiSkuConfigRespVO>> getAllSuperiorApiSkuConfig(@RequestParam("superiorApiId") Long superiorApiId) {
+        List<SuperiorApiSkuConfigDO> superiorApiSkuConfig = superiorApiService.getAllSuperiorApiSkuConfig(superiorApiId);
+        return success(BeanUtils.toBean(superiorApiSkuConfig, SuperiorApiSkuConfigRespVO.class));
+    }
+
     // ==================== 子表（产品对接上游配置） ====================
 
     @GetMapping("/superior-product-config/page")

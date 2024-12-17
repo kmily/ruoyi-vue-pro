@@ -16,6 +16,10 @@ public class SuperiorProductConfigSaveReqVO {
     @NotNull(message = "上游接口ID不能为空")
     private Long haokaSuperiorApiId;
 
+    @Schema(description = "对应上游编码", requiredMode = Schema.RequiredMode.REQUIRED, example = "31755")
+    @NotNull(message = "上游编码不能为空")
+    private String superiorCode;
+
     @Schema(description = "产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "320")
     @NotNull(message = "产品ID不能为空")
     private Long haokaProductId;

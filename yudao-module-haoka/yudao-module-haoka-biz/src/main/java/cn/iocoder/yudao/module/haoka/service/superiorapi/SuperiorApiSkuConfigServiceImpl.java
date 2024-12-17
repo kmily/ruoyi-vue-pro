@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.haoka.service.superiorapi;
 
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+
 import cn.iocoder.yudao.module.haoka.controller.admin.superiorapi.vo.*;
 import cn.iocoder.yudao.module.haoka.dal.dataobject.superiorapi.SuperiorApiSkuConfigDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -69,6 +72,12 @@ public class SuperiorApiSkuConfigServiceImpl implements SuperiorApiSkuConfigServ
     @Override
     public PageResult<SuperiorApiSkuConfigDO> getSuperiorApiSkuConfigPage(SuperiorApiSkuConfigPageReqVO pageReqVO) {
         return superiorApiSkuConfigMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<SuperiorApiSkuConfigDO> getAllSuperiorApiSkuConfig(Long superiorApiId) {
+        return superiorApiSkuConfigMapper.selectList(new LambdaQueryWrapperX<SuperiorApiSkuConfigDO>()
+                .eqIfPresent(SuperiorApiSkuConfigDO::getHaokaSuperiorApiId, superiorApiId));
     }
 
 }

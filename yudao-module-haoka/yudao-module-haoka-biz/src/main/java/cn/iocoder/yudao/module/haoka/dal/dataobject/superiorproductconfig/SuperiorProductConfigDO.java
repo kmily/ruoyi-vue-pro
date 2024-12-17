@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.haoka.dal.dataobject.superiorproductconfig;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
 import java.time.LocalDateTime;
@@ -31,6 +32,11 @@ public class SuperiorProductConfigDO extends BaseDO {
      * 上游接口ID
      */
     private Long haokaSuperiorApiId;
+    /**
+     * 对应上游编码
+     */
+    private String superiorCode;
+
     /**
      * 产品ID
      */
