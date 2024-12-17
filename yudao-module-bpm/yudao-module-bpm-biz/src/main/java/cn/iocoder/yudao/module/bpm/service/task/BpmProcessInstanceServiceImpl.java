@@ -20,6 +20,7 @@ import cn.iocoder.yudao.module.bpm.convert.task.BpmProcessInstanceConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
 import cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmProcessTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeType;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceStatusEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
@@ -211,6 +212,19 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 historicProcessInstance != null ? historicProcessInstance.getProcessDefinitionId() : reqVO.getProcessDefinitionId());
         BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService.getProcessDefinitionInfo(processDefinition.getId());
         BpmnModel bpmnModel = processDefinitionService.getProcessDefinitionBpmnModel(processDefinition.getId());
+        // 1.4 处理子流程的表单需来自于主流程
+        // TODO @芋艿：是通过这样的方式查询子流程的表单好，还是在创建流程的时候通过变量传给子流程好？
+        if (historicProcessInstance != null && BpmProcessTypeEnum.CHILD.getType().equals(processDefinitionInfo.getProcessType())) {
+            HistoricProcessInstance superHistoricProcessInstance = getHistoricProcessInstance(historicProcessInstance.getSuperProcessInstanceId());
+            ProcessDefinition superProcessDefinition = processDefinitionService.getProcessDefinition(superHistoricProcessInstance.getProcessDefinitionId());
+            BpmProcessDefinitionInfoDO superProcessDefinitionInfo = processDefinitionService.getProcessDefinitionInfo(superProcessDefinition.getId());
+            processDefinitionInfo.setFormId(superProcessDefinitionInfo.getFormId());
+            processDefinitionInfo.setFormType(superProcessDefinitionInfo.getFormType());
+            processDefinitionInfo.setFormConf(superProcessDefinitionInfo.getFormConf());
+            processDefinitionInfo.setFormFields(superProcessDefinitionInfo.getFormFields());
+            processDefinitionInfo.setFormCustomViewPath(superProcessDefinitionInfo.getFormCustomViewPath());
+            processDefinitionInfo.setFormCustomCreatePath(superProcessDefinitionInfo.getFormCustomCreatePath());
+        }
 
         // 2.1 已结束 + 进行中的活动节点
         List<ActivityNode> endActivityNodes = null; // 已结束的审批信息
@@ -279,6 +293,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                                                       BpmProcessDefinitionInfoDO processDefinitionInfo,
                                                       HistoricProcessInstance historicProcessInstance, Integer processInstanceStatus,
                                                       List<HistoricActivityInstance> activities, List<HistoricTaskInstance> tasks) {
+        // TODO @芋艿：子流程只有activity，这里是不是需要优化一下
         // 遍历 tasks 列表，只处理已结束的 UserTask
         // 为什么不通过 activities 呢？因为，加签场景下，它只存在于 tasks，没有 activities，导致如果遍历 activities 的话，它无法成为一个节点
         List<HistoricTaskInstance> endTasks = filterList(tasks, task -> task.getEndTime() != null);
@@ -347,7 +362,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                                                      List<HistoricTaskInstance> tasks) {
         // 构建运行中的任务，基于 activityId 分组
         List<HistoricActivityInstance> runActivities = filterList(activities, activity -> activity.getEndTime() == null
-                && (StrUtil.equalsAny(activity.getActivityType(), ELEMENT_TASK_USER)));
+                && (StrUtil.equalsAny(activity.getActivityType(), ELEMENT_TASK_USER, ELEMENT_CALL_ACTIVITY)));
         Map<String, List<HistoricActivityInstance>> runningTaskMap = convertMultiMap(runActivities, HistoricActivityInstance::getActivityId);
 
         // 按照 activityId 分组，构建 ApprovalNodeInfo 节点
@@ -366,6 +381,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             // 处理每个任务的 tasks 属性
             for (HistoricActivityInstance activity : taskActivities) {
                 HistoricTaskInstance task = taskMap.get(activity.getTaskId());
+                if (task == null) {
+                    continue;
+                }
                 activityNode.getTasks().add(BpmProcessInstanceConvert.INSTANCE.buildApprovalTaskInfo(task));
                 // 加签子任务，需要过滤掉已经完成的加签子任务
                 List<HistoricTaskInstance> childrenTasks = filterList(
@@ -447,6 +465,12 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 BpmSimpleModelNodeType.COPY_NODE.getType().equals(node.getType())) {
             return activityNode;
         }
+
+        // 4. 子流程
+        if (BpmSimpleModelNodeType.CHILD_PROCESS.getType().equals(node.getType())) {
+            return activityNode;
+        }
+
         return null;
     }
 

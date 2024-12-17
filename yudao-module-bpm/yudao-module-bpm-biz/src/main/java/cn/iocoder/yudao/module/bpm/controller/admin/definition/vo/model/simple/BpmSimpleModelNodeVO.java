@@ -96,6 +96,11 @@ public class BpmSimpleModelNodeVO {
      */
     private AssignEmptyHandler assignEmptyHandler;
 
+    /**
+     * 调用子流程
+     */
+    private String childProcess;
+
     @Schema(description = "审批节点拒绝处理策略")
     @Data
     public static class RejectHandler {

@@ -37,7 +37,8 @@ public class SimpleModelUtils {
     static {
         List<NodeConvert> converts = asList(new StartNodeConvert(), new EndNodeConvert(),
                 new StartUserNodeConvert(), new ApproveNodeConvert(), new CopyNodeConvert(),
-                new ConditionBranchNodeConvert(), new ParallelBranchNodeConvert(), new InclusiveBranchNodeConvert());
+                new ConditionBranchNodeConvert(), new ParallelBranchNodeConvert(), new InclusiveBranchNodeConvert(),
+                new ChildProcessConvert());
         converts.forEach(convert -> NODE_CONVERTS.put(convert.getType(), convert));
     }
 
@@ -605,6 +606,28 @@ public class SimpleModelUtils {
 
     }
 
+    private static class ChildProcessConvert implements NodeConvert {
+
+        @Override
+        public CallActivity convert(BpmSimpleModelNodeVO node) {
+            CallActivity callActivity = new CallActivity();
+            callActivity.setId(node.getId());
+            callActivity.setName(node.getName());
+            callActivity.setInheritVariables(true);
+            callActivity.setInheritBusinessKey(true);
+            callActivity.setCalledElementType("key");
+            callActivity.setProcessInstanceName(node.getChildProcess().split(":")[1]);
+            callActivity.setCalledElement(node.getChildProcess().split(":")[0]);
+            return callActivity;
+        }
+
+        @Override
+        public BpmSimpleModelNodeType getType() {
+            return BpmSimpleModelNodeType.CHILD_PROCESS;
+        }
+
+    }
+
     private static String buildGatewayJoinId(String id) {
         return id + "_join";
     }
@@ -628,12 +651,13 @@ public class SimpleModelUtils {
         BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(currentNode.getType());
         Assert.notNull(nodeType, "模型节点类型不支持");
 
-        // 情况：START_NODE/START_USER_NODE/APPROVE_NODE/COPY_NODE/END_NODE
+        // 情况：START_NODE/START_USER_NODE/APPROVE_NODE/COPY_NODE/END_NODE/CHILD_PROCESS
         if (nodeType == BpmSimpleModelNodeType.START_NODE
             || nodeType == BpmSimpleModelNodeType.START_USER_NODE
             || nodeType == BpmSimpleModelNodeType.APPROVE_NODE
             || nodeType == BpmSimpleModelNodeType.COPY_NODE
-            || nodeType == BpmSimpleModelNodeType.END_NODE) {
+            || nodeType == BpmSimpleModelNodeType.END_NODE
+            || nodeType == BpmSimpleModelNodeType.CHILD_PROCESS) {
             // 添加元素
             resultNodes.add(currentNode);
         }
