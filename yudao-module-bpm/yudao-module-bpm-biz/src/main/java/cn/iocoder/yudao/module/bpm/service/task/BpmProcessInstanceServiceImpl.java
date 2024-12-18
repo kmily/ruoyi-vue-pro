@@ -373,11 +373,16 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             // 构建活动节点
             FlowElement flowNode = BpmnModelUtils.getFlowElementById(bpmnModel, activityId);
             HistoricActivityInstance firstActivity = CollUtil.getFirst(taskActivities); // 取第一个任务，会签/或签的任务，开始时间相同
-            ActivityNode activityNode = new ActivityNode().setId(firstActivity.getActivityId()).setName(firstActivity.getActivityName())
-                    .setNodeType(BpmSimpleModelNodeType.APPROVE_NODE.getType()).setStatus(BpmTaskStatusEnum.RUNNING.getStatus())
+            ActivityNode activityNode = new ActivityNode().setId(firstActivity.getActivityId()).setName(firstActivity.getActivityName()).setStatus(BpmTaskStatusEnum.RUNNING.getStatus())
                     .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(flowNode))
                     .setStartTime(DateUtils.of(CollUtil.getFirst(taskActivities).getStartTime()))
                     .setTasks(new ArrayList<>());
+            if (firstActivity.getActivityType().equals(ELEMENT_TASK_USER)) {
+                activityNode.setNodeType(BpmSimpleModelNodeType.APPROVE_NODE.getType());
+            }
+            if (firstActivity.getActivityType().equals(ELEMENT_CALL_ACTIVITY)) {
+                activityNode.setNodeType(BpmSimpleModelNodeType.CHILD_PROCESS.getType());
+            }
             // 处理每个任务的 tasks 属性
             for (HistoricActivityInstance activity : taskActivities) {
                 HistoricTaskInstance task = taskMap.get(activity.getTaskId());
