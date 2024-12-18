@@ -423,11 +423,11 @@ public class SimpleModelUtils {
             return userTask;
         }
 
-        private void processMultiInstanceLoopCharacteristics(Integer approveMethod, Integer approveRatio, UserTask userTask) {
+        protected static void processMultiInstanceLoopCharacteristics(Integer approveMethod, Integer approveRatio, Activity activity) {
             BpmUserTaskApproveMethodEnum approveMethodEnum = BpmUserTaskApproveMethodEnum.valueOf(approveMethod);
             Assert.notNull(approveMethodEnum, "审批方式({})不能为空", approveMethodEnum);
             // 添加审批方式的扩展属性
-            addExtensionElement(userTask, BpmnModelConstants.USER_TASK_APPROVE_METHOD, approveMethod);
+            addExtensionElement(activity, BpmnModelConstants.USER_TASK_APPROVE_METHOD, approveMethod);
             if (approveMethodEnum == BpmUserTaskApproveMethodEnum.RANDOM) {
                 // 随机审批，不需要设置多实例属性
                 return;
@@ -450,7 +450,7 @@ public class SimpleModelUtils {
                         String.format(approveMethodEnum.getCompletionCondition(), String.format("%.2f", approveRatio / 100D)));
                 multiInstanceCharacteristics.setSequential(false);
             }
-            userTask.setLoopCharacteristics(multiInstanceCharacteristics);
+            activity.setLoopCharacteristics(multiInstanceCharacteristics);
         }
 
     }
@@ -618,6 +618,21 @@ public class SimpleModelUtils {
             callActivity.setCalledElementType("key");
             callActivity.setProcessInstanceName(node.getChildProcess().split(":")[1]);
             callActivity.setCalledElement(node.getChildProcess().split(":")[0]);
+
+            // 由于重写了多实例处理的behavior，所以这里的多实例也得和UserTask处理逻辑相同~
+            if (node.getCandidateStrategy() != null) {
+                // 目前仅支持通过流程表达式，这样可以灵活一点
+                addCandidateElements(node.getCandidateStrategy(), node.getCandidateParam(), callActivity);
+                ApproveNodeConvert.processMultiInstanceLoopCharacteristics(node.getApproveMethod()
+                        , node.getApproveRatio(), callActivity);
+
+                // 将多实例生成的collectionElementVariable转递给子流程
+                IOParameter ioParameter = new IOParameter();
+                ioParameter.setSource(FlowableUtils.formatExecutionCollectionElementVariable(node.getId()));
+                ioParameter.setTarget("multiInstanceAssignee");
+                callActivity.setInParameters(new ArrayList<>(){{add(ioParameter);}});
+            }
+
             return callActivity;
         }
 
