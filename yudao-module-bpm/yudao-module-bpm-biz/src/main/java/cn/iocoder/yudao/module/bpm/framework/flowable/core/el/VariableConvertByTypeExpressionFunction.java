@@ -21,10 +21,8 @@ public class VariableConvertByTypeExpressionFunction extends AbstractFlowableVar
     public static Object convertByType(VariableContainer variableContainer, String variableName, Object parmaValue) {
         Object variable = variableContainer.getVariable(variableName);
         if (variable != null && parmaValue != null) {
-            // 如果值不是字符串类型，流程变量的类型是字符串，把值转成字符串
-            if (!(parmaValue instanceof String) && variable instanceof String ) {
-                return parmaValue.toString();
-            }
+            //需要把流程变量类型转成和值一样的类型 如果都转成字符串 字符串比较大小只比较首位
+            variableContainer.setVariable(variableName, Convert.convert(parmaValue.getClass(), variable));
         }
         return parmaValue;
     }
