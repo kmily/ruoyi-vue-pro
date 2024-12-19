@@ -475,7 +475,6 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         if (BpmSimpleModelNodeType.CHILD_PROCESS.getType().equals(node.getType())) {
             return activityNode;
         }
-
         return null;
     }
 
