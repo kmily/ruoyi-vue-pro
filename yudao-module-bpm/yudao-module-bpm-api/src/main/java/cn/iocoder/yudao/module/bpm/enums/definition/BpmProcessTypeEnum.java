@@ -15,8 +15,8 @@ import java.util.Arrays;
 @AllArgsConstructor
 public enum BpmProcessTypeEnum implements IntArrayValuable {
 
-    MAIN(0, "主流程"), // 主流程
-    CHILD(1, "子流程"); // 子流程
+    MAIN(1, "主流程"), // 主流程
+    CHILD(2, "子流程"); // 子流程
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BpmProcessTypeEnum::getType).toArray();
 
