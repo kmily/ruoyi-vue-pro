@@ -96,9 +96,7 @@ public class BpmSimpleModelNodeVO {
      */
     private AssignEmptyHandler assignEmptyHandler;
 
-    /**
-     * 调用子流程
-     */
+    @Schema(description = "调用子流程", example = "子流程Key:子流程Name")
     private String childProcess;
 
     @Schema(description = "审批节点拒绝处理策略")
