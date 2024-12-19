@@ -40,7 +40,7 @@ public class BpmModelMetaInfoVO {
 
     @Schema(description = "流程类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @InEnum(BpmProcessTypeEnum.class)
-//    @NotNull(message = "流程类型不能为空") 暂时先注释，可以不提交，需要等创建模型修改完才放开
+//  TODO @芋艿  @NotNull(message = "流程类型不能为空") 暂时先注释，可以不提交，需要等创建模型修改完才放开
     private Integer processType;
 
     @Schema(description = "表单类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
