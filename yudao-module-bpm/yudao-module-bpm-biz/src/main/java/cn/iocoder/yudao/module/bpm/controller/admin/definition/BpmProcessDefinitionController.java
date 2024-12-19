@@ -3,14 +3,12 @@ package cn.iocoder.yudao.module.bpm.controller.admin.definition;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmChildProcessSimpleRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionPageReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.module.bpm.convert.definition.BpmProcessDefinitionConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmCategoryDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmProcessTypeEnum;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmCategoryService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmFormService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionService;
@@ -18,6 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.validation.constraints.NotNull;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.repository.Deployment;
@@ -102,9 +101,9 @@ public class BpmProcessDefinitionController {
                 list, null, processDefinitionMap, null, null));
     }
 
-    @GetMapping({"/child-process/list-all-simple", "/child-process/simple-list"})
-    @Operation(summary = "获取子流程精简信息列表", description = "只包含子流程，主要用于前端的下拉选项")
-    public CommonResult<List<BpmChildProcessSimpleRespVO>> getChildProcessSimpleList() {
+    @GetMapping({"/list-all-simple", "/simple-list"})
+    @Operation(summary = "获取流程精简信息列表", description = "只包含流程，主要用于前端的下拉选项")
+    public CommonResult<List<BpmProcessDefinitionRespVO>> getProcessListByProcessType(@NotNull Integer processType) {
         List<ProcessDefinition> list = processDefinitionService.getProcessDefinitionListBySuspensionState(
                 SuspensionState.ACTIVE.getStateCode());
         if (CollUtil.isEmpty(list)) {
@@ -115,8 +114,8 @@ public class BpmProcessDefinitionController {
         return success(list.stream().filter(processDefinition -> {
             BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionMap.get(processDefinition.getId());
             return processDefinitionInfo != null
-                    && BpmProcessTypeEnum.CHILD.getType().equals(processDefinitionInfo.getProcessType());
-        }).map(processDefinition -> new BpmChildProcessSimpleRespVO()
+                    && processType.equals(processDefinitionInfo.getProcessType());
+        }).map(processDefinition -> new BpmProcessDefinitionRespVO()
                 .setKey(processDefinition.getKey())
                 .setName(processDefinition.getName())).toList());
     }
