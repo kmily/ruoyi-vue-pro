@@ -620,6 +620,7 @@ public class SimpleModelUtils {
             callActivity.setCalledElement(node.getChildProcess().getProcessKey());
 
             // 由于重写了多实例处理的behavior，所以这里的多实例也得和UserTask处理逻辑相同~
+            // TODO 未来需要区分UserTask与其他节点的多实例配置
             if (node.getCandidateStrategy() != null) {
                 // 目前仅支持通过流程表达式，这样可以灵活一点
                 addCandidateElements(node.getCandidateStrategy(), node.getCandidateParam(), callActivity);
