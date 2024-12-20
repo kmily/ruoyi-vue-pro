@@ -16,9 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import jakarta.validation.constraints.NotNull;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -99,25 +97,6 @@ public class BpmProcessDefinitionController {
         // 2. 拼接 VO 返回
         return success(BpmProcessDefinitionConvert.INSTANCE.buildProcessDefinitionList(
                 list, null, processDefinitionMap, null, null));
-    }
-
-    @GetMapping({"/list-all-simple", "/simple-list"})
-    @Operation(summary = "获取流程精简信息列表", description = "只包含流程，主要用于前端的下拉选项")
-    public CommonResult<List<BpmProcessDefinitionRespVO>> getProcessListByProcessType(@NotNull Integer processType) {
-        List<ProcessDefinition> list = processDefinitionService.getProcessDefinitionListBySuspensionState(
-                SuspensionState.ACTIVE.getStateCode());
-        if (CollUtil.isEmpty(list)) {
-            return success(Collections.emptyList());
-        }
-        Map<String, BpmProcessDefinitionInfoDO> processDefinitionMap = processDefinitionService.getProcessDefinitionInfoMap(
-                convertSet(list, ProcessDefinition::getId));
-        return success(list.stream().filter(processDefinition -> {
-            BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionMap.get(processDefinition.getId());
-            return processDefinitionInfo != null
-                    && processType.equals(processDefinitionInfo.getProcessType());
-        }).map(processDefinition -> new BpmProcessDefinitionRespVO()
-                .setKey(processDefinition.getKey())
-                .setName(processDefinition.getName())).toList());
     }
 
     @GetMapping("/get")
