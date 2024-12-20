@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmProcessTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -32,10 +33,15 @@ public class BpmModelMetaInfoVO {
     @Schema(description = "流程描述", example = "我是描述")
     private String description;
 
-    @Schema(description = "流程类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
+    @Schema(description = "模型类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     @InEnum(BpmModelTypeEnum.class)
-    @NotNull(message = "流程类型不能为空")
+    @NotNull(message = "模型类型不能为空")
     private Integer type;
+
+    @Schema(description = "流程类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
+    @InEnum(BpmProcessTypeEnum.class)
+//  TODO @芋艿  @NotNull(message = "流程类型不能为空") 暂时先注释，可以不提交，需要等创建模型修改完才放开
+    private Integer processType;
 
     @Schema(description = "表单类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     @InEnum(BpmModelFormTypeEnum.class)

@@ -99,7 +99,7 @@ public class BpmProcessDefinitionController {
                 list, null, processDefinitionMap, null, null));
     }
 
-    @GetMapping ("/get")
+    @GetMapping("/get")
     @Operation(summary = "获得流程定义")
     @Parameter(name = "id", description = "流程编号", required = true, example = "1024")
     @Parameter(name = "key", description = "流程定义标识", required = true, example = "1024")

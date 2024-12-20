@@ -37,7 +37,8 @@ public class SimpleModelUtils {
     static {
         List<NodeConvert> converts = asList(new StartNodeConvert(), new EndNodeConvert(),
                 new StartUserNodeConvert(), new ApproveNodeConvert(), new CopyNodeConvert(),
-                new ConditionBranchNodeConvert(), new ParallelBranchNodeConvert(), new InclusiveBranchNodeConvert());
+                new ConditionBranchNodeConvert(), new ParallelBranchNodeConvert(), new InclusiveBranchNodeConvert(),
+                new ChildProcessConvert());
         converts.forEach(convert -> NODE_CONVERTS.put(convert.getType(), convert));
     }
 
@@ -422,11 +423,11 @@ public class SimpleModelUtils {
             return userTask;
         }
 
-        private void processMultiInstanceLoopCharacteristics(Integer approveMethod, Integer approveRatio, UserTask userTask) {
+        protected static void processMultiInstanceLoopCharacteristics(Integer approveMethod, Integer approveRatio, Activity activity) {
             BpmUserTaskApproveMethodEnum approveMethodEnum = BpmUserTaskApproveMethodEnum.valueOf(approveMethod);
             Assert.notNull(approveMethodEnum, "审批方式({})不能为空", approveMethodEnum);
             // 添加审批方式的扩展属性
-            addExtensionElement(userTask, BpmnModelConstants.USER_TASK_APPROVE_METHOD, approveMethod);
+            addExtensionElement(activity, BpmnModelConstants.USER_TASK_APPROVE_METHOD, approveMethod);
             if (approveMethodEnum == BpmUserTaskApproveMethodEnum.RANDOM) {
                 // 随机审批，不需要设置多实例属性
                 return;
@@ -449,7 +450,7 @@ public class SimpleModelUtils {
                         String.format(approveMethodEnum.getCompletionCondition(), String.format("%.2f", approveRatio / 100D)));
                 multiInstanceCharacteristics.setSequential(false);
             }
-            userTask.setLoopCharacteristics(multiInstanceCharacteristics);
+            activity.setLoopCharacteristics(multiInstanceCharacteristics);
         }
 
     }
@@ -605,6 +606,44 @@ public class SimpleModelUtils {
 
     }
 
+    private static class ChildProcessConvert implements NodeConvert {
+
+        @Override
+        public CallActivity convert(BpmSimpleModelNodeVO node) {
+            CallActivity callActivity = new CallActivity();
+            callActivity.setId(node.getId());
+            callActivity.setName(node.getName());
+            callActivity.setInheritVariables(true);
+            callActivity.setInheritBusinessKey(true);
+            callActivity.setCalledElementType("key");
+            callActivity.setProcessInstanceName(node.getChildProcess().getProcessName());
+            callActivity.setCalledElement(node.getChildProcess().getProcessKey());
+
+            // 由于重写了多实例处理的behavior，所以这里的多实例也得和UserTask处理逻辑相同~
+            // TODO 未来需要区分UserTask与其他节点的多实例配置
+            if (node.getCandidateStrategy() != null) {
+                // 目前仅支持通过流程表达式，这样可以灵活一点
+                addCandidateElements(node.getCandidateStrategy(), node.getCandidateParam(), callActivity);
+                ApproveNodeConvert.processMultiInstanceLoopCharacteristics(node.getApproveMethod()
+                        , node.getApproveRatio(), callActivity);
+
+                // 将多实例生成的collectionElementVariable转递给子流程
+                IOParameter ioParameter = new IOParameter();
+                ioParameter.setSource(FlowableUtils.formatExecutionCollectionElementVariable(node.getId()));
+                ioParameter.setTarget("multiInstanceAssignee");
+                callActivity.setInParameters(new ArrayList<>(){{add(ioParameter);}});
+            }
+
+            return callActivity;
+        }
+
+        @Override
+        public BpmSimpleModelNodeType getType() {
+            return BpmSimpleModelNodeType.CHILD_PROCESS;
+        }
+
+    }
+
     private static String buildGatewayJoinId(String id) {
         return id + "_join";
     }
@@ -628,12 +667,13 @@ public class SimpleModelUtils {
         BpmSimpleModelNodeType nodeType = BpmSimpleModelNodeType.valueOf(currentNode.getType());
         Assert.notNull(nodeType, "模型节点类型不支持");
 
-        // 情况：START_NODE/START_USER_NODE/APPROVE_NODE/COPY_NODE/END_NODE
+        // 情况：START_NODE/START_USER_NODE/APPROVE_NODE/COPY_NODE/END_NODE/CHILD_PROCESS
         if (nodeType == BpmSimpleModelNodeType.START_NODE
             || nodeType == BpmSimpleModelNodeType.START_USER_NODE
             || nodeType == BpmSimpleModelNodeType.APPROVE_NODE
             || nodeType == BpmSimpleModelNodeType.COPY_NODE
-            || nodeType == BpmSimpleModelNodeType.END_NODE) {
+            || nodeType == BpmSimpleModelNodeType.END_NODE
+            || nodeType == BpmSimpleModelNodeType.CHILD_PROCESS) {
             // 添加元素
             resultNodes.add(currentNode);
         }

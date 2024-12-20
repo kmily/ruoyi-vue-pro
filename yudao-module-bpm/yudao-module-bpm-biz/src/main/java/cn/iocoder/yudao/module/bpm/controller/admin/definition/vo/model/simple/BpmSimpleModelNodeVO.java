@@ -96,6 +96,9 @@ public class BpmSimpleModelNodeVO {
      */
     private AssignEmptyHandler assignEmptyHandler;
 
+    @Schema(description = "调用子流程", example = "子流程")
+    private ChildProcess childProcess;
+
     @Schema(description = "审批节点拒绝处理策略")
     @Data
     public static class RejectHandler {
@@ -206,6 +209,21 @@ public class BpmSimpleModelNodeVO {
         @Schema(description = "运算符右边的值", example = "1")
         @NotEmpty(message = "运算符右边的值不能为空")
         private String rightSide;
+    }
+
+    @Schema(description = "子流程")
+    @Data
+    @Valid
+    public static class ChildProcess {
+
+        @Schema(description = "流程key", example = "Activity_xxx")
+        @NotEmpty(message = "流程key不能为空")
+        private String processKey;
+
+        @Schema(description = "流程名称", example = "流程")
+        @NotEmpty(message = "流程名称不能为空")
+        private String processName;
+
     }
 
     // TODO @芋艿：条件；建议可以固化的一些选项；然后有个表达式兜底；要支持

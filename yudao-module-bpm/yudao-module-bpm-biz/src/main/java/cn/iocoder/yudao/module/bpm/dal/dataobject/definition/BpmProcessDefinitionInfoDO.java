@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.framework.mybatis.core.type.StringListTypeHandler;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmProcessTypeEnum;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -45,6 +46,13 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
      * 关联 {@link ProcessDefinition#getId()} 属性
      */
     private String processDefinitionId;
+    // TODO @芋艿：需要更新一下数据库的表结构~
+    /**
+     * 流程的类型
+     *
+     * 枚举 {@link BpmProcessTypeEnum}
+     */
+    private Integer processType;
     /**
      * 流程模型的编号
      *

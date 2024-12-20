@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.bpm.controller.admin.definition;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelUpdateReqVO;
@@ -19,6 +20,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -87,6 +89,20 @@ public class BpmModelController {
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
         return success(BpmModelConvert.INSTANCE.buildModelList(list,
                 formMap, categoryMap, deploymentMap, processDefinitionMap, userMap));
+    }
+
+    @GetMapping({"/list-all-simple", "/simple-list"})
+    @Operation(summary = "获取模型精简信息列表", description = "只包含模型，主要用于前端的下拉选项")
+    public CommonResult<List<BpmModelRespVO>> getProcessListByProcessType(@NotNull Integer processType) {
+        List<Model> list = modelService.getModelList("");
+        if (CollUtil.isEmpty(list)) {
+            return success(Collections.emptyList());
+        }
+        return success(list.stream().filter(model -> {
+            BpmModelMetaInfoVO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoVO.class);
+            return metaInfo != null && metaInfo.getProcessType() != null
+                    && metaInfo.getProcessType().equals(processType);
+        }).map(model -> new BpmModelRespVO().setKey(model.getKey()).setName(model.getName())).toList());
     }
 
     @GetMapping("/get")
