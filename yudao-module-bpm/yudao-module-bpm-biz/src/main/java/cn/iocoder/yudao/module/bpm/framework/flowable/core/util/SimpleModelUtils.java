@@ -616,8 +616,8 @@ public class SimpleModelUtils {
             callActivity.setInheritVariables(true);
             callActivity.setInheritBusinessKey(true);
             callActivity.setCalledElementType("key");
-            callActivity.setProcessInstanceName(node.getChildProcess().split(":")[1]);
-            callActivity.setCalledElement(node.getChildProcess().split(":")[0]);
+            callActivity.setProcessInstanceName(node.getChildProcess().getProcessName());
+            callActivity.setCalledElement(node.getChildProcess().getProcessKey());
 
             // 由于重写了多实例处理的behavior，所以这里的多实例也得和UserTask处理逻辑相同~
             if (node.getCandidateStrategy() != null) {
