@@ -29,4 +29,7 @@ public interface ErrorCodeConstants {
 
     ErrorCode  ON_SALE_PRODUCT_NOT_EXISTS = new ErrorCode(1_801_001_021, "在售产品不存在");
     ErrorCode ORDERS_NOT_EXISTS = new ErrorCode(1_805_001_001, "订单不存在");
+    ErrorCode ORDER_SOURCE_NOT_EXISTS = new ErrorCode(1_805_002_001, "订单来源配置不存在");
+    ErrorCode ORDER_SOURCE_LIVE_NOT_EXISTS = new ErrorCode(1_805_003_001, "订单来源-直播间配置不存在");
+
 }

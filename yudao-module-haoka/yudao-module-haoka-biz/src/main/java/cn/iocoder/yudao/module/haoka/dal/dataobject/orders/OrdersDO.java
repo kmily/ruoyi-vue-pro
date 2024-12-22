@@ -29,7 +29,7 @@ public class OrdersDO extends BaseDO {
     /**
      * 订单ID
      */
-    @TableId
+    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
     /**
      * 生产商ID
