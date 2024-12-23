@@ -1,0 +1,65 @@
+-- 将该建表 SQL 语句，添加到 yudao-module-haoka-biz 模块的 test/resources/sql/create_tables.sql 文件里
+CREATE TABLE IF NOT EXISTS "haoka_demo"
+(
+    "id"
+    bigint
+    NOT
+    NULL
+    GENERATED
+    BY
+    DEFAULT AS
+    IDENTITY,
+    "name"
+    varchar
+    NOT
+    NULL,
+    "age"
+    int
+    NOT
+    NULL,
+    "agent"
+    int
+    NOT
+    NULL,
+    "creator"
+    varchar
+    DEFAULT
+    '',
+    "create_time"
+    datetime
+    NOT
+    NULL
+    DEFAULT
+    CURRENT_TIMESTAMP,
+    "updater"
+    varchar
+    DEFAULT
+    '',
+    "update_time"
+    datetime
+    NOT
+    NULL
+    DEFAULT
+    CURRENT_TIMESTAMP
+    ON
+    UPDATE
+    CURRENT_TIMESTAMP,
+    "deleted"
+    bit
+    NOT
+    NULL
+    DEFAULT
+    FALSE,
+    "tenant_id"
+    bigint
+    NOT
+    NULL
+    DEFAULT
+    0,
+    PRIMARY
+    KEY
+(
+    "id"
+)
+    ) COMMENT '好卡案例';
+
